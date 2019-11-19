@@ -1,0 +1,10 @@
+coverage/
+node_modules/
+.dockerignore
+.eslintignore
+.git/
+.gitignore
+Dockerfile
+LICENSE
+README.md
+.circleci/

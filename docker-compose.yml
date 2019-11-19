@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  mojaloop-testing-toolkit:
+    build:
+      context: .
+      target: builder
+    container_name: mojaloop-testing-toolkit-int
+    ports:
+      - "3000:3000"
+    command:
+      - sh
+      - -c
+      - "npm start"
