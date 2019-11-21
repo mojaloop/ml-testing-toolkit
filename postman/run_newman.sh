@@ -1,2 +1,2 @@
-sed -i -e 's/localhost/host.docker.internal/g' Mojaloop-PDP-Testing-Tool.postman_environment.json
-newman run --delay-request=10  --environment='Mojaloop-PDP-Testing-Tool.postman_environment.json' 'Mojaloop-PDP-Testing-Tool.postman_collection.json'
+sed -i -e 's/localhost/host.docker.internal/g' mojaloop-pdp-testing-tool.postman_environment.json
+newman run --delay-request=10  --environment='mojaloop-pdp-testing-tool.postman_environment.json' 'mojaloop-pdp-testing-tool.postman_collection.json'
