@@ -64,7 +64,6 @@ module.exports.handleRequest = (req, h) => {
         value: item.minorVersion + ''
       }
     })
-    req.plugins.kumar = 'nitya'
     return h.response(errorResponseBuilder('3001', 'The Client requested an unsupported version, see exten- sion list for supported version(s).', { extensionList })).code(406)
   }
   req.plugins.negotiatedContentType = versionNegotiationResult.responseContentTypeHeader

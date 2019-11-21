@@ -29,13 +29,13 @@
  ******/
 const RC = require('parse-strings-in-object')(require('rc')('ALS', require('../../config/default.json')))
 
-const getOrDefault = (value, defaultValue) => {
-  if (value === undefined) {
-    return defaultValue
-  }
+// const getOrDefault = (value, defaultValue) => {
+//   if (value === undefined) {
+//     return defaultValue
+//   }
 
-  return value
-}
+//   return value
+// }
 
 module.exports = {
   API_PORT: RC.API_PORT,

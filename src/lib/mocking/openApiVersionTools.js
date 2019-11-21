@@ -92,3 +92,5 @@ const parseAcceptHeader = (acceptHeader) => {
     minorVersion
   }
 }
+
+module.exports.parseAcceptHeader = parseAcceptHeader

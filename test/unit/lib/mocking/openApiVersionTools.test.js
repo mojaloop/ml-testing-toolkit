@@ -5,6 +5,82 @@ const OpenApiVersionTools = require('../../../../src/lib/mocking/openApiVersionT
 let sampleAPIsArray
 
 describe('OpenApiVersionTools', () => {
+  describe('parseAcceptHeader', () => {
+    it('Result must contain the required properties', async () => {
+      const result = OpenApiVersionTools.parseAcceptHeader('application/vnd.interoperability.resource+json;version=2.0')
+      expect(result).toHaveProperty('resource')
+      expect(result).toHaveProperty('majorVersion')
+      expect(result).toHaveProperty('minorVersion')
+    })
+
+    it('Full String', async () => {
+      const result = OpenApiVersionTools.parseAcceptHeader('application/vnd.interoperability.resource+json;version=2.0')
+      expect(result.resource).toBe('resource')
+      expect(result.majorVersion).toBe(2)
+      expect(result.minorVersion).toBe(0)
+    })
+    it('With multidigit version numbers', async () => {
+      const result = OpenApiVersionTools.parseAcceptHeader('application/vnd.interoperability.resource+json;version=254.2430')
+      expect(result.resource).toBe('resource')
+      expect(result.majorVersion).toBe(254)
+      expect(result.minorVersion).toBe(2430)
+    })
+    it('Without Minor Version', async () => {
+      const result = OpenApiVersionTools.parseAcceptHeader('application/vnd.interoperability.resource+json;version=2')
+      expect(result.resource).toBe('resource')
+      expect(result.majorVersion).toBe(2)
+      expect(result.minorVersion).toBeFalsy()
+    })
+    it('Without version value', async () => {
+      const result = OpenApiVersionTools.parseAcceptHeader('application/vnd.interoperability.resource+json;version=')
+      expect(result.resource).toBe('resource')
+      expect(result.majorVersion).toBeFalsy()
+      expect(result.minorVersion).toBeFalsy()
+    })
+    it('Without version param', async () => {
+      const result = OpenApiVersionTools.parseAcceptHeader('application/vnd.interoperability.resource+json;')
+      expect(result.resource).toBe('resource')
+      expect(result.majorVersion).toBeFalsy()
+      expect(result.minorVersion).toBeFalsy()
+    })
+    it('Without semicolon at the end', async () => {
+      const result = OpenApiVersionTools.parseAcceptHeader('application/vnd.interoperability.resource+json')
+      expect(result.resource).toBe('resource')
+      expect(result.majorVersion).toBeFalsy()
+      expect(result.minorVersion).toBeFalsy()
+    })
+    it('Without exchange format and version number', async () => {
+      const result = OpenApiVersionTools.parseAcceptHeader('application/vnd.interoperability.resource')
+      expect(result.resource).toBe('resource')
+      expect(result.majorVersion).toBeFalsy()
+      expect(result.minorVersion).toBeFalsy()
+    })
+    it('Without exchange format and with version number', async () => {
+      const result = OpenApiVersionTools.parseAcceptHeader('application/vnd.interoperability.resource;version=2.0')
+      expect(result.resource).toBe('resource')
+      expect(result.majorVersion).toBe(2)
+      expect(result.minorVersion).toBe(0)
+    })
+    it('With wildcard resource type', async () => {
+      const result = OpenApiVersionTools.parseAcceptHeader('application/vnd.interoperability.*+json;version=2.0')
+      expect(result.resource).toBe('*')
+      expect(result.majorVersion).toBe(2)
+      expect(result.minorVersion).toBe(0)
+    })
+    it('With wildcard resource type and without exchange format', async () => {
+      const result = OpenApiVersionTools.parseAcceptHeader('application/vnd.interoperability.*;version=2.0')
+      expect(result.resource).toBe('*')
+      expect(result.majorVersion).toBe(2)
+      expect(result.minorVersion).toBe(0)
+    })
+    it('With wildcard resource type and without any trailing string after that', async () => {
+      const result = OpenApiVersionTools.parseAcceptHeader('application/vnd.interoperability.*')
+      expect(result.resource).toBe('*')
+      expect(result.majorVersion).toBeFalsy()
+      expect(result.minorVersion).toBeFalsy()
+    })
+  })
+
   describe('validateAcceptHeader', () => {
     it('Result must contain the required properties', async () => {
       const result = OpenApiVersionTools.validateAcceptHeader('')

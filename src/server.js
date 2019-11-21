@@ -96,7 +96,7 @@ const createServer = async (port) => {
       type: 'onPreResponse',
       method: (request, h) => {
         if (request.plugins.negotiatedContentType) {
-          request.response.header('content-type', request.plugins.negotiatedContentType);
+          request.response.header('content-type', request.plugins.negotiatedContentType)
         }
         return h.continue
       }
