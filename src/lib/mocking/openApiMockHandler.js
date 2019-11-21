@@ -30,7 +30,25 @@ module.exports.initilizeMockHandler = async () => {
           const { status, mock } = context.api.mockResponseForOperation(context.operation.operationId)
           return h.response(mock).code(status)
         },
-        validationFail: async (context, req, h) => h.response({ err: context.validation.errors }).code(400),
+        validationFail: async (context, req, h) => {
+          const extensionList = [
+            {
+              key: 'keyword',
+              value: context.validation.errors[0].keyword
+            },
+            {
+              key: 'dataPath',
+              value: context.validation.errors[0].dataPath
+            }
+          ]
+          for (const [key, value] of Object.entries(context.validation.errors[0].params)) {
+            extensionList.push({
+              key,
+              value
+            })
+          }
+          return h.response(errorResponseBuilder('3100', context.validation.errors[0].message, { extensionList })).code(400)
+        },
         notFound: async (context, req, h) => h.response({ context, err: 'not found' }).code(404)
       }
     })
@@ -51,7 +69,7 @@ module.exports.handleRequest = (req, h) => {
   // Validate the accept header here
   const acceptHeaderValidationResult = OpenApiVersionTools.validateAcceptHeader(req.headers.accept)
   if (acceptHeaderValidationResult.validationFailed) {
-    return h.response(errorResponseBuilder(3001, acceptHeaderValidationResult.message)).code(400)
+    return h.response(errorResponseBuilder('3001', acceptHeaderValidationResult.message)).code(400)
   }
 
   // Pick the right API object based on the major and minor versions (Version negotiation as per the API Definition file)
