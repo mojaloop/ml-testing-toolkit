@@ -2,6 +2,7 @@ version: "3.7"
 
 services:
   mojaloop-testing-toolkit:
+    image: mojaloop-testing-toolkit:local
     build:
       context: .
       target: builder
@@ -12,3 +13,11 @@ services:
       - sh
       - -c
       - "npm start"
+  mojaloop-testing-toolkit-postman:
+    image: mojaloop-testing-toolkit-postman:local
+    build:
+      context: .
+      dockerfile: Dockerfile-newman
+    container_name: mojaloop-testing-toolkit-postman
+    depends_on:
+      - mojaloop-testing-toolkit

@@ -1,0 +1,9 @@
+FROM node:10.15.3-alpine
+
+WORKDIR /opt/postman
+
+COPY ./postman /opt/postman/
+
+RUN npm install -g newman
+
+CMD ["sh", "run_newman.sh"]
