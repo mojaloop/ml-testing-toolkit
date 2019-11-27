@@ -1,8 +1,12 @@
 FROM node:10.15.3-alpine
 
+RUN apk add --no-cache -t dos2unix
+
 WORKDIR /opt/postman
 
 COPY ./postman /opt/postman/
+
+RUN dos2unix /opt/postman/run_newman.sh
 
 RUN npm install -g newman
 
