@@ -69,3 +69,6 @@ typings/
 # VSCode directory
 .vscode
 jsconfig.json
+
+# Executables from pkg if any
+*.exe

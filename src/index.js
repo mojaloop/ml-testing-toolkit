@@ -18,7 +18,7 @@
  * Gates Foundation
 
  * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
-
+ * Vijay Kumar Guthi <vijaya.guthi@modusbox.com>
  --------------
  ******/
 // TODO: Implement a logger and log the messages with different verbosity
@@ -26,36 +26,9 @@
 'use strict'
 
 const Server = require('./server')
-const PJson = require('../package.json')
-const { Command } = require('commander')
 const Config = require('./lib/config')
-// const Logger = require('@mojaloop/central-services-logger')
-const argv = require('./lib/argv').getArgs()
 
-const Program = new Command()
-
-Program
-  .version(PJson.version)
-  .description('CLI to manage Servers')
-
-Program.command('server') // sub-command name, coffeeType = type, required
-  .alias('s') // alternative sub-command is `o`
-  .description('Start the Self Testing Tool.') // command description
-  // .option('--api', 'Start the api server')
-  // .option('--admin', 'Start the admin server')
-
-  // function to execute
-  .action(async (args) => {
-    const optionsApi = {
-      port: Config.API_PORT
-    }
-    module.exports = Server.initialize(optionsApi.port)
-  })
-
-if (Array.isArray(argv) && argv.length > 1) {
-  // parse command line vars
-  Program.parse(argv)
-} else {
-  // display default help
-  Program.help()
+const optionsApi = {
+  port: Config.API_PORT
 }
+module.exports = Server.initialize(optionsApi.port)

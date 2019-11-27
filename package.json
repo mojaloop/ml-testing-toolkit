@@ -13,6 +13,7 @@
   },
   "bugs": "https://github.com/mojaloop/ml-self-testing-toolkit/issues",
   "config": {},
+  "bin": "src/index.js",
   "standard": {
     "env": [
       "jest"
@@ -24,9 +25,9 @@
     "test"
   ],
   "scripts": {
-    "start": "node src/index.js server",
+    "start": "node src/index.js",
     "standard": "standard",
-    "dev": "nodemon src/index.js server",
+    "dev": "nodemon src/index.js",
     "test": "npm run test:unit",
     "test:unit": "jest --testMatch '**/test/unit/**/*.test.js'",
     "test:int": "jest --reporters=default --reporters=jest-junit --testMatch '**/test/integration/**/*.test.js'",
@@ -42,7 +43,8 @@
     "audit:resolve": "SHELL=sh resolve-audit",
     "audit:check": "SHELL=sh check-audit",
     "dep:check": "npx ncu -e 2",
-    "dep:update": "npx ncu -u"
+    "dep:update": "npx ncu -u",
+    "genexec": "pkg -t node8-win ."
   },
   "dependencies": {
     "@hapi/basic": "5.1.1",
