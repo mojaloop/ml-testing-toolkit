@@ -1,4 +1,4 @@
-// TODO: Implement a logger and log the messages with different verbosity
+const customLogger = require('../requestLogger')
 
 const acceptHeaderRE = new RegExp('^application/vnd.interoperability\\.([a-zA-Z0-9\\*]+)?(\\+json)?(;)?(version=(([0-9]+)(\\.([0-9]+))?)?)?$')
 
@@ -69,7 +69,7 @@ module.exports.negotiateVersion = (acceptHeader, apis) => {
       '.' + apis[negotiatedIndex].minorVersion
     }
   }
-
+  customLogger.logMessage('info', negotiationFailed ? 'Version negotiation failed for the Accept header ' + acceptHeader : 'OK')
   return {
     negotiationFailed: negotiationFailed,
     message: negotiationFailed ? 'Version negotiation failed for the Accept header ' + acceptHeader : 'OK',

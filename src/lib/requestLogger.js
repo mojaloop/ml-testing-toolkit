@@ -24,9 +24,10 @@
 
 'use strict'
 
-const Util = require('util')
+// const Util = require('util')
 var bunyan = require('bunyan')
 var Logger = bunyan.createLogger({ name: 'ml-self-testing-toolkit' })
+const notificationEmitter = require('./notificationEmitter.js')
 
 const logRequest = function (request) {
   let logMessage = `Request: ${request.method} ${request.path}`
@@ -35,7 +36,7 @@ const logRequest = function (request) {
   }
   const logObject = {
     request: {
-      headers: request.headers,    
+      headers: request.headers,
       body: request.payload
     }
   }
@@ -49,11 +50,20 @@ const logResponse = function (request) {
         body: request.response.source
       }
     }
-    Logger.info(logObject, `Response: ${request.method} ${request.path} Status: ${request.response.statusCode}`)
+    const logMessage = `Response: ${request.method} ${request.path} Status: ${request.response.statusCode}`
+    Logger.info(logObject, logMessage)
+    notificationEmitter.broadcastLog({ message: logMessage })
   }
+}
+
+const logMessage = (verbosity, message) => {
+  // TODO: Implementation of verbosity argument
+  Logger.info(message)
+  notificationEmitter.broadcastLog({ message: message })
 }
 
 module.exports = {
   logRequest,
-  logResponse
+  logResponse,
+  logMessage
 }
