@@ -24,30 +24,32 @@
 
 'use strict'
 
-const Logger = require('@mojaloop/central-services-logger')
 const Util = require('util')
+var bunyan = require('bunyan')
+var Logger = bunyan.createLogger({ name: 'ml-self-testing-toolkit' })
 
 const logRequest = function (request) {
-  Logger.debug(`ALS-Trace - Method: ${request.method} Path: ${request.url.path} Query: ${JSON.stringify(request.query)}`)
-  Logger.debug(`ALS-Trace - Headers: ${JSON.stringify(request.headers)}`)
+  let logMessage = `Request: ${request.method} ${request.path}`
   if (request.body) {
-    Logger.debug(`ALS-Trace - Body: ${request.body}`)
+    logMessage += ` Body: ${request.body}`
   }
+  const logObject = {
+    request: {
+      headers: request.headers,    
+      body: request.payload
+    }
+  }
+  Logger.info(logObject, logMessage)
 }
 
 const logResponse = function (request) {
   if (request.response) {
-    let response
-    try {
-      response = JSON.stringify(request.response.source)
-    } catch (e) {
-      response = Util.inspect(request.response.source)
+    const logObject = {
+      response: {
+        body: request.response.source
+      }
     }
-    if (!response) {
-      Logger.info(`ALS-Trace - Response: ${request.response}`)
-    } else {
-      Logger.info(`ALS-Trace - Response: ${response} Status: ${request.response.statusCode}`)
-    }
+    Logger.info(logObject, `Response: ${request.method} ${request.path} Status: ${request.response.statusCode}`)
   }
 }
 

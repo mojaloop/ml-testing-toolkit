@@ -31,7 +31,7 @@ const Hapi = require('@hapi/hapi')
 // const Path = require('path')
 const Config = require('./lib/config.js')
 // const Plugins = require('./plugins')
-// const RequestLogger = require('./lib/requestLogger')
+const RequestLogger = require('./lib/requestLogger')
 const OpenApiMockHandler = require('./lib/mocking/openApiMockHandler')
 
 // const openAPIOptions = {
@@ -93,8 +93,16 @@ const createServer = async (port) => {
 
   await server.ext([
     {
+      type: 'onPreHandler',
+      method: (request, h) => {
+        RequestLogger.logRequest(request)
+        return h.continue
+      }
+    },   
+    {
       type: 'onPreResponse',
       method: (request, h) => {
+        RequestLogger.logResponse(request)
         if (request.plugins.negotiatedContentType) {
           request.response.header('content-type', request.plugins.negotiatedContentType)
         }

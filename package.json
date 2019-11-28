@@ -55,6 +55,7 @@
     "@hapi/vision": "5.5.4",
     "@now-ims/hapi-now-auth": "2.0.0",
     "blipp": "4.0.1",
+    "bunyan": "^1.8.12",
     "commander": "4.0.0",
     "docdash": "1.1.1",
     "hapi-auth-bearer-token": "^6.1.2",
