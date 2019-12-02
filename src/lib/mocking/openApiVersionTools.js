@@ -4,7 +4,9 @@ const acceptHeaderRE = new RegExp('^application/vnd.interoperability\\.([a-zA-Z0
 
 module.exports.validateAcceptHeader = (acceptHeader) => {
   const validationFailed = !acceptHeaderRE.test(acceptHeader)
-
+  if(validationFailed) {
+    customLogger.logMessage('debug', 'Invalid accept header ' + acceptHeader)
+  }
   return {
     validationFailed: validationFailed,
     message: validationFailed ? 'Unknown Accept header format' : 'OK'
@@ -69,7 +71,7 @@ module.exports.negotiateVersion = (acceptHeader, apis) => {
       '.' + apis[negotiatedIndex].minorVersion
     }
   }
-  customLogger.logMessage('info', negotiationFailed ? 'Version negotiation failed for the Accept header ' + acceptHeader : 'OK')
+  customLogger.logMessage('debug', negotiationFailed ? 'Version negotiation failed for the Accept header ' + acceptHeader : 'Version negotiation succeeded, picked up the version ' + apis[negotiatedIndex].majorVersion + '.' + apis[negotiatedIndex].minorVersion)
   return {
     negotiationFailed: negotiationFailed,
     message: negotiationFailed ? 'Version negotiation failed for the Accept header ' + acceptHeader : 'OK',

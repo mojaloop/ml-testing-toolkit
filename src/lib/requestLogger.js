@@ -26,7 +26,7 @@
 
 // const Util = require('util')
 var bunyan = require('bunyan')
-var Logger = bunyan.createLogger({ name: 'ml-self-testing-toolkit' })
+var Logger = bunyan.createLogger({ name: 'ml-self-testing-toolkit', level: 'debug' })
 const notificationEmitter = require('./notificationEmitter.js')
 
 const logRequest = function (request) {
@@ -41,6 +41,7 @@ const logRequest = function (request) {
     }
   }
   Logger.info(logObject, logMessage)
+  notificationEmitter.broadcastLog({ message: logMessage, additionalData: logObject })
 }
 
 const logResponse = function (request) {
@@ -52,14 +53,29 @@ const logResponse = function (request) {
     }
     const logMessage = `Response: ${request.method} ${request.path} Status: ${request.response.statusCode}`
     Logger.info(logObject, logMessage)
-    notificationEmitter.broadcastLog({ message: logMessage })
+    notificationEmitter.broadcastLog({ message: logMessage, additionalData: logObject })
   }
 }
 
-const logMessage = (verbosity, message) => {
-  // TODO: Implementation of verbosity argument
-  Logger.info(message)
-  notificationEmitter.broadcastLog({ message: message })
+const logMessage = (verbosity, message, notification = true) => {
+  switch (verbosity) {
+    case 'debug':
+      Logger.debug(message)
+      break
+    case 'warn':
+      Logger.warn(message)
+      break
+    case 'error':
+      Logger.error(message)
+      break
+    case 'info':
+    default:
+      Logger.info(message)
+  }
+
+  if (notification) {
+    notificationEmitter.broadcastLog({ message: message })
+  }
 }
 
 module.exports = {

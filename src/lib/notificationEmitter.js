@@ -16,11 +16,14 @@ const io = require('socket.io')(http)
 
 const startServer = port => {
   http.listen(port)
-  console.log('Socket Server started on port :' + port);
+  console.log('Socket Server started on port :' + port)
 }
 
 const broadcastLog = log => {
-  io.emit("newLog", log)
+  io.emit('newLog', {
+    logTime: new Date(),
+    ...log
+  })
 }
 
 module.exports = {

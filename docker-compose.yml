@@ -6,7 +6,7 @@ services:
     build:
       context: .
       target: builder
-    container_name: mojaloop-testing-toolkit-int
+    container_name: mojaloop-testing-toolkit
     ports:
       - "3000:3000"
     command:
