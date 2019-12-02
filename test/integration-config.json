@@ -1,0 +1,6 @@
+{
+  "TEST_TOOLKIT_HOST":"mojaloop-testing-toolkit",
+  "API_PORT": 3000,
+  "DISPLAY_ROUTES": true,
+  "SWITCH_ENDPOINT": "http://localhost:3001"
+}
