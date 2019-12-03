@@ -41,7 +41,7 @@ const logRequest = function (request) {
     }
   }
   Logger.info(logObject, logMessage)
-  notificationEmitter.broadcastLog({ message: logMessage, additionalData: logObject })
+  notificationEmitter.broadcastLog({ messageType: 'request', verbosity: 'info', message: logMessage, additionalData: logObject })
 }
 
 const logResponse = function (request) {
@@ -53,7 +53,7 @@ const logResponse = function (request) {
     }
     const logMessage = `Response: ${request.method} ${request.path} Status: ${request.response.statusCode}`
     Logger.info(logObject, logMessage)
-    notificationEmitter.broadcastLog({ message: logMessage, additionalData: logObject })
+    notificationEmitter.broadcastLog({ messageType: 'response', verbosity: 'info', message: logMessage, additionalData: logObject })
   }
 }
 
@@ -74,7 +74,7 @@ const logMessage = (verbosity, message, notification = true) => {
   }
 
   if (notification) {
-    notificationEmitter.broadcastLog({ message: message })
+    notificationEmitter.broadcastLog({ messageType: 'generic', verbosity, message: message })
   }
 }
 
