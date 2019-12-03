@@ -9,6 +9,7 @@ services:
     container_name: mojaloop-testing-toolkit
     ports:
       - "3000:3000"
+      - "4444:4444"
     command:
       - sh
       - -c

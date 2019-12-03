@@ -1,4 +1,6 @@
-const app = require('express')()
+const path = require('path')
+const express = require('express')
+const app = express()
 const http = require('http').Server(app)
 const io = require('socket.io')(http)
 
@@ -15,6 +17,13 @@ const io = require('socket.io')(http)
 // });
 
 const startServer = port => {
+  // For front-end UI
+  app.use('/ui', express.static(path.join('client/build')))
+
+  app.get('*', (req, res) => {
+    res.sendFile(process.cwd() + '/client/build/index.html')
+  })
+
   http.listen(port)
   console.log('Socket Server started on port :' + port)
 }

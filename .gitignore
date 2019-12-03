@@ -72,3 +72,6 @@ jsconfig.json
 
 # Executables from pkg if any
 *.exe
+
+# React based client
+client/
