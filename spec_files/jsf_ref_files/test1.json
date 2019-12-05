@@ -10,5 +10,45 @@
   {
     "id": "transferState",
     "pattern": "COMMITTED|COMPLETED|ABORTED"
+  },
+  {
+    "id": "fulfilment",
+    "pattern": "[A-Fa-f0-9]{64}"
+  },
+  {
+    "id": "transferAmount.properties.currency",
+    "pattern": "USD"
+  },
+  {
+    "id": "transferAmount.properties.amount",
+    "pattern": "123"
+  },
+  {
+    "id": "payeeReceiveAmount.properties.currency",
+    "pattern": "USD"
+  },
+  {
+    "id": "payeeReceiveAmount.properties.amount",
+    "pattern": "123"
+  },
+  {
+    "id": "payeeFspFee.properties.currency",
+    "pattern": "USD"
+  },
+  {
+    "id": "payeeFspFee.properties.amount",
+    "pattern": "123"
+  },
+  {
+    "id": "payeeFspCommission.properties.currency",
+    "pattern": "USD"
+  },
+  {
+    "id": "payeeFspCommission.properties.amount",
+    "pattern": "123"
+  },
+  {
+    "id": "expiration",
+    "format": "date-time"
   }
 ]

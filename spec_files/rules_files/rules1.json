@@ -1,0 +1,36 @@
+[
+  {
+    "ruleId": 1,
+    "description": "Returns an NDC exceeded error response (ML error 4001) from the simulator when transfer value is 123 in any currency",
+    "conditions": {
+      "all": [
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "POST"
+        },
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "123",
+          "path": ".amount"
+        }
+      ]
+    },
+    "event": {
+      "type": "simulateError",
+      "params": {
+        "statusCode": 500,
+        "body": {
+          "statusCode": "4001",
+          "message": "Payer FSP insufficient liquidity"
+        }
+      }
+    }
+  }
+]

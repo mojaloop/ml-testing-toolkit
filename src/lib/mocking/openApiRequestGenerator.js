@@ -102,9 +102,12 @@ const findRequestSchema = (r) => {
 
 const generateMockOperation = async (method, name, data, jsfRefs) => {
   const requestSchema = findRequestSchema(data.requestBody)
+  console.log('GVK', requestSchema.properties)
+
   jsfRefs.forEach(ref => {
-    if (requestSchema.properties[ref.id]) {
-      requestSchema.properties[ref.id].$ref = ref.id
+    const targetObject = _.get(requestSchema.properties, ref.id)
+    if (targetObject) {
+      targetObject.$ref = ref.id
     }
   })
 
