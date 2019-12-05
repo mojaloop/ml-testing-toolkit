@@ -8,7 +8,7 @@ var path = require('path')
 
 var apis = []
 
-const specFilePathPrefix = 'spec_files/'
+const specFilePathPrefix = 'spec_files/openapi_spec_files/'
 
 // TODO: Implement a logger and log the messages with different verbosity
 // TODO: Write unit tests
