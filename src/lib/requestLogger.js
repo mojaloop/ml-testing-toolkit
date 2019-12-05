@@ -57,10 +57,10 @@ const logResponse = function (request) {
   }
 }
 
-const logMessage = (verbosity, message, notification = true) => {
+const logMessage = (verbosity, message, additionalData = null, notification = true) => {
   switch (verbosity) {
     case 'debug':
-      Logger.debug(message)
+      Logger.debug(additionalData, message)
       break
     case 'warn':
       Logger.warn(message)
@@ -74,7 +74,7 @@ const logMessage = (verbosity, message, notification = true) => {
   }
 
   if (notification) {
-    notificationEmitter.broadcastLog({ messageType: 'generic', verbosity, message: message })
+    notificationEmitter.broadcastLog({ messageType: 'generic', verbosity, message: message, additionalData })
   }
 }
 

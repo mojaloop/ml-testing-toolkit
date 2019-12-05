@@ -3,12 +3,19 @@
 const OpenApiBackend = require('openapi-backend').default
 const OpenApiDefinitionsModel = require('./openApiDefinitionsModel')
 const OpenApiVersionTools = require('./openApiVersionTools')
+const customLogger = require('../requestLogger')
+const fs = require('fs')
+const { promisify } = require('util')
+
+const readFileAsync = promisify(fs.readFile)
 
 var path = require('path')
 
 var apis = []
 
 const specFilePathPrefix = 'spec_files/openapi_spec_files/'
+const callbackMapFilePathPrefix = 'spec_files/callback_map_files/'
+const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
 
 // TODO: Implement a logger and log the messages with different verbosity
 // TODO: Write unit tests
@@ -27,7 +34,38 @@ module.exports.initilizeMockHandler = async () => {
       strict: false,
       handlers: {
         notImplemented: async (context, req, h) => {
+
+          // Generate mock response from openAPI spec file
           const { status, mock } = context.api.mockResponseForOperation(context.operation.operationId)
+
+          // Verify that it is a success code, then only generate callback
+          if (status > 200 && status < 299) {
+            // Testing: generate mock callback and log it for now
+            setImmediate(async () => {
+              // Check for the http method and define appropriate callback method and path
+              const cbMapRawdata = await readFileAsync(callbackMapFilePathPrefix + item.callbackMapFile)
+              const callbackMap = JSON.parse(cbMapRawdata)
+              if (!callbackMap[context.operation.path]) {
+                customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path)
+              }
+              if (!callbackMap[context.operation.path][context.request.method]) {
+                customLogger.logMessage('error', 'Callback not found for method in callback map file for ' + context.request.method)
+              }
+              const callbackMethod = callbackMap[context.operation.path][context.request.method].method
+              const callbackPath = callbackMap[context.operation.path][context.request.method].path
+
+              if (callbackMethod) {                
+                const callbackGenerator = new (require('./openApiRequestGenerator'))(path.join(specFilePathPrefix + item.specFile))
+                const rawdata = await readFileAsync(jsfRefFilePathPrefix + 'test1.json')
+                const jsfRefs1 = JSON.parse(rawdata)
+                const generatedCallback = await callbackGenerator.generateRequestBody(callbackPath, callbackMethod, jsfRefs1)
+                customLogger.logMessage('debug', 'Generated callback body', generatedCallback)
+                // customLogger.logMessage('debug', context.operation.path)
+                // customLogger.logMessage('debug', context.request.method)
+              }
+            })
+          }
+
           return h.response(mock).code(status)
         },
         validationFail: async (context, req, h) => {

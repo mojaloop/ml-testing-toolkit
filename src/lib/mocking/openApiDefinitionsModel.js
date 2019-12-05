@@ -11,7 +11,8 @@ module.exports.getApiDefinitions = async () => {
       return {
         minorVersion: +item.version.split('.')[1],
         majorVersion: +item.version.split('.')[0],
-        specFile: item.spec_file
+        specFile: item.spec_file,
+        callbackMapFile: item.callback_map_file
       }
     })
   }

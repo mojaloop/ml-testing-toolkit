@@ -1,0 +1,14 @@
+[
+  { 
+    "id": "transferId",
+    "faker": "internet.email"
+  },
+  {
+    "id": "completedTimestamp",
+    "format": "date-time"
+  },
+  {
+    "id": "transferState",
+    "pattern": "COMMITTED|COMPLETED|ABORTED"
+  }
+]
