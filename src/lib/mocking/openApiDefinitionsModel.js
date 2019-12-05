@@ -4,6 +4,7 @@
 const Config = require('../config.js')
 
 var apiDefinitions = null
+const specFilePrefix = 'spec_files/fspiop_versions/'
 
 module.exports.getApiDefinitions = async () => {
   if (!apiDefinitions) {
@@ -11,8 +12,8 @@ module.exports.getApiDefinitions = async () => {
       return {
         minorVersion: +item.version.split('.')[1],
         majorVersion: +item.version.split('.')[0],
-        specFile: item.spec_file,
-        callbackMapFile: item.callback_map_file
+        specFile: specFilePrefix + item.version + '/api_spec.yaml',
+        callbackMapFile: specFilePrefix + item.version + '/callback_map.json'
       }
     })
   }

@@ -7,14 +7,10 @@
   },
   "FSPIOP_API_DEFINITIONS": [
     {
-      "version": "1.0",
-      "spec_file": "fspiop_v1.0.yaml",
-      "callback_map_file": "map1.json"
+      "version": "1.0"
     },
     {
-      "version": "1.1",
-      "spec_file": "fspiop_v1.1.yaml",
-      "callback_map_file": "map1.json"
+      "version": "1.1"
     }
   ]
 }

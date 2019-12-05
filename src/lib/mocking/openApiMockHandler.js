@@ -13,8 +13,6 @@ var path = require('path')
 
 var apis = []
 
-const specFilePathPrefix = 'spec_files/openapi_spec_files/'
-const callbackMapFilePathPrefix = 'spec_files/callback_map_files/'
 const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
 
 // TODO: Implement a logger and log the messages with different verbosity
@@ -30,7 +28,7 @@ module.exports.initilizeMockHandler = async () => {
   // Create create openApiBackend objects for all the api definitions
   apis = apiDefinitions.map(item => {
     const tempObj = new OpenApiBackend({
-      definition: path.join(specFilePathPrefix + item.specFile),
+      definition: path.join(item.specFile),
       strict: false,
       handlers: {
         notImplemented: async (context, req, h) => {
@@ -43,7 +41,7 @@ module.exports.initilizeMockHandler = async () => {
             // Testing: generate mock callback and log it for now
             setImmediate(async () => {
               // Check for the http method and define appropriate callback method and path
-              const cbMapRawdata = await readFileAsync(callbackMapFilePathPrefix + item.callbackMapFile)
+              const cbMapRawdata = await readFileAsync(item.callbackMapFile)
               const callbackMap = JSON.parse(cbMapRawdata)
               if (!callbackMap[context.operation.path]) {
                 customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path)
@@ -55,7 +53,7 @@ module.exports.initilizeMockHandler = async () => {
               const callbackPath = callbackMap[context.operation.path][context.request.method].path
 
               if (callbackMethod) {                
-                const callbackGenerator = new (require('./openApiRequestGenerator'))(path.join(specFilePathPrefix + item.specFile))
+                const callbackGenerator = new (require('./openApiRequestGenerator'))(path.join(item.specFile))
                 const rawdata = await readFileAsync(jsfRefFilePathPrefix + 'test1.json')
                 const jsfRefs1 = JSON.parse(rawdata)
                 const generatedCallback = await callbackGenerator.generateRequestBody(callbackPath, callbackMethod, jsfRefs1)

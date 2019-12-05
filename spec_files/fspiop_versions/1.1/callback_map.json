@@ -1,0 +1,20 @@
+{
+  "/transfers": {
+    "post": {
+      "method": "put",
+      "path": "/transfers/{ID}"
+    }
+  },
+  "/quotes": {
+    "post": {
+      "method": "put",
+      "path": "/quotes/{ID}"
+    }
+  },
+  "/parties/{Type}/{ID}": {
+    "get": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}"
+    }
+  }
+}
