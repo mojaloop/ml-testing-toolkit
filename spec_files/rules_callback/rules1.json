@@ -23,7 +23,7 @@
       ]
     },
     "event": {
-      "type": "simulateError",
+      "type": "successMockResponse",
       "params": {
         "statusCode": 500,
         "body": {

@@ -6,6 +6,7 @@ const OpenApiVersionTools = require('./openApiVersionTools')
 const customLogger = require('../requestLogger')
 const fs = require('fs')
 const { promisify } = require('util')
+const RulesEngine = require('./openApiRulesEngine')
 
 const readFileAsync = promisify(fs.readFile)
 
@@ -14,6 +15,7 @@ var path = require('path')
 var apis = []
 
 const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
+const rulesRespFilePathPrefix = 'spec_files/rules_response/'
 
 // TODO: Implement a logger and log the messages with different verbosity
 // TODO: Write unit tests
@@ -32,12 +34,45 @@ module.exports.initilizeMockHandler = async () => {
       strict: false,
       handlers: {
         notImplemented: async (context, req, h) => {
+          customLogger.logMessage('debug', 'Schema Validation Passed')
+
+          // After schema validation passed we are running additional validation based on the Json Rules Engine
+          const rulesRespRawdata = await readFileAsync(rulesRespFilePathPrefix + 'rules1.json')
+          const rulesResp = JSON.parse(rulesRespRawdata)
+          const rulesEngine = new RulesEngine()
+          rulesEngine.loadRules(rulesResp)
+
+          const facts = {
+            path: context.operation.path,
+            body: context.request.body,
+            method: context.request.method
+          }
+
+          const res = await rulesEngine.evaluate(facts)
+          if (res) {
+            customLogger.logMessage('debug', 'Validation rules matched', res)
+            const curEvent = res[0]
+            if (curEvent.type === 'errorResponse') {
+              let status
+              let mock
+              // If the body is not supplied in the event then we will generate a mock body from the openAPI
+              if (curEvent.params.body) {
+                status = curEvent.params.statusCode
+                mock = curEvent.params.body
+              } else {
+                const mockResp = context.api.mockResponseForOperation(context.operation.operationId, { code: curEvent.params.statusCode })
+                status = mockResp.status
+                mock = mockResp.mock
+              }
+              return h.response(mock).code(status)
+            }
+          }
 
           // Generate mock response from openAPI spec file
           const { status, mock } = context.api.mockResponseForOperation(context.operation.operationId)
 
-          // Verify that it is a success code, then only generate callback
-          if (status > 200 && status < 299) {
+          // Verify that it is a success code, then generate callback
+          if (status >= 200 && status <= 299) {
             // Testing: generate mock callback and log it for now
             setImmediate(async () => {
               // Check for the http method and define appropriate callback method and path
@@ -52,7 +87,7 @@ module.exports.initilizeMockHandler = async () => {
               const callbackMethod = callbackMap[context.operation.path][context.request.method].method
               const callbackPath = callbackMap[context.operation.path][context.request.method].path
 
-              if (callbackMethod) {                
+              if (callbackMethod) {
                 const callbackGenerator = new (require('./openApiRequestGenerator'))(path.join(item.specFile))
                 const rawdata = await readFileAsync(jsfRefFilePathPrefix + 'test1.json')
                 const jsfRefs1 = JSON.parse(rawdata)

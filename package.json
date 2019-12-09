@@ -67,7 +67,7 @@
     "hapi-swagger": "10.3.0",
     "js-yaml": "^3.13.1",
     "json-ref-lite": "^1.1.0",
-    "json-rules-engine": "4.1.0",
+    "json-rules-engine": "^4.1.0",
     "json-schema-faker": "^0.5.0-rc23",
     "lodash": "^4.17.15",
     "mustache": "3.1.0",
