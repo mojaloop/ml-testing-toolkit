@@ -12,23 +12,27 @@
         {
           "fact": "method",
           "operator": "equal",
-          "value": "POST"
+          "value": "post"
         },
         {
           "fact": "body",
           "operator": "equal",
-          "value": "123",
-          "path": ".amount"
+          "value": "100",
+          "path": "amount.amount"
         }
       ]
     },
     "event": {
-      "type": "successMockResponse",
+      "type": "fixedCallback",
       "params": {
-        "statusCode": 500,
+        "method": "put",
+        "path": "/transfers/123",
+        "headers": {},
+        "delay": 2000,
         "body": {
-          "statusCode": "4001",
-          "message": "Payer FSP insufficient liquidity"
+          "transferState": "COMPLETED",
+          "fulfilment": "80DdD328d2433f0b90a93aBed7ebE4DCFA9E7ff886DdA8A1A5914C3C0aeA3eDb",
+          "completedTimestamp": "1945-11-05T06:31:37.185Z"
         }
       }
     }

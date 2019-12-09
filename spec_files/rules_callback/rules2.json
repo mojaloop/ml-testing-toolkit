@@ -1,0 +1,72 @@
+[
+  {
+    "ruleId": 1,
+    "description": "Returns an NDC exceeded error response (ML error 4001) from the simulator when transfer value is 123 in any currency",
+    "conditions": {
+      "all": [
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        },
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "100",
+          "path": "amount.amount"
+        }
+      ]
+    },
+    "event": {
+      "type": "mockCallback",
+      "params": {
+        "headers": {},
+        "delay": 0,
+        "body": {
+          "fulfilment": "this_is_sample_fulfilment_that_needs_to_be_replaced"
+        }
+      }
+    }
+  },
+  {
+    "ruleId": 2,
+    "description": "Returns an NDC exceeded error response (ML error 4001) from the simulator when transfer value is 123 in any currency",
+    "conditions": {
+      "all": [
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/quotes"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        },
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "100",
+          "path": "amount.amount"
+        }
+      ]
+    },
+    "event": {
+      "type": "mockCallback",
+      "params": {
+        "headers": {},
+        "delay": 0,
+        "body": {
+          "transferAmount": {
+            "amount": "485"
+          }
+        }
+      }
+    }
+  }
+]
