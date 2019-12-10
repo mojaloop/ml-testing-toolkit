@@ -17,18 +17,23 @@
         {
           "fact": "body",
           "operator": "equal",
-          "value": "100",
+          "value": "1",
           "path": "amount.amount"
         }
       ]
     },
     "event": {
-      "type": "MOCK_CALLBACK",
+      "type": "FIXED_ERROR_CALLBACK",
       "params": {
+        "path": "/transfers/{body.transferId}/error",
+        "method": "put",
         "headers": {},
-        "delay": 0,
+        "delay": 100,
         "body": {
-          "fulfilment": "this_is_sample_fulfilment_that_needs_to_be_replaced"
+          "errorInformation": {
+            "errorCode": "5001",
+            "errorDescription": "Sample error description"
+          }
         }
       }
     }
@@ -41,7 +46,7 @@
         {
           "fact": "path",
           "operator": "equal",
-          "value": "/quotes"
+          "value": "/transfers"
         },
         {
           "fact": "method",
@@ -51,19 +56,17 @@
         {
           "fact": "body",
           "operator": "equal",
-          "value": "100",
+          "value": "2",
           "path": "amount.amount"
         }
       ]
     },
     "event": {
-      "type": "MOCK_CALLBACK",
+      "type": "MOCK_ERROR_CALLBACK",
       "params": {
-        "headers": {},
-        "delay": 0,
         "body": {
-          "transferAmount": {
-            "amount": "485"
+          "errorInformation": {
+            "extensionList": null
           }
         }
       }

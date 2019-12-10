@@ -6,18 +6,15 @@ const OpenApiVersionTools = require('./openApiVersionTools')
 const customLogger = require('../requestLogger')
 const fs = require('fs')
 const { promisify } = require('util')
-const RulesEngine = require('./openApiRulesEngine')
-const _ = require('lodash')
+const OpenApiRulesEngine = require('./openApiRulesEngine')
+const CallbackHandler = require('../callbackHandler')
+// const _ = require('lodash')
 
 const readFileAsync = promisify(fs.readFile)
 
 var path = require('path')
 
 var apis = []
-
-const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
-const rulesRespFilePathPrefix = 'spec_files/rules_response/'
-const rulesCallbackFilePathPrefix = 'spec_files/rules_callback/'
 
 // TODO: Implement a logger and log the messages with different verbosity
 // TODO: Write unit tests
@@ -37,41 +34,7 @@ module.exports.initilizeMockHandler = async () => {
       handlers: {
         notImplemented: async (context, req, h) => {
           customLogger.logMessage('debug', 'Schema Validation Passed')
-
-          // After schema validation passed we are running additional validation based on the Json Rules Engine
-          const rulesRespRawdata = await readFileAsync(rulesRespFilePathPrefix + 'rules1.json')
-          const rulesResp = JSON.parse(rulesRespRawdata)
-          const rulesEngine = new RulesEngine()
-          rulesEngine.loadRules(rulesResp)
-
-          const facts = {
-            path: context.operation.path,
-            body: context.request.body,
-            method: context.request.method
-          }
-
-          const res = await rulesEngine.evaluate(facts)
-          if (res) {
-            customLogger.logMessage('debug', 'Validation rules matched', res)
-            const curEvent = res[0]
-            if (curEvent.type === 'errorResponse') {
-              let status
-              let mock
-              // If the body is not supplied in the event then we will generate a mock body from the openAPI
-              if (curEvent.params.body) {
-                status = curEvent.params.statusCode
-                mock = curEvent.params.body
-              } else {
-                const mockResp = context.api.mockResponseForOperation(context.operation.operationId, { code: curEvent.params.statusCode })
-                status = mockResp.status
-                mock = mockResp.mock
-              }
-
-              // TODO: Validate the genrated response against openAPI file
-              return h.response(mock).code(status)
-            }
-          }
-
+          req.customInfo.specFile = item.specFile
           // Generate mock response from openAPI spec file
           const { status, mock } = context.api.mockResponseForOperation(context.operation.operationId)
 
@@ -79,8 +42,7 @@ module.exports.initilizeMockHandler = async () => {
           if (status >= 200 && status <= 299) {
             // Generate callback asynchronously
             setImmediate(async () => {
-
-              // Check for the http method and define appropriate callback method and path
+              // Getting callback info from callback map file
               const cbMapRawdata = await readFileAsync(item.callbackMapFile)
               const callbackMap = JSON.parse(cbMapRawdata)
               if (!callbackMap[context.operation.path]) {
@@ -91,66 +53,26 @@ module.exports.initilizeMockHandler = async () => {
                 customLogger.logMessage('error', 'Callback not found for method in callback map file for ' + context.request.method)
                 return
               }
-              const callbackMethod = callbackMap[context.operation.path][context.request.method].method
-              const callbackPath = callbackMap[context.operation.path][context.request.method].path
+              const callbackInfo = callbackMap[context.operation.path][context.request.method]
+              if (!callbackInfo) {
+                customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method)
+                return
+              }
+              req.customInfo.callbackInfo = callbackInfo
 
-              if (callbackMethod) {
-                // Match the request body with callback rules to return specified callabacks
-                const rulesCallbackRawdata = await readFileAsync(rulesCallbackFilePathPrefix + 'rules2.json')
-                const rulesCallback = JSON.parse(rulesCallbackRawdata)
-                const rulesEngine = new RulesEngine()
-                rulesEngine.loadRules(rulesCallback)
+              // Additional validation based on the Json Rules Engine, send error callback on failure
+              const generatedErrorCallback = await OpenApiRulesEngine.validateRules(context, req)
+              if (generatedErrorCallback.body) {
+                // TODO: Handle method and path verifications against the generated ones
+                CallbackHandler.handleCallback(generatedErrorCallback)
+                return
+              }
 
-                const facts = {
-                  path: context.operation.path,
-                  body: context.request.body,
-                  method: context.request.method
-                }
-
-                const res = await rulesEngine.evaluate(facts)
-                const generatedCallback = {}
-                let callbackDelay = 0
-                if (res) {
-                  customLogger.logMessage('debug', 'Callback rules matched', res)
-                  const curEvent = res[0]
-                  if (curEvent.type === 'fixedCallback') {
-                    generatedCallback.method = curEvent.params.method
-                    generatedCallback.path = curEvent.params.path
-                    generatedCallback.body = curEvent.params.body
-                    generatedCallback.headers = curEvent.params.headers
-                    if (curEvent.params.delay) {
-                      callbackDelay = curEvent.params.delay
-                    }
-                  } else if (curEvent.type === 'mockCallback') {
-                    const callbackGenerator = new (require('./openApiRequestGenerator'))(path.join(item.specFile))
-                    const rawdata = await readFileAsync(jsfRefFilePathPrefix + 'test1.json')
-                    const jsfRefs1 = JSON.parse(rawdata)
-                    generatedCallback.body = await callbackGenerator.generateRequestBody(callbackPath, callbackMethod, jsfRefs1)
-                    _.merge(generatedCallback.body, curEvent.params.body)
-                    if (curEvent.params.delay) {
-                      callbackDelay = curEvent.params.delay
-                    }
-                  } else if (curEvent.type === 'errorMockCallback') {
-
-                  }
-                }
-
-                if (!generatedCallback.body) {
-                  const callbackGenerator = new (require('./openApiRequestGenerator'))(path.join(item.specFile))
-                  const rawdata = await readFileAsync(jsfRefFilePathPrefix + 'test1.json')
-                  const jsfRefs1 = JSON.parse(rawdata)
-                  generatedCallback.body = await callbackGenerator.generateRequestBody(callbackPath, callbackMethod, jsfRefs1)
-                }
-
-                // TODO: Handle method and path verifications agains the generated ones and replacement of params like ID and TYPE in path with the previous values
-
-                if (callbackDelay) {
-                  await new Promise(resolve => setTimeout(resolve, callbackDelay))
-                }
-                customLogger.logMessage('debug', 'Generated mock callback ' + callbackMethod + ' ' + callbackPath, generatedCallback.body)
-
-                // TODO: Send HTTP request via mojaRequest method in sdk-standard-components library
-
+              // Callback Rules engine - match the rules and generate the specified callback
+              const generatedCallback = await OpenApiRulesEngine.callbackRules(context, req)
+              if (generatedCallback.body) {
+                // TODO: Handle method and path verifications against the generated ones
+                CallbackHandler.handleCallback(generatedCallback)
               }
             })
           }

@@ -122,7 +122,11 @@ const generateMockOperation = async (method, name, data, jsfRefs) => {
 
 class OpenApiRequestGenerator {
   constructor (schemaPath) {
-    this.schema = loadYamlFile(schemaPath)
+    if (typeof schemaPath === 'string' || schemaPath instanceof String) {
+      this.schema = loadYamlFile(schemaPath)
+    } else {
+      this.schema = schemaPath
+    }
   }
 
   generateRequestBody (path, httpMethod, jsfRefs) {

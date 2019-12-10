@@ -33,6 +33,7 @@ const Config = require('./lib/config.js')
 // const Plugins = require('./plugins')
 const RequestLogger = require('./lib/requestLogger')
 const OpenApiMockHandler = require('./lib/mocking/openApiMockHandler')
+const UniqueIdGenerator = require('./lib/uniqueIdGenerator')
 
 // const openAPIOptions = {
 //   api: Path.resolve(__dirname, './interface/api_swagger.json'),
@@ -95,6 +96,8 @@ const createServer = async (port) => {
     {
       type: 'onPreHandler',
       method: (request, h) => {
+        request.customInfo = {}
+        request.customInfo.uniqueId = UniqueIdGenerator.generateUniqueId(request)
         RequestLogger.logRequest(request)
         return h.continue
       }

@@ -36,28 +36,30 @@ const logRequest = function (request) {
   }
   const logObject = {
     request: {
+      uniqueId: request.customInfo.uniqueId,
       headers: request.headers,
       body: request.payload
     }
   }
   Logger.info(logObject, logMessage)
-  notificationEmitter.broadcastLog({ messageType: 'request', verbosity: 'info', message: logMessage, additionalData: logObject })
+  notificationEmitter.broadcastLog({ uniqueId: request.uniqueId, messageType: 'request', verbosity: 'info', message: logMessage, additionalData: logObject })
 }
 
 const logResponse = function (request) {
   if (request.response) {
     const logObject = {
       response: {
+        uniqueId: request.customInfo.uniqueId,
         body: request.response.source
       }
     }
     const logMessage = `Response: ${request.method} ${request.path} Status: ${request.response.statusCode}`
     Logger.info(logObject, logMessage)
-    notificationEmitter.broadcastLog({ messageType: 'response', verbosity: 'info', message: logMessage, additionalData: logObject })
+    notificationEmitter.broadcastLog({ uniqueId: request.uniqueId, messageType: 'response', verbosity: 'info', message: logMessage, additionalData: logObject })
   }
 }
 
-const logMessage = (verbosity, message, additionalData = null, notification = true) => {
+const logMessage = (verbosity, message, additionalData = null, notification = true, uniqueId = null) => {
   switch (verbosity) {
     case 'debug':
       Logger.debug(additionalData, message)
@@ -74,7 +76,7 @@ const logMessage = (verbosity, message, additionalData = null, notification = tr
   }
 
   if (notification) {
-    notificationEmitter.broadcastLog({ messageType: 'generic', verbosity, message: message, additionalData })
+    notificationEmitter.broadcastLog({ uniqueId: uniqueId, messageType: 'generic', verbosity, message: message, additionalData })
   }
 }
 

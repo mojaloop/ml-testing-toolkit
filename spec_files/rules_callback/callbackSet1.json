@@ -23,12 +23,12 @@
       ]
     },
     "event": {
-      "type": "fixedCallback",
+      "type": "FIXED_CALLBACK",
       "params": {
         "method": "put",
         "path": "/transfers/123",
         "headers": {},
-        "delay": 2000,
+        "delay": 1000,
         "body": {
           "transferState": "COMPLETED",
           "fulfilment": "80DdD328d2433f0b90a93aBed7ebE4DCFA9E7ff886DdA8A1A5914C3C0aeA3eDb",

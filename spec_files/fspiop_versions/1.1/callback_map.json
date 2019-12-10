@@ -1,20 +1,38 @@
 {
   "/transfers": {
     "post": {
-      "method": "put",
-      "path": "/transfers/{ID}"
+      "successCallback": {
+        "method": "put",
+        "path": "/transfers/{ID}"
+      },
+      "errorCallback": {
+        "method": "put",
+        "path": "/transfers/{ID}/error"
+      }
     }
   },
   "/quotes": {
     "post": {
-      "method": "put",
-      "path": "/quotes/{ID}"
+      "successCallback": {
+        "method": "put",
+        "path": "/quotes/{ID}"
+      },
+      "errorCallback": {
+        "method": "put",
+        "path": "/quotes/{ID}/error"
+      }
     }
   },
   "/parties/{Type}/{ID}": {
     "get": {
-      "method": "put",
-      "path": "/parties/{Type}/{ID}"
+      "successCallback": {
+        "method": "put",
+        "path": "/parties/{Type}/{ID}"
+      },
+      "errorCallback": {
+        "method": "put",
+        "path": "/parties/{Type}/{ID}/error"
+      }
     }
   }
 }
