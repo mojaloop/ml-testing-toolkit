@@ -17,7 +17,7 @@
         {
           "fact": "body",
           "operator": "equal",
-          "value": "100",
+          "value": "77",
           "path": "amount.amount"
         }
       ]

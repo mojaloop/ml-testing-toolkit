@@ -7,7 +7,8 @@
       },
       "errorCallback": {
         "method": "put",
-        "path": "/transfers/{ID}/error"
+        "path": "/transfers/{ID}/error",
+        "pathPattern": "/transfers/{$request.body.transferId}/error"
       }
     }
   },
@@ -19,7 +20,8 @@
       },
       "errorCallback": {
         "method": "put",
-        "path": "/quotes/{ID}/error"
+        "path": "/quotes/{ID}/error",
+        "pathPattern": "/quotes/{$request.body.quoteId}/error"
       }
     }
   },
@@ -31,7 +33,8 @@
       },
       "errorCallback": {
         "method": "put",
-        "path": "/parties/{Type}/{ID}/error"
+        "path": "/parties/{Type}/{ID}/error",
+        "pathPattern": "/parties/{$request.params.Type}/{request.params.ID}/error"
       }
     }
   }

@@ -1,46 +1,7 @@
 [
   {
     "ruleId": 1,
-    "description": "Returns an NDC exceeded error response (ML error 4001) from the simulator when transfer value is 123 in any currency",
-    "conditions": {
-      "all": [
-        {
-          "fact": "path",
-          "operator": "equal",
-          "value": "/transfers"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "post"
-        },
-        {
-          "fact": "body",
-          "operator": "equal",
-          "value": "1",
-          "path": "amount.amount"
-        }
-      ]
-    },
-    "event": {
-      "type": "FIXED_ERROR_CALLBACK",
-      "params": {
-        "path": "/transfers/{body.transferId}/error",
-        "method": "put",
-        "headers": {},
-        "delay": 100,
-        "body": {
-          "errorInformation": {
-            "errorCode": "5001",
-            "errorDescription": "Sample error description"
-          }
-        }
-      }
-    }
-  },
-  {
-    "ruleId": 2,
-    "description": "Returns an NDC exceeded error response (ML error 4001) from the simulator when transfer value is 123 in any currency",
+    "description": "If the transfer amount is lessthan 5 USD, send a fixed error callback",
     "conditions": {
       "all": [
         {
@@ -62,13 +23,80 @@
       ]
     },
     "event": {
-      "type": "MOCK_ERROR_CALLBACK",
+      "type": "FIXED_ERROR_CALLBACK",
       "params": {
+        "path": "/transfers/{$request.body.transferId}/error",
+        "method": "put",
+        "headers": {},
+        "delay": 100,
         "body": {
           "errorInformation": {
-            "extensionList": null
+            "errorCode": "5001",
+            "errorDescription": "The amount is less than the required amount"
           }
         }
+      }
+    }
+  },
+  {
+    "ruleId": 2,
+    "description": "If the party lookup received for other than 9848123456, send error callback that the party is not found",
+    "conditions": {
+      "all": [
+        {
+          "fact": "path",
+          "operator": "notEqual",
+          "value": "/parties/MSISDN/9848123456"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "type": "FIXED_ERROR_CALLBACK",
+      "params": {
+        "path": "/parties/{$request.params.Type}/{$request.params.ID}/error",
+        "method": "put",
+        "headers": {},
+        "delay": 100,
+        "body": {
+          "errorInformation": {
+            "errorCode": "5001",
+            "errorDescription": "The party {$request.params.ID} is not found"
+          }
+        }
+      }
+    }
+  },
+  {
+    "ruleId": 3,
+    "description": "If the transfer request is received with the amount 100, send mock error callback",
+    "conditions": {
+      "all": [
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/quotes"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        },
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "100",
+          "path": "amount.amount"
+        }
+      ]
+    },
+    "event": {
+      "type": "MOCK_ERROR_CALLBACK",
+      "params": {
       }
     }
   }
