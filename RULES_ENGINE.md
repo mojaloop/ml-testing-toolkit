@@ -1,4 +1,5 @@
-# Rules Engine
+Rules Engine
+============
 
 Table of Contents
 =================
@@ -8,9 +9,9 @@ Table of Contents
     - [Rules File](#rules-file)
     - [Defining Conditions](#defining-conditions)
     - [Events](#events)
-      - [FIXED_ERROR_CALLBACK and FIXED_CALLBACK](#fixederrorcallback-and-fixedcallback)
+      - [FIXED_ERROR_CALLBACK and FIXED_CALLBACK](#fixed_error_callback-and-fixed_callback)
       - [Configurable parameters](#configurable-parameters)
-      - [MOCK_ERROR_CALLBACK and MOCK_CALLBACK](#mockerrorcallback-and-mockcallback)
+      - [MOCK_ERROR_CALLBACK and MOCK_CALLBACK](#mock_error_callback-and-mock_callback)
     - [Priority of rules](#priority-of-rules)
   
 This Self Testing Toolkit implemented "Rules Engine" by taking advantage of ***Json Rules Engine***.
