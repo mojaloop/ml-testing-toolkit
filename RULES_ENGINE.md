@@ -1,5 +1,18 @@
 # Rules Engine
 
+Table of Contents
+=================
+
+  - [Json Rules Engine:](#json-rules-engine)
+  - [Implementation in Self Testing Toolkit](#implementation-in-self-testing-toolkit)
+    - [Rules File](#rules-file)
+    - [Defining Conditions](#defining-conditions)
+    - [Events](#events)
+      - [FIXED_ERROR_CALLBACK and FIXED_CALLBACK](#fixederrorcallback-and-fixedcallback)
+      - [Configurable parameters](#configurable-parameters)
+      - [MOCK_ERROR_CALLBACK and MOCK_CALLBACK](#mockerrorcallback-and-mockcallback)
+    - [Priority of rules](#priority-of-rules)
+  
 This Self Testing Toolkit implemented "Rules Engine" by taking advantage of ***Json Rules Engine***.
 
 ## Json Rules Engine:
@@ -176,7 +189,7 @@ There are different type of events based on the rules engine level.
   * FIXED_CALLBACK
   * MOCK_CALLBACK
 
-#### FIXED_ERROR_CALLBACK & FIXED_CALLBACK:
+#### FIXED_ERROR_CALLBACK and FIXED_CALLBACK
 
 For FIXED_ERROR_CALLBACK & FIXED_CALLBACK, we need to supply every detail for sending callback like path, method, headers & body
 Let's look at an example of an event type *FIXED_ERROR_CALLBACK*
@@ -209,7 +222,7 @@ The following is the list of configurable parameters that you can define anywher
 * $request.headers - Http headers of the request
 
 
-#### MOCK_ERROR_CALLBACK & MOCK_CALLBACK:
+#### MOCK_ERROR_CALLBACK and MOCK_CALLBACK
 
 For MOCK_ERROR_CALLBACK & MOCK_CALLBACK, we don't need to supply the details like path, method, headers & body. The toolkit will generate the callback based on the openAPI definition file.
 
@@ -225,6 +238,27 @@ Let's look at an example of an event type *MOCK_ERROR_CALLBACK*
 That's it, the self testing toolkit can be able to generate a mock callback based on the open API file with random values. 
 
 **Also you can define the params like in fixed callbacks to override a particular value.**
+
+See the following example in which the generated values of the firstName & name will be replaced accordingly
+
+```
+"event": {
+  "type": "MOCK_ERROR_CALLBACK",
+  "params": {
+    "body": {
+      "party": {
+        "personalInfo": {
+          "complexName": {
+            "firstName": "A fixed value",
+          }
+        }
+        "name": "The party with phone number ${request.params.ID}"
+      }
+    }
+  }
+}
+
+```
 
 ### Priority of rules
 
