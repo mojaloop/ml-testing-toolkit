@@ -1,6 +1,6 @@
 # Rules Engine
 
-This Self Testing Tookit implemented "Rules Engine" by taking advantage of ***Json Rules Engine***.
+This Self Testing Toolkit implemented "Rules Engine" by taking advantage of ***Json Rules Engine***.
 
 ## Json Rules Engine:
 *"Json Rules Engine"* is a powerful, lightweight rules engine. Rules are composed of simple json structures, making them human readable and easy to persist.
@@ -9,9 +9,9 @@ Rules are composed of two components: conditions and events. Conditions are a se
 
 You can refer https://www.npmjs.com/package/json-rules-engine for further information on JRE.
 
-## Implementation in Self Testing Tookit
+## Implementation in Self Testing Toolkit
 
-The rules in self testing toookit are implemented in two levels.
+The rules in self testing toolkit are implemented at two levels.
 * One for validating the incoming request and send error callback if the validation rule matches.
 * Another for generating callbacks if the callback rule matches.
 
@@ -167,7 +167,7 @@ Let's look at an example of an event type *FIXED_ERROR_CALLBACK*
 
 You can observe the configurable parameters '\{\$request.params.Type\}' and '\{\$request.params.ID\}'. These values will be replaced with the values from the request in run time.
 
-The following is the list of configurable paramers that you can define anywhere in path, headers & body values.
+The following is the list of configurable parameters that you can define anywhere in path, headers & body values.
 * $request.params - Parameters in the request path
 * $request.body - Request body
 * $request.path - Entire request path
@@ -189,4 +189,4 @@ Let's look at an example of an event type *MOCK_ERROR_CALLBACK*
 
 That's it, the self testing toolkit can be able to generate a mock callback based on the open API file with random values. 
 
-**Also you can define the params like fixed callbacks to override a perticular value.**
+**Also you can define the params like fixed callbacks to override a particular value.**
