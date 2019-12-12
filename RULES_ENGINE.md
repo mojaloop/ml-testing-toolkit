@@ -93,40 +93,72 @@ Conditions can be defined with either "all" or "any" type of arrays. In each arr
     * pathParams - By using this the parameter values from the request path can be compared.
       
       Example: Type & ID of pathParams from the get request /parties/{Type}/{ID})
+
+  * Operator - The ```operator``` compares the value returned by the ```fact``` to what is stored in the ```value``` property.  If the result is truthy, the condition passes.
+    There are number of operators available to compare the values
+
+    * String and Numeric operators:
+
+      ```equal``` - _fact_ must equal _value_
+
+      ```notEqual```  - _fact_ must not equal _value_
+
+      _these operators use strict equality (===) and inequality (!==)_
+
+    * Numeric operators:
+
+      ```lessThan``` - _fact_ must be less than _value_
+
+      ```lessThanInclusive```- _fact_ must be less than or equal to _value_
+
+      ```greaterThan``` - _fact_ must be greater than _value_
+
+      ```greaterThanInclusive```- _fact_ must be greater than or equal to _value_
+
+    * Array operators:
+
+      ```in```  - _fact_ must be included in _value_ (an array)
+
+      ```notIn```  - _fact_ must not be included in _value_ (an array)
+
+      ```contains```  - _fact_ (an array) must include _value_
+
+      ```doesNotContain```  - _fact_ (an array) must not include _value_
+  * Value - The actual value to compare
     
-    Following are the examples of conditions
+  Following are the examples of conditions
 
-    ```
-    "all": [
-        {
-          "fact": "path",
-          "operator": "equal",
-          "value": "/transfers"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "post"
-        }
-    ]
-    ```
+  ```
+  "all": [
+      {
+        "fact": "path",
+        "operator": "equal",
+        "value": "/transfers"
+      },
+      {
+        "fact": "method",
+        "operator": "equal",
+        "value": "post"
+      }
+  ]
+  ```
 
-    ```
-    "any": [
-        {
-          "fact": "body",
-          "path": "amount.type",
-          "operator": "equal",
-          "value": "GBP"
-        },
-        {
-          "fact": "body",
-          "path": "amount.type",
-          "operator": "equal",
-          "value": "USD"
-        }
-    ]
-    ```
+  ```
+  "any": [
+      {
+        "fact": "body",
+        "path": "amount.type",
+        "operator": "equal",
+        "value": "GBP"
+      },
+      {
+        "fact": "body",
+        "path": "amount.type",
+        "operator": "equal",
+        "value": "USD"
+      }
+  ]
+  ```
 
 ### Events
 
@@ -189,4 +221,4 @@ Let's look at an example of an event type *MOCK_ERROR_CALLBACK*
 
 That's it, the self testing toolkit can be able to generate a mock callback based on the open API file with random values. 
 
-**Also you can define the params like fixed callbacks to override a particular value.**
+**Also you can define the params like in fixed callbacks to override a particular value.**
