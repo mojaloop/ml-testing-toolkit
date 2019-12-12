@@ -244,7 +244,7 @@ See the following example in which the generated values of the firstName & name 
 
 ```
 "event": {
-  "type": "MOCK_ERROR_CALLBACK",
+  "type": "MOCK_CALLBACK",
   "params": {
     "body": {
       "party": {
