@@ -3,7 +3,8 @@
     "post": {
       "successCallback": {
         "method": "put",
-        "path": "/transfers/{ID}"
+        "path": "/transfers/{ID}",
+        "pathPattern": "/transfers/{$request.body.transferId}"
       },
       "errorCallback": {
         "method": "put",
@@ -16,7 +17,8 @@
     "post": {
       "successCallback": {
         "method": "put",
-        "path": "/quotes/{ID}"
+        "path": "/quotes/{ID}",
+        "pathPattern": "/quotes/{$request.body.quoteId}"
       },
       "errorCallback": {
         "method": "put",
@@ -29,12 +31,13 @@
     "get": {
       "successCallback": {
         "method": "put",
-        "path": "/parties/{Type}/{ID}"
+        "path": "/parties/{Type}/{ID}",
+        "pathPattern": "/parties/{$request.params.Type}/{$request.params.ID}"
       },
       "errorCallback": {
         "method": "put",
         "path": "/parties/{Type}/{ID}/error",
-        "pathPattern": "/parties/{$request.params.Type}/{request.params.ID}/error"
+        "pathPattern": "/parties/{$request.params.Type}/{$request.params.ID}/error"
       }
     }
   }

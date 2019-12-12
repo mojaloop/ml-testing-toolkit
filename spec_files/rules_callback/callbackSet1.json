@@ -1,7 +1,8 @@
 [
   {
     "ruleId": 1,
-    "description": "Returns an NDC exceeded error response (ML error 4001) from the simulator when transfer value is 123 in any currency",
+    "priority": 2,
+    "description": "If the transfer amount is equal to 50 USD, send a fixed callback",
     "conditions": {
       "all": [
         {
@@ -17,7 +18,7 @@
         {
           "fact": "body",
           "operator": "equal",
-          "value": "77",
+          "value": "50",
           "path": "amount.amount"
         }
       ]
@@ -26,7 +27,7 @@
       "type": "FIXED_CALLBACK",
       "params": {
         "method": "put",
-        "path": "/transfers/123",
+        "path": "/transfers/{$request.body.transferId}",
         "headers": {},
         "delay": 1000,
         "body": {
@@ -34,6 +35,79 @@
           "fulfilment": "80DdD328d2433f0b90a93aBed7ebE4DCFA9E7ff886DdA8A1A5914C3C0aeA3eDb",
           "completedTimestamp": "1945-11-05T06:31:37.185Z"
         }
+      }
+    }
+  },
+  {
+    "ruleId": 2,
+    "priority": 1,
+    "description": "Send a mock callback for all the remaining transfer requests",
+    "conditions": {
+      "all": [
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "type": "MOCK_CALLBACK",
+      "params": {
+        "body": {
+          "extensionList": null
+        }
+      }
+    }
+  },
+  {
+    "ruleId": 3,
+    "description": "Send a mock callback for all the parties lookup",
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "type": "MOCK_CALLBACK",
+      "params": {
+      }
+    }
+  },
+  {
+    "ruleId": 4,
+    "description": "Send a mock callback for all quotes requests",
+    "conditions": {
+      "all": [
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/quotes"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "type": "MOCK_CALLBACK",
+      "params": {
       }
     }
   }

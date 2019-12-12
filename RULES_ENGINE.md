@@ -222,3 +222,70 @@ Let's look at an example of an event type *MOCK_ERROR_CALLBACK*
 That's it, the self testing toolkit can be able to generate a mock callback based on the open API file with random values. 
 
 **Also you can define the params like in fixed callbacks to override a particular value.**
+
+### Priority of rules
+
+The 'priority' property in a rule dictates when rule should be run, relative to other rules. Higher priority rules are run before lower priority rules. Rules with the same priority are run in parallel. Priority must be a positive, non-zero integer.
+
+**Example:**
+
+Consider the following example, observe the priority values. So rule which compares the amount value will be executed first and then the other rule will be executed. So if the amount is equal to 50, then we will get FIXED_CALLBACK event in first place, and in other cases we get MOCK_CALLBACK.
+
+```
+[
+  {
+    "ruleId": 1,
+    "priority": 2,
+    "description": "If the transfer amount is equal to 50 USD, send a fixed callback",
+    "conditions": {
+      "all": [
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        },
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "50",
+          "path": "amount.amount"
+        }
+      ]
+    },
+    "event": {
+      "type": "FIXED_CALLBACK",
+      "params": {
+        ...Some fixed callback
+      }
+    }
+  },
+  {
+    "ruleId": 2,
+    "priority": 1,
+    "description": "Send a mock callback for all the remaining transfer requests",
+    "conditions": {
+      "all": [
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "type": "MOCK_CALLBACK",
+      "params": {
+      }
+    }
+  },
+```

@@ -20,7 +20,8 @@ const validateRules = async (context, req) => {
     operationPath: context.operation.path,
     path: context.request.path,
     body: context.request.body,
-    method: context.request.method
+    method: context.request.method,
+    pathParams: context.request.params
   }
 
   const res = await rulesEngine.evaluate(facts)
@@ -72,9 +73,11 @@ const callbackRules = async (context, req) => {
   rulesEngine.loadRules(rulesCallback)
 
   const facts = {
-    path: context.operation.path,
+    operationPath: context.operation.path,
+    path: context.request.path,
     body: context.request.body,
-    method: context.request.method
+    method: context.request.method,
+    pathParams: context.request.params
   }
 
   const res = await rulesEngine.evaluate(facts)
@@ -84,13 +87,10 @@ const callbackRules = async (context, req) => {
     customLogger.logMessage('debug', 'Callback rules matched', res)
     const curEvent = res[0]
     if (curEvent.type === 'FIXED_CALLBACK') {
-      // TODO: replacement of params like ID and TYPE in path with the previous values
       generatedCallback.method = curEvent.params.method
-      generatedCallback.path = curEvent.params.path
-      // TODO: Replacement of any params in body with the previous values
-      generatedCallback.body = curEvent.params.body
-      // TODO: Replacement of any params in headers with the previous values
-      generatedCallback.headers = curEvent.params.headers
+      generatedCallback.path = replaceVariablesFromRequest(curEvent.params.path, context)
+      generatedCallback.body = replaceVariablesFromRequest(curEvent.params.body, context)
+      generatedCallback.headers = replaceVariablesFromRequest(curEvent.params.headers, context)
       if (curEvent.params.delay) {
         generatedCallback.delay = curEvent.params.delay
       }
@@ -99,12 +99,17 @@ const callbackRules = async (context, req) => {
         const callbackGenerator = new (require('./openApiRequestGenerator'))(path.join(req.customInfo.specFile))
         const rawdata = await readFileAsync(jsfRefFilePathPrefix + 'test1.json')
         const jsfRefs1 = JSON.parse(rawdata)
-        // TODO: Define a syntax to replace the params in path like ID or TYPE and replace those values in generatedErrorCallaback path
-        generatedCallback.path = req.customInfo.callbackInfo.successCallback.path
+        const operationCallback = req.customInfo.callbackInfo.successCallback.path
+
+        if (req.customInfo.callbackInfo.successCallback.pathPattern) {
+          generatedCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.pathPattern, context)
+        } else {
+          generatedCallback.path = operationCallback
+        }
         generatedCallback.method = req.customInfo.callbackInfo.successCallback.method
-        generatedCallback.body = await callbackGenerator.generateRequestBody(generatedCallback.path, generatedCallback.method, jsfRefs1)
+        generatedCallback.body = await callbackGenerator.generateRequestBody(operationCallback, generatedCallback.method, jsfRefs1)
         // TODO: Generate mock request headers also from openapi file
-        _.merge(generatedCallback.body, curEvent.params.body)
+        _.merge(generatedCallback.body, replaceVariablesFromRequest(curEvent.params.body, context))
         if (curEvent.params.delay) {
           generatedCallback.delay = curEvent.params.delay
         }
