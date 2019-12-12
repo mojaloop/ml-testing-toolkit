@@ -92,7 +92,10 @@ Conditions can be defined with either "all" or "any" type of arrays. In each arr
   
     * pathParams - By using this the parameter values from the request path can be compared.
       
-      Example: Type & ID of pathParams from the get request /parties/{Type}/{ID})
+      Example: Type & ID of pathParams from the get request /parties/{Type}/{ID}
+    * operationPath - This is used for matching the path syntax from open API file
+
+      Example: operationPath contains the value /parties/{Type}/{ID} instead of /parties/MSISDN/9876543210 which can actually be found in the fact 'path'.
 
   * Operator - The ```operator``` compares the value returned by the ```fact``` to what is stored in the ```value``` property.  If the result is truthy, the condition passes.
     There are number of operators available to compare the values
