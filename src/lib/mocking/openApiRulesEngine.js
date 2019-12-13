@@ -53,9 +53,10 @@ const validateRules = async (context, req) => {
         }
         generatedErrorCallback.method = req.customInfo.callbackInfo.errorCallback.method
         generatedErrorCallback.body = await callbackGenerator.generateRequestBody(operationCallback, generatedErrorCallback.method, jsfRefs1)
-        // TODO: Generate mock request headers also from openapi file
+        generatedErrorCallback.headers = await callbackGenerator.generateRequestHeaders(operationCallback, generatedErrorCallback.method, jsfRefs1)
 
         _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(curEvent.params.body, context))
+        _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context))
         if (curEvent.params.delay) {
           generatedErrorCallback.delay = curEvent.params.delay
         }

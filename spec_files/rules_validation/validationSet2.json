@@ -1,7 +1,7 @@
 [
   {
     "ruleId": 1,
-    "description": "If the transfer amount type is other than USD, send a mock error callback",
+    "description": "If the transfer amount is lessthan 5 USD, send a fixed error callback",
     "conditions": {
       "all": [
         {
@@ -16,22 +16,23 @@
         },
         {
           "fact": "body",
-          "operator": "notEqual",
-          "value": "USD",
-          "path": "amount.currency"
+          "operator": "equal",
+          "value": "2",
+          "path": "amount.amount"
         }
       ]
     },
     "event": {
-      "type": "MOCK_ERROR_CALLBACK",
+      "type": "FIXED_ERROR_CALLBACK",
       "params": {
-        "headers": {
-          "Content-Type": "{$request.headers['content-type']}"
-        },
+        "path": "/transfers/{$request.body.transferId}/error",
+        "method": "put",
+        "headers": {},
+        "delay": 100,
         "body": {
           "errorInformation": {
-            "errorCode": "4103",
-            "errorDescription": "Payer does not have an account which supports the requested currency."
+            "errorCode": "5001",
+            "errorDescription": "The amount is less than the required amount"
           }
         }
       }
@@ -39,13 +40,13 @@
   },
   {
     "ruleId": 2,
-    "description": "If the party lookup received for other than 000111, send error callback that the party is not found",
+    "description": "If the party lookup received for other than 9848123456, send error callback that the party is not found",
     "conditions": {
       "all": [
         {
           "fact": "path",
-          "operator": "notEqual",
-          "value": "/parties/MSISDN/000111"
+          "operator": "equal",
+          "value": "/parties/MSISDN/9848123456"
         },
         {
           "fact": "method",
@@ -55,15 +56,16 @@
       ]
     },
     "event": {
-      "type": "MOCK_ERROR_CALLBACK",
+      "type": "FIXED_ERROR_CALLBACK",
       "params": {
-        "headers": {
-          "Content-Type": "{$request.headers['content-type']}"
-        },
+        "path": "/parties/{$request.params.Type}/{$request.params.ID}/error",
+        "method": "put",
+        "headers": {},
+        "delay": 100,
         "body": {
           "errorInformation": {
-            "errorCode": "3204",
-            "errorDescription": "Party with the provided identifier, identifier type, and optional sub id or type was not found."
+            "errorCode": "5001",
+            "errorDescription": "The party {$request.params.ID} is not found"
           }
         }
       }

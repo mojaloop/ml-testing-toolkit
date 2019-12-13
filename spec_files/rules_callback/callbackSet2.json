@@ -1,6 +1,50 @@
 [
   {
     "ruleId": 1,
+    "priority": 2,
+    "description": "If the transfer amount is equal to 50 USD, send a fixed callback",
+    "conditions": {
+      "all": [
+        {
+          "fact": "path",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        },
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "100",
+          "path": "amount.amount"
+        }
+      ]
+    },
+    "event": {
+      "type": "FIXED_CALLBACK",
+      "params": {
+        "method": "put",
+        "path": "/transfers/{$request.body.transferId}",
+        "headers": {
+          "Accept": "application/vnd.interoperability.transfers+json;version=1",
+          "Content-Type": "application/vnd.interoperability.transfers+json;version=1.0",
+          "Date": "Fri, 13 Dec 2019 11:50:42 GMT",
+          "FSPIOP-Source": "payerfsp"
+        },
+        "delay": 1000,
+        "body": {
+          "transferState": "COMMITTED",
+          "fulfilment": "UNlJ98hZTY_dsw0cAqw4i_UN3v4utt7CZFB4yfLbVFA",
+          "completedTimestamp": "1945-11-05T06:31:37.185Z"
+        }
+      }
+    }
+  },
+  {
+    "ruleId": 2,
     "priority": 1,
     "description": "Send a mock callback for all the remaining transfer requests",
     "conditions": {
@@ -30,7 +74,7 @@
     }
   },
   {
-    "ruleId": 2,
+    "ruleId": 3,
     "description": "Send a mock callback for all the parties lookup",
     "conditions": {
       "all": [
@@ -64,7 +108,7 @@
     }
   },
   {
-    "ruleId": 3,
+    "ruleId": 4,
     "description": "Send a mock callback for all quotes requests",
     "conditions": {
       "all": [

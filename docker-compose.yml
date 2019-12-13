@@ -15,11 +15,11 @@ services:
       - sh
       - -c
       - "npm start"
-  mojaloop-testing-toolkit-postman:
-    image: mojaloop-testing-toolkit-postman:local
-    build:
-      context: .
-      dockerfile: Dockerfile-newman
-    container_name: mojaloop-testing-toolkit-postman
-    depends_on:
-      - mojaloop-testing-toolkit
+  #mojaloop-testing-toolkit-postman:
+  #  image: mojaloop-testing-toolkit-postman:local
+  #  build:
+  #    context: .
+  #    dockerfile: Dockerfile-newman
+  #  container_name: mojaloop-testing-toolkit-postman
+  #  depends_on:
+  #    - mojaloop-testing-toolkit
