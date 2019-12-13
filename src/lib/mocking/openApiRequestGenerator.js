@@ -1,9 +1,10 @@
 const _ = require('lodash')
-const fs = require('fs')
-const jref = require('json-ref-lite')
-const yaml = require('js-yaml')
+// const fs = require('fs')
+// const jref = require('json-ref-lite')
+// const yaml = require('js-yaml')
 const faker = require('faker')
 const jsf = require('json-schema-faker')
+const $RefParser = require('json-schema-ref-parser')
 
 jsf.format('byte', () => Buffer.alloc(faker.lorem.sentence(12)).toString('base64'))
 
@@ -17,8 +18,9 @@ const ajv = require('ajv')({
   unknownFormats: 'ignore'
 })
 
-function loadYamlFile (fn) {
-  let tree = yaml.safeLoad(fs.readFileSync(fn, 'utf8'))
+async function loadYamlFile (fn) {
+  // let tree = yaml.safeLoad(fs.readFileSync(fn, 'utf8'))
+  let tree = await $RefParser.parse(fn)
 
   // Add keys to schemas
   if (tree.components && tree.components.schemas) {
@@ -40,7 +42,8 @@ function loadYamlFile (fn) {
   })
 
   // Resolve $refs
-  tree = jref.resolve(tree)
+  // tree = jref.resolve(tree)
+  tree = await $RefParser.dereference(tree)
 
   // Merge all "allOf"
   if (tree.components && tree.components.schemas) {
@@ -119,20 +122,53 @@ const generateMockOperation = async (method, name, data, jsfRefs) => {
   return fakedResponse
 }
 
-class OpenApiRequestGenerator {
-  constructor (schemaPath) {
-    if (typeof schemaPath === 'string' || schemaPath instanceof String) {
-      this.schema = loadYamlFile(schemaPath)
-    } else {
-      this.schema = schemaPath
+const generateMockHeaders = async (method, name, data, jsfRefs) => {
+  const headers = {}
+  data.parameters.forEach(param => {
+    if (param.in === 'header') {
+      if (param.schema.type) {
+        headers[param.name] = { type: param.schema.type }
+      } else {
+        headers[param.name] = {}
+      }
     }
+  })
+  jsfRefs.forEach(ref => {
+    if (headers[ref.id]) {
+      headers[ref.id] = { $ref: ref.id }
+    }
+  })
+
+  if (headers === {}) {
+    return {}
   }
 
-  generateRequestBody (path, httpMethod, jsfRefs) {
+  const fakedResponse = await jsf.resolve(headers, jsfRefs)
+
+  return fakedResponse
+}
+
+class OpenApiRequestGenerator {
+  constructor () {
+    this.schema = {}
+  }
+
+  async load (schemaPath) {
+    this.schema = await loadYamlFile(schemaPath)
+  }
+
+  async generateRequestBody (path, httpMethod, jsfRefs) {
     const pathValue = this.schema.paths[path]
     const operation = pathValue[httpMethod]
     const id = operation.operationId || operation.summary
     return generateMockOperation(httpMethod, id, operation, jsfRefs)
+  }
+
+  async generateRequestHeaders (path, httpMethod, jsfRefs) {
+    const pathValue = this.schema.paths[path]
+    const operation = pathValue[httpMethod]
+    const id = operation.operationId || operation.summary
+    return generateMockHeaders(httpMethod, id, operation, jsfRefs)
   }
 }
 

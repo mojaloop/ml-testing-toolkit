@@ -40,7 +40,8 @@ const validateRules = async (context, req) => {
       }
     } else if (curEvent.type === 'MOCK_ERROR_CALLBACK') {
       if (req.customInfo.specFile) {
-        const callbackGenerator = new (require('./openApiRequestGenerator'))(path.join(req.customInfo.specFile))
+        const callbackGenerator = new (require('./openApiRequestGenerator'))()
+        await callbackGenerator.load(path.join(req.customInfo.specFile))
         const rawdata = await readFileAsync(jsfRefFilePathPrefix + 'test1.json')
         const jsfRefs1 = JSON.parse(rawdata)
         const operationCallback = req.customInfo.callbackInfo.errorCallback.path
@@ -96,7 +97,8 @@ const callbackRules = async (context, req) => {
       }
     } else if (curEvent.type === 'MOCK_CALLBACK') {
       if (req.customInfo.specFile) {
-        const callbackGenerator = new (require('./openApiRequestGenerator'))(path.join(req.customInfo.specFile))
+        const callbackGenerator = new (require('./openApiRequestGenerator'))()
+        await callbackGenerator.load(path.join(req.customInfo.specFile))
         const rawdata = await readFileAsync(jsfRefFilePathPrefix + 'test1.json')
         const jsfRefs1 = JSON.parse(rawdata)
         const operationCallback = req.customInfo.callbackInfo.successCallback.path
@@ -109,6 +111,8 @@ const callbackRules = async (context, req) => {
         generatedCallback.method = req.customInfo.callbackInfo.successCallback.method
         generatedCallback.body = await callbackGenerator.generateRequestBody(operationCallback, generatedCallback.method, jsfRefs1)
         // TODO: Generate mock request headers also from openapi file
+        generatedCallback.headers = await callbackGenerator.generateRequestHeaders(operationCallback, generatedCallback.method, jsfRefs1)
+
         _.merge(generatedCallback.body, replaceVariablesFromRequest(curEvent.params.body, context))
         if (curEvent.params.delay) {
           generatedCallback.delay = curEvent.params.delay

@@ -74,5 +74,13 @@
   {
     "id": "errorInformation.properties.errorDescription",
     "pattern": "This is a mock error description"
+  },
+  {
+    "id": "Content-Length",
+    "format": "date-time"
+  },
+  {
+    "id": "FSPIOP-Source",
+    "pattern": "Sample FSP Source"
   }
 ]
