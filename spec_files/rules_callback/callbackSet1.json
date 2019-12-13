@@ -18,7 +18,7 @@
         {
           "fact": "body",
           "operator": "equal",
-          "value": "50",
+          "value": "100",
           "path": "amount.amount"
         }
       ]
@@ -28,11 +28,16 @@
       "params": {
         "method": "put",
         "path": "/transfers/{$request.body.transferId}",
-        "headers": {},
+        "headers": {
+          "Accept": "application/vnd.interoperability.transfers+json;version=1",
+          "Content-Type": "application/vnd.interoperability.transfers+json;version=1.0",
+          "Date": "Fri, 13 Dec 2019 11:50:42 GMT",
+          "FSPIOP-Source": "payerfsp"
+        },
         "delay": 1000,
         "body": {
-          "transferState": "COMPLETED",
-          "fulfilment": "80DdD328d2433f0b90a93aBed7ebE4DCFA9E7ff886DdA8A1A5914C3C0aeA3eDb",
+          "transferState": "COMMITTED",
+          "fulfilment": "UNlJ98hZTY_dsw0cAqw4i_UN3v4utt7CZFB4yfLbVFA",
           "completedTimestamp": "1945-11-05T06:31:37.185Z"
         }
       }
@@ -59,8 +64,11 @@
     "event": {
       "type": "MOCK_CALLBACK",
       "params": {
+        "headers": {
+          "Content-Type": "{$request.headers['content-type']}"
+        },
         "body": {
-          "extensionList": null
+          "fulfilment": "UNlJ98hZTY_dsw0cAqw4i_UN3v4utt7CZFB4yfLbVFA"
         }
       }
     }
@@ -85,6 +93,17 @@
     "event": {
       "type": "MOCK_CALLBACK",
       "params": {
+        "headers": {
+          "Content-Type": "{$request.headers['content-type']}"
+        },
+        "body": {
+          "party": {
+            "partyIdInfo": {
+              "partyIdType": "{$request.params.Type}",
+              "partyIdentifier": "{$request.params.ID}"
+            }
+          }
+        }
       }
     }
   },
@@ -108,6 +127,12 @@
     "event": {
       "type": "MOCK_CALLBACK",
       "params": {
+        "headers": {
+          "Content-Type": "{$request.headers['content-type']}"
+        },
+        "body": {
+          "condition": "GRzLaTP7DJ9t4P-a_BA0WA9wzzlsugf00-Tn6kESAfM"
+        }
       }
     }
   }

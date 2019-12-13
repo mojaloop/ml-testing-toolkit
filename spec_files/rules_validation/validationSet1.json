@@ -45,7 +45,7 @@
       "all": [
         {
           "fact": "path",
-          "operator": "notEqual",
+          "operator": "equal",
           "value": "/parties/MSISDN/9848123456"
         },
         {
@@ -89,7 +89,7 @@
         {
           "fact": "body",
           "operator": "equal",
-          "value": "100",
+          "value": "99",
           "path": "amount.amount"
         }
       ]

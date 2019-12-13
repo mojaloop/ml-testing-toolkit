@@ -1,5 +1,5 @@
 {
-  "API_PORT": 3000,
+  "API_PORT": 5000,
   "DISPLAY_ROUTES": true,
   "ENDPOINT_CACHE_CONFIG": {
     "expiresIn": 180000,

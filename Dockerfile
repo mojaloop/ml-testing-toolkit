@@ -26,6 +26,6 @@ WORKDIR /opt/mojaloop-testing-toolkit
 COPY --from=builder /opt/mojaloop-testing-toolkit .
 RUN npm prune --production
 
-EXPOSE 3000
-EXPOSE 4444
+EXPOSE 5000
+EXPOSE 5050
 CMD ["npm", "run", "start"]

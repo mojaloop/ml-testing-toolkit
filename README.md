@@ -31,7 +31,7 @@ npm start
 docker-compose up
 ```
 
-The server will start and listen on port 3000.
+The server will start and listen on port 5000. And you can get the web interface on http://localhost:5050/ui
 
 ## Sending Test Requests
 Once the server is started on a perticular port, you can send api requests from the sample postman collection included in this repository or from your own DFSP implementation to validate the requests.

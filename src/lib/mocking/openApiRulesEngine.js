@@ -1,4 +1,4 @@
-const RulesEngine = require('../RulesEngine')
+const RulesEngine = require('../rulesEngine')
 const fs = require('fs')
 var path = require('path')
 const { promisify } = require('util')
@@ -110,10 +110,10 @@ const callbackRules = async (context, req) => {
         }
         generatedCallback.method = req.customInfo.callbackInfo.successCallback.method
         generatedCallback.body = await callbackGenerator.generateRequestBody(operationCallback, generatedCallback.method, jsfRefs1)
-        // TODO: Generate mock request headers also from openapi file
         generatedCallback.headers = await callbackGenerator.generateRequestHeaders(operationCallback, generatedCallback.method, jsfRefs1)
 
         _.merge(generatedCallback.body, replaceVariablesFromRequest(curEvent.params.body, context))
+        _.merge(generatedCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context))
         if (curEvent.params.delay) {
           generatedCallback.delay = curEvent.params.delay
         }

@@ -8,7 +8,7 @@ const fs = require('fs')
 const { promisify } = require('util')
 const OpenApiRulesEngine = require('./openApiRulesEngine')
 const CallbackHandler = require('../callbackHandler')
-// const _ = require('lodash')
+const _ = require('lodash')
 
 const readFileAsync = promisify(fs.readFile)
 
@@ -76,8 +76,11 @@ module.exports.initilizeMockHandler = async () => {
               }
             })
           }
-
-          return h.response(mock).code(status)
+          if (_.isEmpty(mock)) {
+            return h.response().code(status)
+          } else {
+            return h.response(mock).code(status)
+          }
         },
         validationFail: async (context, req, h) => {
           const extensionList = [

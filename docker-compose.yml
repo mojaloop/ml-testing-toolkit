@@ -3,13 +3,14 @@ version: "3.7"
 services:
   mojaloop-testing-toolkit:
     image: mojaloop-testing-toolkit:local
+    env_file: ./local.env
     build:
       context: .
       target: builder
     container_name: mojaloop-testing-toolkit
     ports:
-      - "3000:3000"
-      - "4444:4444"
+      - "5000:5000"
+      - "5050:5050"
     command:
       - sh
       - -c

@@ -29,7 +29,9 @@ const Server = require('./server')
 const Config = require('./lib/config')
 const notificationEmitter = require('./lib/notificationEmitter')
 
-notificationEmitter.startServer(4444)
+Config.loadUserConfig()
+
+notificationEmitter.startServer(5050)
 
 const optionsApi = {
   port: Config.API_PORT

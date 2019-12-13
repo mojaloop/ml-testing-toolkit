@@ -28,6 +28,7 @@
  --------------
  ******/
 const RC = require('parse-strings-in-object')(require('rc')('ALS', require('../../config/default.json')))
+const fs = require('fs')
 
 // const getOrDefault = (value, defaultValue) => {
 //   if (value === undefined) {
@@ -37,8 +38,35 @@ const RC = require('parse-strings-in-object')(require('rc')('ALS', require('../.
 //   return value
 // }
 
+// Default values can be specified here
+const USER_CONFIG = {
+  CALLBACK_ENDPOINT: 'http://localhost:4000',
+  SEND_CALLBACK_ENABLE: true
+}
+
+// Function to load user configuration from .env file or environment incase of running in container
+const loadUserConfig = () => {
+  if (fs.existsSync('local.env')) {
+    require('dotenv').config({ path: 'local.env' })
+  }
+
+  for (var prop in USER_CONFIG) {
+    if (Object.prototype.hasOwnProperty.call(USER_CONFIG, prop)) {
+      if (process.env[prop]) {
+        if ((typeof USER_CONFIG[prop])==='boolean') {
+          USER_CONFIG[prop] = process.env[prop] === 'true'
+        } else {
+          USER_CONFIG[prop] = process.env[prop]
+        }
+      }
+    }
+  }
+}
+
 module.exports = {
   API_PORT: RC.API_PORT,
   DISPLAY_ROUTES: RC.DISPLAY_ROUTES,
-  FSPIOP_API_DEFINITIONS: RC.FSPIOP_API_DEFINITIONS
+  FSPIOP_API_DEFINITIONS: RC.FSPIOP_API_DEFINITIONS,
+  USER_CONFIG: USER_CONFIG,
+  loadUserConfig: loadUserConfig
 }
