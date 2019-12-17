@@ -94,8 +94,7 @@
     },
     "event": {
       "type": "MOCK_ERROR_CALLBACK",
-      "params": {
-      }
+      "params": {}
     }
   }
 ]

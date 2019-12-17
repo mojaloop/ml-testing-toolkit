@@ -17,12 +17,35 @@ const io = require('socket.io')(http)
 // });
 
 const startServer = port => {
+
+  // For CORS policy
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    )
+    res.setHeader(
+      'Access-Control-Allow-Methods',
+      'GET, POST, PATCH, PUT, DELETE, OPTIONS'
+    )
+    next()
+  })
+
+  // For parsing incoming JSON requests
+  app.use(express.json())
+
+  // For admin API
+  app.use('/api/rules', require('./api-routes/rules'))
+
   // For front-end UI
   app.use('/ui', express.static(path.join('client/build')))
 
   app.get('*', (req, res) => {
     res.sendFile(process.cwd() + '/client/build/index.html')
   })
+
+
 
   http.listen(port)
   console.log('Socket Server started on port :' + port)

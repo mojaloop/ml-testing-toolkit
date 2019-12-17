@@ -5,6 +5,7 @@ const _ = require('lodash')
 const faker = require('faker')
 const jsf = require('json-schema-faker')
 const $RefParser = require('json-schema-ref-parser')
+const util = require('util')
 
 jsf.format('byte', () => Buffer.alloc(faker.lorem.sentence(12)).toString('base64'))
 
@@ -105,18 +106,27 @@ const findRequestSchema = (r) => {
 
 const generateMockOperation = async (method, name, data, jsfRefs) => {
   const requestSchema = findRequestSchema(data.requestBody)
+  // Create a new copy of object without copying by references
+  const newRequestSchema = JSON.parse(JSON.stringify(requestSchema))
   jsfRefs.forEach(ref => {
-    const targetObject = _.get(requestSchema.properties, ref.id)
+    const convertedId = ref.id.replace(/\./g, '.properties.')
+    const targetObject = _.get(newRequestSchema.properties, convertedId)
     if (targetObject) {
+      console.log(targetObject.title)
+
       targetObject.$ref = ref.id
+      if (ref.pattern) {
+        delete targetObject.pattern
+        delete targetObject.enum
+      }
     }
   })
 
-  if (requestSchema == null) {
+  if (newRequestSchema == null) {
     return {}
   }
 
-  const fakedResponse = await jsf.resolve(requestSchema, jsfRefs)
+  const fakedResponse = await jsf.resolve(newRequestSchema, jsfRefs)
 
   return fakedResponse
 }

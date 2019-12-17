@@ -1,20 +1,15 @@
-const RulesEngine = require('../rulesEngine')
 const fs = require('fs')
 var path = require('path')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const customLogger = require('../requestLogger')
 const _ = require('lodash')
+const rulesEngineModel = require('../rulesEngineModel')
 
-const rulesValidationFilePathPrefix = 'spec_files/rules_validation/'
-const rulesCallbackFilePathPrefix = 'spec_files/rules_callback/'
 const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
 
 const validateRules = async (context, req) => {
-  const rulesRespRawdata = await readFileAsync(rulesValidationFilePathPrefix + 'validationSet1.json')
-  const rulesResp = JSON.parse(rulesRespRawdata)
-  const rulesEngine = new RulesEngine()
-  rulesEngine.loadRules(rulesResp)
+  const rulesEngine = await rulesEngineModel.getValidationRulesEngine()
 
   const facts = {
     operationPath: context.operation.path,
@@ -69,10 +64,7 @@ const validateRules = async (context, req) => {
 }
 
 const callbackRules = async (context, req) => {
-  const rulesCallbackRawdata = await readFileAsync(rulesCallbackFilePathPrefix + 'callbackSet1.json')
-  const rulesCallback = JSON.parse(rulesCallbackRawdata)
-  const rulesEngine = new RulesEngine()
-  rulesEngine.loadRules(rulesCallback)
+  const rulesEngine = await rulesEngineModel.getCallbackRulesEngine()
 
   const facts = {
     operationPath: context.operation.path,

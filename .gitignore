@@ -75,3 +75,7 @@ jsconfig.json
 
 # React based client
 client/
+
+# Some rules files which will be generated dynamically
+spec_files/rules_callback/activeRules.json
+spec_files/rules_validation/activeRules.json
