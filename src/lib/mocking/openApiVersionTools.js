@@ -13,7 +13,8 @@ module.exports.validateAcceptHeader = (acceptHeader) => {
   }
 }
 
-module.exports.negotiateVersion = (acceptHeader, apis) => {
+module.exports.negotiateVersion = (req, apis) => {
+  const acceptHeader = req.headers.accept
   let negotiatedIndex = null
   let negotiationFailed = true
   let responseContentTypeHeader = null
@@ -71,7 +72,7 @@ module.exports.negotiateVersion = (acceptHeader, apis) => {
       '.' + apis[negotiatedIndex].minorVersion
     }
   }
-  customLogger.logMessage('debug', negotiationFailed ? 'Version negotiation failed for the Accept header ' + acceptHeader : 'Version negotiation succeeded, picked up the version ' + apis[negotiatedIndex].majorVersion + '.' + apis[negotiatedIndex].minorVersion)
+  customLogger.logMessage('debug', negotiationFailed ? 'Version negotiation failed for the Accept header ' + acceptHeader : 'Version negotiation succeeded, picked up the version ' + apis[negotiatedIndex].majorVersion + '.' + apis[negotiatedIndex].minorVersion, null, true, req)
   return {
     negotiationFailed: negotiationFailed,
     message: negotiationFailed ? 'Version negotiation failed for the Accept header ' + acceptHeader : 'OK',

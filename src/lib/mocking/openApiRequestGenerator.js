@@ -112,8 +112,6 @@ const generateMockOperation = async (method, name, data, jsfRefs) => {
     const convertedId = ref.id.replace(/\./g, '.properties.')
     const targetObject = _.get(newRequestSchema.properties, convertedId)
     if (targetObject) {
-      console.log(targetObject.title)
-
       targetObject.$ref = ref.id
       if (ref.pattern) {
         delete targetObject.pattern

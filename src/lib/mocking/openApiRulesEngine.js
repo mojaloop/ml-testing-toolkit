@@ -23,7 +23,7 @@ const validateRules = async (context, req) => {
   const generatedErrorCallback = {}
 
   if (res) {
-    customLogger.logMessage('debug', 'Validation rules matched', res)
+    customLogger.logMessage('debug', 'Validation rules matched', res, true, req)
     const curEvent = res[0]
     if (curEvent.type === 'FIXED_ERROR_CALLBACK') {
       generatedErrorCallback.method = curEvent.params.method
@@ -56,7 +56,7 @@ const validateRules = async (context, req) => {
           generatedErrorCallback.delay = curEvent.params.delay
         }
       } else {
-        customLogger.logMessage('error', 'No Specification file provided for validateRules function')
+        customLogger.logMessage('error', 'No Specification file provided for validateRules function', null, true, req)
       }
     }
   }
@@ -78,7 +78,7 @@ const callbackRules = async (context, req) => {
   const generatedCallback = {}
 
   if (res) {
-    customLogger.logMessage('debug', 'Callback rules matched', res)
+    customLogger.logMessage('debug', 'Callback rules matched', res, true, req)
     const curEvent = res[0]
     if (curEvent.type === 'FIXED_CALLBACK') {
       generatedCallback.method = curEvent.params.method
@@ -111,7 +111,7 @@ const callbackRules = async (context, req) => {
           generatedCallback.delay = curEvent.params.delay
         }
       } else {
-        customLogger.logMessage('error', 'No Specification file provided for validateRules function')
+        customLogger.logMessage('error', 'No Specification file provided for validateRules function', null, true, req)
       }
     }
   }

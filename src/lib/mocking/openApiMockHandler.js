@@ -33,7 +33,7 @@ module.exports.initilizeMockHandler = async () => {
       strict: false,
       handlers: {
         notImplemented: async (context, req, h) => {
-          customLogger.logMessage('debug', 'Schema Validation Passed')
+          customLogger.logMessage('debug', 'Schema Validation Passed', null, true, req)
           req.customInfo.specFile = item.specFile
           // Generate mock response from openAPI spec file
           const { status, mock } = context.api.mockResponseForOperation(context.operation.operationId)
@@ -46,16 +46,16 @@ module.exports.initilizeMockHandler = async () => {
               const cbMapRawdata = await readFileAsync(item.callbackMapFile)
               const callbackMap = JSON.parse(cbMapRawdata)
               if (!callbackMap[context.operation.path]) {
-                customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path)
+                customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, null, true, req)
                 return
               }
               if (!callbackMap[context.operation.path][context.request.method]) {
-                customLogger.logMessage('error', 'Callback not found for method in callback map file for ' + context.request.method)
+                customLogger.logMessage('error', 'Callback not found for method in callback map file for ' + context.request.method, null, true, req)
                 return
               }
               const callbackInfo = callbackMap[context.operation.path][context.request.method]
               if (!callbackInfo) {
-                customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method)
+                customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method, null, true, req)
                 return
               }
               req.customInfo.callbackInfo = callbackInfo
@@ -64,7 +64,7 @@ module.exports.initilizeMockHandler = async () => {
               const generatedErrorCallback = await OpenApiRulesEngine.validateRules(context, req)
               if (generatedErrorCallback.body) {
                 // TODO: Handle method and path verifications against the generated ones
-                CallbackHandler.handleCallback(generatedErrorCallback)
+                CallbackHandler.handleCallback(generatedErrorCallback, req)
                 return
               }
 
@@ -72,7 +72,7 @@ module.exports.initilizeMockHandler = async () => {
               const generatedCallback = await OpenApiRulesEngine.callbackRules(context, req)
               if (generatedCallback.body) {
                 // TODO: Handle method and path verifications against the generated ones
-                CallbackHandler.handleCallback(generatedCallback)
+                CallbackHandler.handleCallback(generatedCallback, req)
               }
             })
           }
@@ -125,7 +125,7 @@ module.exports.handleRequest = (req, h) => {
   }
 
   // Pick the right API object based on the major and minor versions (Version negotiation as per the API Definition file)
-  const versionNegotiationResult = OpenApiVersionTools.negotiateVersion(req.headers.accept, apis)
+  const versionNegotiationResult = OpenApiVersionTools.negotiateVersion(req, apis)
   if (versionNegotiationResult.negotiationFailed) {
     // Create extensionList property as per the API specification document with supported versions
     const extensionList = apis.map(item => {
