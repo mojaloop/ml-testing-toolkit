@@ -94,7 +94,11 @@
     },
     "event": {
       "type": "MOCK_ERROR_CALLBACK",
-      "params": {}
+      "params": {
+        "headers": {
+          "Content-Type": "{$request.headers['content-type']}"
+        }
+      }
     }
   }
 ]

@@ -122,7 +122,7 @@ const initialize = async (port = Config.API_PORT) => {
   const server = await createServer(port)
   // server.plugins.openapi.setHost(server.info.host + ':' + server.info.port)
   // Logger.info(`Server running on ${server.info.host}:${server.info.port}`)
-  console.log(`Server running on ${server.info.host}:${server.info.port}`)
+  console.log(`Toolkit Server running on port ${server.info.port}`)
   return server
 }
 

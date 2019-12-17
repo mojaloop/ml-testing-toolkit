@@ -87,7 +87,11 @@
           "Content-Type": "{$request.headers['content-type']}"
         },
         "body": {
-          "condition": "GRzLaTP7DJ9t4P-a_BA0WA9wzzlsugf00-Tn6kESAfM"
+          "condition": "GRzLaTP7DJ9t4P-a_BA0WA9wzzlsugf00-Tn6kESAfM",
+          "transferAmount": {
+            "currency": "{$request.body.amount.currency}",
+            "amount": "{$request.body.amount.amount}"
+          }
         }
       }
     }

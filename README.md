@@ -34,7 +34,7 @@ docker-compose up
 The server will start and listen on port 5000. And you can get the web interface on http://localhost:5050/ui
 
 ## Sending Test Requests
-Once the server is started on a perticular port, you can send api requests from the sample postman collection included in this repository or from your own DFSP implementation to validate the requests.
+Once the server is started on a particular port, you can send api requests from the sample postman collection included in this repository or from your own DFSP implementation to validate the requests.
 
 * **postman/mojaloop-pdp-testing-tool.postman_collection.json** - Import this file as a collection in the postman.
 * **postman/mojaloop-pdp-testing-tool.postman_environment.json** - Import this file as environment in postman.

@@ -48,7 +48,7 @@ const startServer = port => {
 
 
   http.listen(port)
-  console.log('Socket Server started on port :' + port)
+  console.log('API Server started on port ' + port)
 }
 
 const broadcastLog = log => {
