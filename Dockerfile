@@ -10,7 +10,7 @@ RUN apk add --no-cache -t build-dependencies git make gcc g++ python libtool aut
 COPY package.json package-lock.json* /opt/mojaloop-testing-toolkit/
 RUN npm install
 
-RUN cd /opt && git clone https://github.com/vijayg10/ml-self-testing-toolkit-ui.git
+RUN cd /opt && git clone https://github.com/mojaloop/ml-self-testing-toolkit-ui.git
 RUN cd /opt/ml-self-testing-toolkit-ui && npm install && npm run build
 RUN mkdir /opt/mojaloop-testing-toolkit/client
 RUN cp -pR /opt/ml-self-testing-toolkit-ui/build /opt/mojaloop-testing-toolkit/client/build
