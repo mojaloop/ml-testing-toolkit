@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-Mojaloop Self Testing Tooolkit
-==============================
-=======
-# Mojaloop Self Testing Toolkit
->>>>>>> 5c7df49f5f08c40a9e904f06c681369a3b7dda03
+Mojaloop Self Testing Toolkit
+=============================
 
 A self testing tool to test the mojaloop implementations.
 
