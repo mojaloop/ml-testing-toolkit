@@ -1,4 +1,4 @@
-# Mojaloop Self Testing Tooolkit
+# Mojaloop Self Testing Toolkit
 
 A self testing tool to test the mojaloop implementations
 
