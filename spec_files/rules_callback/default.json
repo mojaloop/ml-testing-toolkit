@@ -22,9 +22,6 @@
       "params": {
         "headers": {
           "Content-Type": "{$request.headers['content-type']}"
-        },
-        "body": {
-          "fulfilment": "UNlJ98hZTY_dsw0cAqw4i_UN3v4utt7CZFB4yfLbVFA"
         }
       }
     }
@@ -87,7 +84,6 @@
           "Content-Type": "{$request.headers['content-type']}"
         },
         "body": {
-          "condition": "GRzLaTP7DJ9t4P-a_BA0WA9wzzlsugf00-Tn6kESAfM",
           "transferAmount": {
             "currency": "{$request.body.amount.currency}",
             "amount": "{$request.body.amount.amount}"

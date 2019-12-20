@@ -222,6 +222,16 @@ The following is the list of configurable parameters that you can define anywher
 * $request.path - Entire request path
 * $request.headers - Http headers of the request
 
+**Advanced parameters for developers:**
+
+There are some advanced parameters type *$function* is implemented for advanced users / developers. The syntax is like below
+
+* $function.sample.getSampleText (For development purpose)
+
+The above parameter calls the function 'getSampleText' in 'sample.js' file located at 'lib/mocking/custom-functions' folder. An argument will be passed to this function from which the developer can get the request parameters to process like 'arg1.request.body.quoteId', 'arg1.request.headers.date' ...etc
+
+Please be noted that these javascript files can not be change in runtime and need compilation for the changes.
+
 
 #### MOCK_ERROR_CALLBACK and MOCK_CALLBACK
 

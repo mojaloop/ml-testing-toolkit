@@ -27,9 +27,9 @@ const validateRules = async (context, req) => {
     const curEvent = res[0]
     if (curEvent.type === 'FIXED_ERROR_CALLBACK') {
       generatedErrorCallback.method = curEvent.params.method
-      generatedErrorCallback.path = replaceVariablesFromRequest(curEvent.params.path, context)
-      generatedErrorCallback.body = replaceVariablesFromRequest(curEvent.params.body, context)
-      generatedErrorCallback.headers = replaceVariablesFromRequest(curEvent.params.headers, context)
+      generatedErrorCallback.path = replaceVariablesFromRequest(curEvent.params.path, context, req)
+      generatedErrorCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
+      generatedErrorCallback.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req)
       if (curEvent.params.delay) {
         generatedErrorCallback.delay = curEvent.params.delay
       }
@@ -42,7 +42,7 @@ const validateRules = async (context, req) => {
         const operationCallback = req.customInfo.callbackInfo.errorCallback.path
 
         if (req.customInfo.callbackInfo.errorCallback.pathPattern) {
-          generatedErrorCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.pathPattern, context)
+          generatedErrorCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.pathPattern, context, req)
         } else {
           generatedErrorCallback.path = operationCallback
         }
@@ -50,8 +50,8 @@ const validateRules = async (context, req) => {
         generatedErrorCallback.body = await callbackGenerator.generateRequestBody(operationCallback, generatedErrorCallback.method, jsfRefs1)
         generatedErrorCallback.headers = await callbackGenerator.generateRequestHeaders(operationCallback, generatedErrorCallback.method, jsfRefs1)
 
-        _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(curEvent.params.body, context))
-        _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context))
+        _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
+        _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
         if (curEvent.params.delay) {
           generatedErrorCallback.delay = curEvent.params.delay
         }
@@ -82,9 +82,9 @@ const callbackRules = async (context, req) => {
     const curEvent = res[0]
     if (curEvent.type === 'FIXED_CALLBACK') {
       generatedCallback.method = curEvent.params.method
-      generatedCallback.path = replaceVariablesFromRequest(curEvent.params.path, context)
-      generatedCallback.body = replaceVariablesFromRequest(curEvent.params.body, context)
-      generatedCallback.headers = replaceVariablesFromRequest(curEvent.params.headers, context)
+      generatedCallback.path = replaceVariablesFromRequest(curEvent.params.path, context, req)
+      generatedCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
+      generatedCallback.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req)
       if (curEvent.params.delay) {
         generatedCallback.delay = curEvent.params.delay
       }
@@ -97,7 +97,7 @@ const callbackRules = async (context, req) => {
         const operationCallback = req.customInfo.callbackInfo.successCallback.path
 
         if (req.customInfo.callbackInfo.successCallback.pathPattern) {
-          generatedCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.pathPattern, context)
+          generatedCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.pathPattern, context, req)
         } else {
           generatedCallback.path = operationCallback
         }
@@ -105,8 +105,8 @@ const callbackRules = async (context, req) => {
         generatedCallback.body = await callbackGenerator.generateRequestBody(operationCallback, generatedCallback.method, jsfRefs1)
         generatedCallback.headers = await callbackGenerator.generateRequestHeaders(operationCallback, generatedCallback.method, jsfRefs1)
 
-        _.merge(generatedCallback.body, replaceVariablesFromRequest(curEvent.params.body, context))
-        _.merge(generatedCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context))
+        _.merge(generatedCallback.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
+        _.merge(generatedCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
         if (curEvent.params.delay) {
           generatedCallback.delay = curEvent.params.delay
         }
@@ -115,10 +115,12 @@ const callbackRules = async (context, req) => {
       }
     }
   }
+  require('./middleware-functions/ilp_stuff').handleQuoteIlp(context, generatedCallback)
+  require('./middleware-functions/ilp_stuff').handleTransferIlp(context, generatedCallback)
   return generatedCallback
 }
 
-const replaceVariablesFromRequest = (inputObject, fromObject) => {
+const replaceVariablesFromRequest = (inputObject, fromObject, req) => {
   var resultObject
   // Check whether inputObject is string or object. If it is object, then convert that to JSON string and parse it while return
   if (typeof inputObject === 'string') {
@@ -133,7 +135,13 @@ const replaceVariablesFromRequest = (inputObject, fromObject) => {
   const matchedArray = resultObject.match(/{\$([^}]+)}/g)
   if (matchedArray) {
     matchedArray.forEach(element => {
-      resultObject = resultObject.replace(element, getVariableValue(element, fromObject))
+      // Check for the function type of param, if its function we need to call a function in custom-functions and replace the returned value
+      const checkFn = element.startsWith('{$function')
+      if (checkFn) {
+        resultObject = resultObject.replace(element, getFunctionResult(element, fromObject, req))
+      } else {
+        resultObject = resultObject.replace(element, getVariableValue(element, fromObject))
+      }
     })
   }
 
@@ -144,9 +152,33 @@ const replaceVariablesFromRequest = (inputObject, fromObject) => {
   }
 }
 
+// Get the variable from the object using lodash library
 const getVariableValue = (param, fromObject) => {
   const temp = param.replace(/{\$(.*)}/, "$1")
   return _.get(fromObject, temp)
+}
+
+// Execute the function and return the result
+const getFunctionResult = (param, fromObject, req) => {
+  const temp = param.replace(/{\$function\.(.*)}/, "$1").split('.')
+  if (temp.length === 2) {
+    const fileName = temp[0]
+    const functionName = temp[1]
+    try {
+      const fn = require('./custom-functions/' + fileName)[functionName]
+      return fn(fromObject)
+    } catch (e) {
+      if (e.code === 'MODULE_NOT_FOUND') {
+        customLogger.logMessage('error', 'The specified custom function does not exist', param, true, req)
+      } else {
+        throw e
+      }
+      return param
+    }
+  } else {
+    customLogger.logMessage('error', 'The specified custom function format is not correct', param, true, req)
+    return param
+  }
 }
 
 module.exports.validateRules = validateRules
