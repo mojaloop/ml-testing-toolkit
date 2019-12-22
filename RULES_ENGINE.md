@@ -221,6 +221,7 @@ The following is the list of configurable parameters that you can define anywher
 * $request.body - Request body
 * $request.path - Entire request path
 * $request.headers - Http headers of the request
+* $config.<param_name> - Configuration parameter value from environment or local.env file
 
 **Advanced parameters for developers:**
 

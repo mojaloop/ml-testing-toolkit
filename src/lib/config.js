@@ -41,7 +41,8 @@ const fs = require('fs')
 // Default values can be specified here
 const USER_CONFIG = {
   CALLBACK_ENDPOINT: 'http://localhost:4000',
-  SEND_CALLBACK_ENABLE: true
+  SEND_CALLBACK_ENABLE: true,
+  FSPID: 'samplefsp'
 }
 
 // Function to load user configuration from .env file or environment incase of running in container

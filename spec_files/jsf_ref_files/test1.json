@@ -1,9 +1,5 @@
 [
   {
-    "id": "party.partyIdInfo.fspId",
-    "pattern": "payeefsp"
-  },
-  {
     "id": "party.personalInfo.complexName.firstName",
     "pattern": "John|David|Michael|Chris|Mike|Mark|Paul|Daniel|James|Maria"
   },
@@ -83,9 +79,5 @@
   {
     "id": "Content-Length",
     "pattern": "123"
-  },
-  {
-    "id": "FSPIOP-Source",
-    "pattern": "payeefsp"
   }
 ]

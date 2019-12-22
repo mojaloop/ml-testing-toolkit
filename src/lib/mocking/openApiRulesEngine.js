@@ -5,6 +5,7 @@ const readFileAsync = promisify(fs.readFile)
 const customLogger = require('../requestLogger')
 const _ = require('lodash')
 const rulesEngineModel = require('../rulesEngineModel')
+const Config = require('../config')
 
 const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
 
@@ -96,6 +97,7 @@ const callbackRules = async (context, req) => {
         const jsfRefs1 = JSON.parse(rawdata)
         const operationCallback = req.customInfo.callbackInfo.successCallback.path
 
+        // Check if pathPattern from callback_map file exists and determine the callback path
         if (req.customInfo.callbackInfo.successCallback.pathPattern) {
           generatedCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.pathPattern, context, req)
         } else {
@@ -105,6 +107,15 @@ const callbackRules = async (context, req) => {
         generatedCallback.body = await callbackGenerator.generateRequestBody(operationCallback, generatedCallback.method, jsfRefs1)
         generatedCallback.headers = await callbackGenerator.generateRequestHeaders(operationCallback, generatedCallback.method, jsfRefs1)
 
+        // Override the values in generated callback with the values from callback map file
+        if (req.customInfo.callbackInfo.successCallback.bodyOverride) {
+          _.merge(generatedCallback.body, replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.bodyOverride, context, req))
+        }
+        if (req.customInfo.callbackInfo.successCallback.headerOverride) {
+          _.merge(generatedCallback.headers, replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.headerOverride, context, req))
+        }
+
+        // Override the values in generated callback with the values from event params
         _.merge(generatedCallback.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
         _.merge(generatedCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
         if (curEvent.params.delay) {
@@ -120,7 +131,7 @@ const callbackRules = async (context, req) => {
   return generatedCallback
 }
 
-const replaceVariablesFromRequest = (inputObject, fromObject, req) => {
+const replaceVariablesFromRequest = (inputObject, context, req) => {
   var resultObject
   // Check whether inputObject is string or object. If it is object, then convert that to JSON string and parse it while return
   if (typeof inputObject === 'string') {
@@ -136,11 +147,18 @@ const replaceVariablesFromRequest = (inputObject, fromObject, req) => {
   if (matchedArray) {
     matchedArray.forEach(element => {
       // Check for the function type of param, if its function we need to call a function in custom-functions and replace the returned value
-      const checkFn = element.startsWith('{$function')
-      if (checkFn) {
-        resultObject = resultObject.replace(element, getFunctionResult(element, fromObject, req))
-      } else {
-        resultObject = resultObject.replace(element, getVariableValue(element, fromObject))
+      const splitArr = element.split('.')
+      switch (splitArr[0]) {
+        case '{$function':
+          resultObject = resultObject.replace(element, getFunctionResult(element, context, req))
+          break
+        case '{$config':
+          resultObject = resultObject.replace(element, getConfigValue(element, Config.USER_CONFIG))
+          break
+        case '{$request':
+        default:
+          resultObject = resultObject.replace(element, getVariableValue(element, context))
+
       }
     })
   }
@@ -155,6 +173,12 @@ const replaceVariablesFromRequest = (inputObject, fromObject, req) => {
 // Get the variable from the object using lodash library
 const getVariableValue = (param, fromObject) => {
   const temp = param.replace(/{\$(.*)}/, "$1")
+  return _.get(fromObject, temp)
+}
+
+// Get the config value from the object using lodash library
+const getConfigValue = (param, fromObject) => {
+  const temp = param.replace(/{\$config.(.*)}/, "$1")
   return _.get(fromObject, temp)
 }
 

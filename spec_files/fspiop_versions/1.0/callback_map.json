@@ -32,7 +32,18 @@
       "successCallback": {
         "method": "put",
         "path": "/parties/{Type}/{ID}",
-        "pathPattern": "/parties/{$request.params.Type}/{$request.params.ID}"
+        "pathPattern": "/parties/{$request.params.Type}/{$request.params.ID}",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}"
+        },
+        "bodyOverride": {
+          "party": {
+            "partyIdInfo": {
+              "fspId": "{$config.FSPID}"
+            }
+          }
+        }
       },
       "errorCallback": {
         "method": "put",
