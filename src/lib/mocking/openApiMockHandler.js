@@ -30,7 +30,7 @@ module.exports.initilizeMockHandler = async () => {
   apis = apiDefinitions.map(item => {
     const tempObj = new OpenApiBackend({
       definition: path.join(item.specFile),
-      strict: false,
+      strict: true,
       handlers: {
         notImplemented: async (context, req, h) => {
           customLogger.logMessage('debug', 'Schema Validation Passed', null, true, req)
@@ -64,7 +64,7 @@ module.exports.initilizeMockHandler = async () => {
               const generatedErrorCallback = await OpenApiRulesEngine.validateRules(context, req)
               if (generatedErrorCallback.body) {
                 // TODO: Handle method and path verifications against the generated ones
-                CallbackHandler.handleCallback(generatedErrorCallback, req)
+                CallbackHandler.handleCallback(generatedErrorCallback, context, req)
                 return
               }
 
@@ -72,7 +72,7 @@ module.exports.initilizeMockHandler = async () => {
               const generatedCallback = await OpenApiRulesEngine.callbackRules(context, req)
               if (generatedCallback.body) {
                 // TODO: Handle method and path verifications against the generated ones
-                CallbackHandler.handleCallback(generatedCallback, req)
+                CallbackHandler.handleCallback(generatedCallback, context, req)
               }
             })
           }

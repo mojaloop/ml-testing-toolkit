@@ -11,7 +11,8 @@ jsf.format('byte', () => Buffer.alloc(faker.lorem.sentence(12)).toString('base64
 
 jsf.option({
   alwaysFakeOptionals: true,
-  ignoreMissingRefs: true
+  ignoreMissingRefs: true,
+  maxItems: 2
 })
 jsf.extend('faker', () => require('faker'))
 
