@@ -222,6 +222,9 @@ The following is the list of configurable parameters that you can define anywher
 * $request.path - Entire request path
 * $request.headers - Http headers of the request
 * $config.<param_name> - Configuration parameter value from environment or local.env file
+* $session.negotiatedContentType - Negotiated content type. Can be sent to callbacks and error callbacks
+* $session.uniqueId - UniqueID for the request session
+
 
 **Advanced parameters for developers:**
 

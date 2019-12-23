@@ -4,7 +4,13 @@
       "successCallback": {
         "method": "put",
         "path": "/transfers/{ID}",
-        "pathPattern": "/transfers/{$request.body.transferId}"
+        "pathPattern": "/transfers/{$request.body.transferId}",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
       },
       "errorCallback": {
         "method": "put",
@@ -18,7 +24,19 @@
       "successCallback": {
         "method": "put",
         "path": "/quotes/{ID}",
-        "pathPattern": "/quotes/{$request.body.quoteId}"
+        "pathPattern": "/quotes/{$request.body.quoteId}",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        },
+        "bodyOverride": {
+          "transferAmount": {
+            "currency": "{$request.body.amount.currency}",
+            "amount": "{$request.body.amount.amount}"
+          }
+        }
       },
       "errorCallback": {
         "method": "put",
@@ -35,11 +53,15 @@
         "pathPattern": "/parties/{$request.params.Type}/{$request.params.ID}",
         "headerOverride": {
           "FSPIOP-Source": "{$config.FSPID}",
-          "FSPIOP-Destination": "{$request.headers.fspiop-source}"
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
         },
         "bodyOverride": {
           "party": {
             "partyIdInfo": {
+              "partyIdType": "{$request.params.Type}",
+              "partyIdentifier": "{$request.params.ID}",
               "fspId": "{$config.FSPID}"
             }
           }

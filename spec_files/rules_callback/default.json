@@ -19,11 +19,7 @@
     },
     "event": {
       "type": "MOCK_CALLBACK",
-      "params": {
-        "headers": {
-          "Content-Type": "{$request.headers['content-type']}"
-        }
-      }
+      "params": {}
     }
   },
   {
@@ -45,19 +41,7 @@
     },
     "event": {
       "type": "MOCK_CALLBACK",
-      "params": {
-        "headers": {
-          "Content-Type": "{$request.headers['content-type']}"
-        },
-        "body": {
-          "party": {
-            "partyIdInfo": {
-              "partyIdType": "{$request.params.Type}",
-              "partyIdentifier": "{$request.params.ID}"
-            }
-          }
-        }
-      }
+      "params": {}
     }
   },
   {
@@ -79,17 +63,7 @@
     },
     "event": {
       "type": "MOCK_CALLBACK",
-      "params": {
-        "headers": {
-          "Content-Type": "{$request.headers['content-type']}"
-        },
-        "body": {
-          "transferAmount": {
-            "currency": "{$request.body.amount.currency}",
-            "amount": "{$request.body.amount.amount}"
-          }
-        }
-      }
+      "params": {}
     }
   }
 ]

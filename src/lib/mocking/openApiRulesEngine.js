@@ -155,6 +155,9 @@ const replaceVariablesFromRequest = (inputObject, context, req) => {
         case '{$config':
           resultObject = resultObject.replace(element, getConfigValue(element, Config.USER_CONFIG))
           break
+        case '{$session':
+          resultObject = resultObject.replace(element, getSessionValue(element, req.customInfo))
+          break
         case '{$request':
         default:
           resultObject = resultObject.replace(element, getVariableValue(element, context))
@@ -179,6 +182,12 @@ const getVariableValue = (param, fromObject) => {
 // Get the config value from the object using lodash library
 const getConfigValue = (param, fromObject) => {
   const temp = param.replace(/{\$config.(.*)}/, "$1")
+  return _.get(fromObject, temp)
+}
+
+// Get the customInfo value from the object using lodash library
+const getSessionValue = (param, fromObject) => {
+  const temp = param.replace(/{\$session.(.*)}/, "$1")
   return _.get(fromObject, temp)
 }
 
