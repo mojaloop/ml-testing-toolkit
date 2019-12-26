@@ -160,3 +160,7 @@ const errorResponseBuilder = (errorCode, errorDescription, additionalProperties 
     }
   }
 }
+
+module.exports.getOpenApiObjects = () => {
+  return apis
+}
