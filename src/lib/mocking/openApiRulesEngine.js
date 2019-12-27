@@ -72,9 +72,9 @@ const callbackRules = async (context, req) => {
     path: context.request.path,
     body: context.request.body,
     method: context.request.method,
-    pathParams: context.request.params
+    pathParams: context.request.params,
+    headers: context.request.headers
   }
-
   const res = await rulesEngine.evaluate(facts)
   const generatedCallback = {}
 
