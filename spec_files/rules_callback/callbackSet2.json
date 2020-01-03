@@ -6,7 +6,7 @@
     "conditions": {
       "all": [
         {
-          "fact": "path",
+          "fact": "operationPath",
           "operator": "equal",
           "value": "/transfers"
         },
@@ -17,7 +17,7 @@
         },
         {
           "fact": "body",
-          "operator": "equal",
+          "operator": "numericLessThan",
           "value": "100",
           "path": "amount.amount"
         }

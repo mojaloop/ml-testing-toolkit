@@ -6,6 +6,7 @@ const readFileAsync = promisify(fs.readFile)
 const writeFileAsync = promisify(fs.writeFile)
 const accessFileAsync = promisify(fs.access)
 const copyFileAsync = promisify(fs.copyFile)
+const readDirAsync = promisify(fs.readdir)
 const customLogger = require('./requestLogger')
 // const _ = require('lodash')
 
@@ -92,11 +93,35 @@ const getCallbackRulesEngine = async () => {
   return callbackRulesEngine
 }
 
+const getCallbackRulesFiles = async () => {
+  try {
+    const files = await readDirAsync(rulesCallbackFilePathPrefix)
+
+    // ACTIVE_RULES_FILE_NAME
+    return files.filter(item => {
+      return (item !== ACTIVE_RULES_FILE_NAME)
+    })
+  } catch (err) {
+    return null
+  }
+}
+
+const getCallbackRulesFileContent = async (fileName) => {
+  try {
+    const rulesRawdata = await readFileAsync(rulesCallbackFilePathPrefix + fileName)
+    return JSON.parse(rulesRawdata)
+  } catch (err) {
+    return err
+  }
+}
+
 module.exports = {
   getValidationRulesEngine,
   getCallbackRulesEngine,
   getValidationRules,
   getCallbackRules,
   setValidationRules,
-  setCallbackRules
+  setCallbackRules,
+  getCallbackRulesFiles,
+  getCallbackRulesFileContent
 }

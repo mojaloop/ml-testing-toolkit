@@ -4,6 +4,27 @@ const rulesEngineModel = require('../rulesEngineModel')
 
 const router = new express.Router()
 
+// Get rules files
+router.get('/files/callback', async (req, res, next) => {
+  try {
+    const result = await rulesEngineModel.getCallbackRulesFiles()
+    res.status(200).json(result)
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.get('/files/callback/:fileName', async (req, res, next) => {
+  const fileName = req.params.fileName
+
+  try {
+    const result = await rulesEngineModel.getCallbackRulesFileContent(fileName)
+    res.status(200).json(result)
+  } catch (err) {
+    next(err)
+  }
+})
+
 router.get('/validation', async (req, res, next) => {
   try {
     const result = await rulesEngineModel.getValidationRules()
