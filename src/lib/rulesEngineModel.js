@@ -7,6 +7,7 @@ const writeFileAsync = promisify(fs.writeFile)
 const accessFileAsync = promisify(fs.access)
 const copyFileAsync = promisify(fs.copyFile)
 const readDirAsync = promisify(fs.readdir)
+const deleteFileAsync = promisify(fs.unlink)
 const customLogger = require('./requestLogger')
 // const _ = require('lodash')
 
@@ -15,6 +16,7 @@ const rulesCallbackFilePathPrefix = 'spec_files/rules_callback/'
 
 const DEFAULT_RULES_FILE_NAME = 'default.json'
 const ACTIVE_RULES_FILE_NAME = 'activeRules.json'
+const CONFIG_FILE_NAME = 'config.json'
 
 var validationRules = null
 var callbackRules = null
@@ -22,27 +24,57 @@ var callbackRules = null
 var validationRulesEngine = null
 var callbackRulesEngine = null
 
-const reloadValidationRules = async () => {
-  try {
-    await accessFileAsync(rulesValidationFilePathPrefix + ACTIVE_RULES_FILE_NAME, fs.constants.F_OK)
-  } catch (err) {
-    await copyFileAsync(rulesValidationFilePathPrefix + DEFAULT_RULES_FILE_NAME, rulesValidationFilePathPrefix + ACTIVE_RULES_FILE_NAME)
-  }
+var activeValidationRulesFile = null
+var activeCallbackRulesFile = null
 
-  customLogger.logMessage('info', 'Reloading Validation Rules from file', null, false)
-  const rulesRawdata = await readFileAsync(rulesValidationFilePathPrefix + ACTIVE_RULES_FILE_NAME)
+const reloadValidationRules = async () => {
+
+  const rulesConfigRawData = await readFileAsync(rulesValidationFilePathPrefix + CONFIG_FILE_NAME)
+  let rulesConfig = JSON.parse(rulesConfigRawData)
+
+  try {
+    await accessFileAsync(rulesValidationFilePathPrefix + rulesConfig.activeRulesFile, fs.constants.F_OK)
+  } catch (err) {
+    // If active rules file not found then make default rules file as active
+    await setActiveValidationRulesFile(DEFAULT_RULES_FILE_NAME)
+  }
+  activeValidationRulesFile = rulesConfig.activeRulesFile
+  customLogger.logMessage('info', 'Reloading Validation Rules from file ' + rulesConfig.activeRulesFile, null, false)
+  const rulesRawdata = await readFileAsync(rulesValidationFilePathPrefix + rulesConfig.activeRulesFile)
   validationRules = JSON.parse(rulesRawdata)
 }
 
 const reloadCallbackRules = async () => {
+
+  const rulesConfigRawData = await readFileAsync(rulesCallbackFilePathPrefix + CONFIG_FILE_NAME)
+  let rulesConfig = JSON.parse(rulesConfigRawData)
+
   try {
-    await accessFileAsync(rulesCallbackFilePathPrefix + ACTIVE_RULES_FILE_NAME, fs.constants.F_OK)
+    await accessFileAsync(rulesCallbackFilePathPrefix + rulesConfig.activeRulesFile, fs.constants.F_OK)
   } catch (err) {
-    await copyFileAsync(rulesCallbackFilePathPrefix + DEFAULT_RULES_FILE_NAME, rulesCallbackFilePathPrefix + ACTIVE_RULES_FILE_NAME)
+    // If active rules file not found then make default rules file as active
+    await setActiveCallbackRulesFile(DEFAULT_RULES_FILE_NAME)
   }
-  customLogger.logMessage('info', 'Reloading Callback Rules from file', null, false)
-  const rulesRawdata = await readFileAsync(rulesCallbackFilePathPrefix + ACTIVE_RULES_FILE_NAME)
+  activeCallbackRulesFile = rulesConfig.activeRulesFile
+  customLogger.logMessage('info', 'Reloading Callback Rules from file ' + rulesConfig.activeRulesFile, null, false)
+  const rulesRawdata = await readFileAsync(rulesCallbackFilePathPrefix + rulesConfig.activeRulesFile)
   callbackRules = JSON.parse(rulesRawdata)
+}
+
+const setActiveValidationRulesFile = async (fileName) => {
+  const rulesConfig = {
+    activeRulesFile: fileName
+  }
+  await writeFileAsync(rulesValidationFilePathPrefix + CONFIG_FILE_NAME, JSON.stringify(rulesConfig, null, 2))
+  activeValidationRulesFile = fileName
+}
+
+const setActiveCallbackRulesFile = async (fileName) => {
+  const rulesConfig = {
+    activeRulesFile: fileName
+  }
+  await writeFileAsync(rulesCallbackFilePathPrefix + CONFIG_FILE_NAME, JSON.stringify(rulesConfig, null, 2))
+  activeCallbackRulesFile = fileName
 }
 
 const getValidationRules = async () => {
@@ -93,14 +125,60 @@ const getCallbackRulesEngine = async () => {
   return callbackRulesEngine
 }
 
+const getValidationRulesFiles = async () => {
+  await getValidationRules()
+  try {
+    const files = await readDirAsync(rulesValidationFilePathPrefix)
+    const resp = {}
+    // Do not return the config file
+    resp.files = files.filter(item => {
+      return (item !== CONFIG_FILE_NAME)
+    })
+    resp.activeRulesFile = activeValidationRulesFile
+    return resp
+  } catch (err) {
+    return null
+  }
+}
+
+const getValidationRulesFileContent = async (fileName) => {
+  try {
+    const rulesRawdata = await readFileAsync(rulesValidationFilePathPrefix + fileName)
+    return JSON.parse(rulesRawdata)
+  } catch (err) {
+    return err
+  }
+}
+
+const setValidationRulesFileContent = async (fileName, fileContent) => {
+  try {
+    await writeFileAsync(rulesValidationFilePathPrefix + fileName, JSON.stringify(fileContent, null, 2))
+    return true
+  } catch (err) {
+    return err
+  }
+}
+
+const deleteValidationRulesFile = async (fileName) => {
+  try {
+    await deleteFileAsync(rulesValidationFilePathPrefix + fileName)
+    return true
+  } catch (err) {
+    return err
+  }
+}
+
 const getCallbackRulesFiles = async () => {
+  await getCallbackRules()
   try {
     const files = await readDirAsync(rulesCallbackFilePathPrefix)
-
-    // ACTIVE_RULES_FILE_NAME
-    return files.filter(item => {
-      return (item !== ACTIVE_RULES_FILE_NAME)
+    const resp = {}
+    // Do not return the config file
+    resp.files = files.filter(item => {
+      return (item !== CONFIG_FILE_NAME)
     })
+    resp.activeRulesFile = activeCallbackRulesFile
+    return resp
   } catch (err) {
     return null
   }
@@ -115,6 +193,24 @@ const getCallbackRulesFileContent = async (fileName) => {
   }
 }
 
+const setCallbackRulesFileContent = async (fileName, fileContent) => {
+  try {
+    await writeFileAsync(rulesCallbackFilePathPrefix + fileName, JSON.stringify(fileContent, null, 2))
+    return true
+  } catch (err) {
+    return err
+  }
+}
+
+const deleteCallbackRulesFile = async (fileName) => {
+  try {
+    await deleteFileAsync(rulesCallbackFilePathPrefix + fileName)
+    return true
+  } catch (err) {
+    return err
+  }
+}
+
 module.exports = {
   getValidationRulesEngine,
   getCallbackRulesEngine,
@@ -122,6 +218,14 @@ module.exports = {
   getCallbackRules,
   setValidationRules,
   setCallbackRules,
+  getValidationRulesFiles,
+  getValidationRulesFileContent,
+  setValidationRulesFileContent,
+  deleteValidationRulesFile,
   getCallbackRulesFiles,
-  getCallbackRulesFileContent
+  getCallbackRulesFileContent,
+  setCallbackRulesFileContent,
+  deleteCallbackRulesFile,
+  setActiveValidationRulesFile,
+  setActiveCallbackRulesFile
 }

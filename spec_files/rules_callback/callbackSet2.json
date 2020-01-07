@@ -6,6 +6,12 @@
     "conditions": {
       "all": [
         {
+          "fact": "body",
+          "operator": "numericLessThan",
+          "value": "100",
+          "path": "amount.amount"
+        },
+        {
           "fact": "operationPath",
           "operator": "equal",
           "value": "/transfers"
@@ -14,17 +20,11 @@
           "fact": "method",
           "operator": "equal",
           "value": "post"
-        },
-        {
-          "fact": "body",
-          "operator": "numericLessThan",
-          "value": "100",
-          "path": "amount.amount"
         }
       ]
     },
     "event": {
-      "type": "FIXED_CALLBACK",
+      "type": "MOCK_CALLBACK",
       "params": {
         "method": "put",
         "path": "/transfers/{$request.body.transferId}",
@@ -50,7 +50,7 @@
     "conditions": {
       "all": [
         {
-          "fact": "path",
+          "fact": "operationPath",
           "operator": "equal",
           "value": "/transfers"
         },
@@ -113,7 +113,7 @@
     "conditions": {
       "all": [
         {
-          "fact": "path",
+          "fact": "operationPath",
           "operator": "equal",
           "value": "/quotes"
         },
@@ -134,6 +134,33 @@
           "condition": "GRzLaTP7DJ9t4P-a_BA0WA9wzzlsugf00-Tn6kESAfM"
         }
       }
+    }
+  },
+  {
+    "ruleId": 5,
+    "priority": 1,
+    "description": "Sample Test1",
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/participants"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": null,
+      "path": null,
+      "headers": {},
+      "body": {},
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
     }
   }
 ]

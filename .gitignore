@@ -77,5 +77,10 @@ jsconfig.json
 # client/
 
 # Some rules files which will be generated dynamically
-spec_files/rules_callback/activeRules.json
-spec_files/rules_validation/activeRules.json
+spec_files/rules_callback/*
+!spec_files/rules_callback/config.json
+!spec_files/rules_callback/default.json
+
+spec_files/rules_validation/*
+!spec_files/rules_validation/config.json
+!spec_files/rules_validation/default.json

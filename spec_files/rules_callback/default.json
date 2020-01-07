@@ -6,7 +6,7 @@
     "conditions": {
       "all": [
         {
-          "fact": "path",
+          "fact": "operationPath",
           "operator": "equal",
           "value": "/transfers"
         },
@@ -50,7 +50,7 @@
     "conditions": {
       "all": [
         {
-          "fact": "path",
+          "fact": "operationPath",
           "operator": "equal",
           "value": "/quotes"
         },

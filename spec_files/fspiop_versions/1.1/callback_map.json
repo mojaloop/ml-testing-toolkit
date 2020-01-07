@@ -15,7 +15,13 @@
       "errorCallback": {
         "method": "put",
         "path": "/transfers/{ID}/error",
-        "pathPattern": "/transfers/{$request.body.transferId}/error"
+        "pathPattern": "/transfers/{$request.body.transferId}/error",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
       }
     }
   },
@@ -41,7 +47,13 @@
       "errorCallback": {
         "method": "put",
         "path": "/quotes/{ID}/error",
-        "pathPattern": "/quotes/{$request.body.quoteId}/error"
+        "pathPattern": "/quotes/{$request.body.quoteId}/error",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
       }
     }
   },
@@ -70,7 +82,13 @@
       "errorCallback": {
         "method": "put",
         "path": "/parties/{Type}/{ID}/error",
-        "pathPattern": "/parties/{$request.params.Type}/{$request.params.ID}/error"
+        "pathPattern": "/parties/{$request.params.Type}/{$request.params.ID}/error",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
       }
     }
   }

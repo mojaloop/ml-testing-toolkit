@@ -51,6 +51,14 @@ const validateRules = async (context, req) => {
         generatedErrorCallback.body = await callbackGenerator.generateRequestBody(operationCallback, generatedErrorCallback.method, jsfRefs1)
         generatedErrorCallback.headers = await callbackGenerator.generateRequestHeaders(operationCallback, generatedErrorCallback.method, jsfRefs1)
 
+        // Override the values in generated callback with the values from callback map file
+        if (req.customInfo.callbackInfo.errorCallback.bodyOverride) {
+          _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.bodyOverride, context, req))
+        }
+        if (req.customInfo.callbackInfo.errorCallback.headerOverride) {
+          _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.headerOverride, context, req))
+        }
+
         _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
         _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
         if (curEvent.params.delay) {
