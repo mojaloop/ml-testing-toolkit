@@ -2,7 +2,7 @@
   {
     "ruleId": 1,
     "priority": 1,
-    "description": "Send a mock callback for all the remaining transfer requests",
+    "description": "Send a mock callback for all the transfer requests",
     "conditions": {
       "all": [
         {
@@ -19,14 +19,28 @@
     },
     "event": {
       "type": "MOCK_CALLBACK",
-      "params": {}
+      "params": {
+        "method": null,
+        "path": null,
+        "headers": {},
+        "body": {},
+        "delay": 0
+      },
+      "method": "put",
+      "path": "/transfers/{ID}"
     }
   },
   {
     "ruleId": 2,
-    "description": "Send a mock callback for all the parties lookup",
+    "description": "Send a mock callback for all the parties lookup with a constant party info",
     "conditions": {
       "all": [
+        {
+          "fact": "pathParams",
+          "operator": "equal",
+          "value": "000111",
+          "path": "ID"
+        },
         {
           "fact": "operationPath",
           "operator": "equal",
@@ -40,8 +54,36 @@
       ]
     },
     "event": {
-      "type": "MOCK_CALLBACK",
-      "params": {}
+      "type": "FIXED_CALLBACK",
+      "params": {
+        "headers": {
+          "FSPIOP-Source": "{$request.body.FSPIOP-Destination}",
+          "Content-Type": "",
+          "Date": ""
+        },
+        "body": {
+          "party": {
+            "partyIdInfo": {
+              "partyIdType": "{$request.params.Type}",
+              "partyIdentifier": "{$request.params.ID}",
+              "partySubIdOrType": "DRIVING_LICENSE",
+              "fspId": "{$config.FSPID}"
+            },
+            "merchantClassificationCode": "4321",
+            "name": "Justin Trudeau",
+            "personalInfo": {
+              "complexName": {
+                "firstName": "Justin",
+                "middleName": "Pierre",
+                "lastName": "Trudeau"
+              },
+              "dateOfBirth": "1971-12-25"
+            }
+          }
+        }
+      },
+      "method": "put",
+      "path": "/parties/{Type}/{ID}"
     }
   },
   {
