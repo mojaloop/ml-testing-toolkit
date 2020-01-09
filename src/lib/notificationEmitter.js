@@ -38,6 +38,7 @@ const startServer = port => {
   // For admin API
   app.use('/api/rules', require('./api-routes/rules'))
   app.use('/api/openapi', require('./api-routes/openapi'))
+  app.use('/api/outbound', require('./api-routes/outbound'))
 
   // For front-end UI
   app.use('/ui', express.static(path.join('client/build')))
