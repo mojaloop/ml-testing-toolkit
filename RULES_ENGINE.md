@@ -14,9 +14,9 @@ Table of Contents
       - [MOCK_ERROR_CALLBACK and MOCK_CALLBACK](#mock_error_callback-and-mock_callback)
     - [Priority of rules](#priority-of-rules)
   
-This Self Testing Toolkit implemented "Rules Engine" by taking advantage of ***Json Rules Engine***.
+This Self Testing Toolkit implemented "Rules Engine" by taking advantage of ***Json Rules Engine*** (JRE).
 
-## Json Rules Engine:
+## Json Rules Engine (JRE):
 *"Json Rules Engine"* is a powerful, lightweight rules engine. Rules are composed of simple json structures, making them human readable and easy to persist.
 
 Rules are composed of two components: conditions and events. Conditions are a set of requirements that must be met to trigger the rule's event.
@@ -26,8 +26,8 @@ You can refer https://www.npmjs.com/package/json-rules-engine for further inform
 ## Implementation in Self Testing Toolkit
 
 The rules in self testing toolkit are implemented at two levels.
-* One for validating the incoming request and send error callback if the validation rule matches.
-* Another for generating callbacks if the callback rule matches.
+* Validation Rules - for validating the incoming request and sending error callback if the validation rule matches.
+* Callback Rules - for generating callbacks if the callback rule matches.
 
 In both cases the conditions syntax is same as per the Json Rules Engine, where as the event types will be different for the two levels.
 
@@ -86,7 +86,7 @@ Conditions can be defined with either "all" or "any" type of arrays. In each arr
   * Fact - facts are the variable names that can be one of the following
     * path - The request path
   
-      Example: /transfers, /parties/MSISDN/9876543210 ... etc
+      Example: /transfers, /parties/MSSDN/9876543210 ... etc
 
     * method - The http method of the request in lowercase
   
@@ -111,7 +111,7 @@ Conditions can be defined with either "all" or "any" type of arrays. In each arr
 
       Example: operationPath contains the value /parties/{Type}/{ID} instead of /parties/MSISDN/9876543210 which can actually be found in the fact 'path'.
 
-  * Operator - The ```operator``` compares the value returned by the ```fact``` to what is stored in the ```value``` property.  If the result is truthy, the condition passes.
+  * Operator - The ```operator``` compares the value returned by the ```fact``` to what is stored in the ```value``` property.  If the result is true, the condition passes.
     There are number of operators available to compare the values
 
     * String and Numeric operators:
@@ -228,13 +228,13 @@ The following is the list of configurable parameters that you can define anywher
 
 **Advanced parameters for developers:**
 
-There are some advanced parameters type *$function* is implemented for advanced users / developers. The syntax is like below
+There are some advanced parameters type *$function* for advanced users / developers. Here is the exammple syntax:
 
 * $function.sample.getSampleText (For development purpose)
 
-The above parameter calls the function 'getSampleText' in 'sample.js' file located at 'lib/mocking/custom-functions' folder. An argument will be passed to this function from which the developer can get the request parameters to process like 'arg1.request.body.quoteId', 'arg1.request.headers.date' ...etc
+The above parameter calls the function 'getSampleText' in 'sample.js' file located at 'lib/mocking/custom-functions' folder. An argument will be passed to this function from which the developer can get the request parameters to process, for example 'arg1.request.body.quoteId', 'arg1.request.headers.date' ...etc
 
-Please be noted that these javascript files can not be change in runtime and need compilation for the changes.
+Please note that these javascript files can not be changed at runtime and need to be compilated prior to running.
 
 
 #### MOCK_ERROR_CALLBACK and MOCK_CALLBACK
@@ -250,7 +250,7 @@ Let's look at an example of an event type *MOCK_ERROR_CALLBACK*
 }
 ```
 
-That's it, the self testing toolkit can be able to generate a mock callback based on the open API file with random values. 
+That's all that is required; the self testing toolkit will generate a mock callback based on the open API file with random values. 
 
 **Also you can define the params like in fixed callbacks to override a particular value.**
 
@@ -277,11 +277,11 @@ See the following example in which the generated values of the firstName & name 
 
 ### Priority of rules
 
-The 'priority' property in a rule dictates when rule should be run, relative to other rules. Higher priority rules are run before lower priority rules. Rules with the same priority are run in parallel. Priority must be a positive, non-zero integer.
+The 'priority' property in a rule dictates when rule should be run, relative to other rules. Higher priority rules are run before lower priority rules. Rules with the same priority are ran in parallel. Priority must be a positive, non-zero integer.
 
-**Example:**
+**Example:** DJM: can we please discuss
 
-Consider the following example, observe the priority values. So rule which compares the amount value will be executed first and then the other rule will be executed. So if the amount is equal to 50, then we will get FIXED_CALLBACK event in first place, and in other cases we get MOCK_CALLBACK.
+In the example below, the rule which compares the amount value will be executed first, and then the other rule will be executed. Thus if the amount is equal to 50, then we will get FIXED_CALLBACK event in first place, and in other cases we get MOCK_CALLBACK.
 
 ```
 [
