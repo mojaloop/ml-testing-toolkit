@@ -43,7 +43,9 @@ const reloadValidationRules = async () => {
   const rulesRawdata = await readFileAsync(rulesValidationFilePathPrefix + rulesConfig.activeRulesFile)
   validationRules = JSON.parse(rulesRawdata)
   validationRulesEngine = new RulesEngine()
-  validationRulesEngine.loadRules(validationRules)
+  if (validationRules.length) {
+    validationRulesEngine.loadRules(validationRules)
+  }
 }
 
 const reloadCallbackRules = async () => {
@@ -62,7 +64,9 @@ const reloadCallbackRules = async () => {
   const rulesRawdata = await readFileAsync(rulesCallbackFilePathPrefix + rulesConfig.activeRulesFile)
   callbackRules = JSON.parse(rulesRawdata)
   callbackRulesEngine = new RulesEngine()
-  callbackRulesEngine.loadRules(callbackRules)
+  if (callbackRules.length) {
+    callbackRulesEngine.loadRules(callbackRules)
+  }
 }
 
 const setActiveValidationRulesFile = async (fileName) => {
