@@ -43,9 +43,11 @@ const reloadValidationRules = async () => {
   const rulesRawdata = await readFileAsync(rulesValidationFilePathPrefix + rulesConfig.activeRulesFile)
   validationRules = JSON.parse(rulesRawdata)
   validationRulesEngine = new RulesEngine()
-  if (validationRules.length) {
-    validationRulesEngine.loadRules(validationRules)
+  console.log('GVK1', validationRules)
+  if (!validationRules.length) {
+    validationRules = []
   }
+  validationRulesEngine.loadRules(validationRules)
 }
 
 const reloadCallbackRules = async () => {
@@ -64,9 +66,10 @@ const reloadCallbackRules = async () => {
   const rulesRawdata = await readFileAsync(rulesCallbackFilePathPrefix + rulesConfig.activeRulesFile)
   callbackRules = JSON.parse(rulesRawdata)
   callbackRulesEngine = new RulesEngine()
-  if (callbackRules.length) {
-    callbackRulesEngine.loadRules(callbackRules)
+  if (!callbackRules.length) {
+    callbackRules = []
   }
+  callbackRulesEngine.loadRules(callbackRules)
 }
 
 const setActiveValidationRulesFile = async (fileName) => {

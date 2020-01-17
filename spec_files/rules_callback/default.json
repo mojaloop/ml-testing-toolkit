@@ -54,30 +54,18 @@
       ]
     },
     "event": {
-      "type": "FIXED_CALLBACK",
+      "type": "MOCK_CALLBACK",
       "params": {
-        "headers": {
-          "FSPIOP-Source": "{$request.body.FSPIOP-Destination}",
-          "Content-Type": "",
-          "Date": ""
-        },
         "body": {
           "party": {
-            "partyIdInfo": {
-              "partyIdType": "{$request.params.Type}",
-              "partyIdentifier": "{$request.params.ID}",
-              "partySubIdOrType": "DRIVING_LICENSE",
-              "fspId": "{$config.FSPID}"
-            },
-            "merchantClassificationCode": "4321",
-            "name": "Justin Trudeau",
+            "name": "Vijay Kumar",
             "personalInfo": {
               "complexName": {
-                "firstName": "Justin",
-                "middleName": "Pierre",
-                "lastName": "Trudeau"
+                "firstName": "Vijay",
+                "middleName": "Kumar",
+                "lastName": "Guthi"
               },
-              "dateOfBirth": "1971-12-25"
+              "dateOfBirth": "1984-01-01"
             }
           }
         }
@@ -105,7 +93,15 @@
     },
     "event": {
       "type": "MOCK_CALLBACK",
-      "params": {}
+      "params": {
+        "body": {
+          "payeeFspCommission": {
+            "amount": "20"
+          }
+        }
+      },
+      "method": "put",
+      "path": "/quotes/{ID}"
     }
   }
 ]

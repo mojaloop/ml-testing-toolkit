@@ -13,8 +13,22 @@ module.exports.validateAcceptHeader = (acceptHeader) => {
   }
 }
 
+module.exports.validateContentTypeHeader = (acceptHeader) => {
+  const validationFailed = !acceptHeaderRE.test(acceptHeader)
+  if(validationFailed) {
+    customLogger.logMessage('debug', 'Invalid content-type header ' + acceptHeader)
+  }
+  return {
+    validationFailed: validationFailed,
+    message: validationFailed ? 'Unknown Content-Type header format' : 'OK'
+  }
+}
+
 module.exports.negotiateVersion = (req, apis) => {
-  const acceptHeader = req.headers.accept
+  let acceptHeader = req.headers['content-type']
+  if (req.method === 'post' || req.method === 'get') {
+    acceptHeader = req.headers.accept
+  }
   let negotiatedIndex = null
   let negotiationFailed = true
   let responseContentTypeHeader = null
@@ -72,10 +86,10 @@ module.exports.negotiateVersion = (req, apis) => {
       '.' + apis[negotiatedIndex].minorVersion
     }
   }
-  customLogger.logMessage('debug', negotiationFailed ? 'Version negotiation failed for the Accept header ' + acceptHeader : 'Version negotiation succeeded, picked up the version ' + apis[negotiatedIndex].majorVersion + '.' + apis[negotiatedIndex].minorVersion, null, true, req)
+  customLogger.logMessage('debug', negotiationFailed ? 'Version negotiation failed for the Accept / Content-Type header ' + acceptHeader : 'Version negotiation succeeded, picked up the version ' + apis[negotiatedIndex].majorVersion + '.' + apis[negotiatedIndex].minorVersion, null, true, req)
   return {
     negotiationFailed: negotiationFailed,
-    message: negotiationFailed ? 'Version negotiation failed for the Accept header ' + acceptHeader : 'OK',
+    message: negotiationFailed ? 'Version negotiation failed for the Accept / Content-Type header ' + acceptHeader : 'OK',
     negotiatedIndex: negotiatedIndex,
     responseContentTypeHeader: responseContentTypeHeader
   }

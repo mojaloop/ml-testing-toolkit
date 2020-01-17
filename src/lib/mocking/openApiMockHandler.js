@@ -9,6 +9,7 @@ const { promisify } = require('util')
 const OpenApiRulesEngine = require('./openApiRulesEngine')
 const CallbackHandler = require('../callbackHandler')
 const _ = require('lodash')
+const MyEventEmitter = require('../MyEventEmitter')
 
 const readFileAsync = promisify(fs.readFile)
 
@@ -34,12 +35,17 @@ module.exports.initilizeMockHandler = async () => {
       handlers: {
         notImplemented: async (context, req, h) => {
           customLogger.logMessage('debug', 'Schema Validation Passed', null, true, req)
+          if (req.method === 'put') {
+            // MyEventEmitter.getTestOutboundEmitter().emit('incoming', req.payload)
+            MyEventEmitter.getTestOutboundEmitter().emit(req.method + ' ' + req.path, req.headers, req.payload)
+          }
+
           req.customInfo.specFile = item.specFile
           // Generate mock response from openAPI spec file
           const { status, mock } = context.api.mockResponseForOperation(context.operation.operationId)
 
-          // Verify that it is a success code, then generate callback
-          if (status >= 200 && status <= 299) {
+          // Verify that it is a success code, then generate callback and only if the method is post or get
+          if ( (req.method === 'post' || req.method === 'get') && status >= 200 && status <= 299) {
             // Generate callback asynchronously
             setImmediate(async () => {
               // Getting callback info from callback map file
@@ -118,10 +124,19 @@ module.exports.initilizeMockHandler = async () => {
 }
 
 module.exports.handleRequest = (req, h) => {
-  // Validate the accept header here
-  const acceptHeaderValidationResult = OpenApiVersionTools.validateAcceptHeader(req.headers.accept)
-  if (acceptHeaderValidationResult.validationFailed) {
-    return h.response(errorResponseBuilder('3001', acceptHeaderValidationResult.message)).code(400)
+  // Validate accept header for POST & GET.
+  if (req.method === 'post' || req.method === 'get') {
+    // Validate the accept header here
+    const acceptHeaderValidationResult = OpenApiVersionTools.validateAcceptHeader(req.headers.accept)
+    if (acceptHeaderValidationResult.validationFailed) {
+      return h.response(errorResponseBuilder('3001', acceptHeaderValidationResult.message)).code(400)
+    }
+  } else {
+    // Validate content-type header for all the remaining requests
+    const contentTypeHeaderValidationResult = OpenApiVersionTools.validateContentTypeHeader(req.headers['content-type'])
+    if (contentTypeHeaderValidationResult.validationFailed) {
+      return h.response(errorResponseBuilder('3001', contentTypeHeaderValidationResult.message)).code(400)
+    }
   }
 
   // Pick the right API object based on the major and minor versions (Version negotiation as per the API Definition file)
@@ -134,7 +149,7 @@ module.exports.handleRequest = (req, h) => {
         value: item.minorVersion + ''
       }
     })
-    return h.response(errorResponseBuilder('3001', 'The Client requested an unsupported version, see exten- sion list for supported version(s).', { extensionList })).code(406)
+    return h.response(errorResponseBuilder('3001', 'The Client requested an unsupported version, see extension list for supported version(s).', { extensionList })).code(406)
   }
   req.customInfo.negotiatedContentType = versionNegotiationResult.responseContentTypeHeader
 
