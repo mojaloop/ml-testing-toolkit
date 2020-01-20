@@ -5,7 +5,7 @@ const axios = require('axios').default
 const Config = require('../config')
 const customLogger = require('../requestLogger')
 
-// Route to send a outbound request
+// Route to send a single outbound request
 router.post('/request', async (req, res, next) => {
   try {
     axios({
@@ -22,6 +22,20 @@ router.post('/request', async (req, res, next) => {
     }, (err) => {
       customLogger.logMessage('info', 'Failed to send request ' + req.body.method + ' ' + req.body.path, err, true)
     })
+    res.status(200).json({ status: 'OK'})
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Route to send series of outbound requests based on the given template
+router.post('/template/:outboundID', async (req, res, next) => {
+  try {
+    const outboundID = req.params.outboundID
+    const inputJson = JSON.parse(JSON.stringify(req.body))
+    const outbound = require('../test-outbound/outbound-initiator')
+    outbound.OutboundSend(inputJson, outboundID)
+
     res.status(200).json({ status: 'OK'})
   } catch (err) {
     next(err)

@@ -123,10 +123,6 @@ const initialize = async (port = Config.API_PORT) => {
   // server.plugins.openapi.setHost(server.info.host + ':' + server.info.port)
   // Logger.info(`Server running on ${server.info.host}:${server.info.port}`)
 
-  // Start the outbound initiator for development purpose
-  const inputJson = require('./lib/test-outbound/sample1.json')
-  const outbound = require('./lib/test-outbound/outbound-initiator')
-  outbound.OutboundSend(inputJson)
   console.log(`Toolkit Server running on port ${server.info.port}`)
   return server
 }

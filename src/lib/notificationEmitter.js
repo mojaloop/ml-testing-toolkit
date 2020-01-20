@@ -60,7 +60,15 @@ const broadcastLog = log => {
   })
 }
 
+const broadcastOutboundProgress = status => {
+  io.emit('outboundProgress', {
+    reportTime: new Date(),
+    ...status
+  })
+}
+
 module.exports = {
   startServer,
-  broadcastLog
+  broadcastLog,
+  broadcastOutboundProgress
 }

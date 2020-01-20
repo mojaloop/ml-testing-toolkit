@@ -3,8 +3,9 @@ const customLogger = require('../requestLogger')
 const axios = require('axios').default
 const Config = require('../config')
 const MyEventEmitter = require('../MyEventEmitter')
+const notificationEmitter = require('../notificationEmitter.js')
 
-const OutboundSend = async (inputTemplate) => {
+const OutboundSend = async (inputTemplate, outboundID) => {
   // Load the requests array into an object by the request id to access a particular object faster
   // console.log(inputTemplate.requests)
   let requestsObj = {}
@@ -53,8 +54,20 @@ const OutboundSend = async (inputTemplate) => {
         response: resp,
         request: convertedRequest
       }
+      notificationEmitter.broadcastOutboundProgress({ 
+        outboundID: outboundID,
+        status: 'SUCCESS',
+        id: request.id,
+        response: resp
+      })
     } catch(err) {
-      console.log('GVK', 'Catched the error, breaking the loop', err.message)
+      console.log('GVK', 'Caught the error, breaking the loop', err.message)
+      notificationEmitter.broadcastOutboundProgress({ 
+        outboundID: outboundID,
+        status: 'ERROR',
+        id: request.id,
+        error: JSON.parse(err.message)
+      })
       break
     }
   }
@@ -75,6 +88,9 @@ const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallb
         return status < 900 // Reject only if the status code is greater than or equal to 900
       }
     }).then((result) => {
+      if (result.status > 299) {
+        reject(new Error(JSON.stringify(result.data)))
+      }
       customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, true)
       // Listen for success callback
       MyEventEmitter.getTestOutboundEmitter().once(successCallbackUrl, (callbackHeaders, callbackBody) => {
