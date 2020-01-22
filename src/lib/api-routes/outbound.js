@@ -18,9 +18,9 @@ router.post('/request', async (req, res, next) => {
         return status < 900 // Reject only if the status code is greater than or equal to 900
       }
     }).then((result) => {
-      customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, true)
+      customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
     }, (err) => {
-      customLogger.logMessage('info', 'Failed to send request ' + req.body.method + ' ' + req.body.path, err, true)
+      customLogger.logMessage('info', 'Failed to send request ' + req.body.method + ' ' + req.body.path, err, false)
     })
     res.status(200).json({ status: 'OK'})
   } catch (err) {

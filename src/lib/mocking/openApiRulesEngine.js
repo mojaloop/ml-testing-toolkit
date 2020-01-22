@@ -87,7 +87,7 @@ const callbackRules = async (context, req) => {
   const generatedCallback = {}
 
   if (res) {
-    customLogger.logMessage('debug', 'Callback rules matched', res, true, req)
+    customLogger.logMessage('debug', 'Callback rules are matched', res, true, req)
     const curEvent = res[0]
     if (curEvent.type === 'FIXED_CALLBACK') {
       generatedCallback.method = curEvent.params.method
@@ -133,6 +133,8 @@ const callbackRules = async (context, req) => {
         customLogger.logMessage('error', 'No Specification file provided for validateRules function', null, true, req)
       }
     }
+  } else {
+    customLogger.logMessage('error', 'No callback rules are matched', res, true, req)
   }
   require('./middleware-functions/ilp_stuff').handleQuoteIlp(context, generatedCallback)
   require('./middleware-functions/ilp_stuff').handleTransferIlp(context, generatedCallback)

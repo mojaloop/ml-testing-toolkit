@@ -27,7 +27,7 @@ const handleCallback = async (callbackObject, context, req) => {
     }).then((result) => {
       customLogger.logMessage('info', 'Received callback response ' + result.status + ' ' + result.statusText, null, true, req)
     }, (err) => {
-      customLogger.logMessage('info', 'Failed to send callback ' + callbackObject.method + ' ' + callbackObject.path, err, true, req)
+      customLogger.logMessage('error', 'Failed to send callback ' + callbackObject.method + ' ' + callbackObject.path, err, true, req)
     })
   } else {
     customLogger.logMessage('info', 'Log callback ' + callbackObject.method + ' ' + callbackObject.path, callbackObject, true, req)

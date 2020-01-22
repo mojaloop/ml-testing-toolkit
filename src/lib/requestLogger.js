@@ -42,7 +42,7 @@ const logRequest = function (request) {
     }
   }
   Logger.info(logObject, logMessage)
-  notificationEmitter.broadcastLog({ uniqueId: request.customInfo.uniqueId, messageType: 'request', verbosity: 'info', message: logMessage, additionalData: logObject })
+  notificationEmitter.broadcastLog({ uniqueId: request.customInfo.uniqueId, resource: { method: request.method, path: request.path }, messageType: 'request', verbosity: 'info', message: logMessage, additionalData: logObject })
 }
 
 const logResponse = function (request) {
@@ -55,7 +55,7 @@ const logResponse = function (request) {
     }
     const logMessage = `Response: ${request.method} ${request.path} Status: ${request.response.statusCode}`
     Logger.info(logObject, logMessage)
-    notificationEmitter.broadcastLog({ uniqueId: request.customInfo.uniqueId, messageType: 'response', verbosity: 'info', message: logMessage, additionalData: logObject })
+    notificationEmitter.broadcastLog({ uniqueId: request.customInfo.uniqueId, resource: { method: request.method, path: request.path }, messageType: 'response', verbosity: 'info', message: logMessage, additionalData: logObject })
   }
 }
 
@@ -76,7 +76,7 @@ const logMessage = (verbosity, message, additionalData = null, notification = tr
   }
 
   if (notification) {
-    notificationEmitter.broadcastLog({ uniqueId: request ? request.customInfo.uniqueId : null, messageType: 'generic', verbosity, message: message, additionalData })
+    notificationEmitter.broadcastLog({ uniqueId: request ? request.customInfo.uniqueId : null, resource: request ? { method: request.method, path: request.path } : null, messageType: 'generic', verbosity, message: message, additionalData })
   }
 }
 

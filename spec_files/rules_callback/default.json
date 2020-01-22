@@ -19,13 +19,7 @@
     },
     "event": {
       "type": "MOCK_CALLBACK",
-      "params": {
-        "method": null,
-        "path": null,
-        "headers": {},
-        "body": {},
-        "delay": 0
-      },
+      "params": {},
       "method": "put",
       "path": "/transfers/{ID}"
     }
@@ -94,6 +88,7 @@
     "event": {
       "type": "MOCK_CALLBACK",
       "params": {
+        "headers": {},
         "body": {
           "payeeFspCommission": {
             "amount": "20"

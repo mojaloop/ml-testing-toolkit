@@ -70,6 +70,7 @@ module.exports.initilizeMockHandler = async () => {
               const generatedErrorCallback = await OpenApiRulesEngine.validateRules(context, req)
               if (generatedErrorCallback.body) {
                 // TODO: Handle method and path verifications against the generated ones
+                customLogger.logMessage('error', 'Sending error callback', null, true, req)
                 CallbackHandler.handleCallback(generatedErrorCallback, context, req)
                 return
               }

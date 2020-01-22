@@ -91,7 +91,7 @@ const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallb
       if (result.status > 299) {
         reject(new Error(JSON.stringify(result.data)))
       }
-      customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, true)
+      customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
       // Listen for success callback
       MyEventEmitter.getTestOutboundEmitter().once(successCallbackUrl, (callbackHeaders, callbackBody) => {
         MyEventEmitter.getTestOutboundEmitter().removeAllListeners(errorCallbackUrl)
@@ -103,7 +103,7 @@ const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallb
         reject(new Error(JSON.stringify(callbackBody)))
       })
     }, (err) => {
-      customLogger.logMessage('info', 'Failed to send request ' + method + ' ' + method, err, true)
+      customLogger.logMessage('info', 'Failed to send request ' + method + ' ' + method, err, false)
       reject(new Error(JSON.stringify({ errorCode: 4000 })))
     })
   })
@@ -191,14 +191,14 @@ const getFunctionResult = (param, inputValues, request) => {
       return fn(inputValues, request)
     } catch (e) {
       if (e.code === 'MODULE_NOT_FOUND') {
-        customLogger.logMessage('error', 'The specified custom function does not exist', param, true)
+        customLogger.logMessage('error', 'The specified custom function does not exist', param, false)
       } else {
         throw e
       }
       return param
     }
   } else {
-    customLogger.logMessage('error', 'The specified custom function format is not correct', param, true)
+    customLogger.logMessage('error', 'The specified custom function format is not correct', param, false)
     return param
   }
 }
