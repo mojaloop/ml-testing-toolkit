@@ -21,6 +21,10 @@ const OutboundSend = async (inputTemplate, outboundID) => {
   })
   // console.log(requestsObj)
   // console.log(templateIDArr)
+
+  // TODO; Include version support
+  const reqCallbackMap = require('../../../spec_files/fspiop_versions/1.0/callback_map.json')
+
   // Iterate the request ID array
   for (let i in templateIDArr) {
     const request = requestsObj[templateIDArr[i]]
@@ -37,8 +41,6 @@ const OutboundSend = async (inputTemplate, outboundID) => {
     // TODO: Get version from accept / content-type headers
     let successCallbackUrl = null
     let errorCallbackUrl = null
-    const reqVersion = '1.0'
-    const reqCallbackMap = require('../../../spec_files/fspiop_versions/' + reqVersion + '/callback_map.json')
     if (reqCallbackMap[request.operationPath]) {
       if (reqCallbackMap[request.operationPath][request.method]) {
         successCallbackUrl = reqCallbackMap[request.operationPath][request.method].successCallback.method + ' ' + replaceVariables(reqCallbackMap[request.operationPath][request.method].successCallback.pathPattern, null, convertedRequest)
