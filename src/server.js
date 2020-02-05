@@ -34,7 +34,7 @@ const Config = require('./lib/config.js')
 const RequestLogger = require('./lib/requestLogger')
 const OpenApiMockHandler = require('./lib/mocking/openApiMockHandler')
 const UniqueIdGenerator = require('./lib/uniqueIdGenerator')
-
+const objectStore = require('./lib/objectStore')
 // const openAPIOptions = {
 //   api: Path.resolve(__dirname, './interface/api_swagger.json'),
 //   handlers: Path.resolve(__dirname, './handlers')
@@ -122,6 +122,8 @@ const initialize = async (port = Config.API_PORT) => {
   const server = await createServer(port)
   // server.plugins.openapi.setHost(server.info.host + ':' + server.info.port)
   // Logger.info(`Server running on ${server.info.host}:${server.info.port}`)
+
+  objectStore.initObjectStore()
 
   console.log(`Toolkit Server running on port ${server.info.port}`)
   return server

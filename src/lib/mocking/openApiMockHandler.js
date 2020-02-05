@@ -10,7 +10,6 @@ const OpenApiRulesEngine = require('./openApiRulesEngine')
 const CallbackHandler = require('../callbackHandler')
 const _ = require('lodash')
 const MyEventEmitter = require('../MyEventEmitter')
-
 const readFileAsync = promisify(fs.readFile)
 
 var path = require('path')
@@ -71,6 +70,22 @@ module.exports.initilizeMockHandler = async () => {
               if (generatedErrorCallback.body) {
                 // TODO: Handle method and path verifications against the generated ones
                 customLogger.logMessage('error', 'Sending error callback', null, true, req)
+                CallbackHandler.handleCallback(generatedErrorCallback, context, req)
+                return
+              }
+
+              // Handle quotes for transfer association
+              require('./middleware-functions/quotesAssociation').handleQuotes(context, req)
+              const matchFound = require('./middleware-functions/quotesAssociation').handleTransfers(context, req)
+              if (!matchFound) {
+                customLogger.logMessage('error', 'Matching Quote Not Found', null, true, req)
+                const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
+                generatedErrorCallback.body = {
+                  errorInformation: {
+                    errorCode: '9999',
+                    errorDescription: 'Matching Quote Not Found'
+                  }
+                }
                 CallbackHandler.handleCallback(generatedErrorCallback, context, req)
                 return
               }

@@ -30,12 +30,6 @@
     "conditions": {
       "all": [
         {
-          "fact": "pathParams",
-          "operator": "equal",
-          "value": "000111",
-          "path": "ID"
-        },
-        {
           "fact": "operationPath",
           "operator": "equal",
           "value": "/parties/{Type}/{ID}"
@@ -50,19 +44,6 @@
     "event": {
       "type": "MOCK_CALLBACK",
       "params": {
-        "body": {
-          "party": {
-            "name": "Vijay Kumar",
-            "personalInfo": {
-              "complexName": {
-                "firstName": "Vijay",
-                "middleName": "Kumar",
-                "lastName": "Guthi"
-              },
-              "dateOfBirth": "1984-01-01"
-            }
-          }
-        }
       },
       "method": "put",
       "path": "/parties/{Type}/{ID}"

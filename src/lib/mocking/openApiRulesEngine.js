@@ -6,7 +6,6 @@ const customLogger = require('../requestLogger')
 const _ = require('lodash')
 const rulesEngineModel = require('../rulesEngineModel')
 const Config = require('../config')
-
 const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
 
 const validateRules = async (context, req) => {
@@ -21,7 +20,7 @@ const validateRules = async (context, req) => {
   }
 
   const res = await rulesEngine.evaluate(facts)
-  const generatedErrorCallback = {}
+  let generatedErrorCallback = {}
 
   if (res) {
     customLogger.logMessage('debug', 'Validation rules matched', res, true, req)
@@ -36,28 +35,7 @@ const validateRules = async (context, req) => {
       }
     } else if (curEvent.type === 'MOCK_ERROR_CALLBACK') {
       if (req.customInfo.specFile) {
-        const callbackGenerator = new (require('./openApiRequestGenerator'))()
-        await callbackGenerator.load(path.join(req.customInfo.specFile))
-        const rawdata = await readFileAsync(jsfRefFilePathPrefix + 'test1.json')
-        const jsfRefs1 = JSON.parse(rawdata)
-        const operationCallback = req.customInfo.callbackInfo.errorCallback.path
-
-        if (req.customInfo.callbackInfo.errorCallback.pathPattern) {
-          generatedErrorCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.pathPattern, context, req)
-        } else {
-          generatedErrorCallback.path = operationCallback
-        }
-        generatedErrorCallback.method = req.customInfo.callbackInfo.errorCallback.method
-        generatedErrorCallback.body = await callbackGenerator.generateRequestBody(operationCallback, generatedErrorCallback.method, jsfRefs1)
-        generatedErrorCallback.headers = await callbackGenerator.generateRequestHeaders(operationCallback, generatedErrorCallback.method, jsfRefs1)
-
-        // Override the values in generated callback with the values from callback map file
-        if (req.customInfo.callbackInfo.errorCallback.bodyOverride) {
-          _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.bodyOverride, context, req))
-        }
-        if (req.customInfo.callbackInfo.errorCallback.headerOverride) {
-          _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.headerOverride, context, req))
-        }
+        generatedErrorCallback = await generateMockErrorCallback(context, req)
 
         _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
         _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
@@ -68,6 +46,33 @@ const validateRules = async (context, req) => {
         customLogger.logMessage('error', 'No Specification file provided for validateRules function', null, true, req)
       }
     }
+  }
+  return generatedErrorCallback
+}
+
+const generateMockErrorCallback = async (context, req) => {
+  const generatedErrorCallback = {}
+  const callbackGenerator = new (require('./openApiRequestGenerator'))()
+  await callbackGenerator.load(path.join(req.customInfo.specFile))
+  const rawdata = await readFileAsync(jsfRefFilePathPrefix + 'test1.json')
+  const jsfRefs1 = JSON.parse(rawdata)
+  const operationCallback = req.customInfo.callbackInfo.errorCallback.path
+
+  if (req.customInfo.callbackInfo.errorCallback.pathPattern) {
+    generatedErrorCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.pathPattern, context, req)
+  } else {
+    generatedErrorCallback.path = operationCallback
+  }
+  generatedErrorCallback.method = req.customInfo.callbackInfo.errorCallback.method
+  generatedErrorCallback.body = await callbackGenerator.generateRequestBody(operationCallback, generatedErrorCallback.method, jsfRefs1)
+  generatedErrorCallback.headers = await callbackGenerator.generateRequestHeaders(operationCallback, generatedErrorCallback.method, jsfRefs1)
+
+  // Override the values in generated callback with the values from callback map file
+  if (req.customInfo.callbackInfo.errorCallback.bodyOverride) {
+    _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.bodyOverride, context, req))
+  }
+  if (req.customInfo.callbackInfo.errorCallback.headerOverride) {
+    _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.headerOverride, context, req))
   }
   return generatedErrorCallback
 }
@@ -224,5 +229,8 @@ const getFunctionResult = (param, fromObject, req) => {
   }
 }
 
-module.exports.validateRules = validateRules
-module.exports.callbackRules = callbackRules
+module.exports = {
+  validateRules,
+  callbackRules,
+  generateMockErrorCallback
+}
