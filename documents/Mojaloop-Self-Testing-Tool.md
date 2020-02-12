@@ -43,9 +43,6 @@ showToc: true
 
 9. [Roadmap after the PoC](#9-roadmap-after-poc)
 
-10. [Self-testing kit detailed design diagrams](#10-self-testing-kit-detailed-design-diagrams)
-
-
 # 1. Preface
 
 This section contains information about how to use this document.
@@ -323,7 +320,3 @@ Callback generation JSON file format:
   }
 ]
 ```
-
-## 10. Self-testing kit detailed design diagrams
-
-Links: 
