@@ -1,73 +1,44 @@
----
-showToc: true
----
 # Mojaloop Self-Testing Tool
 ## Version 0.4
 
-
 **Table of Contents**
 
-1. [Preface](#1-preface)
+1. [Introduction](#1-introduction)
 
-   1.1 [Conventions Used in This Document](#11-conventions-used-in-this-document)
-  
-   1.2 [Document Version Information](#12-document-version-information)
+   1.1 [Goal](#11-goal)
 
-2. [Introduction](#2-introduction)
+   1.2 [Scope](#12-scope)
 
-   2.1 [Goal](#21-goal)
+   1.3 [Out of Scope](#13-out-of-scope)
 
-   2.2 [Scope](#22-scope)
+   1.4 [User Interface](#14-user-interface)
 
-   2.3 [Out of Scope](#23-out-of-scope)
+   1.5 [Audience](#15-audience)
 
-   2.4 [User Interface](#24-user-interface)
+2. [Tool characteristics](#2-tool-characteristics)
 
-   2.5 [Audience](#25-audience)
+   2.1 [API version](#21-api-version)
 
-3. [Tool characteristics](#3-tool-characteristics)
+   2.2 [Rules engine](#22-rules-engine)
 
-   3.1 [API version](#31-api-version)
+3. [Getting started](#3-getting-started)
 
-   3.2 [Rules engine](#32-rules-engine)
+4. [Sending test requests](#4-sending-test-requests)
 
-4. [Getting started](#4-getting-started)
+5. [Tests included](#5-tests-include)
 
-5. [Sending test requests](#5-sending-test-requests)
+6. [Flow diagram](#6-flow-diagram)
 
-6. [Tests included](#6-tests-include)
+7. [Architecture](#7-architecture)
 
-7. [Flow diagram](#7-flow-diagram)
+8. [Roadmap after the PoC](#8-roadmap-after-poc)
 
-8. [Architecture](#8-architecture)
 
-9. [Roadmap after the PoC](#9-roadmap-after-poc)
-
-# 1. Preface
-
-This section contains information about how to use this document.
-
-## 1.1 Conventions Used in This Document
-
-The following conventions are used in this document to identify the specified types of information
-
-| **Type of Information** | **Convention** | **Example** |
-| :--- | :--- | :--- |
-| **Elements of the API, such as resources** | Boldface | **/authorization** |
-| **Variables** | Italics within curly brackets | _{ID}_ |
-| **Glossary terms** | Italics on first occurrence; defined in _Glossary_ | The purpose of the API is to enable interoperable financial transactions between a _Payer_ (a payer of electronic funds in a payment transaction) located in one _FSP_ (an entity that provides a digital financial service to an end user) and a _Payee_ (a recipient of electronic funds in a payment transaction) located in another FSP. |
-| **Library documents** | Italics | User information should, in general, not be used by API deployments; the security measures detailed in _API Signature_ and _API Encryption_ should be used instead. |
-## 1.2 Document Version Information
-
-| **Version** | **Date** | **Change Description** |
-| :--- | :--- | :--- |
-| **0.4** | 2019-12-11 | Initial version |
-
-## 2. Introduction
+## 1. Introduction
 
 As part of the Mojaloop Partner Development Project (PDP), a ‘self-testing tool kit’ for Mojaloop API implementations was requested by Bill and Melinda Gates Foundation to be delivered. This will happen in two stages, a Proof of Concept (PoC) delivered in the first stage and then a complete tool as the second stage that builds on the PoC. This will be delivered as a toolkit in the Mojaloop Open Source space.
 
-### 2.1 Goal
+### 1.1 Goal
 
 The goal of the Self-testing Tool Kit is for the participants in a Mojaloop Hub, in particular DFSPs, but in future System Integrators and other entities, to have a standard way to test integration to a Mojaloop Hub. 
 
@@ -77,11 +48,11 @@ Having said that, it is understood that due to the time and resource limits, the
 
 The tool will make use of already existing standard components existing in the Mojaloop space such as Simulators and Labs, with the notable difference that it must have the capability of testing different versions of Mojaloop APIs.
 
-### 2.2 Scope
+### 1.2 Scope
 
 The following characteristics are identified for the  initial version of Self-testing tool kit:
 
-#### 2.2.1 Schema Validation
+#### 1.2.1 Schema Validation
 
 The tool must have the capability of testing the API’s structural characteristics, regardless of API version and implementation / local modifications.
 
@@ -97,7 +68,7 @@ Example of that would be:
 - TIPS extension fields used to carry additional information
 - ID fields allocated centrally (incoming message sent blank, and returned with ID) - [@dorota needs discussion]
 
-#### 2.2.3 Content Validation
+#### 1.2.3 Content Validation
 
 The tool must have the capability of testing the allowable and not-allowable content of the API calls.
 
@@ -105,7 +76,7 @@ This could be covered for example by a generic processor and a configuration fil
 
 The configuration file must be editable by the user, using a specified tool that does not require a high level of technical knowledge (currently JRE is being used).
 
-#### 2.2.3 Workflow check
+#### 1.2.3 Workflow check
 
 The tool must have the capability of testing the flow of specific API calls, where the outcome of the one call needs to be used by the following call. A typical example is a quote and transfer flow.
 
@@ -118,13 +89,13 @@ The testing of each use case must include:
 
 Certificate and Public Key integration? - as mentioned by Michael
 
-### 2.3 Out of Scope
+### 1.3 Out of Scope
 
 The scope is limited to endpoints / resources needed for the P2P use-case and once the PoC is in place, all the resources in the FSPIOP API can be supported.
 
 "Settlement API" and the "Operations / Admin API" are outside of scope of the PoC.
 
-### 2.4 User Interface
+### 1.4 User Interface
 
 User Interface will be in scope only after the PoC is delivered. 
 
@@ -140,13 +111,13 @@ It will enable the QA tester to:
 - Add new tests
 - Remove selected tests 
 
-### 2.5 Audience
+### 1.5 Audience
 
 The tool is aimed for use initially by DFSPs only, but it will be later extended to be used by hubs, switches, system integrators and any other parties that will use Mojaloop API’s.
 
 With the first phase of the tool, it will be delivered aimed at a technical user – that is, user that is able to run it using Postman. The follow-up phases will involve UI that will enable less technical users to use it as well.
 
-## 3. Tool characteristics
+## 2. Tool characteristics
 
 Here’s the list of characteristics that we currently identified for the self-testing tool kit:
 1. Version negotiation (using Accept, Content-Type headers) provided as per the API Definition v1.0 Section 3.3.4
@@ -159,13 +130,13 @@ Here’s the list of characteristics that we currently identified for the self-t
 6. Standardization:
    - JWS validation and generation and support TLS (using SDK standard components)
 
-### 3.1 API version
+### 2.1 API version
 
 1. Validations are done using the swagger. 
 2. The API version available should be identified from swagger.json. 
 3. API version needs to be validated just on the first call per client per session, not on every call. 
 
-### 3.2 Rules engine
+### 2.2 Rules engine
 
 Rule engine will be used to:
 1. Facilitate the different versions of API
@@ -174,7 +145,7 @@ Rule engine will be used to:
 
 Rule engine will apply to both parties (payer and payee) and both DFSP and hub.
 
-## 4. Getting started
+## 3. Getting started
 
 When a new release is done, as part of the workflow, Release Notes are published listing all of the new and/or enhanced functionality implemented as part of the release. These notes are used by the QA team to extend and enhance the existing Postman Collections where tests are written behind the request/response scripts to test both positive as well as negative scenarios against the intended behaviour. These tests are then run in the following manner:
 - Manually to determine if the tests cover all aspects and angles of the functionality, positive to assert intended behaviour and negative tests to determine if the correct alternate flows work as intended when something unexpected goes wrong
@@ -204,11 +175,11 @@ Golden Path collection is an end-to-end regression test pack which does a comple
 
 Import the Environment Config and make the required changes to reflect the correct endpoints to the Mojaloop deployment required to be tested. This environment file contains all the required variables and placeholders needed by all the collections, but the examples for endpoints provided, point to a local Mojaloop installation with the standard Ingress exposed local endpoints:
 
-## 5. Sending test requests
+## 4. Sending test requests
 
 TO BE UPDATED
 
-## 6. Tests include
+## 5. Tests include
 
 **For one Use case, P2P**
 
@@ -223,15 +194,15 @@ TO BE UPDATED
 | /transfers | | | Yes | |
 | /transfers/{ID} | Yes | Yes | | |
 
-## 7. Flow diagram
+## 6. Flow diagram
 
 ![Flow Diagram](/assets/diagrams/flow/flow-diagram.svg)
 
-## 8. Architecture
+## 7. Architecture
 
 ![Architecture Diagram](/assets/diagrams/architectural/architectural-diagram.svg)
 
-## 9. Roadmap after POC
+## 8. Roadmap after POC
 
 1. Add User Interface
 2. Add other use cases e.g. B2P, P2B ect
