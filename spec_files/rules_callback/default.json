@@ -43,8 +43,7 @@
     },
     "event": {
       "type": "MOCK_CALLBACK",
-      "params": {
-      },
+      "params": {},
       "method": "put",
       "path": "/parties/{Type}/{ID}"
     }
@@ -68,14 +67,7 @@
     },
     "event": {
       "type": "MOCK_CALLBACK",
-      "params": {
-        "headers": {},
-        "body": {
-          "payeeFspCommission": {
-            "amount": "20"
-          }
-        }
-      },
+      "params": {},
       "method": "put",
       "path": "/quotes/{ID}"
     }
