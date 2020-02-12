@@ -11,6 +11,7 @@ const CallbackHandler = require('../callbackHandler')
 const _ = require('lodash')
 const MyEventEmitter = require('../MyEventEmitter')
 const readFileAsync = promisify(fs.readFile)
+const Config = require('../config')
 
 var path = require('path')
 
@@ -75,19 +76,21 @@ module.exports.initilizeMockHandler = async () => {
               }
 
               // Handle quotes for transfer association
-              require('./middleware-functions/quotesAssociation').handleQuotes(context, req)
-              const matchFound = require('./middleware-functions/quotesAssociation').handleTransfers(context, req)
-              if (!matchFound) {
-                customLogger.logMessage('error', 'Matching Quote Not Found', null, true, req)
-                const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
-                generatedErrorCallback.body = {
-                  errorInformation: {
-                    errorCode: '9999',
-                    errorDescription: 'Matching Quote Not Found'
+              if (Config.USER_CONFIG.TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
+                require('./middleware-functions/quotesAssociation').handleQuotes(context, req)
+                const matchFound = require('./middleware-functions/quotesAssociation').handleTransfers(context, req)
+                if (!matchFound) {
+                  customLogger.logMessage('error', 'Matching Quote Not Found', null, true, req)
+                  const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
+                  generatedErrorCallback.body = {
+                    errorInformation: {
+                      errorCode: '3208',
+                      errorDescription: 'Provided Transfer ID was not found on the server.'
+                    }
                   }
+                  CallbackHandler.handleCallback(generatedErrorCallback, context, req)
+                  return
                 }
-                CallbackHandler.handleCallback(generatedErrorCallback, context, req)
-                return
               }
 
               // Callback Rules engine - match the rules and generate the specified callback
