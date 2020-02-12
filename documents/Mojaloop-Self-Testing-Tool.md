@@ -1,5 +1,4 @@
 # Mojaloop Self-Testing Tool
-## Version 0.4
 
 **Table of Contents**
 
@@ -166,10 +165,6 @@ There are a number of Postman collections in use throughout the different proces
   - Notes: Ensure that there is a delay of 1500ms if executed through Postman UI Test Runner. This will ensure that tests have enough time to validate requests against the simulator.
 - **Golden_Path:** This test collection is the one used by the scheduled regression testing framework to test end-to-end scenarios, resembling real-world use-cases where the response from one API call is used to populate the request of a subsequent call. We make use of an intelligent simulator playing the role of an FSP on the recipient side of the scenario, responding to various request from a Payer FSP as an example
   - Notes: Ensure that there is a delay of 1500ms if executed through Postman UI Test Runner. This will ensure that tests have enough time to validate requests against the simulator.
-
-_For Self-Testing Kit, the **Golden Path collection** will be used._
-
-Golden Path collection is an end-to-end regression test pack which does a complete test of all the deployed functionality. This test can be run manually but is actually designed to be run from the start, in an automated fashion, right through to the end, as response values are being passed from one request to the next.
 
 **Environment Configuration**
 
