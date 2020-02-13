@@ -8,7 +8,7 @@
         {
           "fact": "body",
           "operator": "equal",
-          "value": "string",
+          "value": "some reason here",
           "path": "reason"
         },
         {
@@ -26,9 +26,14 @@
     "event": {
       "method": null,
       "path": null,
-      "params": {},
       "delay": 0,
-      "type": "MOCK_CALLBACK"
+      "type": "MOCK_RESPONSE",
+      "params": {
+        "body": {
+          "state": "{$request.body.state}",
+          "reason": "{$request.body.reason}"
+        }
+      }
     }
   }
 ]

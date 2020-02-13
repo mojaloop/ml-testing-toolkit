@@ -8,9 +8,6 @@
   "FSPIOP_API_DEFINITIONS": [
     {
       "version": "1.0"
-    },
-    {
-      "version": "1.1"
     }
   ]
 }

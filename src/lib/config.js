@@ -43,7 +43,8 @@ const USER_CONFIG = {
   CALLBACK_ENDPOINT: 'http://localhost:4000',
   SEND_CALLBACK_ENABLE: true,
   FSPID: 'samplefsp',
-  TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true
+  TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true,
+  VERSIONING_SUPPORT_ENABLE: true
 }
 
 // Function to load user configuration from .env file or environment incase of running in container

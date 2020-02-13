@@ -146,6 +146,58 @@ const callbackRules = async (context, req) => {
   return generatedCallback
 }
 
+const responseRules = async (context, req) => {
+  const rulesEngine = await rulesEngineModel.getResponseRulesEngine()
+
+  const facts = {
+    operationPath: context.operation.path,
+    path: context.request.path,
+    body: context.request.body,
+    method: context.request.method,
+    pathParams: context.request.params,
+    headers: context.request.headers
+  }
+  const res = await rulesEngine.evaluate(facts)
+  const generatedResponse = {}
+
+  if (res) {
+    customLogger.logMessage('debug', 'Response rules are matched', res, true, req)
+    const curEvent = res[0]
+    if (curEvent.type === 'FIXED_RESPONSE') {
+      generatedResponse.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
+      // generatedResponse.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req)
+    } else if (curEvent.type === 'MOCK_RESPONSE') {
+      if (req.customInfo.specFile) {
+        const responseGenerator = new (require('./openApiRequestGenerator'))()
+        await responseGenerator.load(path.join(req.customInfo.specFile))
+        const rawdata = await readFileAsync(jsfRefFilePathPrefix + 'test1.json')
+        const jsfRefs1 = JSON.parse(rawdata)
+        const { body, status } = await responseGenerator.generateResponseBody(context.operation.path, context.request.method, jsfRefs1)
+        generatedResponse.body = body
+        generatedResponse.status = +status
+        // generatedResponse.headers = await responseGenerator.generateRequestHeaders(operationCallback, generatedResponse.method, jsfRefs1)
+
+        // // Override the values in generated callback with the values from callback map file
+        // if (req.customInfo.callbackInfo.successCallback.bodyOverride) {
+        //   _.merge(generatedResponse.body, replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.bodyOverride, context, req))
+        // }
+        // if (req.customInfo.callbackInfo.successCallback.headerOverride) {
+        //   _.merge(generatedResponse.headers, replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.headerOverride, context, req))
+        // }
+
+        // Override the values in generated callback with the values from event params
+        _.merge(generatedResponse.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
+        _.merge(generatedResponse.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
+      } else {
+        customLogger.logMessage('error', 'No Specification file provided for responseRules function', null, true, req)
+      }
+    }
+  } else {
+    customLogger.logMessage('error', 'No response rules are matched', res, true, req)
+  }
+  return generatedResponse
+}
+
 const replaceVariablesFromRequest = (inputObject, context, req) => {
   var resultObject
   // Check whether inputObject is string or object. If it is object, then convert that to JSON string and parse it while return
@@ -232,5 +284,6 @@ const getFunctionResult = (param, fromObject, req) => {
 module.exports = {
   validateRules,
   callbackRules,
+  responseRules,
   generateMockErrorCallback
 }
