@@ -43,6 +43,18 @@ module.exports.initilizeMockHandler = async () => {
           req.customInfo.specFile = item.specFile
 
           let responseBody, responseStatus
+          // Check for response map file
+          try {
+            const respMapRawdata = await readFileAsync(item.responseMapFile)
+            const responseMap = JSON.parse(respMapRawdata)
+            const responseInfo = responseMap[context.operation.path][context.request.method]
+            if (!responseInfo) {
+              customLogger.logMessage('error', 'Response info not found for method in response map file for ' + context.operation.path + context.request.method, null, true, req)
+              return
+            }
+            req.customInfo.responseInfo = responseInfo
+          } catch (err) {}
+
           // Check for the synchronous response rules
           const generatedResponse = await OpenApiRulesEngine.responseRules(context, req)
           responseStatus = +generatedResponse.status
@@ -61,22 +73,27 @@ module.exports.initilizeMockHandler = async () => {
             // Generate callback asynchronously
             setImmediate(async () => {
               // Getting callback info from callback map file
-              const cbMapRawdata = await readFileAsync(item.callbackMapFile)
-              const callbackMap = JSON.parse(cbMapRawdata)
-              if (!callbackMap[context.operation.path]) {
-                customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, null, true, req)
+              try {
+                const cbMapRawdata = await readFileAsync(item.callbackMapFile)
+                const callbackMap = JSON.parse(cbMapRawdata)
+                if (!callbackMap[context.operation.path]) {
+                  customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, null, true, req)
+                  return
+                }
+                if (!callbackMap[context.operation.path][context.request.method]) {
+                  customLogger.logMessage('error', 'Callback not found for method in callback map file for ' + context.request.method, null, true, req)
+                  return
+                }
+                const callbackInfo = callbackMap[context.operation.path][context.request.method]
+                if (!callbackInfo) {
+                  customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method, null, true, req)
+                  return
+                }
+                req.customInfo.callbackInfo = callbackInfo
+              } catch (err) {
+                customLogger.logMessage('error', 'Callback file not found.', null, true, req)
                 return
               }
-              if (!callbackMap[context.operation.path][context.request.method]) {
-                customLogger.logMessage('error', 'Callback not found for method in callback map file for ' + context.request.method, null, true, req)
-                return
-              }
-              const callbackInfo = callbackMap[context.operation.path][context.request.method]
-              if (!callbackInfo) {
-                customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method, null, true, req)
-                return
-              }
-              req.customInfo.callbackInfo = callbackInfo
 
               // Additional validation based on the Json Rules Engine, send error callback on failure
               const generatedErrorCallback = await OpenApiRulesEngine.validateRules(context, req)

@@ -132,6 +132,70 @@ router.put('/files/callback', async (req, res, next) => {
   }
 })
 
+// Response Rules
+// Get all response rules files
+router.get('/files/response', async (req, res, next) => {
+  try {
+    const result = await rulesEngineModel.getResponseRulesFiles()
+    res.status(200).json(result)
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Route to get content of a response rule file
+router.get('/files/response/:fileName', async (req, res, next) => {
+  const fileName = req.params.fileName
+
+  try {
+    const result = await rulesEngineModel.getResponseRulesFileContent(fileName)
+    res.status(200).json(result)
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Route to edit a response rule file
+router.put('/files/response/:fileName', async (req, res, next) => {
+  const fileName = req.params.fileName
+
+  try {
+    await rulesEngineModel.setResponseRulesFileContent(fileName, req.body)
+    res.status(200).json({ status: 'OK'})
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Route to delete a response rule file
+router.delete('/files/response/:fileName', async (req, res, next) => {
+  const fileName = req.params.fileName
+
+  try {
+    await rulesEngineModel.deleteResponseRulesFile(fileName)
+    res.status(200).json({ status: 'OK'})
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Route to modify configuration in response rules
+router.put('/files/response', async (req, res, next) => {
+  const reqType = req.body.type
+  try {
+    switch (reqType) {
+      case 'activeRulesFile':
+        await rulesEngineModel.setActiveResponseRulesFile(req.body.fileName)
+        res.status(200).json({ status: 'OK'})
+        break
+      default:
+        throw (new Error('Unknown update type'))
+    }
+  } catch (err) {
+    next(err)
+  }
+})
+
 // Old methods
 router.get('/validation', async (req, res, next) => {
   try {

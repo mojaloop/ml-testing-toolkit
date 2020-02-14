@@ -1,0 +1,23 @@
+{
+  "/settlementWindows/{id}": {
+    "post": {
+      "response": {
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        },
+        "bodyOverride": {
+          "state": "{$request.body.state}",
+          "reason": "{$request.body.reason}"
+        }
+      }
+    }
+  },
+  "/settlementWindows": {
+    "get": {
+      "response": {}
+    }
+  }
+}

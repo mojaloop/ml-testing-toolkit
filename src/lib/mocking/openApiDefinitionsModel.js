@@ -13,7 +13,8 @@ module.exports.getApiDefinitions = async () => {
         minorVersion: +item.version.split('.')[1],
         majorVersion: +item.version.split('.')[0],
         specFile: specFilePrefix + item.version + '/api_spec.yaml',
-        callbackMapFile: specFilePrefix + item.version + '/callback_map.json'
+        callbackMapFile: specFilePrefix + item.version + '/callback_map.json',
+        responseMapFile: specFilePrefix + item.version + '/response_map.json'
       }
     })
   }

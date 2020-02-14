@@ -8,8 +8,8 @@
         {
           "fact": "body",
           "operator": "equal",
-          "value": "some reason here",
-          "path": "reason"
+          "value": "CLOSED",
+          "path": "state"
         },
         {
           "fact": "operationPath",
@@ -28,12 +28,33 @@
       "path": null,
       "delay": 0,
       "type": "MOCK_RESPONSE",
-      "params": {
-        "body": {
-          "state": "{$request.body.state}",
-          "reason": "{$request.body.reason}"
+      "params": {}
+    }
+  },
+  {
+    "ruleId": 2,
+    "priority": 1,
+    "description": "get /settlementWindows",
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/settlementWindows"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
         }
-      }
+      ]
+    },
+    "event": {
+      "method": null,
+      "path": null,
+      "delay": 0,
+      "type": "MOCK_RESPONSE",
+      "params": {}
     }
   }
 ]

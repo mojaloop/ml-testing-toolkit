@@ -177,12 +177,12 @@ const responseRules = async (context, req) => {
         generatedResponse.status = +status
         // generatedResponse.headers = await responseGenerator.generateRequestHeaders(operationCallback, generatedResponse.method, jsfRefs1)
 
-        // // Override the values in generated callback with the values from callback map file
-        // if (req.customInfo.callbackInfo.successCallback.bodyOverride) {
-        //   _.merge(generatedResponse.body, replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.bodyOverride, context, req))
-        // }
-        // if (req.customInfo.callbackInfo.successCallback.headerOverride) {
-        //   _.merge(generatedResponse.headers, replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.headerOverride, context, req))
+        // Override the values in generated callback with the values from callback map file
+        if (req.customInfo.responseInfo.response.bodyOverride) {
+          _.merge(generatedResponse.body, replaceVariablesFromRequest(req.customInfo.responseInfo.response.bodyOverride, context, req))
+        }
+        // if (req.customInfo.responseInfo.response.headerOverride) {
+        //   _.merge(generatedResponse.headers, replaceVariablesFromRequest(req.customInfo.responseInfo.response.headerOverride, context, req))
         // }
 
         // Override the values in generated callback with the values from event params
