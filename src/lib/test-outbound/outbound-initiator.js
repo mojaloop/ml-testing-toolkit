@@ -23,7 +23,7 @@ const OutboundSend = async (inputTemplate, outboundID) => {
   // console.log(templateIDArr)
 
   // TODO; Include version support
-  const reqCallbackMap = require('../../../spec_files/fspiop_versions/1.0/callback_map.json')
+  const reqCallbackMap = require('../../../spec_files/api_definitions/1.0/callback_map.json')
 
   // Iterate the request ID array
   for (let i in templateIDArr) {

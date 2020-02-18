@@ -2,24 +2,88 @@
   {
     "ruleId": 1,
     "priority": 1,
-    "description": "post /settlementWindows/{id}",
+    "description": "post /quotes",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
     "conditions": {
       "all": [
         {
-          "fact": "body",
-          "operator": "equal",
-          "value": "string",
-          "path": "reason"
-        },
-        {
           "fact": "operationPath",
           "operator": "equal",
-          "value": "/settlementWindows/{id}"
+          "value": "/quotes"
         },
         {
           "fact": "method",
           "operator": "equal",
           "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": null,
+      "path": null,
+      "params": {},
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
+    }
+  },
+  {
+    "ruleId": 2,
+    "priority": 1,
+    "description": "post /transfers",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": null,
+      "path": null,
+      "params": {},
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
+    }
+  },
+  {
+    "ruleId": 3,
+    "priority": 1,
+    "description": "get /parties/{Type}/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
         }
       ]
     },

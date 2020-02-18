@@ -155,7 +155,10 @@ module.exports.initilizeMockHandler = async () => {
           }
           return h.response(errorResponseBuilder('3100', context.validation.errors[0].message, { extensionList })).code(400)
         },
-        notFound: async (context, req, h) => h.response({ context, err: 'not found' }).code(404)
+        notFound: async (context, req, h) => {
+          customLogger.logMessage('error', 'Resource not found', null, true, req)
+          return h.response({ error: 'Not Found' }).code(404)
+        }
       }
     })
 
@@ -167,13 +170,26 @@ module.exports.initilizeMockHandler = async () => {
 
   // Loop through the apis and initialize them
   apis.forEach(api => {
+    customLogger.logMessage('info', 'Initializing the api spec file: ' + api.specFile, null, false)
     api.openApiBackendObject.init()
   })
 }
 
 module.exports.handleRequest = (req, h) => {
   let selectedVersion = 0
-  if (Config.USER_CONFIG.VERSIONING_SUPPORT_ENABLE) {
+  // Pick a right api definition by searching for the requested resource in the definitions sequentially
+  // TODO: This should be optimized by defining a hash table (object) of all the resources in all definition files on startup.
+  selectedVersion = pickApiByMethodAndPath(req)
+  if (selectedVersion === -1) {
+    customLogger.logMessage('error', 'Resource not found', null, true, req)
+    return h.response({ error: 'Not Found' }).code(404)
+  }
+
+  console.log(selectedVersion)
+  if (apis[selectedVersion].type === 'fspiop' && Config.USER_CONFIG.VERSIONING_SUPPORT_ENABLE) {
+    const fspiopApis = apis.filter(item => {
+      return item.type === 'fspiop'
+    })
     // Validate accept header for POST & GET.
     if (req.method === 'post' || req.method === 'get') {
       // Validate the accept header here
@@ -190,10 +206,10 @@ module.exports.handleRequest = (req, h) => {
     }
 
     // Pick the right API object based on the major and minor versions (Version negotiation as per the API Definition file)
-    const versionNegotiationResult = OpenApiVersionTools.negotiateVersion(req, apis)
+    const versionNegotiationResult = OpenApiVersionTools.negotiateVersion(req, fspiopApis)
     if (versionNegotiationResult.negotiationFailed) {
       // Create extensionList property as per the API specification document with supported versions
-      const extensionList = apis.map(item => {
+      const extensionList = fspiopApis.map(item => {
         return {
           key: item.majorVersion + '',
           value: item.minorVersion + ''
@@ -215,6 +231,12 @@ module.exports.handleRequest = (req, h) => {
     req,
     h
   )
+}
+
+const pickApiByMethodAndPath = (req) => {
+  return apis.findIndex(item => {
+    return item.openApiBackendObject.matchOperation(req) ? true : false
+  })
 }
 
 const errorResponseBuilder = (errorCode, errorDescription, additionalProperties = null) => {

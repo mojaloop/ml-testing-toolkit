@@ -3,14 +3,14 @@
     "ruleId": 1,
     "priority": 1,
     "description": "post /settlementWindows/{id}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "settlements",
+      "asynchronous": false
+    },
     "conditions": {
       "all": [
-        {
-          "fact": "body",
-          "operator": "equal",
-          "value": "CLOSED",
-          "path": "state"
-        },
         {
           "fact": "operationPath",
           "operator": "equal",
@@ -26,35 +26,9 @@
     "event": {
       "method": null,
       "path": null,
+      "params": {},
       "delay": 0,
-      "type": "MOCK_RESPONSE",
-      "params": {}
-    }
-  },
-  {
-    "ruleId": 2,
-    "priority": 1,
-    "description": "get /settlementWindows",
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/settlementWindows"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "get"
-        }
-      ]
-    },
-    "event": {
-      "method": null,
-      "path": null,
-      "delay": 0,
-      "type": "MOCK_RESPONSE",
-      "params": {}
+      "type": "MOCK_RESPONSE"
     }
   }
 ]
