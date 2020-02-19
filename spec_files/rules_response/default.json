@@ -30,5 +30,101 @@
       "delay": 0,
       "type": "MOCK_RESPONSE"
     }
+  },
+  {
+    "ruleId": 2,
+    "priority": 1,
+    "description": "get /settlementWindows",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "settlements",
+      "asynchronous": false
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/settlementWindows"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": null,
+      "path": null,
+      "params": {},
+      "delay": 0,
+      "type": "MOCK_RESPONSE"
+    }
+  },
+  {
+    "ruleId": 3,
+    "priority": 1,
+    "description": "post /settlements",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "settlements",
+      "asynchronous": false
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/settlements"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": null,
+      "path": null,
+      "params": {},
+      "delay": 0,
+      "type": "MOCK_RESPONSE"
+    }
+  },
+  {
+    "ruleId": 4,
+    "priority": 1,
+    "description": "get /settlements/{id}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "settlements",
+      "asynchronous": false
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/settlements/{id}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": null,
+      "path": null,
+      "params": {},
+      "delay": 0,
+      "type": "MOCK_RESPONSE"
+    }
   }
 ]

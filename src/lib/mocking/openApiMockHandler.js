@@ -41,6 +41,7 @@ module.exports.initilizeMockHandler = async () => {
           }
 
           req.customInfo.specFile = item.specFile
+          req.customInfo.jsfRefFile = item.jsfRefFile
 
           let responseBody, responseStatus
           // Check for response map file

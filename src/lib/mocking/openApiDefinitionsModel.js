@@ -16,7 +16,8 @@ module.exports.getApiDefinitions = async () => {
         asynchronous: item.asynchronous? true : false,
         specFile: specFilePrefix + item.folderPath + '/api_spec.yaml',
         callbackMapFile: specFilePrefix + item.folderPath + '/callback_map.json',
-        responseMapFile: specFilePrefix + item.folderPath + '/response_map.json'
+        responseMapFile: specFilePrefix + item.folderPath + '/response_map.json',
+        jsfRefFile: specFilePrefix + item.folderPath + '/mockRef.json'
       }
     })
   }

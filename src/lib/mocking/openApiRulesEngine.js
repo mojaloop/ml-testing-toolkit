@@ -6,7 +6,7 @@ const customLogger = require('../requestLogger')
 const _ = require('lodash')
 const rulesEngineModel = require('../rulesEngineModel')
 const Config = require('../config')
-const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
+// const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
 
 const validateRules = async (context, req) => {
   const rulesEngine = await rulesEngineModel.getValidationRulesEngine()
@@ -54,8 +54,13 @@ const generateMockErrorCallback = async (context, req) => {
   const generatedErrorCallback = {}
   const callbackGenerator = new (require('./openApiRequestGenerator'))()
   await callbackGenerator.load(path.join(req.customInfo.specFile))
-  const rawdata = await readFileAsync(jsfRefFilePathPrefix + 'test1.json')
-  const jsfRefs1 = JSON.parse(rawdata)
+  let jsfRefs1 = []
+  if (req.customInfo.jsfRefFile) {
+    try {
+      const rawdata = await readFileAsync(req.customInfo.jsfRefFile)
+      jsfRefs1 = JSON.parse(rawdata)
+    } catch (err) {}
+  }
   const operationCallback = req.customInfo.callbackInfo.errorCallback.path
 
   if (req.customInfo.callbackInfo.errorCallback.pathPattern) {
@@ -106,8 +111,13 @@ const callbackRules = async (context, req) => {
       if (req.customInfo.specFile) {
         const callbackGenerator = new (require('./openApiRequestGenerator'))()
         await callbackGenerator.load(path.join(req.customInfo.specFile))
-        const rawdata = await readFileAsync(jsfRefFilePathPrefix + 'test1.json')
-        const jsfRefs1 = JSON.parse(rawdata)
+        let jsfRefs1 = []
+        if (req.customInfo.jsfRefFile) {
+          try {
+            const rawdata = await readFileAsync(req.customInfo.jsfRefFile)
+            jsfRefs1 = JSON.parse(rawdata)
+          } catch (err) {}
+        }
         const operationCallback = req.customInfo.callbackInfo.successCallback.path
 
         // Check if pathPattern from callback_map file exists and determine the callback path
@@ -170,15 +180,20 @@ const responseRules = async (context, req) => {
       if (req.customInfo.specFile) {
         const responseGenerator = new (require('./openApiRequestGenerator'))()
         await responseGenerator.load(path.join(req.customInfo.specFile))
-        const rawdata = await readFileAsync(jsfRefFilePathPrefix + 'test1.json')
-        const jsfRefs1 = JSON.parse(rawdata)
+        let jsfRefs1 = []
+        if (req.customInfo.jsfRefFile) {
+          try {
+            const rawdata = await readFileAsync(req.customInfo.jsfRefFile)
+            jsfRefs1 = JSON.parse(rawdata)
+          } catch (err) {}
+        }
         const { body, status } = await responseGenerator.generateResponseBody(context.operation.path, context.request.method, jsfRefs1)
         generatedResponse.body = body
         generatedResponse.status = +status
         // generatedResponse.headers = await responseGenerator.generateRequestHeaders(operationCallback, generatedResponse.method, jsfRefs1)
 
         // Override the values in generated callback with the values from callback map file
-        if (req.customInfo.responseInfo.response.bodyOverride) {
+        if (req.customInfo.responseInfo && req.customInfo.responseInfo.response.bodyOverride) {
           _.merge(generatedResponse.body, replaceVariablesFromRequest(req.customInfo.responseInfo.response.bodyOverride, context, req))
         }
         // if (req.customInfo.responseInfo.response.headerOverride) {
