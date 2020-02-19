@@ -6,19 +6,38 @@ A self testing tool to test the mojaloop implementations.
 Table of Contents
 =================
 
+- 1. [Quick Start](#1-quick-start)
 
-  - [Running the toolkit](#running-the-toolkit)
-    - [With Docker (Preferred way)](#with-docker)
-    - [Running locally](#running-locally)
-  - [Ports](#ports)
-  - [Testing](#testing)
-    - [With Postman](#with-postman)
-    - [With Mojaloop Simulator](#with-mojaloop-simulator)
-  - [Rules Engine](#rules)
+- 2. [Running the toolkit](#2-running-the-toolkit)
 
-## Running the toolkit
+  - 2.1 [With Docker (Preferred way)](#21-with-docker)
 
-### With Docker
+  - 2.2 [Running locally](#22-running-locally)
+
+- 3. [Ports](#3-ports)
+
+- 4. [Testing](#4-testing)
+
+  - 4.1 [With Postman](#41-with-postman)
+
+  - 4.2 [With Mojaloop Simulator](#42-with-mojaloop-simulator)
+
+- 5. [Usgae](#5-usage)
+
+- 6. [Rules Engine](#6-rules)
+
+## 1. Quick Start
+
+For getting started with Self Testing Toolkit quickly please follow the below steps.
+
+* [Deploy Self-Testing Toolkit using docker method](#21-with-docker)
+* [Deploy Mojaloop Simulator](#42-with-mojaloop-simulator)
+* [Follow Usage guide](USAGE_GUIDE.md)
+
+
+## 2. Running the toolkit
+
+### 2.1 With Docker
 
 This is the easiest way to run the self testing toolkit.
 
@@ -35,7 +54,7 @@ cd ml-self-testing-toolkit
 docker-compose up
 ```
 
-### Running locally
+### 2.2 Running locally
 
 The following softwares should be installed on your system to run the toolkit.
 
@@ -51,15 +70,15 @@ npm install
 npm start
 ```
 
-## Ports
+## 3. Ports
 
 The server will start and listen on port 5000. You can send the mojaloop api requests to this port number.
 
 And you can get the web interface on http://localhost:5050/
 
-## Testing
+## 4. Testing
 
-### With Postman
+### 4.1 With Postman
 
 Once the server is started on a particular port, you can send api requests from the sample postman collection included in this repository to test the basic functionalities like schema validation and version negotiation.
 
@@ -68,52 +87,31 @@ Once the server is started on a particular port, you can send api requests from 
 * **postman/mojaloop-pdp-testing-tool.postman_collection.json** - Import this file as a collection in the postman.
 * Run this whole collection using the *"Runner"* button at the top.
 
-### With Mojaloop Simulator
+### 4.2 With Mojaloop Simulator
 
 If you want to test the tool for the whole functionality like schema validation, additional validation and callback generation ..etc, you can initiate a transfer cycle from mojaloop simulator UI.
 
-Please follow the below steps.
+Please follow the below steps from the ml-self-testing-toolkit folder
 
-* Download the mojaloop-simulator repository
-* Download the mojaloop-simulator-ui
-* Configure the scheme adapter to point the PEER_ENDPOINT to the host running the self testing toolkit on 5000 port
-* Run the mojaloop-simulator & scheme adapter using docker-compose script in mojaloop-simulator repository
-* Run the mojaloop simulator UI
-* Access the simulator UI from web browser
-* Run the self testing toolkit and access the toolkit UI on 5050 port
-* Send transfer from Oubound section
-* Observe the logs in tookit UI
-
-
-Mojaloop Simulator
-```
-git clone https://github.com/mojaloop/mojaloop-simulator.git
-cd mojaloop-simulator/src
-vi scheme-adapter.env (Change the PEER_ENDPOINT value to http://localhost:5000)
+```bash
+cd simulator
 docker-compose up
 ```
 
-Simulator UI
-```
-git clone https://github.com/modusbox/mojaloop-simulator-ui.git
-cd mojaloop-simulator-ui
-docker-compose up
-```
-
-Self Testing Toolkit
-```
-git clone https://github.com/mojaloop/ml-self-testing-toolkit
-cd ml-self-testing-toolkit
-docker-compose up
-```
+The above command will start the services scheme-adapter, mojaloop-simulator and mojaloop-simulator-ui.
 
 Open the following URLs in your browser and send a transfer from simulator and observe the toolkit logs in web frontend.
 
-* http://localhost:5050
-* http://localhost
+* http://localhost:5050 (Front end for Self Testing Toolkit)
+* http://localhost (Front end for Mojaloop Simulator)
 
 
-### Rules
+## 5. Usage
+
+After installation you can follow thsi [Usage Guide](USAGE_GUIDE.md)
+
+
+## 6. Rules
 
 After you can send a successful transfer from mojaloop simulator, please observe the validation rules and callback generation rules in the front-end.
 

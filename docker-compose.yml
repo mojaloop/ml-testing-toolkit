@@ -7,7 +7,8 @@ services:
     build:
       context: .
       target: builder
-    container_name: mojaloop-testing-toolkit
+    volumes:
+      - "./spec_files:/opt/mojaloop-testing-toolkit/spec_files"
     ports:
       - "5000:5000"
       - "5050:5050"
@@ -15,11 +16,8 @@ services:
       - sh
       - -c
       - "npm start"
-  #mojaloop-testing-toolkit-postman:
-  #  image: mojaloop-testing-toolkit-postman:local
-  #  build:
-  #    context: .
-  #    dockerfile: Dockerfile-newman
-  #  container_name: mojaloop-testing-toolkit-postman
-  #  depends_on:
-  #    - mojaloop-testing-toolkit
+networks:
+  default:
+    name: mojaloop-testing-toolkit
+
+

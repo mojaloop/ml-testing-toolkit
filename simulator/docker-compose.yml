@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  redis:
+    image: "redis:5.0.4-alpine"
+  sim:
+    image: "mojaloop/mojaloop-simulator:v8.2.0"
+    env_file: ./sim-backend.env
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+      - "3003:3003"
+    depends_on:
+      - scheme-adapter
+  scheme-adapter:
+    image: "mojaloop/sdk-scheme-adapter:v8.6.0"
+    env_file: ./scheme-adapter.env
+    ports:
+      - "3500:3000"
+      - "4000:4000"
+    depends_on:
+      - redis
+  mojaloop-simulator-ui:
+    image: "mojaloop/mojaloop-simulator-ui:v0.1.0"
+    tty: true
+    stdin_open: true
+    ports:
+      - "80:8080"
+    restart: always
+networks:
+  default:
+    name: mojaloop-testing-toolkit
