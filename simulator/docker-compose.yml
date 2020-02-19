@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 services:
   redis:
     image: "redis:5.0.4-alpine"
@@ -13,7 +13,6 @@ services:
       - scheme-adapter
   scheme-adapter:
     image: "mojaloop/sdk-scheme-adapter:v8.6.0"
-    container_name: scheme-adapter1
     env_file: ./scheme-adapter.env
     ports:
       - "3500:3000"
@@ -27,3 +26,6 @@ services:
     ports:
       - "80:8080"
     restart: always
+networks:
+  default:
+    name: mojaloop-testing-toolkit
