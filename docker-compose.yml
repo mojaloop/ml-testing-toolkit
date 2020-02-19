@@ -7,7 +7,8 @@ services:
     build:
       context: .
       target: builder
-    container_name: mojaloop-testing-toolkit
+    volumes:
+      - "./spec_files:/opt/mojaloop-testing-toolkit/spec_files"
     ports:
       - "5000:5000"
       - "5050:5050"
@@ -18,4 +19,5 @@ services:
 networks:
   default:
     name: mojaloop-testing-toolkit
+
 
