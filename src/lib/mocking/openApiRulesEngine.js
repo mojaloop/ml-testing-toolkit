@@ -208,7 +208,7 @@ const responseRules = async (context, req) => {
       }
     }
   } else {
-    customLogger.logMessage('error', 'No response rules are matched', res, true, req)
+    customLogger.logMessage('info', 'No response rules are matched', res, true, req)
   }
   return generatedResponse
 }
