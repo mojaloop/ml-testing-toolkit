@@ -4,6 +4,9 @@ const axios = require('axios').default
 const Config = require('../config')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
+const fs = require('fs')
+const { promisify } = require('util')
+const readFileAsync = promisify(fs.readFile)
 
 const OutboundSend = async (inputTemplate, outboundID) => {
   // Load the requests array into an object by the request id to access a particular object faster
@@ -23,7 +26,8 @@ const OutboundSend = async (inputTemplate, outboundID) => {
   // console.log(templateIDArr)
 
   // TODO; Include version support
-  const reqCallbackMap = require('../../../spec_files/fspiop_versions/1.0/callback_map.json')
+  const cbMapRawdata = await readFileAsync('spec_files/api_definitions/fspiop_1.0/callback_map.json')
+  const reqCallbackMap = JSON.parse(cbMapRawdata)
 
   // Iterate the request ID array
   for (let i in templateIDArr) {

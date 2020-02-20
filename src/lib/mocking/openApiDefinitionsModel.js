@@ -4,16 +4,20 @@
 const Config = require('../config.js')
 
 var apiDefinitions = null
-const specFilePrefix = 'spec_files/fspiop_versions/'
+const specFilePrefix = 'spec_files/api_definitions/'
 
 module.exports.getApiDefinitions = async () => {
   if (!apiDefinitions) {
-    apiDefinitions = Config.FSPIOP_API_DEFINITIONS.map(item => {
+    apiDefinitions = Config.API_DEFINITIONS.map(item => {
       return {
         minorVersion: +item.version.split('.')[1],
         majorVersion: +item.version.split('.')[0],
-        specFile: specFilePrefix + item.version + '/api_spec.yaml',
-        callbackMapFile: specFilePrefix + item.version + '/callback_map.json'
+        type: item.type,
+        asynchronous: item.asynchronous? true : false,
+        specFile: specFilePrefix + item.folderPath + '/api_spec.yaml',
+        callbackMapFile: specFilePrefix + item.folderPath + '/callback_map.json',
+        responseMapFile: specFilePrefix + item.folderPath + '/response_map.json',
+        jsfRefFile: specFilePrefix + item.folderPath + '/mockRef.json'
       }
     })
   }

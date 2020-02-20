@@ -41,30 +41,60 @@ module.exports.initilizeMockHandler = async () => {
           }
 
           req.customInfo.specFile = item.specFile
-          // Generate mock response from openAPI spec file
-          const { status, mock } = context.api.mockResponseForOperation(context.operation.operationId)
+          req.customInfo.jsfRefFile = item.jsfRefFile
+
+          let responseBody, responseStatus
+          // Check for response map file
+          try {
+            const respMapRawdata = await readFileAsync(item.responseMapFile)
+            const responseMap = JSON.parse(respMapRawdata)
+            const responseInfo = responseMap[context.operation.path][context.request.method]
+            if (!responseInfo) {
+              customLogger.logMessage('error', 'Response info not found for method in response map file for ' + context.operation.path + context.request.method, null, true, req)
+              return
+            }
+            req.customInfo.responseInfo = responseInfo
+          } catch (err) {}
+
+          // Check for the synchronous response rules
+          const generatedResponse = await OpenApiRulesEngine.responseRules(context, req)
+          responseStatus = +generatedResponse.status
+          responseBody = generatedResponse.body
+          customLogger.logMessage('info', 'Generated response', generatedResponse, true, req)
+
+          if (!responseBody) {
+            // Generate mock response from openAPI spec file
+            const { status, mock } = context.api.mockResponseForOperation(context.operation.operationId)
+            responseBody = mock
+            responseStatus = +status
+          }
 
           // Verify that it is a success code, then generate callback and only if the method is post or get
-          if ( (req.method === 'post' || req.method === 'get') && status >= 200 && status <= 299) {
+          if ( (req.method === 'post' || req.method === 'get') && responseStatus >= 200 && responseStatus <= 299) {
             // Generate callback asynchronously
             setImmediate(async () => {
               // Getting callback info from callback map file
-              const cbMapRawdata = await readFileAsync(item.callbackMapFile)
-              const callbackMap = JSON.parse(cbMapRawdata)
-              if (!callbackMap[context.operation.path]) {
-                customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, null, true, req)
+              try {
+                const cbMapRawdata = await readFileAsync(item.callbackMapFile)
+                const callbackMap = JSON.parse(cbMapRawdata)
+                if (!callbackMap[context.operation.path]) {
+                  customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, null, true, req)
+                  return
+                }
+                if (!callbackMap[context.operation.path][context.request.method]) {
+                  customLogger.logMessage('error', 'Callback not found for method in callback map file for ' + context.request.method, null, true, req)
+                  return
+                }
+                const callbackInfo = callbackMap[context.operation.path][context.request.method]
+                if (!callbackInfo) {
+                  customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method, null, true, req)
+                  return
+                }
+                req.customInfo.callbackInfo = callbackInfo
+              } catch (err) {
+                customLogger.logMessage('error', 'Callback file not found.', null, true, req)
                 return
               }
-              if (!callbackMap[context.operation.path][context.request.method]) {
-                customLogger.logMessage('error', 'Callback not found for method in callback map file for ' + context.request.method, null, true, req)
-                return
-              }
-              const callbackInfo = callbackMap[context.operation.path][context.request.method]
-              if (!callbackInfo) {
-                customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method, null, true, req)
-                return
-              }
-              req.customInfo.callbackInfo = callbackInfo
 
               // Additional validation based on the Json Rules Engine, send error callback on failure
               const generatedErrorCallback = await OpenApiRulesEngine.validateRules(context, req)
@@ -101,10 +131,10 @@ module.exports.initilizeMockHandler = async () => {
               }
             })
           }
-          if (_.isEmpty(mock)) {
-            return h.response().code(status)
+          if (_.isEmpty(responseBody)) {
+            return h.response().code(responseStatus)
           } else {
-            return h.response(mock).code(status)
+            return h.response(responseBody).code(responseStatus)
           }
         },
         validationFail: async (context, req, h) => {
@@ -126,7 +156,10 @@ module.exports.initilizeMockHandler = async () => {
           }
           return h.response(errorResponseBuilder('3100', context.validation.errors[0].message, { extensionList })).code(400)
         },
-        notFound: async (context, req, h) => h.response({ context, err: 'not found' }).code(404)
+        notFound: async (context, req, h) => {
+          customLogger.logMessage('error', 'Resource not found', null, true, req)
+          return h.response({ error: 'Not Found' }).code(404)
+        }
       }
     })
 
@@ -138,41 +171,57 @@ module.exports.initilizeMockHandler = async () => {
 
   // Loop through the apis and initialize them
   apis.forEach(api => {
+    customLogger.logMessage('info', 'Initializing the api spec file: ' + api.specFile, null, false)
     api.openApiBackendObject.init()
   })
 }
 
 module.exports.handleRequest = (req, h) => {
-  // Validate accept header for POST & GET.
-  if (req.method === 'post' || req.method === 'get') {
-    // Validate the accept header here
-    const acceptHeaderValidationResult = OpenApiVersionTools.validateAcceptHeader(req.headers.accept)
-    if (acceptHeaderValidationResult.validationFailed) {
-      return h.response(errorResponseBuilder('3001', acceptHeaderValidationResult.message)).code(400)
-    }
-  } else {
-    // Validate content-type header for all the remaining requests
-    const contentTypeHeaderValidationResult = OpenApiVersionTools.validateContentTypeHeader(req.headers['content-type'])
-    if (contentTypeHeaderValidationResult.validationFailed) {
-      return h.response(errorResponseBuilder('3001', contentTypeHeaderValidationResult.message)).code(400)
-    }
+  let selectedVersion = 0
+  // Pick a right api definition by searching for the requested resource in the definitions sequentially
+  // TODO: This should be optimized by defining a hash table (object) of all the resources in all definition files on startup.
+  selectedVersion = pickApiByMethodAndPath(req)
+  if (selectedVersion === -1) {
+    customLogger.logMessage('error', 'Resource not found', null, true, req)
+    return h.response({ error: 'Not Found' }).code(404)
   }
 
-  // Pick the right API object based on the major and minor versions (Version negotiation as per the API Definition file)
-  const versionNegotiationResult = OpenApiVersionTools.negotiateVersion(req, apis)
-  if (versionNegotiationResult.negotiationFailed) {
-    // Create extensionList property as per the API specification document with supported versions
-    const extensionList = apis.map(item => {
-      return {
-        key: item.majorVersion + '',
-        value: item.minorVersion + ''
-      }
+  console.log(selectedVersion)
+  if (apis[selectedVersion].type === 'fspiop' && Config.USER_CONFIG.VERSIONING_SUPPORT_ENABLE) {
+    const fspiopApis = apis.filter(item => {
+      return item.type === 'fspiop'
     })
-    return h.response(errorResponseBuilder('3001', 'The Client requested an unsupported version, see extension list for supported version(s).', { extensionList })).code(406)
-  }
-  req.customInfo.negotiatedContentType = versionNegotiationResult.responseContentTypeHeader
+    // Validate accept header for POST & GET.
+    if (req.method === 'post' || req.method === 'get') {
+      // Validate the accept header here
+      const acceptHeaderValidationResult = OpenApiVersionTools.validateAcceptHeader(req.headers.accept)
+      if (acceptHeaderValidationResult.validationFailed) {
+        return h.response(errorResponseBuilder('3001', acceptHeaderValidationResult.message)).code(400)
+      }
+    } else {
+      // Validate content-type header for all the remaining requests
+      const contentTypeHeaderValidationResult = OpenApiVersionTools.validateContentTypeHeader(req.headers['content-type'])
+      if (contentTypeHeaderValidationResult.validationFailed) {
+        return h.response(errorResponseBuilder('3001', contentTypeHeaderValidationResult.message)).code(400)
+      }
+    }
 
-  return apis[versionNegotiationResult.negotiatedIndex].openApiBackendObject.handleRequest(
+    // Pick the right API object based on the major and minor versions (Version negotiation as per the API Definition file)
+    const versionNegotiationResult = OpenApiVersionTools.negotiateVersion(req, fspiopApis)
+    if (versionNegotiationResult.negotiationFailed) {
+      // Create extensionList property as per the API specification document with supported versions
+      const extensionList = fspiopApis.map(item => {
+        return {
+          key: item.majorVersion + '',
+          value: item.minorVersion + ''
+        }
+      })
+      return h.response(errorResponseBuilder('3001', 'The Client requested an unsupported version, see extension list for supported version(s).', { extensionList })).code(406)
+    }
+    req.customInfo.negotiatedContentType = versionNegotiationResult.responseContentTypeHeader
+    selectedVersion = versionNegotiationResult.negotiatedIndex
+  }
+  return apis[selectedVersion].openApiBackendObject.handleRequest(
     {
       method: req.method,
       path: req.path,
@@ -183,6 +232,12 @@ module.exports.handleRequest = (req, h) => {
     req,
     h
   )
+}
+
+const pickApiByMethodAndPath = (req) => {
+  return apis.findIndex(item => {
+    return item.openApiBackendObject.matchOperation(req) ? true : false
+  })
 }
 
 const errorResponseBuilder = (errorCode, errorDescription, additionalProperties = null) => {

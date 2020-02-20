@@ -57,7 +57,7 @@ module.exports.negotiateVersion = (req, apis) => {
             return accumulatorIndex
           }
         }, null)
-        if (temp) {
+        if (temp !== null) {
           negotiatedIndex = temp
           negotiationFailed = false
         }
@@ -75,7 +75,7 @@ module.exports.negotiateVersion = (req, apis) => {
           return accumulatorIndex
         }
       }, null)
-      if (temp) {
+      if (temp !== null) {
         negotiatedIndex = temp
         negotiationFailed = false
       }
