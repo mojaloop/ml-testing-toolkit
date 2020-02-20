@@ -23,7 +23,81 @@
 									"generatedUUID = uuid.v4();",
 									"pm.environment.set('transactionId', generatedUUID);",
 									"pm.environment.set('quoteDate', (new Date()).toUTCString());",
-									"pm.environment.set('transferAmount', 60);",
+									"pm.environment.set('transferAmount', 100);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "029f9c14-13e7-4aac-ada8-572ccf2d502c",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{dateHeader}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "payerfsp"
+							},
+							{
+								"key": "FSPIOP-Destination",
+								"value": "payeefsp"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"quoteId\": \"{{quoteId}}\",\n  \"transactionId\": \"{{transactionId}}\",\n  \"payer\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22507008181\",\n      \"fspId\": \"payerfsp\"\n    },\n    \"personalInfo\": {\n      \"complexName\": {\n        \"firstName\": \"Mats\",\n        \"lastName\": \"Hagman\"\n      },\n      \"dateOfBirth\": \"1983-10-25\"\n    }\n  },\n  \"payee\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22556999125\",\n      \"fspId\": \"payeefsp\"\n    }\n  },\n  \"amountType\": \"SEND\",\n  \"amount\": {\n    \"amount\": \"{{transferAmount}}\",\n    \"currency\": \"{{currency}}\"\n  },\n  \"transactionType\": {\n    \"scenario\": \"TRANSFER\",\n    \"initiator\": \"PAYER\",\n    \"initiatorType\": \"CONSUMER\"\n  },\n  \"note\": \"hej\"\n}"
+						},
+						"url": {
+							"raw": "{{HOST_QUOTING_SERVICE}}/quotes",
+							"host": [
+								"{{HOST_QUOTING_SERVICE}}"
+							],
+							"path": [
+								"quotes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Quote wrong value pattern",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "887e4721-3923-41bd-bf8a-3d0cd5eed8ee",
+								"exec": [
+									"var uuid = require('uuid');",
+									"var generatedUUID = uuid.v4();",
+									"",
+									"pm.environment.set('quoteId', generatedUUID);",
+									"generatedUUID = uuid.v4();",
+									"pm.environment.set('transactionId', generatedUUID);",
+									"pm.environment.set('quoteDate', (new Date()).toUTCString());",
+									"pm.environment.set('transferAmount', 100);",
 									""
 								],
 								"type": "text/javascript"
@@ -394,7 +468,7 @@
 									"pm.environment.set('transfer_ID', generatedUUID);",
 									"pm.environment.set('transferDate', (new Date()).toUTCString());",
 									"pm.environment.set(\"transferExpiration\",new Date(new Date().getTime() + 600000))",
-									"pm.environment.set('transferAmount', 1);"
+									"pm.environment.set('transferAmount', 50);"
 								],
 								"type": "text/javascript"
 							}
@@ -452,6 +526,103 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n  \"transferId\": \"{{transfer_ID}}\",\n  \"payerFsp\": \"{{payerfsp}}\",\n  \"payeeFsp\": \"{{payeefsp}}\",\n  \"amount\": {\n    \"amount\": \"{{transferAmount}}\",\n    \"currency\": \"{{currency}}\"\n  },\n  \"expiration\": \"{{transferExpiration}}\",\n  \"ilpPacket\": \"{{ilpPacket}}\",\n  \"condition\": \"{{condition}}\"\n}"
+						},
+						"url": {
+							"raw": "{{HOST_SWITCH_TRANSFERS}}{{BASE_PATH_SWITCH_TRANSFERS}}/transfers",
+							"host": [
+								"{{HOST_SWITCH_TRANSFERS}}{{BASE_PATH_SWITCH_TRANSFERS}}"
+							],
+							"path": [
+								"transfers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Transfer with Wrong transferId pattern",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "900142b0-e4d7-43a4-a751-38202b600661",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "20820c95-0a24-4906-a6ba-708d6ecf4a61",
+								"exec": [
+									"var uuid = require('uuid');",
+									"var generatedUUID = uuid.v4();",
+									"",
+									"pm.environment.set('transfer_ID', generatedUUID);",
+									"pm.environment.set('transferDate', (new Date()).toUTCString());",
+									"pm.environment.set(\"transferExpiration\",new Date(new Date().getTime() + 600000))",
+									"pm.environment.set('transferAmount', 50);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{WSO2_AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.transfers+json;version=1.0"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.transfers+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{transferDate}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "{{payerfsp}}"
+							},
+							{
+								"key": "FSPIOP-Destination",
+								"value": "{{payeefsp}}"
+							},
+							{
+								"key": "FSPIOP-Signature",
+								"type": "text",
+								"value": "{{fspiop-signature}}"
+							},
+							{
+								"key": "FSPIOP-URI",
+								"type": "text",
+								"value": "/transfers"
+							},
+							{
+								"key": "FSPIOP-HTTP-Method",
+								"type": "text",
+								"value": "POST"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"transferId\": \"{{transfer_ID}}134\",\n  \"payerFsp\": \"{{payerfsp}}\",\n  \"payeeFsp\": \"{{payeefsp}}\",\n  \"amount\": {\n    \"amount\": \"{{transferAmount}}\",\n    \"currency\": \"{{currency}}\"\n  },\n  \"expiration\": \"{{transferExpiration}}\",\n  \"ilpPacket\": \"{{ilpPacket}}\",\n  \"condition\": \"{{condition}}\"\n}"
 						},
 						"url": {
 							"raw": "{{HOST_SWITCH_TRANSFERS}}{{BASE_PATH_SWITCH_TRANSFERS}}/transfers",
@@ -1386,7 +1557,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"quoteId\": \"{{quoteId}}\",\n  \"transactionId\": \"{{transactionId}}\",\n  \"payer\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22507008181\",\n      \"fspId\": \"payerfsp\"\n    },\n    \"personalInfo\": {\n      \"complexName\": {\n        \"firstName\": \"Mats\",\n        \"lastName\": \"Hagman\"\n      },\n      \"dateOfBirth\": \"1983-10-25\"\n    }\n  },\n  \"payee\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22556999125\",\n      \"fspId\": \"payeefsp\"\n    }\n  },\n  \"amountType\": \"SEND\",\n  \"amount\": {\n    \"amount\": \"{{transferAmount}}\",\n    \"currency\": \"{{currency}}\"\n  },\n  \"transactionType\": {\n    \"scenario\": \"TRANSFER\",\n    \"initiator\": \"PAYER\",\n    \"initiatorType\": \"CONSUMER\"\n  },\n  \"note\": \"hej\",\n  \"expiration\": \"3000\"\n}"
+							"raw": "{\n  \"quoteId\": \"{{quoteId}}\",\n  \"transactionId\": \"{{transactionId}}\",\n  \"payer\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22507008181\",\n      \"fspId\": \"payerfsp\"\n    },\n    \"personalInfo\": {\n      \"complexName\": {\n        \"firstName\": \"Mats\",\n        \"lastName\": \"Hagman\"\n      },\n      \"dateOfBirth\": \"1983-10-25\"\n    }\n  },\n  \"payee\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22556999125\",\n      \"fspId\": \"payeefsp\"\n    }\n  },\n  \"amountType\": \"SEND\",\n  \"amount\": {\n    \"amount\": \"{{transferAmount}}\",\n    \"currency\": \"{{currency}}\"\n  },\n  \"transactionType\": {\n    \"scenario\": \"TRANSFER\",\n    \"initiator\": \"PAYER\",\n    \"initiatorType\": \"CONSUMER\"\n  },\n  \"note\": \"hej\"\n}"
 						},
 						"url": {
 							"raw": "{{HOST_QUOTING_SERVICE}}/quotes",
@@ -1460,7 +1631,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"quoteId\": \"{{quoteId}}\",\n  \"transactionId\": \"{{transactionId}}\",\n  \"payer\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22507008181\",\n      \"fspId\": \"payerfsp\"\n    },\n    \"personalInfo\": {\n      \"complexName\": {\n        \"firstName\": \"Mats\",\n        \"lastName\": \"Hagman\"\n      },\n      \"dateOfBirth\": \"1983-10-25\"\n    }\n  },\n  \"payee\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22556999125\",\n      \"fspId\": \"payeefsp\"\n    }\n  },\n  \"amountType\": \"SEND\",\n  \"amount\": {\n    \"amount\": \"{{transferAmount}}\",\n    \"currency\": \"{{currency}}\"\n  },\n  \"transactionType\": {\n    \"scenario\": \"TRANSFER\",\n    \"initiator\": \"PAYER\",\n    \"initiatorType\": \"CONSUMER\"\n  },\n  \"note\": \"hej\",\n  \"expiration\": \"3000\"\n}"
+							"raw": "{\n  \"quoteId\": \"{{quoteId}}\",\n  \"transactionId\": \"{{transactionId}}\",\n  \"payer\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22507008181\",\n      \"fspId\": \"payerfsp\"\n    },\n    \"personalInfo\": {\n      \"complexName\": {\n        \"firstName\": \"Mats\",\n        \"lastName\": \"Hagman\"\n      },\n      \"dateOfBirth\": \"1983-10-25\"\n    }\n  },\n  \"payee\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22556999125\",\n      \"fspId\": \"payeefsp\"\n    }\n  },\n  \"amountType\": \"SEND\",\n  \"amount\": {\n    \"amount\": \"{{transferAmount}}\",\n    \"currency\": \"{{currency}}\"\n  },\n  \"transactionType\": {\n    \"scenario\": \"TRANSFER\",\n    \"initiator\": \"PAYER\",\n    \"initiatorType\": \"CONSUMER\"\n  },\n  \"note\": \"hej\"\n}"
 						},
 						"url": {
 							"raw": "{{HOST_QUOTING_SERVICE}}/quotes",
@@ -1562,7 +1733,7 @@
 					"response": []
 				},
 				{
-					"name": "Send Quote with version 1.1 with expiration body param",
+					"name": "Send Quote with version 1.1 with note body param",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -1628,7 +1799,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"quoteId\": \"{{quoteId}}\",\n  \"transactionId\": \"{{transactionId}}\",\n  \"payer\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22507008181\",\n      \"fspId\": \"payerfsp\"\n    },\n    \"personalInfo\": {\n      \"complexName\": {\n        \"firstName\": \"Mats\",\n        \"lastName\": \"Hagman\"\n      },\n      \"dateOfBirth\": \"1983-10-25\"\n    }\n  },\n  \"payee\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22556999125\",\n      \"fspId\": \"payeefsp\"\n    }\n  },\n  \"amountType\": \"SEND\",\n  \"amount\": {\n    \"amount\": \"{{transferAmount}}\",\n    \"currency\": \"{{currency}}\"\n  },\n  \"transactionType\": {\n    \"scenario\": \"TRANSFER\",\n    \"initiator\": \"PAYER\",\n    \"initiatorType\": \"CONSUMER\"\n  },\n  \"note\": \"hej\",\n  \"expiration\": \"3000\"\n}"
+							"raw": "{\n  \"quoteId\": \"{{quoteId}}\",\n  \"transactionId\": \"{{transactionId}}\",\n  \"payer\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22507008181\",\n      \"fspId\": \"payerfsp\"\n    },\n    \"personalInfo\": {\n      \"complexName\": {\n        \"firstName\": \"Mats\",\n        \"lastName\": \"Hagman\"\n      },\n      \"dateOfBirth\": \"1983-10-25\"\n    }\n  },\n  \"payee\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22556999125\",\n      \"fspId\": \"payeefsp\"\n    }\n  },\n  \"amountType\": \"SEND\",\n  \"amount\": {\n    \"amount\": \"{{transferAmount}}\",\n    \"currency\": \"{{currency}}\"\n  },\n  \"transactionType\": {\n    \"scenario\": \"TRANSFER\",\n    \"initiator\": \"PAYER\",\n    \"initiatorType\": \"CONSUMER\"\n  },\n  \"note\": \"hej\"\n}"
 						},
 						"url": {
 							"raw": "{{HOST_QUOTING_SERVICE}}/quotes",
@@ -1643,7 +1814,7 @@
 					"response": []
 				},
 				{
-					"name": "Send Quote with version 1.1 without expiration body param",
+					"name": "Send Quote with version 1.1 without note body param",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -1709,7 +1880,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"quoteId\": \"{{quoteId}}\",\n  \"transactionId\": \"{{transactionId}}\",\n  \"payer\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22507008181\",\n      \"fspId\": \"payerfsp\"\n    },\n    \"personalInfo\": {\n      \"complexName\": {\n        \"firstName\": \"Mats\",\n        \"lastName\": \"Hagman\"\n      },\n      \"dateOfBirth\": \"1983-10-25\"\n    }\n  },\n  \"payee\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22556999125\",\n      \"fspId\": \"payeefsp\"\n    }\n  },\n  \"amountType\": \"SEND\",\n  \"amount\": {\n    \"amount\": \"{{transferAmount}}\",\n    \"currency\": \"{{currency}}\"\n  },\n  \"transactionType\": {\n    \"scenario\": \"TRANSFER\",\n    \"initiator\": \"PAYER\",\n    \"initiatorType\": \"CONSUMER\"\n  },\n  \"note\": \"hej\"\n}"
+							"raw": "{\n  \"quoteId\": \"{{quoteId}}\",\n  \"transactionId\": \"{{transactionId}}\",\n  \"payer\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22507008181\",\n      \"fspId\": \"payerfsp\"\n    },\n    \"personalInfo\": {\n      \"complexName\": {\n        \"firstName\": \"Mats\",\n        \"lastName\": \"Hagman\"\n      },\n      \"dateOfBirth\": \"1983-10-25\"\n    }\n  },\n  \"payee\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22556999125\",\n      \"fspId\": \"payeefsp\"\n    }\n  },\n  \"amountType\": \"SEND\",\n  \"amount\": {\n    \"amount\": \"{{transferAmount}}\",\n    \"currency\": \"{{currency}}\"\n  },\n  \"transactionType\": {\n    \"scenario\": \"TRANSFER\",\n    \"initiator\": \"PAYER\",\n    \"initiatorType\": \"CONSUMER\"\n  }\n}"
 						},
 						"url": {
 							"raw": "{{HOST_QUOTING_SERVICE}}/quotes",
@@ -1790,7 +1961,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"quoteId\": \"{{quoteId}}\",\n  \"transactionId\": \"{{transactionId}}\",\n  \"payer\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22507008181\",\n      \"fspId\": \"payerfsp\"\n    },\n    \"personalInfo\": {\n      \"complexName\": {\n        \"firstName\": \"Mats\",\n        \"lastName\": \"Hagman\"\n      },\n      \"dateOfBirth\": \"1983-10-25\"\n    }\n  },\n  \"payee\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22556999125\",\n      \"fspId\": \"payeefsp\"\n    }\n  },\n  \"amountType\": \"SEND\",\n  \"amount\": {\n    \"amount\": \"{{transferAmount}}\",\n    \"currency\": \"{{currency}}\"\n  },\n  \"transactionType\": {\n    \"scenario\": \"TRANSFER\",\n    \"initiator\": \"PAYER\",\n    \"initiatorType\": \"CONSUMER\"\n  },\n  \"note\": \"hej\",\n  \"expiration\": \"3000\"\n}"
+							"raw": "{\n  \"quoteId\": \"{{quoteId}}\",\n  \"transactionId\": \"{{transactionId}}\",\n  \"payer\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22507008181\",\n      \"fspId\": \"payerfsp\"\n    },\n    \"personalInfo\": {\n      \"complexName\": {\n        \"firstName\": \"Mats\",\n        \"lastName\": \"Hagman\"\n      },\n      \"dateOfBirth\": \"1983-10-25\"\n    }\n  },\n  \"payee\": {\n    \"partyIdInfo\": {\n      \"partyIdType\": \"MSISDN\",\n      \"partyIdentifier\": \"22556999125\",\n      \"fspId\": \"payeefsp\"\n    }\n  },\n  \"amountType\": \"SEND\",\n  \"amount\": {\n    \"amount\": \"{{transferAmount}}\",\n    \"currency\": \"{{currency}}\"\n  },\n  \"transactionType\": {\n    \"scenario\": \"TRANSFER\",\n    \"initiator\": \"PAYER\",\n    \"initiatorType\": \"CONSUMER\"\n  },\n  \"note\": \"hej\"\n}"
 						},
 						"url": {
 							"raw": "{{HOST_QUOTING_SERVICE}}/quotes",
@@ -1891,6 +2062,357 @@
 						}
 					},
 					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Settlements",
+			"item": [
+				{
+					"name": "Get Existing Open Window",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "06ca836d-99c7-49c7-844e-fe68090e14a4",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"State should be OPEN\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData[0].state).to.eql('OPEN');",
+									"    pm.environment.set(\"openWindowID\", jsonData[0].id);",
+									"    console.log('openWindowID',pm.environment.get(\"openWindowID\"));",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{BEARER_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "FSPIOP-Source",
+								"value": "payerfsp",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{HOST_CENTRAL_SETTLEMENT}}{{BASE_CENTRAL_SETTLEMENT}}/settlementWindows?state=OPEN",
+							"host": [
+								"{{HOST_CENTRAL_SETTLEMENT}}{{BASE_CENTRAL_SETTLEMENT}}"
+							],
+							"path": [
+								"settlementWindows"
+							],
+							"query": [
+								{
+									"key": "state",
+									"value": "OPEN"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Close Existing Window",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5b16f7ed-2212-419d-a43b-e2b38cf2b718",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"New window State should be OPEN\", function () {",
+									"    console.log(pm.response.json());",
+									"    pm.expect(pm.response.json().state).to.eql('OPEN');",
+									"    pm.environment.set(\"newOpenWindowID\", pm.response.json().settlementWindowId);",
+									"    pm.environment.set(\"closedWindowID\",  pm.environment.get(\"openWindowID\"));",
+									"    console.log('newOpenWindowID',pm.environment.get(\"newOpenWindowID\"));",
+									"    console.log('closedWindowID',pm.environment.get(\"closedWindowID\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"state\": \"CLOSED\",\n  \"reason\": \"string\"\n}"
+						},
+						"url": {
+							"raw": "{{HOST_CENTRAL_SETTLEMENT}}{{BASE_CENTRAL_SETTLEMENT}}/settlementWindows/123",
+							"host": [
+								"{{HOST_CENTRAL_SETTLEMENT}}{{BASE_CENTRAL_SETTLEMENT}}"
+							],
+							"path": [
+								"settlementWindows",
+								"123"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Settlement for Closed Window",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2fd9c949-c268-4b8a-b924-724a54c9295d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.environment.set(\"settlementId\", pm.response.json().id);",
+									"var jsonData = pm.response.json();",
+									"    ",
+									"pm.test(\"Settlement State should be PENDING_SETTLEMENT\", function () {",
+									"    pm.expect(jsonData.state).to.eql('PENDING_SETTLEMENT');",
+									"});",
+									"",
+									"pm.test(\"Number of associated windows should be 1\", function () {",
+									"    pm.expect(jsonData.settlementWindows.length).to.eql(1);",
+									"});",
+									"",
+									"",
+									"for(var j in jsonData.participants) {",
+									"    for(var k in jsonData.participants[j].accounts) {",
+									"        console.log(jsonData.participants[j].accounts[k].id)",
+									"        if(jsonData.participants[j].accounts[k].id === Number(pm.environment.get(\"payerFspAccountId\"))) {",
+									"            console.log('payerfspNetSettlementAmount:',jsonData.participants[j].accounts[k].netSettlementAmount.amount)",
+									"            pm.environment.set(\"payerfspNetSettlementAmount\",jsonData.participants[j].accounts[k].netSettlementAmount.amount);",
+									"        } else if(jsonData.participants[j].accounts[k].id === Number(pm.environment.get(\"payeeFspAccountId\"))) {",
+									"            console.log('payeefspNetSettlementAmount:',jsonData.participants[j].accounts[k].netSettlementAmount.amount)",
+									"            pm.environment.set(\"payeefspNetSettlementAmount\",jsonData.participants[j].accounts[k].netSettlementAmount.amount);",
+									"        }",
+									"        ",
+									"    }",
+									"}",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"reason\": \"TESTING\",\n  \"settlementWindows\": [\n    {\n      \"id\": 123\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{HOST_CENTRAL_SETTLEMENT}}{{BASE_CENTRAL_SETTLEMENT}}/settlements",
+							"host": [
+								"{{HOST_CENTRAL_SETTLEMENT}}{{BASE_CENTRAL_SETTLEMENT}}"
+							],
+							"path": [
+								"settlements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Prepare Settlement",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "84a1662c-7bc3-4d02-a4c7-ad43d4f4b514",
+								"exec": [
+									"",
+									"var jsonData = pm.response.json();",
+									"for(var j in jsonData.participants) {",
+									"    for(var k in jsonData.participants[j].accounts) {",
+									"        console.log(jsonData.participants[j].accounts[k].id)",
+									"        const participantPutRequest = {",
+									"          url: pm.environment.get(\"HOST_CENTRAL_SETTLEMENT\")+pm.environment.get(\"BASE_CENTRAL_SETTLEMENT\")+'/settlements/'+pm.environment.get(\"settlementId\"),",
+									"          method: 'PUT',",
+									"          header: {",
+									"              \"Authorization\":\"Bearer \"+pm.environment.get(\"HUBOPERATOR_BEARER_TOKEN\"),",
+									"              \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),",
+									"              \"Content-Type\": \"application/json\"",
+									"          },",
+									"          body: {",
+									"            mode: 'raw',",
+									"            raw: JSON.stringify(",
+									"                {",
+									"                  \"participants\": [",
+									"                    {",
+									"                      \"id\": jsonData.participants[j].id,",
+									"                      \"accounts\": [",
+									"                        {",
+									"                          \"id\": jsonData.participants[j].accounts[k].id,",
+									"                          \"reason\": \"Transfers recorded for payer\",",
+									"                          \"state\": \"PS_TRANSFERS_RECORDED\"",
+									"                        }",
+									"                      ]",
+									"                    }",
+									"                  ]",
+									"                }",
+									"            )",
+									"          }",
+									"        };",
+									"        pm.sendRequest(participantPutRequest, function (err, response) {",
+									"            console.log(response.json());",
+									"        });",
+									"        ",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{BEARER_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "FSPIOP-Source",
+								"value": "payerfsp",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{HOST_CENTRAL_SETTLEMENT}}{{BASE_CENTRAL_SETTLEMENT}}/settlements/{{settlementId}}",
+							"host": [
+								"{{HOST_CENTRAL_SETTLEMENT}}{{BASE_CENTRAL_SETTLEMENT}}"
+							],
+							"path": [
+								"settlements",
+								"{{settlementId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check state for participants after prepare",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1d0f3b99-4ab4-4e9a-8655-30297675b802",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"    ",
+									"pm.test(\"Settlement Id should be: \"+pm.environment.get(\"settlementId\"), function () {",
+									"    pm.expect(jsonData.id).to.eql(pm.environment.get(\"settlementId\"));",
+									"});",
+									"",
+									"pm.test(\"Settlement state should be PS_TRANSFERS_RECORDED\", function () {",
+									"    pm.expect(jsonData.state).to.eql(\"PS_TRANSFERS_RECORDED\");",
+									"});",
+									"",
+									"",
+									"for(var j in jsonData.participants) {",
+									"    for(var k in jsonData.participants[j].accounts) {",
+									"        pm.test(`Participant Account ${jsonData.participants[j].accounts[k].id} state is PS_TRANSFERS_RECORDED`, function () {",
+									"            pm.expect(jsonData.participants[j].accounts[k].state).to.eql(\"PS_TRANSFERS_RECORDED\");",
+									"        });",
+									"    }",
+									"}",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST_CENTRAL_SETTLEMENT}}{{BASE_CENTRAL_SETTLEMENT}}/settlements/{{settlementId}}",
+							"host": [
+								"{{HOST_CENTRAL_SETTLEMENT}}{{BASE_CENTRAL_SETTLEMENT}}"
+							],
+							"path": [
+								"settlements",
+								"{{settlementId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "94ff1dbd-3835-4374-bbae-50892134e33a",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "b7675d4f-8b64-4a44-a60a-6f690740d75d",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				}
 			],
 			"protocolProfileBehavior": {}
