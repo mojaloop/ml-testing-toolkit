@@ -181,20 +181,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SettlementWindows'
-          headers:
-            Content-Length:
-              description: >-
-                The Content-Length header field indicates the anticipated size of
-                the payload body. Only sent if there is a body.
-              schema:
-                type: integer
-            Content-Type:
-              description: >-
-                The Content-Type header indicates the specific version of the API
-                used to send the payload body.
-              schema:
-                type: string
-              required: true
         400:
           description: Bad request.
           content:

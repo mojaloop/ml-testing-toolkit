@@ -165,7 +165,8 @@ const responseRules = async (context, req) => {
     body: context.request.body,
     method: context.request.method,
     pathParams: context.request.params,
-    headers: context.request.headers
+    headers: context.request.headers,
+    queryParams: JSON.parse(JSON.stringify(context.request.query))
   }
   const res = await rulesEngine.evaluate(facts)
   const generatedResponse = {}
@@ -175,6 +176,7 @@ const responseRules = async (context, req) => {
     const curEvent = res[0]
     if (curEvent.type === 'FIXED_RESPONSE') {
       generatedResponse.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
+      generatedResponse.status = +curEvent.params.statusCode
       // generatedResponse.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req)
     } else if (curEvent.type === 'MOCK_RESPONSE') {
       if (req.customInfo.specFile) {

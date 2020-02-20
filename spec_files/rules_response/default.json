@@ -32,38 +32,6 @@
     }
   },
   {
-    "ruleId": 2,
-    "priority": 1,
-    "description": "get /settlementWindows",
-    "apiVersion": {
-      "minorVersion": 0,
-      "majorVersion": 1,
-      "type": "settlements",
-      "asynchronous": false
-    },
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/settlementWindows"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "get"
-        }
-      ]
-    },
-    "event": {
-      "method": null,
-      "path": null,
-      "params": {},
-      "delay": 0,
-      "type": "MOCK_RESPONSE"
-    }
-  },
-  {
     "ruleId": 3,
     "priority": 1,
     "description": "post /settlements",
@@ -125,6 +93,55 @@
       "params": {},
       "delay": 0,
       "type": "MOCK_RESPONSE"
+    }
+  },
+  {
+    "ruleId": 5,
+    "priority": 1,
+    "description": "get /settlementWindows state=OPEN",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "settlements",
+      "asynchronous": false
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "queryParams",
+          "operator": "equal",
+          "value": "OPEN",
+          "path": "state"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/settlementWindows"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": null,
+      "path": null,
+      "params": {
+        "body": [
+          {
+            "createdDate": "nostrud proident ut nisi in",
+            "id": -69487652,
+            "state": "{$request.query.state}",
+            "reason": "eu in in",
+            "changedDate": "ex"
+          }
+        ],
+        "statusCode": "200"
+      },
+      "delay": 0,
+      "type": "FIXED_RESPONSE"
     }
   }
 ]

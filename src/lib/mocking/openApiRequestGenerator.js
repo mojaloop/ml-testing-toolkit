@@ -115,7 +115,6 @@ const generateMockResponseBody = async (method, name, data, jsfRefs) => {
     if (newResponseSchema.type==='array') {
       targetObject = _.get(newResponseSchema.items.properties, convertedId)
     } else {
-      console.log(newResponseSchema.properties)
       targetObject = _.get(newResponseSchema.properties, convertedId)
     }
     if (targetObject) {
