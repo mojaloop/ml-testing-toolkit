@@ -104,9 +104,14 @@ Conditions can be defined with either "all" or "any" type of arrays. In each arr
       }
       ```
   
-    * pathParams - By using this the parameter values from the request path can be compared.
+    * pathParams - By using this the path parameter values from the request can be compared.
       
       Example: Type & ID of pathParams from the get request /parties/{Type}/{ID}
+  
+    * queryParams - By using this the query parameter values from the request can be compared.
+      
+      Example: 'state' of queryParams from the get request /settlementWindows?state=OPEN
+  
     * operationPath - This is used for matching the path syntax from open API file
 
       Example: operationPath contains the value /parties/{Type}/{ID} instead of /parties/MSISDN/9876543210 which can actually be found in the fact 'path'.
@@ -131,6 +136,20 @@ Conditions can be defined with either "all" or "any" type of arrays. In each arr
       ```greaterThan``` - _fact_ must be greater than _value_
 
       ```greaterThanInclusive```- _fact_ must be greater than or equal to _value_
+
+    * String Numeric operators:
+  
+      *(These operators can be used if the type fo the property is string, but we want to parse it to integer and compare)*
+
+      ```numericEqual``` - _fact_ must equal _value_
+      ```numericNotEqual``` - _fact_ must not equal _value_
+      ```numericLessThan``` - _fact_ must be less than _value_
+
+      ```numericLessThanInclusive```- _fact_ must be less than or equal to _value_
+
+      ```numericGreaterThan``` - _fact_ must be greater than _value_
+
+      ```numericGreaterThanInclusive```- _fact_ must be greater than or equal to _value_
 
     * Array operators:
 
@@ -189,6 +208,9 @@ There are different type of events based on the rules engine level.
 * Callbacks Rules Engine
   * FIXED_CALLBACK
   * MOCK_CALLBACK
+* Synchronous Response Rules Engine
+  * FIXED_RESPONSE
+  * MOCK_RESPONSE
 
 #### FIXED_ERROR_CALLBACK and FIXED_CALLBACK
 
@@ -220,6 +242,7 @@ The following is the list of configurable parameters that you can define anywher
 * $request.params - Parameters in the request path
 * $request.body - Request body
 * $request.path - Entire request path
+* $request.query - Query parameters of the request
 * $request.headers - Http headers of the request
 * $config.<param_name> - Configuration parameter value from environment or local.env file
 * $session.negotiatedContentType - Negotiated content type. Can be sent to callbacks and error callbacks
@@ -273,6 +296,32 @@ See the following example in which the generated values of the firstName & name 
   }
 }
 
+```
+
+
+#### MOCK_RESPONSE and FIXED_RESPONSE
+
+These event types are used for defining events for synchronous reponse rules.
+
+These are same like callback event types, but the only difference is we need to provide the statusCode for FIXED_RESPONSE type. MOCK_RESPONSE automatically picks up the success response code from api specification file.
+
+Let's look at an example of an event type *FIXED_RESPONSE*
+```
+"event": {
+  "type": "FIXED_RESPONSE",
+  "params": {
+    "body": [
+      {
+        "createdDate": "2020-02-10",
+        "id": 123,
+        "state": "{$request.query.state}",
+        "reason": "string",
+        "changedDate": "2020-02-10"
+      }
+    ],
+    "statusCode": "200"
+  }
+}
 ```
 
 ### Priority of rules
