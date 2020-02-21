@@ -186,6 +186,109 @@ describe('OpenApiVersionTools', () => {
     })
   })
 
+  describe('validateContentTypeHeader', () => {
+    it('Result must contain the required properties', async () => {
+      const result = OpenApiVersionTools.validateContentTypeHeader('')
+      expect(result).toHaveProperty('validationFailed')
+      expect(result).toHaveProperty('message')
+    })
+
+    describe('Success cases', () => {
+      it('Full String', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('application/vnd.interoperability.resource+json;version=2.0')
+        expect(result.validationFailed).toBe(false)
+      })
+      it('Without Minor Version', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('application/vnd.interoperability.resource+json;version=2')
+        expect(result.validationFailed).toBe(false)
+      })
+      it('Without version value', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('application/vnd.interoperability.resource+json;version=')
+        expect(result.validationFailed).toBe(false)
+      })
+      it('Without version param', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('application/vnd.interoperability.resource+json;')
+        expect(result.validationFailed).toBe(false)
+      })
+      it('Without semicolon at the end', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('application/vnd.interoperability.resource+json')
+        expect(result.validationFailed).toBe(false)
+      })
+      it('Without exchange format and version number', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('application/vnd.interoperability.resource')
+        expect(result.validationFailed).toBe(false)
+      })
+      it('Without exchange format and with version number', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('application/vnd.interoperability.resource;version=2.0')
+        expect(result.validationFailed).toBe(false)
+      })
+      it('With wildcard resource type', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('application/vnd.interoperability.*+json;version=2.0')
+        expect(result.validationFailed).toBe(false)
+      })
+      it('With wildcard resource type and without exchange format', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('application/vnd.interoperability.*;version=2.0')
+        expect(result.validationFailed).toBe(false)
+      })
+      it('With wildcard resource type and without any trailing string after that', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('application/vnd.interoperability.*')
+        expect(result.validationFailed).toBe(false)
+      })
+    })
+
+    describe('Failure cases', () => {
+      it('With version value as text', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('application/vnd.interoperability.resource+json;version=hello')
+        expect(result.validationFailed).toBe(true)
+      })
+      it('With different exchange format other than json', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('application/vnd.interoperability.resource+asdf;version=2.0')
+        expect(result.validationFailed).toBe(true)
+      })
+      it('Without application as prefix', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('asdf/vnd.interoperability.resource+json;version=2.0')
+        expect(result.validationFailed).toBe(true)
+      })
+      it('Without prefix', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('vnd.interoperability.resource+json;version=2.0')
+        expect(result.validationFailed).toBe(true)
+      })
+      it('With improper application type 1', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('application/asdfasdf.resource+json;version=2.0')
+        expect(result.validationFailed).toBe(true)
+      })
+      it('With improper application type 2', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('application/asdf.asdfasdf.resource+json;version=2.0')
+        expect(result.validationFailed).toBe(true)
+      })
+      it('With empty accept header', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('')
+        expect(result.validationFailed).toBe(true)
+      })
+      it('With some plain text accept header', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('asdf')
+        expect(result.validationFailed).toBe(true)
+      })
+
+      it('Some random text 1', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('asdf/asdf.asdf/asdf')
+        expect(result.validationFailed).toBe(true)
+      })
+      it('Some random text 2', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('/asdf/')
+        expect(result.validationFailed).toBe(true)
+      })
+      it('Some random text 3', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('////asdf//')
+        expect(result.validationFailed).toBe(true)
+      })
+      it('Some random text 4', async () => {
+        const result = OpenApiVersionTools.validateContentTypeHeader('asdf+asdf+asdf')
+        expect(result.validationFailed).toBe(true)
+      })
+    })
+  })
+
   describe('negotiateVersion', () => {
     beforeAll(() => {
       // sampleAcceptHeader = 'application/vnd.interoperability.resource+json;version=2.0'
