@@ -245,7 +245,6 @@ const replaceVariablesFromRequest = (inputObject, context, req) => {
         case '{$request':
         default:
           resultObject = resultObject.replace(element, getVariableValue(element, context))
-
       }
     })
   }
@@ -259,25 +258,25 @@ const replaceVariablesFromRequest = (inputObject, context, req) => {
 
 // Get the variable from the object using lodash library
 const getVariableValue = (param, fromObject) => {
-  const temp = param.replace(/{\$(.*)}/, "$1")
+  const temp = param.replace(/{\$(.*)}/, '$1')
   return _.get(fromObject, temp)
 }
 
 // Get the config value from the object using lodash library
 const getConfigValue = (param, fromObject) => {
-  const temp = param.replace(/{\$config.(.*)}/, "$1")
+  const temp = param.replace(/{\$config.(.*)}/, '$1')
   return _.get(fromObject, temp)
 }
 
 // Get the customInfo value from the object using lodash library
 const getSessionValue = (param, fromObject) => {
-  const temp = param.replace(/{\$session.(.*)}/, "$1")
+  const temp = param.replace(/{\$session.(.*)}/, '$1')
   return _.get(fromObject, temp)
 }
 
 // Execute the function and return the result
 const getFunctionResult = (param, fromObject, req) => {
-  const temp = param.replace(/{\$function\.(.*)}/, "$1").split('.')
+  const temp = param.replace(/{\$function\.(.*)}/, '$1').split('.')
   if (temp.length === 2) {
     const fileName = temp[0]
     const functionName = temp[1]

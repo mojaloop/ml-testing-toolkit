@@ -17,12 +17,14 @@
   "standard": {
     "env": [
       "jest"
+    ],
+    "ignore": [
+      "client",
+      "test"
     ]
   },
   "pre-commit": [
-    "standard",
-    "dep:check",
-    "test"
+    "standard"
   ],
   "scripts": {
     "start": "node src/index.js",

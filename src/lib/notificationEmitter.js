@@ -17,7 +17,6 @@ const io = require('socket.io')(http)
 // });
 
 const startServer = port => {
-
   // For CORS policy
   app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*')
@@ -46,8 +45,6 @@ const startServer = port => {
   app.get('*', (req, res) => {
     res.sendFile(process.cwd() + '/client/build/index.html')
   })
-
-
 
   http.listen(port)
   console.log('API Server started on port ' + port)

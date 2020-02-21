@@ -5,7 +5,7 @@ const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const writeFileAsync = promisify(fs.writeFile)
 const accessFileAsync = promisify(fs.access)
-const copyFileAsync = promisify(fs.copyFile)
+// const copyFileAsync = promisify(fs.copyFile)
 const readDirAsync = promisify(fs.readdir)
 const deleteFileAsync = promisify(fs.unlink)
 const customLogger = require('./requestLogger')
@@ -16,7 +16,6 @@ const rulesValidationFilePathPrefix = 'spec_files/rules_validation/'
 const rulesCallbackFilePathPrefix = 'spec_files/rules_callback/'
 
 const DEFAULT_RULES_FILE_NAME = 'default.json'
-const ACTIVE_RULES_FILE_NAME = 'activeRules.json'
 const CONFIG_FILE_NAME = 'config.json'
 
 var responseRules = null
@@ -32,9 +31,8 @@ var activeValidationRulesFile = null
 var activeCallbackRulesFile = null
 
 const reloadResponseRules = async () => {
-
   const rulesConfigRawData = await readFileAsync(rulesResponseFilePathPrefix + CONFIG_FILE_NAME)
-  let rulesConfig = JSON.parse(rulesConfigRawData)
+  const rulesConfig = JSON.parse(rulesConfigRawData)
 
   try {
     await accessFileAsync(rulesResponseFilePathPrefix + rulesConfig.activeRulesFile, fs.constants.F_OK)
@@ -54,9 +52,8 @@ const reloadResponseRules = async () => {
 }
 
 const reloadValidationRules = async () => {
-
   const rulesConfigRawData = await readFileAsync(rulesValidationFilePathPrefix + CONFIG_FILE_NAME)
-  let rulesConfig = JSON.parse(rulesConfigRawData)
+  const rulesConfig = JSON.parse(rulesConfigRawData)
 
   try {
     await accessFileAsync(rulesValidationFilePathPrefix + rulesConfig.activeRulesFile, fs.constants.F_OK)
@@ -76,9 +73,8 @@ const reloadValidationRules = async () => {
 }
 
 const reloadCallbackRules = async () => {
-
   const rulesConfigRawData = await readFileAsync(rulesCallbackFilePathPrefix + CONFIG_FILE_NAME)
-  let rulesConfig = JSON.parse(rulesConfigRawData)
+  const rulesConfig = JSON.parse(rulesConfigRawData)
 
   try {
     await accessFileAsync(rulesCallbackFilePathPrefix + rulesConfig.activeRulesFile, fs.constants.F_OK)

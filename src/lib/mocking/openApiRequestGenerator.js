@@ -5,7 +5,6 @@ const _ = require('lodash')
 const faker = require('faker')
 const jsf = require('json-schema-faker')
 const $RefParser = require('json-schema-ref-parser')
-const util = require('util')
 
 jsf.format('byte', () => Buffer.alloc(faker.lorem.sentence(12)).toString('base64'))
 
@@ -112,7 +111,7 @@ const generateMockResponseBody = async (method, name, data, jsfRefs) => {
   jsfRefs.forEach(ref => {
     const convertedId = ref.id.replace(/\.(?!items)/g, '.properties.')
     let targetObject = null
-    if (newResponseSchema.type==='array') {
+    if (newResponseSchema.type === 'array') {
       targetObject = _.get(newResponseSchema.items.properties, convertedId)
     } else {
       targetObject = _.get(newResponseSchema.properties, convertedId)
