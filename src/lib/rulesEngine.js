@@ -1,4 +1,3 @@
-const util = require('util')
 const { Engine } = require('json-rules-engine')
 const customLogger = require('./requestLogger')
 

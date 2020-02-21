@@ -17,6 +17,10 @@
   "standard": {
     "env": [
       "jest"
+    ],
+    "ignore": [
+      "client",
+      "test"
     ]
   },
   "pre-commit": [

@@ -4,7 +4,7 @@ const acceptHeaderRE = new RegExp('^application/vnd.interoperability\\.([a-zA-Z0
 
 module.exports.validateAcceptHeader = (acceptHeader) => {
   const validationFailed = !acceptHeaderRE.test(acceptHeader)
-  if(validationFailed) {
+  if (validationFailed) {
     customLogger.logMessage('debug', 'Invalid accept header ' + acceptHeader)
   }
   return {
@@ -15,7 +15,7 @@ module.exports.validateAcceptHeader = (acceptHeader) => {
 
 module.exports.validateContentTypeHeader = (acceptHeader) => {
   const validationFailed = !acceptHeaderRE.test(acceptHeader)
-  if(validationFailed) {
+  if (validationFailed) {
     customLogger.logMessage('debug', 'Invalid content-type header ' + acceptHeader)
   }
   return {

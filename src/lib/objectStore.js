@@ -20,7 +20,7 @@ const saveTransaction = (transactionId) => {
 
 const searchTransaction = (transactionId) => {
   // Search for the transactionId
-  return storedObject.transactions.hasOwnProperty(transactionId)
+  return Object.prototype.hasOwnProperty.call(storedObject.transactions, transactionId)
 }
 
 const deleteTransaction = (transactionId) => {
@@ -30,7 +30,7 @@ const deleteTransaction = (transactionId) => {
 const clearOldTransactions = () => {
   for (const transactionId in storedObject.transactions) {
     const timeDiff = Date.now() - storedObject.transactions[transactionId].transactionDate
-    if (timeDiff > 10*60*1000) {  // Remove the old transactions greater than 10min
+    if (timeDiff > 10 * 60 * 1000) { // Remove the old transactions greater than 10min
       delete storedObject.transactions[transactionId]
     }
   }

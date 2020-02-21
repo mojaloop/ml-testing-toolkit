@@ -13,7 +13,7 @@ module.exports.getApiDefinitions = async () => {
         minorVersion: +item.version.split('.')[1],
         majorVersion: +item.version.split('.')[0],
         type: item.type,
-        asynchronous: item.asynchronous? true : false,
+        asynchronous: item.asynchronous,
         specFile: specFilePrefix + item.folderPath + '/api_spec.yaml',
         callbackMapFile: specFilePrefix + item.folderPath + '/callback_map.json',
         responseMapFile: specFilePrefix + item.folderPath + '/response_map.json',

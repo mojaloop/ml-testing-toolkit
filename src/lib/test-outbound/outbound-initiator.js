@@ -11,10 +11,10 @@ const readFileAsync = promisify(fs.readFile)
 const OutboundSend = async (inputTemplate, outboundID) => {
   // Load the requests array into an object by the request id to access a particular object faster
   // console.log(inputTemplate.requests)
-  let requestsObj = {}
+  const requestsObj = {}
   // Store the request ids into a new array
-  let templateIDArr = []
-  for (let i in inputTemplate.requests) {
+  const templateIDArr = []
+  for (const i in inputTemplate.requests) {
     requestsObj[inputTemplate.requests[i].id] = inputTemplate.requests[i]
     templateIDArr.push(inputTemplate.requests[i].id)
   }
@@ -30,7 +30,7 @@ const OutboundSend = async (inputTemplate, outboundID) => {
   const reqCallbackMap = JSON.parse(cbMapRawdata)
 
   // Iterate the request ID array
-  for (let i in templateIDArr) {
+  for (const i in templateIDArr) {
     const request = requestsObj[templateIDArr[i]]
     let convertedRequest = JSON.parse(JSON.stringify(request))
     // console.log(request)
@@ -60,15 +60,15 @@ const OutboundSend = async (inputTemplate, outboundID) => {
         response: resp,
         request: convertedRequest
       }
-      notificationEmitter.broadcastOutboundProgress({ 
+      notificationEmitter.broadcastOutboundProgress({
         outboundID: outboundID,
         status: 'SUCCESS',
         id: request.id,
         response: resp
       })
-    } catch(err) {
+    } catch (err) {
       console.log('GVK', 'Caught the error, breaking the loop', err.message)
-      notificationEmitter.broadcastOutboundProgress({ 
+      notificationEmitter.broadcastOutboundProgress({
         outboundID: outboundID,
         status: 'ERROR',
         id: request.id,
@@ -137,22 +137,22 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
           resultObject = resultObject.replace(element, getFunctionResult(element, inputValues, request))
           break
         case '{$prev':
-          var temp1 = element.replace(/{\$prev.(.*)}/, "$1")
+          var temp1 = element.replace(/{\$prev.(.*)}/, '$1')
           var temp1Arr = temp1.split('.')
-          var replacedValue = _.get(requestsObj[temp1Arr[0]].appended, temp1.replace(temp1Arr[0]+'.', ''))
+          var replacedValue = _.get(requestsObj[temp1Arr[0]].appended, temp1.replace(temp1Arr[0] + '.', ''))
           if (replacedValue) {
             resultObject = resultObject.replace(element, replacedValue)
           }
           break
         case '{$request':
-          var temp2 = element.replace(/{\$request.(.*)}/, "$1")
-          var replacedValue = _.get(request, temp2)
-          if (replacedValue) {
-            resultObject = resultObject.replace(element, replacedValue)
+          var temp2 = element.replace(/{\$request.(.*)}/, '$1')
+          var replacedValue2 = _.get(request, temp2)
+          if (replacedValue2) {
+            resultObject = resultObject.replace(element, replacedValue2)
           }
           break
         case '{$inputs':
-          var temp = element.replace(/{\$inputs.(.*)}/, "$1")
+          var temp = element.replace(/{\$inputs.(.*)}/, '$1')
           if (inputValues[temp]) {
             resultObject = resultObject.replace(element, inputValues[temp])
           }
@@ -169,14 +169,13 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
 }
 
 const replacePathVariables = (operationPath, params) => {
-
   let resultObject = operationPath
 
   // Check the string for any inclusions like {$some_param}
   const matchedArray = resultObject.match(/{([^}]+)}/g)
   if (matchedArray) {
     matchedArray.forEach(element => {
-      var temp = element.replace(/{([^}]+)}/, "$1")
+      var temp = element.replace(/{([^}]+)}/, '$1')
       if (params[temp]) {
         resultObject = resultObject.replace(element, params[temp])
       }
@@ -188,7 +187,7 @@ const replacePathVariables = (operationPath, params) => {
 
 // Execute the function and return the result
 const getFunctionResult = (param, inputValues, request) => {
-  const temp = param.replace(/{\$function\.(.*)}/, "$1").split('.')
+  const temp = param.replace(/{\$function\.(.*)}/, '$1').split('.')
   if (temp.length === 2) {
     const fileName = temp[0]
     const functionName = temp[1]

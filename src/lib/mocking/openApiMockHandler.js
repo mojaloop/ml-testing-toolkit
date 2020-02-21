@@ -70,7 +70,7 @@ module.exports.initilizeMockHandler = async () => {
           }
 
           // Verify that it is a success code, then generate callback and only if the method is post or get
-          if ( (req.method === 'post' || req.method === 'get') && responseStatus >= 200 && responseStatus <= 299) {
+          if ((req.method === 'post' || req.method === 'get') && responseStatus >= 200 && responseStatus <= 299) {
             // Generate callback asynchronously
             setImmediate(async () => {
               // Getting callback info from callback map file
@@ -236,7 +236,11 @@ module.exports.handleRequest = (req, h) => {
 
 const pickApiByMethodAndPath = (req) => {
   return apis.findIndex(item => {
-    return item.openApiBackendObject.matchOperation(req) ? true : false
+    if (item.openApiBackendObject.matchOperation(req)) {
+      return true
+    } else {
+      return false
+    }
   })
 }
 

@@ -56,7 +56,7 @@ const loadUserConfig = () => {
   for (var prop in USER_CONFIG) {
     if (Object.prototype.hasOwnProperty.call(USER_CONFIG, prop)) {
       if (process.env[prop]) {
-        if ((typeof USER_CONFIG[prop])==='boolean') {
+        if ((typeof USER_CONFIG[prop]) === 'boolean') {
           USER_CONFIG[prop] = process.env[prop] === 'true'
         } else {
           USER_CONFIG[prop] = process.env[prop]

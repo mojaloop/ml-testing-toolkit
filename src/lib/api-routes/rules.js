@@ -1,7 +1,6 @@
 const express = require('express')
 const rulesEngineModel = require('../rulesEngineModel')
 
-
 const router = new express.Router()
 
 // Validation Rules
@@ -33,7 +32,7 @@ router.put('/files/validation/:fileName', async (req, res, next) => {
 
   try {
     await rulesEngineModel.setValidationRulesFileContent(fileName, req.body)
-    res.status(200).json({ status: 'OK'})
+    res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
   }
@@ -45,7 +44,7 @@ router.delete('/files/validation/:fileName', async (req, res, next) => {
 
   try {
     await rulesEngineModel.deleteValidationRulesFile(fileName)
-    res.status(200).json({ status: 'OK'})
+    res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
   }
@@ -58,7 +57,7 @@ router.put('/files/validation', async (req, res, next) => {
     switch (reqType) {
       case 'activeRulesFile':
         await rulesEngineModel.setActiveValidationRulesFile(req.body.fileName)
-        res.status(200).json({ status: 'OK'})
+        res.status(200).json({ status: 'OK' })
         break
       default:
         throw (new Error('Unknown update type'))
@@ -97,7 +96,7 @@ router.put('/files/callback/:fileName', async (req, res, next) => {
 
   try {
     await rulesEngineModel.setCallbackRulesFileContent(fileName, req.body)
-    res.status(200).json({ status: 'OK'})
+    res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
   }
@@ -109,7 +108,7 @@ router.delete('/files/callback/:fileName', async (req, res, next) => {
 
   try {
     await rulesEngineModel.deleteCallbackRulesFile(fileName)
-    res.status(200).json({ status: 'OK'})
+    res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
   }
@@ -122,7 +121,7 @@ router.put('/files/callback', async (req, res, next) => {
     switch (reqType) {
       case 'activeRulesFile':
         await rulesEngineModel.setActiveCallbackRulesFile(req.body.fileName)
-        res.status(200).json({ status: 'OK'})
+        res.status(200).json({ status: 'OK' })
         break
       default:
         throw (new Error('Unknown update type'))
@@ -161,7 +160,7 @@ router.put('/files/response/:fileName', async (req, res, next) => {
 
   try {
     await rulesEngineModel.setResponseRulesFileContent(fileName, req.body)
-    res.status(200).json({ status: 'OK'})
+    res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
   }
@@ -173,7 +172,7 @@ router.delete('/files/response/:fileName', async (req, res, next) => {
 
   try {
     await rulesEngineModel.deleteResponseRulesFile(fileName)
-    res.status(200).json({ status: 'OK'})
+    res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
   }
@@ -186,7 +185,7 @@ router.put('/files/response', async (req, res, next) => {
     switch (reqType) {
       case 'activeRulesFile':
         await rulesEngineModel.setActiveResponseRulesFile(req.body.fileName)
-        res.status(200).json({ status: 'OK'})
+        res.status(200).json({ status: 'OK' })
         break
       default:
         throw (new Error('Unknown update type'))
@@ -209,7 +208,7 @@ router.get('/validation', async (req, res, next) => {
 router.put('/validation', async (req, res, next) => {
   try {
     await rulesEngineModel.setValidationRules(req.body)
-    res.status(200).json({ status: 'OK'})
+    res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
   }
