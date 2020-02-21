@@ -84,3 +84,7 @@ spec_files/rules_callback/*
 spec_files/rules_validation/*
 !spec_files/rules_validation/config.json
 !spec_files/rules_validation/default.json
+
+spec_files/rules_response/*
+!spec_files/rules_response/config.json
+!spec_files/rules_response/default.json
