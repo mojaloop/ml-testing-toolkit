@@ -1,6 +1,8 @@
 'use strict'
 
 const OpenApiVersionTools = require('../../../../src/lib/mocking/openApiVersionTools')
+const mockRequest = require('../../../lib/mockRequest')
+
 // let sampleAcceptHeader
 let sampleAPIsArray
 
@@ -19,7 +21,7 @@ describe('OpenApiVersionTools', () => {
       expect(result.majorVersion).toBe(2)
       expect(result.minorVersion).toBe(0)
     })
-    it('With multidigit version numbers', async () => {
+    it('With multi digit version numbers', async () => {
       const result = OpenApiVersionTools.parseAcceptHeader('application/vnd.interoperability.resource+json;version=254.2430')
       expect(result.resource).toBe('resource')
       expect(result.majorVersion).toBe(254)
@@ -232,7 +234,8 @@ describe('OpenApiVersionTools', () => {
     })
 
     it('Result must contain the required properties', async () => {
-      const result = OpenApiVersionTools.negotiateVersion('')
+      const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=1.0' } })
+      const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
       expect(result).toHaveProperty('negotiationFailed')
       expect(result).toHaveProperty('message')
       expect(result).toHaveProperty('negotiatedIndex')
@@ -240,67 +243,80 @@ describe('OpenApiVersionTools', () => {
 
     describe('Success cases', () => {
       it('Accept version 1.0', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=1.0', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=1.0' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(false)
         expect(result.negotiatedIndex).toBe(0)
       })
       it('Accept version 1.1', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=1.1', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=1.1' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(false)
         expect(result.negotiatedIndex).toBe(1)
       })
       it('Accept version 2.2', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=2.2', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=2.2' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(false)
         expect(result.negotiatedIndex).toBe(3)
       })
       it('Accept version 3.4', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=3.4', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=3.4' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(false)
         expect(result.negotiatedIndex).toBe(4)
       })
       it('Accept version 1', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=1', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=1' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(false)
         expect(result.negotiatedIndex).toBe(1)
       })
       it('Accept version 2', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=2', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=2' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(false)
         expect(result.negotiatedIndex).toBe(3)
       })
       it('Accept version 3', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=3', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=3' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(false)
         expect(result.negotiatedIndex).toBe(4)
       })
       it('Accept version 5.41', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=5.41', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=5.41' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(false)
         expect(result.negotiatedIndex).toBe(5)
       })
       it('Accept version 32.4', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=32.4', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=32.4' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(false)
         expect(result.negotiatedIndex).toBe(6)
       })
       it('Accept version 35.102', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=35.102', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=35.102' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(false)
         expect(result.negotiatedIndex).toBe(9)
       })
       it('Accept version 32', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=32', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=32' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(false)
         expect(result.negotiatedIndex).toBe(7)
       })
       it('Accept version 35', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=35', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=35' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(false)
         expect(result.negotiatedIndex).toBe(9)
       })
       it('Accept Everything', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(false)
         expect(result.negotiatedIndex).toBe(9)
       })
@@ -308,57 +324,68 @@ describe('OpenApiVersionTools', () => {
 
     describe('Failure cases', () => {
       it('Accept version 1.2', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=1.2', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=1.2' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(true)
         expect(result.negotiatedIndex).toBeNull()
       })
       it('Accept version 3.0', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=3.0', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=3.0' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(true)
         expect(result.negotiatedIndex).toBeNull()
       })
       it('Accept version 5.2', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=5.2', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=5.2' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(true)
         expect(result.negotiatedIndex).toBeNull()
       })
       it('Accept version 6', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=6', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=6' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(true)
         expect(result.negotiatedIndex).toBeNull()
       })
       it('Accept version 5.2', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=5.2', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=5.2' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(true)
         expect(result.negotiatedIndex).toBeNull()
       })
       it('Accept version 32.8', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=32.8', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=32.8' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(true)
         expect(result.negotiatedIndex).toBeNull()
       })
       it('Accept version 32.86', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=32.86', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=32.86' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(true)
         expect(result.negotiatedIndex).toBeNull()
       })
       it('Accept version 38.8', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=38.8', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=38.8' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(true)
         expect(result.negotiatedIndex).toBeNull()
       })
       it('Accept version 35.106', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=35.106', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=35.106' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(true)
         expect(result.negotiatedIndex).toBeNull()
       })
       it('Accept version 107', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=107', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=107' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(true)
         expect(result.negotiatedIndex).toBeNull()
       })
       it('Accept version 107.108', async () => {
-        const result = OpenApiVersionTools.negotiateVersion('application/vnd.interoperability.resource+json;version=107.108', sampleAPIsArray)
+        const sampleRequest = mockRequest({ headers: { 'content-type': 'application/vnd.interoperability.resource+json;version=107.108' } })
+        const result = OpenApiVersionTools.negotiateVersion(sampleRequest, sampleAPIsArray)
         expect(result.negotiationFailed).toBe(true)
         expect(result.negotiatedIndex).toBeNull()
       })
