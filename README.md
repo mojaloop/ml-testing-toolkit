@@ -11,6 +11,8 @@ Table of Contents
 - 2. [Running the toolkit](#2-running-the-toolkit)
 
   - 2.1 [With Docker (Preferred way)](#21-with-docker)
+	
+	- 2.1.1 [Troubleshooting for Windows](#211-troubleshooting-for-windows)
 
   - 2.2 [Running locally](#22-running-locally)
 
@@ -53,6 +55,36 @@ git clone https://github.com/mojaloop/ml-self-testing-toolkit
 cd ml-self-testing-toolkit
 docker-compose up
 ```
+
+#### 2.1.1 Troubleshooting for Windows
+
+* Heap out of memory
+If face heap error occurs during setup like this: 
+  ![heap error](readme_images/heap_error_windows.jpg)
+
+please open 
+> Docker - settings - resources - advanced  
+
+Allocate more resources. As shown in example below: 
+
+  ![docker settings resources](readme_images/apply_and_restart.jpg)
+  
+* Drive has not been shared error
+If the error with similar stacktrace 
+```
+ERROR: for mojaloop-testing-toolkit  Cannot create container for service mojaloop-testing-toolkit: status code not OK but 500: {"Message":"Unhandled exception: Drive has not been shared"}
+ERROR: Encountered errors while bringing up the project.
+```
+
+  ![drive have not been shared](readme_images/drive_have_not_been_shared.jpg)
+please open 
+> Docker - settings - resources - file sharing
+
+and tick those drives where project have been checked out to (cloned to). 
+I've  ticked both, as cloned repo is on drive D. 
+
+  ![resources file sharing](readme_images/local_drives_to_be_available.jpg)
+
 
 ### 2.2 Running locally
 
