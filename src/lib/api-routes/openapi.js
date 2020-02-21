@@ -32,7 +32,7 @@ router.get('/definition/:type/:version', async (req, res, next) => {
     const apiType = req.params.type
 
     const reqOpenApiObject = openApiObjects.find((item) => {
-      if (item.majorVersion === reqVersionArr[0] && item.minorVersion === reqVersionArr[1] && item.type === apiType) {
+      if (item.majorVersion === +reqVersionArr[0] && item.minorVersion === +reqVersionArr[1] && item.type === apiType) {
         return true
       } else {
         return false
@@ -55,7 +55,7 @@ router.get('/callback_map/:type/:version', async (req, res, next) => {
     const apiType = req.params.type
 
     const reqApiDefinition = apiDefinitions.find((item) => {
-      if (item.majorVersion === reqVersionArr[0] && item.minorVersion === reqVersionArr[1] && item.type === apiType) {
+      if (item.majorVersion === +reqVersionArr[0] && item.minorVersion === +reqVersionArr[1] && item.type === apiType) {
         return true
       } else {
         return false
@@ -86,7 +86,7 @@ router.get('/response_map/:type/:version', async (req, res, next) => {
     const apiType = req.params.type
 
     const reqApiDefinition = apiDefinitions.find((item) => {
-      if (item.majorVersion === reqVersionArr[0] && item.minorVersion === reqVersionArr[1] && item.type === apiType) {
+      if (item.majorVersion === +reqVersionArr[0] && item.minorVersion === +reqVersionArr[1] && item.type === apiType) {
         return true
       } else {
         return false
