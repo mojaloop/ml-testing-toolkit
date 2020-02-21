@@ -24,9 +24,7 @@
     ]
   },
   "pre-commit": [
-    "standard",
-    "dep:check",
-    "test"
+    "standard"
   ],
   "scripts": {
     "start": "node src/index.js",
