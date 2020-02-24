@@ -52,7 +52,7 @@
     "@hapi/basic": "5.1.1",
     "@hapi/boom": "8.0.1",
     "@hapi/good": "8.2.4",
-    "@hapi/hapi": "18.4.0",
+    "@hapi/hapi": "^19.1.1",
     "@hapi/inert": "5.2.2",
     "@hapi/vision": "5.5.4",
     "@mojaloop/sdk-standard-components": "^8.6.6",
