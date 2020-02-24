@@ -15,9 +15,9 @@ const validateRules = async (context, req) => {
     operationPath: context.operation.path,
     path: context.request.path,
     method: context.request.method,
-    body: context.request.body? context.request.body : {},
-    pathParams: context.request.params? context.request.params : {},
-    headers: context.request.headers? context.request.headers : {},
+    body: context.request.body ? context.request.body : {},
+    pathParams: context.request.params ? context.request.params : {},
+    headers: context.request.headers ? context.request.headers : {},
     queryParams: context.request.query ? JSON.parse(JSON.stringify(context.request.query)) : {}
   }
 
@@ -91,9 +91,9 @@ const callbackRules = async (context, req) => {
     operationPath: context.operation.path,
     path: context.request.path,
     method: context.request.method,
-    body: context.request.body? context.request.body : {},
-    pathParams: context.request.params? context.request.params : {},
-    headers: context.request.headers? context.request.headers : {},
+    body: context.request.body ? context.request.body : {},
+    pathParams: context.request.params ? context.request.params : {},
+    headers: context.request.headers ? context.request.headers : {},
     queryParams: context.request.query ? JSON.parse(JSON.stringify(context.request.query)) : {}
   }
 
@@ -167,9 +167,9 @@ const responseRules = async (context, req) => {
     operationPath: context.operation.path,
     path: context.request.path,
     method: context.request.method,
-    body: context.request.body? context.request.body : {},
-    pathParams: context.request.params? context.request.params : {},
-    headers: context.request.headers? context.request.headers : {},
+    body: context.request.body ? context.request.body : {},
+    pathParams: context.request.params ? context.request.params : {},
+    headers: context.request.headers ? context.request.headers : {},
     queryParams: context.request.query ? JSON.parse(JSON.stringify(context.request.query)) : {}
   }
 
