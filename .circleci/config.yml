@@ -283,6 +283,7 @@ jobs:
       # - store_artifacts:
       #     path: /tmp/license-scanner/results
       #     prefix: licenses
+
       - run:
           <<: *defaults_build_docker_publish
       # - run:
@@ -400,4 +401,5 @@ workflows:
             branches:
               ignore:
                 - /.*/
+
 
