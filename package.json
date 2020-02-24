@@ -1,7 +1,7 @@
 {
   "name": "ml-self-testing-toolkit",
   "description": "Self Testing Toolkit for Mojaloop implementations",
-  "version": "1.0.2",
+  "version": "9.2.0",
   "license": "Apache-2.0",
   "author": "ModusBox",
   "contributors": [
