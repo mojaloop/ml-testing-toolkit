@@ -146,10 +146,10 @@ jobs:
           command: sleep 10
       - run:
           name: Execute postman tests
-          command: cd postman; sh run_newman.sh ./test/results/postman.txt
+          command: cd postman; sh run_newman.sh > ../test/results/postman.txt
       - run:
           name: Stop the server
-          command: kill `cat node_prgm_pid`
+          command: cd ..; kill `cat node_prgm_pid`
       - store_artifacts:
           path: ./test/results
           prefix: test
