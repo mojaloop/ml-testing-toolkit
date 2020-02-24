@@ -1,5 +1,6 @@
 const generateUniqueId = (request) => {
-  return Date.now()
+  const r = Math.random().toString(36).substring(7)
+  return Date.now() + r
 }
 
 module.exports.generateUniqueId = generateUniqueId

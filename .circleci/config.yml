@@ -1,0 +1,403 @@
+# CircleCI v2 Config
+version: 2
+
+defaults_working_directory: &defaults_working_directory
+  working_directory: /home/circleci/project
+
+defaults_docker_node: &defaults_docker_node
+  docker:
+    - image: node:10.15.3-alpine
+
+defaults_docker_helm_kube: &defaults_docker_helm_kube
+  docker:
+    - image: hypnoglow/kubernetes-helm
+
+# default_env: &default_env
+#   environment:
+#     # - TAG_EXP: 'v[0-9]+(\.[0-9]+)*'
+#     # - TAG_EXP_SNAPSHOT: 'v[0-9]+(\.[0-9]+)*\-SNAPSHOT'
+#     # - TAG: v1.0
+
+defaults_Dependencies: &defaults_Dependencies |
+    apk --no-cache add git
+    apk --no-cache add ca-certificates
+    apk --no-cache add curl
+    apk --no-cache add openssh-client
+    apk add --no-cache -t build-dependencies make gcc g++ python libtool autoconf automake
+    npm config set unsafe-perm true
+    npm install -g node-gyp
+defaults_awsCliDependencies: &defaults_awsCliDependencies |
+    apk --no-cache add \
+            python \
+            py-pip \
+            groff \
+            less \
+            mailcap
+    pip install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic
+    apk -v --purge del py-pip
+defaults_license_scanner: &defaults_license_scanner
+  name: Install and set up license-scanner
+  command: |
+    git clone https://github.com/mojaloop/license-scanner /tmp/license-scanner
+    cd /tmp/license-scanner && make build default-files set-up
+defaults_build_docker_login: &defaults_build_docker_login
+  name: Login to Docker Hub
+  command: |
+    docker login -u $DOCKER_USER -p $DOCKER_PASS
+defaults_build_docker_build: &defaults_build_docker_build
+  name: Build Docker image
+  command: |
+    docker build -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG .
+defaults_build_docker_publish: &defaults_build_docker_publish
+  name: Publish Docker image $CIRCLE_TAG & Latest tag to Docker Hub
+  command: |
+    echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG"
+    docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG
+    echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG"
+    docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
+defaults_slack_announcement: &defaults_slack_announcement
+  name: Slack announcement for tag releases
+  command: |
+    curl -X POST \
+      $SLACK_WEBHOOK_ANNOUNCEMENT \
+      -H 'Content-type: application/json' \
+      -H 'cache-control: no-cache' \
+      -d "{
+      \"text\": \"*${CIRCLE_PROJECT_REPONAME}* - Release \`${CIRCLE_TAG}\`: https://github.com/mojaloop/${CIRCLE_PROJECT_REPONAME}/releases/tag/${CIRCLE_TAG}\"
+    }"
+jobs:
+  setup:
+    <<: *defaults_working_directory
+    <<: *defaults_docker_node
+    steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
+      - checkout
+      - run:
+          name: Build dependencies
+          command: apk add --no-cache -t build-dependencies make gcc g++ python libtool autoconf automake
+      - run:
+          name: Access npm folder as root
+          command: cd $(npm root -g)/npm
+      - run:
+          name: Install node-gyp globally
+          command: npm install -g node-gyp
+      - run:
+          name: Update NPM install
+          command: npm install
+      - run:
+          name: Delete build dependencies
+          command: apk del build-dependencies
+      # - run:
+      #     name: Update NPM install
+      #     command: npm link sodium && npm link argon2 && npm install --production
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+
+  test-unit:
+    <<: *defaults_working_directory
+    <<: *defaults_docker_node
+    steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Create dir for test results
+          command: mkdir -p ./test/results
+      - run:
+          name: Install tapes
+          command: npm install -g jest
+      - run:
+          name: Execute unit tests
+          command: jest --testMatch '**/test/unit/**/*.test.js' --json --outputFile ./test/results/unit.json
+      - store_artifacts:
+          path: ./test/results
+          prefix: test
+      - store_test_results:
+          path: ./test/results
+
+  # test-coverage:
+  #   <<: *defaults_working_directory
+  #   <<: *defaults_docker_node
+  #   steps:
+  #     - run:
+  #         name: Install general dependencies
+  #         command: *defaults_Dependencies
+  #     - run:
+  #         name: Install AWS CLI dependencies
+  #         command: *defaults_awsCliDependencies
+  #     - checkout
+  #     - restore_cache:
+  #         keys:
+  #           - dependency-cache-{{ checksum "package.json" }}
+  #           - dependency-cache-
+  #     - run:
+  #         name: Execute code coverage check
+  #         command: npm -s run test:coverage-check
+  #     - store_artifacts:
+  #         path: coverage
+  #         prefix: test
+  #     - store_test_results:
+  #         path: coverage
+  #     - run:
+  #         name: Copy code coverage to SonarQube
+  #         command: |
+  #           if [ "${CIRCLE_BRANCH}" == "master" ];
+  #           then
+  #               echo "Sending lcov.info to SonarQube..."
+  #               aws s3 cp coverage/lcov.info $AWS_S3_DIR_SONARQUBE/ml-api-adapter/lcov.info
+  #           else
+  #               echo "Not a release (env CIRCLE_BRANCH != 'master'), skipping sending lcov.info to SonarQube."
+  #           fi
+  # test-integration:
+  #   machine: true
+  #   <<: *defaults_working_directory
+  #   steps:
+  #     - checkout
+  #     - restore_cache:
+  #         key: dependency-cache-{{ checksum "package.json" }}
+  #     - run:
+  #         name: Create dir for test results
+  #         command: mkdir -p ./test/results
+  #     - run:
+  #         name: Execute integration tests
+  #         command: npm -s run test:integration
+  #     - store_artifacts:
+  #         path: ./test/results
+  #         prefix: test
+  #     - store_test_results:
+  #         path: ./test/results
+
+  # test-functional:
+  #   machine: true
+  #   <<: *defaults_working_directory
+  #   steps:
+  #     - run:
+  #         name: Add the Postgres 9.6 binaries to the path.
+  #         command: echo ‘/usr/lib/postgresql/9.6/bin/:$PATH’ >> $BASH_ENV
+  #     - run:
+  #         name: Install Docker Compose
+  #         command: |
+  #           curl -L https://github.com/docker/compose/releases/download/1.11.2/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+  #           chmod +x ~/docker-compose
+  #           mv ~/docker-compose /usr/local/bin/docker-compose
+  #     - checkout
+  #     - restore_cache:
+  #         key: dependency-cache-{{ checksum "package.json" }}
+  #     - run:
+  #         name: Create dir for test results
+  #         command: mkdir -p ./test/results
+  #     - run:
+  #         name: Execute functional tests
+  #         command: npm -s run test:functional
+  #     - store_artifacts:
+  #         path: ./test/results
+  #         prefix: test
+  #     - store_test_results:
+  #         path: ./test/results
+
+  # vulnerability-check:
+  #   <<: *defaults_working_directory
+  #   <<: *defaults_docker_node
+  #   steps:
+  #     - run:
+  #         name: Install general dependencies
+  #         command: *defaults_Dependencies
+  #     - checkout
+  #     - restore_cache:
+  #         key: dependency-cache-{{ checksum "package.json" }}
+  #     - run:
+  #         name: Create dir for test results
+  #         command: mkdir -p ./audit/results
+  #     - run:
+  #         name: Check for new npm vulnerabilities
+  #         command: npm run audit:check --silent -- --json > ./audit/results/auditResults.json 
+  #     - store_artifacts:
+  #         path: ./audit/results
+  #         prefix: audit
+
+  # audit-licenses:
+  #   <<: *defaults_working_directory
+  #   <<: *defaults_docker_node
+  #   steps:
+  #     - run:
+  #         name: Install general dependencies
+  #         command: *defaults_Dependencies
+  #     - run:
+  #         <<: *defaults_license_scanner
+  #     - checkout
+  #     - restore_cache:
+  #         key: dependency-cache-{{ checksum "package.json" }}
+  #     - run:
+  #         name: Prune non-production packages before running license-scanner
+  #         command: npm prune --production
+  #     - run:
+  #         name: Run the license-scanner
+  #         command: cd /tmp/license-scanner && pathToRepo=$CIRCLE_WORKING_DIRECTORY make run
+  #     - store_artifacts:
+  #         path: /tmp/license-scanner/results
+  #         prefix: licenses
+
+  build-snapshot:
+    machine: true
+    <<: *defaults_working_directory
+    steps:
+      - checkout
+      - run:
+          name: setup environment vars for SNAPSHOT release
+          command: |
+            echo 'export RELEASE_TAG=$RELEASE_TAG_SNAPSHOT' >> $BASH_ENV
+      - run:
+          <<: *defaults_build_docker_login
+      - run:
+          <<: *defaults_build_docker_build
+      - run:
+          <<: *defaults_build_docker_publish
+      # - run:
+      #     <<: *defaults_slack_announcement
+
+  build:
+    machine: true
+    # <<: *default_env
+    steps:
+      - checkout
+      - run:
+          name: setup environment vars for LATEST release
+          command: |
+            echo 'export RELEASE_TAG=$RELEASE_TAG_PROD' >> $BASH_ENV
+      - run:
+          <<: *defaults_build_docker_login
+      - run:
+          <<: *defaults_build_docker_build
+      - run:
+          <<: *defaults_license_scanner
+      - run:
+          name: Run the license-scanner
+          command: cd /tmp/license-scanner && mode=docker dockerImage=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG make run
+      - store_artifacts:
+          path: /tmp/license-scanner/results
+          prefix: licenses
+      - run:
+          <<: *defaults_build_docker_publish
+      # - run:
+      #     <<: *defaults_slack_announcement
+
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - setup:
+          context: org-global
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
+      - test-unit:
+          context: org-global
+          requires:
+            - setup
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
+      # - test-coverage:
+      #     context: org-global
+      #     requires:
+      #       - setup
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      #       branches:
+      #         ignore:
+      #           - /feature*/
+      #           - /bugfix*/
+      # - test-integration:
+      #     context: org-global
+      #     requires:
+      #       - setup
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      #       branches:
+      #         ignore:
+      #           - /feature*/
+      #           - /bugfix*/
+      # - test-functional:
+      #     context: org-global
+      #     requires:
+      #       - setup
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      #       branches:
+      #         ignore:
+      #           - /feature*/
+      #           - /bugfix*/
+      # - vulnerability-check:
+      #     context: org-global
+      #     requires:
+      #       - setup
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      #       branches:
+      #         ignore:
+      #           - /feature*/
+      #           - /bugfix*/
+      # - audit-licenses:
+      #     context: org-global
+      #     requires:
+      #       - setup
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      #       branches:
+      #         ignore:
+      #           - /feature*/
+      #           - /bugfix*/
+      # - build-snapshot:
+      #     context: org-global
+      #     requires:
+      #       - setup
+      #       - test-unit
+      #       - test-coverage
+      #       - test-integration
+      #       - test-functional
+      #       - vulnerability-check
+      #       - audit-licenses
+      #     filters:
+      #       tags:
+      #         only: /v[0-9]+(\.[0-9]+)*\-snapshot/
+      #       branches:
+      #         ignore:
+      #           - /.*/
+      # - build:
+      #     context: org-global
+      #     requires:
+      #       - setup
+      #       - test-unit
+      #       - test-coverage
+      #       - test-integration
+      #       - test-functional
+      #       - vulnerability-check
+      #       - audit-licenses
+      #     filters:
+      #       tags:
+      #         only: /v[0-9]+(\.[0-9]+)*/
+      #       branches:
+      #         ignore:
+      #           - /.*/
+
