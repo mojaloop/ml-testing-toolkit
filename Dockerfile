@@ -1,4 +1,4 @@
-FROM node:10.15.3-alpine AS builder
+FROM node:12.16.0-alpine AS builder
 
 WORKDIR /opt/mojaloop-testing-toolkit
 
@@ -20,7 +20,7 @@ COPY config /opt/mojaloop-testing-toolkit/config
 COPY src /opt/mojaloop-testing-toolkit/src
 COPY spec_files /opt/mojaloop-testing-toolkit/spec_files
 
-FROM node:10.15.3-alpine 
+FROM node:12.16.0-alpine
 
 WORKDIR /opt/mojaloop-testing-toolkit
 
