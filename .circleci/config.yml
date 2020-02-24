@@ -259,8 +259,8 @@ jobs:
           <<: *defaults_build_docker_build
       - run:
           <<: *defaults_build_docker_publish
-      # - run:
-      #     <<: *defaults_slack_announcement
+      - run:
+          <<: *defaults_slack_announcement
 
   build:
     machine: true
@@ -285,8 +285,8 @@ jobs:
       #     prefix: licenses
       - run:
           <<: *defaults_build_docker_publish
-      # - run:
-      #     <<: *defaults_slack_announcement
+      - run:
+          <<: *defaults_slack_announcement
 
 
 workflows:
