@@ -14,9 +14,11 @@ const validateRules = async (context, req) => {
   const facts = {
     operationPath: context.operation.path,
     path: context.request.path,
-    body: context.request.body,
     method: context.request.method,
-    pathParams: context.request.params
+    body: context.request.body ? context.request.body : {},
+    pathParams: context.request.params ? context.request.params : {},
+    headers: context.request.headers ? context.request.headers : {},
+    queryParams: context.request.query ? JSON.parse(JSON.stringify(context.request.query)) : {}
   }
 
   const res = await rulesEngine.evaluate(facts)
@@ -88,11 +90,13 @@ const callbackRules = async (context, req) => {
   const facts = {
     operationPath: context.operation.path,
     path: context.request.path,
-    body: context.request.body,
     method: context.request.method,
-    pathParams: context.request.params,
-    headers: context.request.headers
+    body: context.request.body ? context.request.body : {},
+    pathParams: context.request.params ? context.request.params : {},
+    headers: context.request.headers ? context.request.headers : {},
+    queryParams: context.request.query ? JSON.parse(JSON.stringify(context.request.query)) : {}
   }
+
   const res = await rulesEngine.evaluate(facts)
   const generatedCallback = {}
 
@@ -162,12 +166,13 @@ const responseRules = async (context, req) => {
   const facts = {
     operationPath: context.operation.path,
     path: context.request.path,
-    body: context.request.body,
     method: context.request.method,
-    pathParams: context.request.params,
-    headers: context.request.headers,
-    queryParams: JSON.parse(JSON.stringify(context.request.query))
+    body: context.request.body ? context.request.body : {},
+    pathParams: context.request.params ? context.request.params : {},
+    headers: context.request.headers ? context.request.headers : {},
+    queryParams: context.request.query ? JSON.parse(JSON.stringify(context.request.query)) : {}
   }
+
   const res = await rulesEngine.evaluate(facts)
   const generatedResponse = {}
 

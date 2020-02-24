@@ -6,7 +6,7 @@ defaults_working_directory: &defaults_working_directory
 
 defaults_docker_node: &defaults_docker_node
   docker:
-    - image: node:10.15.3-alpine
+    - image: node:12.16.0-alpine
 
 defaults_docker_helm_kube: &defaults_docker_helm_kube
   docker:
@@ -111,11 +111,45 @@ jobs:
           name: Create dir for test results
           command: mkdir -p ./test/results
       - run:
-          name: Install tapes
+          name: Install jest
           command: npm install -g jest
       - run:
           name: Execute unit tests
           command: npm run test:unit --silent -- --json --outputFile ./test/results/unit.json
+      - store_artifacts:
+          path: ./test/results
+          prefix: test
+      - store_test_results:
+          path: ./test/results
+
+  test-postman:
+    <<: *defaults_working_directory
+    <<: *defaults_docker_node
+    steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Create dir for test results
+          command: mkdir -p ./test/results
+      - run:
+          name: Install newman and forever
+          command: npm install -g newman forever
+      - run:
+          name: Start the server
+          command: forever start src/index.js
+      - run:
+          name: Wait for some time
+          command: sleep 10
+      - run:
+          name: Execute postman tests
+          command: sh postman/run_newman.sh |tee ./test/results/postman.txt
+      - run:
+          name: Stop the server
+          command: forever stop src/index.js
       - store_artifacts:
           path: ./test/results
           prefix: test
@@ -303,6 +337,17 @@ workflows:
                 - /feature*/
                 - /bugfix*/
       - test-unit:
+          context: org-global
+          requires:
+            - setup
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
+      - test-postman:
           context: org-global
           requires:
             - setup
