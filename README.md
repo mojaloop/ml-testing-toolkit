@@ -48,7 +48,7 @@ The following softwares should be installed on your system to run the toolkit.
 * Git
 * Docker
 
-Please execute the following lines to build and run the tool.
+Please execute the following lines to build and run the tool. 
 
 ```bash
 git clone https://github.com/mojaloop/ml-self-testing-toolkit
