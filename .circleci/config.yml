@@ -142,6 +142,9 @@ jobs:
           name: Start the server
           command: npm start & echo $! > node_prgm_pid
       - run:
+          name: Wait for some time
+          command: sleep 10
+      - run:
           name: Execute postman tests
           command: cd postman; sh run_newman.sh ./test/results/postman.txt
       - run:
