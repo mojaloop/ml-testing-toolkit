@@ -146,7 +146,7 @@ jobs:
           command: sleep 10
       - run:
           name: Execute postman tests
-          command: sh postman/run_newman.sh |tee ../test/results/postman.txt
+          command: sh postman/run_newman.sh |tee ./test/results/postman.txt
       - run:
           name: Stop the server
           command: forever stop src/index.js
