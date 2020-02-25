@@ -1,6 +1,6 @@
 'use strict'
 
-const UniqueIdGenerator = require('../../../../src/lib/uniqueIdGenerator')
+const UniqueIdGenerator = require('../../../src/lib/uniqueIdGenerator')
 
 describe('UniqueIdGenerator', () => {
   describe('generateUniqueId', () => {

@@ -29,6 +29,9 @@
  ******/
 const RC = require('parse-strings-in-object')(require('rc')('ALS', require('../../config/default.json')))
 const fs = require('fs')
+const { promisify } = require('util')
+const readFileAsync = promisify(fs.readFile)
+const RequestLogger = require('./requestLogger')
 
 // const getOrDefault = (value, defaultValue) => {
 //   if (value === undefined) {
@@ -38,16 +41,22 @@ const fs = require('fs')
 //   return value
 // }
 
-let USER_CONFIG = {}
+var USER_CONFIG = {}
+
+const getUserConfig = () => {
+  return USER_CONFIG
+}
 
 // Function to load user configuration from .env file or environment incase of running in container
-const loadUserConfig = () => {
+const loadUserConfig = async () => {
   // if (fs.existsSync('local.env')) {
   //   require('dotenv').config({ path: 'local.env' })
   // }
-  if (fs.existsSync('spec_files/user_config.json')) {
-    const contents = fs.readFileSync('spec_files/user_config.json')
+  try {
+    const contents = await readFileAsync('spec_files/user_config.json')
     USER_CONFIG = JSON.parse(contents)
+  } catch (err) {
+    RequestLogger.logMessage('error', 'Can not read the file spec_files/user_config.json', null, true, null)
   }
 
   if (USER_CONFIG.OVERRIDE_WITH_ENV) {
@@ -63,13 +72,13 @@ const loadUserConfig = () => {
       }
     }
   }
-  console.log(USER_CONFIG)
+  return true
 }
 
 module.exports = {
   API_PORT: RC.API_PORT,
   DISPLAY_ROUTES: RC.DISPLAY_ROUTES,
   API_DEFINITIONS: RC.API_DEFINITIONS,
-  USER_CONFIG: USER_CONFIG,
+  getUserConfig: getUserConfig,
   loadUserConfig: loadUserConfig
 }

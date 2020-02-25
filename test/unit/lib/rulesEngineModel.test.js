@@ -1,6 +1,6 @@
 'use strict'
 
-const RulesEngineModel = require('../../../../src/lib/rulesEngineModel')
+const RulesEngineModel = require('../../../src/lib/rulesEngineModel')
 
 describe('RulesEngineModel', () => {
   describe('Validation Rules', () => {

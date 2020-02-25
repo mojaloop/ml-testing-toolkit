@@ -29,11 +29,14 @@ const Server = require('./server')
 const Config = require('./lib/config')
 const notificationEmitter = require('./lib/notificationEmitter')
 
-Config.loadUserConfig()
+const init = async () => {
+  await Config.loadUserConfig()
+  notificationEmitter.startServer(5050)
 
-notificationEmitter.startServer(5050)
-
-const optionsApi = {
-  port: Config.API_PORT
+  const optionsApi = {
+    port: Config.API_PORT
+  }
+  Server.initialize(optionsApi.port)
 }
-module.exports = Server.initialize(optionsApi.port)
+
+init()

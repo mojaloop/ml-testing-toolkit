@@ -1,6 +1,6 @@
 'use strict'
 
-const ObjectStore = require('../../../../src/lib/objectStore')
+const ObjectStore = require('../../../src/lib/objectStore')
 
 describe('ObjectStore', () => {
   describe('Transaction Related Functions', () => {
