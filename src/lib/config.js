@@ -38,32 +38,32 @@ const fs = require('fs')
 //   return value
 // }
 
-// Default values can be specified here
-const USER_CONFIG = {
-  CALLBACK_ENDPOINT: 'http://localhost:4000',
-  SEND_CALLBACK_ENABLE: true,
-  FSPID: 'samplefsp',
-  TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true,
-  VERSIONING_SUPPORT_ENABLE: true
-}
+let USER_CONFIG = {}
 
 // Function to load user configuration from .env file or environment incase of running in container
 const loadUserConfig = () => {
-  if (fs.existsSync('local.env')) {
-    require('dotenv').config({ path: 'local.env' })
+  // if (fs.existsSync('local.env')) {
+  //   require('dotenv').config({ path: 'local.env' })
+  // }
+  if (fs.existsSync('spec_files/user_config.json')) {
+    const contents = fs.readFileSync('spec_files/user_config.json')
+    USER_CONFIG = JSON.parse(contents)
   }
 
-  for (var prop in USER_CONFIG) {
-    if (Object.prototype.hasOwnProperty.call(USER_CONFIG, prop)) {
-      if (process.env[prop]) {
-        if ((typeof USER_CONFIG[prop]) === 'boolean') {
-          USER_CONFIG[prop] = process.env[prop] === 'true'
-        } else {
-          USER_CONFIG[prop] = process.env[prop]
+  if (USER_CONFIG.OVERRIDE_WITH_ENV) {
+    for (var prop in USER_CONFIG) {
+      if (Object.prototype.hasOwnProperty.call(USER_CONFIG, prop)) {
+        if (process.env[prop]) {
+          if ((typeof USER_CONFIG[prop]) === 'boolean') {
+            USER_CONFIG[prop] = process.env[prop] === 'true'
+          } else {
+            USER_CONFIG[prop] = process.env[prop]
+          }
         }
       }
     }
   }
+  console.log(USER_CONFIG)
 }
 
 module.exports = {
