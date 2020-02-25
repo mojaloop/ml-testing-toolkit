@@ -31,8 +31,10 @@ const RC = require('parse-strings-in-object')(require('rc')('ALS', require('../.
 const fs = require('fs')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
+const writeFileAsync = promisify(fs.writeFile)
 const RequestLogger = require('./requestLogger')
 
+const USER_CONFIG_FILE = 'spec_files/user_config.json'
 // const getOrDefault = (value, defaultValue) => {
 //   if (value === undefined) {
 //     return defaultValue
@@ -47,16 +49,36 @@ const getUserConfig = () => {
   return USER_CONFIG
 }
 
+const getStoredUserConfig = async () => {
+  let storedConfig = {}
+  try {
+    const contents = await readFileAsync(USER_CONFIG_FILE)
+    storedConfig = JSON.parse(contents)
+  } catch (err) {
+    RequestLogger.logMessage('error', 'Can not read the file spec_files/user_config.json', null, true, null)
+  }
+  return storedConfig
+}
+
+const setStoredUserConfig = async (newConfig) => {
+  try {
+    await writeFileAsync(USER_CONFIG_FILE, JSON.stringify(newConfig, null, 2))
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
 // Function to load user configuration from .env file or environment incase of running in container
 const loadUserConfig = async () => {
   // if (fs.existsSync('local.env')) {
   //   require('dotenv').config({ path: 'local.env' })
   // }
   try {
-    const contents = await readFileAsync('spec_files/user_config.json')
+    const contents = await readFileAsync(USER_CONFIG_FILE)
     USER_CONFIG = JSON.parse(contents)
   } catch (err) {
-    RequestLogger.logMessage('error', 'Can not read the file spec_files/user_config.json', null, true, null)
+    RequestLogger.logMessage('error', 'Can not read the file ' + USER_CONFIG_FILE, null, true, null)
   }
 
   if (USER_CONFIG.OVERRIDE_WITH_ENV) {
@@ -80,5 +102,7 @@ module.exports = {
   DISPLAY_ROUTES: RC.DISPLAY_ROUTES,
   API_DEFINITIONS: RC.API_DEFINITIONS,
   getUserConfig: getUserConfig,
+  getStoredUserConfig: getStoredUserConfig,
+  setStoredUserConfig: setStoredUserConfig,
   loadUserConfig: loadUserConfig
 }
