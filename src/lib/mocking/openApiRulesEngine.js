@@ -242,7 +242,7 @@ const replaceVariablesFromRequest = (inputObject, context, req) => {
           resultObject = resultObject.replace(element, getFunctionResult(element, context, req))
           break
         case '{$config':
-          resultObject = resultObject.replace(element, getConfigValue(element, Config.USER_CONFIG))
+          resultObject = resultObject.replace(element, getConfigValue(element, Config.getUserConfig()))
           break
         case '{$session':
           resultObject = resultObject.replace(element, getSessionValue(element, req.customInfo))

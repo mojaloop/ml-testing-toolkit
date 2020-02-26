@@ -106,7 +106,7 @@ module.exports.initilizeMockHandler = async () => {
               }
 
               // Handle quotes for transfer association
-              if (Config.USER_CONFIG.TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
+              if (Config.getUserConfig().TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
                 require('./middleware-functions/quotesAssociation').handleQuotes(context, req)
                 const matchFound = require('./middleware-functions/quotesAssociation').handleTransfers(context, req)
                 if (!matchFound) {
@@ -187,7 +187,7 @@ module.exports.handleRequest = (req, h) => {
   }
 
   console.log(selectedVersion)
-  if (apis[selectedVersion].type === 'fspiop' && Config.USER_CONFIG.VERSIONING_SUPPORT_ENABLE) {
+  if (apis[selectedVersion].type === 'fspiop' && Config.getUserConfig().VERSIONING_SUPPORT_ENABLE) {
     const fspiopApis = apis.filter(item => {
       return item.type === 'fspiop'
     })

@@ -20,7 +20,11 @@
     ],
     "ignore": [
       "client",
-      "test"
+      "test",
+      "postman",
+      "documents",
+      "spec_files",
+      "simulator"
     ]
   },
   "pre-commit": [

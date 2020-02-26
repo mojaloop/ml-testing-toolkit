@@ -10,7 +10,7 @@ router.post('/request', async (req, res, next) => {
   try {
     axios({
       method: req.body.method,
-      url: Config.USER_CONFIG.CALLBACK_ENDPOINT + req.body.path,
+      url: Config.getUserConfig().CALLBACK_ENDPOINT + req.body.path,
       headers: req.body.headers,
       data: req.body.body,
       timeout: 3000,

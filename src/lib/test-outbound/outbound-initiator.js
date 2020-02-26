@@ -86,7 +86,7 @@ const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallb
   return new Promise((resolve, reject) => {
     axios({
       method: method,
-      url: Config.USER_CONFIG.CALLBACK_ENDPOINT + path,
+      url: Config.getUserConfig().CALLBACK_ENDPOINT + path,
       headers: headers,
       data: body,
       timeout: 3000,
