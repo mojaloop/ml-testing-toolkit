@@ -4,7 +4,7 @@ self.__precacheManifest = [
     "url": "/ui/static/media/nucleo-icons.0b8a30b1.svg"
   },
   {
-    "revision": "85a1dbe1221f9db3ae25",
+    "revision": "fb0b0a214fb45d074871",
     "url": "/ui/static/css/main.f882679a.chunk.css"
   },
   {
@@ -52,12 +52,12 @@ self.__precacheManifest = [
     "url": "/ui/static/media/vue.9378e368.jpg"
   },
   {
-    "revision": "2569aaea6eaaf8cd210db7f2fa016743",
-    "url": "/ui/static/media/nucleo-icons.2569aaea.woff"
-  },
-  {
     "revision": "426439788ec5ba772cdf94057f6f4659",
     "url": "/ui/static/media/nucleo-icons.42643978.woff2"
+  },
+  {
+    "revision": "2569aaea6eaaf8cd210db7f2fa016743",
+    "url": "/ui/static/media/nucleo-icons.2569aaea.woff"
   },
   {
     "revision": "c1733565b32b585676302d4233c39da8",
@@ -68,8 +68,8 @@ self.__precacheManifest = [
     "url": "/ui/static/media/nucleo-icons.f82ec6ba.ttf"
   },
   {
-    "revision": "85a1dbe1221f9db3ae25",
-    "url": "/ui/static/js/main.480f0930.chunk.js"
+    "revision": "fb0b0a214fb45d074871",
+    "url": "/ui/static/js/main.8f13eb45.chunk.js"
   },
   {
     "revision": "949a2b066ec37f5a384712fc7beaf2f1",
@@ -80,12 +80,12 @@ self.__precacheManifest = [
     "url": "/ui/static/media/fa-regular-400.381af09a.woff"
   },
   {
-    "revision": "7422060ca379ee9939d3b687d072acad",
-    "url": "/ui/static/media/fa-regular-400.7422060c.eot"
-  },
-  {
     "revision": "73fe7f1effbf382f499831a0a9f18626",
     "url": "/ui/static/media/fa-regular-400.73fe7f1e.ttf"
+  },
+  {
+    "revision": "7422060ca379ee9939d3b687d072acad",
+    "url": "/ui/static/media/fa-regular-400.7422060c.eot"
   },
   {
     "revision": "48461ea4e797c9774dabb4a0440d2f56",
@@ -104,12 +104,12 @@ self.__precacheManifest = [
     "url": "/ui/static/media/fa-solid-900.815694de.woff"
   },
   {
-    "revision": "9b6c8da3c489424e2b3e9c9fb6314b37",
-    "url": "/ui/static/media/fa-brands-400.9b6c8da3.eot"
-  },
-  {
     "revision": "947b9537bc0fecc8130d48eb753495a1",
     "url": "/ui/static/media/fa-brands-400.947b9537.ttf"
+  },
+  {
+    "revision": "9b6c8da3c489424e2b3e9c9fb6314b37",
+    "url": "/ui/static/media/fa-brands-400.9b6c8da3.eot"
   },
   {
     "revision": "b5a61b229c9c92a6ac21f5b0e3c6e9f1",
@@ -136,7 +136,7 @@ self.__precacheManifest = [
     "url": "/ui/static/css/2.5ed2d519.chunk.css"
   },
   {
-    "revision": "e27a8ad36f955fc372fff68fc30a8485",
+    "revision": "2060318b26a4898b7a92698193ad8f11",
     "url": "/ui/index.html"
   }
 ];
