@@ -10,7 +10,7 @@ router.post('/request', async (req, res, next) => {
   try {
     axios({
       method: req.body.method,
-      url: Config.USER_CONFIG.CALLBACK_ENDPOINT + req.body.path,
+      url: Config.getUserConfig().CALLBACK_ENDPOINT + req.body.path,
       headers: req.body.headers,
       data: req.body.body,
       timeout: 3000,
@@ -22,7 +22,7 @@ router.post('/request', async (req, res, next) => {
     }, (err) => {
       customLogger.logMessage('info', 'Failed to send request ' + req.body.method + ' ' + req.body.path, err, false)
     })
-    res.status(200).json({ status: 'OK'})
+    res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
   }
@@ -36,7 +36,7 @@ router.post('/template/:outboundID', async (req, res, next) => {
     const outbound = require('../test-outbound/outbound-initiator')
     outbound.OutboundSend(inputJson, outboundID)
 
-    res.status(200).json({ status: 'OK'})
+    res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
   }

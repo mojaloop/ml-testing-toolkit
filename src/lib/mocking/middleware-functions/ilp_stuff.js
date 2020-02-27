@@ -1,4 +1,4 @@
-const Ilp = require('@mojaloop/sdk-standard-components').Ilp;
+const Ilp = require('@mojaloop/sdk-standard-components').Ilp
 const base64url = require('base64url')
 // must be pinned at ilp-packet@2.2.0 for ILP v1 compatibility
 const ilpPacket = require('ilp-packet')
@@ -32,7 +32,7 @@ const handleQuoteIlp = (context, response) => {
       data: ilpData // base64url encoded attached data
     }
 
-    const packet = ilpPacket.serializeIlpPayment(packetInput);
+    const packet = ilpPacket.serializeIlpPayment(packetInput)
 
     const base64encodedIlpPacket = base64url.fromBase64(packet.toString('base64')).replace('"', '')
 

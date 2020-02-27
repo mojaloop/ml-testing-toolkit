@@ -5,7 +5,6 @@ const _ = require('lodash')
 const faker = require('faker')
 const jsf = require('json-schema-faker')
 const $RefParser = require('json-schema-ref-parser')
-const util = require('util')
 
 jsf.format('byte', () => Buffer.alloc(faker.lorem.sentence(12)).toString('base64'))
 
@@ -76,7 +75,6 @@ async function loadYamlFile (fn) {
         if (reqSchema) {
           operation.validateRequest = ajv.compile(reqSchema)
         }
-
         const resSchema = findResponseSchema(operation.responses)
         if (resSchema) {
           operation.validateResponse = ajv.compile(resSchema)
@@ -89,8 +87,9 @@ async function loadYamlFile (fn) {
 }
 
 const findResponseSchema = (r) => {
-  const { content } = _.find(r, (v, k) => k >= 200 && k <= 299)
-  if (content == null) {
+  const successCode = _.find(r, (v, k) => k >= 200 && k <= 299)
+  const content = successCode ? successCode.content : null
+  if (content == null || Object.entries(content).length === 0) {
     return null
   }
   // Get first object by key.
@@ -103,6 +102,44 @@ const findRequestSchema = (r) => {
     return null
   }
   return _.find(content).schema
+}
+
+const generateMockResponseBody = async (method, name, data, jsfRefs) => {
+  const responseSchema = findResponseSchema(data.responses)
+  // Create a new copy of object without copying by references
+  const newResponseSchema = JSON.parse(JSON.stringify(responseSchema))
+  jsfRefs.forEach(ref => {
+    const convertedId = ref.id.replace(/\.(?!items)/g, '.properties.')
+    let targetObject = null
+    if (newResponseSchema.type === 'array') {
+      targetObject = _.get(newResponseSchema.items.properties, convertedId)
+    } else {
+      targetObject = _.get(newResponseSchema.properties, convertedId)
+    }
+    if (targetObject) {
+      targetObject.$ref = ref.id
+      if (ref.pattern) {
+        delete targetObject.pattern
+        delete targetObject.enum
+      }
+    }
+  })
+
+  if (newResponseSchema == null) {
+    return {}
+  }
+
+  const fakedResponse = {}
+  fakedResponse.body = await jsf.resolve(newResponseSchema, jsfRefs)
+  for (const key in data.responses) {
+    if (key >= 200 && key <= 299) {
+      fakedResponse.status = key
+      break
+    }
+    // Just in-case
+    fakedResponse.status = key
+  }
+  return fakedResponse
 }
 
 const generateMockOperation = async (method, name, data, jsfRefs) => {
@@ -177,6 +214,14 @@ class OpenApiRequestGenerator {
     const operation = pathValue[httpMethod]
     const id = operation.operationId || operation.summary
     return generateMockHeaders(httpMethod, id, operation, jsfRefs)
+  }
+
+  async generateResponseBody (path, httpMethod, jsfRefs) {
+    const pathValue = this.schema.paths[path]
+    const operation = pathValue[httpMethod]
+    const id = operation.operationId || operation.summary
+
+    return generateMockResponseBody(httpMethod, id, operation, jsfRefs)
   }
 }
 

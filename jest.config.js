@@ -10,5 +10,6 @@ module.exports = {
       branches: 90,
       lines: 90
     }
-  }
+  },
+  modulePathIgnorePatterns: ['spec_files']
 }

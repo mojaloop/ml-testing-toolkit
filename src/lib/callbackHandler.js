@@ -16,11 +16,11 @@ const handleCallback = async (callbackObject, context, req) => {
   }
 
   // Send callback
-  if (Config.USER_CONFIG.SEND_CALLBACK_ENABLE) {
+  if (Config.getUserConfig().SEND_CALLBACK_ENABLE) {
     customLogger.logMessage('info', 'Sending callback ' + callbackObject.method + ' ' + callbackObject.path, callbackObject, true, req)
     axios({
       method: callbackObject.method,
-      url: Config.USER_CONFIG.CALLBACK_ENDPOINT + callbackObject.path,
+      url: Config.getUserConfig().CALLBACK_ENDPOINT + callbackObject.path,
       headers: callbackObject.headers,
       data: callbackObject.body,
       timeout: 3000

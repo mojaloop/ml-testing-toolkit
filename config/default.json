@@ -5,12 +5,23 @@
     "expiresIn": 180000,
     "generateTimeout": 30000
   },
-  "FSPIOP_API_DEFINITIONS": [
+  "API_DEFINITIONS": [
     {
-      "version": "1.0"
+      "type": "fspiop",
+      "version": "1.0",
+      "folderPath": "fspiop_1.0",
+      "asynchronous": true
     },
     {
-      "version": "1.1"
+      "type": "fspiop",
+      "version": "1.1",
+      "folderPath": "fspiop_1.1",
+      "asynchronous": true
+    },
+    {
+      "type": "settlements",
+      "version": "1.0",
+      "folderPath": "settlements_1.0"
     }
   ]
 }

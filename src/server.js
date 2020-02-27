@@ -101,7 +101,7 @@ const createServer = async (port) => {
         RequestLogger.logRequest(request)
         return h.continue
       }
-    },   
+    },
     {
       type: 'onPreResponse',
       method: (request, h) => {

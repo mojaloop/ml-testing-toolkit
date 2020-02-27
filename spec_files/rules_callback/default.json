@@ -2,55 +2,13 @@
   {
     "ruleId": 1,
     "priority": 1,
-    "description": "Send a mock callback for all the transfer requests",
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/transfers"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "post"
-        }
-      ]
+    "description": "post /quotes",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
     },
-    "event": {
-      "type": "MOCK_CALLBACK",
-      "params": {},
-      "method": "put",
-      "path": "/transfers/{ID}"
-    }
-  },
-  {
-    "ruleId": 2,
-    "description": "Send a mock callback for all the parties lookup with a constant party info",
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/parties/{Type}/{ID}"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "get"
-        }
-      ]
-    },
-    "event": {
-      "type": "MOCK_CALLBACK",
-      "params": {},
-      "method": "put",
-      "path": "/parties/{Type}/{ID}"
-    }
-  },
-  {
-    "ruleId": 3,
-    "description": "Send a mock callback for all quotes requests",
     "conditions": {
       "all": [
         {
@@ -66,10 +24,75 @@
       ]
     },
     "event": {
-      "type": "MOCK_CALLBACK",
+      "method": null,
+      "path": null,
       "params": {},
-      "method": "put",
-      "path": "/quotes/{ID}"
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
+    }
+  },
+  {
+    "ruleId": 2,
+    "priority": 1,
+    "description": "post /transfers",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": null,
+      "path": null,
+      "params": {},
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
+    }
+  },
+  {
+    "ruleId": 3,
+    "priority": 1,
+    "description": "get /parties/{Type}/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": null,
+      "path": null,
+      "params": {},
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
     }
   }
 ]
