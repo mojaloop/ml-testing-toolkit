@@ -71,10 +71,10 @@
             [
               {
                 "id": 123,
-                "createdDate": "ipsum aliquip laborum",
-                "state": "in veniam",
+                "createdDate": "1954-11-03",
+                "state": "PENDING_SETTLEMENT",
                 "reason": "do",
-                "changedDate": "consectetur in in id"
+                "changedDate": "1954-11-03"
               }
             ]
           ],
@@ -85,10 +85,10 @@
                 {
                   "id": 81795155,
                   "reason": "veniam est proident commodo aliqua",
-                  "state": "commodo sit anim Lorem enim",
+                  "state": "PENDING_SETTLEMENT",
                   "netSettlementAmount": {
-                    "amount": 33368773.108870283,
-                    "currency": "ea culpa"
+                    "amount": 100,
+                    "currency": "USD"
                   }
                 }
               ]
@@ -135,11 +135,11 @@
           "settlementWindows": [
             [
               {
-                "createdDate": "enim",
+                "createdDate": "2020-02-10",
                 "id": "{$request.params.id}",
-                "state": "dolore sint esse veniam",
+                "state": "PS_TRANSFERS_RECORDED",
                 "reason": "amet cillum culpa v",
-                "changedDate": "sit ex in deserunt"
+                "changedDate": "2020-02-10"
               }
             ]
           ],
@@ -152,8 +152,8 @@
                   "reason": "aliquip aliqua nulla deserunt",
                   "state": "PS_TRANSFERS_RECORDED",
                   "netSettlementAmount": {
-                    "amount": -75070956.16108495,
-                    "currency": "amet eu officia nulla laboris"
+                    "amount": 100,
+                    "currency": "USD"
                   }
                 }
               ]
