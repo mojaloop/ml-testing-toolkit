@@ -170,10 +170,15 @@ module.exports.initilizeMockHandler = async () => {
   })
 
   // Loop through the apis and initialize them
-  apis.forEach(api => {
+  // apis.forEach(api => {
+  //   customLogger.logMessage('info', 'Initializing the api spec file: ' + api.specFile, null, false)
+  //   api.openApiBackendObject.init()
+  // })
+
+  for (const api of apis) {
     customLogger.logMessage('info', 'Initializing the api spec file: ' + api.specFile, null, false)
-    api.openApiBackendObject.init()
-  })
+    await api.openApiBackendObject.init()
+  }
 }
 
 module.exports.handleRequest = (req, h) => {
