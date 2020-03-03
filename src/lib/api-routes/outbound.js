@@ -4,7 +4,7 @@ const router = new express.Router()
 const axios = require('axios').default
 const Config = require('../config')
 const customLogger = require('../requestLogger')
-const { check, validationResult } = require('express-validator') 
+const { check, validationResult } = require('express-validator')
 
 // Route to send a single outbound request
 router.post('/request', [
