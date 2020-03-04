@@ -29,6 +29,10 @@ describe('API route /api/rules', () => {
       })
     })
     describe('PUT /api/rules/files/validation/:fileName', () => {
+      it('Create a test file with wrong content', async () => {
+        const res = await request(app).put(`/api/rules/files/validation/test1.json`).send({})
+        expect(res.statusCode).toEqual(422)
+      })
       it('Create a test file', async () => {
         const res = await request(app).put(`/api/rules/files/validation/test1.json`).send([])
         expect(res.statusCode).toEqual(200)

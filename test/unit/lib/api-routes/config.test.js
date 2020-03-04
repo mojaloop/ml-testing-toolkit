@@ -28,6 +28,11 @@ describe('API route /config', () => {
       const res = await request(app).put(`/api/config/user`).send(newConfig)
       expect(res.statusCode).toEqual(200)
     })
+    it('Set new Config without CALLBACK_ENDPOINT', async () => {
+      const {CALLBACK_ENDPOINT, ...wrongConfig} = userConfig
+      const res = await request(app).put(`/api/config/user`).send(wrongConfig)
+      expect(res.statusCode).toEqual(422)
+    })
     it('Get Stored Config again', async () => {
       const res = await request(app).get(`/api/config/user`)
       expect(res.statusCode).toEqual(200)
