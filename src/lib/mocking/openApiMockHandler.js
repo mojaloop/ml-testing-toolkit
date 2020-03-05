@@ -12,6 +12,7 @@ const _ = require('lodash')
 const MyEventEmitter = require('../MyEventEmitter')
 const readFileAsync = promisify(fs.readFile)
 const Config = require('../config')
+const assertionStore = require('../assertionStore')
 
 var path = require('path')
 
@@ -38,6 +39,14 @@ module.exports.initilizeMockHandler = async () => {
           if (req.method === 'put') {
             // MyEventEmitter.getTestOutboundEmitter().emit('incoming', req.payload)
             MyEventEmitter.getTestOutboundEmitter().emit(req.method + ' ' + req.path, req.headers, req.payload)
+            let assertionPath = req.path
+            const assertionData = { headers: req.headers, body: req.payload }
+            if (assertionPath.endsWith('/error')) {
+              assertionPath = assertionPath.replace('/error', '')
+              assertionData.error = true
+            }
+            assertionStore.pushRequest(assertionPath, assertionData)
+            MyEventEmitter.getAssertionRequestEmitter().emit(assertionPath, assertionData)
           }
 
           req.customInfo.specFile = item.specFile
