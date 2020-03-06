@@ -18,18 +18,17 @@
 
     3.4 [Sync Response Rules](#34-sync-response-rules)
 
-    3.5 [Validation Rules (Error Callbacks)](#35-validation-rules)
+    3.5 [Validation Rules (_Error Callbacks_)](#35-validation-rules)
 
-    3.6 [Callback Rules (Success Callbacks)](#36-callback-rules)
+    3.6 [Callback Rules (_Success Callbacks_)](#36-callback-rules)
 
-#### 3.7 Outbound Request
-[TODO - complete this section of user-guide]
+    3.7 [Outbound Request](#37-outbound-request)
 
-#### 3.8 Settings
+    3.8 [Settings](#38-settings)
 
 ### 1. Introduction
 
-The intention of this document is to provide a basic user guide to the mojaloop Self Testing Toolkit. This easy to use tool set was designed for both technical and non-technical users, even though the primarily users would likely be Quality Assurance (QA) resources. By following this guide, users will have a better understand of the capabilities and fuctionality of the tool set.
+The intention of this document is to provide a basic user guide to the mojaloop Self Testing Toolkit. This easy to use toolkit was designed for both technical and non-technical users, even though the primarily users would likely be Quality Assurance (QA) resources. By following this guide, users will have a better understand of the capabilities and fuctionality of the tool set.
 
 The mojaloop Self Testing Toolkit was designed for participants that would like to partcipate in the mojaloop Hub scheme. Intentially build to have a standard way to test integration with a Mojaloop Hub, this tool set can potentially be used by both the DFSP and the Hub to verify the inergration between the 2 entities.
 
@@ -73,18 +72,18 @@ Allows you to monitor the incomming and outgoing request.
 
 ![Monitoring Initial State](/assets/images/Monitoring_Initial_State.png) 
 
-If you have followed the installation in structions, you should have the Simulator UI open in a browser tab. Go to the **Outbound Send** tab on the left.
+If you have followed the installation instructions, you should have the Simulator UI open in a browser tab. Go to the **Outbound Send** tab on the left.
 
 Press **Send Transfer** button to send a request from the Simulator UI to the Self Testing Toolkit.
 
 ![Send Transfer](/assets/images/Send_Transfer.png)
 
 
-If the request was send successfully from the Simulator UI.
+If the request is send successfully from the Simulator UI.
 
 ![Simulator response](/assets/images/Simulator_Response.png) 
 
-Go back to the Monitoring tab on the Self Testing Toolset. You will notice the three processes assosiated with this request in acending order.
+Go back to the Monitoring tab on the Self Testing Toolset. You will notice the three requests associated with a transfer in an order such that most recent request first.
 
 - GET /parties/{Type}/{ID}
 - POST /quotes
@@ -118,10 +117,16 @@ When you send more transfers from the simulator, these transactions will be adde
 #### 3.4 Sync Response Rules
 [TODO - complete this section of user-guide]
 
-#### 3.5 Validation Rules (Error Callbacks)
+#### 3.5 Validation Rules 
+
+**_Error Callbacks_**
+
 [TODO - complete this section of user-guide]
 
-#### 3.6 Callback Rules (Success Callbacks)
+#### 3.6 Callback Rules
+
+**_Success Callbacks_**
+
 [TODO - complete this section of user-guide]
 
 #### 3.7 Outbound Request
