@@ -1,5 +1,5 @@
 {
-  "name": "ml-self-testing-toolkit",
+  "name": "ml-testing-toolkit",
   "description": "Self Testing Toolkit for Mojaloop implementations",
   "version": "9.2.0",
   "license": "Apache-2.0",
@@ -9,9 +9,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/mojaloop/ml-self-testing-toolkit.git"
+    "url": "https://github.com/mojaloop/ml-testing-toolkit.git"
   },
-  "bugs": "https://github.com/mojaloop/ml-self-testing-toolkit/issues",
+  "bugs": "https://github.com/mojaloop/ml-testing-toolkit/issues",
   "config": {},
   "bin": "src/index.js",
   "standard": {
