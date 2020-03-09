@@ -51,14 +51,14 @@ The following softwares should be installed on your system to run the toolkit.
 Please execute the following lines to build and run the tool. 
 
 ```bash
-git clone https://github.com/mojaloop/ml-self-testing-toolkit
-cd ml-self-testing-toolkit
+git clone https://github.com/mojaloop/ml-testing-toolkit
+cd ml-testing-toolkit
 docker-compose up
 ```
 
 To update the self-testing-toolkit to the latest version and rebuild, please run the following
 ```bash
-cd ml-self-testing-toolkit
+cd ml-testing-toolkit
 git pull
 docker-compose build
 docker-compose up
@@ -104,8 +104,8 @@ The following softwares should be installed on your system to run the toolkit.
 Please execute the following lines to run the tool.
 
 ```
-git clone https://github.com/mojaloop/ml-self-testing-toolkit.git
-cd ml-self-testing-toolkit
+git clone https://github.com/mojaloop/ml-testing-toolkit.git
+cd ml-testing-toolkit
 npm install
 npm start
 ```
@@ -131,7 +131,7 @@ Once the server is started on a particular port, you can send api requests from 
 
 If you want to test the tool for the whole functionality like schema validation, additional validation and callback generation ..etc, you can initiate a transfer cycle from mojaloop simulator UI.
 
-Please follow the below steps from the ml-self-testing-toolkit folder
+Please follow the below steps from the ml-testing-toolkit folder
 
 ```bash
 cd simulator

@@ -2416,6 +2416,206 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Callback Assertions",
+			"item": [
+				{
+					"name": "Get Party Receiver Happy path",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "decab794-66d7-4b03-b6da-4191441206a8",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"",
+									"",
+									"    pm.sendRequest(\"http://localhost:5050/longpolling/callbacks/parties/MSISDN/\"+pm.variables.get(\"pathfinderMSISDN\"), function (err, response) {",
+									"          if(response.responseSize !== 0) {",
+									"              pm.test(\"Got resonse1\"+response.text(), function () {",
+									"                pm.expect(\"1\").equal(\"1\");",
+									"            });",
+									"          } else {",
+									"                console.log(response)",
+									"          }",
+									"    });",
+									"   ",
+									"",
+									"",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c0e9b1b6-9f17-42f4-b7aa-9317535a62b7",
+								"exec": [
+									"pm.variables.set('expectedFullName', 'Siabelo Maroka');",
+									"pm.variables.set('expectedFirstName', 'Siabelo');",
+									"pm.variables.set('expectedLastName', 'Maroka');",
+									"pm.variables.set('expectedDOB', '3/3/1973');",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.parties+json;version=1",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.parties+json;version=1.0",
+								"type": "text"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "{{payerfsp}}",
+								"type": "text"
+							},
+							{
+								"key": "Date",
+								"value": "{{dateHeader}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{HOST_ACCOUNT_LOOKUP_SERVICE}}/parties/MSISDN/{{pathfinderMSISDN}}",
+							"host": [
+								"{{HOST_ACCOUNT_LOOKUP_SERVICE}}"
+							],
+							"path": [
+								"parties",
+								"MSISDN",
+								"{{pathfinderMSISDN}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Party Receiver error callback",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "decab794-66d7-4b03-b6da-4191441206a8",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"",
+									"",
+									"    pm.sendRequest(\"http://localhost:5050/longpolling/callbacks/parties/MSISDN/1234567890\", function (err, response) {",
+									"          if(response.responseSize !== 0) {",
+									"              pm.test(\"Got resonse1\"+response.text(), function () {",
+									"                pm.expect(\"1\").equal(\"1\");",
+									"            });",
+									"          } else {",
+									"                console.log(response)",
+									"          }",
+									"    });",
+									"   ",
+									"",
+									"",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c0e9b1b6-9f17-42f4-b7aa-9317535a62b7",
+								"exec": [
+									"pm.variables.set('expectedFullName', 'Siabelo Maroka');",
+									"pm.variables.set('expectedFirstName', 'Siabelo');",
+									"pm.variables.set('expectedLastName', 'Maroka');",
+									"pm.variables.set('expectedDOB', '3/3/1973');",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.interoperability.parties+json;version=1"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.interoperability.parties+json;version=1.0"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"type": "text",
+								"value": "{{payerfsp}}"
+							},
+							{
+								"key": "Date",
+								"type": "text",
+								"value": "{{dateHeader}}"
+							}
+						],
+						"url": {
+							"raw": "{{HOST_ACCOUNT_LOOKUP_SERVICE}}/parties/MSISDN/1234567890",
+							"host": [
+								"{{HOST_ACCOUNT_LOOKUP_SERVICE}}"
+							],
+							"path": [
+								"parties",
+								"MSISDN",
+								"1234567890"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "335c2302-1ec9-41ff-8484-8d66bafdfb93",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "eae69591-9946-4f24-a59f-ec1c030a5dee",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"event": [

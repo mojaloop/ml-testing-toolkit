@@ -2,6 +2,7 @@ const express = require('express')
 const rulesEngineModel = require('../rulesEngineModel')
 
 const router = new express.Router()
+const { body, validationResult } = require('express-validator')
 
 // Validation Rules
 // Get all validation rules files
@@ -27,7 +28,14 @@ router.get('/files/validation/:fileName', async (req, res, next) => {
 })
 
 // Route to edit a validation rule file
-router.put('/files/validation/:fileName', async (req, res, next) => {
+router.put('/files/validation/:fileName', [
+  body().isArray()
+], async (req, res, next) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() })
+  }
+
   const fileName = req.params.fileName
 
   try {

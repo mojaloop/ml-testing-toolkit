@@ -2,6 +2,7 @@ const express = require('express')
 const Config = require('../config')
 
 const router = new express.Router()
+const { check, validationResult } = require('express-validator')
 
 // Get runtime and stored user config
 router.get('/user', async (req, res, next) => {
@@ -14,8 +15,14 @@ router.get('/user', async (req, res, next) => {
   }
 })
 
-// Route to edit a validation rule file
-router.put('/user', async (req, res, next) => {
+// Route to edit the user configuration
+router.put('/user', [
+  check('CALLBACK_ENDPOINT').notEmpty()
+], async (req, res, next) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() })
+  }
   try {
     await Config.setStoredUserConfig(req.body)
     await Config.loadUserConfig()
