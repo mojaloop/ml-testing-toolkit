@@ -4,9 +4,18 @@ const router = new express.Router()
 const axios = require('axios').default
 const Config = require('../config')
 const customLogger = require('../requestLogger')
+const { check, validationResult } = require('express-validator')
 
 // Route to send a single outbound request
-router.post('/request', async (req, res, next) => {
+router.post('/request', [
+  check('method').notEmpty(),
+  check('path').notEmpty()
+],
+async (req, res, next) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() })
+  }
   try {
     axios({
       method: req.body.method,
@@ -33,6 +42,13 @@ router.post('/template/:outboundID', async (req, res, next) => {
   try {
     const outboundID = req.params.outboundID
     const inputJson = JSON.parse(JSON.stringify(req.body))
+    // Validate the template format
+    if (!inputJson.name) {
+      return res.status(422).json({ errors: 'Template name is missing' })
+    }
+    if (!inputJson.requests) {
+      return res.status(422).json({ errors: 'Template requests are missing' })
+    }
     const outbound = require('../test-outbound/outbound-initiator')
     outbound.OutboundSend(inputJson, outboundID)
 

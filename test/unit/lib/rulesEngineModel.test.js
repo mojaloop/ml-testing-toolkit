@@ -67,8 +67,7 @@ describe('RulesEngineModel', () => {
         await expect(RulesEngineModel.deleteCallbackRulesFile('123.json')).resolves.toEqual(true)
       })
       it('123.json file should not be present', async () => {
-        const result = await RulesEngineModel.getCallbackRulesFileContent('123.json')
-        expect(Array.isArray(result)).not.toBe(true)
+        await expect(RulesEngineModel.getCallbackRulesFileContent('123.json')).rejects.toThrow()
       })
     })
   })
@@ -129,8 +128,7 @@ describe('RulesEngineModel', () => {
         await expect(RulesEngineModel.deleteResponseRulesFile('123.json')).resolves.toEqual(true)
       })
       it('123.json file should not be present', async () => {
-        const result = await RulesEngineModel.getResponseRulesFileContent('123.json')
-        expect(Array.isArray(result)).not.toBe(true)
+        await expect(RulesEngineModel.getResponseRulesFileContent('123.json')).rejects.toThrow()
       })
     })
   })
@@ -191,8 +189,7 @@ describe('RulesEngineModel', () => {
         await expect(RulesEngineModel.deleteValidationRulesFile('123.json')).resolves.toEqual(true)
       })
       it('123.json file should not be present', async () => {
-        const result = await RulesEngineModel.getValidationRulesFileContent('123.json')
-        expect(Array.isArray(result)).not.toBe(true)
+        await expect(RulesEngineModel.getValidationRulesFileContent('123.json')).rejects.toThrow()
       })
     })
   })

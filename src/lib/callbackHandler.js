@@ -1,6 +1,8 @@
 const customLogger = require('./requestLogger')
 const Config = require('../lib/config')
 const axios = require('axios').default
+const assertionStore = require('./assertionStore')
+const MyEventEmitter = require('./MyEventEmitter')
 
 const handleCallback = async (callbackObject, context, req) => {
   if (callbackObject.delay) {
@@ -14,6 +16,16 @@ const handleCallback = async (callbackObject, context, req) => {
   } else {
     customLogger.logMessage('error', 'Callback schema is invalid ' + callbackObject.method + ' ' + callbackObject.path, validationResult.errors, true, req)
   }
+
+  // Store callbacks for assertion
+  let assertionPath = callbackObject.path
+  const assertionData = { headers: callbackObject.headers, body: callbackObject.body }
+  if (assertionPath.endsWith('/error')) {
+    assertionPath = assertionPath.replace('/error', '')
+    assertionData.error = true
+  }
+  assertionStore.pushCallback(assertionPath, assertionData)
+  MyEventEmitter.getAssertionCallbackEmitter().emit(assertionPath, assertionData)
 
   // Send callback
   if (Config.getUserConfig().SEND_CALLBACK_ENABLE) {
