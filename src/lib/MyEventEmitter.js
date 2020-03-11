@@ -1,6 +1,8 @@
 const EventEmitter = require('events')
 class MyEmitter extends EventEmitter {}
 var testOutbound = null
+var assertionRequest = null
+var assertionCallback = null
 
 const getTestOutboundEmitter = () => {
   if (!testOutbound) {
@@ -9,6 +11,22 @@ const getTestOutboundEmitter = () => {
   return testOutbound
 }
 
+const getAssertionRequestEmitter = () => {
+  if (!assertionRequest) {
+    assertionRequest = new MyEmitter()
+  }
+  return assertionRequest
+}
+
+const getAssertionCallbackEmitter = () => {
+  if (!assertionCallback) {
+    assertionCallback = new MyEmitter()
+  }
+  return assertionCallback
+}
+
 module.exports = {
-  getTestOutboundEmitter
+  getTestOutboundEmitter,
+  getAssertionRequestEmitter,
+  getAssertionCallbackEmitter
 }

@@ -185,12 +185,8 @@ const getResponseRulesFiles = async () => {
 }
 
 const getResponseRulesFileContent = async (fileName) => {
-  try {
-    const rulesRawdata = await readFileAsync(rulesResponseFilePathPrefix + fileName)
-    return JSON.parse(rulesRawdata)
-  } catch (err) {
-    return err
-  }
+  const rulesRawdata = await readFileAsync(rulesResponseFilePathPrefix + fileName)
+  return JSON.parse(rulesRawdata)
 }
 
 const setResponseRulesFileContent = async (fileName, fileContent) => {
@@ -230,12 +226,8 @@ const getValidationRulesFiles = async () => {
 }
 
 const getValidationRulesFileContent = async (fileName) => {
-  try {
-    const rulesRawdata = await readFileAsync(rulesValidationFilePathPrefix + fileName)
-    return JSON.parse(rulesRawdata)
-  } catch (err) {
-    return err
-  }
+  const rulesRawdata = await readFileAsync(rulesValidationFilePathPrefix + fileName)
+  return JSON.parse(rulesRawdata)
 }
 
 const setValidationRulesFileContent = async (fileName, fileContent) => {
@@ -275,12 +267,8 @@ const getCallbackRulesFiles = async () => {
 }
 
 const getCallbackRulesFileContent = async (fileName) => {
-  try {
-    const rulesRawdata = await readFileAsync(rulesCallbackFilePathPrefix + fileName)
-    return JSON.parse(rulesRawdata)
-  } catch (err) {
-    return err
-  }
+  const rulesRawdata = await readFileAsync(rulesCallbackFilePathPrefix + fileName)
+  return JSON.parse(rulesRawdata)
 }
 
 const setCallbackRulesFileContent = async (fileName, fileContent) => {
@@ -325,5 +313,6 @@ module.exports = {
   setCallbackRulesFileContent,
   deleteCallbackRulesFile,
   setActiveValidationRulesFile,
-  setActiveCallbackRulesFile
+  setActiveCallbackRulesFile,
+  setActiveResponseRulesFile
 }

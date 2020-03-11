@@ -1,0 +1,107 @@
+{
+  "decisions": {
+    "1488|jest>jest-cli>@jest/core>@jest/reporters>jest-runtime>jest-config>jest-environment-jsdom>jsdom>acorn": {
+      "decision": "fix",
+      "madeAt": 1583744254193
+    },
+    "1488|jest>jest-cli>@jest/core>jest-runner>jest-jasmine2>jest-runtime>jest-config>jest-environment-jsdom>jsdom>acorn": {
+      "decision": "fix",
+      "madeAt": 1583744254193
+    },
+    "1488|jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>jest-environment-jsdom>jsdom>acorn": {
+      "decision": "fix",
+      "madeAt": 1583744254193
+    },
+    "1488|jest>jest-cli>@jest/core>jest-runtime>jest-config>jest-environment-jsdom>jsdom>acorn": {
+      "decision": "fix",
+      "madeAt": 1583744254193
+    },
+    "1488|jest>jest-cli>@jest/core>jest-runner>jest-config>jest-environment-jsdom>jsdom>acorn": {
+      "decision": "fix",
+      "madeAt": 1583744254193
+    },
+    "1488|jest>jest-cli>@jest/core>jest-config>jest-environment-jsdom>jsdom>acorn": {
+      "decision": "fix",
+      "madeAt": 1583744254193
+    },
+    "1488|jest>jest-cli>jest-config>jest-environment-jsdom>jsdom>acorn": {
+      "decision": "fix",
+      "madeAt": 1583744254193
+    },
+    "1488|eslint>espree>acorn": {
+      "decision": "fix",
+      "madeAt": 1583744281278
+    },
+    "1488|standard>eslint>espree>acorn": {
+      "decision": "fix",
+      "madeAt": 1583744281278
+    },
+    "1488|jest>@jest/core>@jest/reporters>jest-runtime>jest-config>jest-environment-jsdom>jsdom>acorn-globals>acorn": {
+      "decision": "ignore",
+      "madeAt": 1583745573218,
+      "expiresAt": 1586337548042
+    },
+    "1488|jest>jest-cli>@jest/core>@jest/reporters>jest-runtime>jest-config>jest-environment-jsdom>jsdom>acorn-globals>acorn": {
+      "decision": "ignore",
+      "madeAt": 1583745573218,
+      "expiresAt": 1586337548042
+    },
+    "1488|jest>@jest/core>jest-runner>jest-jasmine2>jest-runtime>jest-config>jest-environment-jsdom>jsdom>acorn-globals>acorn": {
+      "decision": "ignore",
+      "madeAt": 1583745573218,
+      "expiresAt": 1586337548042
+    },
+    "1488|jest>jest-cli>@jest/core>jest-runner>jest-jasmine2>jest-runtime>jest-config>jest-environment-jsdom>jsdom>acorn-globals>acorn": {
+      "decision": "ignore",
+      "madeAt": 1583745573218,
+      "expiresAt": 1586337548042
+    },
+    "1488|jest>@jest/core>jest-runner>jest-runtime>jest-config>jest-environment-jsdom>jsdom>acorn-globals>acorn": {
+      "decision": "ignore",
+      "madeAt": 1583745573218,
+      "expiresAt": 1586337548042
+    },
+    "1488|jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>jest-environment-jsdom>jsdom>acorn-globals>acorn": {
+      "decision": "ignore",
+      "madeAt": 1583745573218,
+      "expiresAt": 1586337548042
+    },
+    "1488|jest>@jest/core>jest-runtime>jest-config>jest-environment-jsdom>jsdom>acorn-globals>acorn": {
+      "decision": "ignore",
+      "madeAt": 1583745573218,
+      "expiresAt": 1586337548042
+    },
+    "1488|jest>jest-cli>@jest/core>jest-runtime>jest-config>jest-environment-jsdom>jsdom>acorn-globals>acorn": {
+      "decision": "ignore",
+      "madeAt": 1583745573218,
+      "expiresAt": 1586337548042
+    },
+    "1488|jest>@jest/core>jest-runner>jest-config>jest-environment-jsdom>jsdom>acorn-globals>acorn": {
+      "decision": "ignore",
+      "madeAt": 1583745573218,
+      "expiresAt": 1586337548042
+    },
+    "1488|jest>jest-cli>@jest/core>jest-runner>jest-config>jest-environment-jsdom>jsdom>acorn-globals>acorn": {
+      "decision": "ignore",
+      "madeAt": 1583745573218,
+      "expiresAt": 1586337548042
+    },
+    "1488|jest>@jest/core>jest-config>jest-environment-jsdom>jsdom>acorn-globals>acorn": {
+      "decision": "ignore",
+      "madeAt": 1583745573218,
+      "expiresAt": 1586337548042
+    },
+    "1488|jest>jest-cli>@jest/core>jest-config>jest-environment-jsdom>jsdom>acorn-globals>acorn": {
+      "decision": "ignore",
+      "madeAt": 1583745573218,
+      "expiresAt": 1586337548042
+    },
+    "1488|jest>jest-cli>jest-config>jest-environment-jsdom>jsdom>acorn-globals>acorn": {
+      "decision": "ignore",
+      "madeAt": 1583745573218,
+      "expiresAt": 1586337548042
+    }
+  },
+  "rules": {},
+  "version": 1
+}

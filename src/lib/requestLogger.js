@@ -26,7 +26,7 @@
 
 // const Util = require('util')
 var bunyan = require('bunyan')
-var Logger = bunyan.createLogger({ name: 'ml-self-testing-toolkit', level: 'debug' })
+var Logger = bunyan.createLogger({ name: 'ml-testing-toolkit', level: 'debug' })
 const notificationEmitter = require('./notificationEmitter.js')
 
 const logRequest = function (request) {
