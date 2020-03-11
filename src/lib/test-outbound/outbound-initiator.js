@@ -7,7 +7,7 @@ const notificationEmitter = require('../notificationEmitter.js')
 const fs = require('fs')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
-const expect = require('chai').expect
+const expect = require('chai').expect // eslint-disable-line
 
 const OutboundSend = async (inputTemplate, outboundID) => {
   // Load the requests array into an object by the request id to access a particular object faster
@@ -101,7 +101,7 @@ const handleTests = async (request, response = null, callback = null) => {
       // console.log(testCase.description, response)
       try {
         console.log(testCase.exec.join('\n'))
-        eval(testCase.exec.join('\n'))
+        eval(testCase.exec.join('\n')) // eslint-disable-line
         results[testCase.id] = {
           status: 'SUCCESS'
         }
