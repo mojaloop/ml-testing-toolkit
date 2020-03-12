@@ -46,8 +46,8 @@ router.post('/template/:outboundID', async (req, res, next) => {
     if (!inputJson.name) {
       return res.status(422).json({ errors: 'Template name is missing' })
     }
-    if (!inputJson.requests) {
-      return res.status(422).json({ errors: 'Template requests are missing' })
+    if (!inputJson.test_cases) {
+      return res.status(422).json({ errors: 'Template test cases are missing' })
     }
     const outbound = require('../test-outbound/outbound-initiator')
     outbound.OutboundSend(inputJson, outboundID)

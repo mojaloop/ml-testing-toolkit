@@ -10,14 +10,28 @@ const readFileAsync = promisify(fs.readFile)
 const expect = require('chai').expect // eslint-disable-line
 
 const OutboundSend = async (inputTemplate, outboundID) => {
+  for (const i in inputTemplate.test_cases) {
+    await processTestCase(inputTemplate.test_cases[i], outboundID, inputTemplate.inputValues)
+  }
+
+  // Send the total result to client
+  const totalResult = inputTemplate
+  notificationEmitter.broadcastOutboundProgress({
+    status: 'FINISHED',
+    outboundID: outboundID,
+    totalResult
+  })
+}
+
+const processTestCase = async (testCase, outboundID, inputValues) => {
   // Load the requests array into an object by the request id to access a particular object faster
-  // console.log(inputTemplate.requests)
+  // console.log(testCase.requests)
   const requestsObj = {}
   // Store the request ids into a new array
   const templateIDArr = []
-  for (const i in inputTemplate.requests) {
-    requestsObj[inputTemplate.requests[i].id] = inputTemplate.requests[i]
-    templateIDArr.push(inputTemplate.requests[i].id)
+  for (const i in testCase.requests) {
+    requestsObj[testCase.requests[i].id] = testCase.requests[i]
+    templateIDArr.push(testCase.requests[i].id)
   }
   // Sort the request ids array
   templateIDArr.sort((a, b) => {
@@ -37,10 +51,10 @@ const OutboundSend = async (inputTemplate, outboundID) => {
     // console.log(request)
     // Form the actual http request headers, body, path and method by replacing configurable parameters
     // Replace the parameters
-    convertedRequest = replaceVariables(request, inputTemplate.inputValues, request, requestsObj)
+    convertedRequest = replaceVariables(request, inputValues, request, requestsObj)
     convertedRequest = replaceRequestVariables(convertedRequest)
 
-    console.log(convertedRequest)
+    // console.log(convertedRequest)
     // Form the path from params and operationPath
     convertedRequest.path = replacePathVariables(request.operationPath, convertedRequest.params)
 
@@ -59,16 +73,19 @@ const OutboundSend = async (inputTemplate, outboundID) => {
     try {
       const resp = await sendRequest(convertedRequest.method, convertedRequest.path, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl)
 
+      const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback)
       request.appended = {
+        status: 'SUCCESS',
+        testResult,
         response: resp.syncResponse,
         callback: resp.callback,
         request: convertedRequest
       }
-      const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback)
       notificationEmitter.broadcastOutboundProgress({
         outboundID: outboundID,
+        testCaseId: testCase.id,
         status: 'SUCCESS',
-        id: request.id,
+        requestId: request.id,
         response: resp.syncResponse,
         callback: resp.callback,
         testResult
@@ -76,10 +93,18 @@ const OutboundSend = async (inputTemplate, outboundID) => {
     } catch (err) {
       const resp = JSON.parse(err.message)
       const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback)
+      request.appended = {
+        status: 'ERROR',
+        testResult,
+        response: resp.syncResponse,
+        callback: resp.callback,
+        request: convertedRequest
+      }
       notificationEmitter.broadcastOutboundProgress({
         outboundID: outboundID,
+        testCaseId: testCase.id,
         status: 'ERROR',
-        id: request.id,
+        requestId: request.id,
         response: resp.syncResponse,
         callback: resp.callback,
         testResult
@@ -87,34 +112,38 @@ const OutboundSend = async (inputTemplate, outboundID) => {
       break
     }
   }
-  // Set a timout if the response callback is not received in a particular time
-  // Inform the progress to the client
-  // Inform success to the client
+
+  // Return status report of this test case
+  return testCase
+  // Set a timeout if the response callback is not received in a particular time
 }
 
 const handleTests = async (request, response = null, callback = null) => {
-  const results = {}
-  let passedCount = 0
-  if (request.tests && request.tests.test_cases.length > 0) {
-    for (const k in request.tests.test_cases) {
-      const testCase = request.tests.test_cases[k]
-      // console.log(testCase.description, response)
-      try {
-        console.log(testCase.exec.join('\n'))
-        eval(testCase.exec.join('\n')) // eslint-disable-line
-        results[testCase.id] = {
-          status: 'SUCCESS'
-        }
-        passedCount++
-      } catch (err) {
-        results[testCase.id] = {
-          status: 'FAILED',
-          message: err.message
+  try {
+    const results = {}
+    let passedCount = 0
+    if (request.tests && request.tests.assertions.length > 0) {
+      for (const k in request.tests.assertions) {
+        const testCase = request.tests.assertions[k]
+        // console.log(testCase.description, response)
+        try {
+          eval(testCase.exec.join('\n')) // eslint-disable-line
+          results[testCase.id] = {
+            status: 'SUCCESS'
+          }
+          passedCount++
+        } catch (err) {
+          results[testCase.id] = {
+            status: 'FAILED',
+            message: err.message
+          }
         }
       }
     }
+    return { results, passedCount }
+  } catch (err) {
+    return null
   }
-  return { results, passedCount }
 }
 
 const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallbackUrl) => {
@@ -146,10 +175,7 @@ const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallb
 
       // Listen for error callback
       MyEventEmitter.getTestOutboundEmitter().once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
-        console.log('GVK error callback')
-
         MyEventEmitter.getTestOutboundEmitter().removeAllListeners(successCallbackUrl)
-        console.log('GVK error callback1')
         reject(new Error(JSON.stringify({ syncResponse: syncResponse, callback: { body: callbackBody } })))
       })
     }, (err) => {
