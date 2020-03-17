@@ -285,7 +285,7 @@ const replacePathVariables = (operationPath, params) => {
   if (matchedArray) {
     matchedArray.forEach(element => {
       var temp = element.replace(/{([^}]+)}/, '$1')
-      if (params[temp]) {
+      if (params && params[temp]) {
         resultObject = resultObject.replace(element, params[temp])
       }
     })
@@ -302,6 +302,10 @@ const getFunctionResult = (param, inputValues, request) => {
     const functionName = temp[1]
     try {
       const fn = require('./custom-functions/' + fileName)[functionName]
+      if (!fn) {
+        customLogger.logMessage('error', 'The specified custom function does not exist', param, false)
+        return param
+      }
       return fn(inputValues, request)
     } catch (e) {
       if (e.code === 'MODULE_NOT_FOUND') {
@@ -318,5 +322,9 @@ const getFunctionResult = (param, inputValues, request) => {
 }
 
 module.exports = {
-  OutboundSend
+  OutboundSend,
+  replaceVariables,
+  replaceRequestVariables,
+  replacePathVariables,
+  getFunctionResult
 }

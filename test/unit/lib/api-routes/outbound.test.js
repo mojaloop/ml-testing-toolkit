@@ -37,19 +37,25 @@ describe('API route /api/outbound', () => {
       "inputValues": {
         "accept": "test"
       },
-      "requests": [
+      "test_cases": [
         {
           "id": 1,
-          "description": "Get party information",
-          "operationPath": "/parties/{Type}/{ID}",
-          "method": "get",
-          "headers": {
-            "Accept": "{$inputs.accept}",
-          },
-          "params": {
-            "Type": "MSISDN",
-            "ID": "1234567890"
-          }
+          "name": "P2P Transfer Happy Path",
+          "requests": [
+            {
+              "id": 1,
+              "description": "Get party information",
+              "operationPath": "/parties/{Type}/{ID}",
+              "method": "get",
+              "headers": {
+                "Accept": "{$inputs.accept}",
+              },
+              "params": {
+                "Type": "MSISDN",
+                "ID": "1234567890"
+              }
+            }
+          ]
         }
       ]
     }
@@ -62,8 +68,8 @@ describe('API route /api/outbound', () => {
       const res = await request(app).post(`/api/outbound/template/123`).send(wrongTemplate)
       expect(res.statusCode).toEqual(422)
     })
-    it('Send a template without requests', async () => {
-      const {requests, ...wrongTemplate} = properTemplate
+    it('Send a template without test_cases', async () => {
+      const {test_cases, ...wrongTemplate} = properTemplate
       const res = await request(app).post(`/api/outbound/template/123`).send(wrongTemplate)
       expect(res.statusCode).toEqual(422)
     })
