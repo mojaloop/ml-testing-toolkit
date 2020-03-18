@@ -323,6 +323,8 @@ const getFunctionResult = (param, inputValues, request) => {
 
 module.exports = {
   OutboundSend,
+  handleTests,
+  sendRequest,
   replaceVariables,
   replaceRequestVariables,
   replacePathVariables,
