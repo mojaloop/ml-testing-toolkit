@@ -75,9 +75,6 @@ jsconfig.json
 # Executables from pkg if any
 *.exe
 
-# React based client
-# client/
-
 # Some rules files which will be generated dynamically
 spec_files/rules_callback/*
 !spec_files/rules_callback/config.json
