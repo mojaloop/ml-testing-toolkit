@@ -3,7 +3,7 @@
   "description": "Self Testing Toolkit for Mojaloop implementations",
   "version": "9.4.0",
   "license": "Apache-2.0",
-  "author": "ModusBox",
+  "author": "Vijaya Kumar Guthi, ModusBox Inc.",
   "contributors": [
     "Vijay Kumar <vijaya.guthi@modusbox.com>"
   ],

@@ -17,8 +17,8 @@
  optionally within square brackets <email>.
  * Gates Foundation
 
- * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
-
+ * ModusBox
+ * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
 
