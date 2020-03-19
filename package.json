@@ -19,7 +19,6 @@
       "jest"
     ],
     "ignore": [
-      "client",
       "test",
       "postman",
       "documents",

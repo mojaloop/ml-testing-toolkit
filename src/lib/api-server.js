@@ -29,12 +29,12 @@ const initServer = () => {
   app.use('/api/config', require('./api-routes/config'))
   app.use('/longpolling', require('./api-routes/longpolling'))
 
-  // For front-end UI
-  app.use('/ui', express.static(path.join('client/build')))
+  // // For front-end UI
+  // app.use('/ui', express.static(path.join('client/build')))
 
-  app.get('*', (req, res) => {
-    res.sendFile(process.cwd() + '/client/build/index.html')
-  })
+  // app.get('*', (req, res) => {
+  //   res.sendFile(process.cwd() + '/client/build/index.html')
+  // })
 }
 
 const startServer = port => {
