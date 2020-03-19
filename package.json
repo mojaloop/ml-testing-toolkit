@@ -1,7 +1,7 @@
 {
   "name": "ml-testing-toolkit",
   "description": "Self Testing Toolkit for Mojaloop implementations",
-  "version": "9.2.0",
+  "version": "9.4.0",
   "license": "Apache-2.0",
   "author": "ModusBox",
   "contributors": [
@@ -103,10 +103,10 @@
     "jest": "^25.1.0",
     "jest-junit": "9.0.0",
     "jsdoc": "3.6.3",
-    "nodemon": "1.19.4",
+    "nodemon": "^2.0.2",
     "npm-audit-resolver": "2.1.0",
-    "npm-check-updates": "3.2.1",
-    "nyc": "14.1.1",
+    "npm-check-updates": "^4.0.4",
+    "nyc": "^15.0.0",
     "parse-strings-in-object": "1.2.0",
     "pre-commit": "1.2.2",
     "proxyquire": "2.1.3",
