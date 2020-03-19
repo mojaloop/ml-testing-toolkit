@@ -1,7 +1,9 @@
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
-
+const axios = require('axios').default
+jest.mock('axios')
+axios.mockImplementation(() => Promise.resolve(true))
 
 describe('API route /api/outbound', () => {
   describe('POST /api/outbound/request', () => {

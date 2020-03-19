@@ -3,7 +3,7 @@ const apiServer = require('../../../../src/lib/api-server')
 const OpenApiMockHandler = require('../../../../src/lib/mocking/openApiMockHandler')
 
 const app = apiServer.getApp()
-
+jest.setTimeout(30000)
 
 describe('API route /api/openapi', () => {
   describe('GET /api/openapi/api_versions', () => {
