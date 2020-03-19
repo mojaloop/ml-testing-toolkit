@@ -1,19 +1,30 @@
 {
-  "main.css": "/ui/static/css/main.ad32de40.chunk.css",
-  "main.js": "/ui/static/js/main.e82efeb0.chunk.js",
-  "main.js.map": "/ui/static/js/main.e82efeb0.chunk.js.map",
-  "runtime~main.js": "/ui/static/js/runtime~main.13b8cc1c.js",
-  "runtime~main.js.map": "/ui/static/js/runtime~main.13b8cc1c.js.map",
-  "static/css/2.02133483.chunk.css": "/ui/static/css/2.02133483.chunk.css",
-  "static/js/2.c9f2005b.chunk.js": "/ui/static/js/2.c9f2005b.chunk.js",
-  "static/js/2.c9f2005b.chunk.js.map": "/ui/static/js/2.c9f2005b.chunk.js.map",
-  "index.html": "/ui/index.html",
-  "precache-manifest.f86a6492d15666a768fa63b9b836bf0b.js": "/ui/precache-manifest.f86a6492d15666a768fa63b9b836bf0b.js",
-  "service-worker.js": "/ui/service-worker.js",
-  "static/css/2.02133483.chunk.css.map": "/ui/static/css/2.02133483.chunk.css.map",
-  "static/css/main.ad32de40.chunk.css.map": "/ui/static/css/main.ad32de40.chunk.css.map",
-  "static/media/all.min.css": "/ui/static/media/fa-solid-900.815694de.woff",
-  "static/media/editor.min.css": "/ui/static/media/jsoneditor-icons.2b9b4872.svg",
-  "static/media/mojaloop.png": "/ui/static/media/mojaloop.89213192.png",
-  "static/media/nucleo.css": "/ui/static/media/nucleo-icons.f82ec6ba.ttf"
+  "files": {
+    "main.css": "/static/css/main.fcdc1d02.chunk.css",
+    "main.js": "/static/js/main.5775a44b.chunk.js",
+    "main.js.map": "/static/js/main.5775a44b.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.30a57604.js",
+    "runtime-main.js.map": "/static/js/runtime-main.30a57604.js.map",
+    "static/css/2.8765e2da.chunk.css": "/static/css/2.8765e2da.chunk.css",
+    "static/js/2.975eee9b.chunk.js": "/static/js/2.975eee9b.chunk.js",
+    "static/js/2.975eee9b.chunk.js.map": "/static/js/2.975eee9b.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.dd824da7dae009428e0b9a4ed1d7f355.js": "/precache-manifest.dd824da7dae009428e0b9a4ed1d7f355.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/2.8765e2da.chunk.css.map": "/static/css/2.8765e2da.chunk.css.map",
+    "static/css/main.fcdc1d02.chunk.css.map": "/static/css/main.fcdc1d02.chunk.css.map",
+    "static/js/2.975eee9b.chunk.js.LICENSE.txt": "/static/js/2.975eee9b.chunk.js.LICENSE.txt",
+    "static/js/main.5775a44b.chunk.js.LICENSE.txt": "/static/js/main.5775a44b.chunk.js.LICENSE.txt",
+    "static/media/all.min.css": "/static/media/fa-solid-900.815694de.woff",
+    "static/media/editor.min.css": "/static/media/jsoneditor-icons.2b9b4872.svg",
+    "static/media/mojaloop.png": "/static/media/mojaloop.89213192.png",
+    "static/media/nucleo.css": "/static/media/nucleo-icons.f82ec6ba.ttf"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.30a57604.js",
+    "static/css/2.8765e2da.chunk.css",
+    "static/js/2.975eee9b.chunk.js",
+    "static/css/main.fcdc1d02.chunk.css",
+    "static/js/main.5775a44b.chunk.js"
+  ]
 }
