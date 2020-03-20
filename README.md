@@ -101,7 +101,7 @@ The following softwares should be installed on your system to run the toolkit.
 * Git
 * NodeJS
   
-Please execute the following lines to run the tool.
+Please execute the following lines to run the testing tool backend service.
 
 ```
 git clone https://github.com/mojaloop/ml-testing-toolkit.git
@@ -110,11 +110,20 @@ npm install
 npm start
 ```
 
+Please execute the following lines to run the frontend service
+```
+git clone https://github.com/mojaloop/ml-testing-toolkit-ui.git
+cd ml-testing-toolkit-ui
+npm install
+npm start
+```
+
 ## 3. Ports
 
 The server will start and listen on port 5000. You can send the mojaloop api requests to this port number.
+The test api server will start on port 5050.
 
-And you can get the web interface on http://localhost:5050/
+And you can get the web interface on http://localhost:6060/
 
 ## 4. Testing
 
@@ -142,7 +151,7 @@ The above command will start the services scheme-adapter, mojaloop-simulator and
 
 Open the following URLs in your browser and send a transfer from simulator and observe the toolkit logs in web frontend.
 
-* http://localhost:5050 (Front end for Self Testing Toolkit)
+* http://localhost:6060 (Front end for Self Testing Toolkit)
 * http://localhost (Front end for Mojaloop Simulator)
 
 

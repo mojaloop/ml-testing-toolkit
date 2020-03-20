@@ -17,11 +17,10 @@
  optionally within square brackets <email>.
  * Gates Foundation
 
- * Rajiv Mothilal <rajiv.mothilal@modusbox.com>
- * Vijay Kumar Guthi <vijaya.guthi@modusbox.com>
+ * ModusBox
+ * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
-// TODO: Implement a logger and log the messages with different verbosity
 
 'use strict'
 
