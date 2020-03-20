@@ -16,6 +16,14 @@ services:
       - sh
       - -c
       - "npm start"
+  mojaloop-testing-toolkit-ui:
+    image: mojaloop/ml-testing-toolkit-ui:v9.4.0-snapshot
+    ports:
+      - "6060:6060"
+    command:
+      - nginx
+      - -g
+      - "daemon off;"
 networks:
   default:
     name: mojaloop-testing-toolkit
