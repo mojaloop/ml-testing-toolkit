@@ -32,6 +32,7 @@ const fs = require('fs')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const expect = require('chai').expect // eslint-disable-line
+const JwsSigning = require('../jws/JwsSigning')
 
 const OutboundSend = async (inputTemplate, outboundID) => {
   for (const i in inputTemplate.test_cases) {
@@ -172,16 +173,24 @@ const handleTests = async (request, response = null, callback = null) => {
 
 const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallbackUrl) => {
   return new Promise((resolve, reject) => {
-    axios({
+    const reqOpts = {
       method: method,
       url: Config.getUserConfig().CALLBACK_ENDPOINT + path,
+      path: path,
       headers: headers,
       data: body,
       timeout: 3000,
       validateStatus: function (status) {
         return status < 900 // Reject only if the status code is greater than or equal to 900
       }
-    }).then((result) => {
+    }
+    try {
+      JwsSigning.sign(reqOpts)
+      console.log(reqOpts)
+    } catch (err) {
+      console.log(err)
+    }
+    axios(reqOpts).then((result) => {
       const syncResponse = {
         status: result.status,
         statusText: result.statusText,

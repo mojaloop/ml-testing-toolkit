@@ -36,7 +36,6 @@ const OpenApiMockHandler = require('./lib/mocking/openApiMockHandler')
 const UniqueIdGenerator = require('./lib/uniqueIdGenerator')
 const objectStore = require('./lib/objectStore')
 const assertionStore = require('./lib/assertionStore')
-const JwsSigning = require('./lib/jws/JwsSigning')
 // const openAPIOptions = {
 //   api: Path.resolve(__dirname, './interface/api_swagger.json'),
 //   handlers: Path.resolve(__dirname, './handlers')
@@ -97,19 +96,13 @@ const createServer = async (port) => {
   await server.ext([
     {
       type: 'onPreHandler',
-      method: (request, h) => [
-        (request, h) => {
-          // Generate UniqueID
-          request.customInfo = {}
-          request.customInfo.uniqueId = UniqueIdGenerator.generateUniqueId(request)
-          RequestLogger.logRequest(request)
-          return h.continue
-        },
-        (request, h) => {
-          // JWS validation
-          return JwsSigning.validate(request, h)
-        }
-      ]
+      method: (request, h) => {
+        // Generate UniqueID
+        request.customInfo = {}
+        request.customInfo.uniqueId = UniqueIdGenerator.generateUniqueId(request)
+        RequestLogger.logRequest(request)
+        return h.continue
+      }
     },
     {
       type: 'onPreResponse',

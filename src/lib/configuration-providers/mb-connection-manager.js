@@ -22,14 +22,18 @@
  --------------
  ******/
 
+const Config = require('../config')
 const axios = require('axios').default
 const fs = require('fs')
 const _ = require('lodash')
+const { promisify } = require('util')
+const readFileAsync = promisify(fs.readFile)
 
 const DEFAULT_ENVIRONMENT_NAME = 'TESTING-TOOLKIT'
 const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
 const DEFAULT_USER_FSPID = 'userdfsp'
-const CERT_FETCH_INTERVAL = 3000
+const CM_CHECK_INTERVAL = 10000
+const CONNECTION_MANAGER_API_URL = 'http://localhost:5031'
 
 var currentEnvironment = null
 // var currentTestingToolkitDFSP = null
@@ -37,18 +41,23 @@ var currentEnvironment = null
 
 var currentTestingToolkitDfspJWSCerts = null
 var currentUserDfspJWSCerts = null
+var currentTestingToolkitDfspJWSPrivateKey = null
 
 const initEnvironment = async () => {
   // Check whether an environment exists with the name testing-toolkit
   try {
-    const environmentsResult = await axios.get('http://localhost:3001/api/environments', { headers: { 'Content-Type': 'application/json' } })
+    const environmentsResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments', { headers: { 'Content-Type': 'application/json' } })
     if (environmentsResult.status === 200) {
       const environments = environmentsResult.data
       if (environments.length > 0) {
         const testingToolkitEnv = environments.find(item => item.name === DEFAULT_ENVIRONMENT_NAME)
         if (testingToolkitEnv) {
           currentEnvironment = testingToolkitEnv
+        } else {
+          currentEnvironment = null
         }
+      } else {
+        currentEnvironment = null
       }
     }
   } catch (err) {}
@@ -64,14 +73,14 @@ const initEnvironment = async () => {
           OU: 'MCM'
         }
       }
-      const createEnvResponse = await axios.post('http://localhost:3001/api/environments', environmentData, { headers: { 'Content-Type': 'application/json' } })
+      const createEnvResponse = await axios.post(CONNECTION_MANAGER_API_URL + '/api/environments', environmentData, { headers: { 'Content-Type': 'application/json' } })
       if (createEnvResponse.status === 200) {
         currentEnvironment = createEnvResponse.data
       } else {
-        console.log('Some error creating environment')
+        throw new Error('Some error creating environment')
       }
     } catch (err) {
-      console.log('Some error creating environment')
+      throw new Error('Some error creating environment')
     }
   }
 }
@@ -79,7 +88,7 @@ const initEnvironment = async () => {
 const initDFSP = async (environmentId, dfspId, dfspName) => {
   // Check whether a dfspId exists with the name testing-toolkit
   try {
-    const dfspResult = await axios.get('http://localhost:3001/api/environments/' + environmentId + '/dfsps', { headers: { 'Content-Type': 'application/json' } })
+    const dfspResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps', { headers: { 'Content-Type': 'application/json' } })
     if (dfspResult.status === 200) {
       const dfsps = dfspResult.data
       if (dfsps.length > 0) {
@@ -98,51 +107,66 @@ const initDFSP = async (environmentId, dfspId, dfspName) => {
       name: dfspName,
       monetaryZoneId: 'EUR'
     }
-    const dfspCreateResponse = await axios.post('http://localhost:3001/api/environments/' + environmentId + '/dfsps', dfspData, { headers: { 'Content-Type': 'application/json' } })
+    const dfspCreateResponse = await axios.post(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps', dfspData, { headers: { 'Content-Type': 'application/json' } })
     if (dfspCreateResponse.status === 200) {
       return dfspCreateResponse.data
     } else {
       console.log('Some error creating DFSP')
     }
   } catch (err) {
-    console.log('Some error creating DFSP', err.response.data)
+    console.log('Some error creating DFSP', err.response ? err.response.data : err)
   }
 }
 
-const initJWSCertificate = async (environmentId, dfspId, jwsCertificate, intermediateCertificate) => {
+const initJWSCertificate = async (environmentId, dfspId, jwsCertificate = null, intermediateCertificate = null) => {
+  const rootCertificate = null
+  let certExists = false
+  let certResult = null
   // Check whether a jws certificate exists for the dfspId testing-toolkit
   try {
-    const certResult = await axios.get('http://localhost:3001/api/environments/' + environmentId + '/dfsps/' + dfspId + '/jwscerts', { headers: { 'Content-Type': 'application/json' } })
+    certResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps/' + dfspId + '/jwscerts', { headers: { 'Content-Type': 'application/json' } })
     if (certResult.status === 200) {
       // const jwsCert = certResult.data
       if (certResult.data && certResult.data.id) {
-        return certResult.data
+        certExists = true
+        // return certResult.data
       }
     }
   } catch (err) {}
 
-  // Create if not exists
+  if (certExists) {
+    if (rootCertificate === certResult.data.rootCertificate && intermediateCertificate === certResult.data.intermediateChain && jwsCertificate === certResult.data.jwsCertificate) {
+      return certResult
+    }
+  }
+
+  // Create if not exists or update if exists
   try {
     const jwsData = {
-      rootCertificate: null,
+      rootCertificate: rootCertificate,
       intermediateChain: intermediateCertificate,
       jwsCertificate: jwsCertificate
     }
-    const jwsCertResponse = await axios.post('http://localhost:3001/api/environments/' + environmentId + '/dfsps/' + dfspId + '/jwscerts', jwsData, { headers: { 'Content-Type': 'application/json' } })
+    let jwsCertResponse = null
+    if (certExists) {
+      jwsCertResponse = await axios.put(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps/' + dfspId + '/jwscerts', jwsData, { headers: { 'Content-Type': 'application/json' } })
+    } else {
+      jwsCertResponse = await axios.post(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps/' + dfspId + '/jwscerts', jwsData, { headers: { 'Content-Type': 'application/json' } })
+    }
     if (jwsCertResponse.status === 200) {
       return jwsCertResponse.data
     } else {
-      console.log('Some error creating JWS cert for DFSP')
+      console.log('Some error creating / updating JWS cert for DFSP')
     }
   } catch (err) {
-    console.log('Some error creating JWS cert for DFSP', err.response.data)
+    console.log('Some error creating / updating JWS cert for DFSP', err.response ? err.response.data : err)
   }
 }
 
 const fetchUserDFSPJwsCerts = async (environmentId, dfspId) => {
   // Check whether an environment exists with the name testing-toolkit
   try {
-    const certResult = await axios.get('http://localhost:3001/api/environments/' + environmentId + '/dfsps/' + dfspId + '/jwscerts', { headers: { 'Content-Type': 'application/json' } })
+    const certResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps/' + dfspId + '/jwscerts', { headers: { 'Content-Type': 'application/json' } })
     if (certResult.status === 200) {
       // const jwsCert = certResult.data
       if (certResult.data && certResult.data.id) {
@@ -157,27 +181,44 @@ const fetchUserDFSPJwsCerts = async (environmentId, dfspId) => {
   return currentUserDfspJWSCerts
 }
 
-const initialize = async () => {
-  // Initialize HUB environment
-  await initEnvironment()
-  // Initialize the DFSPs
-  if (currentEnvironment) {
-    // currentTestingToolkitDFSP = await initDFSP(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, 'Testing Toolkit DFSP')
-    // currentUserDFSP = await initDFSP(currentEnvironment.id, DEFAULT_USER_FSPID, 'User DFSP')
-    await initDFSP(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, 'Testing Toolkit DFSP')
-    await initDFSP(currentEnvironment.id, DEFAULT_USER_FSPID, 'User DFSP')
-  }
-  // Initialize JWS certificate for testing toolkit dfsp
-  const certData = fs.readFileSync('secrets/publickey.cer')
-  currentTestingToolkitDfspJWSCerts = await initJWSCertificate(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, certData.toString())
+const checkConnectionManager = async () => {
+  if (Config.getUserConfig().JWS_SIGN || Config.getUserConfig().VALIDATE_INBOUND_JWS) {
+    try {
+      // Get private key for signing
+      currentTestingToolkitDfspJWSPrivateKey = await readFileAsync('secrets/privatekey.pem')
 
-  // Fetch the user DFSP Jws certs once and then periodically check
-  await fetchUserDFSPJwsCerts(currentEnvironment.id, DEFAULT_USER_FSPID)
-  setInterval(fetchUserDFSPJwsCerts, CERT_FETCH_INTERVAL, currentEnvironment.id, DEFAULT_USER_FSPID)
+      // Initialize HUB environment
+      await initEnvironment()
+      // Initialize the DFSPs
+      if (currentEnvironment) {
+        // currentTestingToolkitDFSP = await initDFSP(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, 'Testing Toolkit DFSP')
+        // currentUserDFSP = await initDFSP(currentEnvironment.id, DEFAULT_USER_FSPID, 'User DFSP')
+        await initDFSP(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, 'Testing Toolkit DFSP')
+        await initDFSP(currentEnvironment.id, DEFAULT_USER_FSPID, 'User DFSP')
+      }
+      // Initialize JWS certificate for testing toolkit dfsp
+      const certData = await readFileAsync('secrets/publickey.cer')
+      currentTestingToolkitDfspJWSCerts = await initJWSCertificate(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, certData.toString())
+
+      // Fetch the user DFSP Jws certs once and then periodically check
+      await fetchUserDFSPJwsCerts(currentEnvironment.id, DEFAULT_USER_FSPID)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+}
+
+const initialize = async () => {
+  await checkConnectionManager()
+  setInterval(checkConnectionManager, CM_CHECK_INTERVAL)
 }
 
 const getTestingToolkitDfspJWSCerts = () => {
   return currentTestingToolkitDfspJWSCerts ? currentTestingToolkitDfspJWSCerts.jwsCertificate : null
+}
+
+const getTestingToolkitDfspJWSPrivateKey = () => {
+  return currentTestingToolkitDfspJWSPrivateKey
 }
 
 const getUserDfspJWSCerts = () => {
@@ -187,5 +228,6 @@ const getUserDfspJWSCerts = () => {
 module.exports = {
   initialize,
   getTestingToolkitDfspJWSCerts,
-  getUserDfspJWSCerts
+  getUserDfspJWSCerts,
+  getTestingToolkitDfspJWSPrivateKey
 }

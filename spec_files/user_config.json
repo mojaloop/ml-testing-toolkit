@@ -1,8 +1,12 @@
 {
   "CALLBACK_ENDPOINT": "http://localhost:4000",
   "SEND_CALLBACK_ENABLE": true,
-  "FSPID": "samplefsp",
+  "FSPID": "testingtoolkitdfsp",
   "TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES": true,
   "VERSIONING_SUPPORT_ENABLE": true,
-  "OVERRIDE_WITH_ENV": true
+  "OVERRIDE_WITH_ENV": true,
+  "VALIDATE_INBOUND_JWS": true,
+  "VALIDATE_INBOUND_PUT_PARTIES_JWS": true,
+  "JWS_SIGN": true,
+  "JWS_SIGN_PUT_PARTIES": false
 }

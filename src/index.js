@@ -27,11 +27,13 @@
 const Server = require('./server')
 const Config = require('./lib/config')
 const apiServer = require('./lib/api-server')
+const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
 
 const init = async () => {
   await Config.loadUserConfig()
   apiServer.startServer(5050)
 
+  ConnectionProvider.initialize()
   const optionsApi = {
     port: Config.API_PORT
   }
