@@ -33,7 +33,7 @@ const DEFAULT_ENVIRONMENT_NAME = 'TESTING-TOOLKIT'
 const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
 const DEFAULT_USER_FSPID = 'userdfsp'
 const CM_CHECK_INTERVAL = 10000
-const CONNECTION_MANAGER_API_URL = 'http://localhost:5031'
+var CONNECTION_MANAGER_API_URL = null
 
 var currentEnvironment = null
 // var currentTestingToolkitDFSP = null
@@ -182,6 +182,7 @@ const fetchUserDFSPJwsCerts = async (environmentId, dfspId) => {
 }
 
 const checkConnectionManager = async () => {
+  CONNECTION_MANAGER_API_URL = Config.getUserConfig().CONNECTION_MANAGER_API_URL
   if (Config.getUserConfig().JWS_SIGN || Config.getUserConfig().VALIDATE_INBOUND_JWS) {
     try {
       // Get private key for signing

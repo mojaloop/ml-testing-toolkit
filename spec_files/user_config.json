@@ -8,5 +8,6 @@
   "VALIDATE_INBOUND_JWS": true,
   "VALIDATE_INBOUND_PUT_PARTIES_JWS": true,
   "JWS_SIGN": true,
-  "JWS_SIGN_PUT_PARTIES": false
+  "JWS_SIGN_PUT_PARTIES": true,
+  "CONNECTION_MANAGER_API_URL": "http://localhost:5061"
 }
