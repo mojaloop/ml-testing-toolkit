@@ -37,6 +37,7 @@ const MyEventEmitter = require('../MyEventEmitter')
 const readFileAsync = promisify(fs.readFile)
 const Config = require('../config')
 const assertionStore = require('../assertionStore')
+const JwsSigning = require('../jws/JwsSigning')
 
 var path = require('path')
 
@@ -215,6 +216,18 @@ module.exports.initilizeMockHandler = async () => {
 }
 
 module.exports.handleRequest = (req, h) => {
+  // JWS Validation
+  try {
+    const jwsValidated = JwsSigning.validate(req)
+    if (jwsValidated) {
+      customLogger.logMessage('debug', 'JWS Signature Validated', null, true, req)
+    }
+  } catch (err) {
+    // TODO: The errorCode should be checked with the api specification
+    customLogger.logMessage('error', 'JWS validation failed', err.message, true, req)
+    return h.response(errorResponseBuilder('3105', 'Invalid signature')).code(400)
+  }
+
   let selectedVersion = 0
   // Pick a right api definition by searching for the requested resource in the definitions sequentially
   // TODO: This should be optimized by defining a hash table (object) of all the resources in all definition files on startup.
@@ -224,7 +237,6 @@ module.exports.handleRequest = (req, h) => {
     return h.response({ error: 'Not Found' }).code(404)
   }
 
-  console.log(selectedVersion)
   if (apis[selectedVersion].type === 'fspiop' && Config.getUserConfig().VERSIONING_SUPPORT_ENABLE) {
     const fspiopApis = apis.filter(item => {
       return item.type === 'fspiop'
