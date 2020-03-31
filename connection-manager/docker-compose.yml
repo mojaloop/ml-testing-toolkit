@@ -1,0 +1,50 @@
+version: "3.7"
+
+services:
+  connection-manager-db:
+    # Using mariadb because mysql doesn't show any helpful error when docker disk is full as per https://github.com/docker-library/mysql/issues/69
+    image: mariadb
+    hostname: connection-manager-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=modus123
+      - MYSQL_DATABASE=mcm
+      - MYSQL_USER=mcm
+      - MYSQL_PASSWORD=mcm
+    restart: always
+    command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
+  connection-manager-api:
+    image: modusbox/connection-manager-api:1.5.3
+    hostname: connection-manager-api
+    environment:
+      - DATABASE_HOST=connection-manager-db
+      - DATABASE_PORT=3306
+      - DATABASE_USER=mcm
+      - DATABASE_PASSWORD=mcm
+      - DATABASE_SCHEMA=mcm
+      - MYSQL_ROOT_PASSWORD=modus123
+      - PORT=5061
+      - P12_PASS_PHRASE='SOME_S3C4R3_P@SS'
+      - OAUTH2_ISSUER=http://mojaloop-testing-toolkit:5050/api/oauth2/token
+      - AUTH_ENABLED=false
+      - APP_OAUTH_CLIENT_KEY=asdf
+      - APP_OAUTH_CLIENT_SECRET=asdf
+    tty: true
+    stdin_open: true
+    ports:
+     - "5061:5061"
+    restart: always
+    depends_on:
+      - connection-manager-db
+  connection-manager-ui:
+    image: modusbox/connection-manager-ui:1.6.9
+    hostname: connection-manager-ui
+    environment:
+      - API_BASE_URL=http://localhost:5061
+    tty: true
+    stdin_open: true  
+    ports:
+     - "5060:8080"
+    restart: always
+networks:
+  default:
+    name: mojaloop-testing-toolkit

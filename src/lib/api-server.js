@@ -50,6 +50,7 @@ const initServer = () => {
   app.use('/api/outbound', require('./api-routes/outbound'))
   app.use('/api/config', require('./api-routes/config'))
   app.use('/longpolling', require('./api-routes/longpolling'))
+  app.use('/api/oauth2', require('./api-routes/oauth2'))
 
   // // For front-end UI
   // app.use('/ui', express.static(path.join('client/build')))

@@ -22,22 +22,43 @@
  --------------
  ******/
 
-'use strict'
+const express = require('express')
+const router = new express.Router()
+const jwt = require('jsonwebtoken')
 
-const Server = require('./server')
-const Config = require('./lib/config')
-const apiServer = require('./lib/api-server')
-const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
-
-const init = async () => {
-  await Config.loadUserConfig()
-  apiServer.startServer(5050)
-
-  ConnectionProvider.initialize()
-  const optionsApi = {
-    port: Config.API_PORT
+router.post('/token', async (req, res, next) => {
+  try {
+    const idToken = jwt.sign(
+      {
+        at_hash: 'bJi28CeD9HLPf1ouOVkQTA',
+        aud: 'CLIENT_KEY',
+        sub: 'dfsp1',
+        nbf: 1558709500,
+        azp: 'CLIENT_KEY',
+        amr: [
+          'password'
+        ],
+        iss: 'https://SERVERIP:9443/oauth2/token',
+        groups: [
+          'Application/MTA',
+          'Application/DFSP:DFSP1',
+          'Internal/everyone'
+        ],
+        exp: 1558713100,
+        iat: 1558709500,
+        dfspId: 'userdfsp',
+        userguid: 'userguid'
+      }
+      , 'password')
+    res.status(200).json(
+      {
+        access_token: 'sometoken',
+        id_token: idToken
+      }
+    )
+  } catch (err) {
+    next(err)
   }
-  Server.initialize(optionsApi.port)
-}
+})
 
-init()
+module.exports = router

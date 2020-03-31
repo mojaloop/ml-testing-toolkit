@@ -9,6 +9,7 @@ services:
       target: builder
     volumes:
       - "./spec_files:/opt/mojaloop-testing-toolkit/spec_files"
+      - "./secrets:/opt/mojaloop-testing-toolkit/secrets"
     ports:
       - "5000:5000"
       - "5050:5050"
@@ -17,7 +18,7 @@ services:
       - -c
       - "npm start"
   mojaloop-testing-toolkit-ui:
-    image: mojaloop/ml-testing-toolkit-ui:v9.4.0-snapshot
+    image: mojaloop/ml-testing-toolkit-ui:v9.4.1-snapshot
     ports:
       - "6060:6060"
     command:

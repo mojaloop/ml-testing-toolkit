@@ -27,10 +27,27 @@ const Config = require('../lib/config')
 const axios = require('axios').default
 const assertionStore = require('./assertionStore')
 const MyEventEmitter = require('./MyEventEmitter')
+const JwsSigning = require('./jws/JwsSigning')
 
 const handleCallback = async (callbackObject, context, req) => {
   if (callbackObject.delay) {
     await new Promise(resolve => setTimeout(resolve, callbackObject.delay))
+  }
+
+  // JwsSigning
+  const reqOpts = {
+    method: callbackObject.method,
+    url: Config.getUserConfig().CALLBACK_ENDPOINT + callbackObject.path,
+    path: callbackObject.path,
+    headers: callbackObject.headers,
+    data: callbackObject.body,
+    timeout: 3000
+  }
+  try {
+    JwsSigning.sign(reqOpts)
+    console.log(reqOpts)
+  } catch (err) {
+    console.log(err)
   }
 
   // Validate callback against openapi
@@ -54,13 +71,7 @@ const handleCallback = async (callbackObject, context, req) => {
   // Send callback
   if (Config.getUserConfig().SEND_CALLBACK_ENABLE) {
     customLogger.logMessage('info', 'Sending callback ' + callbackObject.method + ' ' + callbackObject.path, callbackObject, true, req)
-    axios({
-      method: callbackObject.method,
-      url: Config.getUserConfig().CALLBACK_ENDPOINT + callbackObject.path,
-      headers: callbackObject.headers,
-      data: callbackObject.body,
-      timeout: 3000
-    }).then((result) => {
+    axios(reqOpts).then((result) => {
       customLogger.logMessage('info', 'Received callback response ' + result.status + ' ' + result.statusText, null, true, req)
     }, (err) => {
       customLogger.logMessage('error', 'Failed to send callback ' + callbackObject.method + ' ' + callbackObject.path, err, true, req)

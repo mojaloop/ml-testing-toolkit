@@ -10,11 +10,12 @@
     "currency": "USD",
     "amount": "100",
     "homeTransactionId": "123ABC",
-    "fromFspId": "payerfsp",
+    "fromFspId": "testingtoolkitdfsp",
     "accept": "application/vnd.interoperability.parties+json;version=1.0",
     "contentType": "application/vnd.interoperability.parties+json;version=1.0",
     "toIdValue": "9848613613",
-    "toIdType": "MSISDN"
+    "toIdType": "MSISDN",
+    "toFspId": "userdfsp"
   },
   "test_cases": [
     {

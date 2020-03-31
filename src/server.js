@@ -97,6 +97,7 @@ const createServer = async (port) => {
     {
       type: 'onPreHandler',
       method: (request, h) => {
+        // Generate UniqueID
         request.customInfo = {}
         request.customInfo.uniqueId = UniqueIdGenerator.generateUniqueId(request)
         RequestLogger.logRequest(request)
