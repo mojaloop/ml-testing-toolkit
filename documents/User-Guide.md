@@ -18,7 +18,6 @@
 
     3.4 [Sync Response Rules](#34-sync-response-rules)
 
-<<<<<<< HEAD
     3.5 [Validation Rules (_Error Callbacks_)](#35-validation-rules)
 
     3.6 [Callback Rules (_Success Callbacks_)](#36-callback-rules)
@@ -34,24 +33,6 @@ The intention of this document is to provide a basic user guide to the mojaloop 
 The mojaloop Self Testing Toolkit was designed for participants that would like to partcipate in the mojaloop Hub scheme. Intentially build to have a standard way to test integration with a Mojaloop Hub, this tool set can potentially be used by both the DFSP and the Hub to verify the inergration between the 2 entities.
 
 For additional back ground information on the Self Testing Toolkit, please see [mojaloop Self Testing Toolkit](/documents/Mojaloop-Self-Testing-Tool.md). At the same time, understanding the [Architecture Diagram](/documents/Mojaloop-Self-Testing-Tool.md#7-architecture) components and related flow, would be beneficial.
-=======
-    3.5 [Validation Rules (Error Callbacks)](#35-validation-rules)
-
-    3.6 [Callback Rules (Success Callbacks)](#36-callback-rules)
-
-#### 3.7 Outbound Request
-[TODO - complete this section of user-guide]
-
-#### 3.8 Settings
-
-### 1. Introduction
-
-The intention of this document is to provide a basic user guide to the mojaloop Self Testing Toolkit. This easy to use tool set was designed for both technical and non-technical users, even though the primarily users would likely be Quality Assurance (QA) resources. By following this guide, users will have a better understand of the capabilities and fuctionality of the tool set.
-
-The mojaloop Self Testing Toolkit was designed for participants that would like to partcipate in the mojaloop Hub scheme. Intentially build to have a standard way to test integration with a Mojaloop Hub, this tool set can potentially be used by both the DFSP and the Hub to verify the inergration between the 2 entities.
-
-For additional back ground information on the Self Testing Toolkit, please see [mojaloop Self Testing Toolkit](/documents/Mojaloop-Self-Testing-Tool.md). It would also be advisable to look at the [Architecture Diagram](/documents/Mojaloop-Self-Testing-Tool.md#7-architecture) to understand the components and related flow.
->>>>>>> f36dde2e49705f9973f18d751f34afa4ccf05c2f
 
 ### 2. Getting Started
 
@@ -91,30 +72,18 @@ Allows you to monitor the incomming and outgoing request.
 
 ![Monitoring Initial State](/assets/images/Monitoring_Initial_State.png) 
 
-<<<<<<< HEAD
 If you have followed the installation instructions, you should have the Simulator UI open in a browser tab. Go to the **Outbound Send** tab on the left.
-=======
-If you have followed the installation in structions, you should have the Simulator UI open in a browser tab. Go to the **Outbound Send** tab on the left.
->>>>>>> f36dde2e49705f9973f18d751f34afa4ccf05c2f
 
 Press **Send Transfer** button to send a request from the Simulator UI to the Self Testing Toolkit.
 
 ![Send Transfer](/assets/images/Send_Transfer.png)
 
 
-<<<<<<< HEAD
 If the request is send successfully from the Simulator UI.
 
 ![Simulator response](/assets/images/Simulator_Response.png) 
 
 Go back to the Monitoring tab on the Self Testing Toolset. You will notice the three requests associated with a transfer in an order such that most recent request first.
-=======
-If the request was send successfully from the Simulator UI.
-
-![Simulator response](/assets/images/Simulator_Response.png) 
-
-Go back to the Monitoring tab on the Self Testing Toolset. You will notice the three processes assosiated with this request in acending order.
->>>>>>> f36dde2e49705f9973f18d751f34afa4ccf05c2f
 
 - GET /parties/{Type}/{ID}
 - POST /quotes
@@ -146,7 +115,6 @@ When you send more transfers from the simulator, these transactions will be adde
 ![Additional transfers](/assets/images/Additional_Transfers.png)
 
 #### 3.4 Sync Response Rules
-<<<<<<< HEAD
 
 **_Validation and synchronous response based on the schema of the code_**
 
@@ -295,18 +263,3 @@ _**Runtime Global Configuration**_ displays the environmental setting as stippul
 _**Edit Global Configuration**_ allows you to edit and override the environment variables by selecting the **Override with Environment Variable** tikbox.
 
 ![Override with Environment Variable](/assets/images/Override-with-Environment-Variable.png)
-=======
-[TODO - complete this section of user-guide]
-
-#### 3.5 Validation Rules (Error Callbacks)
-[TODO - complete this section of user-guide]
-
-#### 3.6 Callback Rules (Success Callbacks)
-[TODO - complete this section of user-guide]
-
-#### 3.7 Outbound Request
-[TODO - complete this section of user-guide]
-
-#### 3.8 Settings
-[TODO - complete this section of user-guide]
->>>>>>> f36dde2e49705f9973f18d751f34afa4ccf05c2f
