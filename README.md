@@ -34,7 +34,7 @@ For getting started with Self Testing Toolkit quickly please follow the below st
 
 * [Deploy Self-Testing Toolkit using docker method](#21-with-docker)
 * [Deploy Mojaloop Simulator](#42-with-mojaloop-simulator)
-* [Follow Usage guide](USAGE_GUIDE.md)
+* [Follow Usage guide](/documents/User-Guide.md)
 
 
 ## 2. Running the toolkit
