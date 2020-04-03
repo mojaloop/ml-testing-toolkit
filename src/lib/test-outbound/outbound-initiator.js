@@ -113,6 +113,7 @@ const processTestCase = async (testCase, outboundID, inputValues) => {
         requestId: request.id,
         response: resp.syncResponse,
         callback: resp.callback,
+        requestSent: convertedRequest,
         testResult
       })
     } catch (err) {
@@ -132,6 +133,7 @@ const processTestCase = async (testCase, outboundID, inputValues) => {
         requestId: request.id,
         response: resp.syncResponse,
         callback: resp.callback,
+        requestSent: convertedRequest,
         testResult
       })
       break
