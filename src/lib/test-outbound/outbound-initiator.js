@@ -25,6 +25,7 @@
 const _ = require('lodash')
 const customLogger = require('../requestLogger')
 const axios = require('axios').default
+const https = require('https')
 const Config = require('../config')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
@@ -33,6 +34,7 @@ const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const expect = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
+const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
 
 const OutboundSend = async (inputTemplate, outboundID) => {
   for (const i in inputTemplate.test_cases) {
@@ -175,6 +177,13 @@ const handleTests = async (request, response = null, callback = null) => {
 
 const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallbackUrl) => {
   return new Promise((resolve, reject) => {
+    const tlsConfig = ConnectionProvider.getTlsConfig()
+    const httpsAgent = new https.Agent({
+      cert: tlsConfig.hubClientCert,
+      key: tlsConfig.hubClientKey,
+      ca: tlsConfig.dfspServerCaRootCert,
+      rejectUnauthorized: false
+    })
     const reqOpts = {
       method: method,
       url: Config.getUserConfig().CALLBACK_ENDPOINT + path,
@@ -184,7 +193,8 @@ const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallb
       timeout: 3000,
       validateStatus: function (status) {
         return status < 900 // Reject only if the status code is greater than or equal to 900
-      }
+      },
+      httpsAgent: httpsAgent
     }
     try {
       JwsSigning.sign(reqOpts)
