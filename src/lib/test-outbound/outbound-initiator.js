@@ -181,9 +181,10 @@ const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallb
     const httpsAgent = new https.Agent({
       cert: tlsConfig.hubClientCert,
       key: tlsConfig.hubClientKey,
-      ca: tlsConfig.dfspServerCaRootCert,
-      rejectUnauthorized: false
+      ca: [tlsConfig.dfspServerCaRootCert],
+      rejectUnauthorized: true
     })
+
     const reqOpts = {
       method: method,
       url: Config.getUserConfig().CALLBACK_ENDPOINT + path,
@@ -198,7 +199,6 @@ const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallb
     }
     try {
       JwsSigning.sign(reqOpts)
-      console.log(reqOpts)
     } catch (err) {
       console.log(err)
     }
@@ -224,7 +224,7 @@ const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallb
         reject(new Error(JSON.stringify({ syncResponse: syncResponse, callback: { body: callbackBody } })))
       })
     }, (err) => {
-      customLogger.logMessage('info', 'Failed to send request ' + method + ' ' + method, err, false)
+      customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, err, false)
       reject(new Error(JSON.stringify({ errorCode: 4000 })))
     })
   })

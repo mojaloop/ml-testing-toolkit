@@ -11,7 +11,7 @@ openssl req -new -sha256 -config openssl.conf -nodes -x509 -days 10000 -extensio
 openssl genrsa -out "$OUTPUT_DIR/dfsp_server_key.key" 4096
 
 ## Generate server csr
-openssl req -new -sha256 -config openssl.conf -key dfsp_server_cakey.key -subj "/C=US/ST=CA/O=DFSP Server/CN=dfspserver" -out dfsp_server.csr
+openssl req -new -sha256 -config openssl.conf -key dfsp_server_cakey.key -subj "/C=US/ST=CA/O=DFSP Server/CN=localhost" -out dfsp_server.csr
 
 ## Sign server cert
 openssl x509 -req -days 3650 -sha256 -extfile openssl.conf -extensions v3_req -in dfsp_server.csr -signkey dfsp_server_key.key -CA dfsp_server_cacert.pem -CAkey dfsp_server_cakey.key -CAcreateserial -out dfsp_server_cert.pem
