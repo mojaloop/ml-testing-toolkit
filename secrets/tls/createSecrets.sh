@@ -10,10 +10,10 @@ openssl req -new -sha256 -config openssl.conf -nodes -x509 -days 10000 -extensio
 openssl genrsa -out "$OUTPUT_DIR/hub_server_key.key" 4096
 
 ## Generate server csr
-openssl req -new -sha256 -config openssl.conf -key hub_server_cakey.key -subj "/C=US/ST=CA/O=Hub Server/CN=hubserver" -out hub_server.csr
+openssl req -new -sha256 -config openssl.conf -key hub_server_cakey.key -subj "/C=US/ST=CA/O=Hub Server/CN=localhost" -out hub_server.csr
 
 ## Sign server cert
-openssl x509 -req -days 3650 -sha256 -extfile openssl.conf -extensions v3_req -in hub_server.csr -CA hub_server_cacert.pem -CAkey hub_server_cakey.key -CAcreateserial -out hub_server_cert.pem
+openssl x509 -req -days 3650 -sha256 -extfile openssl.conf -extensions v3_req -in hub_server.csr -signkey hub_server_key.key  -CA hub_server_cacert.pem -CAkey hub_server_cakey.key -CAcreateserial -out hub_server_cert.pem
 
 ## Generating Client CA certificate
 openssl genrsa -out "$OUTPUT_DIR/hub_client_cakey.key" 4096

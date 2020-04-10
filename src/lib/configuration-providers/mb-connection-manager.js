@@ -384,6 +384,18 @@ const checkDfspServerCerts = async (environmentId, dfspId) => {
   } catch (err) {}
 }
 
+const tlsLoadHubServerCertificates = async () => {
+  // Read Hub Server root CA
+  const tmpHubServerCaRootCert = await readFileAsync('secrets/tls/hub_server_cacert.pem')
+  currentTlsConfig.hubServerCaRootCert = tmpHubServerCaRootCert.toString()
+  // Read Hub server cert
+  const tmpHubServerCert = await readFileAsync('secrets/tls/hub_server_cert.pem')
+  currentTlsConfig.hubServerCert = tmpHubServerCert.toString()
+  // Read Hub server key
+  const tmpHubServerKey = await readFileAsync('secrets/tls/hub_server_key.key')
+  currentTlsConfig.hubServerKey = tmpHubServerKey.toString()
+}
+
 const tlsChecker = async () => {
   try {
     // Initialize HUB CA
@@ -398,12 +410,8 @@ const tlsChecker = async () => {
     // Upload HUB CSRs and also Check for Signed HUB CSRs and get outbound certificate
     await checkHubCsrs(currentEnvironment.id, DEFAULT_USER_FSPID)
 
-    // Read Hub Server root CA
-    const tmpHubServerCaRootCert = await readFileAsync('secrets/tls/hub_server_cacert.pem')
-    currentTlsConfig.hubServerCaRootCert = tmpHubServerCaRootCert.toString()
-    // Read Hub server cert
-    const tmpHubServerCert = await readFileAsync('secrets/tls/hub_server_cert.pem')
-    currentTlsConfig.hubServerCert = tmpHubServerCert.toString()
+    // Read Hub Server Certificates
+    await tlsLoadHubServerCertificates()
 
     // Upload Hub Server root CA and Hub Server cert
     await uploadHubServerCerts(currentEnvironment.id, currentTlsConfig.hubServerCaRootCert, null, currentTlsConfig.hubServerCert)
@@ -457,7 +465,13 @@ const checkConnectionManager = async () => {
 
       // Fetch the user DFSP Jws certs once and then periodically check
       await fetchUserDFSPJwsCerts(currentEnvironment.id, DEFAULT_USER_FSPID)
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
+  if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED || Config.getUserConfig().INBOUND_MUTUAL_TLS_ENABLED) {
+    try {
       // Do TLS related stuff
       tlsChecker()
     } catch (err) {
@@ -492,5 +506,6 @@ module.exports = {
   getTestingToolkitDfspJWSCerts,
   getUserDfspJWSCerts,
   getTestingToolkitDfspJWSPrivateKey,
-  getTlsConfig
+  getTlsConfig,
+  tlsLoadHubServerCertificates
 }

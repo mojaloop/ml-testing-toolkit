@@ -177,17 +177,23 @@ const handleTests = async (request, response = null, callback = null) => {
 
 const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallbackUrl) => {
   return new Promise((resolve, reject) => {
-    const tlsConfig = ConnectionProvider.getTlsConfig()
-    const httpsAgent = new https.Agent({
-      cert: tlsConfig.hubClientCert,
-      key: tlsConfig.hubClientKey,
-      ca: [tlsConfig.dfspServerCaRootCert],
-      rejectUnauthorized: true
-    })
+    const httpsProps = {}
+    let urlGenerated = Config.getUserConfig().CALLBACK_ENDPOINT + path
+    if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
+      const tlsConfig = ConnectionProvider.getTlsConfig()
+      const httpsAgent = new https.Agent({
+        cert: tlsConfig.hubClientCert,
+        key: tlsConfig.hubClientKey,
+        ca: [tlsConfig.dfspServerCaRootCert],
+        rejectUnauthorized: true
+      })
+      httpsProps.httpsAgent = httpsAgent
+      urlGenerated = urlGenerated = urlGenerated.replace('http:', 'https:')
+    }
 
     const reqOpts = {
       method: method,
-      url: Config.getUserConfig().CALLBACK_ENDPOINT + path,
+      url: urlGenerated,
       path: path,
       headers: headers,
       data: body,
@@ -195,7 +201,7 @@ const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallb
       validateStatus: function (status) {
         return status < 900 // Reject only if the status code is greater than or equal to 900
       },
-      httpsAgent: httpsAgent
+      ...httpsProps
     }
     try {
       JwsSigning.sign(reqOpts)

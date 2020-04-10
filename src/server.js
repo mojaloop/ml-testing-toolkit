@@ -36,6 +36,8 @@ const OpenApiMockHandler = require('./lib/mocking/openApiMockHandler')
 const UniqueIdGenerator = require('./lib/uniqueIdGenerator')
 const objectStore = require('./lib/objectStore')
 const assertionStore = require('./lib/assertionStore')
+const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
+
 // const openAPIOptions = {
 //   api: Path.resolve(__dirname, './interface/api_swagger.json'),
 //   handlers: Path.resolve(__dirname, './handlers')
@@ -50,15 +52,33 @@ const assertionStore = require('./lib/assertionStore')
  * @returns {Promise<Server>} Returns the Server object
  */
 const createServer = async (port) => {
-  const server = await new Hapi.Server({
-    port
-    // routes: {
-    //   payload: {
-    //     parse: true,
-    //     output: 'stream'
-    //   }
-    // }
-  })
+  let server
+  if (Config.getUserConfig().INBOUND_MUTUAL_TLS_ENABLED) {
+    // Make sure hub server certificates are set in connection provider
+    await ConnectionProvider.tlsLoadHubServerCertificates()
+    const tlsConfig = ConnectionProvider.getTlsConfig()
+    console.log(tlsConfig)
+    server = await new Hapi.Server({
+      port,
+      tls: {
+        cert: tlsConfig.hubServerCert,
+        key: tlsConfig.hubServerKey,
+        ca: [tlsConfig.hubClientCaRootCert], // Need to use hub external certificate here or wait for connection manager connector to create ub ca
+        rejectUnauthorized: false
+      }
+    })
+  } else {
+    server = await new Hapi.Server({
+      port
+      // routes: {
+      //   payload: {
+      //     parse: true,
+      //     output: 'stream'
+      //   }
+      // }
+    })
+  }
+  // console.log(server)
   // await Plugins.registerPlugins(server)
   // await server.register([
   //   {

@@ -1,5 +1,5 @@
 {
-  "CALLBACK_ENDPOINT": "https://localhost:4000",
+  "CALLBACK_ENDPOINT": "http://localhost:4000",
   "SEND_CALLBACK_ENABLE": true,
   "FSPID": "testingtoolkitdfsp",
   "TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES": true,
@@ -9,5 +9,7 @@
   "VALIDATE_INBOUND_PUT_PARTIES_JWS": false,
   "JWS_SIGN": true,
   "JWS_SIGN_PUT_PARTIES": false,
-  "CONNECTION_MANAGER_API_URL": "http://localhost:5061"
+  "CONNECTION_MANAGER_API_URL": "http://localhost:5061",
+  "INBOUND_MUTUAL_TLS_ENABLED": true,
+  "OUTBOUND_MUTUAL_TLS_ENABLED": true
 }
