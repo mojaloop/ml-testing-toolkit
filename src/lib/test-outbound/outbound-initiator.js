@@ -138,7 +138,7 @@ const processTestCase = async (testCase, outboundID, inputValues) => {
         requestSent: convertedRequest,
         testResult
       })
-      break
+      // break
     }
   }
 
