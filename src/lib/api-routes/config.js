@@ -24,7 +24,7 @@
 
 const express = require('express')
 const Config = require('../config')
-
+const Server = require('../../server')
 const router = new express.Router()
 const { check, validationResult } = require('express-validator')
 
@@ -49,7 +49,16 @@ router.put('/user', [
   }
   try {
     await Config.setStoredUserConfig(req.body)
+    const runtime = await Config.getUserConfig()
+    const stored = await Config.getStoredUserConfig()
+    let reloadServer = false
+    if (runtime.INBOUND_MUTUAL_TLS_ENABLED !== stored.INBOUND_MUTUAL_TLS_ENABLED) {
+      reloadServer = true
+    }
     await Config.loadUserConfig()
+    if (reloadServer) {
+      Server.restartServer()
+    }
     res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)

@@ -38,6 +38,7 @@ const objectStore = require('./lib/objectStore')
 const assertionStore = require('./lib/assertionStore')
 const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
 
+var serverInstance = null
 // const openAPIOptions = {
 //   api: Path.resolve(__dirname, './interface/api_swagger.json'),
 //   handlers: Path.resolve(__dirname, './handlers')
@@ -55,16 +56,21 @@ const createServer = async (port) => {
   let server
   if (Config.getUserConfig().INBOUND_MUTUAL_TLS_ENABLED) {
     // Make sure hub server certificates are set in connection provider
-    await ConnectionProvider.tlsLoadHubServerCertificates()
+    try {
+      await ConnectionProvider.waitForTlsHubCerts()
+    } catch (err) {
+      console.log('Tls certificates initiation failed.')
+      return null
+    }
     const tlsConfig = ConnectionProvider.getTlsConfig()
-    console.log(tlsConfig)
     server = await new Hapi.Server({
       port,
       tls: {
         cert: tlsConfig.hubServerCert,
         key: tlsConfig.hubServerKey,
-        ca: [tlsConfig.hubClientCaRootCert], // Need to use hub external certificate here or wait for connection manager connector to create ub ca
-        rejectUnauthorized: false
+        ca: [tlsConfig.hubCaCert],
+        rejectUnauthorized: true,
+        requestCert: false
       }
     })
   } else {
@@ -139,19 +145,26 @@ const createServer = async (port) => {
   return server
 }
 
-const initialize = async (port = Config.API_PORT) => {
+const initialize = async () => {
   await OpenApiMockHandler.initilizeMockHandler()
-  const server = await createServer(port)
-  // server.plugins.openapi.setHost(server.info.host + ':' + server.info.port)
-  // Logger.info(`Server running on ${server.info.host}:${server.info.port}`)
+  serverInstance = await createServer(Config.API_PORT)
+  // serverInstance.plugins.openapi.setHost(serverInstance.info.host + ':' + serverInstance.info.port)
+  // Logger.info(`serverInstance running on ${serverInstance.info.host}:${serverInstance.info.port}`)
 
   objectStore.initObjectStore()
   assertionStore.initAssertionStore()
 
-  console.log(`Toolkit Server running on port ${server.info.port}`)
-  return server
+  console.log(`Toolkit Server running on port ${serverInstance.info.port}`)
+  return serverInstance
+}
+
+const restartServer = async () => {
+  console.log(`Toolkit Server restarted on port ${serverInstance.info.port}`)
+  serverInstance.stop()
+  serverInstance = await createServer(Config.API_PORT)
 }
 
 module.exports = {
-  initialize
+  initialize,
+  restartServer
 }

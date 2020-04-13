@@ -348,7 +348,7 @@ const uploadHubServerCerts = async (environmentId, rootCert, intermediateChain, 
       try {
         const hubServerCertsUpdateResponse = await axios.put(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/hub/servercerts', newHubServerCerts, { headers: { 'Content-Type': 'application/json' } })
         if (hubServerCertsUpdateResponse.status === 200) {
-          console.log('Hub Server certs updated', hubServerCertsUpdateResponse)
+          console.log('Hub Server certs updated')
         } else {
           console.log('Some error updating Hub server certs')
         }
@@ -360,7 +360,7 @@ const uploadHubServerCerts = async (environmentId, rootCert, intermediateChain, 
     try {
       const hubServerCertsCreateResponse = await axios.post(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/hub/servercerts', newHubServerCerts, { headers: { 'Content-Type': 'application/json' } })
       if (hubServerCertsCreateResponse.status === 200) {
-        console.log('Hub Server certs created', hubServerCertsCreateResponse)
+        console.log('Hub Server certs created')
       } else {
         console.log('Some error creating Hub server certs')
       }
@@ -473,6 +473,10 @@ const checkConnectionManager = async () => {
   if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED || Config.getUserConfig().INBOUND_MUTUAL_TLS_ENABLED) {
     try {
       // Do TLS related stuff
+      if (!currentEnvironment) {
+        // Initialize HUB environment
+        await initEnvironment()
+      }
       tlsChecker()
     } catch (err) {
       console.log(err)
@@ -483,6 +487,24 @@ const checkConnectionManager = async () => {
 const initialize = async () => {
   await checkConnectionManager()
   setInterval(checkConnectionManager, CM_CHECK_INTERVAL)
+}
+
+const waitForFewSecs = async (secs) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(true)
+    }, secs * 1000)
+  })
+}
+
+const waitForTlsHubCerts = async () => {
+  for (let i = 0; i < 10; i++) {
+    await waitForFewSecs(2)
+    if (currentTlsConfig.hubCaCert && currentTlsConfig.hubServerCert && currentTlsConfig.hubServerKey) {
+      return true
+    }
+  }
+  throw new Error('Timeout Hub Init')
 }
 
 const getTestingToolkitDfspJWSCerts = () => {
@@ -507,5 +529,5 @@ module.exports = {
   getUserDfspJWSCerts,
   getTestingToolkitDfspJWSPrivateKey,
   getTlsConfig,
-  tlsLoadHubServerCertificates
+  waitForTlsHubCerts
 }
