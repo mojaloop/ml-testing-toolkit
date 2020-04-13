@@ -159,9 +159,11 @@ const initialize = async () => {
 }
 
 const restartServer = async () => {
-  console.log(`Toolkit Server restarted on port ${serverInstance.info.port}`)
-  serverInstance.stop()
-  serverInstance = await createServer(Config.API_PORT)
+  if (serverInstance) {
+    console.log(`Toolkit Server restarted on port ${serverInstance.info.port}`)
+    serverInstance.stop()
+    serverInstance = await createServer(Config.API_PORT)
+  }
 }
 
 module.exports = {
