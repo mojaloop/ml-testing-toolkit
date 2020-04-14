@@ -25,27 +25,43 @@
 const customLogger = require('./requestLogger')
 const Config = require('../lib/config')
 const axios = require('axios').default
+const https = require('https')
 const assertionStore = require('./assertionStore')
 const MyEventEmitter = require('./MyEventEmitter')
 const JwsSigning = require('./jws/JwsSigning')
+const ConnectionProvider = require('../lib/configuration-providers/mb-connection-manager')
 
 const handleCallback = async (callbackObject, context, req) => {
   if (callbackObject.delay) {
     await new Promise(resolve => setTimeout(resolve, callbackObject.delay))
   }
 
+  const httpsProps = {}
+  let urlGenerated = Config.getUserConfig().CALLBACK_ENDPOINT + callbackObject.path
+  if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
+    const tlsConfig = ConnectionProvider.getTlsConfig()
+    const httpsAgent = new https.Agent({
+      cert: tlsConfig.hubClientCert,
+      key: tlsConfig.hubClientKey,
+      ca: [tlsConfig.dfspServerCaRootCert],
+      rejectUnauthorized: true
+    })
+    httpsProps.httpsAgent = httpsAgent
+    urlGenerated = urlGenerated.replace('http:', 'https:')
+  }
+
   // JwsSigning
   const reqOpts = {
     method: callbackObject.method,
-    url: Config.getUserConfig().CALLBACK_ENDPOINT + callbackObject.path,
+    url: urlGenerated,
     path: callbackObject.path,
     headers: callbackObject.headers,
     data: callbackObject.body,
-    timeout: 3000
+    timeout: 3000,
+    ...httpsProps
   }
   try {
     JwsSigning.sign(reqOpts)
-    console.log(reqOpts)
   } catch (err) {
     console.log(err)
   }

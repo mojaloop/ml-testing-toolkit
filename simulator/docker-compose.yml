@@ -11,6 +11,7 @@ services:
       - scheme-adapter
   scheme-adapter:
     image: "mojaloop/sdk-scheme-adapter:v8.6.0"
+    # image: "sdk-scheme-adapter:local"
     env_file: ./scheme-adapter.env
     volumes:
       - "./secrets:/src/secrets"

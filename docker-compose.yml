@@ -18,7 +18,7 @@ services:
       - -c
       - "npm start"
   mojaloop-testing-toolkit-ui:
-    image: mojaloop/ml-testing-toolkit-ui:v9.5.1-snapshot
+    image: mojaloop/ml-testing-toolkit-ui:v9.5.3-snapshot
     ports:
       - "6060:6060"
     command:

@@ -25,6 +25,7 @@
 const _ = require('lodash')
 const customLogger = require('../requestLogger')
 const axios = require('axios').default
+const https = require('https')
 const Config = require('../config')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
@@ -33,6 +34,7 @@ const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const expect = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
+const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
 
 const OutboundSend = async (inputTemplate, outboundID) => {
   for (const i in inputTemplate.test_cases) {
@@ -175,20 +177,34 @@ const handleTests = async (request, response = null, callback = null) => {
 
 const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallbackUrl) => {
   return new Promise((resolve, reject) => {
+    const httpsProps = {}
+    let urlGenerated = Config.getUserConfig().CALLBACK_ENDPOINT + path
+    if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
+      const tlsConfig = ConnectionProvider.getTlsConfig()
+      const httpsAgent = new https.Agent({
+        cert: tlsConfig.hubClientCert,
+        key: tlsConfig.hubClientKey,
+        ca: [tlsConfig.dfspServerCaRootCert],
+        rejectUnauthorized: true
+      })
+      httpsProps.httpsAgent = httpsAgent
+      urlGenerated = urlGenerated = urlGenerated.replace('http:', 'https:')
+    }
+
     const reqOpts = {
       method: method,
-      url: Config.getUserConfig().CALLBACK_ENDPOINT + path,
+      url: urlGenerated,
       path: path,
       headers: headers,
       data: body,
       timeout: 3000,
       validateStatus: function (status) {
         return status < 900 // Reject only if the status code is greater than or equal to 900
-      }
+      },
+      ...httpsProps
     }
     try {
       JwsSigning.sign(reqOpts)
-      console.log(reqOpts)
     } catch (err) {
       console.log(err)
     }
@@ -214,7 +230,7 @@ const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallb
         reject(new Error(JSON.stringify({ syncResponse: syncResponse, callback: { body: callbackBody } })))
       })
     }, (err) => {
-      customLogger.logMessage('info', 'Failed to send request ' + method + ' ' + method, err, false)
+      customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, err, false)
       reject(new Error(JSON.stringify({ errorCode: 4000 })))
     })
   })

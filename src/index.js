@@ -34,10 +34,8 @@ const init = async () => {
   apiServer.startServer(5050)
 
   ConnectionProvider.initialize()
-  const optionsApi = {
-    port: Config.API_PORT
-  }
-  Server.initialize(optionsApi.port)
+
+  Server.initialize()
 }
 
 init()

@@ -9,5 +9,7 @@
   "VALIDATE_INBOUND_PUT_PARTIES_JWS": false,
   "JWS_SIGN": false,
   "JWS_SIGN_PUT_PARTIES": false,
-  "CONNECTION_MANAGER_API_URL": "http://localhost:5061"
+  "CONNECTION_MANAGER_API_URL": "http://localhost:5061",
+  "INBOUND_MUTUAL_TLS_ENABLED": false,
+  "OUTBOUND_MUTUAL_TLS_ENABLED": false
 }
