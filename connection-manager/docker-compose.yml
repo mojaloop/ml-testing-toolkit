@@ -24,8 +24,8 @@ services:
       - MYSQL_ROOT_PASSWORD=modus123
       - PORT=5061
       - P12_PASS_PHRASE='SOME_S3C4R3_P@SS'
-      - OAUTH2_ISSUER=http://mojaloop-testing-toolkit:5050/api/oauth2/token
-      #- OAUTH2_ISSUER=http://docker.for.mac.localhost:5050/api/oauth2/token
+      #- OAUTH2_ISSUER=http://mojaloop-testing-toolkit:5050/api/oauth2/token
+      - OAUTH2_ISSUER=http://docker.for.mac.localhost:5050/api/oauth2/token
       - AUTH_ENABLED=false
       - APP_OAUTH_CLIENT_KEY=asdf
       - APP_OAUTH_CLIENT_SECRET=asdf

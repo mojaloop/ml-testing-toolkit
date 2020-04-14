@@ -476,6 +476,10 @@ const checkConnectionManager = async () => {
       if (!currentEnvironment) {
         // Initialize HUB environment
         await initEnvironment()
+        if (currentEnvironment) {
+          await initDFSP(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, 'Testing Toolkit DFSP')
+          await initDFSP(currentEnvironment.id, DEFAULT_USER_FSPID, 'User DFSP')
+        }
       }
       tlsChecker()
     } catch (err) {
