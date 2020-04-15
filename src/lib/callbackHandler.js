@@ -50,6 +50,11 @@ const handleCallback = async (callbackObject, context, req) => {
     urlGenerated = urlGenerated.replace('http:', 'https:')
   }
 
+  // Pass on the traceparent header if exists
+  if (req.headers.traceparent) {
+    callbackObject.headers.traceparent = req.headers.traceparent
+  }
+
   // JwsSigning
   const reqOpts = {
     method: callbackObject.method,

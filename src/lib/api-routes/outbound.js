@@ -62,9 +62,9 @@ async (req, res, next) => {
 })
 
 // Route to send series of outbound requests based on the given template
-router.post('/template/:outboundID', async (req, res, next) => {
+router.post('/template/:traceID', async (req, res, next) => {
   try {
-    const outboundID = req.params.outboundID
+    const traceID = req.params.traceID
     const inputJson = JSON.parse(JSON.stringify(req.body))
     // Validate the template format
     if (!inputJson.name) {
@@ -74,7 +74,7 @@ router.post('/template/:outboundID', async (req, res, next) => {
       return res.status(422).json({ errors: 'Template test cases are missing' })
     }
     const outbound = require('../test-outbound/outbound-initiator')
-    outbound.OutboundSend(inputJson, outboundID)
+    outbound.OutboundSend(inputJson, traceID)
 
     res.status(200).json({ status: 'OK' })
   } catch (err) {

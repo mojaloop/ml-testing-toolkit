@@ -34,11 +34,18 @@ const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const expect = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
+const traceHeaderUtils = require('../traceHeaderUtils')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
 
-const OutboundSend = async (inputTemplate, outboundID) => {
+const OutboundSend = async (inputTemplate, traceID) => {
+  let outboundID = traceID
+  let sessionID = null
+  if (traceHeaderUtils.isCustomTraceID(traceID)) {
+    outboundID = traceHeaderUtils.getEndToEndID(traceID)
+    sessionID = traceHeaderUtils.getSessionID(traceID)
+  }
   for (const i in inputTemplate.test_cases) {
-    await processTestCase(inputTemplate.test_cases[i], outboundID, inputTemplate.inputValues)
+    await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues)
   }
 
   // Send the total result to client
@@ -47,10 +54,17 @@ const OutboundSend = async (inputTemplate, outboundID) => {
     status: 'FINISHED',
     outboundID: outboundID,
     totalResult
-  })
+  }, sessionID)
 }
 
-const processTestCase = async (testCase, outboundID, inputValues) => {
+const processTestCase = async (testCase, traceID, inputValues) => {
+  let outboundID = traceID
+  let sessionID = null
+  if (traceHeaderUtils.isCustomTraceID(traceID)) {
+    outboundID = traceHeaderUtils.getEndToEndID(traceID)
+    sessionID = traceHeaderUtils.getSessionID(traceID)
+  }
+
   // Load the requests array into an object by the request id to access a particular object faster
   // console.log(testCase.requests)
   const requestsObj = {}
@@ -96,6 +110,11 @@ const processTestCase = async (testCase, outboundID, inputValues) => {
       }
     }
 
+    // Insert traceparent header if sessionID passed
+    if (sessionID) {
+      convertedRequest.headers.traceparent = '00-' + traceID + '-0123456789abcdef0-00'
+    }
+
     // Send http request
     try {
       const resp = await sendRequest(convertedRequest.method, convertedRequest.path, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl)
@@ -117,7 +136,7 @@ const processTestCase = async (testCase, outboundID, inputValues) => {
         callback: resp.callback,
         requestSent: convertedRequest,
         testResult
-      })
+      }, sessionID)
     } catch (err) {
       const resp = JSON.parse(err.message)
       const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback)
@@ -137,7 +156,7 @@ const processTestCase = async (testCase, outboundID, inputValues) => {
         callback: resp.callback,
         requestSent: convertedRequest,
         testResult
-      })
+      }, sessionID)
       // break
     }
   }

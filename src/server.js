@@ -37,6 +37,7 @@ const UniqueIdGenerator = require('./lib/uniqueIdGenerator')
 const objectStore = require('./lib/objectStore')
 const assertionStore = require('./lib/assertionStore')
 const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
+const traceHeaderUtils = require('./lib/traceHeaderUtils')
 
 var serverInstance = null
 // const openAPIOptions = {
@@ -126,6 +127,17 @@ const createServer = async (port) => {
         // Generate UniqueID
         request.customInfo = {}
         request.customInfo.uniqueId = UniqueIdGenerator.generateUniqueId(request)
+
+        // Parse the traceparent header if present
+        if (request.headers.traceparent) {
+          const traceparentHeaderArr = request.headers.traceparent.split('-')
+          const traceID = traceparentHeaderArr[1]
+          if (traceHeaderUtils.isCustomTraceID(traceID)) {
+            request.customInfo.endToEndID = traceHeaderUtils.getEndToEndID(traceID)
+            request.customInfo.sessionID = traceHeaderUtils.getSessionID(traceID)
+          }
+        }
+
         RequestLogger.logRequest(request)
         return h.continue
       }
