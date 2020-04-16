@@ -1,7 +1,7 @@
-Mojaloop Self Testing Toolkit
+Mojaloop Testing Toolkit
 =============================
 
-A self testing tool to test the mojaloop implementations.
+A testing tool to test the mojaloop implementations.
 
 Table of Contents
 =================
@@ -30,9 +30,9 @@ Table of Contents
 
 ## 1. Quick Start
 
-For getting started with Self Testing Toolkit quickly please follow the below steps.
+For getting started with **Mojaloop Testing Toolkit** quickly please follow the below steps.
 
-* [Deploy Self-Testing Toolkit using docker method](#21-with-docker)
+* [Deploy Mojaloop Testing Toolkit using docker method](#21-with-docker)
 * [Deploy Mojaloop Simulator](#42-with-mojaloop-simulator)
 * [Follow Usage guide](/documents/User-Guide.md)
 
@@ -41,7 +41,7 @@ For getting started with Self Testing Toolkit quickly please follow the below st
 
 ### 2.1 With Docker
 
-This is the easiest way to run the self testing toolkit.
+This is the easiest way to run the **Mojaloop Testing Toolkit**.
 
 The following softwares should be installed on your system to run the toolkit.
 
@@ -56,7 +56,8 @@ cd ml-testing-toolkit
 docker-compose up
 ```
 
-To update the self-testing-toolkit to the latest version and rebuild, please run the following
+To update the **Mojaloop Testing Toolkit** to the latest version and rebuild, please run the following
+
 ```bash
 cd ml-testing-toolkit
 git pull
@@ -151,8 +152,8 @@ The above command will start the services scheme-adapter, mojaloop-simulator and
 
 Open the following URLs in your browser and send a transfer from simulator and observe the toolkit logs in web frontend.
 
-* http://localhost:6060 (Front end for Self Testing Toolkit)
-* http://localhost (Front end for Mojaloop Simulator)
+* http://localhost:6060 (Front end for **Mojaloop Testing Toolkit**)
+* http://localhost (Front end for **Mojaloop Simulator**)
 
 
 ## 5. Usage
@@ -168,4 +169,4 @@ You can follow the following documentation and change the rules as per your need
 
 [Rules Documentation](RULES_ENGINE.md)
 
-****If you have your own DFSP implementation you can point the peer endpoint to self testing toolkit on port 5000 and try to send requests from your implementation instead of using mojaloop-simulator.**
+****If you have your own DFSP implementation you can point the peer endpoint to **Mojaloop Testing Toolkit** on port 5000 and try to send requests from your implementation instead of using mojaloop-simulator.**
