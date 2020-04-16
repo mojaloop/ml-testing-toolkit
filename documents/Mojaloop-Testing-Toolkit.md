@@ -1,4 +1,4 @@
-# Mojaloop Self-Testing Tool
+# Mojaloop Testing Tool
 
 **Table of Contents**
 
