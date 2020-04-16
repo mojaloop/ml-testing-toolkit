@@ -32,7 +32,9 @@
 
     4.2 [Enabling TLS Verification](#42-enabling-the-tls-verification)
 
-    4.3 [Alternative Setups](#43-alternative-setups)
+    4.3 [Connection Manager Certificates](#43-connection-manager-certificates)
+
+    4.4 [Alternative Setups](#43-alternative-setups)
 
 ### 1. Introduction
 
@@ -54,25 +56,25 @@ When you open the **Mojaloop Testing Toolkit** in your browser, you will be welc
 
 ![Opening view](/assets/images/Opening_View.png)
 
-You would also notice the navigation bar on the left. The navigational items currently are;
+Take notice of the navigation bar on the left. The navigational items are;
 
-- Dashboard
-- Monitoring
-- Sync Response Rules
-- Validation Rules (Error Callbacks)
-- Callback Rules (Success Callbacks)
-- Outbound Request
-- Settings
+- **Dashboard**
+- **Monitoring**
+- **Sync Response Rules**
+- **Validation Rules (Error Callbacks)**
+- **Callback Rules (Success Callbacks)**
+- **Outbound Request**
+- **Settings**
 
 We will work through each one of the items and provide you with a fair understanding of the current functionality.
 
-![Menu Items](/assets/images/Menu_Items.png)
+<!-- ![Menu Items](/assets/images/Menu_Items.png) -->
 
 #### 3.2 Dashboard
 
-The _Dashboard_ is the default opening screen. This is still under construction and will provide valuable statistical information to the user of the **Mojaloop Testing Toolkit** related to request and response activities (Request and Responses statistics, including Rules Engine "Hits" information).
+The _Dashboard_ is the default opening window. It will provide the user with valuable statistical data as to the useage of **Mojaloop Testing Toolkit** pertaining to request and response activities (Request and Responses statistics, including Rules Engine "Hits" statistics).
 
-More information would be available once the development is at a more mature stage.
+Accurate information would be available once the development of this functionality is at a more mature stage. Currently only static information is displayed.
 
 #### 3.3 Monitoring
 
@@ -82,7 +84,7 @@ The _Monitoring_ navigation tab allows you to monitor the _incoming_ and _outgoi
 
 By following the docker installation instructions in the [README](/README.md), you should have the **Mojaloop Simulator UI** open in your browser tab. On the **Mojaloop Simulator UI** open browser, go to the navigation bar on the left and click on _Outbound Send_ tab.
 
-Press _Send Transfer_ button on the main page to send sample test data from the **Mojaloop_Simulater UI** to the **Mojaloop Testing Toolkit**. 
+Press _Send Transfer_ button on the main window to send sample test data from the **Mojaloop_Simulater UI** to the **Mojaloop Testing Toolkit**. 
 
 ![Send Transfer](/assets/images/Send_Transfer.png)
 
@@ -90,7 +92,7 @@ You should receive a response on the **Mojaloop Simulator UI** as indicated belo
 
 ![Simulator response](/assets/images/Simulator_Response.png) 
 
-Go back to the **Mojaloop Testing Toolset** in your browser and select from the navigation bar on the left the _Monitoring_ tab. You will notice the three requests associated with a transfer in an order such that most recent request first on the main page content.
+Go back to the **Mojaloop Testing Toolset** in your browser and select from the navigation bar on the left the _Monitoring_ tab. You will notice the three requests associated with the above transfer request send. The order will always show the most recent request first item listed on the main page content.
 
 - GET /parties/{Type}/{ID}
 - POST /quotes
@@ -98,11 +100,11 @@ Go back to the **Mojaloop Testing Toolset** in your browser and select from the 
 
 ![Monitoring messages](/assets/images/Monitoring_Messages.png)
 
-To view detail information on any one of the callback, click on the operation - in this example _GET /parties/MSISDN/0001_ persented as a _blue button_. 
+To view detail information on any one of the callback, click on the operation - in this example _GET /parties/MSISDN/0001_ presented as a _blue button_. 
 
 If you recall the [Architecture Diagram](/documents/Mojaloop-Self-Testing-Tool.md#7-architecture) mentioned earlier, under messages, you'll notice, Version negotiation, Schema Validation and Additional validations;
 
-Clicking on the _+_ to the left of the expanded list on the main page to view detail related to that specific timeline message.
+Clicking on the _+_ to the left of the expanded list on the main window to view detail related to that specific timeline message.
 
 ![Expanded monitoring messages](/assets/images/Expand_Monitoring_Messages.png)
 
@@ -125,7 +127,7 @@ When you send more transfers from the **Mojaloop Simulator UI**, these transacti
 
 **_Validation and synchronous response based on the schema of the code_**
 
-The _Sync Response Rules_ navigation tab on the left of the **Mojaloop Testing Toolset** allow you the setup fixed or mock responses. You will notice the _default.json_ file on the right hand side window. That contain sample content provided for mock or fixed responses on the center window display. These can be tested by running the Postman scripts supplied in the root directory of this project.
+The _Sync Response Rules_ navigation tab on the left of the **Mojaloop Testing Toolset** allow you the setup fixed or mock responses. Take notice the _default.json_ file on the right hand side window. That contains the list of operations and sample content for mock or fixed responses for the operations listed on the center window. These can be tested by running the collection in Postman. (Import the [collection](/postman/mojaloop-pdp-testing-tool.postman_collection.json) and [environment](/postman/mojaloop-pdp-testing-tool.postman_environment.json) files into Postman testing tool.)
 
 ![Opening  Sync Response Rules](/assets/images/Opening_Sync_Response_Rules.png)
 
@@ -139,21 +141,23 @@ Below is a sample **FIXED_RESPONSE**
 
 **Building your own Rules File**
 
-It is possible to create your own file with a collection of rules to suite your specific requirements. For an comprehensive insight, please view [Rules Engine](../RULES_ENGINE.md) document. 
+The toolset allows you to create your own file with a collection of rules to suite your specific testing requirements. For an comprehensive insight, please view the [Rules Engine](/RULES_ENGINE.md) document for more information related to the **Rules Engine**. 
 
 The following section will provide an overview into building your own Rules file. 
 
-On the left window, click the _New Rules File_ tab in the top left window. Provide an appropriate file name. Remember to save it with a _**.json**_ extension.
+On the left window, click the _New Rules File_ button in the top left. Provide an appropriate file name. Remember to save it with a _**.json**_ extension. Click on the |√| to create/save the file.
 
 ![Creating New Rule File](/assets/images/Creating-New-Rule-File2.png)
 
 Click on the _Add a new Rule_ button on the middle top center window. The _**Rule Builder**_ window will popup. 
 
-First thing to do is to select the desired _**API**_ from the drop down. All the current supported API's are listed in the drop down list. 
+![Building New Rules File](/assets/images/Building-New-Rules-File.png)
+
+First thing to do is to select the desired _**API**_. Click on the down arrow to provide the selection. All the current supported API's are listed in the drop down list. 
 
 ![Select API](/assets/images/Rule-Builder-Select-API.png)
 
-Next you will need to select the _operationId_ you require for the new rule. All the _operationId_'s are listed in the _**Resource**_ drop down list. The list is build from the Swagger definition of the selected API. 
+Next, select the _operationId_ you require for the new rule in the _**Resource**_ dropdown list. All the _operationId_'s are listed in the drop down list. Click on the down arrow to provide the selection. The list is build from the Swagger definition of the API selected. 
 
 ![Resource selection](/assets/images/Resource-selection.png)
 
@@ -161,18 +165,18 @@ You have the option to include one or more _**CONDITION**_ for the new rule. Sel
 
 ![Add Condition Button](/assets/images/Add-Condition-Button.png)
 
-You will be presented with 4 drop down list to select from;
+You will be presented with 4 boxes each with a drop down list to select from;
 
 - _**Fact Type**_
 - _**Fact**_
 - _**Operation**_
 - _**Value**_
 
-Each of the above mentioned items will have present a drop down list with options to select. These selection options are as per the Swagger definition for the selected API in the above step.
+For each of the above mentioned items, click on the down arrow in the item box to list the selection options to select from. These selection options are as per the Swagger definition for the selected API above.
 
 ![Sample Condition](/assets/images/Sample-Condition.png) 
 
-Next step would be to select the _**EVENT**_ Type detail below. The drop down menu will provide you with the option to either select a _**Mock Response**_ or a  _**Fixed Response**_.
+Next step would be to select the _**EVENT**_ Type detail below. Click on the down arrow in the item box to list the option.  Select either _**Mock Response**_ or _**Fixed Response**_.
 
 ![Event Response Options](/assets/images/Event-Response-Options.png)
 
@@ -222,9 +226,9 @@ The same applies for this section, the functionality is similar to [3.4 Sync Res
 
 #### 3.7 Outbound Request
 
-This sections will enable you to create a collection of operations and add a number of assertions to these operations. The assertions can be setup and customised to the testing requirements and verify both positive and negative requests and callback data. 
+This sections will enable you to create a collection of operations and add a number of assertions to these operations. The assertions can be setup and customized to the your testing requirements and verify both positive and negative requests and responses. 
 
-Selecting the _**Outbound Request**_ navigation tab on the left side, you will be welcomed with the following display. 
+Selecting the _**Outbound Request**_ navigation tab on the left side, the following will open in the main display window. 
 
 ![Outbound display opening](/assets/images/Outbound-Display-Opening.png)
 
@@ -236,30 +240,105 @@ At the top of the screen, you will notice the following buttons on the main wind
 - Save
 - Send
 
-By selecting the _**Import Template**_ button, it will allow you to import your own template. There are some sample templates for you to explore. On the file explorer window that pop up if you select the _**Import Template**_ button, navigate to the sub directory _test-case_ within the project. Select the _dfsp_tests.json_ file. This sample file consist of a couple of tests samples. Open the file to import into the **Mojaloop Testing Toolkit** application.
+By selecting the _**Import Template**_ button, it will allow you to import your own template. Sample templates are available in the [test-case](/examples/test-cases) sub directory for you to explore. On the file explorer window that pop up if you select the _**Import Template**_ button, navigate to the _/examples_ and sub directory _/test-case_ within the main project directory. Select the ```dfsp_tests.json``` file. This sample file consist of a couple of tests samples. Open the file to import into the **Mojaloop Testing Toolkit** application.
 
 ![Import Template](/assets/images/Import-Template.png)
 
-The sample template contains, among others, the following requests as samples;
+The sample template contains, among others, the following operations as samples;
 
-1.P2P Transfer Happy Path
-- **get/parties/{Type}/{ID}** - Get party information
-- **post/quotes** - Get quote
-- **post/transfers** - Send transfer
+_**P2P Transfer Happy Path**_
+
+  - **get/parties/{Type}/{ID}** - Get party information
+
+  - **post/quotes** - Get quote
+
+  - **post/transfers** - Send transfer
 
 ![Opened Imported Template](/assets/images/Opened-Imported-Template.png)
 
 It is possible to update the _**Input Values**_ on the right hand side window. Additional input values can be added, by selecting the _**Add Input Value**_ button on the top right of this right hand side window. These data types will need to be correct as per the selected API swagger definition.
 
+![Add Additional Input Values](/assets/images/Add-Additional-Input-Values.png)
+
+The process is straight forward. Provide a name for the new input value and click on the _Add_ button.
+
+![Add New Input Variable](/assets/images/Add-New-Input-Variable.png)
+
+The new variable will be added to the _**Input Values**_. To add a value, simply type a value in the box. It will then be available for use. You can allso update any existing value by simply selecting the value and replacing it with the new value.
+
+![Add New Input Value](/assets/images/Add-New-Input-Value.png)
+
 ___out of date starts here
-Below the **Input Values**, you will notice the API operation Id with a description and the content of the request. The **Request** reflects both the appropriate _Header_ and _Body_ that makes up the request as per the API swagger definition.
+
+The window on the left contains the _Template_ with the _Test Cases_ and operations. 
+
+![Template Window](/assets/images/Template-Window.png)
+
+Click on the _**Edit**_ button, to open up the _**Test Case**_ in the edit mode.
+
+![Test-Case Editor](/assets/images/Test-Case-Editor.png)
+
+The **Request** tab reflects both the appropriate _Header_ and _Body_ that makes up the request as per the API swagger definition. These values can be changed in the **Editor** tab.
 
 ![Sample Request](/assets/images/Sample-Request.png)
 
-From 1 to a _n_ number of requests can be setup/created. By selecting the **Send** button on the left top, these requests will execute. The response Tab will appear on top, allowing the Response data to be review, as per the sample failure below.
+The **Editor** tab displays request content and it can be altered on this window. Depending on how the request was defined, you will be able to see the selected API, the operations, the Header and body Content. Options to _Duplicate_, _Delete_ or _Rename_ are also available as buttons above. You can also build your own new request by selecting the _Add New Request_ button on the top right. The process is building a new request is similar to the one explained in [Sync Response Rules](#34-sync-response-rules)
 
-![Sample Response Failure](/assets/images/Sample-Response-Failure.png)
-___out of date stops here
+![Sample Request](/assets/images/Sample-Editor.png)
+
+The **Test** tab contains the assertions that was setup. These are similar to PostMan tests and will evaluate the request and/or the response based on the requirements of the assertion. The below is an assertion from the sample _Template File_ imported earlier, is validation the callback and expect the _**status**_ to be equal to _**202**_.
+
+![Sample Test Assertion](/assets/images/Sample-Test-Assertion.png)
+
+To create a new assertion, you can either add to an existing one, or choise to setup a new assertion. After naming the new assertion, the steps are the same in both cases. We will only cover the basic in this document.
+
+To create a new assertion, select the _**Add New Assertion**_ button on the top right. Provide an appropriate name and click on the _**Add**_ button.
+
+![Add New Assertion](/assets/images/Add-New-Assertion.png) 
+
+The new assertion will be available at the bottom of the existing assertions. You have the option to _Rename_ or _Delete_ the assertion - as are the case with any of the current assertions.
+
+Navigate to the newly create assertion, and click on the arrow on the left of it to expane. 
+
+![New Empty Assertion](/assets/images/New-Empty-Assertion.png) 
+
+Include a new expectation by selecting the _**Add Expectation**_ button at the bottom left. This will launch the Expectation window. Selecting the box will provide you with the option to either select a Request or a Response to be assessed.
+
+![Assess Request or Response](/assets/images/Assess-Request-or-Response.png)
+
+We have opted for the __Response__. Next select the field to be assessed - __Status__ was selected for this demo. 
+
+![Assess Response Status](/assets/images/Assess-Response-Status.png)
+
+Select the equation from the middle box. We have opted for __Not Equal to__.
+
+![Assess Response Equation](/assets/images/Assess-Response-Equation.png)
+
+Add the required value in the last box and click on the _**Save**_ button. Congratulations - you have successfully created an assertion. 
+
+![Assess Response Equation Save](/assets/images/Assess-Response-Equation-Save.png)
+
+It is also possible to generate assertions to values that is not part of either the Request or Response data. Select the _**Configurable Parameter**_ button at the bottom right with bring up the __Configurable Parameter__ window. Click on the box to provide the dropdown list of possible options. We have selected __Input Values__ for this demo.
+
+![Configurable Parameter](/assets/images/Configurable-Parameter.png)
+
+Click on the box below that one to list the options to select from. We have chosen __currency__ for this demo.
+
+![Configurable Parameter Currency](/assets/images/Configurable-Parameter-Currency.png)
+
+The __Configurable Parameter__ ```{$inputs.currency}``` is now available for use with the option to __Copy to clipboard__ or __Insert into editor__.
+
+To get a better understanding of how this will work, please have a look at the below. This assertion is part of the samples provided. This assertion contains 2 expectations. You will notice it is possible to refer to the previous operation ```prev.2.callback.body``` and compare the current operation ```request.body```. So yes, it can become very technical, and would be better explained in a separate document to cover this subject on assertions.
+
+![Configurable Parameter Assertion](/assets/images/Configurable-Parameter-Assertion.png)
+
+Finally we can execute the __Test Cases__. Please insure you have setup added a user with {MSISDN} = {9848613613} on the simulator. Select the _**Send**_ button on the right top.
+
+![Sending Test Cases](/assets/images/Sending-Test-Cases.png)
+
+If you select the _**Edit**_ button now, you will notice the addition of the response tab. Select that to view all the responses for the operation.
+
+![View Response](/assets/images/View-Response.png)
 
 #### 3.8 Settings
 
@@ -267,7 +346,7 @@ The _**SETTINGS**_ navigation tab will open to the following view. This is the d
 
 ![Opening Default Settings](/assets/images/Opening-Default-Settings.png)
 
-The _**SETTINGS**_ window consist og the following to windows;
+The _**SETTINGS**_ window consist of the following to windows;
 
 On the right _**Runtime Global Configuration**_ displays the environmental setting as stipulated in the _local.env_ file. 
 
@@ -285,7 +364,7 @@ This section will guide you in the required configuration updates to enable runn
 
 The following configurations on the local file system. Remember to save the files when the config is completed.
 
-- [local.env](../local.env) file under the root directory;
+- [local.env](/local.env) file under the root directory;
   
   - update _CALLBACK_ENDPOINT_ to **HTTPS**,
   
@@ -304,7 +383,7 @@ OUTBOUND_MUTUAL_TLS_ENABLED=true
 
 ![Local Enabled Mutual TLS](/assets/images/Local_Mutual_TLS_Enabled.png)
 
-- [/simulator/scheme-adapter.env](../simulator/scheme-adapter.env) file, make the following update;
+- [/simulator/scheme-adapter.env](/simulator/scheme-adapter.env) file, make the following update;
   
   - Update _INBOUND_MUTUAL_TLS_ENABLED_ to **true**,
   
@@ -338,11 +417,13 @@ As we have made updates to the configuration files for both **Mojaloop Simulator
 ```
 docker-compose down
 ```  
+
 You should still verify that all containers are down by running the below. There shouldn't be any active docker containers.
 
 ```
 docker-compose ps
 ```
+
 You should see the following on the respective terminal windows
 
 ```
@@ -356,11 +437,29 @@ To enable the integration with **Mojaloop Connection Manager**, you will need to
 cd connection-manager
 ```
 
-Now the restart **Mojaloop Simulator** and **Mojaloop Testing Toolkit**, you can simply run the below command in the respective terminal windows. The containers will startup as per the initial instructions in the [README](../README.md) document.
+To start **Mojaloop Connection Manager** as part of the **Mojaloop Testing Toolkit**, the same command can be executed in the respective terminal window.
+
+```
+docker-compose up
+```  
+
+Once **Mojaloop Connection Manager** is running, you can open a browser and enter ```localhost:5060``` in the url. This will open the **Mojaloop Connection Manager UI**. You will be signed on as a _DFSP_ **dfsp1**, on a _**TESTING-TOOL**_ environment.
+
+![Connection Manager UI Opening](/assets/images/Connection-Manager-UI-Opening.png)
+
+**Importanant Note**
+The **Mojaloop Testing Toolkit** is a local docker images. Due to the changes, you will need to rebuild the docker images before restarting **Mojaloop TestingToolkit**.
+
+```
+docker-compose build
+```
+
+Now the restart **Mojaloop Simulator** and **Mojaloop Testing Toolkit**, you can simply run the below command in the respective terminal windows. The containers will startup as per the initial instructions in the [README](/README.md) document.
 
 ```
 docker-compose up
 ``` 
+
 To start **Mojaloop Connection Manager** as part of the **Mojaloop Testing Toolkit**, the same command can be executed in the respective terminal window.
 
 ```
@@ -377,9 +476,51 @@ As per the initial configurations that was done on the _local.env_ files, you wi
 
 ![TLS Enabled on Environment](/assets/images/TLS-Enabled-on-Environment.png)
 
+#### 4.3 Connection Manager Certificates
+
+Even though all the certificates have been pre generated palced in a folder and ready for use, some manual actions are required to enable these from a security perspective. Since the **Mojaloop Testing Toolkit** is simulating a DFSP, we will only focus on the **Mojaloop Connect Manager** requirements from the DFSP perspective.
+
+From the **Mojaloop Connect Manager** window, click on the _**TESTING-TOOL**_ environment button.
+
+![MCM Environment Opening](/assets/images/MCM-Environment-Opening.png)
+
+##### 4.3.1 Certificate Authorities
+
+On the navigational tab on the left, navigate to _Certificates_ and select _Certificate Authorities_. Under the _DFSP Certificate Authority_ tab in the _Root Certificate_ box, click on _choice a file_ button. Navigate to ```/simulator/secrets/tls/``` and select ```dfsp_client_cacert.pem``` file. 
+
+![dfsp_client_cacert](/assets/images/dfsp_client_cacert.png)
+
+##### 4.3.2 TSL Client Certificates
+
+Still under _Certificates_ on the navigational tab on the left, select _TSL Client Certificates_. Under the _CSR_ tab in the _CSR_ box, click on the _choice a file_ button. Navigate to ```/simulator/secrets/tls/``` and select ```dfsp_client.csr``` file.
+
+![dfsp_client](/assets/images/dfsp_client.png)
+
+Click on the _|√|Submit_ button to send the file to the HUB signing.
+
+![dfsp_client Submit](/assets/images/dfsp_client-submit.png)
+
+Now select the _Unprocessed Hub CSRs_ tab. Under normal circumstances, we will download the signed certificate by clicking on the _Download CSR_ button. As we already have the signed certificate in the folder, this is not necessary, and you can click on the _Upload Certificate_ button on the right of the main window. Navigate to ```/simulator/secrets/tls/``` and select ```hub_client_cert.pem``` file.
+
+![hub_client_cert](/assets/images/hub_client_cert.png)
+
+##### 4.3.3 TLS Server Certificates
+
+Still under _Certificates_ on the navigational tab on the left, select _TSL Server Certificates_. Under the _DFSP Server certificates_ tab in the _Server certificate_ box, click on the _choice a file_ button. Navigate to ```/simulator/secrets/tls/``` and select ```dfsp_server_cert.pem``` file.
+
+![dfsp_server_cert](/assets/images/dfsp_server_cert.png)
+
+Under the _DFSP Server certificates_ tab in the _Root certificate_ box, click on the _choice a file_ button. Navigate to ```/simulator/secrets/tls/``` and select ```dfsp_server_cacert.pem``` file.
+
+![dfsp_server_cacert](/assets/images/dfsp_server_cacert.png)
+
+Click on the _|√|Submit_ button
+
+![Server certificates submitted](/assets/images/Server-certificates-submitted.png)
+
 To do a quick verification if everything is still functioning as expected, you can repeat the simulator test done in 3.3 [Monitoring](#33-monitoring).
 
-#### 4.3 Alternative Setups
+#### 4.4 Alternative Setups
 
 It is also possible for **Mojaloop Testing Toolkit** to function outside of a local docker environment, enabling more advance integration testing and verifications between a Mojaloop Switch and testing DFSP before going live. 
 
@@ -390,4 +531,4 @@ To familiarize yourself with the process, you can create your own TLS certificat
 
 Please be aware should you setup on another environment , some variables will need to be updated like DNS or IP address of the server.
 
-We will be covering the setting up and activation of the certificates in more depth in a seperate document. This will including the actions required on **Mojaloop Connection Manager** interface.
+We will be covering the setting up and activation of the certificates in more depth in a separate document. This will including the actions required on **Mojaloop Connection Manager** interface.
