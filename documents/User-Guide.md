@@ -78,7 +78,7 @@ Accurate information would be available once the development of this functionali
 
 #### 3.3 Monitoring
 
-The _Monitoring_ navigation tab allows you to monitor the _incoming_ and _outgoing_ request.
+The _Monitoring_ navigation tab allows you to monitor the _incoming_ requests.
 
 ![Monitoring Initial State](/assets/images/Monitoring_Initial_State.png) 
 
