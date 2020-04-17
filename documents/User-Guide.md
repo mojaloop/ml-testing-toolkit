@@ -141,7 +141,7 @@ Below is a sample **FIXED_RESPONSE**
 
 **Building your own Rules File**
 
-The toolset allows you to create your own file with a collection of rules to suite your specific testing requirements. For an comprehensive insight, please view the [Rules Engine](/RULES_ENGINE.md) document for more information related to the **Rules Engine**. 
+The toolset allows you to create your own file with a collection of rules to suite your specific testing requirements. A rule can be created completely with the web UI. But for advanced users and a comprehensive insight, please view the [Rules Engine](/RULES_ENGINE.md) document for more information related to the **Rules Engine**. 
 
 The following section will provide an overview into building your own Rules file. 
 
@@ -180,7 +180,7 @@ Next step would be to select the _**EVENT**_ Type detail below. Click on the dow
 
 ![Event Response Options](/assets/images/Event-Response-Options.png)
 
-By selecting the _**Mock Response**_, you will have the option to override the standard mock response by selecting _**Override some parameters**_ tick box. This will open the _**Headers**_. Your options to select from are _**Add Header**_, _**Add Required Header**_, _**Add All Headers**_.
+For normal use case you can select _**Mock Response**_, testing toolkit can generate mock data based on the scheme in swagger file. By selecting the _**Mock Response**_, you will have the option to override the standard mock response by selecting _**Override some parameters**_ tick box. This will open the _**Headers**_. Your options to select from are _**Add Header**_, _**Add Required Header**_, _**Add All Headers**_.
 
 ![Header Selection](/assets/images/Header-Selection.png)
 
@@ -212,6 +212,8 @@ Lastly, set the new rule file as active by selecting the new rule file on the ri
 
 **_Error Callbacks_**
 
+This Rules section is to simulate asynchronous error callbacks.
+
 The setup and functionality is similar to [3.4 Sync Response Rules](#34-sync-response-rules) with the ability to create your own Rules file. This has already been explained in the previous section under **Building your own Rules File**
 
 ![Validation Rules Screen](/assets/images/validation-rules-screen.png)
@@ -220,13 +222,16 @@ The setup and functionality is similar to [3.4 Sync Response Rules](#34-sync-res
 
 **_Success Callbacks_**
 
+This Rules section is to simulate asynchronous success callbacks.
+
 The same applies for this section, the functionality is similar to [3.4 Sync Response Rules](#34-sync-response-rules) with the ability to create your own Rules file. This has already been explained in the previous section under **Building your own Rules File**
 
 ![Callback Rules Screen](/assets/images/callback-rules-screen.png)
 
 #### 3.7 Outbound Request
 
-This sections will enable you to create a collection of operations and add a number of assertions to these operations. The assertions can be setup and customized to the your testing requirements and verify both positive and negative requests and responses. 
+This sections will enable you to intiate requests from the testing toolkit to your DFSP implementation.
+User can create a collection of operations and add a number of assertions to these operations. The assertions can be setup and customized to the your testing requirements and verify both positive and negative requests and responses. 
 
 Selecting the _**Outbound Request**_ navigation tab on the left side, the following will open in the main display window. 
 
@@ -256,7 +261,7 @@ _**P2P Transfer Happy Path**_
 
 ![Opened Imported Template](/assets/images/Opened-Imported-Template.png)
 
-It is possible to update the _**Input Values**_ on the right hand side window. Additional input values can be added, by selecting the _**Add Input Value**_ button on the top right of this right hand side window. These data types will need to be correct as per the selected API swagger definition.
+It is possible to update the _**Input Values**_ on the right hand side window. Additional input values can be added, by selecting the _**Add Input Value**_ button on the top right of this right hand side window. These values are like global environment variables those you can refer in any request in any test case you create.
 
 ![Add Additional Input Values](/assets/images/Add-Additional-Input-Values.png)
 
@@ -302,7 +307,7 @@ Navigate to the newly create assertion, and click on the arrow on the left of it
 
 ![New Empty Assertion](/assets/images/New-Empty-Assertion.png) 
 
-Include a new expectation by selecting the _**Add Expectation**_ button at the bottom left. This will launch the Expectation window. Selecting the box will provide you with the option to either select a Request or a Response to be assessed.
+Include a new expectation by selecting the _**Add Expectation**_ button at the bottom left. This will launch the Expectation window. Selecting the box will provide you with the option to either select a synchronous response or a callback to be assessed.
 
 ![Assess Request or Response](/assets/images/Assess-Request-or-Response.png)
 
@@ -318,7 +323,7 @@ Add the required value in the last box and click on the _**Save**_ button. Congr
 
 ![Assess Response Equation Save](/assets/images/Assess-Response-Equation-Save.png)
 
-It is also possible to generate assertions to values that is not part of either the Request or Response data. Select the _**Configurable Parameter**_ button at the bottom right with bring up the __Configurable Parameter__ window. Click on the box to provide the dropdown list of possible options. We have selected __Input Values__ for this demo.
+It is also possible to compare the values from input values or the parameters from the request. Select the _**Configurable Parameter**_ button at the bottom right with bring up the __Configurable Parameter__ window. Click on the box to provide the dropdown list of possible options. We have selected __Input Values__ for this demo.
 
 ![Configurable Parameter](/assets/images/Configurable-Parameter.png)
 
@@ -332,7 +337,7 @@ To get a better understanding of how this will work, please have a look at the b
 
 ![Configurable Parameter Assertion](/assets/images/Configurable-Parameter-Assertion.png)
 
-Finally we can execute the __Test Cases__. Please insure you have setup added a user with {MSISDN} = {9848613613} on the simulator. Select the _**Send**_ button on the right top.
+Finally we can execute the __Test Cases__. Please insure you have setup added a user with {MSISDN} with a value found in the Input Values on the simulator. Select the _**Send**_ button on the right top.
 
 ![Sending Test Cases](/assets/images/Sending-Test-Cases.png)
 
@@ -342,15 +347,17 @@ If you select the _**Edit**_ button now, you will notice the addition of the res
 
 #### 3.8 Settings
 
-The _**SETTINGS**_ navigation tab will open to the following view. This is the default view without **Mojaloop Connection Manager** activated. 
+The _**SETTINGS**_ navigation tab will open to the following view. This is the default view of this page.
 
 ![Opening Default Settings](/assets/images/Opening-Default-Settings.png)
 
 The _**SETTINGS**_ window consist of the following to windows;
 
-On the right _**Runtime Global Configuration**_ displays the environmental setting as stipulated in the _local.env_ file. 
+On the left _**Runtime Global Configuration**_ displays the actual configuration that is in effect in the testing toolkit service.
 
-On the left _**Edit Global Configuration**_ amounts a couple of other options, it allows you to edit and override the environment variables by selecting the _**Override with Environment Variable**_ tick box.
+On the right _**Edit Global Configuration**_ amounts a couple of other options, it allows you to edit the values manually.
+If you want your own values other than the values from environment you should disable the option _**Override with Environment Variable**_.
+In docker mode the environment values can be passed with a provided _local.env_ file.
 
 ![Override with Environment Variable](/assets/images/Override-with-Environment-Variable.png)
 
@@ -431,7 +438,7 @@ Name   Command   State   Ports
 ------------------------------
 ```
 
-To enable the integration with **Mojaloop Connection Manager**, you will need to open a new terminal window to bring up the **Mojaloop Connection Manage** docker container. The **Mojaloop Connection Manager** is part of the **Mojaloop Testing Toolkit** download, and you can just navigate to the respective repository. Change directory into _/connection-manager_.
+To enable the integration with **Mojaloop Connection Manager**, you will need to open a new terminal window to bring up the **Mojaloop Connection Manage** docker container. The **Mojaloop Connection Manager** is part of the **Mojaloop Testing Toolkit** download, and you can just navigate to the respective folder in the repository. Change directory into _/connection-manager_.
 
 ```
 cd connection-manager
@@ -443,12 +450,8 @@ To start **Mojaloop Connection Manager** as part of the **Mojaloop Testing Toolk
 docker-compose up
 ```  
 
-Once **Mojaloop Connection Manager** is running, you can open a browser and enter ```localhost:5060``` in the url. This will open the **Mojaloop Connection Manager UI**. You will be signed on as a _DFSP_ **dfsp1**, on a _**TESTING-TOOL**_ environment.
-
-![Connection Manager UI Opening](/assets/images/Connection-Manager-UI-Opening.png)
-
 **Importanant Note**
-The **Mojaloop Testing Toolkit** is a local docker images. Due to the changes, you will need to rebuild the docker images before restarting **Mojaloop TestingToolkit**.
+The **Mojaloop Testing Toolkit** is a local docker images. If you pull the changes from git repository, you will need to rebuild the docker images before restarting **Mojaloop TestingToolkit**.
 
 ```
 docker-compose build
@@ -464,7 +467,7 @@ To start **Mojaloop Connection Manager** as part of the **Mojaloop Testing Toolk
 
 ```
 docker-compose up
-```  
+```
 
 To verify if you are running with TLS enabled, navigate to the _**Settings**_ on the right hand navigation plain and select _**Settings**_.
 
@@ -476,9 +479,15 @@ As per the initial configurations that was done on the _local.env_ files, you wi
 
 ![TLS Enabled on Environment](/assets/images/TLS-Enabled-on-Environment.png)
 
+
+Once **Mojaloop Connection Manager** and all other services are running, you can open a browser and enter ```localhost:5060``` in the url. This will open the **Mojaloop Connection Manager UI**. You will be signed on as a _DFSP_ **dfsp1**, on a _**TESTING-TOOL**_ environment.
+
+![Connection Manager UI Opening](/assets/images/Connection-Manager-UI-Opening.png)
+
+
 #### 4.3 Connection Manager Certificates
 
-Even though all the certificates have been pre generated palced in a folder and ready for use, some manual actions are required to enable these from a security perspective. Since the **Mojaloop Testing Toolkit** is simulating a DFSP, we will only focus on the **Mojaloop Connect Manager** requirements from the DFSP perspective.
+Even though all the certificates for testing toolkit and simulator have been pre generated and placed in a folder and ready for use, some manual actions are required to enable these from a security perspective. Since the **Mojaloop Testing Toolkit** is simulating a HUB, we will only focus on the **Mojaloop Connect Manager** requirements from the DFSP perspective.
 
 From the **Mojaloop Connect Manager** window, click on the _**TESTING-TOOL**_ environment button.
 
@@ -492,7 +501,7 @@ On the navigational tab on the left, navigate to _Certificates_ and select _Cert
 
 ##### 4.3.2 TSL Client Certificates
 
-Still under _Certificates_ on the navigational tab on the left, select _TSL Client Certificates_. Under the _CSR_ tab in the _CSR_ box, click on the _choice a file_ button. Navigate to ```/simulator/secrets/tls/``` and select ```dfsp_client.csr``` file.
+Still under _Certificates_ on the navigational tab on the left, select _TSL Client Certificates_. Under the _CSR_ tab in the _CSR_ box, click on the _choice a file_ button. Navigate to ```/simulator/secrets/tls/``` and select ```dfsp_client.csr``` file. On submission of this CSR, the testing toolkit will automaticallly sign this and the signed certificate will be available in the _Sent CSR_ tab. Under normal circumstances, you can download this client certificate and provide it to your DFSP implementation. But for this demo, it is already place in the simulator/tls folder for convinience.
 
 ![dfsp_client](/assets/images/dfsp_client.png)
 
@@ -500,7 +509,7 @@ Click on the _|√|Submit_ button to send the file to the HUB signing.
 
 ![dfsp_client Submit](/assets/images/dfsp_client-submit.png)
 
-Now select the _Unprocessed Hub CSRs_ tab. Under normal circumstances, we will download the signed certificate by clicking on the _Download CSR_ button. As we already have the signed certificate in the folder, this is not necessary, and you can click on the _Upload Certificate_ button on the right of the main window. Navigate to ```/simulator/secrets/tls/``` and select ```hub_client_cert.pem``` file.
+Now select the _Unprocessed Hub CSRs_ tab. Under normal circumstances, we will download the CSR file and sign it with our CA  by clicking on the _Download CSR_ button. For the dempo as we already have the signed hub certificate in the folder, this is not necessary, and you can click on the _Upload Certificate_ button on the right of the main window. Navigate to ```/simulator/secrets/tls/``` and select ```hub_client_cert.pem``` file.
 
 ![hub_client_cert](/assets/images/hub_client_cert.png)
 
