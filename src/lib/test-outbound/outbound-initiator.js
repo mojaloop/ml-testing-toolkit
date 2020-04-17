@@ -37,6 +37,8 @@ const JwsSigning = require('../jws/JwsSigning')
 const traceHeaderUtils = require('../traceHeaderUtils')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
 
+delete axios.defaults.headers.common.Accept
+
 const OutboundSend = async (inputTemplate, traceID) => {
   let outboundID = traceID
   let sessionID = null
