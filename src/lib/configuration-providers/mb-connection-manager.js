@@ -76,6 +76,7 @@ const initEnvironment = async () => {
         }
       }
       const createEnvResponse = await axios.post(CONNECTION_MANAGER_API_URL + '/api/environments', environmentData, { headers: { 'Content-Type': 'application/json' } })
+      // console.log(createEnvResponse)
       if (createEnvResponse.status === 200) {
         currentEnvironment = createEnvResponse.data
       } else {
@@ -415,7 +416,6 @@ const tlsChecker = async () => {
 
     // Upload Hub Server root CA and Hub Server cert
     await uploadHubServerCerts(currentEnvironment.id, currentTlsConfig.hubServerCaRootCert, null, currentTlsConfig.hubServerCert)
-
     // Check for DFSP Server root CA and server cert
     await checkDfspServerCerts(currentEnvironment.id, DEFAULT_USER_FSPID)
 
@@ -481,7 +481,7 @@ const checkConnectionManager = async () => {
           await initDFSP(currentEnvironment.id, DEFAULT_USER_FSPID, 'User DFSP')
         }
       }
-      tlsChecker()
+      await tlsChecker()
     } catch (err) {
       console.log(err)
     }
@@ -503,10 +503,10 @@ const waitForFewSecs = async (secs) => {
 
 const waitForTlsHubCerts = async () => {
   for (let i = 0; i < 10; i++) {
-    await waitForFewSecs(2)
     if (currentTlsConfig.hubCaCert && currentTlsConfig.hubServerCert && currentTlsConfig.hubServerKey) {
       return true
     }
+    await waitForFewSecs(2)
   }
   throw new Error('Timeout Hub Init')
 }
