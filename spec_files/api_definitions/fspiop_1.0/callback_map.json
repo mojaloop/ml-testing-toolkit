@@ -91,5 +91,31 @@
         }
       }
     }
+  },
+  "/transactionRequests": {
+    "post": {
+      "successCallback": {
+        "method": "put",
+        "path": "/transactionRequests/{ID}",
+        "pathPattern": "/transactionRequests/{$request.body.transactionRequestId}",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      },
+      "errorCallback": {
+        "method": "put",
+        "path": "/transactionRequests/{ID}/error",
+        "pathPattern": "/transactionRequests/{$request.body.transactionRequestId}/error",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      }
+    }
   }
 }
