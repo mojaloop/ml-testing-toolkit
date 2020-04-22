@@ -162,6 +162,8 @@ module.exports.initilizeMockHandler = async () => {
               if (generatedCallback.body) {
                 // TODO: Handle method and path verifications against the generated ones
                 CallbackHandler.handleCallback(generatedCallback, context, req)
+                // Handle triggers for a transaction request
+                require('./middleware-functions/transactionRequestsService').handleRequest(context, req, generatedCallback, item.triggerTemplatesFolder)
               }
             })
           }

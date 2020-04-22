@@ -94,5 +94,41 @@
       "delay": 0,
       "type": "MOCK_CALLBACK"
     }
+  },
+  {
+    "ruleId": 4,
+    "priority": 1,
+    "description": "post /transactionRequests",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transactionRequests"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transactionRequests/{ID}",
+      "params": {
+        "body": {
+          "transactionRequestState": "RECEIVED"
+        }
+      },
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
+    }
   }
 ]

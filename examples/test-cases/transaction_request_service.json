@@ -1,0 +1,149 @@
+{
+  "name": "Test1",
+  "inputValues": {
+    "payerIdType": "MSISDN",
+    "payerIdValue": "44123456789",
+    "payeeFirstName": "Vijay",
+    "payeeMiddleName": "Kumar",
+    "payeeLastName": "Guthi",
+    "payeeDOB": "1984-01-01",
+    "note": "Test Payment",
+    "currency": "USD",
+    "amount": "100",
+    "homeTransactionId": "123ABC",
+    "accept": "application/vnd.interoperability.parties+json;version=1.0",
+    "contentType": "application/vnd.interoperability.parties+json;version=1.0",
+    "payeeIdType": "MSISDN",
+    "payeeIdValue": "9876543210",
+    "payeeFspId": "userdfsp",
+    "scenario": "PAYMENT",
+    "initiator": "PAYEE",
+    "initiatorType": "BUSINESS",
+    "refundReason": "userdfsp"
+  },
+  "test_cases": [
+    {
+      "id": 1,
+      "name": "P2P Transfer Happy Path",
+      "requests": [
+        {
+          "id": 1,
+          "description": "Get party information",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/parties/{Type}/{ID}",
+          "method": "get",
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.payeeFspId}"
+          },
+          "params": {
+            "Type": "{$inputs.payerIdType}",
+            "ID": "{$inputs.payerIdValue}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response should be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body should contain party",
+                "exec": [
+                  "expect(callback.body).to.have.property('party')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "Send Transaction Request to Payer",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transactionRequests",
+          "path": "/transactionRequests",
+          "method": "post",
+          "body": {
+            "transactionRequestId": "{$function.generic.generateUUID}",
+            "payee": {
+              "partyIdInfo": {
+                "partyIdType": "{$inputs.payeeIdType}",
+                "partyIdentifier": "{$inputs.payeeIdValue}",
+                "fspId": "{$inputs.payeeFspId}"
+              },
+              "merchantClassificationCode": "98",
+              "name": "nisi in",
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "{$inputs.payeeFirstName}",
+                  "middleName": "{$inputs.payeeMiddleName}",
+                  "lastName": "{$inputs.payeeFirstName}"
+                },
+                "dateOfBirth": "{$inputs.payeeDOB}"
+              }
+            },
+            "payer": {
+              "partyIdType": "{$inputs.payerIdType}",
+              "partyIdentifier": "{$inputs.payerIdValue}",
+              "fspId": "{$prev.1.callback.body.party.partyIdInfo.fspId}"
+            },
+            "amount": {
+              "currency": "{$inputs.currency}",
+              "amount": "{$inputs.amount}"
+            },
+            "transactionType": {
+              "scenario": "{$inputs.scenario}",
+              "initiator": "{$inputs.initiator}",
+              "initiatorType": "{$inputs.initiatorType}",
+              "refundInfo": {
+                "originalTransactionId": "{$function.generic.generateUUID}",
+                "refundReason": "{$inputs.refundReason}"
+              },
+              "balanceOfPayments": "968"
+            },
+            "note": "{$inputs.note}"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.payeeFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response should be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body should contain transactionRequestState",
+                "exec": [
+                  "expect(callback.body).to.have.property('transactionRequestState')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

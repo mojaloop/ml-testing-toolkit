@@ -42,7 +42,7 @@ delete axios.defaults.headers.common.Accept
 const OutboundSend = async (inputTemplate, traceID) => {
   let outboundID = traceID
   let sessionID = null
-  if (traceHeaderUtils.isCustomTraceID(traceID)) {
+  if (traceID && traceHeaderUtils.isCustomTraceID(traceID)) {
     outboundID = traceHeaderUtils.getEndToEndID(traceID)
     sessionID = traceHeaderUtils.getSessionID(traceID)
   }
@@ -51,18 +51,20 @@ const OutboundSend = async (inputTemplate, traceID) => {
   }
 
   // Send the total result to client
-  const totalResult = inputTemplate
-  notificationEmitter.broadcastOutboundProgress({
-    status: 'FINISHED',
-    outboundID: outboundID,
-    totalResult
-  }, sessionID)
+  if (outboundID) {
+    const totalResult = inputTemplate
+    notificationEmitter.broadcastOutboundProgress({
+      status: 'FINISHED',
+      outboundID: outboundID,
+      totalResult
+    }, sessionID)
+  }
 }
 
 const processTestCase = async (testCase, traceID, inputValues) => {
   let outboundID = traceID
   let sessionID = null
-  if (traceHeaderUtils.isCustomTraceID(traceID)) {
+  if (traceID && traceHeaderUtils.isCustomTraceID(traceID)) {
     outboundID = traceHeaderUtils.getEndToEndID(traceID)
     sessionID = traceHeaderUtils.getSessionID(traceID)
   }
@@ -129,16 +131,18 @@ const processTestCase = async (testCase, traceID, inputValues) => {
         callback: resp.callback,
         request: convertedRequest
       }
-      notificationEmitter.broadcastOutboundProgress({
-        outboundID: outboundID,
-        testCaseId: testCase.id,
-        status: 'SUCCESS',
-        requestId: request.id,
-        response: resp.syncResponse,
-        callback: resp.callback,
-        requestSent: convertedRequest,
-        testResult
-      }, sessionID)
+      if (outboundID) {
+        notificationEmitter.broadcastOutboundProgress({
+          outboundID: outboundID,
+          testCaseId: testCase.id,
+          status: 'SUCCESS',
+          requestId: request.id,
+          response: resp.syncResponse,
+          callback: resp.callback,
+          requestSent: convertedRequest,
+          testResult
+        }, sessionID)
+      }
     } catch (err) {
       const resp = JSON.parse(err.message)
       const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback)
@@ -149,16 +153,18 @@ const processTestCase = async (testCase, traceID, inputValues) => {
         callback: resp.callback,
         request: convertedRequest
       }
-      notificationEmitter.broadcastOutboundProgress({
-        outboundID: outboundID,
-        testCaseId: testCase.id,
-        status: 'ERROR',
-        requestId: request.id,
-        response: resp.syncResponse,
-        callback: resp.callback,
-        requestSent: convertedRequest,
-        testResult
-      }, sessionID)
+      if (outboundID) {
+        notificationEmitter.broadcastOutboundProgress({
+          outboundID: outboundID,
+          testCaseId: testCase.id,
+          status: 'ERROR',
+          requestId: request.id,
+          response: resp.syncResponse,
+          callback: resp.callback,
+          requestSent: convertedRequest,
+          testResult
+        }, sessionID)
+      }
       // break
     }
   }
