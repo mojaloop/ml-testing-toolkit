@@ -49,6 +49,9 @@ const handleRequest = async (context, request, callback, triggerFolder) => {
         outboundTemplate.inputValues.TrsInitiator = transactionRequest.transactionType.initiator
         outboundTemplate.inputValues.TrsInitiatorType = transactionRequest.transactionType.initiatorType
 
+        // Replace the transaction ID from the generated callback
+        outboundTemplate.inputValues.transactionId = callback.body.transactionId
+
         outbound.OutboundSend(outboundTemplate)
       } catch (err) {
         console.log(err)
