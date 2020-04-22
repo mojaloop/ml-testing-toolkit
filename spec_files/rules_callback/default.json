@@ -122,7 +122,11 @@
     "event": {
       "method": "put",
       "path": "/transactionRequests/{ID}",
-      "params": {},
+      "params": {
+        "body": {
+          "transactionRequestState": "RECEIVED"
+        }
+      },
       "delay": 0,
       "type": "MOCK_CALLBACK"
     }
