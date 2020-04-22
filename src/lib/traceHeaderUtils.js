@@ -35,8 +35,13 @@ const getSessionID = (traceID) => {
   return traceID.slice(4, -4)
 }
 
+const getTraceIdPrefix = () => {
+  return customTracePrefix
+}
+
 module.exports = {
   isCustomTraceID,
   getEndToEndID,
-  getSessionID
+  getSessionID,
+  getTraceIdPrefix
 }

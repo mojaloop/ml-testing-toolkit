@@ -132,6 +132,7 @@ const createServer = async (port) => {
         if (request.headers.traceparent) {
           const traceparentHeaderArr = request.headers.traceparent.split('-')
           const traceID = traceparentHeaderArr[1]
+          request.customInfo.traceID = traceID
           if (traceHeaderUtils.isCustomTraceID(traceID)) {
             request.customInfo.endToEndID = traceHeaderUtils.getEndToEndID(traceID)
             request.customInfo.sessionID = traceHeaderUtils.getSessionID(traceID)

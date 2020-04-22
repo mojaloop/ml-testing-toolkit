@@ -26,6 +26,7 @@ const fs = require('fs')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const outbound = require('../../test-outbound/outbound-initiator')
+const TraceHeaderUtils = require('../../traceHeaderUtils')
 
 const handleRequest = async (context, request, callback, triggerFolder) => {
   // Check whether the request is POST /transactionRequests
@@ -51,8 +52,11 @@ const handleRequest = async (context, request, callback, triggerFolder) => {
 
         // Replace the transaction ID from the generated callback
         outboundTemplate.inputValues.transactionId = callback.body.transactionId
-
-        outbound.OutboundSend(outboundTemplate)
+        if (request.customInfo.sessionID) {
+          outbound.OutboundSend(outboundTemplate, TraceHeaderUtils.getTraceIdPrefix() + request.customInfo.sessionID + '0000')
+        } else {
+          outbound.OutboundSend(outboundTemplate)
+        }
       } catch (err) {
         console.log(err)
       }
