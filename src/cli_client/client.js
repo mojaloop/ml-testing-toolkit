@@ -25,7 +25,7 @@ const axios = require('axios').default
 const socketIOClient = require('socket.io-client')
 const fStr = require('node-strings')
 
-const template = require('../../examples/test-cases/p2p_transfer.json')
+const template = require('../../examples/test-cases/dfsp-tests.json')
 
 const sendTemplate = async () => {
   try {
@@ -46,7 +46,7 @@ const handleIncomingProgress = (progress) => {
     const testResultText = progress.testResult.passedCount + '/' + request.tests.assertions.length
     const testResultFailed = progress.testResult.passedCount < request.tests.assertions.length
     console.log(
-      (progress.status === 'SUCCESS' ? fStr.green(progress.status) : fStr.red(progress.status)) +
+      (testResultFailed ? fStr.red('FAILED') : fStr.green('PASSED')) +
       '\t' + (testResultFailed ? fStr.red(testResultText) : fStr.green(testResultText)) +
       '\t' + fStr.italic(fStr.yellow('"' + testCase.name + '"')) + fStr.grey(' -> ') + fStr.cyan(request.method + ' ' + request.operationPath)
     )
