@@ -51,16 +51,58 @@
             "assertions": [
               {
                 "id": 1,
-                "description": "Response should be 202",
+                "description": "Response status to be 202",
                 "exec": [
                   "expect(response.status).to.equal(202)"
                 ]
               },
               {
                 "id": 2,
+                "description": "Response statusText to be Accepted",
+                "exec": [
+                  "expect(response.statusText).to.equal('Accepted')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback Content Length not 0",
+                "exec": [
+                  "expect(callback.headers['Content-Length']).to.not.equal('0')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback FSP Destination equal to request FSP Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers['FSPIOP-Source']}')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "Callback content-type to be parties",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers['Accept']}')"
+                ]
+              },
+              {
+                "id": 6,
                 "description": "Callback body should contain party",
                 "exec": [
                   "expect(callback.body).to.have.property('party')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "Callback body partyIdentifier equal to request param ID",
+                "exec": [
+                  "expect(callback.body.party.partyIdInfo.partyIdentifier).to.equal('{$request.params['ID']}')"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Callback body partyIdType equal to request param Type",
+                "exec": [
+                  "expect(callback.body.party.partyIdInfo.partyIdType).to.equal('{$request.params['Type']}')"
                 ]
               }
             ]
@@ -128,16 +170,65 @@
             "assertions": [
               {
                 "id": 1,
-                "description": "Response should be 202",
+                "description": "Response status to be 202",
                 "exec": [
                   "expect(response.status).to.equal(202)"
                 ]
               },
               {
                 "id": 2,
+                "description": "Response statusText to be Accepted",
+                "exec": [
+                  "expect(response.statusText).to.equal('Accepted')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback Content Length not 0",
+                "exec": [
+                  "expect(callback.headers['Content-Length']).to.not.equal('0')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback FSP Destination equal to request FSP Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers['FSPIOP-Source']}')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "Callback FSP Source equal to request body payer fspId",
+                "exec": [
+                  "expect(callback.headers['fspiop-source']).to.equal('{$request.body.payer.fspId}')"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "Callback content-type to be parties",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers['Accept']}')"
+                ]
+              },
+              {
+                "id": 7,
                 "description": "Callback body should contain transactionRequestState",
                 "exec": [
                   "expect(callback.body).to.have.property('transactionRequestState')"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Callback body should contain transactionId",
+                "exec": [
+                  "expect(callback.body).to.have.property('transactionId')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "Callback body transactionRequestState to be RECEIVED ",
+                "exec": [
+                  "expect(callback.body.transactionRequestState).to.equal('RECEIVED')"
                 ]
               }
             ]
