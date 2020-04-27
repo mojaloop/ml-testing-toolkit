@@ -25,11 +25,11 @@
 'use strict'
 
 const fs = require('fs')
-const JwsSigning = require('../../../src/lib/jws/JwsSigning')
-const Config = require('../../../src/lib/config')
-const ConnectionProvider = require('../../../src/lib/configuration-providers/mb-connection-manager')
-jest.mock('../../../src/lib/config')
-jest.mock('../../../src/lib/configuration-providers/mb-connection-manager')
+const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
+const Config = require('../../../../src/lib/config')
+const ConnectionProvider = require('../../../../src/lib/configuration-providers/mb-connection-manager')
+jest.mock('../../../../src/lib/config')
+jest.mock('../../../../src/lib/configuration-providers/mb-connection-manager')
 
 Config.getUserConfig.mockImplementation(() => {
   return {
