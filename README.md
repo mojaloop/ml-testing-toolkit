@@ -158,7 +158,7 @@ Open the following URLs in your browser and send a transfer from simulator and o
 
 ## 5. Usage
 
-After installation you can follow thsi [Usage Guide](/documents/User-Guide.md)
+After installation you can follow this [Usage Guide](/documents/User-Guide.md)
 
 
 ## 6. Rules
