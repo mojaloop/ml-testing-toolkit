@@ -48,7 +48,7 @@ const handleIncomingProgress = (progress) => {
     console.log(
       (testResultFailed ? fStr.red('FAILED') : fStr.green('PASSED')) +
       '\t' + (testResultFailed ? fStr.red(testResultText) : fStr.green(testResultText)) +
-      '\t' + fStr.italic(fStr.yellow('"' + testCase.name + '"')) + fStr.grey(' -> ') + fStr.cyan(request.method + ' ' + request.operationPath)
+      '\t' + fStr.italic(fStr.yellow('"' + testCase.name + '"')) + fStr.gray(' -> ') + fStr.cyan(request.method + ' ' + request.operationPath)
     )
   }
 }

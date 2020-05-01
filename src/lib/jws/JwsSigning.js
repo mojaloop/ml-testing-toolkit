@@ -28,10 +28,6 @@ const Config = require('../config')
 const { Jws } = require('@mojaloop/sdk-standard-components')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
 
-const loadConfig = (config) => {
-  this.config = config
-}
-
 const validate = (req) => {
   if (Config.getUserConfig().VALIDATE_INBOUND_JWS) {
     if (req.method === 'get') {
@@ -105,7 +101,6 @@ const sign = (req) => {
 }
 
 module.exports = {
-  loadConfig,
   validate,
   sign
 }

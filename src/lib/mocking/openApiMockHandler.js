@@ -59,120 +59,7 @@ module.exports.initilizeMockHandler = async () => {
       definition: path.join(item.specFile),
       strict: true,
       handlers: {
-        notImplemented: async (context, req, h) => {
-          customLogger.logMessage('debug', 'Schema Validation Passed', null, true, req)
-          if (req.method === 'put') {
-            // MyEventEmitter.getTestOutboundEmitter().emit('incoming', req.payload)
-            MyEventEmitter.getTestOutboundEmitter().emit(req.method + ' ' + req.path, req.headers, req.payload)
-            let assertionPath = req.path
-            const assertionData = { headers: req.headers, body: req.payload }
-            if (assertionPath.endsWith('/error')) {
-              assertionPath = assertionPath.replace('/error', '')
-              assertionData.error = true
-            }
-            assertionStore.pushRequest(assertionPath, assertionData)
-            MyEventEmitter.getAssertionRequestEmitter().emit(assertionPath, assertionData)
-          }
-
-          req.customInfo.specFile = item.specFile
-          req.customInfo.jsfRefFile = item.jsfRefFile
-
-          let responseBody, responseStatus
-          // Check for response map file
-          try {
-            const respMapRawdata = await readFileAsync(item.responseMapFile)
-            const responseMap = JSON.parse(respMapRawdata)
-            const responseInfo = responseMap[context.operation.path][context.request.method]
-            if (!responseInfo) {
-              customLogger.logMessage('error', 'Response info not found for method in response map file for ' + context.operation.path + context.request.method, null, true, req)
-              return
-            }
-            req.customInfo.responseInfo = responseInfo
-          } catch (err) {}
-
-          // Check for the synchronous response rules
-          const generatedResponse = await OpenApiRulesEngine.responseRules(context, req)
-          responseStatus = +generatedResponse.status
-          responseBody = generatedResponse.body
-          customLogger.logMessage('info', 'Generated response', generatedResponse, true, req)
-
-          if (!responseBody) {
-            // Generate mock response from openAPI spec file
-            const { status, mock } = context.api.mockResponseForOperation(context.operation.operationId)
-            responseBody = mock
-            responseStatus = +status
-          }
-
-          // Verify that it is a success code, then generate callback and only if the method is post or get
-          if ((req.method === 'post' || req.method === 'get') && responseStatus >= 200 && responseStatus <= 299) {
-            // Generate callback asynchronously
-            setImmediate(async () => {
-              // Getting callback info from callback map file
-              try {
-                const cbMapRawdata = await readFileAsync(item.callbackMapFile)
-                const callbackMap = JSON.parse(cbMapRawdata)
-                if (!callbackMap[context.operation.path]) {
-                  customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, null, true, req)
-                  return
-                }
-                if (!callbackMap[context.operation.path][context.request.method]) {
-                  customLogger.logMessage('error', 'Callback not found for method in callback map file for ' + context.request.method, null, true, req)
-                  return
-                }
-                const callbackInfo = callbackMap[context.operation.path][context.request.method]
-                if (!callbackInfo) {
-                  customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method, null, true, req)
-                  return
-                }
-                req.customInfo.callbackInfo = callbackInfo
-              } catch (err) {
-                customLogger.logMessage('error', 'Callback file not found.', null, true, req)
-                return
-              }
-
-              // Additional validation based on the Json Rules Engine, send error callback on failure
-              const generatedErrorCallback = await OpenApiRulesEngine.validateRules(context, req)
-              if (generatedErrorCallback.body) {
-                // TODO: Handle method and path verifications against the generated ones
-                customLogger.logMessage('error', 'Sending error callback', null, true, req)
-                CallbackHandler.handleCallback(generatedErrorCallback, context, req)
-                return
-              }
-
-              // Handle quotes for transfer association
-              if (Config.getUserConfig().TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
-                require('./middleware-functions/quotesAssociation').handleQuotes(context, req)
-                const matchFound = require('./middleware-functions/quotesAssociation').handleTransfers(context, req)
-                if (!matchFound) {
-                  customLogger.logMessage('error', 'Matching Quote Not Found', null, true, req)
-                  const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
-                  generatedErrorCallback.body = {
-                    errorInformation: {
-                      errorCode: '3208',
-                      errorDescription: 'Provided Transfer ID was not found on the server.'
-                    }
-                  }
-                  CallbackHandler.handleCallback(generatedErrorCallback, context, req)
-                  return
-                }
-              }
-
-              // Callback Rules engine - match the rules and generate the specified callback
-              const generatedCallback = await OpenApiRulesEngine.callbackRules(context, req)
-              if (generatedCallback.body) {
-                // TODO: Handle method and path verifications against the generated ones
-                CallbackHandler.handleCallback(generatedCallback, context, req)
-                // Handle triggers for a transaction request
-                require('./middleware-functions/transactionRequestsService').handleRequest(context, req, generatedCallback, item.triggerTemplatesFolder)
-              }
-            })
-          }
-          if (_.isEmpty(responseBody)) {
-            return h.response().code(responseStatus)
-          } else {
-            return h.response(responseBody).code(responseStatus)
-          }
-        },
+        notImplemented: openApiBackendNotImplementedHandler(item),
         validationFail: async (context, req, h) => {
           const extensionList = [
             {
@@ -309,3 +196,117 @@ const errorResponseBuilder = (errorCode, errorDescription, additionalProperties 
 module.exports.getOpenApiObjects = () => {
   return apis
 }
+
+const openApiBackendNotImplementedHandler = (item) => {
+  return async (context, req, h) => {
+    customLogger.logMessage('debug', 'Schema Validation Passed', null, true, req)
+    if (req.method === 'put') {
+      // MyEventEmitter.getTestOutboundEmitter().emit('incoming', req.payload)
+      MyEventEmitter.getTestOutboundEmitter().emit(req.method + ' ' + req.path, req.headers, req.payload)
+      let assertionPath = req.path
+      const assertionData = { headers: req.headers, body: req.payload }
+      if (assertionPath.endsWith('/error')) {
+        assertionPath = assertionPath.replace('/error', '')
+        assertionData.error = true
+      }
+      assertionStore.pushRequest(assertionPath, assertionData)
+      MyEventEmitter.getAssertionRequestEmitter().emit(assertionPath, assertionData)
+    }
+    req.customInfo.specFile = item.specFile
+    req.customInfo.jsfRefFile = item.jsfRefFile
+    let responseBody, responseStatus
+    // Check for response map file
+    try {
+      const respMapRawdata = await readFileAsync(item.responseMapFile)
+      const responseMap = JSON.parse(respMapRawdata)
+      const responseInfo = responseMap[context.operation.path][context.request.method]
+      if (!responseInfo) {
+        customLogger.logMessage('error', 'Response info not found for method in response map file for ' + context.operation.path + context.request.method, null, true, req)
+        return
+      }
+      req.customInfo.responseInfo = responseInfo
+    } catch (err) { }
+    // Check for the synchronous response rules
+    const generatedResponse = await OpenApiRulesEngine.responseRules(context, req)
+    responseStatus = +generatedResponse.status
+    responseBody = generatedResponse.body
+    customLogger.logMessage('info', 'Generated response', generatedResponse, true, req)
+    if (!responseBody) {
+      // Generate mock response from openAPI spec file
+      const { status, mock } = context.api.mockResponseForOperation(context.operation.operationId)
+      responseBody = mock
+      responseStatus = +status
+    }
+    // Verify that it is a success code, then generate callback and only if the method is post or get
+    if ((req.method === 'post' || req.method === 'get') && responseStatus >= 200 && responseStatus <= 299) {
+      // Generate callback asynchronously
+      setImmediate(generateAsyncCallback, item, context, req)
+    }
+    if (_.isEmpty(responseBody)) {
+      return h.response().code(responseStatus)
+    } else {
+      return h.response(responseBody).code(responseStatus)
+    }
+  }
+}
+
+const generateAsyncCallback = async (item, context, req) => {
+  // Getting callback info from callback map file
+  try {
+    const cbMapRawdata = await readFileAsync(item.callbackMapFile)
+    const callbackMap = JSON.parse(cbMapRawdata)
+    if (!callbackMap[context.operation.path]) {
+      customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, null, true, req)
+      return
+    }
+    if (!callbackMap[context.operation.path][context.request.method]) {
+      customLogger.logMessage('error', 'Callback not found for method in callback map file for ' + context.request.method, null, true, req)
+      return
+    }
+    const callbackInfo = callbackMap[context.operation.path][context.request.method]
+    if (!callbackInfo) {
+      customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method, null, true, req)
+      return
+    }
+    req.customInfo.callbackInfo = callbackInfo
+  } catch (err) {
+    customLogger.logMessage('error', 'Callback file not found.', null, true, req)
+    return
+  }
+  // Additional validation based on the Json Rules Engine, send error callback on failure
+  const generatedErrorCallback = await OpenApiRulesEngine.validateRules(context, req)
+  if (generatedErrorCallback.body) {
+    // TODO: Handle method and path verifications against the generated ones
+    customLogger.logMessage('error', 'Sending error callback', null, true, req)
+    CallbackHandler.handleCallback(generatedErrorCallback, context, req)
+    return
+  }
+  // Handle quotes for transfer association
+  if (Config.getUserConfig().TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
+    require('./middleware-functions/quotesAssociation').handleQuotes(context, req)
+    const matchFound = require('./middleware-functions/quotesAssociation').handleTransfers(context, req)
+    if (!matchFound) {
+      customLogger.logMessage('error', 'Matching Quote Not Found', null, true, req)
+      const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
+      generatedErrorCallback.body = {
+        errorInformation: {
+          errorCode: '3208',
+          errorDescription: 'Provided Transfer ID was not found on the server.'
+        }
+      }
+      CallbackHandler.handleCallback(generatedErrorCallback, context, req)
+      return
+    }
+  }
+  // Callback Rules engine - match the rules and generate the specified callback
+  const generatedCallback = await OpenApiRulesEngine.callbackRules(context, req)
+  if (generatedCallback.body) {
+    // TODO: Handle method and path verifications against the generated ones
+    CallbackHandler.handleCallback(generatedCallback, context, req)
+    // Handle triggers for a transaction request
+    require('./middleware-functions/transactionRequestsService').handleRequest(context, req, generatedCallback, item.triggerTemplatesFolder)
+  }
+}
+
+module.exports.openApiBackendNotImplementedHandler = openApiBackendNotImplementedHandler
+module.exports.generateAsyncCallback = generateAsyncCallback
