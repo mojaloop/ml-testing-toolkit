@@ -21,56 +21,20 @@
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
+
 'use strict'
 
-const Package = require('../package')
-const Config = require('./lib/config')
-const Inert = require('@hapi/inert')
-const Vision = require('@hapi/vision')
-const Blipp = require('blipp')
+const Server = require('../../src/server')
 
-const registerPlugins = async (server) => {
-  await server.register({
-    plugin: require('hapi-swagger'),
-    options: {
-      info: {
-        title: server.info.port === Config.API_PORT ? 'ALS API Swagger Documentation' : 'ALS Admin Swagger Documentation',
-        version: Package.version
-      }
-    }
+describe('Server', () => {
+  describe('initialize', () => {
+    it('initialize should not throw an error', async () => {
+      await expect(Server.initialize()).resolves.toBeTruthy()
+    })
   })
-
-  await server.register({
-    plugin: require('@hapi/good'),
-    options: {
-      ops: {
-        interval: 10000
-      }
-    }
+  describe('restartServer', () => {
+    it('restartServer should not throw an error', async () => {
+      await expect(Server.restartServer()).resolves.toBeUndefined()
+    })
   })
-
-  await server.register({
-    plugin: require('@hapi/basic')
-  })
-
-  await server.register({
-    plugin: require('@now-ims/hapi-now-auth')
-  })
-
-  await server.register({
-    plugin: require('hapi-auth-bearer-token')
-  })
-
-  await server.register([
-    Inert,
-    Vision
-  ])
-
-  if (Config.DISPLAY_ROUTES === true) {
-    await server.register([Blipp])
-  }
-}
-
-module.exports = {
-  registerPlugins
-}
+})

@@ -31,8 +31,8 @@ jest.mock('../../../../src/lib/config')
 
 Config.getUserConfig.mockImplementation(() => {
   return {
-    JWS_SIGN: false,
-    VALIDATE_INBOUND_JWS: false,
+    JWS_SIGN: true,
+    VALIDATE_INBOUND_JWS: true,
     OUTBOUND_MUTUAL_TLS_ENABLED: true,
     INBOUND_MUTUAL_TLS_ENABLED: true,
     CONNECTION_MANAGER_API_URL: ''
@@ -93,6 +93,18 @@ axios.post.mockImplementation((url) => {
       })
       break
 
+      // Upload Testing Toolkit JWS certs
+    case '/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts':
+      return Promise.resolve({
+          status: 200,
+          data: {
+            rootCertificate: 'asdf',
+            intermediateChain: 'asdf',
+            jwsCertificate: 'asdf'
+          }
+      })
+      break
+
     default:
       return Promise.reject(new Error('not found'))
   }
@@ -126,6 +138,19 @@ axios.get.mockImplementation((url) => {
       })
       break
 
+    // Get User DFSP JWS certs
+    case '/api/environments/1/dfsps/userdfsp/jwscerts':
+      return Promise.resolve({
+          status: 200,
+          data: {
+            id: 1,
+            rootCertificate: 'asdf',
+            intermediateChain: 'asdf',
+            jwsCertificate: 'asdf'
+          }
+      })
+      break
+
     default:
       return Promise.reject(new Error('not found'))
   }
@@ -147,6 +172,24 @@ describe('mb-connection-manager', () => {
       expect(tlsConfig).toHaveProperty('hubServerCert')
       expect(tlsConfig).toHaveProperty('hubServerKey')
       expect(tlsConfig).toHaveProperty('hubClientKey')
+    })
+  })
+  describe('getTestingToolkitDfspJWSCerts', () => {
+    it('should return certificate value', async () => {
+      const dfspJwsCerts = MBConnectionManagerProvider.getTestingToolkitDfspJWSCerts()
+      expect(dfspJwsCerts).toEqual('asdf')
+    })
+  })
+  describe('getUserDfspJWSCerts', () => {
+    it('should return certificate value', async () => {
+      const dfspJwsCerts = MBConnectionManagerProvider.getUserDfspJWSCerts()
+      expect(dfspJwsCerts).toEqual('asdf')
+    })
+  })
+  describe('getTestingToolkitDfspJWSPrivateKey', () => {
+    it('should return certificate value', async () => {
+      const dfspJwsCerts = MBConnectionManagerProvider.getTestingToolkitDfspJWSPrivateKey()
+      expect(dfspJwsCerts).toBeTruthy()
     })
   })
   describe('waitForTlsHubCerts', () => {
