@@ -412,6 +412,72 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Quote happy path",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "71ba6b27-7b12-4248-b38d-ced6eea02ba1",
+								"exec": [
+									"var uuid = require('uuid');",
+									"var generatedUUID = uuid.v4();",
+									"pm.environment.set('quoteId', generatedUUID);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "a0199f4a-5101-41ae-936a-95876d73d460",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{dateHeader}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "payerfsp"
+							},
+							{
+								"key": "FSPIOP-Destination",
+								"value": "payeefsp"
+							}
+						],
+						"url": {
+							"raw": "{{HOST_QUOTING_SERVICE}}/quotes/{{quoteId}}",
+							"host": [
+								"{{HOST_QUOTING_SERVICE}}"
+							],
+							"path": [
+								"quotes",
+								"{{quoteId}}"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"description": "Author: Sridevi Miriyala",
@@ -461,6 +527,103 @@
 							"listen": "prerequest",
 							"script": {
 								"id": "20820c95-0a24-4906-a6ba-708d6ecf4a61",
+								"exec": [
+									"var uuid = require('uuid');",
+									"var generatedUUID = uuid.v4();",
+									"",
+									"pm.environment.set('transfer_ID', generatedUUID);",
+									"pm.environment.set('transferDate', (new Date()).toUTCString());",
+									"pm.environment.set(\"transferExpiration\",new Date(new Date().getTime() + 600000))",
+									"pm.environment.set('transferAmount', 50);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{WSO2_AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.transfers+json;version=1"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.transfers+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{transferDate}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "{{payerfsp}}"
+							},
+							{
+								"key": "FSPIOP-Destination",
+								"value": "{{payeefsp}}"
+							},
+							{
+								"key": "FSPIOP-Signature",
+								"value": "{{fspiop-signature}}",
+								"type": "text"
+							},
+							{
+								"key": "FSPIOP-URI",
+								"value": "/transfers",
+								"type": "text"
+							},
+							{
+								"key": "FSPIOP-HTTP-Method",
+								"value": "POST",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"transferId\": \"{{transfer_ID}}\",\n  \"payerFsp\": \"{{payerfsp}}\",\n  \"payeeFsp\": \"{{payeefsp}}\",\n  \"amount\": {\n    \"amount\": \"{{transferAmount}}\",\n    \"currency\": \"{{currency}}\"\n  },\n  \"expiration\": \"{{transferExpiration}}\",\n  \"ilpPacket\": \"{{ilpPacket}}\",\n  \"condition\": \"{{condition}}\"\n}"
+						},
+						"url": {
+							"raw": "{{HOST_SWITCH_TRANSFERS}}{{BASE_PATH_SWITCH_TRANSFERS}}/transfers",
+							"host": [
+								"{{HOST_SWITCH_TRANSFERS}}{{BASE_PATH_SWITCH_TRANSFERS}}"
+							],
+							"path": [
+								"transfers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Transfer Happy Path Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dd26c8bc-80fc-4fd4-94f0-8aeebca99504",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "acf606f3-df75-4428-80ff-28b3aeec4aba",
 								"exec": [
 									"var uuid = require('uuid');",
 									"var generatedUUID = uuid.v4();",
@@ -961,6 +1124,72 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Transfer Happy Path",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "fed25f87-0c3b-4df6-a13b-2a69b3025fa5",
+								"exec": [
+									"var uuid = require('uuid');",
+									"var generatedUUID = uuid.v4();",
+									"pm.environment.set('transferId', generatedUUID);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "b362e5fd-6781-43c6-a57f-984eeb09e73d",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{dateHeader}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "payerfsp"
+							},
+							{
+								"key": "FSPIOP-Destination",
+								"value": "payeefsp"
+							}
+						],
+						"url": {
+							"raw": "{{HOST_QUOTING_SERVICE}}/transfers/{{transferId}}",
+							"host": [
+								"{{HOST_QUOTING_SERVICE}}"
+							],
+							"path": [
+								"transfers",
+								"{{transferId}}"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"description": "Author: Sridevi Miriyala",
@@ -1222,6 +1451,455 @@
 								"parties",
 								"MSISDN",
 								"{{pathfinderMSISDN}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Participants By Type and ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "95582be5-a2c2-4a86-bafb-c612234e5bdf",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.participants+json;version=1"
+							},
+							{
+								"key": "Connection",
+								"value": "keep-alive"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.participants+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{transferDate}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "payeefsp"
+							},
+							{
+								"key": "Postman-Token",
+								"value": "7aa4c9f3-1738-49f0-8904-7821e2336692,4127ff87-7d17-483c-8e3e-f0b562a16d84"
+							},
+							{
+								"key": "User-Agent",
+								"value": "PostmanRuntime/7.11.0"
+							},
+							{
+								"key": "accept-encoding",
+								"value": "gzip, deflate"
+							},
+							{
+								"key": "cache-control",
+								"value": "no-cache"
+							}
+						],
+						"url": {
+							"raw": "{{HOST_ACCOUNT_LOOKUP_SERVICE}}/participants/MSISDN/{{pathfinderMSISDN}}",
+							"host": [
+								"{{HOST_ACCOUNT_LOOKUP_SERVICE}}"
+							],
+							"path": [
+								"participants",
+								"MSISDN",
+								"{{pathfinderMSISDN}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Participants By Type, SubId and ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "31ccc420-2849-44cd-80a5-2fe59b6dbeaa",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.participants+json;version=1"
+							},
+							{
+								"key": "Connection",
+								"value": "keep-alive"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.participants+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{transferDate}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "payeefsp"
+							},
+							{
+								"key": "Postman-Token",
+								"value": "7aa4c9f3-1738-49f0-8904-7821e2336692,4127ff87-7d17-483c-8e3e-f0b562a16d84"
+							},
+							{
+								"key": "User-Agent",
+								"value": "PostmanRuntime/7.11.0"
+							},
+							{
+								"key": "accept-encoding",
+								"value": "gzip, deflate"
+							},
+							{
+								"key": "cache-control",
+								"value": "no-cache"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"currency\": \"USD\"\n}"
+						},
+						"url": {
+							"raw": "{{HOST_ACCOUNT_LOOKUP_SERVICE}}/participants/MSISDN/{{pathfinderMSISDN}}",
+							"host": [
+								"{{HOST_ACCOUNT_LOOKUP_SERVICE}}"
+							],
+							"path": [
+								"participants",
+								"MSISDN",
+								"{{pathfinderMSISDN}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Participant By Type, SubId and ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c561f2f4-fff0-47f8-b43e-778b9a5e64ee",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.participants+json;version=1"
+							},
+							{
+								"key": "Connection",
+								"value": "keep-alive"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.participants+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{transferDate}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "payeefsp"
+							},
+							{
+								"key": "Postman-Token",
+								"value": "7aa4c9f3-1738-49f0-8904-7821e2336692,4127ff87-7d17-483c-8e3e-f0b562a16d84"
+							},
+							{
+								"key": "User-Agent",
+								"value": "PostmanRuntime/7.11.0"
+							},
+							{
+								"key": "accept-encoding",
+								"value": "gzip, deflate"
+							},
+							{
+								"key": "cache-control",
+								"value": "no-cache"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"fspId\": \"fsp1\",\n    \"currency\": \"USD\"\n}"
+						},
+						"url": {
+							"raw": "{{HOST_ACCOUNT_LOOKUP_SERVICE}}/participants/MSISDN/shoecompany/{{pathfinderMSISDN}}",
+							"host": [
+								"{{HOST_ACCOUNT_LOOKUP_SERVICE}}"
+							],
+							"path": [
+								"participants",
+								"MSISDN",
+								"shoecompany",
+								"{{pathfinderMSISDN}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Participant By Type and ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "08622785-32d6-48c7-9723-8bd7927fb4e3",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.participants+json;version=1"
+							},
+							{
+								"key": "Connection",
+								"value": "keep-alive"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.participants+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{transferDate}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "payeefsp"
+							},
+							{
+								"key": "Postman-Token",
+								"value": "7aa4c9f3-1738-49f0-8904-7821e2336692,4127ff87-7d17-483c-8e3e-f0b562a16d84"
+							},
+							{
+								"key": "User-Agent",
+								"value": "PostmanRuntime/7.11.0"
+							},
+							{
+								"key": "accept-encoding",
+								"value": "gzip, deflate"
+							},
+							{
+								"key": "cache-control",
+								"value": "no-cache"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"fspId\": \"fsp1\",\n    \"currency\": \"USD\"\n}"
+						},
+						"url": {
+							"raw": "{{HOST_ACCOUNT_LOOKUP_SERVICE}}/participants/MSISDN/{{pathfinderMSISDN}}",
+							"host": [
+								"{{HOST_ACCOUNT_LOOKUP_SERVICE}}"
+							],
+							"path": [
+								"participants",
+								"MSISDN",
+								"{{pathfinderMSISDN}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Party Receiver by SubId Happy path",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6f30ae19-aa12-45f4-99f7-b74a5726efd0",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "05c8c884-77c0-4857-a8d5-0e2b3a8a9abb",
+								"exec": [
+									"pm.variables.set('expectedFullName', 'Siabelo Maroka');",
+									"pm.variables.set('expectedFirstName', 'Siabelo');",
+									"pm.variables.set('expectedLastName', 'Maroka');",
+									"pm.variables.set('expectedDOB', '3/3/1973');",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.parties+json;version=1",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.parties+json;version=1.0",
+								"type": "text"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "{{payerfsp}}",
+								"type": "text"
+							},
+							{
+								"key": "Date",
+								"value": "{{dateHeader}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{HOST_ACCOUNT_LOOKUP_SERVICE}}/parties/MSISDN/{{pathfinderMSISDN}}",
+							"host": [
+								"{{HOST_ACCOUNT_LOOKUP_SERVICE}}"
+							],
+							"path": [
+								"parties",
+								"MSISDN",
+								"{{pathfinderMSISDN}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Participants",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "28e389c2-6f44-45c9-8f64-f7a8e99661c5",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b3e4faa7-f837-4e8e-975e-a9c7f7749407",
+								"exec": [
+									"var uuid = require('uuid');",
+									"pm.environment.set('requestId', uuid.v4());"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.participants+json;version=1"
+							},
+							{
+								"key": "Connection",
+								"value": "keep-alive"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.participants+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{transferDate}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "payeefsp"
+							},
+							{
+								"key": "Postman-Token",
+								"value": "7aa4c9f3-1738-49f0-8904-7821e2336692,4127ff87-7d17-483c-8e3e-f0b562a16d84"
+							},
+							{
+								"key": "User-Agent",
+								"value": "PostmanRuntime/7.11.0"
+							},
+							{
+								"key": "accept-encoding",
+								"value": "gzip, deflate"
+							},
+							{
+								"key": "cache-control",
+								"value": "no-cache"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"requestId\": \"{{requestId}}\",\r\n  \"partyList\": [\r\n    {\r\n      \"partyIdType\": \"MSISDN\",\r\n      \"partyIdentifier\": \"string\",\r\n      \"partySubIdOrType\": \"string\",\r\n      \"fspId\": \"string\"\r\n    }\r\n  ],\r\n  \"currency\": \"AED\"\r\n}"
+						},
+						"url": {
+							"raw": "{{HOST_ACCOUNT_LOOKUP_SERVICE}}/participants",
+							"host": [
+								"{{HOST_ACCOUNT_LOOKUP_SERVICE}}"
+							],
+							"path": [
+								"participants"
 							]
 						}
 					},
@@ -2613,6 +3291,432 @@
 							""
 						]
 					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Authorization Requests",
+			"item": [
+				{
+					"name": "request the Payer to enter the applicable credentials",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8f4897da-18cb-4195-95b1-582b13ba0677",
+								"exec": [
+									"var uuid = require('uuid');",
+									"var generatedUUID = uuid.v4();",
+									"pm.environment.set('transactionRequestsId', generatedUUID);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "15dc16b3-7238-4a57-8f3d-a84d3a831334",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{dateHeader}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "payerfsp"
+							},
+							{
+								"key": "FSPIOP-Destination",
+								"value": "payeefsp"
+							}
+						],
+						"url": {
+							"raw": "{{HOST_QUOTING_SERVICE}}/authorizations/{{transactionRequestsId}}",
+							"host": [
+								"{{HOST_QUOTING_SERVICE}}"
+							],
+							"path": [
+								"authorizations",
+								"{{transactionRequestsId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "BulkQuote Requests",
+			"item": [
+				{
+					"name": "request the creation of a bulk quote",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "36893df3-4cd3-424c-9f6c-f1e42a5bd989",
+								"exec": [
+									"var uuid = require('uuid');",
+									"pm.environment.set('bulkQuoteId', uuid.v4());",
+									"pm.environment.set('transactionId', uuid.v4());",
+									"pm.environment.set('quoteId', uuid.v4());",
+									"pm.environment.set('originalTransactionId', uuid.v4());",
+									"pm.environment.set('expiration', new Date().toISOString());",
+									"pm.environment.set('merchantClassificationCode', _.random(0, 9999));",
+									"pm.environment.set('balanceOfPayments', _.random(100, 999));",
+									"pm.environment.set('latitude', _.random(-90,90))",
+									"pm.environment.set('longitude', _.random(-180, 90))"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "65433afb-5284-451d-a038-df0de5808b00",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{dateHeader}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "payerfsp"
+							},
+							{
+								"key": "FSPIOP-Destination",
+								"value": "payeefsp"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"bulkQuoteId\": \"{{bulkQuoteId}}\",\r\n  \"payer\": {\r\n    \"partyIdInfo\": {\r\n      \"partyIdType\": \"MSISDN\",\r\n      \"partyIdentifier\": \"string\",\r\n      \"partySubIdOrType\": \"string\",\r\n      \"fspId\": \"string\"\r\n    },\r\n    \"merchantClassificationCode\": \"{{merchantClassificationCode}}\",\r\n    \"name\": \"string\",\r\n    \"personalInfo\": {\r\n      \"complexName\": {\r\n        \"firstName\": \"string\",\r\n        \"middleName\": \"string\",\r\n        \"lastName\": \"string\"\r\n      },\r\n      \"dateOfBirth\": \"1999-01-01\"\r\n    }\r\n  },\r\n  \"geoCode\": {\r\n    \"latitude\": \"{{latitude}}\",\r\n    \"longitude\": \"{{longitude}}\"\r\n  },\r\n  \"expiration\": \"{{expiration}}\",\r\n  \"individualQuotes\": [\r\n    {\r\n      \"quoteId\": \"{{quoteId}}\",\r\n      \"transactionId\": \"{{transactionId}}\",\r\n      \"payee\": {\r\n        \"partyIdInfo\": {\r\n          \"partyIdType\": \"MSISDN\",\r\n          \"partyIdentifier\": \"string\",\r\n          \"partySubIdOrType\": \"string\",\r\n          \"fspId\": \"string\"\r\n        },\r\n        \"merchantClassificationCode\": \"{{merchantClassificationCode}}\",\r\n        \"name\": \"string\",\r\n        \"personalInfo\": {\r\n          \"complexName\": {\r\n            \"firstName\": \"string\",\r\n            \"middleName\": \"string\",\r\n            \"lastName\": \"string\"\r\n          },\r\n          \"dateOfBirth\": \"1999-01-01\"\r\n        }\r\n      },\r\n      \"amountType\": \"SEND\",\r\n      \"amount\": {\r\n        \"currency\": \"AED\",\r\n        \"amount\": \"100\"\r\n      },\r\n      \"fees\": {\r\n        \"currency\": \"AED\",\r\n        \"amount\": \"100\"\r\n      },\r\n      \"transactionType\": {\r\n        \"scenario\": \"DEPOSIT\",\r\n        \"subScenario\": \"A_Z\",\r\n        \"initiator\": \"PAYER\",\r\n        \"initiatorType\": \"CONSUMER\",\r\n        \"refundInfo\": {\r\n          \"originalTransactionId\": \"{{originalTransactionId}}\",\r\n          \"refundReason\": \"string\"\r\n        },\r\n        \"balanceOfPayments\": \"{{balanceOfPayments}}\"\r\n      },\r\n      \"note\": \"string\",\r\n      \"extensionList\": {\r\n        \"extension\": [\r\n          {\r\n            \"key\": \"string\",\r\n            \"value\": \"string\"\r\n          }\r\n        ]\r\n      }\r\n    }\r\n  ],\r\n  \"extensionList\": {\r\n    \"extension\": [\r\n      {\r\n        \"key\": \"string\",\r\n        \"value\": \"string\"\r\n      }\r\n    ]\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "{{HOST_QUOTING_SERVICE}}/bulkQuotes",
+							"host": [
+								"{{HOST_QUOTING_SERVICE}}"
+							],
+							"path": [
+								"bulkQuotes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get information regarding an earlier created or requested bulk quote",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "6a05323c-3fae-4fb6-9647-5ea0fc6fce7a",
+								"exec": [
+									"var uuid = require('uuid');",
+									"pm.environment.set('bulkQuoteId', uuid.v4());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "97cf7435-419a-4883-a929-3b2172999a72",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{dateHeader}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "payerfsp"
+							},
+							{
+								"key": "FSPIOP-Destination",
+								"value": "payeefsp"
+							}
+						],
+						"url": {
+							"raw": "{{HOST_QUOTING_SERVICE}}/bulkQuotes/{{bulkQuoteId}}",
+							"host": [
+								"{{HOST_QUOTING_SERVICE}}"
+							],
+							"path": [
+								"bulkQuotes",
+								"{{bulkQuoteId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "BulkTransfer Requests",
+			"item": [
+				{
+					"name": "request the creation of a bulk transfer",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "842f7fa6-aa4c-448f-aca1-fd581ec6a359",
+								"exec": [
+									"var uuid = require('uuid');",
+									"pm.environment.set('bulkQuoteId', uuid.v4());",
+									"pm.environment.set('bulkTransferId', uuid.v4());",
+									"pm.environment.set('expiration', new Date().toISOString());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "cdb2065c-6b79-40cd-b431-93a5b6a92150",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{dateHeader}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "payerfsp"
+							},
+							{
+								"key": "FSPIOP-Destination",
+								"value": "payeefsp"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"bulkTransferId\": \"{{bulkTransferId}}\",\r\n  \"bulkQuoteId\": \"{{bulkQuoteId}}\",\r\n  \"payerFsp\": \"string\",\r\n  \"payeeFsp\": \"string\",\r\n  \"individualTransfers\": [\r\n    {\r\n      \"transferId\": \"{{transferId}}\",\r\n      \"transferAmount\": {\r\n        \"currency\": \"AED\",\r\n        \"amount\": \"100\"\r\n      },\r\n      \"ilpPacket\": \"string\",\r\n      \"condition\": \"condition1_condition2_condition3_condition4\",\r\n      \"extensionList\": {\r\n        \"extension\": [\r\n          {\r\n            \"key\": \"string\",\r\n            \"value\": \"string\"\r\n          }\r\n        ]\r\n      }\r\n    }\r\n  ],\r\n  \"expiration\": \"{{expiration}}\",\r\n  \"extensionList\": {\r\n    \"extension\": [\r\n      {\r\n        \"key\": \"string\",\r\n        \"value\": \"string\"\r\n      }\r\n    ]\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "{{HOST_QUOTING_SERVICE}}/bulkTransfers",
+							"host": [
+								"{{HOST_QUOTING_SERVICE}}"
+							],
+							"path": [
+								"bulkTransfers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get information regarding an earlier created or requested bulk transfer",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "5fbb3cb0-68d3-4ae7-b695-7dfe4ab14431",
+								"exec": [
+									"var uuid = require('uuid');",
+									"pm.environment.set('bulkTransferId', uuid.v4());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "47049fc6-a814-47d5-973f-047939828b22",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{dateHeader}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "payerfsp"
+							},
+							{
+								"key": "FSPIOP-Destination",
+								"value": "payeefsp"
+							}
+						],
+						"url": {
+							"raw": "{{HOST_QUOTING_SERVICE}}/bulkTransfers/{{bulkTransferId}}",
+							"host": [
+								"{{HOST_QUOTING_SERVICE}}"
+							],
+							"path": [
+								"bulkTransfers",
+								"{{bulkTransferId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Transaction Requests",
+			"item": [
+				{
+					"name": "get transaction information regarding a financial transaction created earlier",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0d5c06dc-21d9-4fcc-bef0-1264adeccc43",
+								"exec": [
+									"var uuid = require('uuid');",
+									"pm.environment.set('ID', uuid.v4());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "51097182-567d-4d80-b6e5-f86c457d671c",
+								"exec": [
+									"pm.test(\"Status code is 202\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.interoperability.quotes+json;version=1.0"
+							},
+							{
+								"key": "Date",
+								"value": "{{dateHeader}}"
+							},
+							{
+								"key": "FSPIOP-Source",
+								"value": "payerfsp"
+							},
+							{
+								"key": "FSPIOP-Destination",
+								"value": "payeefsp"
+							}
+						],
+						"url": {
+							"raw": "{{HOST_QUOTING_SERVICE}}/transactions/{{ID}}",
+							"host": [
+								"{{HOST_QUOTING_SERVICE}}"
+							],
+							"path": [
+								"transactions",
+								"{{ID}}"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
