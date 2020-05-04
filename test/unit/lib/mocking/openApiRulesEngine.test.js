@@ -29,6 +29,8 @@ const OpenApiRulesEngine = require('../../../../src/lib/mocking/openApiRulesEngi
 const rulesEngineModel = require('../../../../src/lib/rulesEngineModel')
 jest.mock('../../../../src/lib/rulesEngineModel')
 
+jest.setTimeout(30000)
+
 rulesEngineModel.getValidationRulesEngine.mockImplementation(() => {
   const evaluateFn = async (facts) => {
     if (facts.method === 'get') {

@@ -26,6 +26,8 @@
 
 const Server = require('../../src/server')
 
+jest.setTimeout(30000)
+
 describe('Server', () => {
   describe('initialize', () => {
     it('initialize should not throw an error', async () => {
