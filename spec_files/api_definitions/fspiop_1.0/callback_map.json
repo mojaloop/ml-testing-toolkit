@@ -436,7 +436,7 @@
     }
   },
   "/bulkQuotes/{ID}": {
-    "post": {
+    "get": {
       "successCallback": {
         "method": "put",
         "path": "/bulkQuotes/{ID}",
@@ -488,7 +488,7 @@
     }
   },
   "/bulkTransfers/{ID}": {
-    "post": {
+    "get": {
       "successCallback": {
         "method": "put",
         "path": "/bulkTransfers/{ID}",

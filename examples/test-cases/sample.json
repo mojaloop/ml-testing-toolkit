@@ -15,7 +15,8 @@
     "contentType": "application/vnd.interoperability.parties+json;version=1.0",
     "toIdValue": "9848613613",
     "toIdType": "MSISDN",
-    "toFspId": "userdfsp"
+    "toFspId": "userdfsp",
+    "toIdSubId": "shoecompany"
   },
   "test_cases": [
     {
@@ -290,6 +291,4704 @@
                 "description": "Callback error should be 3200",
                 "exec": [
                   "expect(callback.body.errorInformation.errorCode).to.equal('3200')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "get participants by Type,ID and SubId",
+      "requests": [
+        {
+          "id": 1,
+          "description": "success",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}/{SubId}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body to have property fspId",
+                "exec": [
+                  "expect(callback.body).to.have.property('fspId')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback header Content-Type to be request Accept header",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers.Accept}')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback header FSPIOP-destination to be request FSPIOP-Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers.FSPIOP-Source}')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "missing accept header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}/{SubId}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3001",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "missing FSPIOP-Source header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}/{SubId}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "description": "missing Date header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}/{SubId}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "description": "missing Content-Type header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}/{SubId}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "get participants by Type and ID",
+      "requests": [
+        {
+          "id": 1,
+          "description": "success",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body to have property fspId",
+                "exec": [
+                  "expect(callback.body).to.have.property('fspId')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback header Content-Type to be request Accept header",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers.Accept}')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback header FSPIOP-destination to be request FSPIOP-Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers.FSPIOP-Source}')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "missing accept header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3001",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "missing FSPIOP-Source header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "description": "missing Date header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "description": "missing Content-Type header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "create participant by Type, ID and SubId",
+      "requests": [
+        {
+          "id": 1,
+          "description": "success",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}/{SubId}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "post",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "body": {
+            "fspId": "nulla",
+            "currency": "AFN"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body to have property fspId",
+                "exec": [
+                  "expect(callback.body).to.have.property('fspId')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback header Content-Type to be request Accept header",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers.Accept}')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback header FSPIOP-destination to be request FSPIOP-Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers.FSPIOP-Source}')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "missing Accept header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}/{SubId}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "post",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "body": {
+            "fspId": "nulla",
+            "currency": "AFN"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3001",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "missing FSPIOP-Source header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}/{SubId}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "post",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "body": {
+            "currency": "AFN"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "description": "missing Date header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}/{SubId}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "post",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "body": {
+            "fspId": "nulla",
+            "currency": "AFN"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "description": "missing Content-Type header - BUG",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}/{SubId}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "post",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "body": {
+            "fspId": "nulla",
+            "currency": "AFN"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 6,
+          "description": "missing required field fspId",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}/{SubId}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "post",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "body": {
+            "currency": "AFN"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "create participant by Type and ID",
+      "requests": [
+        {
+          "id": 1,
+          "description": "success",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}",
+          "method": "post",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          },
+          "body": {
+            "fspId": "deserunt sed lab",
+            "currency": "ISK"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body to have property fspId",
+                "exec": [
+                  "expect(callback.body).to.have.property('fspId')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback header Content-Type to be request Accept header",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers.Accept}')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback header FSPIOP-destination to be request FSPIOP-Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers.FSPIOP-Source}')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "missing Accept header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}",
+          "method": "post",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "body": {
+            "fspId": "nulla",
+            "currency": "AFN"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3001",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "missing FSPIOP-Source header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}",
+          "method": "post",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "body": {
+            "currency": "AFN"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "description": "missing Date header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}",
+          "method": "post",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "body": {
+            "fspId": "nulla",
+            "currency": "AFN"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "description": "missing Content-Type header - BUG",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}",
+          "method": "post",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "body": {
+            "fspId": "nulla",
+            "currency": "AFN"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 6,
+          "description": "missing required field fspId",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}",
+          "path": "/participants/{$inputs.fromIdType}/{$inputs.toIdValue}",
+          "method": "post",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "body": {
+            "currency": "AFN"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "create participants",
+      "requests": [
+        {
+          "id": 1,
+          "description": "success",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants",
+          "path": "/participants",
+          "method": "post",
+          "body": {
+            "requestId": "{$function.generic.generateUUID}",
+            "partyList": [
+              {
+                "partyIdType": "ACCOUNT_ID",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "partySubIdOrType": "{$inputs.toIdSubId}",
+                "fspId": "dolor consect"
+              },
+              {
+                "partyIdType": "EMAIL",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "partySubIdOrType": "{$inputs.toIdSubId}",
+                "fspId": "Duis officia Except"
+              }
+            ],
+            "currency": "LAK"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body to have property partyList",
+                "exec": [
+                  "expect(callback.body).to.have.property('partyList')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback header Content-Type to be request Accept header",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers.Accept}')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback header FSPIOP-destination to be request FSPIOP-Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers.FSPIOP-Source}')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "missing Accept header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants",
+          "path": "/participants",
+          "method": "post",
+          "params": {},
+          "body": {
+            "requestId": "{$function.generic.generateUUID}",
+            "partyList": [
+              {
+                "partyIdType": "ACCOUNT_ID",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "partySubIdOrType": "{$inputs.toIdSubId}",
+                "fspId": "dolor consect"
+              },
+              {
+                "partyIdType": "EMAIL",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "partySubIdOrType": "{$inputs.toIdSubId}",
+                "fspId": "Duis officia Except"
+              }
+            ],
+            "currency": "LAK"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3001",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "missing FSPIOP-Source header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants",
+          "path": "/participants",
+          "method": "post",
+          "params": {},
+          "body": {
+            "requestId": "{$function.generic.generateUUID}",
+            "partyList": [
+              {
+                "partyIdType": "ACCOUNT_ID",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "partySubIdOrType": "{$inputs.toIdSubId}",
+                "fspId": "dolor consect"
+              },
+              {
+                "partyIdType": "EMAIL",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "partySubIdOrType": "{$inputs.toIdSubId}",
+                "fspId": "Duis officia Except"
+              }
+            ],
+            "currency": "LAK"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "description": "missing Date header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants",
+          "path": "/participants",
+          "method": "post",
+          "params": {},
+          "body": {
+            "requestId": "{$function.generic.generateUUID}",
+            "partyList": [
+              {
+                "partyIdType": "ACCOUNT_ID",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "partySubIdOrType": "{$inputs.toIdSubId}",
+                "fspId": "dolor consect"
+              },
+              {
+                "partyIdType": "EMAIL",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "partySubIdOrType": "{$inputs.toIdSubId}",
+                "fspId": "Duis officia Except"
+              }
+            ],
+            "currency": "LAK"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "description": "missing Content-Type header - BUG",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants",
+          "path": "/participants",
+          "method": "post",
+          "params": {},
+          "body": {
+            "requestId": "{$function.generic.generateUUID}",
+            "partyList": [
+              {
+                "partyIdType": "ACCOUNT_ID",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "partySubIdOrType": "{$inputs.toIdSubId}",
+                "fspId": "dolor consect"
+              },
+              {
+                "partyIdType": "EMAIL",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "partySubIdOrType": "{$inputs.toIdSubId}",
+                "fspId": "Duis officia Except"
+              }
+            ],
+            "currency": "LAK"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 6,
+          "description": "requestId wrong pattern",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants",
+          "path": "/participants",
+          "method": "post",
+          "params": {},
+          "body": {
+            "requestId": "wrong-format",
+            "partyList": [
+              {
+                "partyIdType": "ACCOUNT_ID",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "partySubIdOrType": "{$inputs.toIdSubId}",
+                "fspId": "dolor consect"
+              },
+              {
+                "partyIdType": "EMAIL",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "partySubIdOrType": "{$inputs.toIdSubId}",
+                "fspId": "Duis officia Except"
+              }
+            ],
+            "currency": "LAK"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 7,
+          "description": "missing required field requestId",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants",
+          "path": "/participants",
+          "method": "post",
+          "params": {},
+          "body": {
+            "partyList": [
+              {
+                "partyIdType": "ACCOUNT_ID",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "partySubIdOrType": "{$inputs.toIdSubId}",
+                "fspId": "dolor consect"
+              },
+              {
+                "partyIdType": "EMAIL",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "partySubIdOrType": "{$inputs.toIdSubId}",
+                "fspId": "Duis officia Except"
+              }
+            ],
+            "currency": "LAK"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 8,
+          "description": "missing required field partyList",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants",
+          "path": "/participants",
+          "method": "post",
+          "params": {},
+          "body": {
+            "requestId": "{$function.generic.generateUUID}",
+            "currency": "LAK"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "get parties by Type, ID and SubId",
+      "requests": [
+        {
+          "id": 1,
+          "description": "success",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/parties/{Type}/{ID}/{SubId}",
+          "path": "/parties/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body to have property party",
+                "exec": [
+                  "expect(callback.body).to.have.property('party')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback header Content-Type to be request Accept header",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers.Accept}')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback header FSPIOP-destination to be request FSPIOP-Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers.FSPIOP-Source}')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "missing accept header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/parties/{Type}/{ID}/{SubId}",
+          "path": "/parties/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3001",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "missing FSPIOP-Source header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/parties/{Type}/{ID}/{SubId}",
+          "path": "/parties/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "description": "missing Date header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/parties/{Type}/{ID}/{SubId}",
+          "path": "/parties/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "description": "missing Content-Type header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/parties/{Type}/{ID}/{SubId}",
+          "path": "/parties/{$inputs.fromIdType}/{$inputs.toIdValue}/{$inputs.toIdSubId}",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromIdType}",
+            "ID": "{$inputs.toIdValue}",
+            "SubId": "{$inputs.toIdSubId}"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "get transactionRequests by ID",
+      "requests": [
+        {
+          "id": 1,
+          "description": "success",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transactionRequests/{ID}",
+          "path": "/transactionRequests/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body to have property transactionRequestState",
+                "exec": [
+                  "expect(callback.body).to.have.property('transactionRequestState')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback header Content-Type to be request Accept header",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers.Accept}')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback header FSPIOP-destination to be request FSPIOP-Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers.FSPIOP-Source}')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "missing accept header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transactionRequests/{ID}",
+          "path": "/transactionRequests/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3001",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "missing FSPIOP-Source header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transactionRequests/{ID}",
+          "path": "/transactionRequests/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "description": "missing Date header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transactionRequests/{ID}",
+          "path": "/transactionRequests/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "description": "missing Content-Type header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transactionRequests/{ID}",
+          "path": "/transactionRequests/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "get authorizations by ID",
+      "requests": [
+        {
+          "id": 1,
+          "description": "success",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/authorizations/{ID}",
+          "path": "/authorizations/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body to have property responseType",
+                "exec": [
+                  "expect(callback.body).to.have.property('responseType')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback header Content-Type to be request Accept header",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers.Accept}')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback header FSPIOP-destination to be request FSPIOP-Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers.FSPIOP-Source}')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "missing accept header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/authorizations/{ID}",
+          "path": "/authorizations/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3001",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "missing FSPIOP-Source header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/authorizations/{ID}",
+          "path": "/authorizations/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "description": "missing Date header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/authorizations/{ID}",
+          "path": "/authorizations/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "description": "missing Content-Type header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/authorizations/{ID}",
+          "path": "/authorizations/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "get transactions by ID",
+      "requests": [
+        {
+          "id": 1,
+          "description": "success",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transactions/{ID}",
+          "path": "/transactions/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body to have property transactionState",
+                "exec": [
+                  "expect(callback.body).to.have.property('transactionState')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback header Content-Type to be request Accept header",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers.Accept}')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback header FSPIOP-destination to be request FSPIOP-Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers.FSPIOP-Source}')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "missing accept header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transactions/{ID}",
+          "path": "/transactions/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3001",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "missing FSPIOP-Source header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transactions/{ID}",
+          "path": "/transactions/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "description": "missing Date header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transactions/{ID}",
+          "path": "/transactions/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "description": "missing Content-Type header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transactions/{ID}",
+          "path": "/transactions/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "name": "get bulkQuotes by ID",
+      "requests": [
+        {
+          "id": 1,
+          "description": "success",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkQuotes/{ID}",
+          "path": "/bulkQuotes/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body to have property expiration",
+                "exec": [
+                  "expect(callback.body).to.have.property('expiration')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback header Content-Type to be request Accept header",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers.Accept}')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback header FSPIOP-destination to be request FSPIOP-Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers.FSPIOP-Source}')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "missing accept header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkQuotes/{ID}",
+          "path": "/bulkQuotes/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3001",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "missing FSPIOP-Source header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkQuotes/{ID}",
+          "path": "/bulkQuotes/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "description": "missing Date header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkQuotes/{ID}",
+          "path": "/bulkQuotes/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "description": "missing Content-Type header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkQuotes/{ID}",
+          "path": "/bulkQuotes/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "get bulkTransfers by ID",
+      "requests": [
+        {
+          "id": 1,
+          "description": "success",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers/{ID}",
+          "path": "/bulkTransfers/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body to have property bulkTransferState",
+                "exec": [
+                  "expect(callback.body).to.have.property('bulkTransferState')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback header Content-Type to be request Accept header",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers.Accept}')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback header FSPIOP-destination to be request FSPIOP-Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers.FSPIOP-Source}')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "missing accept header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers/{ID}",
+          "path": "/bulkTransfers/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3001",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "missing FSPIOP-Source header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers/{ID}",
+          "path": "/bulkTransfers/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "description": "missing Date header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers/{ID}",
+          "path": "/bulkTransfers/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "description": "missing Content-Type header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers/{ID}",
+          "path": "/bulkTransfers/{$inputs.toIdValue}",
+          "method": "get",
+          "params": {
+            "ID": "{$inputs.toIdValue}"
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "name": "create bulkQuotes",
+      "requests": [
+        {
+          "id": 1,
+          "description": "success",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkQuotes",
+          "path": "/bulkQuotes",
+          "method": "post",
+          "body": {
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "MSISDN",
+                "partyIdentifier": "string",
+                "partySubIdOrType": "string",
+                "fspId": "string"
+              },
+              "merchantClassificationCode": "1000",
+              "name": "string",
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "string",
+                  "middleName": "string",
+                  "lastName": "string"
+                },
+                "dateOfBirth": "1999-01-01"
+              }
+            },
+            "geoCode": {
+              "latitude": "-90",
+              "longitude": "90"
+            },
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "individualQuotes": [
+              {
+                "quoteId": "{$function.generic.generateUUID}",
+                "transactionId": "{$function.generic.generateUUID}",
+                "payee": {
+                  "partyIdInfo": {
+                    "partyIdType": "MSISDN",
+                    "partyIdentifier": "string",
+                    "partySubIdOrType": "string",
+                    "fspId": "string"
+                  },
+                  "merchantClassificationCode": "1000",
+                  "name": "string",
+                  "personalInfo": {
+                    "complexName": {
+                      "firstName": "string",
+                      "middleName": "string",
+                      "lastName": "string"
+                    },
+                    "dateOfBirth": "1999-01-01"
+                  }
+                },
+                "amountType": "SEND",
+                "amount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "fees": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "transactionType": {
+                  "scenario": "DEPOSIT",
+                  "subScenario": "A_Z",
+                  "initiator": "PAYER",
+                  "initiatorType": "CONSUMER",
+                  "refundInfo": {
+                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "refundReason": "string"
+                  },
+                  "balanceOfPayments": "100"
+                },
+                "note": "string",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body to have property expiration",
+                "exec": [
+                  "expect(callback.body).to.have.property('expiration')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback header Content-Type to be request Accept header",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers.Accept}')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback header FSPIOP-destination to be request FSPIOP-Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers.FSPIOP-Source}')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "missing Accept header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkQuotes",
+          "path": "/bulkQuotes",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "MSISDN",
+                "partyIdentifier": "string",
+                "partySubIdOrType": "string",
+                "fspId": "string"
+              },
+              "merchantClassificationCode": "1000",
+              "name": "string",
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "string",
+                  "middleName": "string",
+                  "lastName": "string"
+                },
+                "dateOfBirth": "1999-01-01"
+              }
+            },
+            "geoCode": {
+              "latitude": "-90",
+              "longitude": "90"
+            },
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "individualQuotes": [
+              {
+                "quoteId": "{$function.generic.generateUUID}",
+                "transactionId": "{$function.generic.generateUUID}",
+                "payee": {
+                  "partyIdInfo": {
+                    "partyIdType": "MSISDN",
+                    "partyIdentifier": "string",
+                    "partySubIdOrType": "string",
+                    "fspId": "string"
+                  },
+                  "merchantClassificationCode": "1000",
+                  "name": "string",
+                  "personalInfo": {
+                    "complexName": {
+                      "firstName": "string",
+                      "middleName": "string",
+                      "lastName": "string"
+                    },
+                    "dateOfBirth": "1999-01-01"
+                  }
+                },
+                "amountType": "SEND",
+                "amount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "fees": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "transactionType": {
+                  "scenario": "DEPOSIT",
+                  "subScenario": "A_Z",
+                  "initiator": "PAYER",
+                  "initiatorType": "CONSUMER",
+                  "refundInfo": {
+                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "refundReason": "string"
+                  },
+                  "balanceOfPayments": "100"
+                },
+                "note": "string",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3001",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "missing FSPIOP-Source header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkQuotes",
+          "path": "/bulkQuotes",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "MSISDN",
+                "partyIdentifier": "string",
+                "partySubIdOrType": "string",
+                "fspId": "string"
+              },
+              "merchantClassificationCode": "1000",
+              "name": "string",
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "string",
+                  "middleName": "string",
+                  "lastName": "string"
+                },
+                "dateOfBirth": "1999-01-01"
+              }
+            },
+            "geoCode": {
+              "latitude": "-90",
+              "longitude": "90"
+            },
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "individualQuotes": [
+              {
+                "quoteId": "{$function.generic.generateUUID}",
+                "transactionId": "{$function.generic.generateUUID}",
+                "payee": {
+                  "partyIdInfo": {
+                    "partyIdType": "MSISDN",
+                    "partyIdentifier": "string",
+                    "partySubIdOrType": "string",
+                    "fspId": "string"
+                  },
+                  "merchantClassificationCode": "1000",
+                  "name": "string",
+                  "personalInfo": {
+                    "complexName": {
+                      "firstName": "string",
+                      "middleName": "string",
+                      "lastName": "string"
+                    },
+                    "dateOfBirth": "1999-01-01"
+                  }
+                },
+                "amountType": "SEND",
+                "amount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "fees": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "transactionType": {
+                  "scenario": "DEPOSIT",
+                  "subScenario": "A_Z",
+                  "initiator": "PAYER",
+                  "initiatorType": "CONSUMER",
+                  "refundInfo": {
+                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "refundReason": "string"
+                  },
+                  "balanceOfPayments": "100"
+                },
+                "note": "string",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "description": "missing Date header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkQuotes",
+          "path": "/bulkQuotes",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "MSISDN",
+                "partyIdentifier": "string",
+                "partySubIdOrType": "string",
+                "fspId": "string"
+              },
+              "merchantClassificationCode": "1000",
+              "name": "string",
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "string",
+                  "middleName": "string",
+                  "lastName": "string"
+                },
+                "dateOfBirth": "1999-01-01"
+              }
+            },
+            "geoCode": {
+              "latitude": "-90",
+              "longitude": "90"
+            },
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "individualQuotes": [
+              {
+                "quoteId": "{$function.generic.generateUUID}",
+                "transactionId": "{$function.generic.generateUUID}",
+                "payee": {
+                  "partyIdInfo": {
+                    "partyIdType": "MSISDN",
+                    "partyIdentifier": "string",
+                    "partySubIdOrType": "string",
+                    "fspId": "string"
+                  },
+                  "merchantClassificationCode": "1000",
+                  "name": "string",
+                  "personalInfo": {
+                    "complexName": {
+                      "firstName": "string",
+                      "middleName": "string",
+                      "lastName": "string"
+                    },
+                    "dateOfBirth": "1999-01-01"
+                  }
+                },
+                "amountType": "SEND",
+                "amount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "fees": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "transactionType": {
+                  "scenario": "DEPOSIT",
+                  "subScenario": "A_Z",
+                  "initiator": "PAYER",
+                  "initiatorType": "CONSUMER",
+                  "refundInfo": {
+                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "refundReason": "string"
+                  },
+                  "balanceOfPayments": "100"
+                },
+                "note": "string",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "description": "missing Content-Type header - BUG",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkQuotes",
+          "path": "/bulkQuotes",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "MSISDN",
+                "partyIdentifier": "string",
+                "partySubIdOrType": "string",
+                "fspId": "string"
+              },
+              "merchantClassificationCode": "1000",
+              "name": "string",
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "string",
+                  "middleName": "string",
+                  "lastName": "string"
+                },
+                "dateOfBirth": "1999-01-01"
+              }
+            },
+            "geoCode": {
+              "latitude": "-90",
+              "longitude": "90"
+            },
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "individualQuotes": [
+              {
+                "quoteId": "{$function.generic.generateUUID}",
+                "transactionId": "{$function.generic.generateUUID}",
+                "payee": {
+                  "partyIdInfo": {
+                    "partyIdType": "MSISDN",
+                    "partyIdentifier": "string",
+                    "partySubIdOrType": "string",
+                    "fspId": "string"
+                  },
+                  "merchantClassificationCode": "1000",
+                  "name": "string",
+                  "personalInfo": {
+                    "complexName": {
+                      "firstName": "string",
+                      "middleName": "string",
+                      "lastName": "string"
+                    },
+                    "dateOfBirth": "1999-01-01"
+                  }
+                },
+                "amountType": "SEND",
+                "amount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "fees": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "transactionType": {
+                  "scenario": "DEPOSIT",
+                  "subScenario": "A_Z",
+                  "initiator": "PAYER",
+                  "initiatorType": "CONSUMER",
+                  "refundInfo": {
+                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "refundReason": "string"
+                  },
+                  "balanceOfPayments": "100"
+                },
+                "note": "string",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 6,
+          "description": "requestId wrong pattern",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkQuotes",
+          "path": "/bulkQuotes",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkQuoteId": "wrong-format",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "MSISDN",
+                "partyIdentifier": "string",
+                "partySubIdOrType": "string",
+                "fspId": "string"
+              },
+              "merchantClassificationCode": "1000",
+              "name": "string",
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "string",
+                  "middleName": "string",
+                  "lastName": "string"
+                },
+                "dateOfBirth": "1999-01-01"
+              }
+            },
+            "geoCode": {
+              "latitude": "-90",
+              "longitude": "90"
+            },
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "individualQuotes": [
+              {
+                "quoteId": "{$function.generic.generateUUID}",
+                "transactionId": "{$function.generic.generateUUID}",
+                "payee": {
+                  "partyIdInfo": {
+                    "partyIdType": "MSISDN",
+                    "partyIdentifier": "string",
+                    "partySubIdOrType": "string",
+                    "fspId": "string"
+                  },
+                  "merchantClassificationCode": "1000",
+                  "name": "string",
+                  "personalInfo": {
+                    "complexName": {
+                      "firstName": "string",
+                      "middleName": "string",
+                      "lastName": "string"
+                    },
+                    "dateOfBirth": "1999-01-01"
+                  }
+                },
+                "amountType": "SEND",
+                "amount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "fees": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "transactionType": {
+                  "scenario": "DEPOSIT",
+                  "subScenario": "A_Z",
+                  "initiator": "PAYER",
+                  "initiatorType": "CONSUMER",
+                  "refundInfo": {
+                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "refundReason": "string"
+                  },
+                  "balanceOfPayments": "100"
+                },
+                "note": "string",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 7,
+          "description": "missing required field bulkQuoteId",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkQuotes",
+          "path": "/bulkQuotes",
+          "method": "post",
+          "params": {},
+          "body": {
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "MSISDN",
+                "partyIdentifier": "string",
+                "partySubIdOrType": "string",
+                "fspId": "string"
+              },
+              "merchantClassificationCode": "1000",
+              "name": "string",
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "string",
+                  "middleName": "string",
+                  "lastName": "string"
+                },
+                "dateOfBirth": "1999-01-01"
+              }
+            },
+            "geoCode": {
+              "latitude": "-90",
+              "longitude": "90"
+            },
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "individualQuotes": [
+              {
+                "quoteId": "{$function.generic.generateUUID}",
+                "transactionId": "{$function.generic.generateUUID}",
+                "payee": {
+                  "partyIdInfo": {
+                    "partyIdType": "MSISDN",
+                    "partyIdentifier": "string",
+                    "partySubIdOrType": "string",
+                    "fspId": "string"
+                  },
+                  "merchantClassificationCode": "1000",
+                  "name": "string",
+                  "personalInfo": {
+                    "complexName": {
+                      "firstName": "string",
+                      "middleName": "string",
+                      "lastName": "string"
+                    },
+                    "dateOfBirth": "1999-01-01"
+                  }
+                },
+                "amountType": "SEND",
+                "amount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "fees": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "transactionType": {
+                  "scenario": "DEPOSIT",
+                  "subScenario": "A_Z",
+                  "initiator": "PAYER",
+                  "initiatorType": "CONSUMER",
+                  "refundInfo": {
+                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "refundReason": "string"
+                  },
+                  "balanceOfPayments": "100"
+                },
+                "note": "string",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 8,
+          "description": "missing required field payer",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkQuotes",
+          "path": "/bulkQuotes",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "geoCode": {
+              "latitude": "-90",
+              "longitude": "90"
+            },
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "individualQuotes": [
+              {
+                "quoteId": "{$function.generic.generateUUID}",
+                "transactionId": "{$function.generic.generateUUID}",
+                "payee": {
+                  "partyIdInfo": {
+                    "partyIdType": "MSISDN",
+                    "partyIdentifier": "string",
+                    "partySubIdOrType": "string",
+                    "fspId": "string"
+                  },
+                  "merchantClassificationCode": "1000",
+                  "name": "string",
+                  "personalInfo": {
+                    "complexName": {
+                      "firstName": "string",
+                      "middleName": "string",
+                      "lastName": "string"
+                    },
+                    "dateOfBirth": "1999-01-01"
+                  }
+                },
+                "amountType": "SEND",
+                "amount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "fees": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "transactionType": {
+                  "scenario": "DEPOSIT",
+                  "subScenario": "A_Z",
+                  "initiator": "PAYER",
+                  "initiatorType": "CONSUMER",
+                  "refundInfo": {
+                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "refundReason": "string"
+                  },
+                  "balanceOfPayments": "100"
+                },
+                "note": "string",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 9,
+          "description": "missing required field individualQuotes",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkQuotes",
+          "path": "/bulkQuotes",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "MSISDN",
+                "partyIdentifier": "string",
+                "partySubIdOrType": "string",
+                "fspId": "string"
+              },
+              "merchantClassificationCode": "1000",
+              "name": "string",
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "string",
+                  "middleName": "string",
+                  "lastName": "string"
+                },
+                "dateOfBirth": "1999-01-01"
+              }
+            },
+            "geoCode": {
+              "latitude": "-90",
+              "longitude": "90"
+            },
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "name": "create bulkTransfers",
+      "requests": [
+        {
+          "id": 1,
+          "description": "success",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "path": "/bulkTransfers",
+          "method": "post",
+          "body": {
+            "bulkTransferId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payerFsp": "string",
+            "payeeFsp": "string",
+            "individualTransfers": [
+              {
+                "transferId": "{$function.generic.generateUUID}",
+                "transferAmount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "ilpPacket": "string",
+                "condition": "condition1_condition2_condition3_condition4",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback body to have property bulkTransferState",
+                "exec": [
+                  "expect(callback.body).to.have.property('bulkTransferState')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback header Content-Type to be request Accept header",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('{$request.headers.Accept}')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback header FSPIOP-destination to be request FSPIOP-Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers.FSPIOP-Source}')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "missing Accept header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "path": "/bulkTransfers",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkTransferId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payerFsp": "string",
+            "payeeFsp": "string",
+            "individualTransfers": [
+              {
+                "transferId": "{$function.generic.generateUUID}",
+                "transferAmount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "ilpPacket": "string",
+                "condition": "condition1_condition2_condition3_condition4",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3001",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "missing FSPIOP-Source header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "path": "/bulkTransfers",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkTransferId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payerFsp": "string",
+            "payeeFsp": "string",
+            "individualTransfers": [
+              {
+                "transferId": "{$function.generic.generateUUID}",
+                "transferAmount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "ilpPacket": "string",
+                "condition": "condition1_condition2_condition3_condition4",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "Accept": "{$inputs.accept}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "description": "missing Date header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "path": "/bulkTransfers",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkTransferId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payerFsp": "string",
+            "payeeFsp": "string",
+            "individualTransfers": [
+              {
+                "transferId": "{$function.generic.generateUUID}",
+                "transferAmount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "ilpPacket": "string",
+                "condition": "condition1_condition2_condition3_condition4",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "description": "missing Content-Type header - BUG",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "path": "/bulkTransfers",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkTransferId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payerFsp": "string",
+            "payeeFsp": "string",
+            "individualTransfers": [
+              {
+                "transferId": "{$function.generic.generateUUID}",
+                "transferAmount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "ilpPacket": "string",
+                "condition": "condition1_condition2_condition3_condition4",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 6,
+          "description": "requestId wrong pattern",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "path": "/bulkTransfers",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkTransferId": "wrong-pattern",
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payerFsp": "string",
+            "payeeFsp": "string",
+            "individualTransfers": [
+              {
+                "transferId": "{$function.generic.generateUUID}",
+                "transferAmount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "ilpPacket": "string",
+                "condition": "condition1_condition2_condition3_condition4",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 7,
+          "description": "missing required field bulkTransferId",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "path": "/bulkTransfers",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payerFsp": "string",
+            "payeeFsp": "string",
+            "individualTransfers": [
+              {
+                "transferId": "{$function.generic.generateUUID}",
+                "transferAmount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "ilpPacket": "string",
+                "condition": "condition1_condition2_condition3_condition4",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 8,
+          "description": "missing required field bulkQuoteId",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "path": "/bulkTransfers",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkTransferId": "{$function.generic.generateUUID}",
+            "payerFsp": "string",
+            "payeeFsp": "string",
+            "individualTransfers": [
+              {
+                "transferId": "{$function.generic.generateUUID}",
+                "transferAmount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "ilpPacket": "string",
+                "condition": "condition1_condition2_condition3_condition4",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 9,
+          "description": "missing required field payerFsp",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "path": "/bulkTransfers",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkTransferId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payeeFsp": "string",
+            "individualTransfers": [
+              {
+                "transferId": "{$function.generic.generateUUID}",
+                "transferAmount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "ilpPacket": "string",
+                "condition": "condition1_condition2_condition3_condition4",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 10,
+          "description": "missing required field payeeFsp",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "path": "/bulkTransfers",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkTransferId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payerFsp": "string",
+            "individualTransfers": [
+              {
+                "transferId": "{$function.generic.generateUUID}",
+                "transferAmount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "ilpPacket": "string",
+                "condition": "condition1_condition2_condition3_condition4",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 11,
+          "description": "missing required field individualTransfers",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "path": "/bulkTransfers",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkTransferId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payerFsp": "string",
+            "payeeFsp": "string",
+            "expiration": "2020-01-01T10:10:10.000Z",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 12,
+          "description": "missing required field expiration",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "path": "/bulkTransfers",
+          "method": "post",
+          "params": {},
+          "body": {
+            "bulkTransferId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "payerFsp": "string",
+            "payeeFsp": "string",
+            "individualTransfers": [
+              {
+                "transferId": "{$function.generic.generateUUID}",
+                "transferAmount": {
+                  "currency": "AED",
+                  "amount": "100"
+                },
+                "ilpPacket": "string",
+                "condition": "condition1_condition2_condition3_condition4",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "string",
+                      "value": "string"
+                    }
+                  ]
+                }
+              }
+            ],
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Date": "{$function.generic.curDate}",
+            "Content-Type": "{$inputs.contentType}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data.errorInformation.errorCode to be 3100",
+                "exec": [
+                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]

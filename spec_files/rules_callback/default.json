@@ -258,11 +258,7 @@
     "event": {
       "method": "put",
       "path": "/participants/{Type}/{ID}",
-      "params": {
-        "body": {
-          "fspId": "payerFspId"
-        }
-      },
+      "params": {},
       "delay": 0,
       "type": "MOCK_CALLBACK"
     }
