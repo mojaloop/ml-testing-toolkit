@@ -65,7 +65,7 @@ To get started, please follow the instructions in the [README](/README.md) docum
 
 When you open the **Mojaloop Testing Toolkit** in your browser, you will be welcomed by the Dashboard display. Currently this is still under development, and only display "static data". The current static display will provide you with a fair representations of the intentional Dashboard functionality.
 
-![Opening view](/assets/images/opening_view.png)
+![Opening view](/assets/images/opening-view.png)
 
 Take note of the navigation bar on the left. The navigational items are;
 
@@ -79,7 +79,7 @@ Take note of the navigation bar on the left. The navigational items are;
 
 We will work through each one of the items and provide you with a fair understanding of the current functionality.
 
-<!-- ![Menu Items](/assets/images/menu_items.png) -->
+<!-- ![Menu Items](/assets/images/menu-items.png) -->
 
 #### 2.2 Dashboard
 
@@ -91,17 +91,17 @@ The static data will be replaced with accurate information once the development 
 
 The _Monitoring_ navigation tab allows you to monitor _incoming_ requests from the **Mojaloop Simulator**.
 
-![Monitoring Initial State](/assets/images/monitoring_initial_state.png) 
+![Monitoring Initial State](/assets/images/monitoring-initial-state.png) 
 
 By following the docker installation instructions in the [README](/README.md) document, you should have the **Mojaloop Simulator UI** open in your browser tab. On the **Mojaloop Simulator UI** open browser, go to the navigation bar on the left and click on _Outbound Send_ tab.
 
 Press _**Send Transfer**_ button on the main window to send sample test data from the **Mojaloop Simulater UI** to the **Mojaloop Testing Toolkit**. 
 
-![Send Transfer](/assets/images/send_transfer.png)
+![Send Transfer](/assets/images/send-transfer.png)
 
 You should receive a response on the **Mojaloop Simulator UI** as indicated below. **Note** the variable data are generated randomly, therefore it could differ from the information displayed in the images provided below.
 
-![Simulator response](/assets/images/simulator_response.png) 
+![Simulator response](/assets/images/simulator-response.png) 
 
 Go back to the **Mojaloop Testing Toolkit UI** in your browser and select from the navigation bar on the left the _Monitoring_ tab. You will notice the three operations associated with the above transfer request send. The most recent request with the associated operations will be the most recent displayed item on the main page and can be verified by the date/time stamp associated to each operation.
 
@@ -109,7 +109,7 @@ Go back to the **Mojaloop Testing Toolkit UI** in your browser and select from t
 - POST /quotes
 - POST /transfers
 
-![Monitoring messages](/assets/images/monitoring_messages.png)
+![Monitoring messages](/assets/images/monitoring-messages.png)
 
 To view detailed information on any one of the Callbacks, click on the operation - in this example _**GET /parties/MSISDN/0001**_ presented as a _blue button_. 
 
@@ -117,7 +117,7 @@ If you recall the [Architecture Diagram](/documents/Mojaloop-Self-Testing-Tool.m
 
 Clicking on the _+_ to the left of the expanded list on the main window to view detail related to that specific timeline message.
 
-![Expanded monitoring messages](/assets/images/expand_monitoring_messages.png)
+![Expanded monitoring messages](/assets/images/expand-monitoring-messages.png)
 
 As an example for this document, the above messages in the image has be expanded to provide better insight.
 
@@ -132,7 +132,7 @@ As an example for this document, the above messages in the image has be expanded
 
 When you send more transfers from the **Mojaloop Simulator UI**, these transactions will be added to the monitoring event.
 
-![Additional transfers](/assets/images/additional_transfers.png)
+![Additional transfers](/assets/images/additional-transfers.png)
 
 #### 2.4 Sync Response Rules
 
@@ -140,7 +140,7 @@ When you send more transfers from the **Mojaloop Simulator UI**, these transacti
 
 The _Sync Response Rules_ navigation tab on the left of the **Mojaloop Testing Toolset** allow you the setup fixed or mock responses. Take note of the _default.json_ file on the right hand side window. That contains the list of operations and sample content for mock or fixed responses for the operations listed on the center window. These can be tested by running the collection in Postman. (Import the [collection](/postman/mojaloop-pdp-testing-tool.postman_collection.json) and [environment](/postman/mojaloop-pdp-testing-tool.postman_environment.json) files into Postman testing tool.)
 
-![Opening  Sync Response Rules](/assets/images/opening_sync_response_rules.png)
+![Opening  Sync Response Rules](/assets/images/opening-sync-response-rules.png)
 
 Below is a sample **MOCK_RESPONSE**
 
@@ -398,7 +398,7 @@ INBOUND_MUTUAL_TLS_ENABLED=true
 OUTBOUND_MUTUAL_TLS_ENABLED=true
 ```
 
-![Local Enabled Mutual TLS](/assets/images/local_mutual_tls_enabled.png)
+![Local Enabled Mutual TLS](/assets/images/local-mutual-tls-enabled.png)
 
 - [/simulator/scheme-adapter.env](/simulator/scheme-adapter.env) file, make the following update;
   
@@ -411,11 +411,11 @@ INBOUND_MUTUAL_TLS_ENABLED=true
 OUTBOUND_MUTUAL_TLS_ENABLED=true
 ```
 
-![Adapter Enabled Mutual TLS](/assets/images/adapter_mutual_tls_enabled.png)
+![Adapter Enabled Mutual TLS](/assets/images/adapter-mutual-tls-enabled.png)
 		
 The TLS certificates and keys for the _Mojaloop Switch_ have already been pre-generated and populated for use in the docker container. For information purposes ,the configuration and location are defined in the file content as per the image below. 
 
-![Simulator HUB TLS Certificates and Key](/assets/images/tls-hub_certs_keys.png)
+![Simulator HUB TLS Certificates and Key](/assets/images/tls-hub-certs-keys.png)
 
 The current configuration caters for a local setup within a docker container. 
 
@@ -561,31 +561,31 @@ From the **Mojaloop Connect Manager** window, click on the _**TESTING-TOOL**_ en
 
 On the navigational tab on the left, navigate to _Certificates_ and select _Certificate Authorities_. Under the _DFSP Certificate Authority_ tab in the _Root Certificate_ box, click on _Choose file_ button. Navigate to ```/simulator/secrets/tls/``` and select ```dfsp_client_cacert.pem``` file. 
 
-![dfsp_client_cacert](/assets/images/dfsp_client_cacert.png)
+![dfsp_client_cacert](/assets/images/dfsp-client-cacert.png)
 
 ##### 3.4.2 TLS Client Certificates
 
 Still under _Certificates_ on the navigational tab on the left, select _TLS Client Certificates_. Under the _CSR_ tab in the _CSR_ box, click on the _choose file_ button. Navigate to ```/simulator/secrets/tls/``` and select ```dfsp_client.csr``` file. On submission of this CSR, the testing toolkit will automaticallly sign this and the signed certificate will be available in the _Sent CSR_ tab. Under normal circumstances, you can download this client certificate and provide it to your DFSP implementation. But for this demo, it is already placed in the simulator/tls folder for convinience.
 
-![dfsp_client](/assets/images/dfsp_client.png)
+![dfsp_client](/assets/images/dfsp-client.png)
 
 Click on the _**√ Submit**_ button to send the file to the HUB signing.
 
-![dfsp_client Submit](/assets/images/dfsp_client-submit.png)
+![dfsp_client Submit](/assets/images/dfsp-client-submit.png)
 
 Now select the _Unprocessed Hub CSRs_ tab. Under normal circumstances, we will download the CSR file and sign it with our _Certificate Authority (CA)_  by clicking on the _Download CSR_ button. For the demo as we already have the signed hub certificate in the folder, this is not necessary, and you can click on the _Upload Certificate_ button on the right of the main window. Navigate to ```/simulator/secrets/tls/``` and select ```hub_client_cert.pem``` file.
 
-![hub_client_cert](/assets/images/hub_client_cert.png)
+![hub_client_cert](/assets/images/hub-client-cert.png)
 
 ##### 3.4.3 TLS Server Certificates
 
 Still under _Certificates_ on the navigational tab on the left, select _TSL Server Certificates_. Under the _DFSP Server certificates_ tab in the _Server certificate_ box, click on the _Choice File_ button. Navigate to ```/simulator/secrets/tls/``` and select ```dfsp_server_cert.pem``` file.
 
-![dfsp_server_cert](/assets/images/dfsp_server_cert.png)
+![dfsp_server_cert](/assets/images/dfsp-server-cert.png)
 
 Under the _DFSP Server certificates_ tab in the _Root certificate_ box, click on the _Choose File_ button. Navigate to ```/simulator/secrets/tls/``` and select ```dfsp_server_cacert.pem``` file.
 
-![dfsp_server_cacert](/assets/images/dfsp_server_cacert.png)
+![dfsp_server_cacert](/assets/images/dfsp-server-cacert.png)
 
 Click on the _**√ Submit**_ button
 
