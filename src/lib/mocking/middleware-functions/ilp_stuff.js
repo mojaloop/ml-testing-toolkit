@@ -31,7 +31,7 @@ const ilpPacket = require('ilp-packet')
 const handleQuoteIlp = (context, response) => {
   // Check whether the request is PUT /quotes
   const pathMatch = new RegExp(/\/quotes\/([^/]+)$/)
-  if (response.method === 'put' && pathMatch.test(response.path)) {
+  if (context.request.method === 'post' && response.method === 'put' && pathMatch.test(response.path)) {
     this.ilp = new Ilp({
       secret: 'asdf'
     })
@@ -70,7 +70,7 @@ const handleQuoteIlp = (context, response) => {
 const handleTransferIlp = (context, response) => {
   // Check whether the request is PUT /quotes
   const pathMatch = new RegExp(/\/transfers\/([^/]+)$/)
-  if (response.method === 'put' && pathMatch.test(response.path)) {
+  if (context.request.method === 'post' && response.method === 'put' && pathMatch.test(response.path)) {
     this.ilp = new Ilp({
       secret: 'asdf'
     })

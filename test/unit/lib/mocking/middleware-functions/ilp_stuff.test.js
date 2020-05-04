@@ -44,7 +44,8 @@ describe('ILP Stuff', () => {
               currency: 'USD',
               amount: '10'
             }
-          }
+          },
+          method: 'post'
         }
       }
       let response = {
@@ -62,7 +63,8 @@ describe('ILP Stuff', () => {
         request: {
           body: {
             ilpPacket: ilpPacket
-          }
+          },
+          method: 'post'
         }
       }
       const response = {
@@ -72,6 +74,23 @@ describe('ILP Stuff', () => {
       }
       IlpStuff.handleTransferIlp(sampleContext, response)
       expect(response.body).toHaveProperty('fulfilment')
+    })
+    it('It should not append fulfilment for get requests', () => {
+      const sampleContext = {
+        request: {
+          body: {
+            ilpPacket: ilpPacket
+          },
+          method: 'get'
+        }
+      }
+      const response = {
+        method: 'put',
+        path: '/transfers/asdfasdf',
+        body: {}
+      }
+      IlpStuff.handleTransferIlp(sampleContext, response)
+      expect(response.body).not.toHaveProperty('fulfilment')
     })
   })
 })
