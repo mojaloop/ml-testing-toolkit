@@ -35,6 +35,10 @@ const initServer = () => {
       'Origin, X-Requested-With, Content-Type, Accept, Authorization'
     )
     res.setHeader(
+      'Access-Control-Expose-Headers',
+      'Content-Disposition'
+    )
+    res.setHeader(
       'Access-Control-Allow-Methods',
       'GET, POST, PATCH, PUT, DELETE, OPTIONS'
     )
@@ -51,6 +55,7 @@ const initServer = () => {
   app.use('/api/config', require('./api-routes/config'))
   app.use('/longpolling', require('./api-routes/longpolling'))
   app.use('/api/oauth2', require('./api-routes/oauth2'))
+  app.use('/api/reports', require('./api-routes/reports'))
 
   // // For front-end UI
   // app.use('/ui', express.static(path.join('client/build')))
