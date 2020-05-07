@@ -40,6 +40,7 @@ const ConnectionProvider = require('../configuration-providers/mb-connection-man
 delete axios.defaults.headers.common.Accept
 
 const OutboundSend = async (inputTemplate, traceID) => {
+  const startedTimeStamp = new Date()
   let outboundID = traceID
   let sessionID = null
   if (traceID && traceHeaderUtils.isCustomTraceID(traceID)) {
@@ -49,10 +50,18 @@ const OutboundSend = async (inputTemplate, traceID) => {
   for (const i in inputTemplate.test_cases) {
     await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues)
   }
-
+  const completedTimeStamp = new Date()
+  const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
   // Send the total result to client
   if (outboundID) {
-    const totalResult = inputTemplate
+    const runtimeInformation = {
+      completedTimeISO: completedTimeStamp.toISOString(),
+      startedTime: startedTimeStamp.toUTCString(),
+      completedTime: completedTimeStamp.toUTCString(),
+      runDurationMs: runDurationMs,
+      avgResponseTime: 'NA'
+    }
+    const totalResult = generateFinalReport(inputTemplate, runtimeInformation)
     notificationEmitter.broadcastOutboundProgress({
       status: 'FINISHED',
       outboundID: outboundID,
@@ -396,6 +405,39 @@ const getFunctionResult = (param, inputValues, request) => {
   } else {
     customLogger.logMessage('error', 'The specified custom function format is not correct', param, false)
     return param
+  }
+}
+
+// Generate consolidated final report
+const generateFinalReport = (inputTemplate, runtimeInformation) => {
+  const { test_cases, ...remaingPropsInTemplate } = inputTemplate  // eslint-disable-line
+  const resultTestCases = test_cases.map(testCase => {
+    const { requests, ...remainingPropsInTestCase } = testCase
+    const resultRequests = requests.map(requestItem => {
+      const { testResult, request, ...remainginPropsInRequest } = requestItem.appended
+      if (request.tests && request.tests.assertions) {
+        request.tests.assertions = request.tests.assertions.map(assertion => {
+          return {
+            ...assertion,
+            resultStatus: testResult.results[assertion.id]
+          }
+        })
+        request.tests.passedAssertionsCount = testResult.passedCount
+      }
+      return {
+        request,
+        ...remainginPropsInRequest
+      }
+    })
+    return {
+      ...remainingPropsInTestCase,
+      requests: resultRequests
+    }
+  })
+  return {
+    ...remaingPropsInTemplate,
+    test_cases: resultTestCases,
+    runtimeInformation: runtimeInformation
   }
 }
 
