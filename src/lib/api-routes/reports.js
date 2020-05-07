@@ -32,7 +32,7 @@ const readFileAsync = promisify(fs.readFile)
 
 const BASE_TEMPLATE_PATH = 'spec_files/reports/templates/newman'
 
-// Get sample report
+// Generate report
 router.post('/testcase/:format', async (req, res, next) => {
   const jsonReport = req.body
   const format = req.params.format
@@ -48,10 +48,10 @@ router.post('/testcase/:format', async (req, res, next) => {
   if (jsonReport.runtimeInformation) {
     downloadFileSuffix = '-' + jsonReport.runtimeInformation.completedTimeISO + downloadFileSuffix
   }
+  downloadFileSuffix = '-' + jsonReport.name + downloadFileSuffix
   try {
     const templateContent = await readFileAsync(BASE_TEMPLATE_PATH + '/' + templateFile)
     const scriptContent = await readFileAsync(BASE_TEMPLATE_PATH + '/script.js')
-    console.log(scriptContent.toString())
     const result = await jsreport.render({
       template: {
         content: templateContent.toString(),
