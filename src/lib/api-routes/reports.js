@@ -25,7 +25,7 @@
 const express = require('express')
 const router = new express.Router()
 // const { check, validationResult } = require('express-validator')
-const jsreport = require('jsreport-core')()
+const jsreportCore = require('jsreport-core')
 const fs = require('fs')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
@@ -52,6 +52,7 @@ router.post('/testcase/:format', async (req, res, next) => {
   try {
     const templateContent = await readFileAsync(BASE_TEMPLATE_PATH + '/' + templateFile)
     const scriptContent = await readFileAsync(BASE_TEMPLATE_PATH + '/script.js')
+    const jsreport = jsreportCore()
     await jsreport.init()
     const result = await jsreport.render({
       template: {
