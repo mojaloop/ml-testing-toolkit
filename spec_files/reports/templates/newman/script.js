@@ -59,7 +59,7 @@ function failedRequests(test_cases) {
 }
 
 function testPassPercentage(tests) {
-  if (tests.assertions) {
+  if (tests && tests.assertions) {
     return Math.round(tests.passedAssertionsCount * 100 / tests.assertions.length)
   } else {
     return 0
@@ -67,7 +67,7 @@ function testPassPercentage(tests) {
 }
 
 function ifAllTestsPassedInRequest(request) {
-  if (request.tests.assertions) {
+  if (request.tests && request.tests.assertions) {
     return request.tests.passedAssertionsCount===request.tests.assertions.length
   } else {
     return false

@@ -127,7 +127,6 @@ const createServer = async (port) => {
         // Generate UniqueID
         request.customInfo = {}
         request.customInfo.uniqueId = UniqueIdGenerator.generateUniqueId(request)
-
         // Parse the traceparent header if present
         if (request.headers.traceparent) {
           const traceparentHeaderArr = request.headers.traceparent.split('-')
@@ -147,7 +146,7 @@ const createServer = async (port) => {
       type: 'onPreResponse',
       method: (request, h) => {
         RequestLogger.logResponse(request)
-        if (request.customInfo.negotiatedContentType) {
+        if (request.customInfo && request.customInfo.negotiatedContentType) {
           request.response.header('content-type', request.customInfo.negotiatedContentType)
         }
         return h.continue

@@ -36,6 +36,7 @@ const expect = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
 const traceHeaderUtils = require('../traceHeaderUtils')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
+require('request-to-curl')
 
 delete axios.defaults.headers.common.Accept
 
@@ -138,7 +139,10 @@ const processTestCase = async (testCase, traceID, inputValues) => {
         testResult,
         response: resp.syncResponse,
         callback: resp.callback,
-        request: convertedRequest
+        request: convertedRequest,
+        additionalInfo: {
+          curlRequest: resp.curlRequest
+        }
       }
       if (outboundID) {
         notificationEmitter.broadcastOutboundProgress({
@@ -149,6 +153,9 @@ const processTestCase = async (testCase, traceID, inputValues) => {
           response: resp.syncResponse,
           callback: resp.callback,
           requestSent: convertedRequest,
+          additionalInfo: {
+            curlRequest: resp.curlRequest
+          },
           testResult
         }, sessionID)
       }
@@ -160,7 +167,10 @@ const processTestCase = async (testCase, traceID, inputValues) => {
         testResult,
         response: resp.syncResponse,
         callback: resp.callback,
-        request: convertedRequest
+        request: convertedRequest,
+        additionalInfo: {
+          curlRequest: resp.curlRequest
+        }
       }
       if (outboundID) {
         notificationEmitter.broadcastOutboundProgress({
@@ -171,6 +181,9 @@ const processTestCase = async (testCase, traceID, inputValues) => {
           response: resp.syncResponse,
           callback: resp.callback,
           requestSent: convertedRequest,
+          additionalInfo: {
+            curlRequest: resp.curlRequest
+          },
           testResult
         }, sessionID)
       }
@@ -250,20 +263,23 @@ const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallb
         statusText: result.statusText,
         data: result.data
       }
+      const curlRequest = result.request.toCurl()
+
       if (result.status > 299) {
-        reject(new Error(JSON.stringify({ syncResponse })))
+        reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
       }
+
       customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
       // Listen for success callback
       MyEventEmitter.getTestOutboundEmitter().once(successCallbackUrl, (callbackHeaders, callbackBody) => {
         MyEventEmitter.getTestOutboundEmitter().removeAllListeners(errorCallbackUrl)
-        resolve({ syncResponse: syncResponse, callback: { headers: callbackHeaders, body: callbackBody } })
+        resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { headers: callbackHeaders, body: callbackBody } })
       })
 
       // Listen for error callback
       MyEventEmitter.getTestOutboundEmitter().once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
         MyEventEmitter.getTestOutboundEmitter().removeAllListeners(successCallbackUrl)
-        reject(new Error(JSON.stringify({ syncResponse: syncResponse, callback: { body: callbackBody } })))
+        reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { body: callbackBody } })))
       })
     }, (err) => {
       customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, err, false)

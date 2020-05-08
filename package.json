@@ -92,6 +92,7 @@
     "parse-strings-in-object": "1.2.0",
     "path": "^0.12.7",
     "rc": "1.2.8",
+    "request-to-curl": "^0.1.6",
     "selectn": "^1.1.2",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
