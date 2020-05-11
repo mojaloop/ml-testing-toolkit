@@ -296,6 +296,71 @@ describe('Outbound Initiator Functions', () => {
     })
   })
 
+  describe('generateFinalReport', () => {
+    // Positive Scenarios
+    it('generateFinalReport should stream line the input template', async () => {
+      const runtimeInformation = {
+        runDurationMs: 123
+      }
+      const inputTemplate = {
+        test_cases: [
+          {
+            requests: [{
+              name: 'request1',
+              appended: {
+                name: 'request1',
+                request: {
+                  tests: {
+                    assertions: [
+                      {
+                        id: 1
+                      }
+                    ]
+                  }
+                },
+                testResult: {
+                  results: {
+                    '1': {
+                      status: 'SUCCESS'
+                    }
+                  },
+                  passedCount: 5
+                }
+              }
+            }]
+          }
+        ],
+        name: 'report1'
+      }
+      const result = OutboundInitiator.generateFinalReport(inputTemplate, runtimeInformation)
+      expect(result).toHaveProperty('name')
+      expect(result).toHaveProperty('test_cases')
+      expect(result).toHaveProperty('runtimeInformation')
+
+      expect(result.name).toEqual('report1')
+      expect(result.runtimeInformation).toHaveProperty('runDurationMs')
+      expect(result.runtimeInformation.runDurationMs).toEqual(123)
+      expect(result.test_cases.length).toBeGreaterThan(0)
+      expect(result.test_cases[0]).toHaveProperty('requests')
+      expect(result.test_cases[0].requests.length).toBeGreaterThan(0)
+
+      expect(result.test_cases[0].requests[0]).toHaveProperty('name')
+      expect(result.test_cases[0].requests[0]).toHaveProperty('request')
+      expect(result.test_cases[0].requests[0].name).toEqual('request1') 
+
+      expect(result.test_cases[0].requests[0].request).toHaveProperty('tests')
+      expect(result.test_cases[0].requests[0].request.tests).toHaveProperty('assertions')
+      expect(result.test_cases[0].requests[0].request.tests).toHaveProperty('passedAssertionsCount')
+      expect(result.test_cases[0].requests[0].request.tests.assertions.length).toBeGreaterThan(0)
+      expect(result.test_cases[0].requests[0].request.tests.assertions[0]).toHaveProperty('id')
+      expect(result.test_cases[0].requests[0].request.tests.assertions[0]).toHaveProperty('resultStatus')
+      expect(result.test_cases[0].requests[0].request.tests.assertions[0].resultStatus).toHaveProperty('status')
+      expect(result.test_cases[0].requests[0].request.tests.assertions[0].resultStatus.status).toEqual('SUCCESS')
+
+
+    })
+  })
+
   describe('handleTests', () => {
     // Positive Scenarios
     it('handleTests should execute test cases about request and return results', async () => {
