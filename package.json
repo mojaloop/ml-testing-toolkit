@@ -65,6 +65,8 @@
     "blipp": "4.0.1",
     "bunyan": "^1.8.12",
     "chai": "^4.2.0",
+    "cli-progress": "3.8.2",
+    "cli-table3": "0.6.0",
     "commander": "4.0.0",
     "docdash": "1.1.1",
     "dotenv": "^8.2.0",
