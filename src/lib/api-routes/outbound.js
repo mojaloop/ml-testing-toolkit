@@ -76,7 +76,7 @@ router.post('/template/:traceID', async (req, res, next) => {
     const outbound = require('../test-outbound/outbound-initiator')
     outbound.OutboundSend(inputJson, traceID)
 
-    res.status(200).json({ status: 'OK' })
+    return res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
   }

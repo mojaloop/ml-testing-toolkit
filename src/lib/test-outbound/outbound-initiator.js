@@ -263,7 +263,7 @@ const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallb
         statusText: result.statusText,
         data: result.data
       }
-      const curlRequest = result.request.toCurl()
+      const curlRequest = result.request ? result.request.toCurl() : ''
 
       if (result.status > 299) {
         reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
@@ -464,5 +464,6 @@ module.exports = {
   replaceVariables,
   replaceRequestVariables,
   replacePathVariables,
-  getFunctionResult
+  getFunctionResult,
+  generateFinalReport
 }
