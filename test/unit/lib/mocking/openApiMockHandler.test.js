@@ -83,6 +83,9 @@ const sampleContext = {
 const sampleRequest = {
   method: 'post',
   path: '/transfers',
+  headers: {
+    'Accept': 'asdf'
+  },
   payload: {
     transactionId: '57138ef8-17e9-4514-899b-279d805340ff',
     payer: {
