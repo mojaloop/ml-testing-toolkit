@@ -30,7 +30,7 @@ const cli = (commander) => {
     mode: commander.mode || configFile.mode,
     inputFile: commander.inputFile,
     reportFormat: commander.reportFormat || configFile.reportFormat,
-    reportFilename: commander.inputFilename
+    reportFilename: commander.reportFilename
   }
   switch (config.mode) {
     case 'monitoring':
