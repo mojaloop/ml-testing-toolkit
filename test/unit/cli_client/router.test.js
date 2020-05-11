@@ -23,13 +23,52 @@
  ******/
 'use strict'
 
-const spyRouter = jest.spyOn(require('../../../src/cli_client/router'), 'cli').mockReturnValue({})
+const spyExit = jest.spyOn(process, 'exit').mockImplementation(jest.fn())
+const { cli } = require('../../../src/cli_client/router')
+
 
 describe('Cli client', () => {
-  it('running the client should not throw an error', async () => {
-    process.argv = ['', '']
-    expect(() => {
-      require('../../../src/cli_client/client')
-    }).not.toThrowError();
+  describe('running router', () => {
+    it('when mode is monitoring should not throw an error', () => {
+      const config = {
+        "mode": "monitoring"
+      }  
+      jest.mock('../../../src/cli_client/modes/monitoring')
+      expect(() => {
+        cli(config)
+      }).not.toThrowError();
+    })
+    it('when mode is outbound and inputFile is provided should not throw an error', () => {
+      const config = {
+        "mode": "outbound",
+        "inputFile": "test"
+      }
+      jest.mock('../../../src/cli_client/modes/outbound')
+      expect(() => {
+        cli(config)
+      }).not.toThrowError();
+    })
+    it('when mode is outbound and inputFile was not provided should not throw an error', () => {
+      const config = {
+        "mode": "outbound"
+      }
+      expect(() => {
+        cli(config)
+      }).not.toThrowError();
+    })
+    it('when mode is not supported should not throw an error', () => {
+      const config = {
+        "mode": "unsupported"
+      }
+      expect(() => {
+        cli(config)
+      }).not.toThrowError();
+    })
+    it('when mode is not provided should not throw an error', () => {
+      const config = {}
+      expect(() => {
+        cli(config)
+      }).not.toThrowError();
+    })
   })
 })
