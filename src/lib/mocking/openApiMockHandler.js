@@ -41,6 +41,8 @@ const JwsSigning = require('../jws/JwsSigning')
 
 var path = require('path')
 
+const IlpModel = require('./middleware-functions/ilpModel')
+
 var apis = []
 
 // TODO: Implement a logger and log the messages with different verbosity
@@ -50,6 +52,8 @@ var apis = []
  * Operations on /
  */
 module.exports.initilizeMockHandler = async () => {
+  // Initialize ILP
+  IlpModel.init(Config.getUserConfig().ILP_SECRET)
   // Get API Definitions from configuration
   const apiDefinitions = await OpenApiDefinitionsModel.getApiDefinitions()
 
@@ -298,9 +302,47 @@ const generateAsyncCallback = async (item, context, req) => {
       return
     }
   }
+
+  // Handle transfer validation against decoded ILP Packet
+  if (Config.getUserConfig().TRANSFERS_VALIDATION_ILP_PACKET) {
+    const validated = IlpModel.validateTransferIlpPacket(context, req)
+    if (!validated) {
+      customLogger.logMessage('error', 'ILP Packet is not matching with the content', null, true, req)
+      const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
+      generatedErrorCallback.body = {
+        errorInformation: {
+          errorCode: '3106',
+          errorDescription: 'ILP Packet is not matching with the content.'
+        }
+      }
+      CallbackHandler.handleCallback(generatedErrorCallback, context, req)
+      return
+    }
+  }
+
+  // Handle condition validation in transfer request
+  if (Config.getUserConfig().TRANSFERS_VALIDATION_CONDITION) {
+    const validated = IlpModel.validateTransferCondition(context, req)
+    if (!validated) {
+      customLogger.logMessage('error', 'Condition can not be validated', null, true, req)
+      const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
+      generatedErrorCallback.body = {
+        errorInformation: {
+          errorCode: '3106',
+          errorDescription: 'Condition can not be validated.'
+        }
+      }
+      CallbackHandler.handleCallback(generatedErrorCallback, context, req)
+      return
+    }
+  }
+
   // Callback Rules engine - match the rules and generate the specified callback
   const generatedCallback = await OpenApiRulesEngine.callbackRules(context, req)
   if (generatedCallback.body) {
+    // Append ILP properties to callback
+    IlpModel.handleQuoteIlp(context, generatedCallback)
+    IlpModel.handleTransferIlp(context, generatedCallback)
     // TODO: Handle method and path verifications against the generated ones
     CallbackHandler.handleCallback(generatedCallback, context, req)
     // Handle triggers for a transaction request

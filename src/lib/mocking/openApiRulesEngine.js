@@ -179,8 +179,7 @@ const callbackRules = async (context, req) => {
   } else {
     customLogger.logMessage('error', 'No callback rules are matched', res, true, req)
   }
-  require('./middleware-functions/ilp_stuff').handleQuoteIlp(context, generatedCallback)
-  require('./middleware-functions/ilp_stuff').handleTransferIlp(context, generatedCallback)
+
   return generatedCallback
 }
 

@@ -24,9 +24,9 @@
 
 'use strict'
 
-const IlpStuff = require('../../../../../src/lib/mocking/middleware-functions/ilp_stuff')
+const IlpModel = require('../../../../../src/lib/mocking/middleware-functions/ilpModel')
 
-describe('ILP Stuff', () => {
+describe('ILP Model', () => {
   describe('handleQuoteIlp and handleTransferIlp', () => {
     let ilpPacket
     it('It should append ip packet and condition', () => {
@@ -53,7 +53,7 @@ describe('ILP Stuff', () => {
         path: '/quotes/asdfasdf',
         body: {}
       }
-      IlpStuff.handleQuoteIlp(sampleContext, response)
+      IlpModel.handleQuoteIlp(sampleContext, response)
       ilpPacket = response.body.ilpPacket
       expect(response.body).toHaveProperty('ilpPacket')
       expect(response.body).toHaveProperty('condition')
@@ -72,7 +72,7 @@ describe('ILP Stuff', () => {
         path: '/transfers/asdfasdf',
         body: {}
       }
-      IlpStuff.handleTransferIlp(sampleContext, response)
+      IlpModel.handleTransferIlp(sampleContext, response)
       expect(response.body).toHaveProperty('fulfilment')
     })
     it('It should not append fulfilment for get requests', () => {
@@ -89,7 +89,7 @@ describe('ILP Stuff', () => {
         path: '/transfers/asdfasdf',
         body: {}
       }
-      IlpStuff.handleTransferIlp(sampleContext, response)
+      IlpModel.handleTransferIlp(sampleContext, response)
       expect(response.body).not.toHaveProperty('fulfilment')
     })
   })
