@@ -216,6 +216,7 @@ const sampleOutboundProgress = {
 const sampleMonitoringProgress = {
   "logTime": "Thu, 07 May 2020 10:44:00 GMT",
   "message": "SUCCESS",
+  "verbosity": "info",
   "additionalData": {}
 }
 

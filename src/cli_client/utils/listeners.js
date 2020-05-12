@@ -30,13 +30,13 @@ const uri = 'http://127.0.0.1:5050'
 const outbound = () => {
   const socket = socketIOClient(uri)
   socket.on('outboundProgress', outboundMode.handleIncomingProgress)
-  console.log('Listening on outboundProgress events')
+  console.log('Listening on outboundProgress events...')
 }
 
 const monitoring = () => {
   const socket = socketIOClient(uri)
   socket.on('newLog', monitoringMode.handleIncomingProgress)
-  console.log('Listening on newLog events')
+  console.log('Listening on newLog events...')
 }
 
 module.exports = {

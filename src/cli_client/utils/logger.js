@@ -69,11 +69,11 @@ const outbound = (progress) => {
 
 const monitoring = (progress) => {
   console.log(
-    fStr.red('\nlog time: ') + progress.logTime +
-    fStr.yellow('\nuniqueId: ') + progress.uniqueId +
-    fStr.yellow('\n\tmessage: ') + progress.message +
-    fStr.yellow('\n\tadditional data: ') + JSON.stringify(progress.additionalData) +
-    '\n'
+    fStr.red(`\n${progress.logTime}`) +
+    fStr.blue(` ${progress.verbosity.toUpperCase()}`) +
+    (progress.uniqueId ? fStr.yellow(`\t(${progress.uniqueId})`) : '\t') +
+    fStr.green(`\t${progress.message}`) +
+    (progress.additionalData ? ('\n' + JSON.stringify(progress.additionalData, null, 2)) : '\n')
   )
 }
 
