@@ -23,49 +23,54 @@
  ******/
 'use strict'
 
-const spyExit = jest.spyOn(process, 'exit').mockImplementation(jest.fn())
+const spyExit = jest.spyOn(process, 'exit')
 const { cli } = require('../../../src/cli_client/router')
 
 
 describe('Cli client', () => {
   describe('running router', () => {
-    it('when mode is monitoring should not throw an error', () => {
+    it('when mode is monitoring should not throw an error', async () => {
       const config = {
         "mode": "monitoring"
       }  
+      spyExit.mockImplementationOnce(jest.fn())
       jest.mock('../../../src/cli_client/modes/monitoring')
       expect(() => {
         cli(config)
       }).not.toThrowError();
     })
-    it('when mode is outbound and inputFile is provided should not throw an error', () => {
+    it('when mode is outbound and inputFile is provided should not throw an error', async () => {
       const config = {
         "mode": "outbound",
         "inputFile": "test"
       }
+      spyExit.mockImplementationOnce(jest.fn())
       jest.mock('../../../src/cli_client/modes/outbound')
       expect(() => {
         cli(config)
       }).not.toThrowError();
     })
-    it('when mode is outbound and inputFile was not provided should not throw an error', () => {
+    it('when mode is outbound and inputFile was not provided should not throw an error', async () => {
       const config = {
         "mode": "outbound"
       }
+      spyExit.mockImplementationOnce(jest.fn())
       expect(() => {
         cli(config)
       }).not.toThrowError();
     })
-    it('when mode is not supported should not throw an error', () => {
+    it('when mode is not supported should not throw an error', async () => {
       const config = {
         "mode": "unsupported"
       }
+      spyExit.mockImplementationOnce(jest.fn())
       expect(() => {
         cli(config)
       }).not.toThrowError();
     })
-    it('when mode is not provided should not throw an error', () => {
+    it('when mode is not provided should not throw an error', async () => {
       const config = {}
+      spyExit.mockImplementationOnce(jest.fn())
       expect(() => {
         cli(config)
       }).not.toThrowError();

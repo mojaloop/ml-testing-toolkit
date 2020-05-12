@@ -23,11 +23,12 @@
  ******/
 'use strict'
 
-const spyRouter = jest.spyOn(require('../../../src/cli_client/router'), 'cli').mockReturnValue({})
+const spyRouter = jest.spyOn(require('../../../src/cli_client/router'), 'cli')
 
 describe('Cli client', () => {
   it('running the client should not throw an error', async () => {
     process.argv = ['', '']
+    spyRouter.mockReturnValueOnce({})
     expect(() => {
       require('../../../src/cli_client/client')
     }).not.toThrowError();

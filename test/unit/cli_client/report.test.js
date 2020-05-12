@@ -24,16 +24,10 @@
 'use strict'
 
 const util = require('util')
-jest.spyOn(util, 'promisify').mockReturnValueOnce(jest.fn())
-const report = require('../../../src/cli_client/utils/report')
+const spyPromisify = jest.spyOn(util, 'promisify')
 const axios = require('axios')
-const spyAxios = jest.spyOn(axios, 'post')
-
-const response = {
-  'headers': {
-    'content-disposition': 'attachment; filename=TTK-Assertion-Report-Test1-2020-05-08T13:53:51.887Z.html'
-  }
-}
+jest.mock('axios')
+const report = require('../../../src/cli_client/utils/report')
 
 const data = { 
   runtimeInformation: {
@@ -44,23 +38,68 @@ const data = {
 describe('Cli client', () => {
   describe('run report functionality', () => {
     it('when the report format is json should not throw an error', async () => {
-      spyAxios.mockReturnValueOnce(response)
+      spyPromisify.mockReturnValueOnce(jest.fn())
       await expect(report.outbound(data, {reportFormat: 'json'})).resolves.toBe(undefined)
     })
     it('when the report format is html and reportFilename present should not throw an error', async () => {
-      spyAxios.mockReturnValueOnce(response)
+      const response = {
+        'headers': {
+          'content-disposition': 'attachment; filename=TTK-Assertion-Report-Test1-2020-05-08T13:53:51.887Z.html'
+        }
+      }
+      axios.post.mockReturnValueOnce(response)
+      spyPromisify.mockReturnValueOnce(jest.fn())
       await expect(report.outbound(data, {reportFormat: 'html', reportFilename: 'report'})).resolves.not.toBeNull
     })
     it('when the report format is html and reportFilename not present should not throw an error', async () => {
-      spyAxios.mockReturnValueOnce(response)
+      const response = {
+        'headers': {
+          'content-disposition': 'attachment; filename=TTK-Assertion-Report-Test1-2020-05-08T13:53:51.887Z.html'
+        }
+      }
+      axios.post.mockReturnValueOnce(response)
+      spyPromisify.mockReturnValueOnce(jest.fn())
       await expect(report.outbound(data, {reportFormat: 'html'})).resolves.toBe(undefined)
     })
+    it('when the report format is html and content-disposition not present should not throw an error', async () => {
+      const response = {
+        'headers': {}
+      }
+      axios.post.mockReturnValueOnce(response)
+      spyPromisify.mockReturnValueOnce(jest.fn())
+      await expect(report.outbound(data, {reportFormat: 'printhtml'})).resolves.toBe(undefined)
+    })
+    it('when the report format is html and wrong data not present should not throw an error', async () => {
+      const response = {
+        'headers': {
+          'content-disposition': 'attachment; filname=TTK-Assertion-Report-Test1-2020-05-08T13:53:51.887Z.html'
+        }
+      }
+      axios.post.mockReturnValueOnce(response)
+      spyPromisify.mockReturnValueOnce(jest.fn())
+      await expect(report.outbound(data, {reportFormat: 'printhtml'})).resolves.toBe(undefined)
+    })
     it('when the report format is printhtml and reportFilename not present should not throw an error', async () => {
-      spyAxios.mockReturnValueOnce(response)
+      const response = {
+        'headers': {
+          'content-disposition': 'attachment; filename=TTK-Assertion-Report-Test1-2020-05-08T13:53:51.887Z.html'
+        }
+      }
+      axios.post.mockReturnValueOnce(response)
+      spyPromisify.mockReturnValueOnce(jest.fn())
+      await expect(report.outbound(data, {reportFormat: 'printhtml'})).resolves.toBe(undefined)
+    })
+    it('when the report format is printhtml and reportFilename not present should not throw an error', async () => {
+      const response = {
+        'headers': {
+          'content-disposition': 'attachment; filename=TTK-Assertion-Report-Test1-2020-05-08T13:53:51.887Z.html'
+        }
+      }
+      axios.post.mockReturnValueOnce(response)
+      spyPromisify.mockReturnValueOnce(jest.fn())
       await expect(report.outbound(data, {reportFormat: 'printhtml'})).resolves.toBe(undefined)
     })
     it('when the report format is not supported should not throw an error', async () => {
-      spyAxios.mockReturnValueOnce(response)
       await expect(report.outbound(data, {reportFormat: 'default'})).resolves.toBe(undefined)
     })
   })

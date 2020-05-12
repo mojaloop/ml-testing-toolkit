@@ -24,9 +24,9 @@
 const axios = require('axios').default
 const fs = require('fs')
 const { promisify } = require('util')
-const writeFileAsync = promisify(fs.writeFile)
 
 const outbound = async (data, config) => {
+  const writeFileAsync = promisify(fs.writeFile)
   let reportData
   let reportFilename
   switch (config.reportFormat) {
