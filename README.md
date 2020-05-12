@@ -158,7 +158,11 @@ Open the following URLs in your browser and send a transfer from simulator and o
 
 ## 5. Usage
 
-After installation you can follow this [Usage Guide](/documents/User-Guide.md)
+After installation you can interact with the testing toolkit from either web interface or with a command line tool.
+
+For Web interface follow this [Usage Guide](/documents/User-Guide.md)
+
+For Command line tool follow this [CLI User Guide](/documents/User-Guide-CLI.md)
 
 
 ## 6. Rules

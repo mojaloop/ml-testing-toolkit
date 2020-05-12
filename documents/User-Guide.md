@@ -10,6 +10,7 @@ The **Mojaloop Testing Toolkit** was designed for participants that would like t
 
 For additional back ground information on the Self Testing Toolkit, please see [Mojaloop Testing Toolkit](/documents/Mojaloop-Testing-Tool.md). It would be to the particpant's benefit to familiarise themselves with the understanding of the  [Architecture Diagram](/documents/MojaloopÂ-Testing-Tool.md#7-architecture) that explains the various components and related flows.
 
+If you need The Mojaloop Testing Toolkit CLI you could follow [CLI User Guide](/documents/User-Guide-CLI.md)
 
 **Table of Contents**
 
@@ -54,6 +55,7 @@ For additional back ground information on the Self Testing Toolkit, please see [
     3.5 [Alternative Set-ups](#35-alternative-set-ups)
 
 4. [Frequently Asked Questions](#4-frequently-asked-questions)
+5. [The Mojaloop Testing Toolkit CLI](#5-the-mojaloop-testing-toolkit-cli)
 
 ### 1. Getting Started
 
