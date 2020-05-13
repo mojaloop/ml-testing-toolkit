@@ -24,8 +24,6 @@
 
 const Ilp = require('@mojaloop/sdk-standard-components').Ilp
 // const customLogger = require('./requestLogger')
-const ilpPacket = require('ilp-packet')
-const base64url = require('base64url')
 
 var ilpObj = null
 
@@ -73,10 +71,9 @@ const handleTransferIlp = (context, response) => {
 // Check the contents of ILP Packet against the values from body
 const validateTransferIlpPacket = (context, request) => {
   if (request.method === 'post' && request.path === '/transfers') {
-    return validateIlpAgainstTransferRequest(request.payload)
+    return ilpObj.validateIlpAgainstTransferRequest(request.payload)
   }
   return true
-  // Check the fulfilment and condition matching
 }
 
 // Check the condition is matched with fulfilment stored
@@ -84,43 +81,6 @@ const validateTransferCondition = (context, request) => {
   if (request.method === 'post' && request.path === '/transfers') {
     const generatedFulfilment = ilpObj.calculateFulfil(request.payload.ilpPacket).replace('"', '')
     return ilpObj.validateFulfil(generatedFulfilment, request.payload.condition)
-  }
-  return true
-  // Check the fulfilment and condition matching
-}
-
-// TODO: To be moved to sdk-standandard-componenets library
-const decodeIlpPacket = (inputIlpPacket) => {
-  const binaryPacket = Buffer.from(inputIlpPacket, 'base64')
-  const jsonPacket = ilpPacket.deserializeIlpPayment(binaryPacket)
-  return jsonPacket
-}
-
-// TODO: To be moved to sdk-standandard-componenets library
-const getTransactionObject = (inputIlpPacket) => {
-  const jsonPacket = decodeIlpPacket(inputIlpPacket)
-  const decodedData = base64url.decode(jsonPacket.data.toString())
-  return JSON.parse(decodedData)
-}
-
-// TODO: To be moved to sdk-standandard-componenets library
-const validateIlpAgainstTransferRequest = (transferRequestBody) => {
-  const transactionObject = getTransactionObject(transferRequestBody.ilpPacket)
-
-  if (transferRequestBody.transferId !== transactionObject.transactionId) {
-    return false
-  }
-  if (transferRequestBody.payerFsp !== transactionObject.payer.partyIdInfo.fspId) {
-    return false
-  }
-  if (transferRequestBody.payeeFsp !== transactionObject.payee.partyIdInfo.fspId) {
-    return false
-  }
-  if (transferRequestBody.amount.currency !== transactionObject.amount.currency) {
-    return false
-  }
-  if (transferRequestBody.amount.amount !== transactionObject.amount.amount) {
-    return false
   }
   return true
 }
