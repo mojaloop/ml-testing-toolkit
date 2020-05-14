@@ -25,9 +25,12 @@
 'use strict'
 
 const OpenApiMockHandler = require('../../../../src/lib/mocking/openApiMockHandler')
+const IlpModel = require('../../../../src/lib/mocking/middleware-functions/ilpModel')
 
 const OpenApiBackend = require('openapi-backend').default
 jest.mock('openapi-backend')
+jest.mock('../../../../src/lib/mocking/middleware-functions/ilpModel')
+IlpModel.handleQuoteIlp.mockImplementation(() => 'asdf')
 
 
 OpenApiBackend.mockImplementation((argObj) => {
