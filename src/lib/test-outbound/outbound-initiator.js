@@ -37,6 +37,7 @@ const JwsSigning = require('../jws/JwsSigning')
 const traceHeaderUtils = require('../traceHeaderUtils')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
 require('request-to-curl')
+const atob = require('atob') // eslint-disable-line
 
 delete axios.defaults.headers.common.Accept
 
