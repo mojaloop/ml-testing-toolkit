@@ -132,7 +132,7 @@ const processTestCase = async (testCase, traceID, inputValues) => {
 
     // Send http request
     try {
-      const resp = await sendRequest(convertedRequest.method, convertedRequest.path, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl)
+      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl)
 
       const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback)
       request.appended = {
@@ -225,10 +225,24 @@ const handleTests = async (request, response = null, callback = null) => {
   }
 }
 
-const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallbackUrl) => {
+const getUrlPrefix = (baseUrl) => {
+  let returnUrl = baseUrl
+  if (!returnUrl.startsWith('http:') && !returnUrl.startsWith('https:')) {
+    returnUrl = 'http://' + returnUrl
+  }
+  if (returnUrl.endsWith('/')) {
+    returnUrl = returnUrl.slice(0, returnUrl.length - 1)
+  }
+  return returnUrl
+}
+
+const sendRequest = (baseUrl, method, path, headers, body, successCallbackUrl, errorCallbackUrl) => {
   return new Promise((resolve, reject) => {
     const httpsProps = {}
     let urlGenerated = Config.getUserConfig().CALLBACK_ENDPOINT + path
+    if (baseUrl) {
+      urlGenerated = getUrlPrefix(baseUrl) + path
+    }
     if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
       const tlsConfig = ConnectionProvider.getTlsConfig()
       const httpsAgent = new https.Agent({
@@ -238,7 +252,7 @@ const sendRequest = (method, path, headers, body, successCallbackUrl, errorCallb
         rejectUnauthorized: true
       })
       httpsProps.httpsAgent = httpsAgent
-      urlGenerated = urlGenerated = urlGenerated.replace('http:', 'https:')
+      urlGenerated = urlGenerated.replace('http:', 'https:')
     }
 
     const reqOpts = {
