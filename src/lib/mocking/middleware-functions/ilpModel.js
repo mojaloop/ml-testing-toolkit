@@ -74,7 +74,12 @@ const handleTransferIlp = (context, response) => {
 const validateTransferIlpPacket = (context, request) => {
   if (request.method === 'post' && request.path === '/transfers') {
     customLogger.logMessage('info', 'Validating Ilp packet against the transfer request', null, true, request)
-    return ilpObj.validateIlpAgainstTransferRequest(request.payload)
+    try {
+      return ilpObj.validateIlpAgainstTransferRequest(request.payload)
+    } catch (err) {
+      customLogger.logMessage('error', 'Failed to validate the Ilp packet. Error: ' + err.message, null, true, request)
+      return false
+    }
   }
   return true
 }
@@ -87,10 +92,20 @@ const validateTransferCondition = (context, request) => {
       fulfilment = request.customInfo.storedTransaction.fulfilment
       customLogger.logMessage('info', 'Validating condition with the stored fulfilment', null, true, request)
     } else {
-      fulfilment = ilpObj.calculateFulfil(request.payload.ilpPacket).replace('"', '')
-      customLogger.logMessage('info', 'Validating condition with the generated fulfilment', null, true, request)
+      try {
+        fulfilment = ilpObj.calculateFulfil(request.payload.ilpPacket).replace('"', '')
+        customLogger.logMessage('info', 'Validating condition with the generated fulfilment', null, true, request)
+      } catch (err) {
+        customLogger.logMessage('error', 'Failed to calculate the fulfilment. Error: ' + err.message, null, true, request)
+        return false
+      }
     }
-    return ilpObj.validateFulfil(fulfilment, request.payload.condition)
+    try {
+      return ilpObj.validateFulfil(fulfilment, request.payload.condition)
+    } catch (err) {
+      customLogger.logMessage('error', 'Failed to validate the fulfilment. Error: ' + err.message, null, true, request)
+      return false
+    }
   }
   return true
 }

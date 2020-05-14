@@ -36,7 +36,12 @@ const handleQuotes = (context, request, fulfilment = null) => {
 const handleTransfers = (context, request) => {
   // Check whether the request is POST /transfers
   if (request.method === 'post' && request.path === '/transfers') {
-    const ilpTransactionObject = IlpModel.getIlpTransactionObject(request.payload.ilpPacket)
+    let ilpTransactionObject
+    try {
+      ilpTransactionObject = IlpModel.getIlpTransactionObject(request.payload.ilpPacket)
+    } catch (err) {
+      return false
+    }
     // Search for the Transaction ID in object store
     if (ObjectStore.searchTransaction(ilpTransactionObject.transactionId)) {
       const storedTransaction = ObjectStore.getTransaction(ilpTransactionObject.transactionId)

@@ -29,6 +29,7 @@ const OpenApiMockHandler = require('../../../../src/lib/mocking/openApiMockHandl
 const OpenApiBackend = require('openapi-backend').default
 jest.mock('openapi-backend')
 
+
 OpenApiBackend.mockImplementation((argObj) => {
   const initFn = async () => {
 
@@ -46,6 +47,46 @@ OpenApiBackend.mockImplementation((argObj) => {
   }
 })
 
+const quoteRequestBody = {
+  quoteId: 'f27456e9-fffb-47c0-9f28-5c727434873d',
+  transactionId: '49618fcc-8b13-49b1-8126-2a0cda6472ce',
+  amountType: 'SEND',
+  amount: {
+    currency: 'USD',
+    amount: '100'
+  },
+  expiration: '2020-05-14T13:06:20.442Z',
+  payer: {
+    partyIdInfo: {
+      partyIdType: 'MSISDN',
+      partyIdentifier: '123456',
+      fspId: 'userdfsp'
+    },
+    name: 'John Johnson'
+  },
+  payee: {
+    partyIdInfo: {
+      partyIdType: 'MSISDN',
+      partyIdentifier: '000111',
+      fspId: 'testingtoolkitdfsp'
+    },
+    personalInfo: {
+      complexName: {
+        firstName: 'Maria',
+        middleName: 'N',
+        lastName: 'Williams'
+      },
+      dateOfBirth: '1932-04-24'
+    }
+  },
+  transactionType: {
+    scenario: 'TRANSFER',
+    initiator: 'PAYER',
+    initiatorType: 'CONSUMER'
+  },
+  note: 'this is a test'
+}
+
 const sampleContext = {
   operation: {
     path: '/quotes',
@@ -54,19 +95,7 @@ const sampleContext = {
   request: {
     path: '/quotes',
     method: 'post',
-    body: {
-      payee: {
-        partyIdInfo: {
-          partyIdType: 'MSISDN',
-          partyIdentifier: '000111',
-          fspId: 'fspid'
-        }
-      },
-      amount: {
-        currency: 'USD',
-        amount: '10'
-      }
-    }
+    body: {...quoteRequestBody}
   },
   api: {
     mockResponseForOperation: () => {
@@ -82,22 +111,11 @@ const sampleContext = {
 
 const sampleRequest = {
   method: 'post',
-  path: '/transfers',
+  path: '/quotes',
   headers: {
     'Accept': 'asdf'
   },
-  payload: {
-    transactionId: '57138ef8-17e9-4514-899b-279d805340ff',
-    payer: {
-      partyIdType: 'MSISDN',
-      partyIdentifier: '44123456789',
-      fspId: 'testingtoolkitdfsp'
-    },
-    amount: {
-      currency: 'USD',
-      amount: '100'
-    },
-  },
+  payload: {...quoteRequestBody},
   customInfo: {
     sessionID: '123'
   }
