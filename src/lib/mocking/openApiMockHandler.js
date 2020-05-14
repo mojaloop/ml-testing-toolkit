@@ -285,9 +285,9 @@ const generateAsyncCallback = async (item, context, req) => {
     CallbackHandler.handleCallback(generatedErrorCallback, context, req)
     return
   }
-  // Handle quotes for transfer association
+
+  // Handle quotes and transfer association - should do this first to get the associated quote
   if (Config.getUserConfig().TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
-    require('./middleware-functions/quotesAssociation').handleQuotes(context, req)
     const matchFound = require('./middleware-functions/quotesAssociation').handleTransfers(context, req)
     if (!matchFound) {
       customLogger.logMessage('error', 'Matching Quote Not Found', null, true, req)
@@ -341,8 +341,11 @@ const generateAsyncCallback = async (item, context, req) => {
   const generatedCallback = await OpenApiRulesEngine.callbackRules(context, req)
   if (generatedCallback.body) {
     // Append ILP properties to callback
-    IlpModel.handleQuoteIlp(context, generatedCallback)
+    const fulfilment = IlpModel.handleQuoteIlp(context, generatedCallback)
     IlpModel.handleTransferIlp(context, generatedCallback)
+    if (Config.getUserConfig().TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
+      require('./middleware-functions/quotesAssociation').handleQuotes(context, req, fulfilment)
+    }
     // TODO: Handle method and path verifications against the generated ones
     CallbackHandler.handleCallback(generatedCallback, context, req)
     // Handle triggers for a transaction request

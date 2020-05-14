@@ -23,7 +23,7 @@
  ******/
 
 const Ilp = require('@mojaloop/sdk-standard-components').Ilp
-// const customLogger = require('./requestLogger')
+const customLogger = require('../../requestLogger')
 
 var ilpObj = null
 
@@ -50,10 +50,12 @@ const handleQuoteIlp = (context, response) => {
       transactionType: context.request.body.transactionType,
       note: response.body.note
     }
-    const { ilpPacket, condition } = ilpObj.getResponseIlp(transactionObject)
+    const { ilpPacket, fulfilment, condition } = ilpObj.getResponseIlp(transactionObject)
     response.body.ilpPacket = ilpPacket
     response.body.condition = condition
+    return fulfilment
   }
+  return null
 }
 
 const handleTransferIlp = (context, response) => {
@@ -71,6 +73,7 @@ const handleTransferIlp = (context, response) => {
 // Check the contents of ILP Packet against the values from body
 const validateTransferIlpPacket = (context, request) => {
   if (request.method === 'post' && request.path === '/transfers') {
+    customLogger.logMessage('info', 'Validating Ilp packet against the transfer request', null, true, request)
     return ilpObj.validateIlpAgainstTransferRequest(request.payload)
   }
   return true
@@ -79,10 +82,24 @@ const validateTransferIlpPacket = (context, request) => {
 // Check the condition is matched with fulfilment stored
 const validateTransferCondition = (context, request) => {
   if (request.method === 'post' && request.path === '/transfers') {
-    const generatedFulfilment = ilpObj.calculateFulfil(request.payload.ilpPacket).replace('"', '')
-    return ilpObj.validateFulfil(generatedFulfilment, request.payload.condition)
+    let fulfilment = null
+    if (request.customInfo.storedTransaction && request.customInfo.storedTransaction.fulfilment) {
+      fulfilment = request.customInfo.storedTransaction.fulfilment
+      customLogger.logMessage('info', 'Validating condition with the stored fulfilment', null, true, request)
+    } else {
+      fulfilment = ilpObj.calculateFulfil(request.payload.ilpPacket).replace('"', '')
+      customLogger.logMessage('info', 'Validating condition with the generated fulfilment', null, true, request)
+    }
+    return ilpObj.validateFulfil(fulfilment, request.payload.condition)
   }
   return true
+}
+
+// Decoding functions
+
+const getIlpTransactionObject = (ilpPacket) => {
+  const ilpTransactionObject = ilpObj.getTransactionObject(ilpPacket)
+  return ilpTransactionObject
 }
 
 module.exports = {
@@ -90,5 +107,6 @@ module.exports = {
   handleQuoteIlp,
   handleTransferIlp,
   validateTransferIlpPacket,
-  validateTransferCondition
+  validateTransferCondition,
+  getIlpTransactionObject
 }

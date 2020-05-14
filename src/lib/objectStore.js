@@ -34,17 +34,27 @@ const get = (key) => {
   return { ...storedObject[key] }
 }
 
-const saveTransaction = (transactionId) => {
+const saveTransaction = (transactionId, fulfilment) => {
   // Append the current transaction to transactions
   const curDateMillis = Date.now()
   storedObject.transactions[transactionId] = {
-    transactionDate: curDateMillis
+    transactionDate: curDateMillis,
+    fulfilment: fulfilment
   }
 }
 
 const searchTransaction = (transactionId) => {
   // Search for the transactionId
   return Object.prototype.hasOwnProperty.call(storedObject.transactions, transactionId)
+}
+
+const getTransaction = (transactionId) => {
+  // get the transaction for the transactionId
+  if (searchTransaction(transactionId)) {
+    return storedObject.transactions[transactionId]
+  } else {
+    return null
+  }
 }
 
 const deleteTransaction = (transactionId) => {
@@ -69,6 +79,7 @@ module.exports = {
   get,
   saveTransaction,
   searchTransaction,
+  getTransaction,
   deleteTransaction,
   initObjectStore
 }
