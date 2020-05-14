@@ -291,7 +291,7 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      OutboundInitiator.sendRequest(sampleRequest)
+      OutboundInitiator.sendRequest(null, 'post', '/quotes', sampleRequest.headers, sampleRequest.body, null, null)
       expect(axios).toHaveBeenCalledTimes(1);
     })
   })
