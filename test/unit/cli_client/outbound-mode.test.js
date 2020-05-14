@@ -28,15 +28,7 @@ const spyReport = jest.spyOn(require('../../../src/cli_client/utils/report'), 'o
 const spyLogger = jest.spyOn(require('../../../src/cli_client/utils/logger'), 'outbound')
 const spyExit = jest.spyOn(process, 'exit')
 const spyAxios = jest.spyOn(axios, 'post')
-jest.spyOn(require('util'), 'promisify').mockReturnValueOnce(() => {
-  return JSON.stringify({
-    "test_cases": [
-      {
-        "requests": []
-      }
-    ]
-  })
-})
+const spyPromisify = jest.spyOn(require('util'), 'promisify')
 
 const outbound = require('../../../src/cli_client/modes/outbound')
 
@@ -86,12 +78,27 @@ describe('Cli client', () => {
     })
   })
   describe('run sendTemplate', () => {
-    it('when sendTemplate should not throw an error', async () => {
+    it('when readFile returns data should not throw an error', async () => {
+      spyPromisify.mockReturnValueOnce(() => {
+        return JSON.stringify({
+          "test_cases": [
+            {
+              "requests": []
+            }
+          ]
+        })
+      })
       const configuration = {
         "inputFile": "sample-cli.json"
       }
       spyAxios.mockReturnValue({})
-      spyExit.mockReturnValueOnce({})
+      await expect(outbound.sendTemplate(configuration)).resolves.toBe(undefined)
+    })
+    it('when readFile throws error should not throw an error', async () => {
+      spyPromisify.mockReturnValueOnce(() => {throw new Error('expected error')})
+      const configuration = {
+        "inputFile": "sample-cli.json"
+      }
       await expect(outbound.sendTemplate(configuration)).resolves.toBe(undefined)
     })
   })

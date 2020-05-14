@@ -28,7 +28,6 @@ const logger = require('../utils/logger')
 const fStr = require('node-strings')
 const fs = require('fs')
 const { promisify } = require('util')
-const readFileAsync = promisify(fs.readFile)
 
 const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
 
@@ -37,6 +36,7 @@ let template
 
 const sendTemplate = async (configiration) => {
   try {
+    const readFileAsync = promisify(fs.readFile)
     const outboundRequestID = Math.random().toString(36).substring(7)
     config = configiration
     template = JSON.parse(await readFileAsync(`${config.inputFile}`, 'utf8'))

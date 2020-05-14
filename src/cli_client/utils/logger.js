@@ -52,9 +52,9 @@ const outbound = (progress) => {
     [{ colSpan: 2, content: 'SUMMARY', hAlign: 'center' }],
     { 'Total assertions': totalAssertionsCount },
     { 'Passed assertions': totalPassedAssertionsCount },
-    { 'Faile assertions': totalAssertionsCount - totalPassedAssertionsCount },
+    { 'Failed assertions': totalAssertionsCount - totalPassedAssertionsCount },
     { 'Total requests': totalRequestsCount },
-    { 'Total test cases': totalRequestsCount },
+    { 'Total test cases': progress.test_cases.length },
     { 'Passed percentage': `${(100 * (totalPassedAssertionsCount / totalAssertionsCount)).toFixed(2)}%` },
     { 'Started time': progress.runtimeInformation.startedTime },
     { 'Completed time': progress.runtimeInformation.completedTime },
@@ -69,11 +69,11 @@ const outbound = (progress) => {
 
 const monitoring = (progress) => {
   console.log(
-    fStr.red('\nlog time: ') + progress.logTime +
-    fStr.yellow('\nuniqueId: ') + progress.uniqueId +
-    fStr.yellow('\n\tmessage: ') + progress.message +
-    fStr.yellow('\n\tadditional data: ') + JSON.stringify(progress.additionalData) +
-    '\n'
+    fStr.red(`\n${progress.logTime}`) +
+    fStr.blue(` ${progress.verbosity.toUpperCase()}`) +
+    (progress.uniqueId ? fStr.yellow(`\t(${progress.uniqueId})`) : '\t') +
+    fStr.green(`\t${progress.message}`) +
+    (progress.additionalData ? ('\n' + JSON.stringify(progress.additionalData, null, 2)) : '\n')
   )
 }
 

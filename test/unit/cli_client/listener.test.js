@@ -25,11 +25,6 @@
 
 const socketIOClient = require('socket.io-client')
 jest.mock('socket.io-client')
-socketIOClient.mockImplementation(() => {
-  return {
-    on: (someName, incomingFn) => {}
-  }
-})
 const listeners = require('../../../src/cli_client/utils/listeners')
 
 
@@ -38,6 +33,11 @@ describe('Cli client', () => {
     it('running the outbound listener should not throw an error', async () => {
       const outbound = require('../../../src/cli_client/modes/outbound')
       jest.spyOn(outbound, 'handleIncomingProgress').mockReturnValueOnce({})
+      socketIOClient.mockImplementationOnce(() => {
+        return {
+          on: (someName, incomingFn) => {}
+        }
+      })
       expect(() => {
         listeners.outbound()
       }).not.toThrowError();
@@ -45,6 +45,11 @@ describe('Cli client', () => {
     it('running the monitoring listener should not throw an error', async () => {
       const monitoring = require('../../../src/cli_client/modes/monitoring')
       jest.spyOn(monitoring, 'handleIncomingProgress').mockReturnValueOnce({})
+      socketIOClient.mockImplementationOnce(() => {
+        return {
+          on: (someName, incomingFn) => {}
+        }
+      })
       expect(() => {
         listeners.monitoring()
       }).not.toThrowError();

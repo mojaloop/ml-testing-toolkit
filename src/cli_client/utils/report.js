@@ -24,38 +24,43 @@
 const axios = require('axios').default
 const fs = require('fs')
 const { promisify } = require('util')
-const writeFileAsync = promisify(fs.writeFile)
 
 const outbound = async (data, config) => {
-  let testCaseReport
+  const writeFileAsync = promisify(fs.writeFile)
+  let reportData
+  let reportFilename
   switch (config.reportFormat) {
     case 'json':
-      testCaseReport = JSON.stringify(data, null, 2)
-      await writeFileAsync(`${data.name}-${data.runtimeInformation.completedTimeISO}.${config.reportFormat}`, testCaseReport)
+      reportData = JSON.stringify(data, null, 2)
+      reportFilename = config.reportFilename || `${data.name}-${data.runtimeInformation.completedTimeISO}.json`
       break
     case 'html':
     case 'printhtml': {
       const response = await axios.post(`http://localhost:5050/api/reports/testcase/${config.reportFormat}`, data, { headers: { 'Content-Type': 'application/json' } })
-      let downloadFilename
+      reportData = response.data
       if (config.reportFilename) {
-        downloadFilename = config.reportFilename
+        reportFilename = config.reportFilename
       } else {
         const disposition = response.headers['content-disposition']
         if (disposition && disposition.indexOf('attachment') !== -1) {
           var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
           var matches = filenameRegex.exec(disposition)
           if (matches != null && matches[1]) {
-            downloadFilename = matches[1].replace(/['"]/g, '')
+            reportFilename = matches[1].replace(/['"]/g, '')
           }
         }
+        if (!reportFilename) {
+          reportFilename = 'report.html'
+        }
       }
-      await writeFileAsync(downloadFilename, response.data)
-      console.log(`${downloadFilename} was generated`)
       break
     }
     default:
       console.log('reportFormat is not supported')
+      return
   }
+  await writeFileAsync(reportFilename, reportData)
+  console.log(`${reportFilename} was generated`)
 }
 
 module.exports = {
