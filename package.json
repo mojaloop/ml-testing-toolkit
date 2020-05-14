@@ -1,7 +1,7 @@
 {
   "name": "ml-testing-toolkit",
   "description": "Testing Toolkit for Mojaloop implementations",
-  "version": "10.1.2",
+  "version": "10.2.1",
   "license": "Apache-2.0",
   "author": "Vijaya Kumar Guthi, ModusBox Inc.",
   "contributors": [
@@ -58,7 +58,7 @@
     "@hapi/hapi": "19.1.1",
     "@hapi/inert": "5.2.2",
     "@hapi/vision": "5.5.4",
-    "@mojaloop/sdk-standard-components": "^8.6.9",
+    "@mojaloop/sdk-standard-components": "10.2.0",
     "@now-ims/hapi-now-auth": "2.0.0",
     "@types/socket.io": "^2.1.4",
     "axios": "^0.19.2",

@@ -23,22 +23,31 @@
  ******/
 
 const ObjectStore = require('../../objectStore')
+const IlpModel = require('./ilpModel')
 
-const handleQuotes = (context, request) => {
+const handleQuotes = (context, request, fulfilment = null) => {
   // Check whether the request is POST /quotes
   if (request.method === 'post' && request.path === '/quotes') {
     // Save the Transaction ID in object store
-    ObjectStore.saveTransaction(request.payload.transactionId)
+    ObjectStore.saveTransaction(request.payload.transactionId, fulfilment)
   }
 }
 
 const handleTransfers = (context, request) => {
   // Check whether the request is POST /transfers
   if (request.method === 'post' && request.path === '/transfers') {
+    let ilpTransactionObject
+    try {
+      ilpTransactionObject = IlpModel.getIlpTransactionObject(request.payload.ilpPacket)
+    } catch (err) {
+      return false
+    }
     // Search for the Transaction ID in object store
-    if (ObjectStore.searchTransaction(request.payload.transferId)) {
+    if (ObjectStore.searchTransaction(ilpTransactionObject.transactionId)) {
+      const storedTransaction = ObjectStore.getTransaction(ilpTransactionObject.transactionId)
+      request.customInfo.storedTransaction = storedTransaction
       // Transaction Found, delete it in objectStore
-      ObjectStore.deleteTransaction(request.payload.transferId)
+      ObjectStore.deleteTransaction(ilpTransactionObject.transactionId)
     } else {
       // Transaction not found, throw error callback
       return false
