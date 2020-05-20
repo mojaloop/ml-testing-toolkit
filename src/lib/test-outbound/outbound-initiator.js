@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -37,9 +38,11 @@ const JwsSigning = require('../jws/JwsSigning')
 const traceHeaderUtils = require('../traceHeaderUtils')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
 require('request-to-curl')
-const atob = require('atob') // eslint-disable-line
-
+require('atob') // eslint-disable-line
 delete axios.defaults.headers.common.Accept
+const context = require('./context')
+const openApiDefinitionsModel = require('../mocking/openApiDefinitionsModel')
+const uuid4 = require('uuid4')
 
 const OutboundSend = async (inputTemplate, traceID) => {
   const startedTimeStamp = new Date()
@@ -49,9 +52,11 @@ const OutboundSend = async (inputTemplate, traceID) => {
     outboundID = traceHeaderUtils.getEndToEndID(traceID)
     sessionID = traceHeaderUtils.getSessionID(traceID)
   }
+
   for (const i in inputTemplate.test_cases) {
     await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues)
   }
+
   const completedTimeStamp = new Date()
   const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
   // Send the total result to client
@@ -72,7 +77,7 @@ const OutboundSend = async (inputTemplate, traceID) => {
   }
 }
 
-const processTestCase = async (testCase, traceID, inputValues) => {
+const processTestCase = async (testCase, traceID, inputValues, contextObj) => {
   let outboundID = traceID
   let sessionID = null
   if (traceID && traceHeaderUtils.isCustomTraceID(traceID)) {
@@ -96,13 +101,19 @@ const processTestCase = async (testCase, traceID, inputValues) => {
   // console.log(requestsObj)
   // console.log(templateIDArr)
 
-  // TODO; Include version support
-  const cbMapRawdata = await readFileAsync('spec_files/api_definitions/fspiop_1.0/callback_map.json')
-  const reqCallbackMap = JSON.parse(cbMapRawdata)
-
+  const apiDefinitions = await openApiDefinitionsModel.getApiDefinitions()
   // Iterate the request ID array
   for (const i in templateIDArr) {
     const request = requestsObj[templateIDArr[i]]
+
+    const reqApiDefinition = apiDefinitions.find((item) => {
+      return (
+        item.majorVersion === +request.apiVersion.majorVersion &&
+        item.minorVersion === +request.apiVersion.minorVersion &&
+        item.type === request.apiVersion.type
+      )
+    })
+
     let convertedRequest = JSON.parse(JSON.stringify(request))
     // console.log(request)
     // Form the actual http request headers, body, path and method by replacing configurable parameters
@@ -118,10 +129,14 @@ const processTestCase = async (testCase, traceID, inputValues) => {
     // TODO: Get version from accept / content-type headers
     let successCallbackUrl = null
     let errorCallbackUrl = null
-    if (reqCallbackMap[request.operationPath]) {
-      if (reqCallbackMap[request.operationPath][request.method]) {
-        successCallbackUrl = reqCallbackMap[request.operationPath][request.method].successCallback.method + ' ' + replaceVariables(reqCallbackMap[request.operationPath][request.method].successCallback.pathPattern, null, convertedRequest)
-        errorCallbackUrl = reqCallbackMap[request.operationPath][request.method].errorCallback.method + ' ' + replaceVariables(reqCallbackMap[request.operationPath][request.method].errorCallback.pathPattern, null, convertedRequest)
+    if (request.apiVersion.asynchronous === true) {
+      const cbMapRawdata = await readFileAsync(reqApiDefinition.callbackMapFile)
+      const reqCallbackMap = JSON.parse(cbMapRawdata)
+      if (reqCallbackMap[request.operationPath]) {
+        if (reqCallbackMap[request.operationPath][request.method]) {
+          successCallbackUrl = reqCallbackMap[request.operationPath][request.method].successCallback.method + ' ' + replaceVariables(reqCallbackMap[request.operationPath][request.method].successCallback.pathPattern, null, convertedRequest)
+          errorCallbackUrl = reqCallbackMap[request.operationPath][request.method].errorCallback.method + ' ' + replaceVariables(reqCallbackMap[request.operationPath][request.method].errorCallback.pathPattern, null, convertedRequest)
+        }
       }
     }
 
@@ -129,12 +144,41 @@ const processTestCase = async (testCase, traceID, inputValues) => {
     if (sessionID) {
       convertedRequest.headers.traceparent = '00-' + traceID + '-0123456789abcdef0-00'
     }
-
+    let environment
+    const scriptsExecution = {}
     // Send http request
     try {
+      const contextObj = await context.generageContextObj(inputValues)
+
+      if (request.scripts && request.scripts.preRequest && request.scripts.preRequest.exec.length > 0) {
+        scriptsExecution.preRequest = await context.executeAsync(request.scripts.preRequest.exec, { context: { ...contextObj, convertedRequest }, id: uuid4() }, contextObj)
+        console.log(JSON.stringify(scriptsExecution.preRequest, null, 2))
+        const envVars = scriptsExecution.preRequest.environment.reduce((envObj, item) => {
+          envObj[item.key] = item.value
+          return envObj
+        }, {})
+        convertedRequest = replaceEnvironmentVariables(convertedRequest, envVars)
+      }
+
       const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl)
 
-      const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback)
+      if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0) {
+        scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, resp }, id: uuid4() }, contextObj)
+        console.log(JSON.stringify(scriptsExecution.postRequest, null, 2))
+      }
+
+      if (contextObj.environment.values && contextObj.environment.values.length > 0) {
+        environment = contextObj.environment.values.reduce((envObj, item) => {
+          envObj[item.key] = item.value
+          return envObj
+        }, {})
+        console.log(environment)
+      }
+
+      contextObj.ctx.dispose()
+      contextObj.ctx = null
+
+      const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environment)
       request.appended = {
         status: 'SUCCESS',
         testResult,
@@ -155,12 +199,14 @@ const processTestCase = async (testCase, traceID, inputValues) => {
           callback: resp.callback,
           requestSent: convertedRequest,
           additionalInfo: {
-            curlRequest: resp.curlRequest
+            curlRequest: resp.curlRequest,
+            scriptsExecution: scriptsExecution
           },
           testResult
         }, sessionID)
       }
     } catch (err) {
+      console.log(err.message)
       const resp = JSON.parse(err.message)
       const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback)
       request.appended = {
@@ -183,7 +229,8 @@ const processTestCase = async (testCase, traceID, inputValues) => {
           callback: resp.callback,
           requestSent: convertedRequest,
           additionalInfo: {
-            curlRequest: resp.curlRequest
+            curlRequest: resp.curlRequest,
+            scriptsExecution: scriptsExecution
           },
           testResult
         }, sessionID)
@@ -197,7 +244,7 @@ const processTestCase = async (testCase, traceID, inputValues) => {
   // Set a timeout if the response callback is not received in a particular time
 }
 
-const handleTests = async (request, response = null, callback = null) => {
+const handleTests = async (request, response = null, callback = null, environment = []) => {
   try {
     const results = {}
     let passedCount = 0
@@ -285,17 +332,21 @@ const sendRequest = (baseUrl, method, path, headers, body, successCallbackUrl, e
       }
 
       customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
-      // Listen for success callback
-      MyEventEmitter.getTestOutboundEmitter().once(successCallbackUrl, (callbackHeaders, callbackBody) => {
-        MyEventEmitter.getTestOutboundEmitter().removeAllListeners(errorCallbackUrl)
-        resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { headers: callbackHeaders, body: callbackBody } })
-      })
 
-      // Listen for error callback
-      MyEventEmitter.getTestOutboundEmitter().once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
-        MyEventEmitter.getTestOutboundEmitter().removeAllListeners(successCallbackUrl)
-        reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { body: callbackBody } })))
-      })
+      if (successCallbackUrl && errorCallbackUrl) {
+        // Listen for success callback
+        MyEventEmitter.getTestOutboundEmitter().once(successCallbackUrl, (callbackHeaders, callbackBody) => {
+          MyEventEmitter.getTestOutboundEmitter().removeAllListeners(errorCallbackUrl)
+          resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { headers: callbackHeaders, body: callbackBody } })
+        })
+        // Listen for error callback
+        MyEventEmitter.getTestOutboundEmitter().once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
+          MyEventEmitter.getTestOutboundEmitter().removeAllListeners(successCallbackUrl)
+          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { body: callbackBody } })))
+        })
+      } else {
+        resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
+      }
     }, (err) => {
       customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, err, false)
       reject(new Error(JSON.stringify({ errorCode: 4000 })))
@@ -378,6 +429,44 @@ const replaceRequestVariables = (inputRequest) => {
         case '{$request':
           var temp2 = element.replace(/{\$request.(.*)}/, '$1')
           var replacedValue2 = _.get(inputRequest, temp2)
+          if (replacedValue2) {
+            resultObject = resultObject.replace(element, replacedValue2)
+          }
+          break
+        default:
+          break
+      }
+    })
+  }
+
+  if (typeof inputRequest === 'object') {
+    return JSON.parse(resultObject)
+  } else {
+    return resultObject
+  }
+}
+
+const replaceEnvironmentVariables = (inputRequest, environment) => {
+  var resultObject
+  // Check whether inputRequest is string or object. If it is object, then convert that to JSON string and parse it while return
+  if (typeof inputRequest === 'string') {
+    resultObject = inputRequest
+  } else if (typeof inputRequest === 'object') {
+    resultObject = JSON.stringify(inputRequest)
+  } else {
+    return inputRequest
+  }
+
+  // Check once again for the replaced request variables
+  const matchedArray2 = resultObject.match(/{\$([^}]+)}/g)
+  if (matchedArray2) {
+    matchedArray2.forEach(element => {
+      // Check for the function type of param, if its function we need to call a function in custom-functions and replace the returned value
+      const splitArr = element.split('.')
+      switch (splitArr[0]) {
+        case '{$environment':
+          var temp2 = element.replace(/{\$environment.(.*)}/, '$1')
+          var replacedValue2 = _.get(environment, temp2)
           if (replacedValue2) {
             resultObject = resultObject.replace(element, replacedValue2)
           }

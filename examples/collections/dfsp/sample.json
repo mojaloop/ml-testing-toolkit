@@ -4995,6 +4995,35 @@
           }
         }
       ]
+    },
+    {
+      "id": 17,
+      "name": "Block Transfer",
+      "requests": [
+        {
+          "id": 1,
+          "description": "GET limits paterfsp",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/participants/{Type}/{ID}",
+          "path": "/participants/{$inputs.fromFspId}/limits",
+          "method": "get",
+          "params": {
+            "Type": "{$inputs.fromFspId}",
+            "ID": "limits"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          }
+        }
+      ]
     }
   ]
 }

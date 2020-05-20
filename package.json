@@ -93,6 +93,8 @@
     "openapi-backend": "^2.3.5",
     "parse-strings-in-object": "1.2.0",
     "path": "^0.12.7",
+    "postman-collection": "3.6.1",
+    "postman-sandbox": "3.5.3",
     "rc": "1.2.8",
     "request-to-curl": "^0.1.6",
     "selectn": "^1.1.2",

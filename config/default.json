@@ -22,6 +22,11 @@
       "type": "settlements",
       "version": "1.0",
       "folderPath": "settlements_1.0"
+    },
+    {
+      "type": "hub",
+      "version": "9.3",
+      "folderPath": "hub_9.3"
     }
   ]
 }

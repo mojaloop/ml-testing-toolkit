@@ -1,0 +1,246 @@
+{
+  "name": "hub-tests",
+  "inputValues": {
+    "fromIdType": "MSISDN",
+    "fromIdValue": "44123456789",
+    "fromFirstName": "Firstname-Test",
+    "fromLastName": "Lastname-Test",
+    "fromDOB": "1984-01-01",
+    "note": "Test Payment",
+    "currency": "USD",
+    "amount": "100",
+    "homeTransactionId": "123ABC",
+    "fromFspId": "testingtoolkitdfsp",
+    "accept": "application/vnd.interoperability.parties+json;version=1.0",
+    "contentType": "application/vnd.interoperability.parties+json;version=1.0",
+    "toIdValue": "9848613613",
+    "toIdType": "MSISDN",
+    "toFspId": "userdfsp",
+    "acceptQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
+    "contentTypeQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
+    "acceptTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
+    "contentTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
+    "centralLedger": "http://localhost:3001",
+    "HOST_CENTRAL_LEDGER": "http://localhost:3001",
+    "BASE_CENTRAL_LEDGER_ADMIN": "",
+    "HUB_OPERATOR_BEARER_TOKEN": "NOT_APPLICABLE",
+    "hub_operator": "NOT_APPLICABLE",
+    "payerfsp": "testingtoolkitdfsp"
+  },
+  "test_cases": [
+    {
+      "id": 3,
+      "name": "funds_in",
+      "requests": [
+        {
+          "id": 1,
+          "description": "test",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "hub"
+          },
+          "operationPath": "/participants/{name}/accounts/{id}",
+          "path": "/participants/{$inputs.fromFspId}/accounts/4",
+          "method": "post",
+          "params": {
+            "name": "{$inputs.fromFspId}",
+            "id": "4"
+          },
+          "headers": {
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "transferId": "{$environment.fundsInPrepareTransferId}",
+            "externalReference": "string",
+            "action": "recordFundsIn",
+            "reason": "string",
+            "amount": {
+              "amount": "{$environment.fundsInPrepareAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "url": "http://localhost:3001",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "status code to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "hub Recon Account Balance After Funds In is as expected",
+                "exec": [
+                  "expect(Number(environment.hubReconAccountBalanceAfterFundsIn)).to.equal(Number(environment.hubReconAccountBalanceBeforeFundsIn) + Number(request.body.amount.amount))"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "payerfsp Settlement Account Balance After Funds In is as expected",
+                "exec": [
+                  "expect(Number(environment.payerfspSettlementAccountBalanceAfterFundsIn)).to.equal(Number(environment.payerfspSettlementAccountBalanceBeforeFundsIn) - Number(request.body.amount.amount))"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');\r",
+                "var generatedUUID = uuid.v4();\r",
+                "pm.environment.set('fundsInPrepareTransferId', generatedUUID);\r",
+                "pm.environment.set('fundsInPrepareAmount', 5000);\r",
+                "\r",
+                "\r",
+                "const payerfspGetStatusRequest = {\r",
+                "    url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/' + pm.environment.get(\"payerfsp\") + '/accounts',\r",
+                "    method: 'GET',\r",
+                "    header: {\r",
+                "        \"Authorization\": \"Bearer \" + pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "        \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "        \"Content-Type\": \"application/json\"\r",
+                "    }\r",
+                "};\r",
+                "pm.sendRequest(payerfspGetStatusRequest, function (err, response) {\r",
+                "    console.log(response.json())\r",
+                "    var jsonData = response.json()\r",
+                "    for (var i in jsonData) {\r",
+                "        if ((jsonData[i].ledgerAccountType === 'SETTLEMENT') && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "            pm.environment.set(\"payerfspSettlementAccountBalanceBeforeFundsIn\", jsonData[i].value)\r",
+                "        }\r",
+                "    }\r",
+                "});\r",
+                "\r",
+                "const hubGetStatusRequest = {\r",
+                "    url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/Hub/accounts',\r",
+                "    method: 'GET',\r",
+                "    header: {\r",
+                "        \"Authorization\": \"Bearer \" + pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "        \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "        \"Content-Type\": \"application/json\"\r",
+                "    }\r",
+                "};\r",
+                "pm.sendRequest(hubGetStatusRequest, function (err, response) {\r",
+                "    console.log(response.json())\r",
+                "    var jsonData = response.json()\r",
+                "    for (var i in jsonData) {\r",
+                "        if ((jsonData[i].ledgerAccountType === 'HUB_RECONCILIATION') && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "            pm.environment.set(\"hubReconAccountBalanceBeforeFundsIn\", jsonData[i].value)\r",
+                "        }\r",
+                "    }\r",
+                "});"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {\r",
+                "    const payerfspGetStatusRequest = {\r",
+                "        url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/' + pm.environment.get(\"payerfsp\") + '/accounts',\r",
+                "        method: 'GET',\r",
+                "        header: {\r",
+                "            \"Authorization\": \"Bearer \" + pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "            \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "            \"Content-Type\": \"application/json\"\r",
+                "        }\r",
+                "    };\r",
+                "    pm.sendRequest(payerfspGetStatusRequest, function (err, response) {\r",
+                "        console.log('payerfsp accounts: ', response.json())\r",
+                "        var jsonData = response.json()\r",
+                "        var payerfspSettlementAccountBalanceAfterFundsIn\r",
+                "        for (var i in jsonData) {\r",
+                "            if (jsonData[i].ledgerAccountType === 'SETTLEMENT' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "                pm.environment.set(\"payerfspSettlementAccountBalanceAfterFundsIn\", jsonData[i].value)\r",
+                "            }\r",
+                "        }\r",
+                "        var payerfspExpectedBalance = -(-Number(pm.environment.get('payerfspSettlementAccountBalanceBeforeFundsIn')) + Number(pm.environment.get('fundsInPrepareAmount')))\r",
+                "        pm.test(\"Final Payerfsp Settlement Account Balance should be same as before FundsIn + fundsInPrepareAmount\", function () {\r",
+                "            pm.expect(pm.environment.get('payerfspSettlementAccountBalanceAfterFundsIn')).to.eql(payerfspExpectedBalance);\r",
+                "        });\r",
+                "\r",
+                "    });\r",
+                "\r",
+                "    const hubGetStatusRequest = {\r",
+                "        url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/Hub/accounts',\r",
+                "        method: 'GET',\r",
+                "        header: {\r",
+                "            \"Authorization\": \"Bearer \" + pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "            \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "            \"Content-Type\": \"application/json\"\r",
+                "        }\r",
+                "    };\r",
+                "    pm.sendRequest(hubGetStatusRequest, function (err, response) {\r",
+                "        console.log('Hub accounts balance: ', response.json())\r",
+                "        var jsonData = response.json()\r",
+                "        for (var i in jsonData) {\r",
+                "            if (jsonData[i].ledgerAccountType === 'HUB_RECONCILIATION' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "              pm.environment.set(\"hubReconAccountBalanceAfterFundsIn\", jsonData[i].value)\r",
+                "            }\r",
+                "        }\r",
+                "        var hubExpectedBalance = Number(pm.environment.get(\"hubReconAccountBalanceBeforeFundsIn\")) + Number(pm.environment.get('fundsInPrepareAmount'))\r",
+                "        console.log(hubExpectedBalance)\r",
+                "        pm.test(\"Final Hub Reconciliation Account Balance should be same as before FundsIn + fundsInPrepareAmount\", function () {\r",
+                "            pm.expect(pm.environment.get(\"hubReconAccountBalanceAfterFundsIn\")).to.eql(hubExpectedBalance);\r",
+                "        });\r",
+                "    });\r",
+                "}, 2000)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 2,
+          "description": "Record Funds In - prepare transfer status",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transfers/{ID}",
+          "path": "/transfers/3b6dcd23-e2c5-4663-be4e-ab59e98741e4",
+          "method": "get",
+          "params": {
+            "ID": "3b6dcd23-e2c5-4663-be4e-ab59e98741e4"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.accept}"
+          },
+          "url": "http://localhost:3005",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "test",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "commited",
+                "exec": [
+                  "expect(callback.body.transferState).to.equal('COMMITTED')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
