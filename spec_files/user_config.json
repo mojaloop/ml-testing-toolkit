@@ -1,5 +1,5 @@
 {
-  "CALLBACK_ENDPOINT": "http://localhost:5000",
+  "CALLBACK_ENDPOINT": "http://localhost:4000",
   "SEND_CALLBACK_ENABLE": true,
   "FSPID": "testingtoolkitdfsp",
   "TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES": true,

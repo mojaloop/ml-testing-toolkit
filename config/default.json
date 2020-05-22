@@ -24,9 +24,9 @@
       "folderPath": "settlements_1.0"
     },
     {
-      "type": "hub",
+      "type": "central_admin",
       "version": "9.3",
-      "folderPath": "hub_9.3"
+      "folderPath": "central_admin_9.3"
     }
   ]
 }
