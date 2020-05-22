@@ -53,8 +53,9 @@ const OutboundSend = async (inputTemplate, traceID) => {
     sessionID = traceHeaderUtils.getSessionID(traceID)
   }
 
+  const templateEnvironment = Object.entries(inputTemplate.inputValues).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
   for (const i in inputTemplate.test_cases) {
-    await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues)
+    await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, templateEnvironment)
   }
 
   const completedTimeStamp = new Date()
@@ -77,7 +78,7 @@ const OutboundSend = async (inputTemplate, traceID) => {
   }
 }
 
-const processTestCase = async (testCase, traceID, inputValues, contextObj) => {
+const processTestCase = async (testCase, traceID, inputValues, templateEnvironment) => {
   let outboundID = traceID
   let sessionID = null
   if (traceID && traceHeaderUtils.isCustomTraceID(traceID)) {
@@ -144,15 +145,15 @@ const processTestCase = async (testCase, traceID, inputValues, contextObj) => {
     if (sessionID) {
       convertedRequest.headers.traceparent = '00-' + traceID + '-0123456789abcdef0-00'
     }
-    let environment
+
     const scriptsExecution = {}
     // Send http request
     try {
-      const contextObj = await context.generageContextObj(inputValues)
+      const contextObj = await context.generageContextObj(templateEnvironment)
 
-      if (request.scripts && request.scripts.preRequest && request.scripts.preRequest.exec.length > 0) {
-        scriptsExecution.preRequest = await context.executeAsync(request.scripts.preRequest.exec, { context: { ...contextObj, convertedRequest }, id: uuid4() }, contextObj)
-        console.log(JSON.stringify(scriptsExecution.preRequest, null, 2))
+      if (request.scripts && request.scripts.preRequest && request.scripts.preRequest.exec.length > 0 && request.scripts.preRequest.exec !== ['']) {
+        scriptsExecution.preRequest = await context.executeAsync(request.scripts.preRequest.exec, { context: { ...contextObj, request: convertedRequest }, id: uuid4() }, contextObj)
+
         const envVars = scriptsExecution.preRequest.environment.reduce((envObj, item) => {
           envObj[item.key] = item.value
           return envObj
@@ -162,18 +163,16 @@ const processTestCase = async (testCase, traceID, inputValues, contextObj) => {
 
       const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl)
 
-      if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0) {
-        scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, resp }, id: uuid4() }, contextObj)
-        console.log(JSON.stringify(scriptsExecution.postRequest, null, 2))
+      if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
+        const response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
+        scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, response }, id: uuid4() }, contextObj)
       }
 
       if (contextObj.environment.values && contextObj.environment.values.length > 0) {
-        environment = contextObj.environment.values.reduce((envObj, item) => {
-          envObj[item.key] = item.value
-          return envObj
-        }, {})
-        console.log(environment)
+        templateEnvironment = contextObj.environment.values
       }
+
+      const environment = templateEnvironment.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
 
       contextObj.ctx.dispose()
       contextObj.ctx = null
@@ -334,13 +333,20 @@ const sendRequest = (baseUrl, method, path, headers, body, successCallbackUrl, e
       customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
 
       if (successCallbackUrl && errorCallbackUrl) {
+        const timer = setTimeout(() => {
+          MyEventEmitter.getTestOutboundEmitter().removeAllListeners(successCallbackUrl)
+          MyEventEmitter.getTestOutboundEmitter().removeAllListeners(errorCallbackUrl)
+          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
+        }, Config.getUserConfig().CALLBACK_TIMEOUT)
         // Listen for success callback
         MyEventEmitter.getTestOutboundEmitter().once(successCallbackUrl, (callbackHeaders, callbackBody) => {
+          clearTimeout(timer)
           MyEventEmitter.getTestOutboundEmitter().removeAllListeners(errorCallbackUrl)
           resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { headers: callbackHeaders, body: callbackBody } })
         })
         // Listen for error callback
         MyEventEmitter.getTestOutboundEmitter().once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
+          clearTimeout(timer)
           MyEventEmitter.getTestOutboundEmitter().removeAllListeners(successCallbackUrl)
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { body: callbackBody } })))
         })
