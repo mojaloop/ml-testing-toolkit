@@ -28,7 +28,7 @@ const axios = require('axios').default
 
 const createContextAsync = util.promisify(Sandbox.createContext)
 
-const generageContextObj = async (environment) => {
+const generageContextObj = async (environment = []) => {
   const ctx = await createContextAsync({ timeout: 5000 })
   ctx.executeAsync = util.promisify(ctx.execute)
   ctx.on('error', function (cursor, err) {
@@ -48,31 +48,26 @@ const executeAsync = async (script, data, contextObj) => {
     consoleLog.push(Array.from(arguments))
   })
 
-  try {
-    contextObj.ctx.on(`execution.request.${data.id}`, async (cursor, id, requestId, req) => {
-      const uri = `${req.url.protocol}://${req.url.host[0]}:${req.url.port}/`
-      const response = await axios({
-        method: req.method,
-        url: uri + req.url.path.join('/'),
-        headers: req.header
-      })
-      contextObj.ctx.dispatch(`execution.response.${id}`, requestId, null, {
-        code: response.status,
-        body: JSON.stringify(response.data)
-      })
+  contextObj.ctx.on(`execution.request.${data.id}`, async (cursor, id, requestId, req) => {
+    const host = `${req.url.protocol}://${req.url.host.join('.')}:${req.url.port}/`
+    const response = await axios({
+      method: req.method,
+      url: host + req.url.path.join('/'),
+      headers: req.header
     })
-    contextObj.ctx.on(`execution.error.${data.id}`, function (cur, err) {
-      consoleLog.push([
-        cur,
-        'executionError',
-        err
-      ])
+    contextObj.ctx.dispatch(`execution.response.${id}`, requestId, null, {
+      code: response.status,
+      body: JSON.stringify(response.data)
     })
-    const resp = await contextObj.ctx.executeAsync(script, data)
-    contextObj.environment = resp.environment
-  } catch (err) {
-    console.log(err.message)
-  }
+  })
+
+  contextObj.ctx.on(`execution.error.${data.id}`, function (cur, err) {
+    consoleLog.push([cur, 'executionError', err])
+  })
+
+  const resp = await contextObj.ctx.executeAsync(script, data)
+  contextObj.environment = resp.environment
+
   const result = {
     consoleLog: consoleLog,
     environment: contextObj.environment.values

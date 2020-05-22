@@ -100,6 +100,7 @@
     "selectn": "^1.1.2",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
+    "uuid": "8.1.0",
     "uuid4": "1.1.4"
   },
   "devDependencies": {

@@ -42,7 +42,7 @@ require('atob') // eslint-disable-line
 delete axios.defaults.headers.common.Accept
 const context = require('./context')
 const openApiDefinitionsModel = require('../mocking/openApiDefinitionsModel')
-const uuid4 = require('uuid4')
+const uuid = require('uuid')
 
 const OutboundSend = async (inputTemplate, traceID) => {
   const startedTimeStamp = new Date()
@@ -152,7 +152,7 @@ const processTestCase = async (testCase, traceID, inputValues, templateEnvironme
       const contextObj = await context.generageContextObj(templateEnvironment)
 
       if (request.scripts && request.scripts.preRequest && request.scripts.preRequest.exec.length > 0 && request.scripts.preRequest.exec !== ['']) {
-        scriptsExecution.preRequest = await context.executeAsync(request.scripts.preRequest.exec, { context: { ...contextObj, request: convertedRequest }, id: uuid4() }, contextObj)
+        scriptsExecution.preRequest = await context.executeAsync(request.scripts.preRequest.exec, { context: { ...contextObj, request: convertedRequest }, id: uuid.v4() }, contextObj)
 
         const envVars = scriptsExecution.preRequest.environment.reduce((envObj, item) => {
           envObj[item.key] = item.value
@@ -165,7 +165,7 @@ const processTestCase = async (testCase, traceID, inputValues, templateEnvironme
 
       if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
         const response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
-        scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, response }, id: uuid4() }, contextObj)
+        scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, response }, id: uuid.v4() }, contextObj)
       }
 
       if (contextObj.environment.values && contextObj.environment.values.length > 0) {
@@ -573,6 +573,7 @@ module.exports = {
   sendRequest,
   replaceVariables,
   replaceRequestVariables,
+  replaceEnvironmentVariables,
   replacePathVariables,
   getFunctionResult,
   generateFinalReport

@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -146,6 +147,42 @@ describe('Outbound Initiator Functions', () => {
       const request = OutboundInitiator.replaceRequestVariables(sampleRequest)
       expect(request.body.transactionAmount.amount).toEqual('{$request.body.amount.amount}')
       expect(request.body.transactionAmount.currency).toEqual('{$request.body.amount.currency}')
+    })
+  })
+
+  describe('replaceEnvironmentVariables', () => {
+    // Positive Scenarios
+    it('replaceEnvironmentVariables should replace environment variables properly', async () => {
+      const environment = {
+        transactionId: '123'
+      }
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'payerfsp',
+          Date: '2020-01-01 01:01:01'
+        },
+        body: {
+          transactionId: '{$environment.transactionId}'
+        }
+      }
+      const request = OutboundInitiator.replaceEnvironmentVariables(sampleRequest,environment)
+      expect(request.body.transactionId).toEqual('123')
+    })
+    it('replaceEnvironmentVariables should not replace request variables which does not exist', async () => {
+      const environment = {
+        quoteId: '123'
+      }
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'payerfsp',
+          Date: '2020-01-01 01:01:01'
+        },
+        body: {
+          transactionId: '{$environment.transactionId}'
+        }
+      }
+      const request = OutboundInitiator.replaceEnvironmentVariables(sampleRequest,environment)
+      expect(request.body.transactionId).toEqual('{$environment.transactionId}')
     })
   })
 

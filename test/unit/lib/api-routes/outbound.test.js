@@ -71,6 +71,12 @@ describe('API route /api/outbound', () => {
             {
               "id": 1,
               "description": "Get party information",
+              "apiVersion": {
+                "minorVersion": 0,
+                "majorVersion": 1,
+                "type": "fspiop",
+                "asynchronous": true
+              },
               "operationPath": "/parties/{Type}/{ID}",
               "method": "get",
               "headers": {
