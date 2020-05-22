@@ -1,12 +1,12 @@
 {
-  "name": "hub-tests",
+  "name": "central-admin-tests",
   "inputValues": {
     "fromIdType": "MSISDN",
     "fromIdValue": "44123456789",
     "fromFirstName": "Firstname-Test",
     "fromLastName": "Lastname-Test",
     "fromDOB": "1984-01-01",
-    "note": "Test Payment",
+    "note": "Test",
     "currency": "USD",
     "amount": "100",
     "homeTransactionId": "123ABC",
@@ -36,7 +36,7 @@
   },
   "test_cases": [
     {
-      "id": 3,
+      "id": 1,
       "name": "funds_in",
       "requests": [
         {
@@ -45,7 +45,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/accounts/{id}",
           "path": "/participants/{$inputs.fromFspId}/accounts/4",
@@ -250,7 +250,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 2,
       "name": "funds_out - Reserve&Commit",
       "requests": [
         {
@@ -259,7 +259,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/accounts/{id}",
           "path": "/participants/{$inputs.fromFspId}/accounts/{$inputs.accountId}",
@@ -461,7 +461,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/accounts/{id}/transfers/{transferId}",
           "path": "/participants/{$inputs.fromFspId}/accounts/{$inputs.accountId}/transfers/{$prev.1.request.body.transferId}",
@@ -644,7 +644,7 @@
       ]
     },
     {
-      "id": 5,
+      "id": 3,
       "name": "funds_out - Reserve&Abort",
       "requests": [
         {
@@ -653,7 +653,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/accounts/{id}",
           "path": "/participants/{$inputs.fromFspId}/accounts/{$inputs.accountId}",
@@ -855,7 +855,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/accounts/{id}/transfers/{transferId}",
           "path": "/participants/{$inputs.fromFspId}/accounts/{$inputs.accountId}/transfers/{$prev.1.request.body.transferId}",
@@ -1038,7 +1038,7 @@
       ]
     },
     {
-      "id": 6,
+      "id": 4,
       "name": "block_transfer ( p>ndc )",
       "requests": [
         {
@@ -1047,7 +1047,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/limits",
           "path": "/participants/{$inputs.fromFspId}/limits",
@@ -1088,7 +1088,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/limits",
           "path": "/participants/{$inputs.toFspId}/limits",
@@ -1129,7 +1129,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/positions",
           "path": "/participants/{$inputs.fromFspId}/positions",
@@ -1171,7 +1171,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/positions",
           "path": "/participants/{$inputs.toFspId}/positions",
@@ -1222,7 +1222,8 @@
             "Accept": "application/vnd.interoperability.quotes+json;version=1.0",
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0",
             "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}"
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$inputs.toFspId}"
           },
           "body": {
             "quoteId": "{$function.generic.generateUUID}",
@@ -1243,9 +1244,9 @@
             },
             "payee": {
               "partyIdInfo": {
-                "partyIdType": "MSISDN",
-                "partyIdentifier": "9848613613",
-                "fspId": "userdfsp"
+                "partyIdType": "{$inputs.toIdType}",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "fspId": "{$inputs.toFspId}"
               }
             },
             "amountType": "SEND",
@@ -1274,7 +1275,8 @@
           "params": {
             "Type": "",
             "ID": ""
-          }
+          },
+          "url": null
         },
         {
           "id": 6,
@@ -1291,7 +1293,8 @@
             "Accept": "application/vnd.interoperability.transfers+json;version=1.0",
             "Content-Type": "application/vnd.interoperability.transfers+json;version=1.0",
             "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}"
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$inputs.toFspId}"
           },
           "body": {
             "transferId": "{$prev.5.request.body.transactionId}",
@@ -1323,7 +1326,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/positions",
           "path": "/participants/{$inputs.fromFspId}/positions",
@@ -1365,7 +1368,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/positions",
           "path": "/participants/{$inputs.toFspId}/positions",
@@ -1404,7 +1407,7 @@
       ]
     },
     {
-      "id": 7,
+      "id": 5,
       "name": "p2p_money_transfer - p2p_happy_path SEND QUOTE",
       "requests": [
         {
@@ -1772,7 +1775,7 @@
       ]
     },
     {
-      "id": 8,
+      "id": 6,
       "name": "p2p_money_transfer - p2p_happy_path RECEIVE_QUOTE",
       "requests": [
         {
@@ -2140,7 +2143,7 @@
       ]
     },
     {
-      "id": 9,
+      "id": 7,
       "name": "Store Settlement&Position Account Balances Before Transfers",
       "requests": [
         {
@@ -2149,7 +2152,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/accounts",
           "path": "/participants/testfsp1/accounts",
@@ -2193,7 +2196,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/accounts",
           "path": "/participants/testfsp2/accounts",
@@ -2238,7 +2241,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/accounts",
           "path": "/participants/testfsp3/accounts",
@@ -2288,7 +2291,7 @@
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
-            "type": "hub"
+            "type": "central_admin"
           },
           "operationPath": "/participants/{name}/accounts",
           "path": "/participants/testfsp4/accounts",
