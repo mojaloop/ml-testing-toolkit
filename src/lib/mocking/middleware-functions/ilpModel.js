@@ -66,6 +66,10 @@ const handleTransferIlp = (context, response) => {
     // const generatedCondition = ilpObj.calculateConditionFromFulfil(generatedFulfilment).replace('"', '')
     response.body.fulfilment = generatedFulfilment
   }
+  if (context.request.method === 'get' && response.method === 'put' && pathMatch.test(response.path)) {
+    // const generatedCondition = ilpObj.calculateConditionFromFulfil(generatedFulfilment).replace('"', '')
+    delete response.body.fulfilment
+  }
 }
 
 // Validation Functions

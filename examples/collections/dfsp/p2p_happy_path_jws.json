@@ -1,0 +1,511 @@
+{
+  "name": "dfsp-p2p-tests",
+  "inputValues": {
+    "fromIdType": "MSISDN",
+    "fromIdValue": "44123456789",
+    "fromFirstName": "Firstname-Test",
+    "fromLastName": "Lastname-Test",
+    "fromDOB": "1984-01-01",
+    "note": "Test Payment",
+    "currency": "USD",
+    "amount": "100",
+    "homeTransactionId": "123ABC",
+    "fromFspId": "testingtoolkitdfsp",
+    "accept": "application/vnd.interoperability.parties+json;version=1.0",
+    "contentType": "application/vnd.interoperability.parties+json;version=1.0",
+    "toIdValue": "9848613613",
+    "toIdType": "MSISDN",
+    "toFspId": "userdfsp",
+    "acceptQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
+    "contentTypeQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
+    "acceptTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
+    "contentTransfers": "application/vnd.interoperability.transfers+json;version=1.0"
+  },
+  "test_cases": [
+    {
+      "id": 1,
+      "name": "P2P Transfer Happy Path",
+      "requests": [
+        {
+          "id": 1,
+          "description": "Get party information",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/parties/{Type}/{ID}",
+          "method": "get",
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "params": {
+            "Type": "{$inputs.toIdType}",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response statusText be Accepted",
+                "exec": [
+                  "expect(response.statusText).to.equal('Accepted')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback Content Length not 0",
+                "exec": [
+                  "expect(callback.headers['Content-Length']).to.not.equal('0')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback body should contain party",
+                "exec": [
+                  "expect(callback.body).to.have.property('party')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "Request FSPIOP-Source same as inputs fromFspId",
+                "exec": [
+                  "expect('{$request.headers['FSPIOP-Source']}').to.equal('{$inputs.fromFspId}')"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "Callback FSPIOP-Destination same as request FSPIOP-Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers['FSPIOP-Source']}')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "Callback content-type to be parties",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('application/vnd.interoperability.parties+json;version=1.0')"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Callback partyIdInfo (partyIdType, partyIdentifier)",
+                "exec": [
+                  "expect(callback.body.party.partyIdInfo.partyIdType).to.equal('{$inputs.toIdType}')",
+                  "expect(callback.body.party.partyIdInfo.partyIdentifier).to.equal('{$inputs.toIdValue}')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "FSPIOP-Signature Protected Header alg to be RS256",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['alg']).to.equal('RS256')"
+                ]
+              },
+              {
+                "id": 10,
+                "description": "FSPIOP-Signature Protected Header FSPIOP-URI to be /parties/{Type}/{ID}}",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['FSPIOP-URI']).to.equal('/parties' + '/{$inputs.toIdType}' +  '/{$inputs.toIdValue}')"
+                ]
+              },
+              {
+                "id": 11,
+                "description": "FSPIOP-Signature Protected Header FSPIOP-HTTP-Method to be PUT",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['FSPIOP-HTTP-Method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 12,
+                "description": "FSPIOP-Signature Protected Header FSPIOP-Source to be payeefsp",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['FSPIOP-Source']).to.equal('{$inputs.toFspId}')"
+                ]
+              },
+              {
+                "id": 13,
+                "description": "FSPIOP-Signature Protected Header FSPIOP-Destination to be payerfsp",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['FSPIOP-Destination']).to.equal('{$inputs.fromFspId}')"
+                ]
+              },
+              {
+                "id": 14,
+                "description": "FSPIOP-Signature Protected Header Date is present",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))",
+                  "expect(decodedProtectedHeaders['Date']).to.not.equal(undefined)"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "description": "Send quote",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/quotes",
+          "method": "post",
+          "headers": {
+            "Accept": "application/vnd.interoperability.quotes+json;version=1.0",
+            "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "body": {
+            "quoteId": "{$function.generic.generateUUID}",
+            "transactionId": "{$function.generic.generateUUID}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "{$inputs.fromIdType}",
+                "partyIdentifier": "{$inputs.fromIdValue}",
+                "fspId": "{$inputs.fromFspId}"
+              },
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "{$inputs.fromFirstName}",
+                  "lastName": "{$inputs.fromLastName}"
+                },
+                "dateOfBirth": "{$inputs.fromDOB}"
+              }
+            },
+            "payee": {
+              "partyIdInfo": {
+                "partyIdType": "{$prev.1.callback.body.party.partyIdInfo.partyIdType}",
+                "partyIdentifier": "{$prev.1.callback.body.party.partyIdInfo.partyIdentifier}",
+                "fspId": "{$prev.1.callback.body.party.partyIdInfo.fspId}"
+              }
+            },
+            "amountType": "SEND",
+            "amount": {
+              "amount": "{$inputs.amount}",
+              "currency": "{$inputs.currency}"
+            },
+            "transactionType": {
+              "scenario": "TRANSFER",
+              "initiator": "PAYER",
+              "initiatorType": "CONSUMER"
+            },
+            "note": "{$inputs.note}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response statusText be Accepted",
+                "exec": [
+                  "expect(response.statusText).to.equal('Accepted')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback Content Length not 0",
+                "exec": [
+                  "expect(callback.headers['Content-Length']).to.not.equal('0')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback FSP Destination equal to request FSP Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers['FSPIOP-Source']}')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "Callback body should contain transferAmount",
+                "exec": [
+                  "expect(callback.body).to.have.property('transferAmount')"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "Callback transferAmount (amount & currency)to match the request",
+                "exec": [
+                  "expect(callback.body.transferAmount.amount).to.equal('{$request.body.amount.amount}')",
+                  "expect(callback.body.transferAmount.currency).to.equal('{$request.body.amount.currency}')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "Callback content-type to be quotes",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('application/vnd.interoperability.quotes+json;version=1.0')"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Request amountType to be SEND",
+                "exec": [
+                  "expect('{$request.body.amountType}').to.equal('SEND')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "Request transactionType scenario to be TRANSFER",
+                "exec": [
+                  "expect('{$request.body.transactionType.scenario}').to.equal('TRANSFER')"
+                ]
+              },
+              {
+                "id": 10,
+                "description": "Request transactionType initiator to be PAYER",
+                "exec": [
+                  "expect('{$request.body.transactionType.initiator}').to.equal('PAYER')"
+                ]
+              },
+              {
+                "id": 11,
+                "description": "Request transactionType initiatorType to be CONSUMER",
+                "exec": [
+                  "expect('{$request.body.transactionType.initiatorType}').to.equal('CONSUMER')"
+                ]
+              },
+              {
+                "id": 12,
+                "description": "FSPIOP-Signature Protected Header alg to be RS256",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['alg']).to.equal('RS256')"
+                ]
+              },
+              {
+                "id": 13,
+                "description": "FSPIOP-Signature Protected Header FSPIOP-URI to be /quotes/{quoteId}",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['FSPIOP-URI']).to.equal('/quotes/' + '{$request.body.quoteId}')"
+                ]
+              },
+              {
+                "id": 14,
+                "description": "FSPIOP-Signature Protected Header FSPIOP-HTTP-Method to be PUT",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['FSPIOP-HTTP-Method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 15,
+                "description": "FSPIOP-Signature Protected Header FSPIOP-Source to be payeefsp",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['FSPIOP-Source']).to.equal('{$inputs.toFspId}')"
+                ]
+              },
+              {
+                "id": 16,
+                "description": "FSPIOP-Signature Protected Header FSPIOP-Destination to be payerfsp",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['FSPIOP-Destination']).to.equal('{$inputs.fromFspId}')"
+                ]
+              },
+              {
+                "id": 17,
+                "description": "FSPIOP-Signature Protected Header Date is present",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))",
+                  "expect(decodedProtectedHeaders['Date']).to.not.equal(undefined)"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "Send transfer",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transfers",
+          "method": "post",
+          "headers": {
+            "Accept": "application/vnd.interoperability.transfers+json;version=1.0",
+            "Content-Type": "application/vnd.interoperability.transfers+json;version=1.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "body": {
+            "transferId": "{$prev.2.request.body.transactionId}",
+            "payerFsp": "{$inputs.fromFspId}",
+            "payeeFsp": "{$prev.1.callback.body.party.partyIdInfo.fspId}",
+            "amount": {
+              "amount": "{$inputs.amount}",
+              "currency": "{$inputs.currency}"
+            },
+            "expiration": "{$prev.2.callback.body.expiration}",
+            "ilpPacket": "{$prev.2.callback.body.ilpPacket}",
+            "condition": "{$prev.2.callback.body.condition}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response statusText be Accepted",
+                "exec": [
+                  "expect(response.statusText).to.equal('Accepted')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback Content Length not 0",
+                "exec": [
+                  "expect(callback.headers['Content-Length']).to.not.equal('0')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback FSP Destination equal to request FSP Source",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers['FSPIOP-Source']}')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "Callback transferState to be COMMITTED",
+                "exec": [
+                  "expect(callback.body.transferState).to.equal('COMMITTED')"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "Callback content-type to be transfers",
+                "exec": [
+                  "expect(callback.headers['content-type']).to.equal('application/vnd.interoperability.transfers+json;version=1.0')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "Request transferId same as quote request transferId",
+                "exec": [
+                  "expect('{$request.body.transferId}').to.equal('{$prev.2.request.body.transactionId}')"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Request transferAmount (amount & currency) to match quote request",
+                "exec": [
+                  "expect('{$prev.2.callback.body.transferAmount.amount}').to.equal('{$request.body.amount.amount}')",
+                  "expect('{$prev.2.callback.body.transferAmount.currency}').to.equal('{$request.body.amount.currency}')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "Request FSP source the same as quote callback FSP destination",
+                "exec": [
+                  "expect('{$request.headers['FSPIOP-Source']}').to.equal('{$prev.2.callback.headers.fspiop-destination}')"
+                ]
+              },
+              {
+                "id": 12,
+                "description": "FSPIOP-Signature Protected Header alg to be RS256",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['alg']).to.equal('RS256')"
+                ]
+              },
+              {
+                "id": 13,
+                "description": "FSPIOP-Signature Protected Header FSPIOP-URI to be /transfers/{transferId}",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['FSPIOP-URI']).to.equal('/transfers/' + '{$request.body.transferId}')"
+                ]
+              },
+              {
+                "id": 14,
+                "description": "FSPIOP-Signature Protected Header FSPIOP-HTTP-Method to be PUT",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['FSPIOP-HTTP-Method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 15,
+                "description": "FSPIOP-Signature Protected Header FSPIOP-Source to be payeefsp",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['FSPIOP-Source']).to.equal('{$inputs.toFspId}')"
+                ]
+              },
+              {
+                "id": 16,
+                "description": "FSPIOP-Signature Protected Header FSPIOP-Destination to be payerfsp",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])\r",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))\r",
+                  "expect(decodedProtectedHeaders['FSPIOP-Destination']).to.equal('{$inputs.fromFspId}')"
+                ]
+              },
+              {
+                "id": 17,
+                "description": "FSPIOP-Signature Protected Header Date is present",
+                "exec": [
+                  "const { signature, protectedHeader } = JSON.parse(callback.headers['fspiop-signature'])",
+                  "const decodedProtectedHeaders = JSON.parse(atob(protectedHeader))",
+                  "expect(decodedProtectedHeaders['Date']).to.not.equal(undefined)"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -24,329 +24,6 @@
   "test_cases": [
     {
       "id": 1,
-      "name": "P2P Transfer Happy Path",
-      "requests": [
-        {
-          "id": 1,
-          "description": "Get party information",
-          "apiVersion": {
-            "minorVersion": 0,
-            "majorVersion": 1,
-            "type": "fspiop",
-            "asynchronous": true
-          },
-          "operationPath": "/parties/{Type}/{ID}",
-          "method": "get",
-          "headers": {
-            "Accept": "{$inputs.accept}",
-            "Content-Type": "{$inputs.contentType}",
-            "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}"
-          },
-          "params": {
-            "Type": "{$inputs.toIdType}",
-            "ID": "{$inputs.toIdValue}"
-          },
-          "tests": {
-            "assertions": [
-              {
-                "id": 1,
-                "description": "Response status to be 202",
-                "exec": [
-                  "expect(response.status).to.equal(202)"
-                ]
-              },
-              {
-                "id": 2,
-                "description": "Response statusText be Accepted",
-                "exec": [
-                  "expect(response.statusText).to.equal('Accepted')"
-                ]
-              },
-              {
-                "id": 3,
-                "description": "Callback Content Length not 0",
-                "exec": [
-                  "expect(callback.headers['Content-Length']).to.not.equal('0')"
-                ]
-              },
-              {
-                "id": 4,
-                "description": "Callback body should contain party",
-                "exec": [
-                  "expect(callback.body).to.have.property('party')"
-                ]
-              },
-              {
-                "id": 5,
-                "description": "Request FSPIOP-Source same as inputs fromFspId",
-                "exec": [
-                  "expect('{$request.headers['FSPIOP-Source']}').to.equal('{$inputs.fromFspId}')"
-                ]
-              },
-              {
-                "id": 6,
-                "description": "Callback FSPIOP-Destination same as request FSPIOP-Source",
-                "exec": [
-                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers['FSPIOP-Source']}')"
-                ]
-              },
-              {
-                "id": 7,
-                "description": "Callback content-type to be parties",
-                "exec": [
-                  "expect(callback.headers['content-type']).to.equal('application/vnd.interoperability.parties+json;version=1.0')"
-                ]
-              },
-              {
-                "id": 8,
-                "description": "Callback partyIdInfo (partyIdType, partyIdentifier)",
-                "exec": [
-                  "expect(callback.body.party.partyIdInfo.partyIdType).to.equal('{$inputs.toIdType}')",
-                  "expect(callback.body.party.partyIdInfo.partyIdentifier).to.equal('{$inputs.toIdValue}')"
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "id": 2,
-          "description": "Send quote",
-          "apiVersion": {
-            "minorVersion": 0,
-            "majorVersion": 1,
-            "type": "fspiop",
-            "asynchronous": true
-          },
-          "operationPath": "/quotes",
-          "method": "post",
-          "headers": {
-            "Accept": "application/vnd.interoperability.quotes+json;version=1.0",
-            "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0",
-            "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}"
-          },
-          "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
-            "payer": {
-              "partyIdInfo": {
-                "partyIdType": "{$inputs.fromIdType}",
-                "partyIdentifier": "{$inputs.fromIdValue}",
-                "fspId": "{$inputs.fromFspId}"
-              },
-              "personalInfo": {
-                "complexName": {
-                  "firstName": "{$inputs.fromFirstName}",
-                  "lastName": "{$inputs.fromLastName}"
-                },
-                "dateOfBirth": "{$inputs.fromDOB}"
-              }
-            },
-            "payee": {
-              "partyIdInfo": {
-                "partyIdType": "{$prev.1.callback.body.party.partyIdInfo.partyIdType}",
-                "partyIdentifier": "{$prev.1.callback.body.party.partyIdInfo.partyIdentifier}",
-                "fspId": "{$prev.1.callback.body.party.partyIdInfo.fspId}"
-              }
-            },
-            "amountType": "SEND",
-            "amount": {
-              "amount": "{$inputs.amount}",
-              "currency": "{$inputs.currency}"
-            },
-            "transactionType": {
-              "scenario": "TRANSFER",
-              "initiator": "PAYER",
-              "initiatorType": "CONSUMER"
-            },
-            "note": "{$inputs.note}"
-          },
-          "tests": {
-            "assertions": [
-              {
-                "id": 1,
-                "description": "Response status to be 202",
-                "exec": [
-                  "expect(response.status).to.equal(202)"
-                ]
-              },
-              {
-                "id": 2,
-                "description": "Response statusText be Accepted",
-                "exec": [
-                  "expect(response.statusText).to.equal('Accepted')"
-                ]
-              },
-              {
-                "id": 3,
-                "description": "Callback Content Length not 0",
-                "exec": [
-                  "expect(callback.headers['Content-Length']).to.not.equal('0')"
-                ]
-              },
-              {
-                "id": 4,
-                "description": "Callback FSP Destination equal to request FSP Source",
-                "exec": [
-                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers['FSPIOP-Source']}')"
-                ]
-              },
-              {
-                "id": 5,
-                "description": "Callback body should contain transferAmount",
-                "exec": [
-                  "expect(callback.body).to.have.property('transferAmount')"
-                ]
-              },
-              {
-                "id": 6,
-                "description": "Callback transferAmount (amount & currency)to match the request",
-                "exec": [
-                  "expect(callback.body.transferAmount.amount).to.equal('{$request.body.amount.amount}')",
-                  "expect(callback.body.transferAmount.currency).to.equal('{$request.body.amount.currency}')"
-                ]
-              },
-              {
-                "id": 7,
-                "description": "Callback content-type to be quotes",
-                "exec": [
-                  "expect(callback.headers['content-type']).to.equal('application/vnd.interoperability.quotes+json;version=1.0')"
-                ]
-              },
-              {
-                "id": 8,
-                "description": "Request amountType to be SEND",
-                "exec": [
-                  "expect('{$request.body.amountType}').to.equal('SEND')"
-                ]
-              },
-              {
-                "id": 9,
-                "description": "Request transactionType scenario to be TRANSFER",
-                "exec": [
-                  "expect('{$request.body.transactionType.scenario}').to.equal('TRANSFER')"
-                ]
-              },
-              {
-                "id": 10,
-                "description": "Request transactionType initiator to be PAYER",
-                "exec": [
-                  "expect('{$request.body.transactionType.initiator}').to.equal('PAYER')"
-                ]
-              },
-              {
-                "id": 11,
-                "description": "Request transactionType initiatorType to be CONSUMER",
-                "exec": [
-                  "expect('{$request.body.transactionType.initiatorType}').to.equal('CONSUMER')"
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "id": 3,
-          "description": "Send transfer",
-          "apiVersion": {
-            "minorVersion": 0,
-            "majorVersion": 1,
-            "type": "fspiop",
-            "asynchronous": true
-          },
-          "operationPath": "/transfers",
-          "method": "post",
-          "headers": {
-            "Accept": "application/vnd.interoperability.transfers+json;version=1.0",
-            "Content-Type": "application/vnd.interoperability.transfers+json;version=1.0",
-            "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}"
-          },
-          "body": {
-            "transferId": "{$prev.2.request.body.transactionId}",
-            "payerFsp": "{$inputs.fromFspId}",
-            "payeeFsp": "{$prev.1.callback.body.party.partyIdInfo.fspId}",
-            "amount": {
-              "amount": "{$inputs.amount}",
-              "currency": "{$inputs.currency}"
-            },
-            "expiration": "{$prev.2.callback.body.expiration}",
-            "ilpPacket": "{$prev.2.callback.body.ilpPacket}",
-            "condition": "{$prev.2.callback.body.condition}"
-          },
-          "tests": {
-            "assertions": [
-              {
-                "id": 1,
-                "description": "Response status to be 202",
-                "exec": [
-                  "expect(response.status).to.equal(202)"
-                ]
-              },
-              {
-                "id": 2,
-                "description": "Response statusText be Accepted",
-                "exec": [
-                  "expect(response.statusText).to.equal('Accepted')"
-                ]
-              },
-              {
-                "id": 3,
-                "description": "Callback Content Length not 0",
-                "exec": [
-                  "expect(callback.headers['Content-Length']).to.not.equal('0')"
-                ]
-              },
-              {
-                "id": 4,
-                "description": "Callback FSP Destination equal to request FSP Source",
-                "exec": [
-                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers['FSPIOP-Source']}')"
-                ]
-              },
-              {
-                "id": 5,
-                "description": "Callback transferState to be COMMITTED",
-                "exec": [
-                  "expect(callback.body.transferState).to.equal('COMMITTED')"
-                ]
-              },
-              {
-                "id": 6,
-                "description": "Callback content-type to be transfers",
-                "exec": [
-                  "expect(callback.headers['content-type']).to.equal('application/vnd.interoperability.transfers+json;version=1.0')"
-                ]
-              },
-              {
-                "id": 7,
-                "description": "Request transferId same as quote request transferId",
-                "exec": [
-                  "expect('{$request.body.transferId}').to.equal('{$prev.2.request.body.transactionId}')"
-                ]
-              },
-              {
-                "id": 8,
-                "description": "Request transferAmount (amount & currency) to match quote request",
-                "exec": [
-                  "expect('{$prev.2.callback.body.transferAmount.amount}').to.equal('{$request.body.amount.amount}')",
-                  "expect('{$prev.2.callback.body.transferAmount.currency}').to.equal('{$request.body.amount.currency}')"
-                ]
-              },
-              {
-                "id": 9,
-                "description": "Request FSP source the same as quote callback FSP destination",
-                "exec": [
-                  "expect('{$request.headers['FSPIOP-Source']}').to.equal('{$prev.2.callback.headers.fspiop-destination}')"
-                ]
-              }
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "id": 2,
       "name": "Party info with missing header",
       "requests": [
         {
@@ -620,7 +297,7 @@
       ]
     },
     {
-      "id": 3,
+      "id": 2,
       "name": "Party info of unprovisioned party",
       "requests": [
         {
@@ -793,7 +470,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 3,
       "name": "Party info with wrong header values",
       "requests": [
         {
@@ -975,7 +652,7 @@
       ]
     },
     {
-      "id": 5,
+      "id": 4,
       "name": "POST /quotes with missing headers",
       "requests": [
         {
@@ -1538,7 +1215,7 @@
       ]
     },
     {
-      "id": 6,
+      "id": 5,
       "name": "POST /quotes with wrong headers",
       "requests": [
         {
@@ -1993,7 +1670,7 @@
       ]
     },
     {
-      "id": 7,
+      "id": 6,
       "name": "POST /Transfers with missing headers",
       "requests": [
         {
@@ -2530,7 +2207,7 @@
       ]
     },
     {
-      "id": 8,
+      "id": 7,
       "name": "POST /Transfers with wrong headers",
       "requests": [
         {
@@ -2981,7 +2658,7 @@
       ]
     },
     {
-      "id": 9,
+      "id": 8,
       "name": "POST /quotes with missing parameters in body",
       "requests": [
         {
@@ -3928,7 +3605,7 @@
       ]
     },
     {
-      "id": 10,
+      "id": 9,
       "name": "POST /Transfers with missing parameters in body",
       "requests": [
         {
@@ -4780,7 +4457,7 @@
       ]
     },
     {
-      "id": 12,
+      "id": 10,
       "name": "POST /Transfers with wrong parameters in body",
       "requests": [
         {
@@ -5328,7 +5005,7 @@
       ]
     },
     {
-      "id": 14,
+      "id": 11,
       "name": "POST /quotes with wrong parameter in body",
       "requests": [
         {
@@ -6279,7 +5956,7 @@
       ]
     },
     {
-      "id": 15,
+      "id": 12,
       "name": "POST /Quotes with wrong optional parameters and headers",
       "requests": [
         {
@@ -6706,7 +6383,7 @@
       ]
     },
     {
-      "id": 16,
+      "id": 13,
       "name": "POST /Transfers with wrong optional parameters and headers",
       "requests": [
         {
@@ -7190,7 +6867,7 @@
       ]
     },
     {
-      "id": 17,
+      "id": 14,
       "name": "Get Party with wrong optional headers",
       "requests": [
         {
@@ -7363,7 +7040,7 @@
       ]
     },
     {
-      "id": 18,
+      "id": 15,
       "name": "transaction-request-service (BUG)",
       "requests": [
         {

@@ -22,6 +22,11 @@
       "type": "settlements",
       "version": "1.0",
       "folderPath": "settlements_1.0"
+    },
+    {
+      "type": "central_admin",
+      "version": "9.3",
+      "folderPath": "central_admin_9.3"
     }
   ]
 }
