@@ -49,12 +49,27 @@ const executeAsync = async (script, data, contextObj) => {
   })
 
   contextObj.ctx.on(`execution.request.${data.id}`, async (cursor, id, requestId, req) => {
-    const host = `${req.url.protocol}://${req.url.host.join('.')}:${req.url.port}/`
-    const response = await axios({
-      method: req.method,
-      url: host + req.url.path.join('/'),
-      headers: req.header
-    })
+    const host = `${req.url.protocol}://${req.url.host.join('.')}${req.url.port ? ':' + req.url.port : ''}/`
+    let response
+    try {
+      const reqObject = {
+        method: req.method,
+        url: host + req.url.path.join('/'),
+        headers: req.header.reduce((rObj, item) => { rObj[item.key] = item.value; return rObj }, {}),
+        data: req.body && req.body.mode === 'raw' ? JSON.parse(req.body.raw) : null
+      }
+      response = await axios(reqObject)
+    } catch (err) {
+      consoleLog.push([cursor, 'executionError', err])
+      if (err.response) {
+        response = err.response
+      } else {
+        response = {
+          status: 4001,
+          data: err.message
+        }
+      }
+    }
     contextObj.ctx.dispatch(`execution.response.${id}`, requestId, null, {
       code: response.status,
       body: JSON.stringify(response.data)

@@ -205,7 +205,12 @@ const processTestCase = async (testCase, traceID, inputValues, templateEnvironme
         }, sessionID)
       }
     } catch (err) {
-      const resp = (typeof err.message === 'string') ? err.message : JSON.parse(err.message)
+      let resp
+      try {
+        resp = JSON.parse(err.message)
+      } catch (err) {
+        resp = err.message
+      }
       const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback)
       request.appended = {
         status: 'ERROR',
