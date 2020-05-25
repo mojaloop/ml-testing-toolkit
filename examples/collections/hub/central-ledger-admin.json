@@ -1,65 +1,66 @@
 {
-  "name": "central-admin-tests",
+  "name": "hub-tests",
   "inputValues": {
     "fromIdType": "MSISDN",
     "fromIdValue": "44123456789",
     "fromFirstName": "Firstname-Test",
     "fromLastName": "Lastname-Test",
     "fromDOB": "1984-01-01",
-    "note": "Test",
+    "note": "test",
     "currency": "USD",
     "amount": "100",
     "homeTransactionId": "123ABC",
     "fromFspId": "testingtoolkitdfsp",
     "accept": "application/vnd.interoperability.parties+json;version=1.0",
     "contentType": "application/vnd.interoperability.parties+json;version=1.0",
-    "toIdValue": "9848613613",
+    "toIdValue": "27713803912",
     "toIdType": "MSISDN",
-    "toFspId": "userdfsp",
+    "toFspId": "payeefsp",
     "acceptQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
     "contentTypeQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
     "acceptTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
     "contentTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
-    "centralLedger": "http://localhost:3001",
-    "HOST_CENTRAL_LEDGER": "http://localhost:3001",
+    "HOST_CENTRAL_LEDGER": "http://central-ledger.local",
     "BASE_CENTRAL_LEDGER_ADMIN": "",
     "HUB_OPERATOR_BEARER_TOKEN": "NOT_APPLICABLE",
     "hub_operator": "NOT_APPLICABLE",
     "payerfsp": "testingtoolkitdfsp",
-    "mlAPIAdapter": "http://localhost:3005",
-    "accountId": "4",
-    "payeefsp": "userdfsp",
-    "receiverMSISDN": "9848613613",
+    "HOST_ML_API_ADAPTER": "http://ml-api-adapter.local",
+    "accountId": "6",
+    "payeefsp": "payeefsp",
+    "receiverMSISDN": "27713803912",
     "ilpPacket": "AQAAAAAAAADIEHByaXZhdGUucGF5ZWVmc3CCAiB7InRyYW5zYWN0aW9uSWQiOiIyZGY3NzRlMi1mMWRiLTRmZjctYTQ5NS0yZGRkMzdhZjdjMmMiLCJxdW90ZUlkIjoiMDNhNjA1NTAtNmYyZi00NTU2LThlMDQtMDcwM2UzOWI4N2ZmIiwicGF5ZWUiOnsicGFydHlJZEluZm8iOnsicGFydHlJZFR5cGUiOiJNU0lTRE4iLCJwYXJ0eUlkZW50aWZpZXIiOiIyNzcxMzgwMzkxMyIsImZzcElkIjoicGF5ZWVmc3AifSwicGVyc29uYWxJbmZvIjp7ImNvbXBsZXhOYW1lIjp7fX19LCJwYXllciI6eyJwYXJ0eUlkSW5mbyI6eyJwYXJ0eUlkVHlwZSI6Ik1TSVNETiIsInBhcnR5SWRlbnRpZmllciI6IjI3NzEzODAzOTExIiwiZnNwSWQiOiJwYXllcmZzcCJ9LCJwZXJzb25hbEluZm8iOnsiY29tcGxleE5hbWUiOnt9fX0sImFtb3VudCI6eyJjdXJyZW5jeSI6IlVTRCIsImFtb3VudCI6IjIwMCJ9LCJ0cmFuc2FjdGlvblR5cGUiOnsic2NlbmFyaW8iOiJERVBPU0lUIiwic3ViU2NlbmFyaW8iOiJERVBPU0lUIiwiaW5pdGlhdG9yIjoiUEFZRVIiLCJpbml0aWF0b3JUeXBlIjoiQ09OU1VNRVIiLCJyZWZ1bmRJbmZvIjp7fX19",
     "condition": "HOr22-H3AfTDHrSkPjJtVPRdKouuMkDXTR4ejlQa8Ks",
-    "HOST_QUOTING_SERVICE": "http://localhost:3002"
+    "HOST_QUOTING_SERVICE": "http://quoting-service.local",
+    "HOST_ACCOUNT_LOOKUP_SERVICE": "http://account-lookup-service.local",
+    "HOST_SIMULATOR": "http://moja-simulator.local"
   },
   "test_cases": [
     {
-      "id": 1,
+      "id": 3,
       "name": "funds_in",
       "requests": [
         {
           "id": 1,
-          "description": "test",
+          "description": "Record Funds In - prepare",
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
             "type": "central_admin"
           },
           "operationPath": "/participants/{name}/accounts/{id}",
-          "path": "/participants/{$inputs.fromFspId}/accounts/4",
+          "path": "/participants/{$inputs.fromFspId}/accounts/{$inputs.accountId}",
           "method": "post",
           "params": {
             "name": "{$inputs.fromFspId}",
-            "id": "4"
+            "id": "{$inputs.accountId}"
           },
           "headers": {
             "FSPIOP-Source": "{$inputs.fromFspId}",
             "Content-Type": "application/json"
           },
           "body": {
-            "transferId": "{$environment.fundsInPrepareTransferId}",
+            "transferId": "{$function.generic.generateUUID}",
             "externalReference": "string",
             "action": "recordFundsIn",
             "reason": "string",
@@ -76,7 +77,7 @@
               ]
             }
           },
-          "url": "http://localhost:3001",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "tests": {
             "assertions": [
               {
@@ -105,9 +106,6 @@
           "scripts": {
             "preRequest": {
               "exec": [
-                "var uuid = require('uuid');\r",
-                "var generatedUUID = uuid.v4();\r",
-                "pm.environment.set('fundsInPrepareTransferId', generatedUUID);\r",
                 "pm.environment.set('fundsInPrepareAmount', 5000);\r",
                 "\r",
                 "\r",
@@ -201,7 +199,7 @@
                 "            pm.expect(pm.environment.get(\"hubReconAccountBalanceAfterFundsIn\")).to.eql(hubExpectedBalance);\r",
                 "        });\r",
                 "    });\r",
-                "}, 2000)"
+                "}, 500)"
               ]
             }
           }
@@ -216,10 +214,10 @@
             "asynchronous": true
           },
           "operationPath": "/transfers/{ID}",
-          "path": "/transfers/3b6dcd23-e2c5-4663-be4e-ab59e98741e4",
+          "path": "/transfers/{$prev.1.request.body.transferId}",
           "method": "get",
           "params": {
-            "ID": "3b6dcd23-e2c5-4663-be4e-ab59e98741e4"
+            "ID": "{$prev.1.request.body.transferId}"
           },
           "headers": {
             "Content-Type": "{$inputs.contentType}",
@@ -227,7 +225,7 @@
             "FSPIOP-Source": "{$inputs.fromFspId}",
             "Accept": "{$inputs.accept}"
           },
-          "url": "http://localhost:3005",
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
           "tests": {
             "assertions": [
               {
@@ -245,17 +243,24 @@
                 ]
               }
             ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                ""
+              ]
+            }
           }
         }
       ]
     },
     {
-      "id": 2,
+      "id": 4,
       "name": "funds_out - Reserve&Commit",
       "requests": [
         {
           "id": 1,
-          "description": "test",
+          "description": "Record Funds Out Prepare&Reserve- payerfsp",
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
@@ -273,7 +278,7 @@
             "Content-Type": "application/json"
           },
           "body": {
-            "transferId": "{$environment.fundsOutPrepareReserveTransferId}",
+            "transferId": "{$function.generic.generateUUID}",
             "externalReference": "string",
             "action": "recordFundsOutPrepareReserve",
             "reason": "string",
@@ -290,7 +295,7 @@
               ]
             }
           },
-          "url": "{$inputs.centralLedger}",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "tests": {
             "assertions": [
               {
@@ -319,10 +324,6 @@
           "scripts": {
             "preRequest": {
               "exec": [
-                "var uuid = require('uuid');\r",
-                "var generatedUUID = uuid.v4();\r",
-                "\r",
-                "pm.environment.set('fundsOutPrepareReserveTransferId', generatedUUID);\r",
                 "pm.environment.set('fundsOutPrepareReserveAmount', 1000);\r",
                 "\r",
                 "const payerfspGetStatusRequest = {\r",
@@ -409,14 +410,14 @@
                 "            }\r",
                 "        }\r",
                 "    });\r",
-                "}, 2000)"
+                "}, 500)"
               ]
             }
           }
         },
         {
           "id": 2,
-          "description": "Record Funds In - prepare transfer status",
+          "description": "Record Funds Out Prepare&Reserve - transfer status",
           "apiVersion": {
             "minorVersion": 0,
             "majorVersion": 1,
@@ -435,7 +436,7 @@
             "FSPIOP-Source": "{$inputs.fromFspId}",
             "Accept": "{$inputs.accept}"
           },
-          "url": "{$inputs.mlAPIAdapter}",
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
           "tests": {
             "assertions": [
               {
@@ -471,7 +472,7 @@
             "id": "{$inputs.accountId}",
             "transferId": "{$prev.1.request.body.transferId}"
           },
-          "url": "{$inputs.centralLedger}",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "headers": {
             "FSPIOP-Source": "{$inputs.hub_operator}",
             "Content-Type": "application/json"
@@ -508,9 +509,6 @@
           "scripts": {
             "preRequest": {
               "exec": [
-                "var uuid = require('uuid');\r",
-                "var generatedUUID = uuid.v4();\r",
-                "pm.environment.set('fundsOutCommitTransferId', generatedUUID);\r",
                 "pm.environment.set('fundsOutCommitAmount', 1000);\r",
                 "\r",
                 "\r",
@@ -595,14 +593,14 @@
                 "            }\r",
                 "        }\r",
                 "    });\r",
-                "}, 2000)"
+                "}, 500)"
               ]
             }
           }
         },
         {
           "id": 4,
-          "description": "Record Funds In - prepare transfer status Copy",
+          "description": "Record Funds Out Commit - transfer status",
           "apiVersion": {
             "minorVersion": 0,
             "majorVersion": 1,
@@ -621,7 +619,7 @@
             "FSPIOP-Source": "{$inputs.fromFspId}",
             "Accept": "{$inputs.accept}"
           },
-          "url": "{$inputs.mlAPIAdapter}",
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
           "tests": {
             "assertions": [
               {
@@ -644,7 +642,7 @@
       ]
     },
     {
-      "id": 3,
+      "id": 5,
       "name": "funds_out - Reserve&Abort",
       "requests": [
         {
@@ -667,7 +665,7 @@
             "Content-Type": "application/json"
           },
           "body": {
-            "transferId": "{$environment.fundsOutPrepareReserveTransferId}",
+            "transferId": "{$function.generic.generateUUID}",
             "externalReference": "string",
             "action": "recordFundsOutPrepareReserve",
             "reason": "string",
@@ -684,7 +682,7 @@
               ]
             }
           },
-          "url": "{$inputs.centralLedger}",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "tests": {
             "assertions": [
               {
@@ -713,10 +711,6 @@
           "scripts": {
             "preRequest": {
               "exec": [
-                "var uuid = require('uuid');\r",
-                "var generatedUUID = uuid.v4();\r",
-                "\r",
-                "pm.environment.set('fundsOutPrepareReserveTransferId', generatedUUID);\r",
                 "pm.environment.set('fundsOutPrepareReserveAmount', 1000);\r",
                 "\r",
                 "const payerfspGetStatusRequest = {\r",
@@ -803,7 +797,7 @@
                 "            }\r",
                 "        }\r",
                 "    });\r",
-                "}, 2000)"
+                "}, 500)"
               ]
             }
           }
@@ -829,7 +823,7 @@
             "FSPIOP-Source": "{$inputs.fromFspId}",
             "Accept": "{$inputs.accept}"
           },
-          "url": "{$inputs.mlAPIAdapter}",
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
           "tests": {
             "assertions": [
               {
@@ -865,7 +859,7 @@
             "id": "{$inputs.accountId}",
             "transferId": "{$prev.1.request.body.transferId}"
           },
-          "url": "http://localhost:3001",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "headers": {
             "FSPIOP-Source": "{$inputs.hub_operator}",
             "Content-Type": "application/json"
@@ -902,8 +896,6 @@
           "scripts": {
             "preRequest": {
               "exec": [
-                "var uuid = require('uuid');\r",
-                "var generatedUUID = uuid.v4();\r",
                 "pm.environment.set('fundsOutCommitAmount', 1000);\r",
                 "\r",
                 "setTimeout(function () {\r",
@@ -944,7 +936,7 @@
                 "          }\r",
                 "      }\r",
                 "  });\r",
-                "}, 2000)"
+                "}, 500)"
               ]
             },
             "postRequest": {
@@ -989,7 +981,7 @@
                 "            }\r",
                 "        }\r",
                 "    });\r",
-                "}, 2000)"
+                "}, 500)"
               ]
             }
           }
@@ -1015,7 +1007,7 @@
             "FSPIOP-Source": "{$inputs.fromFspId}",
             "Accept": "{$inputs.accept}"
           },
-          "url": "{$inputs.mlAPIAdapter}",
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
           "tests": {
             "assertions": [
               {
@@ -1038,7 +1030,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 6,
       "name": "block_transfer ( p>ndc )",
       "requests": [
         {
@@ -1055,7 +1047,7 @@
           "params": {
             "name": "{$inputs.fromFspId}"
           },
-          "url": "{$inputs.centralLedger}",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "tests": {
             "assertions": [
               {
@@ -1096,7 +1088,7 @@
           "params": {
             "name": "{$inputs.toFspId}"
           },
-          "url": "{$inputs.centralLedger}",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "tests": {
             "assertions": [
               {
@@ -1137,7 +1129,7 @@
           "params": {
             "name": "{$inputs.fromFspId}"
           },
-          "url": "{$inputs.centralLedger}",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "tests": {
             "assertions": [
               {
@@ -1179,7 +1171,7 @@
           "params": {
             "name": "{$inputs.toFspId}"
           },
-          "url": "{$inputs.centralLedger}",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "tests": {
             "assertions": [
               {
@@ -1251,7 +1243,7 @@
             },
             "amountType": "SEND",
             "amount": {
-              "amount": "{$inputs.amount}",
+              "amount": "{$environment.transferAmount}",
               "currency": "{$inputs.currency}"
             },
             "transactionType": {
@@ -1276,7 +1268,15 @@
             "Type": "",
             "ID": ""
           },
-          "url": null
+          "url": "{$inputs.HOST_QUOTING_SERVICE}",
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var amount = Number(pm.variables.get(\"payerNDC\")) - Number(pm.variables.get(\"payerfspPositionBeforeTransfer\")) + 100",
+                "pm.environment.set('transferAmount', amount)"
+              ]
+            }
+          }
         },
         {
           "id": 6,
@@ -1293,18 +1293,17 @@
             "Accept": "application/vnd.interoperability.transfers+json;version=1.0",
             "Content-Type": "application/vnd.interoperability.transfers+json;version=1.0",
             "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}",
-            "FSPIOP-Destination": "{$inputs.toFspId}"
+            "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "transferId": "{$prev.5.request.body.transactionId}",
+            "transferId": "{$function.generic.generateUUID}",
             "payerFsp": "{$inputs.fromFspId}",
             "payeeFsp": "{$inputs.toFspId}",
             "amount": {
-              "amount": "{$inputs.amount}",
+              "amount": "{$environment.transferAmount}",
               "currency": "{$inputs.currency}"
             },
-            "expiration": "{$prev.5.callback.body.expiration}",
+            "expiration": "{$environment.transferExpiration}",
             "ilpPacket": "{$prev.5.callback.body.ilpPacket}",
             "condition": "{$prev.5.callback.body.condition}"
           },
@@ -1318,6 +1317,18 @@
                 ]
               }
             ]
+          },
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "pm.environment.set('transferDate', (new Date()).toUTCString());",
+                "pm.environment.set(\"transferExpiration\",new Date(new Date().getTime() + 600000))",
+                "",
+                "var amount = Number(pm.environment.get(\"payerNDC\")) - Number( pm.variables.get(\"payerfspPositionBeforeTransfer\")) + 100",
+                "pm.environment.set('transferAmount', amount)"
+              ]
+            }
           }
         },
         {
@@ -1334,7 +1345,7 @@
           "params": {
             "name": "{$inputs.fromFspId}"
           },
-          "url": "{$inputs.centralLedger}",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "tests": {
             "assertions": [
               {
@@ -1376,7 +1387,7 @@
           "params": {
             "name": "{$inputs.toFspId}"
           },
-          "url": "{$inputs.centralLedger}",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "tests": {
             "assertions": [
               {
@@ -1407,47 +1418,9 @@
       ]
     },
     {
-      "id": 5,
+      "id": 7,
       "name": "p2p_money_transfer - p2p_happy_path SEND QUOTE",
       "requests": [
-        {
-          "id": 1,
-          "description": "test",
-          "apiVersion": {
-            "minorVersion": 0,
-            "majorVersion": 1,
-            "type": "fspiop",
-            "asynchronous": true
-          },
-          "operationPath": "/participants/{Type}/{ID}",
-          "path": "/participants/MSISDN/{$inputs.toIdValue}",
-          "method": "post",
-          "params": {
-            "Type": "MSISDN",
-            "ID": "{$inputs.toIdValue}"
-          },
-          "body": {
-            "fspId": "{$environment.payeefsp}",
-            "currency": "DOP"
-          },
-          "headers": {
-            "Content-Type": "{$inputs.contentType}",
-            "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}",
-            "Accept": "{$inputs.accept}"
-          },
-          "tests": {
-            "assertions": [
-              {
-                "id": 1,
-                "description": "Status code is 200",
-                "exec": [
-                  "expect(response.status).to.equal(202)"
-                ]
-              }
-            ]
-          }
-        },
         {
           "id": 2,
           "description": "Get party information",
@@ -1530,9 +1503,66 @@
               }
             ]
           },
+          "url": "{$inputs.HOST_ACCOUNT_LOOKUP_SERVICE}",
           "scripts": {
             "preRequest": {
               "exec": [
+                "\r",
+                "const curDate = (new Date()).toUTCString()\r",
+                "const alsAddParticipant = {\r",
+                "    url: pm.environment.get(\"HOST_ACCOUNT_LOOKUP_SERVICE\") + '/participants/' + pm.environment.get(\"toIdType\") + '/' + pm.environment.get(\"toIdValue\"),\r",
+                "    method: 'POST',\r",
+                "    header: {\r",
+                "        'FSPIOP-Source': 'payeefsp',\r",
+                "        'Accept': 'application/vnd.interoperability.participants+json;version=1.0',\r",
+                "        'Content-Type': 'application/vnd.interoperability.participants+json;version=1.0',\r",
+                "        'Date': curDate\r",
+                "    },\r",
+                "    body: {\r",
+                "      mode: 'raw',\r",
+                "      raw: JSON.stringify({\r",
+                "        \"fspId\": \"payeefsp\",\r",
+                "        \"currency\": \"USD\"\r",
+                "      })\r",
+                "    }\r",
+                "}\r",
+                "  \r",
+                "pm.sendRequest(alsAddParticipant, function (err, response) {\r",
+                "    console.log('asdf'+JSON.stringify(response.json()))\r",
+                "});\r",
+                "\r",
+                "const simulatorAddParty = {\r",
+                "    url: pm.environment.get(\"HOST_SIMULATOR\") + '/payeefsp/parties/' + pm.environment.get(\"toIdType\") + '/' + pm.environment.get(\"toIdValue\"),\r",
+                "    method: 'POST',\r",
+                "    header: {\r",
+                "        \"FSPIOP-Source\": \"payeefsp\",\r",
+                "        \"Content-Type\": \"application/json\"\r",
+                "    },\r",
+                "    body: {\r",
+                "      mode: 'raw',\r",
+                "      raw: JSON.stringify({\r",
+                "        \"party\": {\r",
+                "            \"partyIdInfo\": {\r",
+                "                \"partyIdType\": pm.environment.get(\"toIdType\"),\r",
+                "                \"partyIdentifier\": pm.environment.get(\"toIdValue\"),\r",
+                "                \"fspId\": \"payeefsp\"\r",
+                "            },\r",
+                "            \"name\": \"Test PayeeFSP\",\r",
+                "            \"personalInfo\": {\r",
+                "                \"complexName\": {\r",
+                "                    \"firstName\": \"Test\",\r",
+                "                    \"lastName\": \"Test\"\r",
+                "                },\r",
+                "                \"dateOfBirth\": \"1984-01-01\"\r",
+                "            }\r",
+                "        }\r",
+                "      })\r",
+                "    }\r",
+                "}\r",
+                "\r",
+                "  \r",
+                "pm.sendRequest(simulatorAddParty, function (err, response) {});\r",
+                "\r",
                 ""
               ]
             }
@@ -1553,7 +1583,8 @@
             "Accept": "application/vnd.interoperability.quotes+json;version=1.0",
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0",
             "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}"
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$inputs.toFspId}"
           },
           "body": {
             "quoteId": "{$function.generic.generateUUID}",
@@ -1672,7 +1703,8 @@
                 ]
               }
             ]
-          }
+          },
+          "url": "{$inputs.HOST_QUOTING_SERVICE}"
         },
         {
           "id": 4,
@@ -1770,52 +1802,15 @@
                 ]
               }
             ]
-          }
+          },
+          "url": "{$inputs.HOST_ML_API_ADAPTER}"
         }
       ]
     },
     {
-      "id": 6,
+      "id": 8,
       "name": "p2p_money_transfer - p2p_happy_path RECEIVE_QUOTE",
       "requests": [
-        {
-          "id": 1,
-          "description": "test",
-          "apiVersion": {
-            "minorVersion": 0,
-            "majorVersion": 1,
-            "type": "fspiop",
-            "asynchronous": true
-          },
-          "operationPath": "/participants/{Type}/{ID}",
-          "path": "/participants/MSISDN/{$inputs.toIdValue}",
-          "method": "post",
-          "params": {
-            "Type": "MSISDN",
-            "ID": "{$inputs.toIdValue}"
-          },
-          "body": {
-            "fspId": "{$environment.payeefsp}",
-            "currency": "DOP"
-          },
-          "headers": {
-            "Content-Type": "{$inputs.contentType}",
-            "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}",
-            "Accept": "{$inputs.accept}"
-          },
-          "tests": {
-            "assertions": [
-              {
-                "id": 1,
-                "description": "Status code is 200",
-                "exec": [
-                  "expect(response.status).to.equal(202)"
-                ]
-              }
-            ]
-          }
-        },
         {
           "id": 2,
           "description": "Get party information",
@@ -1898,9 +1893,66 @@
               }
             ]
           },
+          "url": "{$inputs.HOST_ACCOUNT_LOOKUP_SERVICE}",
           "scripts": {
             "preRequest": {
               "exec": [
+                "\r",
+                "const curDate = (new Date()).toUTCString()\r",
+                "const alsAddParticipant = {\r",
+                "    url: pm.environment.get(\"HOST_ACCOUNT_LOOKUP_SERVICE\") + '/participants/' + pm.environment.get(\"toIdType\") + '/' + pm.environment.get(\"toIdValue\"),\r",
+                "    method: 'POST',\r",
+                "    header: {\r",
+                "        'FSPIOP-Source': 'payeefsp',\r",
+                "        'Accept': 'application/vnd.interoperability.participants+json;version=1.0',\r",
+                "        'Content-Type': 'application/vnd.interoperability.participants+json;version=1.0',\r",
+                "        'Date': curDate\r",
+                "    },\r",
+                "    body: {\r",
+                "      mode: 'raw',\r",
+                "      raw: JSON.stringify({\r",
+                "        \"fspId\": \"payeefsp\",\r",
+                "        \"currency\": \"USD\"\r",
+                "      })\r",
+                "    }\r",
+                "}\r",
+                "  \r",
+                "pm.sendRequest(alsAddParticipant, function (err, response) {\r",
+                "    console.log('asdf'+JSON.stringify(response.json()))\r",
+                "});\r",
+                "\r",
+                "const simulatorAddParty = {\r",
+                "    url: pm.environment.get(\"HOST_SIMULATOR\") + '/payeefsp/parties/' + pm.environment.get(\"toIdType\") + '/' + pm.environment.get(\"toIdValue\"),\r",
+                "    method: 'POST',\r",
+                "    header: {\r",
+                "        \"FSPIOP-Source\": \"payeefsp\",\r",
+                "        \"Content-Type\": \"application/json\"\r",
+                "    },\r",
+                "    body: {\r",
+                "      mode: 'raw',\r",
+                "      raw: JSON.stringify({\r",
+                "        \"party\": {\r",
+                "            \"partyIdInfo\": {\r",
+                "                \"partyIdType\": pm.environment.get(\"toIdType\"),\r",
+                "                \"partyIdentifier\": pm.environment.get(\"toIdValue\"),\r",
+                "                \"fspId\": \"payeefsp\"\r",
+                "            },\r",
+                "            \"name\": \"Test PayeeFSP\",\r",
+                "            \"personalInfo\": {\r",
+                "                \"complexName\": {\r",
+                "                    \"firstName\": \"Test\",\r",
+                "                    \"lastName\": \"Test\"\r",
+                "                },\r",
+                "                \"dateOfBirth\": \"1984-01-01\"\r",
+                "            }\r",
+                "        }\r",
+                "      })\r",
+                "    }\r",
+                "}\r",
+                "\r",
+                "  \r",
+                "pm.sendRequest(simulatorAddParty, function (err, response) {});\r",
+                "\r",
                 ""
               ]
             }
@@ -1921,7 +1973,8 @@
             "Accept": "application/vnd.interoperability.quotes+json;version=1.0",
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0",
             "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}"
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$inputs.toFspId}"
           },
           "body": {
             "quoteId": "{$function.generic.generateUUID}",
@@ -2040,7 +2093,13 @@
                 ]
               }
             ]
-          }
+          },
+          "params": {
+            "Type": "MSISDN",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "path": "/quotes",
+          "url": "{$inputs.HOST_QUOTING_SERVICE}"
         },
         {
           "id": 4,
@@ -2138,12 +2197,13 @@
                 ]
               }
             ]
-          }
+          },
+          "url": "{$inputs.HOST_ML_API_ADAPTER}"
         }
       ]
     },
     {
-      "id": 7,
+      "id": 9,
       "name": "Store Settlement&Position Account Balances Before Transfers",
       "requests": [
         {
@@ -2160,7 +2220,7 @@
           "params": {
             "name": "testfsp1"
           },
-          "url": "{$inputs.centralLedger}",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "tests": {
             "assertions": [
               {
@@ -2204,7 +2264,7 @@
           "params": {
             "name": "testfsp2"
           },
-          "url": "{$inputs.centralLedger}",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "tests": {
             "assertions": [
               {
@@ -2249,7 +2309,7 @@
           "params": {
             "name": "testfsp3"
           },
-          "url": "{$inputs.centralLedger}",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "tests": {
             "assertions": [
               {
@@ -2299,7 +2359,7 @@
           "params": {
             "name": "testfsp4"
           },
-          "url": "{$inputs.centralLedger}",
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
           "tests": {
             "assertions": [
               {
