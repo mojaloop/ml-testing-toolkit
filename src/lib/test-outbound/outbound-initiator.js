@@ -150,28 +150,29 @@ const processTestCase = async (testCase, traceID, inputValues, templateEnvironme
     // Send http request
     try {
       const contextObj = await context.generageContextObj(templateEnvironment)
-      let environment
+
       if (request.scripts && request.scripts.preRequest && request.scripts.preRequest.exec.length > 0 && request.scripts.preRequest.exec !== ['']) {
         scriptsExecution.preRequest = await context.executeAsync(request.scripts.preRequest.exec, { context: { ...contextObj, request: convertedRequest }, id: uuid.v4() }, contextObj)
-        templateEnvironment = scriptsExecution.preRequest.environment
-      }
 
-      environment = templateEnvironment.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
-      convertedRequest = replaceEnvironmentVariables(convertedRequest, environment)
+        const envVars = scriptsExecution.preRequest.environment.reduce((envObj, item) => {
+          envObj[item.key] = item.value
+          return envObj
+        }, {})
+        convertedRequest = replaceEnvironmentVariables(convertedRequest, envVars)
+      }
 
       const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl)
 
       if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
         const response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
         scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, response }, id: uuid.v4() }, contextObj)
-        templateEnvironment = scriptsExecution.postRequest.environment
       }
 
       if (contextObj.environment.values && contextObj.environment.values.length > 0) {
         templateEnvironment = contextObj.environment.values
       }
 
-      environment = templateEnvironment.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
+      const environment = templateEnvironment.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
 
       contextObj.ctx.dispose()
       contextObj.ctx = null
