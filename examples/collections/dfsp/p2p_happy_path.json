@@ -47,15 +47,6 @@
             "Type": "{$inputs.toIdType}",
             "ID": "{$inputs.toIdValue}"
           },
-          "scripts": {
-            "preRequest": {
-              "exec": [
-                "var uuid = require('uuid');'",
-                "var generatedUUID = uuid.v4();",
-                "pm.environment.set('test'+generatedUUID, generatedUUID)"
-              ]
-            }
-          },
           "tests": {
             "assertions": [
               {

@@ -53,9 +53,11 @@ const OutboundSend = async (inputTemplate, traceID) => {
     sessionID = traceHeaderUtils.getSessionID(traceID)
   }
 
-  const templateEnvironment = Object.entries(inputTemplate.inputValues).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
+  const environmentVariables = {
+    items: Object.entries(inputTemplate.inputValues).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
+  }
   for (const i in inputTemplate.test_cases) {
-    await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, templateEnvironment)
+    await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, environmentVariables)
   }
 
   const completedTimeStamp = new Date()
@@ -78,7 +80,7 @@ const OutboundSend = async (inputTemplate, traceID) => {
   }
 }
 
-const processTestCase = async (testCase, traceID, inputValues, templateEnvironment) => {
+const processTestCase = async (testCase, traceID, inputValues, environmentVariables) => {
   let outboundID = traceID
   let sessionID = null
   if (traceID && traceHeaderUtils.isCustomTraceID(traceID)) {
@@ -147,31 +149,28 @@ const processTestCase = async (testCase, traceID, inputValues, templateEnvironme
     }
 
     const scriptsExecution = {}
+    let environment
     // Send http request
     try {
-      const contextObj = await context.generageContextObj(templateEnvironment)
-      let environment
+      const contextObj = await context.generageContextObj(environmentVariables.items)
+
       if (request.scripts && request.scripts.preRequest && request.scripts.preRequest.exec.length > 0 && request.scripts.preRequest.exec !== ['']) {
         scriptsExecution.preRequest = await context.executeAsync(request.scripts.preRequest.exec, { context: { ...contextObj, request: convertedRequest }, id: uuid.v4() }, contextObj)
-        templateEnvironment = scriptsExecution.preRequest.environment
+        environmentVariables.items = scriptsExecution.preRequest.environment
       }
 
-      environment = templateEnvironment.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
+      environment = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
       convertedRequest = replaceEnvironmentVariables(convertedRequest, environment)
 
-      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl)
+      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks)
 
       if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
         const response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
         scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, response }, id: uuid.v4() }, contextObj)
-        templateEnvironment = scriptsExecution.postRequest.environment
+        environmentVariables.items = scriptsExecution.postRequest.environment
       }
 
-      if (contextObj.environment.values && contextObj.environment.values.length > 0) {
-        templateEnvironment = contextObj.environment.values
-      }
-
-      environment = templateEnvironment.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
+      environment = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
 
       contextObj.ctx.dispose()
       contextObj.ctx = null
@@ -210,7 +209,7 @@ const processTestCase = async (testCase, traceID, inputValues, templateEnvironme
       } catch (err) {
         resp = err.message
       }
-      const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback)
+      const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environment)
       request.appended = {
         status: 'ERROR',
         testResult,
@@ -285,7 +284,7 @@ const getUrlPrefix = (baseUrl) => {
   return returnUrl
 }
 
-const sendRequest = (baseUrl, method, path, headers, body, successCallbackUrl, errorCallbackUrl) => {
+const sendRequest = (baseUrl, method, path, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks) => {
   return new Promise((resolve, reject) => {
     const httpsProps = {}
     let urlGenerated = Config.getUserConfig().CALLBACK_ENDPOINT + path
@@ -335,7 +334,7 @@ const sendRequest = (baseUrl, method, path, headers, body, successCallbackUrl, e
 
       customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
 
-      if (successCallbackUrl && errorCallbackUrl) {
+      if (successCallbackUrl && errorCallbackUrl && (ignoreCallbacks !== true)) {
         const timer = setTimeout(() => {
           MyEventEmitter.getTestOutboundEmitter().removeAllListeners(successCallbackUrl)
           MyEventEmitter.getTestOutboundEmitter().removeAllListeners(errorCallbackUrl)
