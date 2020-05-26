@@ -59,7 +59,7 @@ describe('Test Outbound Context', () => {
           "var amountAfter = Number(pm.environment.get('amountBefore') + 100)",
           "pm.environment.set('amountAfter', amountAfter)",
           "console.log('amountAfter: ', pm.environment.get('amountAfter'))",
-          "pm.sendRequest('http://localhost:3999/test', function (err, response) {})"
+          "pm.sendRequest({ url: 'http://localhost:3999/test?state=OPEN', header: {'Accept': 'application/json'}}, function (err, response) {})"
         ],
         data: { context: {...contextObj}, id: uuid.v4()},
         contextObj: contextObj

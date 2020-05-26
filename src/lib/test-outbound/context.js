@@ -52,23 +52,23 @@ const executeAsync = async (script, data, contextObj) => {
     const host = `${req.url.protocol}://${req.url.host.join('.')}${req.url.port ? ':' + req.url.port : ''}/`
     let response
     try {
+      let queryParams = ''
+      if (req.url.query && req.url.query.length > 0) {
+        queryParams = '?'
+        req.url.query.forEach(queryParam => {
+          queryParams += `${queryParam.key}=${queryParam.value}&`
+        })
+      }
       const reqObject = {
         method: req.method,
-        url: host + req.url.path.join('/'),
-        headers: req.header.reduce((rObj, item) => { rObj[item.key] = item.value; return rObj }, {}),
+        url: host + req.url.path.join('/') + queryParams,
+        headers: req.header ? req.header.reduce((rObj, item) => { rObj[item.key] = item.value; return rObj }, {}) : null,
         data: req.body && req.body.mode === 'raw' ? JSON.parse(req.body.raw) : null
       }
       response = await axios(reqObject)
     } catch (err) {
       consoleLog.push([cursor, 'executionError', err])
-      if (err.response) {
-        response = err.response
-      } else {
-        response = {
-          status: 4001,
-          data: err.message
-        }
-      }
+      response = err.response ? err.response : { status: 4001, data: err.message }
     }
     contextObj.ctx.dispatch(`execution.response.${id}`, requestId, null, {
       code: response.status,
