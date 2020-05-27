@@ -128,8 +128,17 @@ const callbackRules = async (context, req) => {
     customLogger.logMessage('debug', 'Callback rules are matched', res, true, req)
     const curEvent = res[0]
     if (curEvent.type === 'FIXED_CALLBACK') {
-      generatedCallback.method = curEvent.params.method
-      generatedCallback.path = replaceVariablesFromRequest(curEvent.params.path, context, req)
+      // generatedCallback.method = curEvent.params.method
+      // generatedCallback.path = replaceVariablesFromRequest(curEvent.params.path, context, req)
+      const operationCallback = req.customInfo.callbackInfo.successCallback.path
+
+      // Check if pathPattern from callback_map file exists and determine the callback path
+      if (req.customInfo.callbackInfo.successCallback.pathPattern) {
+        generatedCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.pathPattern, context, req)
+      } else {
+        generatedCallback.path = operationCallback
+      }
+      generatedCallback.method = req.customInfo.callbackInfo.successCallback.method
       generatedCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
       generatedCallback.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req)
       if (curEvent.params.delay) {
