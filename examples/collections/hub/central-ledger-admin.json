@@ -1,5 +1,5 @@
 {
-  "name": "hub-tests",
+  "name": "central-ledger-admin-tests",
   "inputValues": {
     "fromIdType": "MSISDN",
     "fromIdValue": "44123456789",

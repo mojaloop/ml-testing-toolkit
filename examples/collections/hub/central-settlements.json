@@ -1,5 +1,5 @@
 {
-  "name": "central-admin-tests",
+  "name": "central-settlements-tests",
   "inputValues": {
     "fromIdType": "MSISDN",
     "fromIdValue": "44123456789",
