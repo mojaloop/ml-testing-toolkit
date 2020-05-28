@@ -1,42 +1,5 @@
 {
-  "name": "transaction-requests-tests",
-  "inputValues": {
-    "fromIdType": "MSISDN",
-    "fromIdValue": "44123456789",
-    "fromFirstName": "Firstname-Test",
-    "fromLastName": "Lastname-Test",
-    "fromDOB": "1984-01-01",
-    "note": "test",
-    "currency": "USD",
-    "amount": "100",
-    "homeTransactionId": "123ABC",
-    "fromFspId": "testingtoolkitdfsp",
-    "accept": "application/vnd.interoperability.parties+json;version=1.0",
-    "contentType": "application/vnd.interoperability.parties+json;version=1.0",
-    "toIdValue": "27713803912",
-    "toIdType": "MSISDN",
-    "toFspId": "payeefsp",
-    "acceptQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
-    "contentTypeQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
-    "acceptTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
-    "contentTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
-    "HOST_CENTRAL_LEDGER": "http://central-ledger.local",
-    "BASE_CENTRAL_LEDGER_ADMIN": "",
-    "HUB_OPERATOR_BEARER_TOKEN": "NOT_APPLICABLE",
-    "hub_operator": "NOT_APPLICABLE",
-    "payerfsp": "testingtoolkitdfsp",
-    "HOST_ML_API_ADAPTER": "http://ml-api-adapter.local",
-    "accountId": "6",
-    "payeefsp": "payeefsp",
-    "receiverMSISDN": "27713803912",
-    "ilpPacket": "AQAAAAAAAADIEHByaXZhdGUucGF5ZWVmc3CCAiB7InRyYW5zYWN0aW9uSWQiOiIyZGY3NzRlMi1mMWRiLTRmZjctYTQ5NS0yZGRkMzdhZjdjMmMiLCJxdW90ZUlkIjoiMDNhNjA1NTAtNmYyZi00NTU2LThlMDQtMDcwM2UzOWI4N2ZmIiwicGF5ZWUiOnsicGFydHlJZEluZm8iOnsicGFydHlJZFR5cGUiOiJNU0lTRE4iLCJwYXJ0eUlkZW50aWZpZXIiOiIyNzcxMzgwMzkxMyIsImZzcElkIjoicGF5ZWVmc3AifSwicGVyc29uYWxJbmZvIjp7ImNvbXBsZXhOYW1lIjp7fX19LCJwYXllciI6eyJwYXJ0eUlkSW5mbyI6eyJwYXJ0eUlkVHlwZSI6Ik1TSVNETiIsInBhcnR5SWRlbnRpZmllciI6IjI3NzEzODAzOTExIiwiZnNwSWQiOiJwYXllcmZzcCJ9LCJwZXJzb25hbEluZm8iOnsiY29tcGxleE5hbWUiOnt9fX0sImFtb3VudCI6eyJjdXJyZW5jeSI6IlVTRCIsImFtb3VudCI6IjIwMCJ9LCJ0cmFuc2FjdGlvblR5cGUiOnsic2NlbmFyaW8iOiJERVBPU0lUIiwic3ViU2NlbmFyaW8iOiJERVBPU0lUIiwiaW5pdGlhdG9yIjoiUEFZRVIiLCJpbml0aWF0b3JUeXBlIjoiQ09OU1VNRVIiLCJyZWZ1bmRJbmZvIjp7fX19",
-    "condition": "HOr22-H3AfTDHrSkPjJtVPRdKouuMkDXTR4ejlQa8Ks",
-    "HOST_QUOTING_SERVICE": "http://quoting-service.local",
-    "HOST_ACCOUNT_LOOKUP_SERVICE": "http://account-lookup-service.local",
-    "HOST_SIMULATOR": "http://moja-simulator.local",
-    "HOST_CENTRAL_SETTLEMENT": "http://central-settlement.local/v1",
-    "HOST_TRANSACTION_REQUESTS_SERVICE": "http://transaction-request-service.local"
-  },
+  "name": "hub-transaction-requests-tests",
   "test_cases": [
     {
       "id": 9,
@@ -975,7 +938,123 @@
               }
             ]
           },
-          "body": null
+          "body": {
+            "transactionRequestId": "ee47ec82-3a89-24b8-882a-c87825c51b7e",
+            "payee": {
+              "partyIdInfo": {
+                "partyIdType": "EMAIL",
+                "partyIdentifier": "labore in",
+                "partySubIdOrType": "do Ut",
+                "fspId": "consequat officia ullamco fugi"
+              },
+              "merchantClassificationCode": "1",
+              "name": "voluptate Ut ut ipsum",
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "aSD",
+                  "middleName": "ASDF",
+                  "lastName": "SADF"
+                },
+                "dateOfBirth": "3582-07-30"
+              }
+            },
+            "payer": {
+              "partyIdType": "IBAN",
+              "partyIdentifier": "dolore",
+              "partySubIdOrType": "incididunt consequat est",
+              "fspId": "{$inputs.fromFspId}"
+            },
+            "amount": {
+              "currency": "BBD",
+              "amount": "0.8"
+            },
+            "transactionType": {
+              "scenario": "WITHDRAWAL",
+              "initiator": "PAYEE",
+              "initiatorType": "AGENT",
+              "subScenario": "D",
+              "refundInfo": {
+                "originalTransactionId": "a2babcaf-ec21-248f-be51-c217dc417f3b",
+                "refundReason": "incididunt Lorem"
+              },
+              "balanceOfPayments": "406"
+            },
+            "note": "nulla cillum",
+            "geoCode": {
+              "latitude": "+90.0",
+              "longitude": "180.000"
+            },
+            "authenticationType": "QRCODE",
+            "expiration": "8561-03-30T23:12:56.488+06:58",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "t",
+                  "value": "proident eu aliquip ea"
+                },
+                {
+                  "key": "dolor eiusmod in ut est",
+                  "value": "ex sunt"
+                },
+                {
+                  "key": "et",
+                  "value": "in anim"
+                },
+                {
+                  "key": "voluptat",
+                  "value": "dolor Ut magna"
+                },
+                {
+                  "key": "s",
+                  "value": "elit voluptate Lorem"
+                },
+                {
+                  "key": "ni",
+                  "value": "est irure incididunt nostru"
+                },
+                {
+                  "key": "et fugiat",
+                  "value": "mollit"
+                },
+                {
+                  "key": "reprehenderit",
+                  "value": "incididunt proident ad"
+                },
+                {
+                  "key": "in ipsum ad",
+                  "value": "aliqua"
+                },
+                {
+                  "key": "enim occaecat tempor",
+                  "value": "ut"
+                },
+                {
+                  "key": "elit",
+                  "value": "et tempor laboris Ut eiusmod"
+                },
+                {
+                  "key": "sint Excepteur",
+                  "value": "laboris in nisi"
+                },
+                {
+                  "key": "sint",
+                  "value": "dolore consequat et enim ea"
+                },
+                {
+                  "key": "nostrud minim",
+                  "value": "nisi consectetur id"
+                },
+                {
+                  "key": "occaecat a",
+                  "value": "fugiat ea labo"
+                },
+                {
+                  "key": "sed qui",
+                  "value": "ea sint ad velit"
+                }
+              ]
+            }
+          }
         },
         {
           "id": 4,
@@ -1022,7 +1101,123 @@
               }
             ]
           },
-          "body": null
+          "body": {
+            "transactionRequestId": "ee47ec82-3a89-24b8-882a-c87825c51b7e",
+            "payee": {
+              "partyIdInfo": {
+                "partyIdType": "EMAIL",
+                "partyIdentifier": "labore in",
+                "partySubIdOrType": "do Ut",
+                "fspId": "consequat officia ullamco fugi"
+              },
+              "merchantClassificationCode": "1",
+              "name": "voluptate Ut ut ipsum",
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "aSD",
+                  "middleName": "ASDF",
+                  "lastName": "SADF"
+                },
+                "dateOfBirth": "3582-07-30"
+              }
+            },
+            "payer": {
+              "partyIdType": "IBAN",
+              "partyIdentifier": "dolore",
+              "partySubIdOrType": "incididunt consequat est",
+              "fspId": "{$inputs.fromFspId}"
+            },
+            "amount": {
+              "currency": "BBD",
+              "amount": "0.8"
+            },
+            "transactionType": {
+              "scenario": "WITHDRAWAL",
+              "initiator": "PAYEE",
+              "initiatorType": "AGENT",
+              "subScenario": "D",
+              "refundInfo": {
+                "originalTransactionId": "a2babcaf-ec21-248f-be51-c217dc417f3b",
+                "refundReason": "incididunt Lorem"
+              },
+              "balanceOfPayments": "406"
+            },
+            "note": "nulla cillum",
+            "geoCode": {
+              "latitude": "+90.0",
+              "longitude": "180.000"
+            },
+            "authenticationType": "QRCODE",
+            "expiration": "8561-03-30T23:12:56.488+06:58",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "t",
+                  "value": "proident eu aliquip ea"
+                },
+                {
+                  "key": "dolor eiusmod in ut est",
+                  "value": "ex sunt"
+                },
+                {
+                  "key": "et",
+                  "value": "in anim"
+                },
+                {
+                  "key": "voluptat",
+                  "value": "dolor Ut magna"
+                },
+                {
+                  "key": "s",
+                  "value": "elit voluptate Lorem"
+                },
+                {
+                  "key": "ni",
+                  "value": "est irure incididunt nostru"
+                },
+                {
+                  "key": "et fugiat",
+                  "value": "mollit"
+                },
+                {
+                  "key": "reprehenderit",
+                  "value": "incididunt proident ad"
+                },
+                {
+                  "key": "in ipsum ad",
+                  "value": "aliqua"
+                },
+                {
+                  "key": "enim occaecat tempor",
+                  "value": "ut"
+                },
+                {
+                  "key": "elit",
+                  "value": "et tempor laboris Ut eiusmod"
+                },
+                {
+                  "key": "sint Excepteur",
+                  "value": "laboris in nisi"
+                },
+                {
+                  "key": "sint",
+                  "value": "dolore consequat et enim ea"
+                },
+                {
+                  "key": "nostrud minim",
+                  "value": "nisi consectetur id"
+                },
+                {
+                  "key": "occaecat a",
+                  "value": "fugiat ea labo"
+                },
+                {
+                  "key": "sed qui",
+                  "value": "ea sint ad velit"
+                }
+              ]
+            }
+          }
         },
         {
           "id": 5,

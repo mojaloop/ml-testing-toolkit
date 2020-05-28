@@ -1,41 +1,5 @@
 {
-  "name": "central-settlements-tests",
-  "inputValues": {
-    "fromIdType": "MSISDN",
-    "fromIdValue": "44123456789",
-    "fromFirstName": "Firstname-Test",
-    "fromLastName": "Lastname-Test",
-    "fromDOB": "1984-01-01",
-    "note": "test",
-    "currency": "USD",
-    "amount": "100",
-    "homeTransactionId": "123ABC",
-    "fromFspId": "testingtoolkitdfsp",
-    "accept": "application/vnd.interoperability.parties+json;version=1.0",
-    "contentType": "application/vnd.interoperability.parties+json;version=1.0",
-    "toIdValue": "27713803912",
-    "toIdType": "MSISDN",
-    "toFspId": "payeefsp",
-    "acceptQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
-    "contentTypeQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
-    "acceptTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
-    "contentTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
-    "HOST_CENTRAL_LEDGER": "http://central-ledger.local",
-    "BASE_CENTRAL_LEDGER_ADMIN": "",
-    "HUB_OPERATOR_BEARER_TOKEN": "NOT_APPLICABLE",
-    "hub_operator": "NOT_APPLICABLE",
-    "payerfsp": "testingtoolkitdfsp",
-    "HOST_ML_API_ADAPTER": "http://ml-api-adapter.local",
-    "accountId": "6",
-    "payeefsp": "payeefsp",
-    "receiverMSISDN": "27713803912",
-    "ilpPacket": "AQAAAAAAAADIEHByaXZhdGUucGF5ZWVmc3CCAiB7InRyYW5zYWN0aW9uSWQiOiIyZGY3NzRlMi1mMWRiLTRmZjctYTQ5NS0yZGRkMzdhZjdjMmMiLCJxdW90ZUlkIjoiMDNhNjA1NTAtNmYyZi00NTU2LThlMDQtMDcwM2UzOWI4N2ZmIiwicGF5ZWUiOnsicGFydHlJZEluZm8iOnsicGFydHlJZFR5cGUiOiJNU0lTRE4iLCJwYXJ0eUlkZW50aWZpZXIiOiIyNzcxMzgwMzkxMyIsImZzcElkIjoicGF5ZWVmc3AifSwicGVyc29uYWxJbmZvIjp7ImNvbXBsZXhOYW1lIjp7fX19LCJwYXllciI6eyJwYXJ0eUlkSW5mbyI6eyJwYXJ0eUlkVHlwZSI6Ik1TSVNETiIsInBhcnR5SWRlbnRpZmllciI6IjI3NzEzODAzOTExIiwiZnNwSWQiOiJwYXllcmZzcCJ9LCJwZXJzb25hbEluZm8iOnsiY29tcGxleE5hbWUiOnt9fX0sImFtb3VudCI6eyJjdXJyZW5jeSI6IlVTRCIsImFtb3VudCI6IjIwMCJ9LCJ0cmFuc2FjdGlvblR5cGUiOnsic2NlbmFyaW8iOiJERVBPU0lUIiwic3ViU2NlbmFyaW8iOiJERVBPU0lUIiwiaW5pdGlhdG9yIjoiUEFZRVIiLCJpbml0aWF0b3JUeXBlIjoiQ09OU1VNRVIiLCJyZWZ1bmRJbmZvIjp7fX19",
-    "condition": "HOr22-H3AfTDHrSkPjJtVPRdKouuMkDXTR4ejlQa8Ks",
-    "HOST_QUOTING_SERVICE": "http://quoting-service.local",
-    "HOST_ACCOUNT_LOOKUP_SERVICE": "http://account-lookup-service.local",
-    "HOST_SIMULATOR": "http://moja-simulator.local",
-    "HOST_CENTRAL_SETTLEMENT": "http://central-settlement.local/v1"
-  },
+  "name": "hub-central-settlements-tests",
   "test_cases": [
     {
       "id": 1,
@@ -317,8 +281,8 @@
             "Accept": "{$inputs.acceptQuotes}",
             "Content-Type": "{$inputs.contentTypeQuotes}",
             "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}",
-            "FSPIOP-Destination": "{$inputs.toFspId}"
+            "FSPIOP-Source": "testfsp1",
+            "FSPIOP-Destination": "testfsp2"
           },
           "body": {
             "quoteId": "{$function.generic.generateUUID}",
@@ -367,6 +331,7 @@
               }
             ]
           },
+          "ignoreCallbacks": true,
           "scripts": {
             "preRequest": {
               "exec": [
@@ -471,8 +436,8 @@
             "Accept": "{$inputs.acceptQuotes}",
             "Content-Type": "{$inputs.contentTypeQuotes}",
             "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}",
-            "FSPIOP-Destination": "{$inputs.toFspId}"
+            "FSPIOP-Source": "testfsp1",
+            "FSPIOP-Destination": "testfsp4"
           },
           "body": {
             "quoteId": "{$function.generic.generateUUID}",
@@ -521,6 +486,7 @@
               }
             ]
           },
+          "ignoreCallbacks": true,
           "scripts": {
             "preRequest": {
               "exec": [
@@ -626,8 +592,8 @@
             "Accept": "{$inputs.acceptQuotes}",
             "Content-Type": "{$inputs.contentTypeQuotes}",
             "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}",
-            "FSPIOP-Destination": "{$inputs.toFspId}"
+            "FSPIOP-Source": "testfsp3",
+            "FSPIOP-Destination": "testfsp1"
           },
           "body": {
             "quoteId": "{$function.generic.generateUUID}",
@@ -676,6 +642,7 @@
               }
             ]
           },
+          "ignoreCallbacks": true,
           "scripts": {
             "preRequest": {
               "exec": [
@@ -781,8 +748,8 @@
             "Accept": "{$inputs.acceptQuotes}",
             "Content-Type": "{$inputs.contentTypeQuotes}",
             "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}",
-            "FSPIOP-Destination": "{$inputs.toFspId}"
+            "FSPIOP-Source": "testfsp2",
+            "FSPIOP-Destination": "testfsp3"
           },
           "body": {
             "quoteId": "{$function.generic.generateUUID}",
@@ -831,6 +798,7 @@
               }
             ]
           },
+          "ignoreCallbacks": true,
           "scripts": {
             "preRequest": {
               "exec": [
@@ -936,8 +904,8 @@
             "Accept": "{$inputs.acceptQuotes}",
             "Content-Type": "{$inputs.contentTypeQuotes}",
             "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}",
-            "FSPIOP-Destination": "{$inputs.toFspId}"
+            "FSPIOP-Source": "testfsp4",
+            "FSPIOP-Destination": "testfsp2"
           },
           "body": {
             "quoteId": "{$function.generic.generateUUID}",
@@ -986,6 +954,7 @@
               }
             ]
           },
+          "ignoreCallbacks": true,
           "scripts": {
             "preRequest": {
               "exec": [
@@ -1089,8 +1058,8 @@
             "Accept": "{$inputs.acceptQuotes}",
             "Content-Type": "{$inputs.contentTypeQuotes}",
             "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}",
-            "FSPIOP-Destination": "{$inputs.toFspId}"
+            "FSPIOP-Source": "testfsp4",
+            "FSPIOP-Destination": "testfsp3"
           },
           "body": {
             "quoteId": "{$function.generic.generateUUID}",
@@ -1139,6 +1108,7 @@
               }
             ]
           },
+          "ignoreCallbacks": true,
           "scripts": {
             "preRequest": {
               "exec": [
