@@ -2,7 +2,7 @@
   "name": "hub-transaction-requests-tests",
   "test_cases": [
     {
-      "id": 9,
+      "id": 1,
       "name": "received State",
       "requests": [
         {
@@ -376,7 +376,7 @@
       ]
     },
     {
-      "id": 10,
+      "id": 2,
       "name": "reject State",
       "requests": [
         {
@@ -732,7 +732,7 @@
       ]
     },
     {
-      "id": 11,
+      "id": 3,
       "name": "error framework",
       "requests": [
         {
@@ -1318,7 +1318,7 @@
       ]
     },
     {
-      "id": 12,
+      "id": 4,
       "name": "authorizations",
       "requests": [
         {
