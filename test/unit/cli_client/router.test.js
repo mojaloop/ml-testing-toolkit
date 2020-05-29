@@ -26,6 +26,8 @@
 const spyExit = jest.spyOn(process, 'exit')
 const { cli } = require('../../../src/cli_client/router')
 
+jest.mock('../../../src/cli_client/utils/listeners')
+jest.mock('../../../src/cli_client/modes/outbound')
 
 describe('Cli client', () => {
   describe('running router', () => {
@@ -34,18 +36,27 @@ describe('Cli client', () => {
         "mode": "monitoring"
       }  
       spyExit.mockImplementationOnce(jest.fn())
-      jest.mock('../../../src/cli_client/modes/monitoring')
       expect(() => {
         cli(config)
       }).not.toThrowError();
     })
-    it('when mode is outbound and inputFile is provided should not throw an error', async () => {
+    it('when mode is outbound and inputFiles is provided should not throw an error', async () => {
       const config = {
         "mode": "outbound",
-        "inputFile": "test"
+        "inputFiles": "test"
       }
       spyExit.mockImplementationOnce(jest.fn())
-      jest.mock('../../../src/cli_client/modes/outbound')
+      expect(() => {
+        cli(config)
+      }).not.toThrowError();
+    })
+    it('when mode is outbound, inputFiles and environmentFile is provided should not throw an error', async () => {
+      const config = {
+        "mode": "outbound",
+        "inputFiles": "test",
+        "environmentFile": "test"
+      }
+      spyExit.mockImplementationOnce(jest.fn())
       expect(() => {
         cli(config)
       }).not.toThrowError();

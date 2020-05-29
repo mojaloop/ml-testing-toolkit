@@ -37,7 +37,6 @@ const cli = (commander) => {
   switch (config.mode) {
     case 'monitoring':
       require('./utils/listeners').monitoring()
-      require('./modes/monitoring')
       break
     case 'outbound':
       if (config.inputFiles) {

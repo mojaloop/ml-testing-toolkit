@@ -78,7 +78,7 @@ describe('Cli client', () => {
     })
   })
   describe('run sendTemplate', () => {
-    it('when readFile returns data should not throw an error', async () => {
+    it('when inputFiles contains files should not throw an error', async () => {
       spyPromisify.mockReturnValueOnce(() => {
         return JSON.stringify({
           "test_cases": [
@@ -89,7 +89,28 @@ describe('Cli client', () => {
         })
       })
       const configuration = {
-        "inputFile": "sample-cli.json"
+        "inputFiles": "sample-cli.json"
+      }
+      spyAxios.mockReturnValue({})
+      await expect(outbound.sendTemplate(configuration)).resolves.toBe(undefined)
+    })
+    it('when inputFiles contains files and directories should not throw an error', async () => {
+      spyPromisify.mockReturnValueOnce(() => {
+        return JSON.stringify({
+          "test_cases": [
+            {
+              "requests": []
+            }
+          ]
+        })
+      })
+      spyPromisify.mockReturnValueOnce(() => {
+        return JSON.stringify([
+          "file1"
+        ])
+      })
+      const configuration = {
+        "inputFiles": "sample-cli.json,sample-dir"
       }
       spyAxios.mockReturnValue({})
       await expect(outbound.sendTemplate(configuration)).resolves.toBe(undefined)
@@ -97,7 +118,23 @@ describe('Cli client', () => {
     it('when readFile throws error should not throw an error', async () => {
       spyPromisify.mockReturnValueOnce(() => {throw new Error('expected error')})
       const configuration = {
-        "inputFile": "sample-cli.json"
+        "inputFiles": "sample-cli.json"
+      }
+      await expect(outbound.sendTemplate(configuration)).resolves.toBe(undefined)
+    })
+    it('when readFile throws error should not throw an error', async () => {
+      spyPromisify.mockReturnValueOnce(() => {
+        return JSON.stringify({
+          "test_cases": [
+            {
+              "requests": []
+            }
+          ]
+        })
+      })
+      spyPromisify.mockReturnValueOnce(() => {throw new Error('expected error')})
+      const configuration = {
+        "inputFiles": "sample-cli.json,sample-dir"
       }
       await expect(outbound.sendTemplate(configuration)).resolves.toBe(undefined)
     })
