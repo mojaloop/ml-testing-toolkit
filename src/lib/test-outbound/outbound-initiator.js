@@ -385,10 +385,14 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
         case '{$prev':
           var temp1 = element.replace(/{\$prev.(.*)}/, '$1')
           var temp1Arr = temp1.split('.')
+          try {
             var replacedValue = _.get(requestsObj[temp1Arr[0]].appended, temp1.replace(temp1Arr[0] + '.', ''))
             if (replacedValue) {
               resultObject = resultObject.replace(element, replacedValue)
             }
+          } catch (err) {
+            console.log(`${element} not found`)
+          }
           break
         case '{$request':
           var temp2 = element.replace(/{\$request.(.*)}/, '$1')
