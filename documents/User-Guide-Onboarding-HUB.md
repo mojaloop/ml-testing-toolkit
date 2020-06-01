@@ -57,6 +57,10 @@ docker-compose up
 
 ## 2 Settings
 
+Setup database
+
+- execute postman/hub_onboarding.sh
+
 The _**SETTINGS**_ navigation tab will open to the **SETTINGS** window. Below is the default view of this page.
 
 ![Opening Default Settings](/assets/images/opening-default-settings.png)
