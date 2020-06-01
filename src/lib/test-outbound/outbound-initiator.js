@@ -128,21 +128,6 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
     // Form the path from params and operationPath
     convertedRequest.path = replacePathVariables(request.operationPath, convertedRequest.params)
 
-    // Form callbacks
-    // TODO: Get version from accept / content-type headers
-    let successCallbackUrl = null
-    let errorCallbackUrl = null
-    if (request.apiVersion.asynchronous === true) {
-      const cbMapRawdata = await readFileAsync(reqApiDefinition.callbackMapFile)
-      const reqCallbackMap = JSON.parse(cbMapRawdata)
-      if (reqCallbackMap[request.operationPath]) {
-        if (reqCallbackMap[request.operationPath][request.method]) {
-          successCallbackUrl = reqCallbackMap[request.operationPath][request.method].successCallback.method + ' ' + replaceVariables(reqCallbackMap[request.operationPath][request.method].successCallback.pathPattern, null, convertedRequest)
-          errorCallbackUrl = reqCallbackMap[request.operationPath][request.method].errorCallback.method + ' ' + replaceVariables(reqCallbackMap[request.operationPath][request.method].errorCallback.pathPattern, null, convertedRequest)
-        }
-      }
-    }
-
     // Insert traceparent header if sessionID passed
     if (sessionID) {
       convertedRequest.headers.traceparent = '00-' + traceID + '-0123456789abcdef0-00'
@@ -161,6 +146,21 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
 
       environment = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
       convertedRequest = replaceEnvironmentVariables(convertedRequest, environment)
+
+      // Form callbacks
+      // TODO: Get version from accept / content-type headers
+      let successCallbackUrl = null
+      let errorCallbackUrl = null
+      if (request.apiVersion.asynchronous === true) {
+        const cbMapRawdata = await readFileAsync(reqApiDefinition.callbackMapFile)
+        const reqCallbackMap = JSON.parse(cbMapRawdata)
+        if (reqCallbackMap[request.operationPath] && reqCallbackMap[request.operationPath][request.method]) {
+          const successCallback = reqCallbackMap[request.operationPath][request.method].successCallback
+          const errorCallback = reqCallbackMap[request.operationPath][request.method].errorCallback
+          successCallbackUrl = successCallback.method + ' ' + replaceVariables(successCallback.pathPattern, null, convertedRequest)
+          errorCallbackUrl = errorCallback.method + ' ' + replaceVariables(errorCallback.pathPattern, null, convertedRequest)
+        }
+      }
 
       const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks)
 
@@ -385,9 +385,13 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
         case '{$prev':
           var temp1 = element.replace(/{\$prev.(.*)}/, '$1')
           var temp1Arr = temp1.split('.')
-          var replacedValue = _.get(requestsObj[temp1Arr[0]].appended, temp1.replace(temp1Arr[0] + '.', ''))
-          if (replacedValue) {
-            resultObject = resultObject.replace(element, replacedValue)
+          try {
+            var replacedValue = _.get(requestsObj[temp1Arr[0]].appended, temp1.replace(temp1Arr[0] + '.', ''))
+            if (replacedValue) {
+              resultObject = resultObject.replace(element, replacedValue)
+            }
+          } catch (err) {
+            console.log(`${element} not found`)
           }
           break
         case '{$request':

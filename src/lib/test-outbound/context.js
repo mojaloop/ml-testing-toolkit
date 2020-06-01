@@ -29,7 +29,7 @@ const axios = require('axios').default
 const createContextAsync = util.promisify(Sandbox.createContext)
 
 const generageContextObj = async (environment = []) => {
-  const ctx = await createContextAsync({ timeout: 5000 })
+  const ctx = await createContextAsync({ timeout: 30000 })
   ctx.executeAsync = util.promisify(ctx.execute)
   ctx.on('error', function (cursor, err) {
     console.log(cursor, err)

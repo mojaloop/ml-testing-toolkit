@@ -2,7 +2,7 @@
   "name": "hub-p2p-fundsinout-block-transfers",
   "test_cases": [
     {
-      "id": 3,
+      "id": 1,
       "name": "funds_in",
       "requests": [
         {
@@ -221,7 +221,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 2,
       "name": "funds_out - Reserve&Commit",
       "requests": [
         {
@@ -608,7 +608,7 @@
       ]
     },
     {
-      "id": 5,
+      "id": 3,
       "name": "funds_out - Reserve&Abort",
       "requests": [
         {
@@ -996,7 +996,7 @@
       ]
     },
     {
-      "id": 6,
+      "id": 4,
       "name": "block_transfer ( p>ndc )",
       "requests": [
         {
@@ -1384,7 +1384,7 @@
       ]
     },
     {
-      "id": 7,
+      "id": 5,
       "name": "p2p_money_transfer - p2p_happy_path SEND QUOTE",
       "requests": [
         {
@@ -1774,7 +1774,7 @@
       ]
     },
     {
-      "id": 8,
+      "id": 6,
       "name": "p2p_money_transfer - p2p_happy_path RECEIVE_QUOTE",
       "requests": [
         {
@@ -2165,195 +2165,6 @@
             ]
           },
           "url": "{$inputs.HOST_ML_API_ADAPTER}"
-        }
-      ]
-    },
-    {
-      "id": 9,
-      "name": "Store Settlement&Position Account Balances Before Transfers",
-      "requests": [
-        {
-          "id": 1,
-          "description": "testfsp1 balances",
-          "apiVersion": {
-            "minorVersion": 3,
-            "majorVersion": 9,
-            "type": "central_admin"
-          },
-          "operationPath": "/participants/{name}/accounts",
-          "path": "/participants/testfsp1/accounts",
-          "method": "get",
-          "params": {
-            "name": "testfsp1"
-          },
-          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
-          "tests": {
-            "assertions": [
-              {
-                "id": 1,
-                "description": "Status code is 200",
-                "exec": [
-                  "expect(response.status).to.equal(200)"
-                ]
-              }
-            ]
-          },
-          "scripts": {
-            "postRequest": {
-              "exec": [
-                "var jsonData = pm.response.body;\r",
-                "for (var i in jsonData) {\r",
-                "    if (jsonData[i].ledgerAccountType === \"SETTLEMENT\") {\r",
-                "        console.log(jsonData[i].value)\r",
-                "        pm.environment.set(\"testfsp1SettleAccountBalanceBeforeTransfer\", jsonData[i].value);\r",
-                "    }\r",
-                "    if (jsonData[i].ledgerAccountType === \"POSITION\") {\r",
-                "        console.log(jsonData[i].value)\r",
-                "        pm.environment.set(\"testfsp1PositionAccountBalanceBeforeTransfer\", jsonData[i].value);\r",
-                "    }\r",
-                "}"
-              ]
-            }
-          }
-        },
-        {
-          "id": 2,
-          "description": "testfsp2 balances",
-          "apiVersion": {
-            "minorVersion": 3,
-            "majorVersion": 9,
-            "type": "central_admin"
-          },
-          "operationPath": "/participants/{name}/accounts",
-          "path": "/participants/testfsp2/accounts",
-          "method": "get",
-          "params": {
-            "name": "testfsp2"
-          },
-          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
-          "tests": {
-            "assertions": [
-              {
-                "id": 1,
-                "description": "Status code is 200",
-                "exec": [
-                  "expect(response.status).to.equal(200)"
-                ]
-              }
-            ]
-          },
-          "scripts": {
-            "postRequest": {
-              "exec": [
-                "var jsonData = pm.response.body;\r",
-                "for (var i in jsonData) {\r",
-                "    if (jsonData[i].ledgerAccountType === \"SETTLEMENT\") {\r",
-                "        console.log(jsonData[i].value)\r",
-                "        pm.environment.set(\"testfsp2SettleAccountBalanceBeforeTransfer\", jsonData[i].value);\r",
-                "    }\r",
-                "    if (jsonData[i].ledgerAccountType === \"POSITION\") {\r",
-                "        console.log(jsonData[i].value)\r",
-                "        pm.environment.set(\"testfsp2PositionAccountBalanceBeforeTransfer\", jsonData[i].value);\r",
-                "    }\r",
-                "}\r",
-                ""
-              ]
-            }
-          }
-        },
-        {
-          "id": 3,
-          "description": "testfsp3 balances",
-          "apiVersion": {
-            "minorVersion": 3,
-            "majorVersion": 9,
-            "type": "central_admin"
-          },
-          "operationPath": "/participants/{name}/accounts",
-          "path": "/participants/testfsp3/accounts",
-          "method": "get",
-          "params": {
-            "name": "testfsp3"
-          },
-          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
-          "tests": {
-            "assertions": [
-              {
-                "id": 1,
-                "description": "Status code is 200",
-                "exec": [
-                  "expect(response.status).to.equal(200)"
-                ]
-              }
-            ]
-          },
-          "scripts": {
-            "preRequest": {
-              "exec": [
-                ""
-              ]
-            },
-            "postRequest": {
-              "exec": [
-                "var jsonData = pm.response.body;\r",
-                "for (var i in jsonData) {\r",
-                "    if (jsonData[i].ledgerAccountType === \"SETTLEMENT\") {\r",
-                "        console.log(jsonData[i].value)\r",
-                "        pm.environment.set(\"testfsp3SettleAccountBalanceBeforeTransfer\", jsonData[i].value);\r",
-                "    }\r",
-                "    if (jsonData[i].ledgerAccountType === \"POSITION\") {\r",
-                "        console.log(jsonData[i].value)\r",
-                "        pm.environment.set(\"testfsp3PositionAccountBalanceBeforeTransfer\", jsonData[i].value);\r",
-                "    }\r",
-                "}\r",
-                ""
-              ]
-            }
-          }
-        },
-        {
-          "id": 4,
-          "description": "testfsp4 balances",
-          "apiVersion": {
-            "minorVersion": 3,
-            "majorVersion": 9,
-            "type": "central_admin"
-          },
-          "operationPath": "/participants/{name}/accounts",
-          "path": "/participants/testfsp4/accounts",
-          "method": "get",
-          "params": {
-            "name": "testfsp4"
-          },
-          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
-          "tests": {
-            "assertions": [
-              {
-                "id": 1,
-                "description": "Status code is 200",
-                "exec": [
-                  "expect(response.status).to.equal(200)"
-                ]
-              }
-            ]
-          },
-          "scripts": {
-            "postRequest": {
-              "exec": [
-                "var jsonData = pm.response.body;\r",
-                "for (var i in jsonData) {\r",
-                "    if (jsonData[i].ledgerAccountType === \"SETTLEMENT\") {\r",
-                "        console.log(jsonData[i].value)\r",
-                "        pm.environment.set(\"testfsp4SettleAccountBalanceBeforeTransfer\", jsonData[i].value);\r",
-                "    }\r",
-                "    if (jsonData[i].ledgerAccountType === \"POSITION\") {\r",
-                "        console.log(jsonData[i].value)\r",
-                "        pm.environment.set(\"testfsp4PositionAccountBalanceBeforeTransfer\", jsonData[i].value);\r",
-                "    }\r",
-                "}"
-              ]
-            }
-          }
         }
       ]
     }
