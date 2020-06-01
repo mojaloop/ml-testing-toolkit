@@ -106,4 +106,10 @@ describe('API route /api/outbound', () => {
       expect(res.statusCode).toEqual(422)
     })
   })
+  describe('DELETE /api/outbound/template/:outboundID', () => {
+    it('Send request', async () => {
+      const res = await request(app).delete(`/api/outbound/template/123`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+  })
 })

@@ -82,4 +82,17 @@ router.post('/template/:traceID', async (req, res, next) => {
   }
 })
 
+// Route to terminate the given execution
+router.delete('/template/:traceID', async (req, res, next) => {
+  try {
+    const traceID = req.params.traceID
+    const outbound = require('../test-outbound/outbound-initiator')
+    outbound.terminateOutbound(traceID)
+
+    return res.status(200).json({ status: 'OK' })
+  } catch (err) {
+    next(err)
+  }
+})
+
 module.exports = router
