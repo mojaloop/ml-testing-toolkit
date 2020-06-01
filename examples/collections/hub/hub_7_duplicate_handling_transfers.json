@@ -1,0 +1,1377 @@
+{
+  "name": "hub_duplicate_handling_transfers",
+  "test_cases": [
+    {
+      "id": 1,
+      "name": "original_transfer_at_committed",
+      "requests": [
+        {
+          "id": 1,
+          "description": "Send Transfer",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transfers",
+          "path": "/transfers",
+          "method": "post",
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
+          "headers": {
+            "Accept": "{$inputs.acceptTransfers}",
+            "Content-Type": "{$inputs.contentTransfers}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.payerfsp}",
+            "FSPIOP-Destination": "{$inputs.payeefsp}"
+          },
+          "body": {
+            "transferId": "{$environment.transfer_ID}",
+            "payerFsp": "{$environment.payerfsp}",
+            "payeeFsp": "{$environment.payeefsp}",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "expiration": "{$environment.transferExpiration}",
+            "ilpPacket": "{$environment.ilpPacket}",
+            "condition": "{$environment.condition}"
+          },
+          "ignoreCallbacks": false,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data does not have transferId",
+                "exec": [
+                  "expect(callback.body).to.not.have.property('transferId')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Response status is COMMITTED",
+                "exec": [
+                  "expect(callback.body.transferState).to.equal('COMMITTED')"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "var generatedUUID = uuid.v4();",
+                "",
+                "pm.environment.set('transfer_ID', generatedUUID);",
+                "pm.environment.set('transferDate', (new Date()).toUTCString());",
+                "pm.environment.set(\"transferExpiration\",new Date(new Date().getTime() + 60000))",
+                "pm.environment.set('transferAmount', 1);"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "",
+                "",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "id": 2,
+          "description": "Duplicate Transfer",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transfers",
+          "path": "/transfers",
+          "method": "post",
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
+          "headers": {
+            "Accept": "{$inputs.acceptTransfers}",
+            "Content-Type": "{$inputs.contentTransfers}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.payerfsp}",
+            "FSPIOP-Destination": "{$inputs.payeefsp}"
+          },
+          "body": {
+            "transferId": "{$environment.transfer_ID}",
+            "payerFsp": "{$environment.payerfsp}",
+            "payeeFsp": "{$environment.payeefsp}",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "expiration": "{$environment.transferExpiration}",
+            "ilpPacket": "{$environment.ilpPacket}",
+            "condition": "{$environment.condition}"
+          },
+          "ignoreCallbacks": false,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response data does not have transferId",
+                "exec": [
+                  "expect(callback.body).to.not.have.property('transferId')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Response status is COMMITTED",
+                "exec": [
+                  "expect(callback.body.transferState).to.equal('COMMITTED')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "fspiop-source is switch",
+                "exec": [
+                  "expect(callback.headers['fspiop-source']).to.equal('switch')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "fspiop-destination is payerfsp",
+                "exec": [
+                  "expect(callback.headers['fspiop-destination']).to.equal(environment.payerfsp)"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "fspiop-uri contains /transfers/",
+                "exec": [
+                  "expect(callback.headers['fspiop-uri']).to.equal(`/transfers/${environment.transfer_ID}`)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                ""
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "fullfill_commit_duplicate_valid",
+      "requests": [
+        {
+          "id": 1,
+          "description": "Send Quote",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/quotes",
+          "path": "/quotes",
+          "method": "post",
+          "body": {
+            "quoteId": "{$environment.quoteId}",
+            "transactionId": "{$environment.quoteId}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "{$inputs.fromIdType}",
+                "partyIdentifier": "{$inputs.fromIdValue}",
+                "fspId": "{$inputs.fromFspId}"
+              },
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "Mats",
+                  "lastName": "Hagman"
+                },
+                "dateOfBirth": "1983-10-25"
+              }
+            },
+            "payee": {
+              "partyIdInfo": {
+                "partyIdType": "{$environment.payeeIdType}",
+                "partyIdentifier": "{$environment.payeeIdentifier}",
+                "fspId": "{$environment.payeefsp}"
+              }
+            },
+            "amountType": "SEND",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "transactionType": {
+              "scenario": "TRANSFER",
+              "initiator": "PAYER",
+              "initiatorType": "CONSUMER"
+            },
+            "note": "hej"
+          },
+          "url": "{$inputs.HOST_QUOTING_SERVICE}",
+          "headers": {
+            "Accept": "{$inputs.acceptQuotes}",
+            "Content-Type": "{$inputs.contentTypeQuotes}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$inputs.payeefsp}"
+          },
+          "ignoreCallbacks": false,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response ilpPacket is not undefined",
+                "exec": [
+                  "expect(callback.body.ilpPacket).not.equal(undefined)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Response condition is not undefined",
+                "exec": [
+                  "expect(callback.body.condition).not.equal(undefined)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "var generatedUUID = uuid.v4();",
+                "",
+                "pm.environment.set('quoteId', generatedUUID);",
+                "pm.environment.set('quoteDate', (new Date()).toUTCString());",
+                "pm.environment.set('transferAmount', 100);"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "id": 2,
+          "description": "Send Transfer-Prepare",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transfers",
+          "path": "/transfers",
+          "method": "post",
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
+          "ignoreCallbacks": true,
+          "headers": {
+            "Accept": "{$inputs.acceptTransfers}",
+            "Content-Type": "{$inputs.contentTransfers}",
+            "Date": "Fri, 29 May 2020 11:21:03 GMT",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "noresponsepayeefsp"
+          },
+          "body": {
+            "transferId": "{$environment.transfer_ID}",
+            "payerFsp": "payerfsp",
+            "payeeFsp": "noresponsepayeefsp",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "expiration": "{$environment.transferExpiration}",
+            "ilpPacket": "{$environment.ilpPacket}",
+            "condition": "{$environment.validCondition}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "sendFulfillResponse Status code is 200",
+                "exec": [
+                  "expect(environment.sendFulfillResponse.code).to.equal(200)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "fspiop-source is noresponsepayeefsp",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers['fspiop-source']).to.eql('noresponsepayeefsp')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "fspiop-destination is payerfsp",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers['fspiop-destination']).to.eql('payerfsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "date header should not be empty",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "accept header should not be sent in the response",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers).to.not.have.property('accept')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "payeefsp content-type is same as sent in the request",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers['content-type']).to.equal(environment.acceptTransfers)"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Response transferState should be COMMITTED",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.data.transferState).to.equal('COMMITTED')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "Response fulfilment should be same as in request",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.data.fulfilment).to.equal(environment.validFulfillment)"
+                ]
+              },
+              {
+                "id": 10,
+                "description": "sendDuplicateFulfillResponse Status code is 200",
+                "exec": [
+                  "expect(environment.sendDuplicateFulfillResponse.code).to.equal(200)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "var generatedUUID = uuid.v4();",
+                "",
+                "pm.environment.set('transfer_ID', generatedUUID);",
+                "pm.environment.set('transferDate', (new Date()).toUTCString());",
+                "pm.environment.set('transferAmount', 100);",
+                "pm.environment.set(\"transferExpiration\",new Date(new Date().getTime() + 60000))"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "",
+                "pm.environment.set(\"completedTimestamp\",new Date().toISOString());",
+                "",
+                "setTimeout(function () {",
+                "  const req = {",
+                "    url: pm.environment.get(\"HOST_ML_API_ADAPTER\")+\"/transfers/\"+pm.environment.get(\"transfer_ID\"),",
+                "    method: \"PUT\",",
+                "    header: {",
+                "      \"Content-Type\": pm.environment.get(\"contentTransfers\"),",
+                "      \"Date\": pm.environment.get(\"transferDate\"),",
+                "      \"FSPIOP-Source\": \"noresponsepayeefsp\",",
+                "      \"FSPIOP-Destination\": \"payerfsp\"",
+                "    },",
+                "    body: {",
+                "      mode: 'raw',",
+                "      raw: JSON.stringify({",
+                "        \"fulfilment\": pm.environment.get(\"validFulfillment\"),",
+                "        \"completedTimestamp\": pm.environment.get(\"completedTimestamp\"),",
+                "        \"transferState\": \"COMMITTED\"",
+                "      })",
+                "    }",
+                "  }",
+                "  pm.sendRequest(req, function (err, response) {",
+                "    console.log(\"Send Fulfill:\", response)",
+                "    pm.environment.set(\"sendFulfillResponse\", response)",
+                "   });",
+                "}, 500)",
+                "",
+                "setTimeout(function () {",
+                "  const req = {",
+                "    url: pm.environment.get(\"HOST_ML_API_ADAPTER\")+\"/transfers/\"+pm.environment.get(\"transfer_ID\"),",
+                "    method: \"PUT\",",
+                "    header: {",
+                "      \"Content-Type\": pm.environment.get(\"contentTransfers\"),",
+                "      \"Date\": pm.environment.get(\"transferDate\"),",
+                "      \"FSPIOP-Source\": \"noresponsepayeefsp\",",
+                "      \"FSPIOP-Destination\": \"payerfsp\"",
+                "    },",
+                "    body: {",
+                "      mode: 'raw',",
+                "      raw: JSON.stringify({",
+                "        \"fulfilment\": pm.environment.get(\"validFulfillment\"),",
+                "        \"completedTimestamp\": pm.environment.get(\"completedTimestamp\"),",
+                "        \"transferState\": \"COMMITTED\"",
+                "      })",
+                "    }",
+                "  }",
+                "  pm.sendRequest(req, function (err, response) {",
+                "    console.log(\"Send Duplicate Fulfill:\", response)",
+                "    pm.environment.set(\"sendDuplicateFulfillResponse\", response)",
+                "   });",
+                "}, 700)",
+                "",
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"HOST_SIMULATOR\")+\"/payerfsp/callbacks/\"+pm.environment.get(\"transfer_ID\"), function (err, response) {",
+                "    console.log(\"Send Fulfill Callback:\", response.json())",
+                "    pm.environment.set(\"sendFulfillCallback\", response.json())",
+                "   });",
+                "}, 1000)",
+                "",
+                ""
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "fullfill_commit_duplicate_invalid",
+      "requests": [
+        {
+          "id": 1,
+          "description": "Send Quote",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/quotes",
+          "path": "/quotes",
+          "method": "post",
+          "body": {
+            "quoteId": "{$environment.quoteId}",
+            "transactionId": "{$environment.quoteId}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "{$inputs.fromIdType}",
+                "partyIdentifier": "{$inputs.fromIdValue}",
+                "fspId": "{$inputs.fromFspId}"
+              },
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "Mats",
+                  "lastName": "Hagman"
+                },
+                "dateOfBirth": "1983-10-25"
+              }
+            },
+            "payee": {
+              "partyIdInfo": {
+                "partyIdType": "{$environment.payeeIdType}",
+                "partyIdentifier": "{$environment.payeeIdentifier}",
+                "fspId": "{$environment.payeefsp}"
+              }
+            },
+            "amountType": "SEND",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "transactionType": {
+              "scenario": "TRANSFER",
+              "initiator": "PAYER",
+              "initiatorType": "CONSUMER"
+            },
+            "note": "hej"
+          },
+          "url": "{$inputs.HOST_QUOTING_SERVICE}",
+          "headers": {
+            "Accept": "{$inputs.acceptQuotes}",
+            "Content-Type": "{$inputs.contentTypeQuotes}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$inputs.payeefsp}"
+          },
+          "ignoreCallbacks": false,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response ilpPacket is not undefined",
+                "exec": [
+                  "expect(callback.body.ilpPacket).not.equal(undefined)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Response condition is not undefined",
+                "exec": [
+                  "expect(callback.body.condition).not.equal(undefined)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "var generatedUUID = uuid.v4();",
+                "",
+                "pm.environment.set('quoteId', generatedUUID);",
+                "pm.environment.set('quoteDate', (new Date()).toUTCString());",
+                "pm.environment.set('transferAmount', 100);"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "id": 2,
+          "description": "Send Transfer-Prepare",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transfers",
+          "path": "/transfers",
+          "method": "post",
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
+          "ignoreCallbacks": true,
+          "headers": {
+            "Accept": "{$inputs.acceptTransfers}",
+            "Content-Type": "{$inputs.contentTransfers}",
+            "Date": "Fri, 29 May 2020 11:21:03 GMT",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "noresponsepayeefsp"
+          },
+          "body": {
+            "transferId": "{$environment.transfer_ID}",
+            "payerFsp": "payerfsp",
+            "payeeFsp": "noresponsepayeefsp",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "expiration": "{$environment.transferExpiration}",
+            "ilpPacket": "{$environment.ilpPacket}",
+            "condition": "{$environment.validCondition}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "sendFulfillResponse Status code is 200",
+                "exec": [
+                  "expect(environment.sendFulfillResponse.code).to.equal(200)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "fspiop-source is noresponsepayeefsp",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers['fspiop-source']).to.eql('noresponsepayeefsp')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "fspiop-destination is payerfsp",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers['fspiop-destination']).to.eql('payerfsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "date header should not be empty",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "accept header should not be sent in the response",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers).to.not.have.property('accept')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "payeefsp content-type is same as sent in the request",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers['content-type']).to.equal(environment.acceptTransfers)"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Response transferState should be COMMITTED",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.data.transferState).to.equal('COMMITTED')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "Response fulfilment should be same as in request",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.data.fulfilment).to.equal(environment.validFulfillment)"
+                ]
+              },
+              {
+                "id": 10,
+                "description": "sendInvalidDuplicateFulfillResponse Status code is 200",
+                "exec": [
+                  "expect(environment.sendInvalidDuplicateFulfillResponse.code).to.equal(200)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "var generatedUUID = uuid.v4();",
+                "",
+                "pm.environment.set('transfer_ID', generatedUUID);",
+                "pm.environment.set('transferDate', (new Date()).toUTCString());",
+                "pm.environment.set('transferAmount', 100);",
+                "pm.environment.set(\"transferExpiration\",new Date(new Date().getTime() + 60000))"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "",
+                "pm.environment.set(\"completedTimestamp\",new Date().toISOString());",
+                "",
+                "setTimeout(function () {",
+                "  const req = {",
+                "    url: pm.environment.get(\"HOST_ML_API_ADAPTER\")+\"/transfers/\"+pm.environment.get(\"transfer_ID\"),",
+                "    method: \"PUT\",",
+                "    header: {",
+                "      \"Content-Type\": pm.environment.get(\"contentTransfers\"),",
+                "      \"Date\": pm.environment.get(\"transferDate\"),",
+                "      \"FSPIOP-Source\": \"noresponsepayeefsp\",",
+                "      \"FSPIOP-Destination\": \"payerfsp\"",
+                "    },",
+                "    body: {",
+                "      mode: 'raw',",
+                "      raw: JSON.stringify({",
+                "        \"fulfilment\": pm.environment.get(\"validFulfillment\"),",
+                "        \"completedTimestamp\": pm.environment.get(\"completedTimestamp\"),",
+                "        \"transferState\": \"COMMITTED\"",
+                "      })",
+                "    }",
+                "  }",
+                "  pm.sendRequest(req, function (err, response) {",
+                "    console.log(\"Send Fulfill:\", response)",
+                "    pm.environment.set(\"sendFulfillResponse\", response)",
+                "   });",
+                "}, 500)",
+                "",
+                "setTimeout(function () {",
+                "  pm.environment.set(\"updatedTimestamp\",new Date().toISOString());",
+                "  const req = {",
+                "    url: pm.environment.get(\"HOST_ML_API_ADAPTER\")+\"/transfers/\"+pm.environment.get(\"transfer_ID\"),",
+                "    method: \"PUT\",",
+                "    header: {",
+                "      \"Content-Type\": pm.environment.get(\"contentTransfers\"),",
+                "      \"Date\": pm.environment.get(\"transferDate\"),",
+                "      \"FSPIOP-Source\": \"noresponsepayeefsp\",",
+                "      \"FSPIOP-Destination\": \"payerfsp\"",
+                "    },",
+                "    body: {",
+                "      mode: 'raw',",
+                "      raw: JSON.stringify({",
+                "        \"fulfilment\": pm.environment.get(\"validFulfillment\"),",
+                "        \"completedTimestamp\": pm.environment.get(\"updatedTimestamp\"),",
+                "        \"transferState\": \"COMMITTED\"",
+                "      })",
+                "    }",
+                "  }",
+                "  pm.sendRequest(req, function (err, response) {",
+                "    console.log(\"Send Invalid Duplicate Fulfill:\", response)",
+                "    pm.environment.set(\"sendInvalidDuplicateFulfillResponse\", response)",
+                "   });",
+                "}, 700)",
+                "",
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"HOST_SIMULATOR\")+\"/payerfsp/callbacks/\"+pm.environment.get(\"transfer_ID\"), function (err, response) {",
+                "    console.log(\"Send Fulfill Callback:\", response.json())",
+                "    pm.environment.set(\"sendFulfillCallback\", response.json())",
+                "   });",
+                "}, 1000)",
+                "",
+                ""
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "fullfill_reject_duplicate_valid",
+      "requests": [
+        {
+          "id": 1,
+          "description": "Send Quote",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/quotes",
+          "path": "/quotes",
+          "method": "post",
+          "body": {
+            "quoteId": "{$environment.quoteId}",
+            "transactionId": "{$environment.quoteId}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "{$inputs.fromIdType}",
+                "partyIdentifier": "{$inputs.fromIdValue}",
+                "fspId": "{$inputs.fromFspId}"
+              },
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "Mats",
+                  "lastName": "Hagman"
+                },
+                "dateOfBirth": "1983-10-25"
+              }
+            },
+            "payee": {
+              "partyIdInfo": {
+                "partyIdType": "{$environment.payeeIdType}",
+                "partyIdentifier": "{$environment.payeeIdentifier}",
+                "fspId": "{$environment.payeefsp}"
+              }
+            },
+            "amountType": "SEND",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "transactionType": {
+              "scenario": "TRANSFER",
+              "initiator": "PAYER",
+              "initiatorType": "CONSUMER"
+            },
+            "note": "hej"
+          },
+          "url": "{$inputs.HOST_QUOTING_SERVICE}",
+          "headers": {
+            "Accept": "{$inputs.acceptQuotes}",
+            "Content-Type": "{$inputs.contentTypeQuotes}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$inputs.payeefsp}"
+          },
+          "ignoreCallbacks": false,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response ilpPacket is not undefined",
+                "exec": [
+                  "expect(callback.body.ilpPacket).not.equal(undefined)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Response condition is not undefined",
+                "exec": [
+                  "expect(callback.body.condition).not.equal(undefined)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "var generatedUUID = uuid.v4();",
+                "",
+                "pm.environment.set('quoteId', generatedUUID);",
+                "pm.environment.set('quoteDate', (new Date()).toUTCString());",
+                "pm.environment.set('transferAmount', 100);"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "id": 2,
+          "description": "Send Transfer-Prepare",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transfers",
+          "path": "/transfers",
+          "method": "post",
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
+          "ignoreCallbacks": true,
+          "headers": {
+            "Accept": "{$inputs.acceptTransfers}",
+            "Content-Type": "{$inputs.contentTransfers}",
+            "Date": "Fri, 29 May 2020 11:21:03 GMT",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "noresponsepayeefsp"
+          },
+          "body": {
+            "transferId": "{$environment.transfer_ID}",
+            "payerFsp": "payerfsp",
+            "payeeFsp": "noresponsepayeefsp",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "expiration": "{$environment.transferExpiration}",
+            "ilpPacket": "{$environment.ilpPacket}",
+            "condition": "{$environment.validCondition}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "sendFulfillRejectResponse Status code is 200",
+                "exec": [
+                  "expect(environment.sendFulfillRejectResponse.code).to.equal(200)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "fspiop-source is noresponsepayeefsp",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers['fspiop-source']).to.eql('noresponsepayeefsp')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "fspiop-destination is payerfsp",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers['fspiop-destination']).to.eql('payerfsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "date header should not be empty",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "accept header should not be sent in the response",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers).to.not.have.property('accept')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "payeefsp content-type is same as sent in the request",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers['content-type']).to.equal(environment.acceptTransfers)"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Response Error Code is 5101",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.data.errorInformation.errorCode).to.equal('5101')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "Response Error Desription is 'Payee transaction limit reached'",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.data.errorInformation.errorDescription).to.equal('Payee transaction limit reached')"
+                ]
+              },
+              {
+                "id": 10,
+                "description": "sendDuplicateFulfillResponse Status code is 200",
+                "exec": [
+                  "expect(environment.sendDuplicateFulfillRejectResponse.code).to.equal(200)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "var generatedUUID = uuid.v4();",
+                "",
+                "pm.environment.set('transfer_ID', generatedUUID);",
+                "pm.environment.set('transferDate', (new Date()).toUTCString());",
+                "pm.environment.set('transferAmount', 100);",
+                "pm.environment.set(\"transferExpiration\",new Date(new Date().getTime() + 60000))"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "",
+                "pm.environment.set(\"completedTimestamp\",new Date().toISOString());",
+                "",
+                "setTimeout(function () {",
+                "  const req = {",
+                "    url: pm.environment.get(\"HOST_ML_API_ADAPTER\")+\"/transfers/\"+pm.environment.get(\"transfer_ID\") + \"/error\",",
+                "    method: \"PUT\",",
+                "    header: {",
+                "      \"Content-Type\": pm.environment.get(\"contentTransfers\"),",
+                "      \"Date\": pm.environment.get(\"transferDate\"),",
+                "      \"FSPIOP-Source\": \"noresponsepayeefsp\",",
+                "      \"FSPIOP-Destination\": \"payerfsp\"",
+                "    },",
+                "    body: {",
+                "      mode: 'raw',",
+                "      raw: JSON.stringify({",
+                "      \t\"errorInformation\": {",
+                "      \t\t\"errorCode\": \"5101\",",
+                "      \t\t\"errorDescription\": \"Payee transaction limit reached\",",
+                "      \t\t\"extensionList\": {",
+                "      \t\t\t\"extension\": [{",
+                "      \t\t\t\t\"key\": \"errorDetail\",",
+                "      \t\t\t\t\"value\": \"This is an abort extension\"",
+                "      \t\t\t}]",
+                "      \t\t}",
+                "      \t}",
+                "      })",
+                "    }",
+                "  }",
+                "  pm.sendRequest(req, function (err, response) {",
+                "    console.log(\"Send Fulfill-Reject:\", response)",
+                "    pm.environment.set(\"sendFulfillRejectResponse\", response)",
+                "   });",
+                "}, 500)",
+                "",
+                "setTimeout(function () {",
+                "  const req = {",
+                "    url: pm.environment.get(\"HOST_ML_API_ADAPTER\")+\"/transfers/\"+pm.environment.get(\"transfer_ID\") + \"/error\",",
+                "    method: \"PUT\",",
+                "    header: {",
+                "      \"Content-Type\": pm.environment.get(\"contentTransfers\"),",
+                "      \"Date\": pm.environment.get(\"transferDate\"),",
+                "      \"FSPIOP-Source\": \"noresponsepayeefsp\",",
+                "      \"FSPIOP-Destination\": \"payerfsp\"",
+                "    },",
+                "    body: {",
+                "      mode: 'raw',",
+                "      raw: JSON.stringify({",
+                "      \t\"errorInformation\": {",
+                "      \t\t\"errorCode\": \"5101\",",
+                "      \t\t\"errorDescription\": \"Payee transaction limit reached\",",
+                "      \t\t\"extensionList\": {",
+                "      \t\t\t\"extension\": [{",
+                "      \t\t\t\t\"key\": \"errorDetail\",",
+                "      \t\t\t\t\"value\": \"This is an abort extension\"",
+                "      \t\t\t}]",
+                "      \t\t}",
+                "      \t}",
+                "      })",
+                "    }",
+                "  }",
+                "  pm.sendRequest(req, function (err, response) {",
+                "    console.log(\"Send Duplicate Fulfill-Reject:\", response)",
+                "    pm.environment.set(\"sendDuplicateFulfillRejectResponse\", response)",
+                "   });",
+                "}, 700)",
+                "",
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"HOST_SIMULATOR\")+\"/payerfsp/callbacks/\"+pm.environment.get(\"transfer_ID\"), function (err, response) {",
+                "    console.log(\"Send Fulfill Callback:\", response.json())",
+                "    pm.environment.set(\"sendFulfillCallback\", response.json())",
+                "   });",
+                "}, 1000)"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "fullfill_reject_duplicate_invalid",
+      "requests": [
+        {
+          "id": 1,
+          "description": "Send Quote",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/quotes",
+          "path": "/quotes",
+          "method": "post",
+          "body": {
+            "quoteId": "{$environment.quoteId}",
+            "transactionId": "{$environment.quoteId}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "{$inputs.fromIdType}",
+                "partyIdentifier": "{$inputs.fromIdValue}",
+                "fspId": "{$inputs.fromFspId}"
+              },
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "Mats",
+                  "lastName": "Hagman"
+                },
+                "dateOfBirth": "1983-10-25"
+              }
+            },
+            "payee": {
+              "partyIdInfo": {
+                "partyIdType": "{$environment.payeeIdType}",
+                "partyIdentifier": "{$environment.payeeIdentifier}",
+                "fspId": "{$environment.payeefsp}"
+              }
+            },
+            "amountType": "SEND",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "transactionType": {
+              "scenario": "TRANSFER",
+              "initiator": "PAYER",
+              "initiatorType": "CONSUMER"
+            },
+            "note": "hej"
+          },
+          "url": "{$inputs.HOST_QUOTING_SERVICE}",
+          "headers": {
+            "Accept": "{$inputs.acceptQuotes}",
+            "Content-Type": "{$inputs.contentTypeQuotes}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$inputs.payeefsp}"
+          },
+          "ignoreCallbacks": false,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Response ilpPacket is not undefined",
+                "exec": [
+                  "expect(callback.body.ilpPacket).not.equal(undefined)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Response condition is not undefined",
+                "exec": [
+                  "expect(callback.body.condition).not.equal(undefined)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "var generatedUUID = uuid.v4();",
+                "",
+                "pm.environment.set('quoteId', generatedUUID);",
+                "pm.environment.set('quoteDate', (new Date()).toUTCString());",
+                "pm.environment.set('transferAmount', 100);"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "id": 2,
+          "description": "Send Transfer-Prepare",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transfers",
+          "path": "/transfers",
+          "method": "post",
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
+          "ignoreCallbacks": true,
+          "headers": {
+            "Accept": "{$inputs.acceptTransfers}",
+            "Content-Type": "{$inputs.contentTransfers}",
+            "Date": "Fri, 29 May 2020 11:21:03 GMT",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "noresponsepayeefsp"
+          },
+          "body": {
+            "transferId": "{$environment.transfer_ID}",
+            "payerFsp": "payerfsp",
+            "payeeFsp": "noresponsepayeefsp",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "expiration": "{$environment.transferExpiration}",
+            "ilpPacket": "{$environment.ilpPacket}",
+            "condition": "{$environment.validCondition}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "sendFulfillRejectResponse Status code is 200",
+                "exec": [
+                  "expect(environment.sendFulfillRejectResponse.code).to.equal(200)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "fspiop-source is noresponsepayeefsp",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers['fspiop-source']).to.eql('noresponsepayeefsp')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "fspiop-destination is payerfsp",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers['fspiop-destination']).to.eql('payerfsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "date header should not be empty",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "accept header should not be sent in the response",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers).to.not.have.property('accept')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "payeefsp content-type is same as sent in the request",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.headers['content-type']).to.equal(environment.acceptTransfers)"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Response Error Code is 5101",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.data.errorInformation.errorCode).to.equal('5101')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "Response Error Desription is 'Payee transaction limit reached'",
+                "exec": [
+                  "expect(environment.sendFulfillCallback.data.errorInformation.errorDescription).to.equal('Payee transaction limit reached')"
+                ]
+              },
+              {
+                "id": 10,
+                "description": "sendDuplicateFulfillResponse Status code is 200",
+                "exec": [
+                  "expect(environment.sendDuplicateFulfillRejectResponse.code).to.equal(200)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "var generatedUUID = uuid.v4();",
+                "",
+                "pm.environment.set('transfer_ID', generatedUUID);",
+                "pm.environment.set('transferDate', (new Date()).toUTCString());",
+                "pm.environment.set('transferAmount', 100);",
+                "pm.environment.set(\"transferExpiration\",new Date(new Date().getTime() + 60000))"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "",
+                "pm.environment.set(\"completedTimestamp\",new Date().toISOString());",
+                "",
+                "setTimeout(function () {",
+                "  const req = {",
+                "    url: pm.environment.get(\"HOST_ML_API_ADAPTER\")+\"/transfers/\"+pm.environment.get(\"transfer_ID\") + \"/error\",",
+                "    method: \"PUT\",",
+                "    header: {",
+                "      \"Content-Type\": pm.environment.get(\"contentTransfers\"),",
+                "      \"Date\": pm.environment.get(\"transferDate\"),",
+                "      \"FSPIOP-Source\": \"noresponsepayeefsp\",",
+                "      \"FSPIOP-Destination\": \"payerfsp\"",
+                "    },",
+                "    body: {",
+                "      mode: 'raw',",
+                "      raw: JSON.stringify({",
+                "      \t\"errorInformation\": {",
+                "      \t\t\"errorCode\": \"5101\",",
+                "      \t\t\"errorDescription\": \"Payee transaction limit reached\",",
+                "      \t\t\"extensionList\": {",
+                "      \t\t\t\"extension\": [{",
+                "      \t\t\t\t\"key\": \"errorDetail\",",
+                "      \t\t\t\t\"value\": \"This is an abort extension\"",
+                "      \t\t\t}]",
+                "      \t\t}",
+                "      \t}",
+                "      })",
+                "    }",
+                "  }",
+                "  pm.sendRequest(req, function (err, response) {",
+                "    console.log(\"Send Fulfill-Reject:\", response)",
+                "    pm.environment.set(\"sendFulfillRejectResponse\", response)",
+                "   });",
+                "}, 500)",
+                "",
+                "setTimeout(function () {",
+                "  const req = {",
+                "    url: pm.environment.get(\"HOST_ML_API_ADAPTER\")+\"/transfers/\"+pm.environment.get(\"transfer_ID\") + \"/error\",",
+                "    method: \"PUT\",",
+                "    header: {",
+                "      \"Content-Type\": pm.environment.get(\"contentTransfers\"),",
+                "      \"Date\": pm.environment.get(\"transferDate\"),",
+                "      \"FSPIOP-Source\": \"noresponsepayeefsp\",",
+                "      \"FSPIOP-Destination\": \"payerfsp\"",
+                "    },",
+                "    body: {",
+                "      mode: 'raw',",
+                "      raw: JSON.stringify({",
+                "      \t\"errorInformation\": {",
+                "      \t\t\"errorCode\": \"5101\",",
+                "      \t\t\"errorDescription\": \"This is an invalid duplicate request\",",
+                "      \t\t\"extensionList\": {",
+                "      \t\t\t\"extension\": [{",
+                "      \t\t\t\t\"key\": \"errorDetail\",",
+                "      \t\t\t\t\"value\": \"This is an abort extension\"",
+                "      \t\t\t}]",
+                "      \t\t}",
+                "      \t}",
+                "      })",
+                "    }",
+                "  }",
+                "  pm.sendRequest(req, function (err, response) {",
+                "    console.log(\"Send Duplicate Fulfill-Reject:\", response)",
+                "    pm.environment.set(\"sendDuplicateFulfillRejectResponse\", response)",
+                "   });",
+                "}, 700)",
+                "",
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"HOST_SIMULATOR\")+\"/payerfsp/callbacks/\"+pm.environment.get(\"transfer_ID\"), function (err, response) {",
+                "    console.log(\"Send Fulfill Callback:\", response.json())",
+                "    pm.environment.set(\"sendFulfillCallback\", response.json())",
+                "   });",
+                "}, 1000)",
+                "",
+                ""
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

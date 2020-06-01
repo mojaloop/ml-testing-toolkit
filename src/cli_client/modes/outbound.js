@@ -32,14 +32,51 @@ const { promisify } = require('util')
 const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
 
 let config
-let template
 
-const sendTemplate = async (configiration) => {
+const sendTemplate = async (configuration) => {
+  config = configuration
   try {
     const readFileAsync = promisify(fs.readFile)
+    const readFilesAsync = promisify(fs.readdir)
     const outboundRequestID = Math.random().toString(36).substring(7)
-    config = configiration
-    template = JSON.parse(await readFileAsync(`${config.inputFile}`, 'utf8'))
+    const collections = []
+    const inputFiles = config.inputFiles.split(',')
+    for (let i = 0; i < inputFiles.length; i++) {
+      try {
+        if (inputFiles[i].endsWith('.json')) {
+          collections.push(JSON.parse(await readFileAsync(inputFiles[i], 'utf8')))
+        } else {
+          const files = await readFilesAsync(inputFiles[i])
+          for (let j = 0; j < files.length; j++) {
+            collections.push(JSON.parse(await readFileAsync(`${inputFiles[i]}/${files[j]}`, 'utf8')))
+          }
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    }
+
+    const template = {
+      inputValues: JSON.parse(await readFileAsync(`${config.environmentFile}`, 'utf8')).inputValues,
+      test_cases: []
+    }
+    if (collections.length > 1) {
+      template.name = 'multi'
+      let index = 1
+      collections.forEach(collection => {
+        collection.test_cases.forEach(testCase => {
+          const { id, ...remainingTestCaseProps } = testCase
+          template.test_cases.push({
+            id: index++,
+            ...remainingTestCaseProps
+          })
+        })
+      })
+    } else {
+      template.name = collections[0].name
+      template.test_cases = collections[0].test_cases
+    }
+
     let totalRequests = 0
     template.test_cases.forEach(testCase => {
       totalRequests += testCase.requests.length

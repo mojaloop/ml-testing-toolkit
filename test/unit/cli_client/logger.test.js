@@ -213,13 +213,6 @@ const sampleOutboundProgress = {
   }
 }
 
-const sampleMonitoringProgress = {
-  "logTime": "Thu, 07 May 2020 10:44:00 GMT",
-  "message": "SUCCESS",
-  "verbosity": "info",
-  "additionalData": {}
-}
-
 describe('Cli client', () => {
   describe('run logger functionality', () => {
     it('when the cli mode is outbound should not throw an error', async () => {
@@ -227,7 +220,24 @@ describe('Cli client', () => {
         logger.outbound(sampleOutboundProgress)
       }).not.toThrowError()
     }),
-    it('when the cli mode is monitoring should not throw an error', async () => {
+    it('when the cli mode is monitoring should not throw an error 1', async () => {
+      const sampleMonitoringProgress = {
+        "logTime": "Thu, 07 May 2020 10:44:00 GMT",
+        "message": "SUCCESS",
+        "verbosity": "info",
+        "additionalData": {}
+      }
+      expect(() => {
+        logger.monitoring(sampleMonitoringProgress)
+      }).not.toThrowError()
+    })
+    it('when the cli mode is monitoring should not throw an error 2', async () => {
+      const sampleMonitoringProgress = {
+        "logTime": "Thu, 07 May 2020 10:44:00 GMT",
+        "message": "SUCCESS",
+        "verbosity": "info",
+        "uniqueId": "uniqueId"
+      }
       expect(() => {
         logger.monitoring(sampleMonitoringProgress)
       }).not.toThrowError()

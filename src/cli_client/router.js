@@ -28,21 +28,27 @@ const cli = (commander) => {
 
   const config = {
     mode: commander.mode || configFile.mode,
-    inputFile: commander.inputFile,
+    inputFiles: commander.inputFiles,
+    environmentFile: commander.environmentFile,
     reportFormat: commander.reportFormat || configFile.reportFormat,
     reportFilename: commander.reportFilename
   }
+
   switch (config.mode) {
     case 'monitoring':
       require('./utils/listeners').monitoring()
-      require('./modes/monitoring')
       break
     case 'outbound':
-      if (config.inputFile) {
-        require('./utils/listeners').outbound()
-        require('./modes/outbound').sendTemplate(config)
+      if (config.inputFiles) {
+        if (config.environmentFile) {
+          require('./utils/listeners').outbound()
+          require('./modes/outbound').sendTemplate(config)
+        } else {
+          console.log('error: required option \'-e, --environment-file <environmentFile>\' not specified')
+          process.exit(1)
+        }
       } else {
-        console.log('error: required option \'-i, --input-file <inputFile>\' not specified')
+        console.log('error: required option \'-i, --input-files <inputFiles>\' not specified')
         process.exit(1)
       }
       break

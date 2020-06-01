@@ -38,6 +38,10 @@
     "HOST_ACCOUNT_LOOKUP_SERVICE": "http://account-lookup-service.local",
     "HOST_SIMULATOR": "http://moja-simulator.local",
     "HOST_CENTRAL_SETTLEMENT": "http://central-settlement.local/v1",
-    "HOST_TRANSACTION_REQUESTS_SERVICE": "http://transaction-request-service.local"
+    "HOST_TRANSACTION_REQUESTS_SERVICE": "http://transaction-request-service.local",
+    "payerIdType": "MSISDN",
+    "payerIdentifier": "22507008181",
+    "payeeIdType": "MSISDN",
+    "payeeIdentifier": "22556999125"
   }
 }
