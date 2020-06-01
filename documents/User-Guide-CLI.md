@@ -59,7 +59,7 @@ Options:
 
 The monitoring mode allows you to monitor _incoming_ requests from the **Mojaloop Simulator**.
 
-#### Example
+Example:
 
 command:
 
@@ -136,7 +136,7 @@ The CLI tool is able to return the proper exit codes in case of success and fail
 command:
 
 ```
-node src/cli_client/client -m outbound -i examples/test-cases/sample.json
+node src/cli_client/client -m outbound -i examples/collections/dfsp/p2p_happy_path.json -e examples/environments/dfsp_local_environment.json --report-format html
 ```
 
 output:
@@ -146,16 +146,16 @@ Listening on outboundProgress events...
  ████████████████████████████████████████ 100% | ETA: 0s | 3/3
 --------------------TEST CASES--------------------
 P2P Transfer Happy Path
-        Get party information - GET - /parties/{Type}/{ID} - [2/2]
-        Get quote - POST - /quotes - [4/4]
-        Send transfer - POST - /transfers - [3/3]
+        Get party information - GET - /parties/{Type}/{ID} - [8/8]
+        Send quote - POST - /quotes - [11/11]
+        Send transfer - POST - /transfers - [9/9]
 --------------------TEST CASES--------------------
 ┌───────────────────────────────────────────────────────┐
 │                        SUMMARY                        │
 ├───────────────────────┬───────────────────────────────┤
-│ Total assertions      │ 9                             │
+│ Total assertions      │ 28                            │
 ├───────────────────────┼───────────────────────────────┤
-│ Passed assertions     │ 9                             │
+│ Passed assertions     │ 28                            │
 ├───────────────────────┼───────────────────────────────┤
 │ Failed assertions     │ 0                             │
 ├───────────────────────┼───────────────────────────────┤
@@ -165,14 +165,16 @@ P2P Transfer Happy Path
 ├───────────────────────┼───────────────────────────────┤
 │ Passed percentage     │ 100.00%                       │
 ├───────────────────────┼───────────────────────────────┤
-│ Started time          │ Tue, 12 May 2020 10:56:32 GMT │
+│ Started time          │ Mon, 01 Jun 2020 14:46:20 GMT │
 ├───────────────────────┼───────────────────────────────┤
-│ Completed time        │ Tue, 12 May 2020 10:56:33 GMT │
+│ Completed time        │ Mon, 01 Jun 2020 14:46:21 GMT │
 ├───────────────────────┼───────────────────────────────┤
-│ Runtime duration      │ 1111 ms                       │
+│ Runtime duration      │ 832 ms                        │
 ├───────────────────────┼───────────────────────────────┤
 │ Average response time │ NA                            │
 └───────────────────────┴───────────────────────────────┘
-Test1-2020-05-12T10:56:36.723Z.json was generated
+TTK-Assertion-Report-dfsp-p2p-tests-2020-06-01T14:46:21.303Z.html was generated
 Terminate with exit code 0
 ```
+
+You will find a report in the project folder - 'TTK-Assertion-Report-{collection-name}-{ISO-date}.{report-format}'

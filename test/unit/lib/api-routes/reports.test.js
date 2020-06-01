@@ -59,7 +59,7 @@ const properJsonReport = {
     fromFspId: 'testingtoolkitdfsp',
     accept: 'application/vnd.interoperability.parties+json;version=1.0',
     contentType: 'application/vnd.interoperability.parties+json;version=1.0',
-    toIdValue: '9848613613',
+    toIdValue: '9876543210',
     toIdType: 'MSISDN',
     toFspId: 'userdfsp',
     acceptQuotes: 'application/vnd.interoperability.quotes+json;version=1.0',
@@ -110,7 +110,7 @@ const properJsonReport = {
               payee: {
                 partyIdInfo: {
                   partyIdType: 'MSISDN',
-                  partyIdentifier: '9848613613',
+                  partyIdentifier: '9876543210',
                   fspId: 'testingtoolkitdfsp'
                 }
               },
@@ -143,7 +143,7 @@ const properJsonReport = {
             },
             params: {
               Type: 'MSISDN',
-              ID: '9848613613'
+              ID: '9876543210'
             },
             path: '/quotes'
           },
@@ -208,7 +208,7 @@ const properJsonReport = {
             }
           },
           additionalInfo: {
-            curlRequest: 'curl \'http://localhost:5000/quotes\' -H \'content-type: application/vnd.interoperability.quotes+json;version=1.0\' -H \'accept: application/vnd.interoperability.quotes+json;version=1.0\' -H \'date: Mon, 11 May 2020 13:39:54 GMT\' -H \'fspiop-source: testingtoolkitdfsp\' -H \'user-agent: axios/0.19.2\' --data-binary \'{"quoteId":"61084f91-d13d-4443-a7ed-a493e0f72eb0","transactionId":"32b5c0de-f02a-4e33-b3f9-5efe9a9cc225","payer":{"partyIdInfo":{"partyIdType":"MSISDN","partyIdentifier":"44123456789","fspId":"testingtoolkitdfsp"},"personalInfo":{"complexName":{"firstName":"Firstname-Test","lastName":"Lastname-Test"},"dateOfBirth":"1984-01-01"}},"payee":{"partyIdInfo":{"partyIdType":"MSISDN","partyIdentifier":"9848613613","fspId":"testingtoolkitdfsp"}},"amountType":"SEND","amount":{"amount":"100","currency":"USD"},"transactionType":{"scenario":"TRANSFER","initiator":"PAYER","initiatorType":"CONSUMER"},"note":"Test Payment"}\' --compressed'
+            curlRequest: 'curl \'http://localhost:5000/quotes\' -H \'content-type: application/vnd.interoperability.quotes+json;version=1.0\' -H \'accept: application/vnd.interoperability.quotes+json;version=1.0\' -H \'date: Mon, 11 May 2020 13:39:54 GMT\' -H \'fspiop-source: testingtoolkitdfsp\' -H \'user-agent: axios/0.19.2\' --data-binary \'{"quoteId":"61084f91-d13d-4443-a7ed-a493e0f72eb0","transactionId":"32b5c0de-f02a-4e33-b3f9-5efe9a9cc225","payer":{"partyIdInfo":{"partyIdType":"MSISDN","partyIdentifier":"44123456789","fspId":"testingtoolkitdfsp"},"personalInfo":{"complexName":{"firstName":"Firstname-Test","lastName":"Lastname-Test"},"dateOfBirth":"1984-01-01"}},"payee":{"partyIdInfo":{"partyIdType":"MSISDN","partyIdentifier":"9876543210","fspId":"testingtoolkitdfsp"}},"amountType":"SEND","amount":{"amount":"100","currency":"USD"},"transactionType":{"scenario":"TRANSFER","initiator":"PAYER","initiatorType":"CONSUMER"},"note":"Test Payment"}\' --compressed'
           }
         }
       ]
