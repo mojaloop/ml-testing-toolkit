@@ -44,6 +44,8 @@ const context = require('./context')
 const openApiDefinitionsModel = require('../mocking/openApiDefinitionsModel')
 const uuid = require('uuid')
 
+var terminateTraceIds = {}
+
 const OutboundSend = async (inputTemplate, traceID) => {
   const startedTimeStamp = new Date()
   let outboundID = traceID
@@ -56,28 +58,39 @@ const OutboundSend = async (inputTemplate, traceID) => {
   const environmentVariables = {
     items: Object.entries(inputTemplate.inputValues).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
   }
-  for (const i in inputTemplate.test_cases) {
-    await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, environmentVariables)
-  }
-
-  const completedTimeStamp = new Date()
-  const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
-  // Send the total result to client
-  if (outboundID) {
-    const runtimeInformation = {
-      completedTimeISO: completedTimeStamp.toISOString(),
-      startedTime: startedTimeStamp.toUTCString(),
-      completedTime: completedTimeStamp.toUTCString(),
-      runDurationMs: runDurationMs,
-      avgResponseTime: 'NA'
+  try {
+    for (const i in inputTemplate.test_cases) {
+      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, environmentVariables)
     }
-    const totalResult = generateFinalReport(inputTemplate, runtimeInformation)
+
+    const completedTimeStamp = new Date()
+    const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
+    // Send the total result to client
+    if (outboundID) {
+      const runtimeInformation = {
+        completedTimeISO: completedTimeStamp.toISOString(),
+        startedTime: startedTimeStamp.toUTCString(),
+        completedTime: completedTimeStamp.toUTCString(),
+        runDurationMs: runDurationMs,
+        avgResponseTime: 'NA'
+      }
+      const totalResult = generateFinalReport(inputTemplate, runtimeInformation)
+      notificationEmitter.broadcastOutboundProgress({
+        status: 'FINISHED',
+        outboundID: outboundID,
+        totalResult
+      }, sessionID)
+    }
+  } catch (err) {
     notificationEmitter.broadcastOutboundProgress({
-      status: 'FINISHED',
-      outboundID: outboundID,
-      totalResult
+      status: 'TERMINATED',
+      outboundID: outboundID
     }, sessionID)
   }
+}
+
+const terminateOutbound = async (traceID) => {
+  terminateTraceIds[traceID] = true
 }
 
 const processTestCase = async (testCase, traceID, inputValues, environmentVariables) => {
@@ -107,6 +120,10 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
   const apiDefinitions = await openApiDefinitionsModel.getApiDefinitions()
   // Iterate the request ID array
   for (const i in templateIDArr) {
+    if (terminateTraceIds[traceID]) {
+      delete terminateTraceIds[traceID]
+      throw new Error('Terminated')
+    }
     const request = requestsObj[templateIDArr[i]]
 
     const reqApiDefinition = apiDefinitions.find((item) => {
@@ -575,6 +592,7 @@ const generateFinalReport = (inputTemplate, runtimeInformation) => {
 
 module.exports = {
   OutboundSend,
+  terminateOutbound,
   handleTests,
   sendRequest,
   replaceVariables,
