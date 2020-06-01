@@ -253,18 +253,18 @@ Selecting the _**Outbound Request**_ navigation tab on the left side, the follow
 
 At the top of the screen, you will notice the following buttons on the main window, starting from the left.
 
-- _**Import Template**_
+- _**Import Collection**_
 - _**Import Environment**_
 - _**New Template**_
 - _**Show Template**_
 - _**Save**_
 - _**Send**_
 
-By selecting the _**Import Template**_ button, it will allow you to import a template. For your exploration, sample templates are available under the project root directory under [/examples/collections](/examples/collections) sub directory. To select one of the sample files, on the file explorer window that poped up when you selected the _**Import Template**_ button, navigate to [/examples/collections/dfsp](/examples/collections/dfsp) under the project root directory. Select the ```p2p_happy_path.json``` file to import into the **Mojaloop Testing Toolkit** application. This sample file consist of a couple of test samples. 
+By selecting the _**Import Collection**_ button, it will allow you to import a collection. For your exploration, sample collections are available under the project root directory under [/examples/collections](/examples/collections) sub directory. To select one of the sample files, on the file explorer window that poped up when you selected the _**Import Collection**_ button, navigate to [/examples/collections/dfsp](/examples/collections/dfsp) under the project root directory. Select the ```p2p_happy_path.json``` file to import into the **Mojaloop Testing Toolkit** application. This sample file consist of a couple of test samples. 
 
 By selecting the _**Import Environment**_ button, it will allow you to import input values. For your exploration, sample environments are available under the project root directory under [/examples/environments](/examples/environments) sub directory. To select one of the sample files, on the file explorer window that poped up when you selected the _**Import Environment**_ button, navigate to [/examples/environments](/examples/environments) under the project root directory. Select the ```dfsp_local_environment.json``` file to import into the **Mojaloop Testing Toolkit** application. This sample file consist of a couple of input values.
 
-![Import Template or Environment](/assets/images/import-template.png)
+![Import Collection or Environment](/assets/images/import-template.png)
 
 The template contains, amongst others, the following operations as samples;
 
