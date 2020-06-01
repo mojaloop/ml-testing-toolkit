@@ -65,10 +65,10 @@ const sendTemplate = async (configuration) => {
       let index = 1
       collections.forEach(collection => {
         collection.test_cases.forEach(testCase => {
+         const { id, ...remainingTestCaseProps } = testCase
           template.test_cases.push({
             id: index++,
-            name: testCase.name,
-            requests: testCase.requests
+            ...remainingTestCaseProps
           })
         })
       })
