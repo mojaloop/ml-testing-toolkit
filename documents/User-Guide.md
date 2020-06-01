@@ -254,14 +254,17 @@ Selecting the _**Outbound Request**_ navigation tab on the left side, the follow
 At the top of the screen, you will notice the following buttons on the main window, starting from the left.
 
 - _**Import Template**_
+- _**Import Environment**_
 - _**New Template**_
 - _**Show Template**_
 - _**Save**_
 - _**Send**_
 
-By selecting the _**Import Template**_ button, it will allow you to import a template. For your exploration, sample templates are available under the project root directory under [/examples/test-case](/examples/test-cases) sub directory. To select one of the sample files, on the file explorer window that poped up when you selected the _**Import Template**_ button, navigate to [/examples/test-case](/examples/test-cases) under the project root directory. Select the ```dfsp-tests.json``` file to import into the **Mojaloop Testing Toolkit** application. This sample file consist of a couple of test samples. 
+By selecting the _**Import Template**_ button, it will allow you to import a template. For your exploration, sample templates are available under the project root directory under [/examples/collections](/examples/collections) sub directory. To select one of the sample files, on the file explorer window that poped up when you selected the _**Import Template**_ button, navigate to [/examples/collections/dfsp](/examples/collections/dfsp) under the project root directory. Select the ```p2p_happy_path.json``` file to import into the **Mojaloop Testing Toolkit** application. This sample file consist of a couple of test samples. 
 
-![Import Template](/assets/images/import-template.png)
+By selecting the _**Import Environment**_ button, it will allow you to import input values. For your exploration, sample environments are available under the project root directory under [/examples/environments](/examples/environments) sub directory. To select one of the sample files, on the file explorer window that poped up when you selected the _**Import Template**_ button, navigate to [/examples/environments](/examples/environments) under the project root directory. Select the ```dfsp_local_environment.json``` file to import into the **Mojaloop Testing Toolkit** application. This sample file consist of a couple of input values.
+
+![Import Template or Environment](/assets/images/import-template.png)
 
 The template contains, amongst others, the following operations as samples;
 
@@ -299,9 +302,26 @@ The **Request** tab reflects both the appropriate _Header_ and _Body_ that makes
 
 ![Sample Request](/assets/images/sample-request.png)
 
-The **Editor** tab displays request content and it can be updated manually on this window. Depending on how the request was defined, you will be able to see the selected **API**, the _operationId_, the _Header_ and _Body_ content. Options to _**Duplicate**_, _**Delete**_ or _**Rename**_ are also available as buttons above. You can also build your own new request by selecting the _**Add New Request**_ button on the top right of this window. The process to build a new request is similar to the one explained in [2.4 Sync Response Rules](#24-sync-response-rules)
+The **Editor** tab displays request content and it can be updated manually on this window. Depending on how the request was defined, you will be able to see the selected **API**, the _operationId_, the _Header_ and _Body_ content. Options to _**Duplicate**_, _**Delete**_ or _**Rename**_ are also available as buttons above. There are some additional options like _Override with Custom URL_ or _Ignore Callbacks_. You can also build your own new request by selecting the _**Add New Request**_ button on the top right of this window. The process to build a new request is similar to the one explained in [2.4 Sync Response Rules](#24-sync-response-rules)
 
-![Sample Request](/assets/images/sample-editor.png)
+![Sample Scripts](/assets/images/sample-editor.png)
+
+The **Scripts** tab allows you to use postman like pre request and test scripts. Make sure that advanced features options is enabled. 
+- pm.test - not supported - Use Testing Toolkit Tests for this purpose. In **Tests** You could use values stored in the environment. To access thoes values use environment.'key'
+- pm.response - to get the response object outside pm.sendRequest use pm.response.body not pm.response.json()
+- everything else should work the same way is in postman
+
+![Sample Pre Request and Post Request Scripts](/assets/images/test-case-editor-scripts.png)
+
+After executing the test case you will see _Console Log_ and _Environment State_ as well.
+
+- _Console Log_
+
+![Sample Scripts - Console Log](/assets/images/test-case-editor-console-log.png)
+
+- _Environment State_
+
+![Sample Scripts - Environment State](/assets/images/test-case-editor-environment-state.png)
 
 The **Tests** tab contains the assertions that was setup for the specified _operationId_. These are similar to PostMan tests and will evaluate the request and/or the response based on the requirements of the assertion. The below is an assertion from the sample _Import Template_ imported earlier, and validate the Callback and expect the _**response.status**_ to be equal to _**202**_.
 
@@ -349,9 +369,19 @@ To get a better understanding of how this will work, please refer to the below. 
 
 ![Configurable Parameter Assertion](/assets/images/configurable-parameter-assertion.png)
 
-Finally we can execute the _Test Cases_. Please insure you added a user with {MSISDN} and value found in the **Input Values** on the simulator (see [Frequently Asked Questions](#4-frequently-asked-questions) section [4.2 Generic ID not found](#42-eneric-id-not-found)). Select the _**Send**_ button on the right top.
+Finally we can execute the _Test Cases_. Please insure you added a user with {MSISDN} and value found in the **Input Values** on the simulator (see [Frequently Asked Questions](#4-frequently-asked-questions) section [4.2 Generic ID not found](#42-eneric-id-not-found)). 
+
+- Select the _**Send**_ button on the right top.
 
 ![Sending Test Cases](/assets/images/sending-test-cases.png)
+
+- Select the aditional options and _**Send this test case**_ button on the right top.
+
+![Sending Test Cases](/assets/images/sending-single-test-case-1.png)
+
+- Select _**Edit**_ and then the _**Send**_ button on the right top.
+
+![Sending Test Cases](/assets/images/sending-single-test-case-2.png)
 
 If you select the _**Edit**_ button now, you will notice the addition of the response tab. Select that to view all the responses for the operation.
 
