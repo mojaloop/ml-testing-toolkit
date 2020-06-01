@@ -51,7 +51,7 @@ const sampleOutboundProgress = {
             },
             "params": {
               "Type": "MSISDN",
-              "ID": "9848613613"
+              "ID": "9876543210"
             },
             "tests": {
               "assertions": [
@@ -78,7 +78,7 @@ const sampleOutboundProgress = {
               ],
               "passedAssertionsCount": 2
             },
-            "path": "/parties/MSISDN/9848613613"
+            "path": "/parties/MSISDN/9876543210"
           },
           "response": {
             "status": 202,
@@ -100,7 +100,7 @@ const sampleOutboundProgress = {
               "party": {
                 "partyIdInfo": {
                   "partyIdType": "MSISDN",
-                  "partyIdentifier": "9848613613",
+                  "partyIdentifier": "9876543210",
                   "fspId": "userdfsp"
                 },
                 "personalInfo": {
@@ -136,7 +136,7 @@ const sampleOutboundProgress = {
             },
             "params": {
               "Type": "MSISDN",
-              "ID": "9848613613"
+              "ID": "9876543210"
             },
             "tests": {
               "assertions": [
@@ -163,7 +163,7 @@ const sampleOutboundProgress = {
               ],
               "passedAssertionsCount": 1
             },
-            "path": "/parties/MSISDN/9848613613"
+            "path": "/parties/MSISDN/9876543210"
           },
           "response": {
             "status": 202,
@@ -185,7 +185,7 @@ const sampleOutboundProgress = {
               "party": {
                 "partyIdInfo": {
                   "partyIdType": "MSISDN",
-                  "partyIdentifier": "9848613613",
+                  "partyIdentifier": "9876543210",
                   "fspId": "userdfsp"
                 },
                 "personalInfo": {

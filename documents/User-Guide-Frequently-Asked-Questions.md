@@ -32,7 +32,7 @@ When I run the _**Outbound Request**_, I receive failures on the Callback respon
 }
 ```
 
-- The reason for this is the **Inbound User** is no present on the **Mojaloop Simulator**. For the samples used in this document, you will need to create a new user for **MSISDN** = **9848613613**. In the **Mojaloop Simulator UI**, select _**+ Add User**_ button on the _**Config Inbound**_ navigation tab. Below screenshot is a sample based on the sample data used within this document. Click on the _**√ Submit**_ button when done. 
+- The reason for this is the **Inbound User** is no present on the **Mojaloop Simulator**. For the samples used in this document, you will need to create a new user for **MSISDN** = **9876543210**. In the **Mojaloop Simulator UI**, select _**+ Add User**_ button on the _**Config Inbound**_ navigation tab. Below screenshot is a sample based on the sample data used within this document. Click on the _**√ Submit**_ button when done. 
 
 You are welcome to change any values as required. Important values to keep in mind, are the _Id Type_, _Id Value_ and the _DateOfBirth_ date format _(CCYY-MM-DDD)_.
 

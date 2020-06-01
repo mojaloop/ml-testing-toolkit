@@ -65,7 +65,7 @@ docker-compose up
 
 ## 2 Settings
 
-You will need to create a new user for **MSISDN** = **9848613613**. In the **Mojaloop Simulator UI**, select _**+ Add User**_ button on the _**Config Inbound**_ navigation tab. Below screenshot is a sample based on the sample data used within this document. Click on the _**√ Submit**_ button when done. 
+You will need to create a new user for **MSISDN** = **9876543210**. In the **Mojaloop Simulator UI**, select _**+ Add User**_ button on the _**Config Inbound**_ navigation tab. Below screenshot is a sample based on the sample data used within this document. Click on the _**√ Submit**_ button when done. 
 
 ![Create Inbound User on Simulator](/assets/images/create-inbound-user-simulator.png)
 
