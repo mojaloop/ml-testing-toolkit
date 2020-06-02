@@ -159,7 +159,7 @@ const createServer = async (port) => {
 
 const initialize = async () => {
   await OpenApiMockHandler.initilizeMockHandler()
-  serverInstance = await createServer(Config.API_PORT)
+  serverInstance = await createServer(Config.getSystemConfig().API_PORT)
   // serverInstance.plugins.openapi.setHost(serverInstance.info.host + ':' + serverInstance.info.port)
   // Logger.info(`serverInstance running on ${serverInstance.info.host}:${serverInstance.info.port}`)
 
@@ -174,7 +174,7 @@ const restartServer = async () => {
   if (serverInstance) {
     console.log(`Toolkit Server restarted on port ${serverInstance.info.port}`)
     serverInstance.stop()
-    serverInstance = await createServer(Config.API_PORT)
+    serverInstance = await createServer(Config.getSystemConfig().API_PORT)
   }
 }
 

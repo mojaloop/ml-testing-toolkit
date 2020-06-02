@@ -30,6 +30,7 @@ const apiServer = require('./lib/api-server')
 const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
 
 const init = async () => {
+  await Config.loadSystemConfig()
   await Config.loadUserConfig()
   apiServer.startServer(5050)
 
