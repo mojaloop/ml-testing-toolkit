@@ -1,5 +1,5 @@
 {
-  "CALLBACK_ENDPOINT": "http://localhost:5000",
+  "CALLBACK_ENDPOINT": "http://localhost:4000",
   "SEND_CALLBACK_ENABLE": true,
   "FSPID": "testingtoolkitdfsp",
   "TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES": true,
@@ -7,7 +7,7 @@
   "TRANSFERS_VALIDATION_CONDITION": true,
   "ILP_SECRET": "secret",
   "VERSIONING_SUPPORT_ENABLE": true,
-  "OVERRIDE_WITH_ENV": false,
+  "OVERRIDE_WITH_ENV": true,
   "VALIDATE_INBOUND_JWS": false,
   "VALIDATE_INBOUND_PUT_PARTIES_JWS": false,
   "JWS_SIGN": false,
