@@ -62,6 +62,7 @@
     "@mojaloop/sdk-standard-components": "10.2.0",
     "@now-ims/hapi-now-auth": "2.0.0",
     "@types/socket.io": "^2.1.4",
+    "atob": "2.1.2",
     "axios": "^0.19.2",
     "blipp": "4.0.1",
     "bunyan": "^1.8.12",
