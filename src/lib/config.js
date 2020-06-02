@@ -22,23 +22,21 @@
  --------------
  ******/
 
-const RC = require('parse-strings-in-object')(require('rc')('ALS', require('../../config/default.json')))
 const fs = require('fs')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const writeFileAsync = promisify(fs.writeFile)
 const RequestLogger = require('./requestLogger')
 
+const SYSTEM_CONFIG_FILE = 'spec_files/system_config.json'
 const USER_CONFIG_FILE = 'spec_files/user_config.json'
-// const getOrDefault = (value, defaultValue) => {
-//   if (value === undefined) {
-//     return defaultValue
-//   }
 
-//   return value
-// }
-
+var SYSTEM_CONFIG = {}
 var USER_CONFIG = {}
+
+const getSystemConfig = () => {
+  return SYSTEM_CONFIG
+}
 
 const getUserConfig = () => {
   return USER_CONFIG
@@ -92,12 +90,22 @@ const loadUserConfig = async () => {
   return true
 }
 
+// Function to load system configuration
+const loadSystemConfig = async () => {
+  try {
+    const contents = await readFileAsync(SYSTEM_CONFIG_FILE)
+    SYSTEM_CONFIG = JSON.parse(contents)
+  } catch (err) {
+    RequestLogger.logMessage('error', 'Can not read the file ' + SYSTEM_CONFIG_FILE, null, true, null)
+  }
+  return true
+}
+
 module.exports = {
-  API_PORT: RC.API_PORT,
-  DISPLAY_ROUTES: RC.DISPLAY_ROUTES,
-  API_DEFINITIONS: RC.API_DEFINITIONS,
   getUserConfig: getUserConfig,
   getStoredUserConfig: getStoredUserConfig,
   setStoredUserConfig: setStoredUserConfig,
-  loadUserConfig: loadUserConfig
+  loadUserConfig: loadUserConfig,
+  getSystemConfig: getSystemConfig,
+  loadSystemConfig: loadSystemConfig
 }

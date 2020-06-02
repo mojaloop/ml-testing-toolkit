@@ -10,7 +10,6 @@ RUN apk add --no-cache -t build-dependencies git make gcc g++ python libtool aut
 COPY package.json package-lock.json* /opt/mojaloop-testing-toolkit/
 RUN npm install
 
-COPY config /opt/mojaloop-testing-toolkit/config
 COPY src /opt/mojaloop-testing-toolkit/src
 COPY spec_files /opt/mojaloop-testing-toolkit/spec_files
 COPY secrets /opt/mojaloop-testing-toolkit/secrets
