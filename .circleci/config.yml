@@ -53,8 +53,17 @@ defaults_build_docker_publish: &defaults_build_docker_publish
   command: |
     echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG"
     docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG
-    echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG"
-    docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
+    case "$CIRCLE_TAG" in 
+      *-pisp*)
+        # Don't update `late5t` for an image that has a `-pisp`
+        echo 'skipping late5t tag'
+        exit 0
+        ;;
+      *)
+        echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG"
+        docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
+        ;;
+    esac
 defaults_slack_announcement: &defaults_slack_announcement
   name: Slack announcement for tag releases
   command: |
@@ -425,7 +434,7 @@ workflows:
             # - audit-licenses
           filters:
             tags:
-              only: /v[0-9]+(\.[0-9]+)*\-snapshot/
+              only: /v[0-9]+(\.[0-9]+)*(\-snapshot)?(\-hotfix(\.[0-9]+))?(\-pisp)/
             branches:
               ignore:
                 - /.*/
