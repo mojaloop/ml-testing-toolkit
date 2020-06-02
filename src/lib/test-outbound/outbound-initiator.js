@@ -179,7 +179,7 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
         }
       }
 
-      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks)
+      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks)
 
       if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
         const response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
@@ -301,7 +301,7 @@ const getUrlPrefix = (baseUrl) => {
   return returnUrl
 }
 
-const sendRequest = (baseUrl, method, path, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks) => {
+const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks) => {
   return new Promise((resolve, reject) => {
     const httpsProps = {}
     let urlGenerated = Config.getUserConfig().CALLBACK_ENDPOINT + path
@@ -324,6 +324,7 @@ const sendRequest = (baseUrl, method, path, headers, body, successCallbackUrl, e
       method: method,
       url: urlGenerated,
       path: path,
+      params: queryParams,
       headers: headers,
       data: body,
       timeout: 3000,

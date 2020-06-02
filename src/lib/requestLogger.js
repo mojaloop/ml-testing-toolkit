@@ -38,6 +38,7 @@ const logRequest = function (request) {
     request: {
       uniqueId: request.customInfo ? request.customInfo.uniqueId : null,
       headers: request.headers,
+      queryParams: request.query,
       body: request.payload
     }
   }
