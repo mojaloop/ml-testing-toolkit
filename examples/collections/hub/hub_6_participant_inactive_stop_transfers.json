@@ -106,7 +106,7 @@
             "payee": {
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
-                "partyIdentifier": "{$environment.receiverMSISDN}",
+                "partyIdentifier": "{$environment.toIdValue}",
                 "fspId": "{$environment.payeefsp}"
               }
             },
@@ -393,7 +393,7 @@
             "payee": {
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
-                "partyIdentifier": "{$environment.receiverMSISDN}",
+                "partyIdentifier": "{$environment.toIdValue}",
                 "fspId": "{$environment.payeefsp}"
               }
             },
