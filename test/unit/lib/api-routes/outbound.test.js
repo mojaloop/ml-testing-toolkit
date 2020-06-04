@@ -122,20 +122,12 @@ describe('API route /api/outbound', () => {
       const res = await request(app).get(`/api/outbound/samples?type=hub`).send()
       expect(res.statusCode).toEqual(200)
     })
-    it('Send a proper request with type: dfsp', async () => {
-      const res = await request(app).get(`/api/outbound/samples?type=dfsp`).send()
-      expect(res.statusCode).toEqual(200)
-    })
     it('Send an invalid request with type: not existing', async () => {
       const res = await request(app).get(`/api/outbound/samples?type=notexisting`).send()
       expect(res.statusCode).toEqual(404)
     })
   })
   describe('GET /api/outbound/samples/data', () => {
-    it('Send an invalid request with missing collections query param', async () => {
-      const res = await request(app).get(`/api/outbound/samples/data`).send()
-      expect(res.statusCode).toEqual(400)
-    })
     it('Send a proper request with missing collections query param', async () => {
       const res = await request(app).get(`/api/outbound/samples/data`).query({
         collections: [
