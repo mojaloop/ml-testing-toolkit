@@ -31,8 +31,10 @@ const Config = require('../config')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
 const fs = require('fs')
+const { files } = require('node-dir')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
+const dirFilesAsync = promisify(files)
 const expect = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
 const traceHeaderUtils = require('../traceHeaderUtils')
@@ -591,6 +593,70 @@ const generateFinalReport = (inputTemplate, runtimeInformation) => {
   }
 }
 
+// load samples filenames
+const loadSamplesFilenames = async (type) => {
+  const filenames = {
+    environments: [],
+    collections: []
+  }
+  filenames.environments = await dirFilesAsync('examples/environments')
+
+  if (type) {
+    try {
+      const newEnviromentList = []
+      for (const index in filenames.environments) {
+        if (filenames.environments[index].startsWith(`examples/environments/${type}`)) {
+          newEnviromentList.push(filenames.environments[index])
+        }
+      }
+      filenames.environments = newEnviromentList
+      filenames.collections = await dirFilesAsync(`examples/collections/${type}`)
+    } catch (err) {
+      console.log(`Sample type ${type} not found`)
+    }
+  } else {
+    filenames.collections = await dirFilesAsync('examples/collections')
+  }
+
+  return filenames
+}
+
+// load samples content
+const loadSamplesContent = async (queryParams) => {
+  const collections = []
+  for (const i in queryParams.collections) {
+    collections.push(JSON.parse(await readFileAsync(queryParams.collections[i], 'utf8')))
+  }
+  const sample = {
+    name: null,
+    inputValues: null,
+    test_cases: []
+  }
+
+  if (queryParams.environment) {
+    sample.inputValues = JSON.parse(await readFileAsync(queryParams.environment, 'utf8')).inputValues
+  }
+
+  if (collections.length > 1) {
+    sample.name = 'multi'
+    let index = 1
+    collections.forEach(collection => {
+      collection.test_cases.forEach(testCase => {
+        const { id, ...remainingTestCaseProps } = testCase
+        sample.test_cases.push({
+          id: index++,
+          ...remainingTestCaseProps
+        })
+      })
+    })
+  } else {
+    sample.name = collections[0].name
+    sample.test_cases = collections[0].test_cases
+  }
+
+  return sample
+}
+
 module.exports = {
   OutboundSend,
   terminateOutbound,
@@ -601,5 +667,7 @@ module.exports = {
   replaceEnvironmentVariables,
   replacePathVariables,
   getFunctionResult,
-  generateFinalReport
+  generateFinalReport,
+  loadSamplesFilenames,
+  loadSamplesContent
 }

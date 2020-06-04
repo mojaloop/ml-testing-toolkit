@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -109,6 +110,40 @@ describe('API route /api/outbound', () => {
   describe('DELETE /api/outbound/template/:outboundID', () => {
     it('Send request', async () => {
       const res = await request(app).delete(`/api/outbound/template/123`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+  })
+  describe('GET /api/outbound/samples', () => {
+    it('Send a proper request', async () => {
+      const res = await request(app).get(`/api/outbound/samples`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Send a proper request with type: hub', async () => {
+      const res = await request(app).get(`/api/outbound/samples?type=hub`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Send a proper request with type: dfsp', async () => {
+      const res = await request(app).get(`/api/outbound/samples?type=dfsp`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Send an invalid request with type: not existing', async () => {
+      const res = await request(app).get(`/api/outbound/samples?type=notexisting`).send()
+      expect(res.statusCode).toEqual(404)
+    })
+  })
+  describe('GET /api/outbound/samples/data', () => {
+    it('Send an invalid request with missing collections query param', async () => {
+      const res = await request(app).get(`/api/outbound/samples/data`).send()
+      expect(res.statusCode).toEqual(400)
+    })
+    it('Send a proper request with missing collections query param', async () => {
+      const res = await request(app).get(`/api/outbound/samples/data`).query({
+        collections: [
+          'examples/collections/hub/hub_1_p2p_fundsinout_block_transfers.json',
+          'examples/collections/hub/hub_2_settlements.json'
+        ],
+        environment: 'examples/environments/hub_local_environment.json'
+      }).send()
       expect(res.statusCode).toEqual(200)
     })
   })
