@@ -8,11 +8,13 @@ The intention of this document is to provide a basic user guide to the **Mojaloo
 
 The **Mojaloop Testing Toolkit** was designed for participants that would like to participate in the Mojaloop scheme. Intentionally build as a standard integration testing tool between a _Digital Financial Service Provider (DFSP)_ and the _Mojaloop Switch_ (Hub), to facilitate testing. This tool set can potentially be used by both the DFSP and the _Mojaloop Switch_ to verify the integration between the 2 entities.
 
-For additional back ground information on the Self Testing Toolkit, please see [Mojaloop Testing Toolkit](/documents/Mojaloop-Testing-Tool.md). It would be to the particpant's benefit to familiarise themselves with the understanding of the  [Architecture Diagram](/documents/Mojaloop-Testing-Tool.md#7-architecture) that explains the various components and related flows.
+For additional back ground information on the Self Testing Toolkit, please see [Mojaloop Testing Toolkit](/documents/Mojaloop-Testing-Toolkit.md). It would be to the particpant's benefit to familiarise themselves with the understanding of the  [Architecture Diagram](/documents/Mojaloop-Testing-Toolkit.md#7-architecture) that explains the various components and related flows.
 
-### Getting Started - The document below covers the use-cases with the **Mojaloop Simulator** and **Mojaloop Simulator _UI (User Interface)_**.
+### Getting Started
 
-- [README](/README.md)
+The document below covers the use-cases with the **Mojaloop Simulator** and **Mojaloop Simulator _UI (User Interface)_**.
+
+- [Installation](/documents/User-Guide-Installation.md)
 
 ### DFSP Onboarding
 
@@ -37,3 +39,7 @@ For additional back ground information on the Self Testing Toolkit, please see [
 ### Frequently Asked Questions
 
 - [Freaquently Asked Question](/documents/User-Guide-Frequently-Asked-Questions.md)
+
+### Rules Engine (Advanced Users)
+
+- [Rules Engine Documentation](/documents/RULES_ENGINE.md)

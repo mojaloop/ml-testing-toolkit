@@ -8,7 +8,7 @@ The intention of this document is to provide a basic user guide to the **Mojaloo
 
 The **Mojaloop Testing Toolkit CLI** was designed for participants that would like to participate in the Mojaloop scheme. Intentionally build as a standard integration testing tool between a _Digital Financial Service Provider (DFSP)_ and the _Mojaloop Switch_ (Hub), to facilitate testing. This tool set can potentially be used by both the DFSP and the _Mojaloop Switch_ to verify the integration between the 2 entities.
 
-For additional back ground information on the Self Testing Toolkit, please see [Mojaloop Testing Toolkit](/documents/Mojaloop-Testing-Tool.md). It would be to the particpant's benefit to familiarise themselves with the understanding of the  [Architecture Diagram](/documents/MojaloopÂ-Testing-Tool.md#7-architecture) that explains the various components and related flows.
+For additional back ground information on the Self Testing Toolkit, please see [Mojaloop Testing Toolkit](/documents/Mojaloop-Testing-Toolkit.md). It would be to the particpant's benefit to familiarise themselves with the understanding of the  [Architecture Diagram](/documents/MojaloopÂ-Testing-Tool.md#7-architecture) that explains the various components and related flows.
 
 
 **Table of Contents**

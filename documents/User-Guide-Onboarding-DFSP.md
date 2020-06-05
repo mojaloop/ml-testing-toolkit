@@ -30,8 +30,6 @@
 
 ## 1. Running the toolkit
 
-This is the easiest way to run the **Mojaloop Testing Toolkit**.
-
 The following softwares should be installed on your system to run the toolkit.
 
 * Git
@@ -62,6 +60,8 @@ Please follow the below steps from the ml-testing-toolkit folder
 cd simulator
 docker-compose up
 ```
+
+The above command will start the services scheme-adapter, mojaloop-simulator and mojaloop-simulator-ui.
 
 ## 2 Settings
 

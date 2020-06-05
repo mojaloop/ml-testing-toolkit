@@ -31,8 +31,6 @@
 
 ## 1. Running the toolkit
 
-This is the easiest way to run the **Mojaloop Testing Toolkit**.
-
 The following softwares should be installed on your system to run the toolkit.
 
 * Git
@@ -65,7 +63,7 @@ The _**SETTINGS**_ navigation tab will open to the **SETTINGS** window. Below is
 
 ![Opening Default Settings](/assets/images/opening-default-settings.png)
 
-- The **SETTINGS** window consist of the following two windows;
+- The **SETTINGS** window consist of the following two sections;
   - On the left **Runtime Global Configuration** displays the actual configuration that is effectively active by the **Mojaloop Testing Toolkit** service.
   - On the right **Edit Global Configuration** amongst a couple of other options, it allows you to edit the values manually. Should you elect to use other environment values you can disable the default values by selecting the _**Override with Environment Variable**_ option.
 

@@ -391,8 +391,8 @@ You could save the collection or the environment by clicking on _Save_ button in
 
 #### 7.8 Send
 
-You could execute the whole template by clicking on _Send_ button in the top right corner. Please insure you added a user with {MSISDN} and value found in the **Input Values** on the simulator (see [Frequently Asked Questions](/documents/Mojaloop-Testing-Tool.md#4-frequently-asked-questions) section [4.2 Generic ID not found](/documents/Mojaloop-Testing-Tool.md#42-eneric-id-not-found)). 
-(/documents/Mojaloop-Testing-Tool.md#7-architecture)
+You could execute the whole template by clicking on _Send_ button in the top right corner. Please insure you added a user with {MSISDN} and value found in the **Input Values** on the simulator (see [Frequently Asked Questions](/documents/Mojaloop-Testing-Toolkit.md#4-frequently-asked-questions) section [4.2 Generic ID not found](/documents/Mojaloop-Testing-Toolkit.md#42-eneric-id-not-found)). 
+(/documents/Mojaloop-Testing-Toolkit.md#7-architecture)
 
 ![Sending Test Cases](/assets/images/sending-test-cases.png)
 
