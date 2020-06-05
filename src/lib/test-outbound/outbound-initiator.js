@@ -624,13 +624,16 @@ const loadSamplesFilenames = async (type) => {
 // load samples content
 const loadSamplesContent = async (queryParams) => {
   const collections = []
-  for (const i in queryParams.collections) {
-    collections.push(JSON.parse(await readFileAsync(queryParams.collections[i], 'utf8')))
+  if (queryParams.collections) {
+    for (const i in queryParams.collections) {
+      collections.push(JSON.parse(await readFileAsync(queryParams.collections[i], 'utf8')))
+    }
   }
+
   const sample = {
     name: null,
     inputValues: null,
-    test_cases: []
+    test_cases: null
   }
 
   if (queryParams.environment) {
@@ -639,6 +642,7 @@ const loadSamplesContent = async (queryParams) => {
 
   if (collections.length > 1) {
     sample.name = 'multi'
+    sample.test_cases = []
     let index = 1
     collections.forEach(collection => {
       collection.test_cases.forEach(testCase => {
@@ -649,7 +653,7 @@ const loadSamplesContent = async (queryParams) => {
         })
       })
     })
-  } else {
+  } else if (collections.length === 1) {
     sample.name = collections[0].name
     sample.test_cases = collections[0].test_cases
   }
