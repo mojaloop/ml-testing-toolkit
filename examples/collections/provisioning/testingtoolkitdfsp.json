@@ -102,7 +102,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_PARTICIPANT_PUT",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/participants/{{partyIdType}}/{{partyIdentifier}}"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/participants/{{partyIdType}}/{{partyIdentifier}}"
           },
           "tests": {
             "assertions": [
@@ -136,7 +136,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_PARTICIPANT_PUT_ERROR",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/participants/{{partyIdType}}/{{partyIdentifier}}/error"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/participants/{{partyIdType}}/{{partyIdentifier}}/error"
           },
           "tests": {
             "assertions": [
@@ -170,7 +170,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_PARTIES_GET",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/parties/{{partyIdType}}/{{partyIdentifier}}"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/parties/{{partyIdType}}/{{partyIdentifier}}"
           },
           "tests": {
             "assertions": [
@@ -204,7 +204,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_PARTIES_PUT",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/parties/{{partyIdType}}/{{partyIdentifier}}"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/parties/{{partyIdType}}/{{partyIdentifier}}"
           },
           "tests": {
             "assertions": [
@@ -238,7 +238,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_QUOTES",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}"
           },
           "tests": {
             "assertions": [
@@ -272,7 +272,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_TRANSFER_POST",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/transfers"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/transfers"
           },
           "tests": {
             "assertions": [
@@ -306,7 +306,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_TRANSFER_PUT",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/transfers/{{transferId}}"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/transfers/{{transferId}}"
           },
           "tests": {
             "assertions": [
@@ -340,7 +340,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_TRANSFER_ERROR",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/transfers/{{transferId}}/error"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/transfers/{{transferId}}/error"
           },
           "tests": {
             "assertions": [
@@ -374,7 +374,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_PARTICIPANT_SUB_ID_PUT",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/participants/{{partyIdType}}/{{partyIdentifier}}/{{partySubIdOrType}}"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/participants/{{partyIdType}}/{{partyIdentifier}}/{{partySubIdOrType}}"
           },
           "tests": {
             "assertions": [
@@ -408,7 +408,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_PARTICIPANT_SUB_ID_PUT_ERROR",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/participants/{{partyIdType}}/{{partyIdentifier}}/{{partySubIdOrType}}/error"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/participants/{{partyIdType}}/{{partyIdentifier}}/{{partySubIdOrType}}/error"
           },
           "tests": {
             "assertions": [
@@ -442,7 +442,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_PARTICIPANT_SUB_ID_DELETE",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/participants/{{partyIdType}}/{{partyIdentifier}}/{{partySubIdOrType}}"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/participants/{{partyIdType}}/{{partyIdentifier}}/{{partySubIdOrType}}"
           },
           "tests": {
             "assertions": [
@@ -476,7 +476,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_PARTIES_SUB_ID_GET",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/parties/{{partyIdType}}/{{partyIdentifier}}/{{partySubIdOrType}}"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/parties/{{partyIdType}}/{{partyIdentifier}}/{{partySubIdOrType}}"
           },
           "tests": {
             "assertions": [
@@ -510,7 +510,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_PARTIES_SUB_ID_PUT",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/parties/{{partyIdType}}/{{partyIdentifier}}/{{partySubIdOrType}}"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/parties/{{partyIdType}}/{{partyIdentifier}}/{{partySubIdOrType}}"
           },
           "tests": {
             "assertions": [
@@ -544,7 +544,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_PARTIES_SUB_ID_PUT_ERROR",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/parties/{{partyIdType}}/{{partyIdentifier}}/{{partySubIdOrType}}/error"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/parties/{{partyIdType}}/{{partyIdentifier}}/{{partySubIdOrType}}/error"
           },
           "tests": {
             "assertions": [
@@ -578,7 +578,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_TRX_REQ_SERVICE",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}"
           },
           "tests": {
             "assertions": [
@@ -714,7 +714,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_BULK_TRANSFER_POST",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/bulkTransfers"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/bulkTransfers"
           },
           "tests": {
             "assertions": [
@@ -748,7 +748,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_BULK_TRANSFER_PUT",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/bulkTransfers/{{id}}"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/bulkTransfers/{{id}}"
           },
           "tests": {
             "assertions": [
@@ -782,7 +782,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_BULK_TRANSFER_ERROR",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/bulkTransfers/{{id}}/error"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/bulkTransfers/{{id}}/error"
           },
           "tests": {
             "assertions": [
@@ -816,7 +816,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_PARTICIPANT_BATCH_PUT",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/participants/{{requestId}}"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/participants/{{requestId}}"
           },
           "tests": {
             "assertions": [
@@ -850,7 +850,7 @@
           },
           "body": {
             "type": "FSPIOP_CALLBACK_URL_PARTICIPANT_BATCH_PUT_ERROR",
-            "value": "{$inputs.SCHEME_ADAPTER_PAYER}/participants/{{requestId}}/error"
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/participants/{{requestId}}/error"
           },
           "tests": {
             "assertions": [

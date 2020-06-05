@@ -41,6 +41,6 @@
     "payerIdentifier": "22507008181",
     "payeeIdType": "MSISDN",
     "payeeIdentifier": "22556999125",
-    "SCHEME_ADAPTER_PAYER": "http://172.17.0.1:5000"
+    "CALLBACK_ENDPOINT_BASE_URL": "http://172.17.0.1:5000"
   }
 }
