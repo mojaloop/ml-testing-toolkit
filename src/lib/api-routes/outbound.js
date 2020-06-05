@@ -102,12 +102,6 @@ router.get('/samples', async (req, res, next) => {
   try {
     const outbound = require('../test-outbound/outbound-initiator')
     const filenames = await outbound.loadSamplesFilenames(req.query.type)
-    if (filenames.environments.length === 0) {
-      return res.status(404).json({ errors: 'environment not found' })
-    }
-    if (filenames.collections.length === 0) {
-      return res.status(404).json({ errors: 'collections not found' })
-    }
     return res.status(200).json({ status: 'OK', body: filenames })
   } catch (err) {
     next(err)
@@ -119,9 +113,6 @@ router.get('/samples', async (req, res, next) => {
 router.get('/samples/data', async (req, res, next) => {
   try {
     const outbound = require('../test-outbound/outbound-initiator')
-    if (!req.query.collections || req.query.collections.length === 0) {
-      return res.status(400).send('collections is empty')
-    }
     const files = await outbound.loadSamplesContent(req.query)
     return res.status(200).json({ status: 'OK', body: files })
   } catch (err) {
