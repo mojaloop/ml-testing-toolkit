@@ -12,6 +12,7 @@ RUN npm install
 
 COPY src /opt/mojaloop-testing-toolkit/src
 COPY spec_files /opt/mojaloop-testing-toolkit/spec_files
+COPY examples /opt/mojaloop-testing-toolkit/examples
 COPY secrets /opt/mojaloop-testing-toolkit/secrets
 
 FROM node:12.16.0-alpine
