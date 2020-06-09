@@ -22,8 +22,21 @@
  --------------
  ******/
 
-const getSampleText = (context) => {
-  return 'Sample Text'
+const generateUUID = () => {
+  const uuid = require('uuid')
+  return uuid.v4()
 }
 
-module.exports.getSampleText = getSampleText
+const curDate = () => {
+  return (new Date()).toUTCString()
+}
+
+const curDateISO = () => {
+  return (new Date()).toISOString()
+}
+
+module.exports = {
+  generateUUID,
+  curDate,
+  curDateISO
+}

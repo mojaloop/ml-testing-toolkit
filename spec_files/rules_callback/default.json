@@ -58,12 +58,7 @@
     "event": {
       "method": "put",
       "path": "/transfers/{ID}",
-      "params": {
-        "body": {
-          "completedTimestamp": "2020-06-09T18:32:08.699+05:30",
-          "transferState": "COMMITTED"
-        }
-      },
+      "params": {},
       "delay": 0,
       "type": "MOCK_CALLBACK"
     }
@@ -95,35 +90,9 @@
     "event": {
       "method": "put",
       "path": "/parties/{Type}/{ID}",
-      "params": {
-        "headers": {
-          "Content-Type": "application/vnd.interoperability.parties+json;version=1.0",
-          "Date": "Mon, 08 Jun 2020 19:46:45 GMT",
-          "FSPIOP-Source": "testingtoolkitdfsp",
-          "FSPIOP-Destination": "{$request.headers.fspiop-source}"
-        },
-        "body": {
-          "party": {
-            "partyIdInfo": {
-              "partyIdType": "{$request.params.Type}",
-              "partyIdentifier": "{$request.params.ID}",
-              "fspId": "{$config.FSPID}"
-            },
-            "merchantClassificationCode": "4321",
-            "name": "Justin Trudeau",
-            "personalInfo": {
-              "complexName": {
-                "firstName": "Justin",
-                "middleName": "Pierre",
-                "lastName": "Trudeau"
-              },
-              "dateOfBirth": "1971-12-25"
-            }
-          }
-        }
-      },
+      "params": {},
       "delay": 0,
-      "type": "FIXED_CALLBACK"
+      "type": "MOCK_CALLBACK"
     }
   },
   {

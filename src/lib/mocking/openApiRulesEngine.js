@@ -32,6 +32,13 @@ const rulesEngineModel = require('../rulesEngineModel')
 const Config = require('../config')
 // const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
 
+const removeEmpty = obj => {
+  Object.keys(obj).forEach(key => {
+    if (obj[key] && typeof obj[key] === 'object') removeEmpty(obj[key])
+    else if (obj[key] == null) delete obj[key]
+  })
+}
+
 const validateRules = async (context, req) => {
   const rulesEngine = await rulesEngineModel.getValidationRulesEngine()
 
@@ -65,6 +72,7 @@ const validateRules = async (context, req) => {
 
         _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
         _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
+        removeEmpty(generatedErrorCallback.body)
         if (curEvent.params.delay) {
           generatedErrorCallback.delay = curEvent.params.delay
         }
@@ -101,6 +109,7 @@ const generateMockErrorCallback = async (context, req) => {
   // Override the values in generated callback with the values from callback map file
   if (req.customInfo.callbackInfo.errorCallback.bodyOverride) {
     _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.bodyOverride, context, req))
+    removeEmpty(generatedErrorCallback.body)
   }
   if (req.customInfo.callbackInfo.errorCallback.headerOverride) {
     _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.headerOverride, context, req))
@@ -170,6 +179,7 @@ const callbackRules = async (context, req) => {
         // Override the values in generated callback with the values from callback map file
         if (req.customInfo.callbackInfo.successCallback.bodyOverride) {
           _.merge(generatedCallback.body, replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.bodyOverride, context, req))
+          removeEmpty(generatedCallback.body)
         }
         if (req.customInfo.callbackInfo.successCallback.headerOverride) {
           _.merge(generatedCallback.headers, replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.headerOverride, context, req))
@@ -177,6 +187,7 @@ const callbackRules = async (context, req) => {
 
         // Override the values in generated callback with the values from event params
         _.merge(generatedCallback.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
+        removeEmpty(generatedCallback.body)
         _.merge(generatedCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
         if (curEvent.params.delay) {
           generatedCallback.delay = curEvent.params.delay
@@ -234,6 +245,7 @@ const responseRules = async (context, req) => {
         // Override the values in generated callback with the values from callback map file
         if (req.customInfo.responseInfo && req.customInfo.responseInfo.response.bodyOverride) {
           _.merge(generatedResponse.body, replaceVariablesFromRequest(req.customInfo.responseInfo.response.bodyOverride, context, req))
+          removeEmpty(generatedResponse.body)
         }
         // if (req.customInfo.responseInfo.response.headerOverride) {
         //   _.merge(generatedResponse.headers, replaceVariablesFromRequest(req.customInfo.responseInfo.response.headerOverride, context, req))
@@ -241,6 +253,7 @@ const responseRules = async (context, req) => {
 
         // Override the values in generated callback with the values from event params
         _.merge(generatedResponse.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
+        removeEmpty(generatedResponse.body)
         _.merge(generatedResponse.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
       } else {
         customLogger.logMessage('error', 'No Specification file provided for responseRules function', null, true, req)
