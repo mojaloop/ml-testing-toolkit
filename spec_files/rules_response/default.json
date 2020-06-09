@@ -1,5 +1,7 @@
 [
   {
+    "type": "response",
+    "version": 1,
     "ruleId": 1,
     "priority": 1,
     "description": "post /settlementWindows/{id}",
@@ -37,7 +39,9 @@
     }
   },
   {
-    "ruleId": 3,
+    "type": "response",
+    "version": 1,
+    "ruleId": 2,
     "priority": 1,
     "description": "post /settlements",
     "apiVersion": {
@@ -102,7 +106,9 @@
     }
   },
   {
-    "ruleId": 4,
+    "type": "response",
+    "version": 1,
+    "ruleId": 3,
     "priority": 1,
     "description": "get /settlements/{id}",
     "apiVersion": {
@@ -169,19 +175,19 @@
   {
     "ruleId": 5,
     "priority": 1,
-    "description": "get /settlementWindows",
+    "description": "get /participants/{Type}/{ID}/{SubId}",
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 1,
-      "type": "settlements",
-      "asynchronous": false
+      "type": "fspiop",
+      "asynchronous": true
     },
     "conditions": {
       "all": [
         {
           "fact": "operationPath",
           "operator": "equal",
-          "value": "/settlementWindows"
+          "value": "/participants/{Type}/{ID}/{SubId}"
         },
         {
           "fact": "method",
@@ -193,20 +199,11 @@
     "event": {
       "method": null,
       "path": null,
-      "params": {
-        "body": [
-          {
-            "createdDate": "2020-02-10",
-            "id": 123,
-            "state": "{$request.query.state}",
-            "reason": "string",
-            "changedDate": "2020-02-10"
-          }
-        ],
-        "statusCode": "200"
-      },
+      "params": {},
       "delay": 0,
-      "type": "FIXED_RESPONSE"
-    }
+      "type": "MOCK_RESPONSE"
+    },
+    "type": "response",
+    "version": 1.0
   }
 ]

@@ -227,6 +227,27 @@ router.put('/files/response', async (req, res, next) => {
   }
 })
 
+// export rules
+router.get('/export', async (req, res, next) => {
+  try {
+    const resp = await rulesEngineModel.exportFiles(req.query.elements)
+    res.status(200).json({ status: 'OK', body: resp })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// import rules
+router.post('/import', async (req, res, next) => {
+  try {
+    const resp = await rulesEngineModel.importFiles(req.body.buffer)
+    res.status(200).json({ status: 'OK', body: resp })
+  } catch (err) {
+    res.status(400).send(err.message)
+    next(err)
+  }
+})
+
 // Old methods
 router.get('/validation', async (req, res, next) => {
   try {

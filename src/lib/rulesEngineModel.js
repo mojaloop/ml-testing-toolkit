@@ -29,10 +29,14 @@ const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const writeFileAsync = promisify(fs.writeFile)
 const accessFileAsync = promisify(fs.access)
+const AdmZip = require('adm-zip')
 // const copyFileAsync = promisify(fs.copyFile)
 const readDirAsync = promisify(fs.readdir)
+const rmDirAsync = promisify(fs.rmdir)
 const deleteFileAsync = promisify(fs.unlink)
 const customLogger = require('./requestLogger')
+const Config = require('./config')
+const { Engine } = require('json-rules-engine')
 // const _ = require('lodash')
 
 const rulesResponseFilePathPrefix = 'spec_files/rules_response/'
@@ -213,8 +217,18 @@ const getResponseRulesFileContent = async (fileName) => {
   return JSON.parse(rulesRawdata)
 }
 
+const addTypeAndVersion = (ruleType, fileContent) => {
+  if (!fileContent[fileContent.length - 1].type) {
+    fileContent[fileContent.length - 1].type = ruleType
+  }
+  if (!fileContent[fileContent.length - 1].version) {
+    fileContent[fileContent.length - 1].version = parseFloat(Config.getSystemConfig().RULES_VERSIONS[ruleType])
+  }
+}
+
 const setResponseRulesFileContent = async (fileName, fileContent) => {
   try {
+    addTypeAndVersion('response', fileContent)
     await writeFileAsync(rulesResponseFilePathPrefix + fileName, JSON.stringify(fileContent, null, 2))
     await reloadResponseRules()
     return true
@@ -256,6 +270,7 @@ const getValidationRulesFileContent = async (fileName) => {
 
 const setValidationRulesFileContent = async (fileName, fileContent) => {
   try {
+    addTypeAndVersion('validation', fileContent)
     await writeFileAsync(rulesValidationFilePathPrefix + fileName, JSON.stringify(fileContent, null, 2))
     await reloadValidationRules()
     return true
@@ -297,6 +312,7 @@ const getCallbackRulesFileContent = async (fileName) => {
 
 const setCallbackRulesFileContent = async (fileName, fileContent) => {
   try {
+    addTypeAndVersion('callback', fileContent)
     await writeFileAsync(rulesCallbackFilePathPrefix + fileName, JSON.stringify(fileContent, null, 2))
     await reloadCallbackRules()
     return true
@@ -313,6 +329,88 @@ const deleteCallbackRulesFile = async (fileName) => {
   } catch (err) {
     return err
   }
+}
+
+const exportFiles = async (ruleTypes) => {
+  const zip = new AdmZip()
+  ruleTypes.forEach(ruleType => {
+    const filename = `spec_files/${ruleType}`
+    if (filename.endsWith('.json')) {
+      zip.addLocalFile(filename)
+    } else {
+      zip.addLocalFolder(filename, ruleType)
+    }
+  })
+  return {
+    namePrefix: ruleTypes.length > 1 ? 'spec_files' : ruleTypes[0],
+    buffer: zip.toBuffer()
+  }
+}
+
+const rulesHelper = async (ruleType, folder, zipEntry) => {
+  if (zipEntry.entryName !== `${folder}/${CONFIG_FILE_NAME}`) {
+    const rules = JSON.parse(zipEntry.getData().toString('utf-8'))
+    const responseVersion = Config.getSystemConfig().RULES_VERSIONS[ruleType]
+    const engine = new Engine()
+    rules.forEach(rule => {
+      if (rule.type !== ruleType) {
+        throw new Error(`validation error: rule ${rule.ruleId} in ${zipEntry.entryName} should be of type ${ruleType}`)
+      }
+      if (rule.version > responseVersion) {
+        throw new Error(`validation error: rule ${rule.ruleId} in ${zipEntry.entryName} version should at most ${responseVersion}`)
+      }
+      try {
+        engine.addRule(rule)
+      } catch (err) {
+        throw new Error(`validation error: rule ${rule.ruleId} in ${zipEntry.entryName} is not valid: ${err.message}`)
+      }
+    })
+  }
+}
+
+const importFiles = async (data) => {
+  console.log(data)
+  const zip = new AdmZip(Buffer.from(data))
+  const elements = []
+  const zipEntries = zip.getEntries()
+  zipEntries.forEach((zipEntry) => {
+    if (!zipEntry.isDirectory) {
+      const element = zipEntry.entryName.split('/')[0]
+      if (!elements.includes(element)) {
+        elements.push(element)
+      }
+      switch (element) {
+        case 'rules_response': {
+          rulesHelper('response', 'rules_response', zipEntry)
+          break
+        }
+        case 'rules_validation': {
+          rulesHelper('validation', 'rules_validation', zipEntry)
+          break
+        }
+        case 'rules_callback': {
+          rulesHelper('callback', 'rules_callback', zipEntry)
+          break
+        }
+        case 'user_config.json': {
+          // already validated
+          break
+        }
+        default:
+          throw new Error(`validation error: element ${element} not supported`)
+      }
+    }
+  })
+  for (const index in elements) {
+    const elementToRemove = `spec_files/${elements[index]}`
+    if (elementToRemove.endsWith('.json')) {
+      await deleteFileAsync(elementToRemove)
+    } else {
+      await rmDirAsync(elementToRemove, { recursive: true })
+    }
+  }
+  zip.extractAllTo('spec_files')
+  return elements
 }
 
 module.exports = {
@@ -338,5 +436,7 @@ module.exports = {
   deleteCallbackRulesFile,
   setActiveValidationRulesFile,
   setActiveCallbackRulesFile,
-  setActiveResponseRulesFile
+  setActiveResponseRulesFile,
+  exportFiles,
+  importFiles
 }
