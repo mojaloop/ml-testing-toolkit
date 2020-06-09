@@ -593,32 +593,21 @@ const generateFinalReport = (inputTemplate, runtimeInformation) => {
   }
 }
 
-// load samples filenames
-const loadSamplesFilenames = async (type) => {
-  const filenames = {
-    environments: [],
-    collections: []
-  }
-  filenames.environments = await dirFilesAsync('examples/environments')
-
+// load collections or environments
+const loadSamplesCollectionsOrEnvironments = async (exampleType, type) => {
+  let data
   if (type) {
-    try {
-      const newEnviromentList = []
-      for (const index in filenames.environments) {
-        if (filenames.environments[index].startsWith(`examples/environments/${type}`)) {
-          newEnviromentList.push(filenames.environments[index])
-        }
-      }
-      filenames.environments = newEnviromentList
-      filenames.collections = await dirFilesAsync(`examples/collections/${type}`)
-    } catch (err) {
-      console.log(`Sample type ${type} not found`)
-    }
+    data = await dirFilesAsync(`examples/${exampleType}/${type}`)
   } else {
-    filenames.collections = await dirFilesAsync('examples/collections')
+    data = await dirFilesAsync(`examples/${exampleType}`)
   }
-
-  return filenames
+  const list = []
+  for (const index in data) {
+    if (data[index].endsWith('.json')) {
+      list.push(data[index])
+    }
+  }
+  return list
 }
 
 // load samples content
@@ -672,6 +661,6 @@ module.exports = {
   replacePathVariables,
   getFunctionResult,
   generateFinalReport,
-  loadSamplesFilenames,
+  loadSamplesCollectionsOrEnvironments,
   loadSamplesContent
 }
