@@ -10,6 +10,11 @@
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
           "Content-Type": "{$session.negotiatedContentType}",
           "Date": "{$request.headers.date}"
+        },
+        "bodyOverride": {
+          "completedTimestamp": "{$function.generic.curDateISO}",
+          "transferState": "COMMITTED",
+          "extensionList": null
         }
       },
       "errorCallback": {
@@ -161,6 +166,7 @@
             "partyIdInfo": {
               "partyIdType": "{$request.params.Type}",
               "partyIdentifier": "{$request.params.ID}",
+              "partySubIdOrType": null,
               "fspId": "{$config.FSPID}"
             }
           }

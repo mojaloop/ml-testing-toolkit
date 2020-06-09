@@ -58,11 +58,7 @@
     "event": {
       "method": "put",
       "path": "/transfers/{ID}",
-      "params": {
-        "body": {
-          "transferState": "COMMITTED"
-        }
-      },
+      "params": {},
       "delay": 0,
       "type": "MOCK_CALLBACK"
     }
@@ -92,8 +88,8 @@
       ]
     },
     "event": {
-      "method": null,
-      "path": null,
+      "method": "put",
+      "path": "/parties/{Type}/{ID}",
       "params": {},
       "delay": 0,
       "type": "MOCK_CALLBACK"

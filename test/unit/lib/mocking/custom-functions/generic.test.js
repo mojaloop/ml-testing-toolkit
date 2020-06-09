@@ -24,13 +24,37 @@
 
 'use strict'
 
-const Sample = require('../../../../../src/lib/mocking/custom-functions/sample')
+const Generic = require('../../../../../src/lib/mocking/custom-functions/generic')
 
-describe('Sample Custom Function', () => {
-  describe('getSampleText', () => {
-    it('It should return some value', async () => {
-      const result = Sample.getSampleText()
+
+describe('Generic Custom Functions', () => {
+  describe('generateUUID', () => {
+    it('It should return some uuid value', async () => {
+      const result = Generic.generateUUID()
       expect(result).toBeTruthy()
+      expect(result.length).toBeGreaterThan(20)
+    })
+    it('It should return unique values each time', async () => {
+      const result1 = Generic.generateUUID()
+      const result2 = Generic.generateUUID()
+      expect(result1).toBeTruthy()
+      expect(result2).toBeTruthy()
+      expect(result1).not.toEqual(result2)
+    })
+  })
+  describe('curDate', () => {
+    it('It should return proper date', async () => {
+      const result = Generic.curDate()
+      expect(result).toBeTruthy()
+      expect(result.length).toBeGreaterThan(20)
+    })
+  })
+  describe('curDateISO', () => {
+    it('It should return proper date', async () => {
+      const result = Generic.curDateISO()
+      expect(result).toBeTruthy()
+      expect(result.length).toBeGreaterThan(15)
     })
   })
 })
+

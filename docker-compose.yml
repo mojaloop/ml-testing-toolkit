@@ -3,7 +3,6 @@ version: "3.7"
 services:
   mojaloop-testing-toolkit:
     image: mojaloop-testing-toolkit:local
-    env_file: ./local.env
     build:
       context: .
       target: builder

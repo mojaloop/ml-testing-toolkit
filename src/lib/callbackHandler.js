@@ -36,8 +36,23 @@ const handleCallback = async (callbackObject, context, req) => {
     await new Promise(resolve => setTimeout(resolve, callbackObject.delay))
   }
 
+  let callbackEndpoint = Config.getUserConfig().CALLBACK_ENDPOINT
+  if (Config.getUserConfig().CALLBACK_RESOURCE_ENDPOINTS && Config.getUserConfig().CALLBACK_RESOURCE_ENDPOINTS.enabled) {
+    const callbackEndpoints = Config.getUserConfig().CALLBACK_RESOURCE_ENDPOINTS
+    const matchedObject = callbackEndpoints.endpoints.find(item => {
+      if (item.method === callbackObject.method) {
+        const patt = new RegExp(item.path.replace(/{.*}/, '.*'))
+        return patt.test(callbackObject.path)
+      }
+      return false
+    })
+    if (matchedObject && matchedObject.endpoint) {
+      callbackEndpoint = matchedObject.endpoint
+    }
+  }
+
   const httpsProps = {}
-  let urlGenerated = Config.getUserConfig().CALLBACK_ENDPOINT + callbackObject.path
+  let urlGenerated = callbackEndpoint + callbackObject.path
   if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
     const tlsConfig = ConnectionProvider.getTlsConfig()
     const httpsAgent = new https.Agent({
