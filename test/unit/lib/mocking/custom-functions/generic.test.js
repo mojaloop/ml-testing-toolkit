@@ -49,5 +49,12 @@ describe('Generic Custom Functions', () => {
       expect(result.length).toBeGreaterThan(20)
     })
   })
+  describe('curDateISO', () => {
+    it('It should return proper date', async () => {
+      const result = Generic.curDateISO()
+      expect(result).toBeTruthy()
+      expect(result.length).toBeGreaterThan(15)
+    })
+  })
 })
 
