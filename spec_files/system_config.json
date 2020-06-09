@@ -8,12 +8,6 @@
       "asynchronous": true
     },
     {
-      "type": "fspiop",
-      "version": "1.1",
-      "folderPath": "fspiop_1.1",
-      "asynchronous": true
-    },
-    {
       "type": "settlements",
       "version": "1.0",
       "folderPath": "settlements_1.0"

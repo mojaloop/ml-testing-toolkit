@@ -1,5 +1,25 @@
 {
   "CALLBACK_ENDPOINT": "http://localhost:4000",
+  "CALLBACK_RESOURCE_ENDPOINTS": {
+    "enabled": true,
+    "endpoints": [
+      {
+        "method": "put",
+        "path": "/parties/{Type}/{ID}",
+        "endpoint": "http://localhost:4002"
+      },
+      {
+        "method": "put",
+        "path": "/quotes/{ID}",
+        "endpoint": "http://localhost:3002"
+      },
+      {
+        "method": "put",
+        "path": "/transfers/{ID}",
+        "endpoint": "http://localhost:3000"
+      }
+    ]
+  },
   "SEND_CALLBACK_ENABLE": true,
   "FSPID": "testingtoolkitdfsp",
   "TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES": true,
@@ -7,7 +27,6 @@
   "TRANSFERS_VALIDATION_CONDITION": true,
   "ILP_SECRET": "secret",
   "VERSIONING_SUPPORT_ENABLE": true,
-  "OVERRIDE_WITH_ENV": true,
   "VALIDATE_INBOUND_JWS": false,
   "VALIDATE_INBOUND_PUT_PARTIES_JWS": false,
   "JWS_SIGN": false,

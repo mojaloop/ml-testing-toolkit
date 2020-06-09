@@ -62,30 +62,12 @@ const setStoredUserConfig = async (newConfig) => {
   }
 }
 
-// Function to load user configuration from .env file or environment incase of running in container
 const loadUserConfig = async () => {
-  // if (fs.existsSync('local.env')) {
-  //   require('dotenv').config({ path: 'local.env' })
-  // }
   try {
     const contents = await readFileAsync(USER_CONFIG_FILE)
     USER_CONFIG = JSON.parse(contents)
   } catch (err) {
     RequestLogger.logMessage('error', 'Can not read the file ' + USER_CONFIG_FILE, null, true, null)
-  }
-
-  if (USER_CONFIG.OVERRIDE_WITH_ENV) {
-    for (var prop in USER_CONFIG) {
-      if (Object.prototype.hasOwnProperty.call(USER_CONFIG, prop)) {
-        if (process.env[prop]) {
-          if ((typeof USER_CONFIG[prop]) === 'boolean') {
-            USER_CONFIG[prop] = process.env[prop] === 'true'
-          } else {
-            USER_CONFIG[prop] = process.env[prop]
-          }
-        }
-      }
-    }
   }
   return true
 }
