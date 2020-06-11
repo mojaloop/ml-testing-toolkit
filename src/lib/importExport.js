@@ -28,6 +28,7 @@ const AdmZip = require('adm-zip')
 const rmDirAsync = promisify(fs.rmdir)
 const Config = require('./config')
 const { Engine } = require('json-rules-engine')
+const Server = require('../server')
 
 const CONFIG_FILE_NAME = 'config.json'
 
@@ -47,14 +48,14 @@ const exportSpecFiles = async (ruleTypes) => {
   }
 }
 
-const validateRules = (entryName, ruleType, responseVersion, rules) => {
+const validateRules = (entryName, ruleType, ruleVersion, rules) => {
   const engine = new Engine()
   rules.forEach(rule => {
     if (rule.type !== ruleType) {
       throw new Error(`validation error: rule ${rule.ruleId} in ${entryName} should be of type ${ruleType}`)
     }
-    if (rule.version > responseVersion) {
-      throw new Error(`validation error: rule ${rule.ruleId} in ${entryName} version should at most ${responseVersion}`)
+    if (rule.version > ruleVersion) {
+      throw new Error(`validation error: rule ${rule.ruleId} in ${entryName} version should at most ${ruleVersion}`)
     }
     try {
       engine.addRule(rule)
@@ -78,19 +79,26 @@ const importSpecFiles = async (data, options) => {
       switch (element) {
         case 'rules_response': {
           if (entryName !== `rules_response/${CONFIG_FILE_NAME}`) {
-            validateRules(entryName, 'response', Config.getSystemConfig().RULES_VERSIONS.response, entryData)
+            validateRules(entryName, 'response', Config.getSystemConfig().CONFIG_VERSIONS.response, entryData)
           }
           break
         }
         case 'rules_validation': {
           if (entryName !== `rules_validation/${CONFIG_FILE_NAME}`) {
-            validateRules(entryName, 'validation', Config.getSystemConfig().RULES_VERSIONS.validation, entryData)
+            validateRules(entryName, 'validation', Config.getSystemConfig().CONFIG_VERSIONS.validation, entryData)
           }
           break
         }
         case 'rules_callback': {
           if (entryName !== `rules_callback/${CONFIG_FILE_NAME}`) {
-            validateRules(entryName, 'callback', Config.getSystemConfig().RULES_VERSIONS.callback, entryData)
+            validateRules(entryName, 'callback', Config.getSystemConfig().CONFIG_VERSIONS.callback, entryData)
+          }
+          break
+        }
+        case 'user_config.json': {
+          const userSettingsVersion = Config.getSystemConfig().CONFIG_VERSIONS.userSettings
+          if (entryData.VERSION > userSettingsVersion) {
+            throw new Error(`validation error: user_config.json version ${entryData.VERSION} not supproted be at most ${userSettingsVersion}`)
           }
           break
         }
@@ -103,6 +111,16 @@ const importSpecFiles = async (data, options) => {
     const option = options[index]
     if (option === 'user_config.json') {
       zip.extractEntryTo(option, 'spec_files', false, true)
+      const runtime = await Config.getUserConfig()
+      const stored = await Config.getStoredUserConfig()
+      let reloadServer = false
+      if (runtime.INBOUND_MUTUAL_TLS_ENABLED !== stored.INBOUND_MUTUAL_TLS_ENABLED) {
+        reloadServer = true
+      }
+      await Config.loadUserConfig()
+      if (reloadServer) {
+        Server.restartServer()
+      }
     } else {
       let deleted
       for (const index in entries) {

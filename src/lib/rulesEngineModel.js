@@ -220,7 +220,7 @@ const addTypeAndVersion = (ruleType, fileContent) => {
       fileContent[index].type = ruleType
     }
     if (!fileContent[index].version) {
-      fileContent[index].version = parseFloat(Config.getSystemConfig().RULES_VERSIONS[ruleType])
+      fileContent[index].version = parseFloat(Config.getSystemConfig().CONFIG_VERSIONS[ruleType])
     }
   }
 }
@@ -228,8 +228,6 @@ const addTypeAndVersion = (ruleType, fileContent) => {
 const setResponseRulesFileContent = async (fileName, fileContent) => {
   try {
     addTypeAndVersion('response', fileContent)
-    console.log('after')
-    console.log(fileContent)
     await writeFileAsync(rulesResponseFilePathPrefix + fileName, JSON.stringify(fileContent, null, 2))
     await reloadResponseRules()
     return true
