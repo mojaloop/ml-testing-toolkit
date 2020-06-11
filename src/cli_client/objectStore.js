@@ -21,26 +21,19 @@
  * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
-const socketIOClient = require('socket.io-client')
-const outboundMode = require('../modes/outbound')
-const monitoringMode = require('../modes/monitoring')
-const objectStore = require('../objectStore')
 
-const outbound = () => {
-  const config = objectStore.get('config')
-  const socket = socketIOClient(config.baseURL)
-  socket.on('outboundProgress', outboundMode.handleIncomingProgress)
-  console.log(`Listening on ${config.baseURL}...`)
+const storedObject = {
 }
 
-const monitoring = () => {
-  const config = objectStore.get('config')
-  const socket = socketIOClient(config.baseUrl)
-  socket.on('newLog', monitoringMode.handleIncomingProgress)
-  console.log('Listening on newLog events...')
+const set = (key, value) => {
+  storedObject[key] = { ...value }
+}
+
+const get = (key) => {
+  return { ...storedObject[key] }
 }
 
 module.exports = {
-  outbound,
-  monitoring
+  set,
+  get
 }

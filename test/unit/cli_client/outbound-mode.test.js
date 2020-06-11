@@ -29,6 +29,7 @@ const spyLogger = jest.spyOn(require('../../../src/cli_client/utils/logger'), 'o
 const spyExit = jest.spyOn(process, 'exit')
 const spyAxios = jest.spyOn(axios, 'post')
 const spyPromisify = jest.spyOn(require('util'), 'promisify')
+const objectStore = require('../../../src/cli_client/objectStore')
 
 const outbound = require('../../../src/cli_client/modes/outbound')
 
@@ -88,11 +89,13 @@ describe('Cli client', () => {
           ]
         })
       })
-      const configuration = {
-        "inputFiles": "sample-cli.json"
+      const config = {
+        inputFiles: "sample-cli.json"
       }
+      objectStore.set('config', config)
+
       spyAxios.mockReturnValue({})
-      await expect(outbound.sendTemplate(configuration)).resolves.toBe(undefined)
+      await expect(outbound.sendTemplate()).resolves.toBe(undefined)
     })
     it('when inputFiles contains files and directories should not throw an error', async () => {
       spyPromisify.mockReturnValueOnce(() => {
@@ -109,18 +112,22 @@ describe('Cli client', () => {
           "file1"
         ])
       })
-      const configuration = {
-        "inputFiles": "sample-cli.json,sample-dir"
+
+      const config = {
+        inputFiles: "sample-cli.json,sample-dir"
       }
+      objectStore.set('config', config)
       spyAxios.mockReturnValue({})
-      await expect(outbound.sendTemplate(configuration)).resolves.toBe(undefined)
+      await expect(outbound.sendTemplate()).resolves.toBe(undefined)
     })
     it('when readFile throws error should not throw an error', async () => {
       spyPromisify.mockReturnValueOnce(() => {throw new Error('expected error')})
-      const configuration = {
-        "inputFiles": "sample-cli.json"
+
+      const config = {
+        inputFiles: "sample-cli.json"
       }
-      await expect(outbound.sendTemplate(configuration)).resolves.toBe(undefined)
+      objectStore.set('config', config)
+      await expect(outbound.sendTemplate()).resolves.toBe(undefined)
     })
     it('when readFile throws error should not throw an error', async () => {
       spyPromisify.mockReturnValueOnce(() => {
@@ -133,10 +140,13 @@ describe('Cli client', () => {
         })
       })
       spyPromisify.mockReturnValueOnce(() => {throw new Error('expected error')})
-      const configuration = {
-        "inputFiles": "sample-cli.json,sample-dir"
+      
+      const config = {
+        inputFiles: "sample-cli.json,sample-dir"
       }
-      await expect(outbound.sendTemplate(configuration)).resolves.toBe(undefined)
+      objectStore.set('config', config)
+
+      await expect(outbound.sendTemplate()).resolves.toBe(undefined)
     })
   })
 })
