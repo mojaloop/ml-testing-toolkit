@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -56,6 +57,8 @@ const initServer = () => {
   app.use('/longpolling', require('./api-routes/longpolling'))
   app.use('/api/oauth2', require('./api-routes/oauth2'))
   app.use('/api/reports', require('./api-routes/reports'))
+  app.use('/api/settings', require('./api-routes/settings'))
+  app.use('/api/samples', require('./api-routes/samples'))
 
   // // For front-end UI
   // app.use('/ui', express.static(path.join('client/build')))

@@ -28,13 +28,12 @@ const logger = require('../utils/logger')
 const fStr = require('node-strings')
 const fs = require('fs')
 const { promisify } = require('util')
+const objectStore = require('../objectStore')
 
 const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
 
-let config
-
-const sendTemplate = async (configuration) => {
-  config = configuration
+const sendTemplate = async () => {
+  const config = objectStore.get('config')
   try {
     const readFileAsync = promisify(fs.readFile)
     const readFilesAsync = promisify(fs.readdir)
@@ -57,7 +56,7 @@ const sendTemplate = async (configuration) => {
     }
 
     const template = {
-      inputValues: JSON.parse(await readFileAsync(`${config.environmentFile}`, 'utf8')).inputValues,
+      inputValues: JSON.parse(await readFileAsync(config.environmentFile, 'utf8')).inputValues,
       test_cases: []
     }
     if (collections.length > 1) {
@@ -82,7 +81,7 @@ const sendTemplate = async (configuration) => {
       totalRequests += testCase.requests.length
     })
     bar.start(totalRequests, 0)
-    await axios.post('http://localhost:5050/api/outbound/template/' + outboundRequestID, template, { headers: { 'Content-Type': 'application/json' } })
+    await axios.post(`${config.baseURL}/api/outbound/template/` + outboundRequestID, template, { headers: { 'Content-Type': 'application/json' } })
   } catch (err) {
     console.log(err)
   }
@@ -94,7 +93,7 @@ const handleIncomingProgress = async (progress) => {
     let passed
     try {
       passed = logger.outbound(progress.totalResult)
-      await report.outbound(progress.totalResult, config)
+      await report.outbound(progress.totalResult)
     } catch (err) {
       console.log(err)
       passed = false

@@ -78,6 +78,26 @@ describe('transactionRequestsService', () => {
         sessionID: '123'
       }
     }
+    it('It should not call outboundsend method if the method is not post', async () => {
+      const sampleContext = {}
+      const request = {
+        method: 'put',
+        path: '/transactionRequests'
+      }
+      outbound.OutboundSend.mockClear()
+      await TransactionRequestsService.handleRequest(sampleContext, request, null, null)
+      expect(outbound.OutboundSend).not.toHaveBeenCalled()
+    })
+    it('It should not call outboundsend method if the path is not is not /transactionRequests', async () => {
+      const sampleContext = {}
+      const request = {
+        method: 'post',
+        path: '/transactions'
+      }
+      outbound.OutboundSend.mockClear()
+      await TransactionRequestsService.handleRequest(sampleContext, request, null, null)
+      expect(outbound.OutboundSend).not.toHaveBeenCalled()
+    })
     it('It should call outboundsend method', async () => {
       const sampleContext = {}
       const callback = {
@@ -90,6 +110,10 @@ describe('transactionRequestsService', () => {
       expect(outbound.OutboundSend).toHaveBeenCalled()
     })
     it('It should not call outboundsend method if the callback request state is not RECEIVED', async () => {
+      const request = {
+        method: 'post',
+        path: '/transactionRequests'
+      }
       const sampleContext = {}
       const callback = {
         body: {
@@ -97,7 +121,118 @@ describe('transactionRequestsService', () => {
         }
       }
       outbound.OutboundSend.mockClear()
-      await TransactionRequestsService.handleRequest(sampleContext, request, callback, 'spec_files/api_definitions/fspiop_1.0/trigger_templates')
+      await TransactionRequestsService.handleRequest(sampleContext, request, callback, null)
+      expect(outbound.OutboundSend).not.toHaveBeenCalled()
+    })
+    it('It should call outboundsend method if there is no sessionId', async () => {
+      const requestWithoutSessionId = {
+        method: 'post',
+        path: '/transactionRequests',
+        payload: {
+          transactionRequestId: '57138ef8-17e9-4514-899b-279d805340ff',
+          payee: {
+            partyIdInfo: {
+              partyIdType: 'MSISDN',
+              partyIdentifier: '9876543210',
+              fspId: 'userdfsp'
+            },
+            merchantClassificationCode: '98',
+            name: 'nisi in',
+            personalInfo: {
+              complexName: {
+                firstName: 'User',
+                middleName: 'FSP',
+                lastName: 'DFSP'
+              },
+              dateOfBirth: '1984-01-01'
+            }
+          },
+          payer: {
+            partyIdType: 'MSISDN',
+            partyIdentifier: '44123456789',
+            fspId: 'testingtoolkitdfsp'
+          },
+          amount: {
+            currency: 'USD',
+            amount: '100'
+          },
+          transactionType: {
+            scenario: 'PAYMENT',
+            initiator: 'PAYEE',
+            initiatorType: 'BUSINESS',
+            refundInfo: {
+              originalTransactionId: '168e0f2c-58a3-496a-830a-940534238c81',
+              refundReason: 'Reason'
+            },
+            balanceOfPayments: '968'
+          },
+          note: 'Test Payment'
+        },
+        customInfo: {}
+      }
+      const sampleContext = {}
+      const callback = {
+        body: {
+          transactionRequestState: 'RECEIVED'
+        }
+      }
+      outbound.OutboundSend.mockClear()
+      await TransactionRequestsService.handleRequest(sampleContext, requestWithoutSessionId, callback, 'spec_files/api_definitions/fspiop_1.0/trigger_templates')
+      expect(outbound.OutboundSend).toHaveBeenCalled()
+    })
+    it('It should call outboundsend method if there is no sessionId', async () => {
+      const requestWithoutCustomInfo = {
+        method: 'post',
+        path: '/transactionRequests',
+        payload: {
+          transactionRequestId: '57138ef8-17e9-4514-899b-279d805340ff',
+          payee: {
+            partyIdInfo: {
+              partyIdType: 'MSISDN',
+              partyIdentifier: '9876543210',
+              fspId: 'userdfsp'
+            },
+            merchantClassificationCode: '98',
+            name: 'nisi in',
+            personalInfo: {
+              complexName: {
+                firstName: 'User',
+                middleName: 'FSP',
+                lastName: 'DFSP'
+              },
+              dateOfBirth: '1984-01-01'
+            }
+          },
+          payer: {
+            partyIdType: 'MSISDN',
+            partyIdentifier: '44123456789',
+            fspId: 'testingtoolkitdfsp'
+          },
+          amount: {
+            currency: 'USD',
+            amount: '100'
+          },
+          transactionType: {
+            scenario: 'PAYMENT',
+            initiator: 'PAYEE',
+            initiatorType: 'BUSINESS',
+            refundInfo: {
+              originalTransactionId: '168e0f2c-58a3-496a-830a-940534238c81',
+              refundReason: 'Reason'
+            },
+            balanceOfPayments: '968'
+          },
+          note: 'Test Payment'
+        }
+      }
+      const sampleContext = {}
+      const callback = {
+        body: {
+          transactionRequestState: 'RECEIVED'
+        }
+      }
+      outbound.OutboundSend.mockClear()
+      await TransactionRequestsService.handleRequest(sampleContext, requestWithoutCustomInfo, callback, 'spec_files/api_definitions/fspiop_1.0/trigger_templates')
       expect(outbound.OutboundSend).not.toHaveBeenCalled()
     })
   })

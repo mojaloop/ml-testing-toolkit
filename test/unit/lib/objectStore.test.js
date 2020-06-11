@@ -37,6 +37,14 @@ describe('ObjectStore', () => {
       const result = ObjectStore.searchTransaction('123')
       expect(result).toBe(true)
     })
+    it('Get existing transaction', async () => {
+      const result = ObjectStore.getTransaction('123')
+      expect(result).not.toBe(null)
+    })
+    it('Get not existing transaction', async () => {
+      const result = ObjectStore.getTransaction('1234')
+      expect(result).toBe(null)
+    })
     it('Delete the transaction', async () => {
       expect(() => {
         const result = ObjectStore.deleteTransaction('123')
@@ -48,7 +56,14 @@ describe('ObjectStore', () => {
     })
   })
   describe('Generic Functions', () => {
-    it('Initialize Object Store', async () => {
+    it('Initialize Object Store', async (done) => {
+      const curDate = new Date()
+      const expiredDate = new Date(curDate.setMinutes(curDate.getMinutes() - 10))
+      ObjectStore.set('transactions', {
+        '123': {transactionDate: expiredDate.getTime()},
+        '124': {transactionDate: Date.now()}
+      })
+      setTimeout(() => {done()}, 2000);
       expect(() => {
         const result = ObjectStore.initObjectStore()
       }).not.toThrowError();

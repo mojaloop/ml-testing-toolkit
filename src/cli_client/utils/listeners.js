@@ -24,17 +24,18 @@
 const socketIOClient = require('socket.io-client')
 const outboundMode = require('../modes/outbound')
 const monitoringMode = require('../modes/monitoring')
-
-const uri = 'http://127.0.0.1:5050'
+const objectStore = require('../objectStore')
 
 const outbound = () => {
-  const socket = socketIOClient(uri)
+  const config = objectStore.get('config')
+  const socket = socketIOClient(config.baseURL)
   socket.on('outboundProgress', outboundMode.handleIncomingProgress)
-  console.log('Listening on outboundProgress events...')
+  console.log(`Listening on ${config.baseURL}...`)
 }
 
 const monitoring = () => {
-  const socket = socketIOClient(uri)
+  const config = objectStore.get('config')
+  const socket = socketIOClient(config.baseUrl)
   socket.on('newLog', monitoringMode.handleIncomingProgress)
   console.log('Listening on newLog events...')
 }

@@ -27,6 +27,7 @@ const util = require('util')
 const spyPromisify = jest.spyOn(util, 'promisify')
 const axios = require('axios')
 jest.mock('axios')
+const objectStore = require('../../../src/cli_client/objectStore')
 const report = require('../../../src/cli_client/utils/report')
 
 const data = { 
@@ -39,7 +40,11 @@ describe('Cli client', () => {
   describe('run report functionality', () => {
     it('when the report format is json should not throw an error', async () => {
       spyPromisify.mockReturnValueOnce(jest.fn())
-      await expect(report.outbound(data, {reportFormat: 'json'})).resolves.toBe(undefined)
+      const config = {
+        reportFormat: 'json'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.toBe(undefined)
     })
     it('when the report format is html and reportFilename present should not throw an error', async () => {
       const response = {
@@ -49,7 +54,12 @@ describe('Cli client', () => {
       }
       axios.post.mockReturnValueOnce(response)
       spyPromisify.mockReturnValueOnce(jest.fn())
-      await expect(report.outbound(data, {reportFormat: 'html', reportFilename: 'report'})).resolves.not.toBeNull
+      const config = {
+        reportFormat: 'html',
+        reportFilename: 'report'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.not.toBeNull
     })
     it('when the report format is html and reportFilename not present should not throw an error', async () => {
       const response = {
@@ -59,7 +69,11 @@ describe('Cli client', () => {
       }
       axios.post.mockReturnValueOnce(response)
       spyPromisify.mockReturnValueOnce(jest.fn())
-      await expect(report.outbound(data, {reportFormat: 'html'})).resolves.toBe(undefined)
+      const config = {
+        reportFormat: 'html'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.toBe(undefined)
     })
     it('when the report format is html and content-disposition not present should not throw an error', async () => {
       const response = {
@@ -67,7 +81,11 @@ describe('Cli client', () => {
       }
       axios.post.mockReturnValueOnce(response)
       spyPromisify.mockReturnValueOnce(jest.fn())
-      await expect(report.outbound(data, {reportFormat: 'printhtml'})).resolves.toBe(undefined)
+      const config = {
+        reportFormat: 'printhtml'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.toBe(undefined)
     })
     it('when the report format is html and wrong data not present should not throw an error', async () => {
       const response = {
@@ -77,7 +95,11 @@ describe('Cli client', () => {
       }
       axios.post.mockReturnValueOnce(response)
       spyPromisify.mockReturnValueOnce(jest.fn())
-      await expect(report.outbound(data, {reportFormat: 'printhtml'})).resolves.toBe(undefined)
+      const config = {
+        reportFormat: 'printhtml'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.toBe(undefined)
     })
     it('when the report format is printhtml and reportFilename not present should not throw an error', async () => {
       const response = {
@@ -87,7 +109,11 @@ describe('Cli client', () => {
       }
       axios.post.mockReturnValueOnce(response)
       spyPromisify.mockReturnValueOnce(jest.fn())
-      await expect(report.outbound(data, {reportFormat: 'printhtml'})).resolves.toBe(undefined)
+      const config = {
+        reportFormat: 'printhtml'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.toBe(undefined)
     })
     it('when the report format is printhtml and reportFilename not present should not throw an error', async () => {
       const response = {
@@ -97,10 +123,18 @@ describe('Cli client', () => {
       }
       axios.post.mockReturnValueOnce(response)
       spyPromisify.mockReturnValueOnce(jest.fn())
-      await expect(report.outbound(data, {reportFormat: 'printhtml'})).resolves.toBe(undefined)
+      const config = {
+        reportFormat: 'printhtml'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.toBe(undefined)
     })
     it('when the report format is not supported should not throw an error', async () => {
-      await expect(report.outbound(data, {reportFormat: 'default'})).resolves.toBe(undefined)
+      const config = {
+        reportFormat: 'default'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.toBe(undefined)
     })
   })
 })

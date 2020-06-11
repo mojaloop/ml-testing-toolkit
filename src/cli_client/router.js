@@ -22,6 +22,7 @@
  --------------
  ******/
 const fs = require('fs')
+const objectStore = require('./objectStore')
 
 const cli = (commander) => {
   const configFile = JSON.parse(fs.readFileSync(commander.config || 'cli-default-config.json', 'utf8'))
@@ -31,8 +32,11 @@ const cli = (commander) => {
     inputFiles: commander.inputFiles,
     environmentFile: commander.environmentFile,
     reportFormat: commander.reportFormat || configFile.reportFormat,
-    reportFilename: commander.reportFilename
+    reportFilename: commander.reportFilename,
+    baseURL: commander.baseURL || configFile.baseURL
   }
+
+  objectStore.set('config', config)
 
   switch (config.mode) {
     case 'monitoring':
@@ -42,7 +46,7 @@ const cli = (commander) => {
       if (config.inputFiles) {
         if (config.environmentFile) {
           require('./utils/listeners').outbound()
-          require('./modes/outbound').sendTemplate(config)
+          require('./modes/outbound').sendTemplate()
         } else {
           console.log('error: required option \'-e, --environment-file <environmentFile>\' not specified')
           process.exit(1)

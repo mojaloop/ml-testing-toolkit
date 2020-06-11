@@ -1,5 +1,7 @@
 [
   {
+    "type": "response",
+    "version": 1.0,
     "ruleId": 1,
     "priority": 1,
     "description": "post /settlementWindows/{id}",
@@ -37,6 +39,8 @@
     }
   },
   {
+    "type": "response",
+    "version": 1.0,
     "ruleId": 3,
     "priority": 1,
     "description": "post /settlements",
@@ -102,6 +106,8 @@
     }
   },
   {
+    "type": "response",
+    "version": 1.0,
     "ruleId": 4,
     "priority": 1,
     "description": "get /settlements/{id}",
@@ -167,6 +173,8 @@
     }
   },
   {
+    "type": "response",
+    "version": 1.0,
     "ruleId": 5,
     "priority": 1,
     "description": "get /settlementWindows",

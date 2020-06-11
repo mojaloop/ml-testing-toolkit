@@ -58,4 +58,11 @@ describe('TraceHeaderUtils', () => {
       expect(result).toEqual('14d5b207d3ba722c6c0fdcd4')
     })
   })
+  describe('getTraceIdPrefix', () => {
+    it('Should get the session ID properly', () => {
+      const result = TraceHeaderUtils.getTraceIdPrefix()
+      console.log(result)
+      expect(result).toBeDefined()
+    })
+  })
 })

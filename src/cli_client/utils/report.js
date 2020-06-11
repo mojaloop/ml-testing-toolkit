@@ -24,8 +24,10 @@
 const axios = require('axios').default
 const fs = require('fs')
 const { promisify } = require('util')
+const objectStore = require('../objectStore')
 
-const outbound = async (data, config) => {
+const outbound = async (data) => {
+  const config = objectStore.get('config')
   const writeFileAsync = promisify(fs.writeFile)
   let reportData
   let reportFilename
@@ -36,7 +38,7 @@ const outbound = async (data, config) => {
       break
     case 'html':
     case 'printhtml': {
-      const response = await axios.post(`http://localhost:5050/api/reports/testcase/${config.reportFormat}`, data, { headers: { 'Content-Type': 'application/json' } })
+      const response = await axios.post(`${config.baseURL}/api/reports/testcase/${config.reportFormat}`, data, { headers: { 'Content-Type': 'application/json' } })
       reportData = response.data
       if (config.reportFilename) {
         reportFilename = config.reportFilename

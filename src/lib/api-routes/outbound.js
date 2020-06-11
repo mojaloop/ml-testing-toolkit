@@ -96,28 +96,4 @@ router.delete('/template/:traceID', async (req, res, next) => {
   }
 })
 
-// Route to get all collections and environments filenames
-// query param 'type': supported values: 'hub', 'dfsp'
-router.get('/samples', async (req, res, next) => {
-  try {
-    const outbound = require('../test-outbound/outbound-initiator')
-    const filenames = await outbound.loadSamplesFilenames(req.query.type)
-    return res.status(200).json({ status: 'OK', body: filenames })
-  } catch (err) {
-    next(err)
-  }
-})
-
-// Route to load a sample
-// query param 'collections' should have at least 1 object
-router.get('/samples/data', async (req, res, next) => {
-  try {
-    const outbound = require('../test-outbound/outbound-initiator')
-    const files = await outbound.loadSamplesContent(req.query)
-    return res.status(200).json({ status: 'OK', body: files })
-  } catch (err) {
-    next(err)
-  }
-})
-
 module.exports = router

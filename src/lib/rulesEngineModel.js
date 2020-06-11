@@ -33,6 +33,7 @@ const accessFileAsync = promisify(fs.access)
 const readDirAsync = promisify(fs.readdir)
 const deleteFileAsync = promisify(fs.unlink)
 const customLogger = require('./requestLogger')
+const Config = require('./config')
 // const _ = require('lodash')
 
 const rulesResponseFilePathPrefix = 'spec_files/rules_response/'
@@ -213,8 +214,20 @@ const getResponseRulesFileContent = async (fileName) => {
   return JSON.parse(rulesRawdata)
 }
 
+const addTypeAndVersion = (ruleType, fileContent) => {
+  for (const index in fileContent) {
+    if (!fileContent[index].type) {
+      fileContent[index].type = ruleType
+    }
+    if (!fileContent[index].version) {
+      fileContent[index].version = parseFloat(Config.getSystemConfig().CONFIG_VERSIONS[ruleType])
+    }
+  }
+}
+
 const setResponseRulesFileContent = async (fileName, fileContent) => {
   try {
+    addTypeAndVersion('response', fileContent)
     await writeFileAsync(rulesResponseFilePathPrefix + fileName, JSON.stringify(fileContent, null, 2))
     await reloadResponseRules()
     return true
@@ -256,6 +269,7 @@ const getValidationRulesFileContent = async (fileName) => {
 
 const setValidationRulesFileContent = async (fileName, fileContent) => {
   try {
+    addTypeAndVersion('validation', fileContent)
     await writeFileAsync(rulesValidationFilePathPrefix + fileName, JSON.stringify(fileContent, null, 2))
     await reloadValidationRules()
     return true
@@ -297,6 +311,7 @@ const getCallbackRulesFileContent = async (fileName) => {
 
 const setCallbackRulesFileContent = async (fileName, fileContent) => {
   try {
+    addTypeAndVersion('callback', fileContent)
     await writeFileAsync(rulesCallbackFilePathPrefix + fileName, JSON.stringify(fileContent, null, 2))
     await reloadCallbackRules()
     return true

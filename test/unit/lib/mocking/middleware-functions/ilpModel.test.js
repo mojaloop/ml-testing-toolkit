@@ -131,6 +131,22 @@ describe('ILP Model', () => {
       expect(response.body).toHaveProperty('condition')
       expect(fulfilment.length).toBeGreaterThan(5)
     })
+    it('handleQuoteIlp should return null', () => {
+      const sampleContext = {
+        request: {
+          method: 'put',
+          path: '/quotes',
+          body: {...quoteRequestBody}
+        }
+      }
+      let response = {
+        method: 'put',
+        path: '/quotes/f27456e9-fffb-47c0-9f28-5c727434873d',
+        body: {...quotePartResponseBody}
+      }
+      const fulfilment = IlpModel.handleQuoteIlp(sampleContext, response)
+      expect(fulfilment).toBe(null)
+    })
     it('handleTransferIlp should append fulfilment', () => {
       const sampleContext = {
         request: {
@@ -222,6 +238,24 @@ describe('ILP Model', () => {
       const result = IlpModel.validateTransferIlpPacket(sampleContext, sampleRequest)
       expect(result).toBe(false)
     })
+    it('validateTransferIlpPacket should return true', () => {
+      const sampleRequest = {
+        payload: {
+          ...transferPartRequestBody,
+          ilpPacket: 'asdf'
+        },
+        method: 'put',
+        path: '/transfers',
+        customInfo: {
+          sessionID: '123'
+        }
+      }
+      const sampleContext = {
+        request: sampleRequest
+      }
+      const result = IlpModel.validateTransferIlpPacket(sampleContext, sampleRequest)
+      expect(result).toBe(true)
+    })
     it('validateTransferCondition should validate the ilpPacket', () => {
       const sampleRequest = {
         payload: {
@@ -281,6 +315,51 @@ describe('ILP Model', () => {
       }
       const result = IlpModel.validateTransferCondition(sampleContext, sampleRequest)
       expect(result).toBe(false)
+    })
+    it('validateTransferCondition should fail with wrong condition if calculateFulfil throws an error', () => {
+      const sampleRequest = {
+        method: 'post',
+        path: '/transfers',
+        customInfo: {
+          sessionID: '123'
+        }
+      }
+      const sampleContext = {
+        request: sampleRequest
+      }
+      const result = IlpModel.validateTransferCondition(sampleContext, sampleRequest)
+      expect(result).toBe(false)
+    })
+    it('validateTransferCondition should fail with wrong condition if calculateFulfil throws an error', () => {
+      const sampleRequest = {
+        method: 'post',
+        path: '/transfers',
+        customInfo: {
+          sessionID: '123',
+          storedTransaction: {
+            fulfilment: {}
+          }
+        }
+      }
+      const sampleContext = {
+        request: sampleRequest
+      }
+      const result = IlpModel.validateTransferCondition(sampleContext, sampleRequest)
+      expect(result).toBe(false)
+    })
+    it('validateTransferCondition should return true if method is not post', () => {
+      const sampleRequest = {
+        method: 'put',
+        path: '/transfers',
+        customInfo: {
+          sessionID: '123'
+        }
+      }
+      const sampleContext = {
+        request: sampleRequest
+      }
+      const result = IlpModel.validateTransferCondition(sampleContext, sampleRequest)
+      expect(result).toBe(true)
     })
     it('getIlpTransactionObject should return transaction object', () => {
 
