@@ -31,10 +31,8 @@ const Config = require('../config')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
 const fs = require('fs')
-const { files } = require('node-dir')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
-const dirFilesAsync = promisify(files)
 const expect = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
 const traceHeaderUtils = require('../traceHeaderUtils')
@@ -593,63 +591,6 @@ const generateFinalReport = (inputTemplate, runtimeInformation) => {
   }
 }
 
-// load collections or environments
-const loadSamplesCollectionsOrEnvironments = async (exampleType, type) => {
-  let data
-  if (type) {
-    data = await dirFilesAsync(`examples/${exampleType}/${type}`)
-  } else {
-    data = await dirFilesAsync(`examples/${exampleType}`)
-  }
-  const list = []
-  for (const index in data) {
-    if (data[index].endsWith('.json')) {
-      list.push(data[index])
-    }
-  }
-  return list
-}
-
-// load samples content
-const loadSamplesContent = async (queryParams) => {
-  const collections = []
-  if (queryParams.collections) {
-    for (const i in queryParams.collections) {
-      collections.push(JSON.parse(await readFileAsync(queryParams.collections[i], 'utf8')))
-    }
-  }
-
-  const sample = {
-    name: null,
-    inputValues: null,
-    test_cases: null
-  }
-
-  if (queryParams.environment) {
-    sample.inputValues = JSON.parse(await readFileAsync(queryParams.environment, 'utf8')).inputValues
-  }
-
-  if (collections.length > 1) {
-    sample.name = 'multi'
-    sample.test_cases = []
-    let index = 1
-    collections.forEach(collection => {
-      collection.test_cases.forEach(testCase => {
-        const { id, ...remainingTestCaseProps } = testCase
-        sample.test_cases.push({
-          id: index++,
-          ...remainingTestCaseProps
-        })
-      })
-    })
-  } else if (collections.length === 1) {
-    sample.name = collections[0].name
-    sample.test_cases = collections[0].test_cases
-  }
-
-  return sample
-}
-
 module.exports = {
   OutboundSend,
   terminateOutbound,
@@ -660,7 +601,5 @@ module.exports = {
   replaceEnvironmentVariables,
   replacePathVariables,
   getFunctionResult,
-  generateFinalReport,
-  loadSamplesCollectionsOrEnvironments,
-  loadSamplesContent
+  generateFinalReport
 }

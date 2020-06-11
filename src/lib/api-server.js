@@ -58,6 +58,7 @@ const initServer = () => {
   app.use('/api/oauth2', require('./api-routes/oauth2'))
   app.use('/api/reports', require('./api-routes/reports'))
   app.use('/api/settings', require('./api-routes/settings'))
+  app.use('/api/samples', require('./api-routes/samples'))
 
   // // For front-end UI
   // app.use('/ui', express.static(path.join('client/build')))

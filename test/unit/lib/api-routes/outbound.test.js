@@ -113,26 +113,4 @@ describe('API route /api/outbound', () => {
       expect(res.statusCode).toEqual(200)
     })
   })
-  describe('GET /api/outbound/samples', () => {
-    it('Send a proper request', async () => {
-      const res = await request(app).get(`/api/outbound/samples`).send()
-      expect(res.statusCode).toEqual(200)
-    })
-    it('Send a proper request with type: hub', async () => {
-      const res = await request(app).get(`/api/outbound/samples?type=hub`).send()
-      expect(res.statusCode).toEqual(200)
-    })
-  })
-  describe('GET /api/outbound/samples/data', () => {
-    it('Send a proper request with missing collections query param', async () => {
-      const res = await request(app).get(`/api/outbound/samples`).query({
-        collections: [
-          'examples/collections/hub/hub_1_p2p_fundsinout_block_transfers.json',
-          'examples/collections/hub/hub_2_settlements.json'
-        ],
-        environment: 'examples/environments/hub_local_environment.json'
-      }).send()
-      expect(res.statusCode).toEqual(200)
-    })
-  })
 })
