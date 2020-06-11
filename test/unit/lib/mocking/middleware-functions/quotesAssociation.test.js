@@ -119,6 +119,14 @@ describe('QuotesAssociation', () => {
       QuotesAssociation.handleTransfers(sampleContext, request)
       expect(ObjectStore.searchTransaction).not.toHaveBeenCalledWith('123')
     })
-
+    it('It should not call searchTransaction if there is no payload', () => {
+      const sampleContext = {}
+      const request = {
+        method: 'post',
+        path: '/asdf'
+      }
+      QuotesAssociation.handleTransfers(sampleContext, request)
+      expect(ObjectStore.searchTransaction).not.toHaveBeenCalledWith('123')
+    })
   })
 })

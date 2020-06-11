@@ -125,7 +125,7 @@ describe('API route /api/outbound', () => {
   })
   describe('GET /api/outbound/samples/data', () => {
     it('Send a proper request with missing collections query param', async () => {
-      const res = await request(app).get(`/api/outbound/samples/data`).query({
+      const res = await request(app).get(`/api/outbound/samples`).query({
         collections: [
           'examples/collections/hub/hub_1_p2p_fundsinout_block_transfers.json',
           'examples/collections/hub/hub_2_settlements.json'

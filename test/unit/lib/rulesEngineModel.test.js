@@ -25,6 +25,7 @@
 'use strict'
 
 const RulesEngineModel = require('../../../src/lib/rulesEngineModel')
+require('../../../src/lib/config').loadSystemConfig()
 
 describe('RulesEngineModel', () => {
   describe('Validation Rules', () => {
