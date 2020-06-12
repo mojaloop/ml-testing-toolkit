@@ -353,5 +353,8 @@ module.exports = {
   deleteCallbackRulesFile,
   setActiveValidationRulesFile,
   setActiveCallbackRulesFile,
-  setActiveResponseRulesFile
+  setActiveResponseRulesFile,
+  reloadResponseRules,
+  reloadCallbackRules,
+  reloadValidationRules
 }
