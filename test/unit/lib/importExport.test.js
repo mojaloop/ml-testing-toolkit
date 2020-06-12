@@ -229,11 +229,4 @@ describe('importExport', () => {
       }).not.toThrowError();
     })
   })
-  describe('reload should not throw an error when', () => {
-    it('option not exists', async () => {
-      expect(() => {
-        importExport.reload(['not_existings_option'])
-      }).not.toThrowError();
-    })
-  })
 })

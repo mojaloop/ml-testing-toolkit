@@ -23,9 +23,11 @@
  ******/
 
 const express = require('express')
-const importExport = require('../importExport')
-
 const router = new express.Router()
+const Config = require('../config')
+const Server = require('../../server')
+const importExport = require('../importExport')
+const RulesEngineModel = require('../rulesEngineModel')
 
 // export and import from spec files
 
@@ -43,7 +45,27 @@ router.get('/export', async (req, res, next) => {
 
 router.post('/import', async (req, res, next) => {
   try {
-    await importExport.importSpecFiles(req.body.buffer, req.query.options)
+    const options = req.query.options
+    await importExport.importSpecFiles(req.body.buffer, options)
+    for (const index in options) {
+      switch (options[index]) {
+        case 'rules_response': await RulesEngineModel.reloadResponseRules(); break
+        case 'rules_callback': await RulesEngineModel.reloadCallbackRules(); break
+        case 'rules_validation': await RulesEngineModel.reloadValidationRules(); break
+        case 'user_config.json': {
+          const runtime = await Config.getUserConfig()
+          const stored = await Config.getStoredUserConfig()
+          let reloadServer = false
+          if (runtime.INBOUND_MUTUAL_TLS_ENABLED !== stored.INBOUND_MUTUAL_TLS_ENABLED) {
+            reloadServer = true
+          }
+          await Config.loadUserConfig()
+          if (reloadServer) {
+            Server.restartServer()
+          }
+        }
+      }
+    }
     res.status(200).json({ status: 'OK' })
   } catch (err) {
     res.status(400).send(err.message)
