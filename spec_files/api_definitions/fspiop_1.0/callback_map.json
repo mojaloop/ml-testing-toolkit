@@ -72,7 +72,9 @@
           "transferAmount": {
             "currency": "{$request.body.amount.currency}",
             "amount": "{$request.body.amount.amount}"
-          }
+          },
+          "expiration": "2040-01-01T01:01:01.001Z",
+          "extensionList": null
         }
       },
       "errorCallback": {
