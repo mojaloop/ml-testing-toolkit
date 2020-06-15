@@ -38,18 +38,15 @@ describe('API route /api/rules', () => {
       })
     })
     describe('GET /api/rules/files/validation/:fileName', () => {
-      let activeRulesFile
       it('Getting all rules files', async () => {
         const res = await request(app).get(`/api/rules/files/validation`)
         expect(res.statusCode).toEqual(200)
         expect(res.body).toHaveProperty('files')
         expect(res.body).toHaveProperty('activeRulesFile')
-        activeRulesFile = res.body.activeRulesFile
-      })
-      it('Getting the activated rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/validation/${activeRulesFile}`)
-        expect(res.statusCode).toEqual(200)
-        expect(Array.isArray(res.body)).toBe(true)
+
+        const resActive = await request(app).get(`/api/rules/files/validation/${res.body.activeRulesFile}`)
+        expect(resActive.statusCode).toEqual(200)
+        expect(Array.isArray(resActive.body)).toBe(true)
       })
     })
     describe('PUT /api/rules/files/validation/:fileName', () => {
@@ -60,11 +57,10 @@ describe('API route /api/rules', () => {
       it('Create a test file', async () => {
         const res = await request(app).put(`/api/rules/files/validation/test1.json`).send([])
         expect(res.statusCode).toEqual(200)
-      })
-      it('Getting the test rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/validation/test1.json`)
-        expect(res.statusCode).toEqual(200)
-        expect(Array.isArray(res.body)).toBe(true)
+
+        const resGet = await request(app).get(`/api/rules/files/validation/test1.json`)
+        expect(resGet.statusCode).toEqual(200)
+        expect(Array.isArray(resGet.body)).toBe(true)
       })
       it('Getting the wrong rule file', async () => {
         const res = await request(app).get(`/api/rules/files/validation/test2.json`)
@@ -79,21 +75,25 @@ describe('API route /api/rules', () => {
             fileName: 'test1.json'
           })
         expect(res.statusCode).toEqual(200)
-      })
-      it('Checking active rules file is test1.json', async () => {
-        const res = await request(app).get(`/api/rules/files/validation`)
-        expect(res.statusCode).toEqual(200)
-        expect(res.body).toHaveProperty('files')
-        expect(res.body).toHaveProperty('activeRulesFile')
-        expect(res.body.activeRulesFile).toEqual('test1.json')
-      })
-      it('Restore active rules file to default', async () => {
-        const res = await request(app).put(`/api/rules/files/validation`)
+
+        const resGet = await request(app).get(`/api/rules/files/validation`)
+        expect(resGet.statusCode).toEqual(200)
+        expect(resGet.body).toHaveProperty('files')
+        expect(resGet.body).toHaveProperty('activeRulesFile')
+        expect(resGet.body.activeRulesFile).toEqual('test1.json')
+
+        const resRestore = await request(app).put(`/api/rules/files/validation`)
           .send({
             type: 'activeRulesFile',
             fileName: 'default.json'
           })
-        expect(res.statusCode).toEqual(200)
+        expect(resRestore.statusCode).toEqual(200)
+
+        const resDelete = await request(app).delete(`/api/rules/files/validation/test1.json`)
+        expect(resDelete.statusCode).toEqual(200)
+
+        const resGetDeleted = await request(app).get(`/api/rules/files/validation/test1.json`)
+        expect(resGetDeleted.statusCode).toEqual(500)
       })
     })
     it('Update active rules file, wrong format', async () => {
@@ -103,16 +103,6 @@ describe('API route /api/rules', () => {
           fileName: 'test1.json'
         })
       expect(res.statusCode).toEqual(500)
-    })
-    describe('DELETE /api/rules/files/validation/:fileName', () => {
-      it('Delete the test file', async () => {
-        const res = await request(app).delete(`/api/rules/files/validation/test1.json`)
-        expect(res.statusCode).toEqual(200)
-      })
-      it('Getting the test rule file which is deleted', async () => {
-        const res = await request(app).get(`/api/rules/files/validation/test1.json`)
-        expect(res.statusCode).toEqual(500)
-      })
     })
   })
 
@@ -126,29 +116,24 @@ describe('API route /api/rules', () => {
       })
     })
     describe('GET /api/rules/files/callback/:fileName', () => {
-      let activeRulesFile
       it('Getting all rules files', async () => {
-        const res = await request(app).get(`/api/rules/files/callback`)
-        expect(res.statusCode).toEqual(200)
-        expect(res.body).toHaveProperty('files')
-        expect(res.body).toHaveProperty('activeRulesFile')
-        activeRulesFile = res.body.activeRulesFile
-      })
-      it('Getting the activated rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/callback/${activeRulesFile}`)
-        expect(res.statusCode).toEqual(200)
-        expect(Array.isArray(res.body)).toBe(true)
+        const resCallback = await request(app).get(`/api/rules/files/callback`)
+        expect(resCallback.statusCode).toEqual(200)
+        expect(resCallback.body).toHaveProperty('files')
+        expect(resCallback.body).toHaveProperty('activeRulesFile')
+        const resActiveCallback = await request(app).get(`/api/rules/files/callback/${resCallback.body.activeRulesFile}`)
+        expect(resActiveCallback.statusCode).toEqual(200)
+        expect(Array.isArray(resActiveCallback.body)).toBe(true)
       })
     })
     describe('PUT /api/rules/files/callback/:fileName', () => {
       it('Create a test file', async () => {
         const res = await request(app).put(`/api/rules/files/callback/test1.json`).send([])
         expect(res.statusCode).toEqual(200)
-      })
-      it('Getting the test rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/callback/test1.json`)
-        expect(res.statusCode).toEqual(200)
-        expect(Array.isArray(res.body)).toBe(true)
+
+        const resGet = await request(app).get(`/api/rules/files/callback/test1.json`)
+        expect(resGet.statusCode).toEqual(200)
+        expect(Array.isArray(resGet.body)).toBe(true)
       })
       it('Getting the wrong rule file', async () => {
         const res = await request(app).get(`/api/rules/files/callback/test2.json`)
@@ -157,27 +142,31 @@ describe('API route /api/rules', () => {
     })
     describe('UPDATE /api/rules/files/callback', () => {
       it('Update active rules file', async () => {
-        const res = await request(app).put(`/api/rules/files/callback`)
+        const resCreate = await request(app).put(`/api/rules/files/callback`)
           .send({
             type: 'activeRulesFile',
             fileName: 'test1.json'
           })
-        expect(res.statusCode).toEqual(200)
-      })
-      it('Checking active rules file is test1.json', async () => {
-        const res = await request(app).get(`/api/rules/files/callback`)
-        expect(res.statusCode).toEqual(200)
-        expect(res.body).toHaveProperty('files')
-        expect(res.body).toHaveProperty('activeRulesFile')
-        expect(res.body.activeRulesFile).toEqual('test1.json')
-      })
-      it('Restore active rules file to default', async () => {
-        const res = await request(app).put(`/api/rules/files/callback`)
+        expect(resCreate.statusCode).toEqual(200)
+
+        const resGet = await request(app).get(`/api/rules/files/callback`)
+        expect(resGet.statusCode).toEqual(200)
+        expect(resGet.body).toHaveProperty('files')
+        expect(resGet.body).toHaveProperty('activeRulesFile')
+        expect(resGet.body.activeRulesFile).toEqual('test1.json')
+
+        const resRestore = await request(app).put(`/api/rules/files/callback`)
           .send({
             type: 'activeRulesFile',
             fileName: 'default.json'
           })
-        expect(res.statusCode).toEqual(200)
+        expect(resRestore.statusCode).toEqual(200)
+
+        const resDelete = await request(app).delete(`/api/rules/files/callback/test1.json`)
+        expect(resDelete.statusCode).toEqual(200)
+
+        const resGetDeleted = await request(app).get(`/api/rules/files/callback/test1.json`)
+        expect(resGetDeleted.statusCode).toEqual(500)
       })
       it('Update active rules file, wrong format', async () => {
         const res = await request(app).put(`/api/rules/files/callback`)
@@ -185,16 +174,6 @@ describe('API route /api/rules', () => {
             type: 'activeRulesWrong',
             fileName: 'test1.json'
           })
-        expect(res.statusCode).toEqual(500)
-      })
-    })
-    describe('DELETE /api/rules/files/callback/:fileName', () => {
-      it('Delete the test file', async () => {
-        const res = await request(app).delete(`/api/rules/files/callback/test1.json`)
-        expect(res.statusCode).toEqual(200)
-      })
-      it('Getting the test rule file which is deleted', async () => {
-        const res = await request(app).get(`/api/rules/files/callback/test1.json`)
         expect(res.statusCode).toEqual(500)
       })
     })
@@ -217,22 +196,20 @@ describe('API route /api/rules', () => {
         expect(res.body).toHaveProperty('files')
         expect(res.body).toHaveProperty('activeRulesFile')
         activeRulesFile = res.body.activeRulesFile
-      })
-      it('Getting the activated rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/response/${activeRulesFile}`)
-        expect(res.statusCode).toEqual(200)
-        expect(Array.isArray(res.body)).toBe(true)
+
+        const resActive = await request(app).get(`/api/rules/files/response/${activeRulesFile}`)
+        expect(resActive.statusCode).toEqual(200)
+        expect(Array.isArray(resActive.body)).toBe(true)
       })
     })
     describe('PUT /api/rules/files/response/:fileName', () => {
       it('Create a test file', async () => {
         const res = await request(app).put(`/api/rules/files/response/test1.json`).send([])
         expect(res.statusCode).toEqual(200)
-      })
-      it('Getting the test rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/response/test1.json`)
-        expect(res.statusCode).toEqual(200)
-        expect(Array.isArray(res.body)).toBe(true)
+
+        const resGet = await request(app).get(`/api/rules/files/response/test1.json`)
+        expect(resGet.statusCode).toEqual(200)
+        expect(Array.isArray(resGet.body)).toBe(true)
       })
       it('Getting the wrong rule file', async () => {
         const res = await request(app).get(`/api/rules/files/response/test2.json`)
@@ -247,21 +224,25 @@ describe('API route /api/rules', () => {
             fileName: 'test1.json'
           })
         expect(res.statusCode).toEqual(200)
-      })
-      it('Checking active rules file is test1.json', async () => {
-        const res = await request(app).get(`/api/rules/files/response`)
-        expect(res.statusCode).toEqual(200)
-        expect(res.body).toHaveProperty('files')
-        expect(res.body).toHaveProperty('activeRulesFile')
-        expect(res.body.activeRulesFile).toEqual('test1.json')
-      })
-      it('Restore active rules file to default', async () => {
-        const res = await request(app).put(`/api/rules/files/response`)
+
+        const resGet = await request(app).get(`/api/rules/files/response`)
+        expect(resGet.statusCode).toEqual(200)
+        expect(resGet.body).toHaveProperty('files')
+        expect(resGet.body).toHaveProperty('activeRulesFile')
+        expect(resGet.body.activeRulesFile).toEqual('test1.json')
+
+        const resRestore = await request(app).put(`/api/rules/files/response`)
           .send({
             type: 'activeRulesFile',
             fileName: 'default.json'
           })
-        expect(res.statusCode).toEqual(200)
+        expect(resRestore.statusCode).toEqual(200)
+
+        const resDelete = await request(app).delete(`/api/rules/files/response/test1.json`)
+        expect(resDelete.statusCode).toEqual(200)
+
+        const resGetDeleted = await request(app).get(`/api/rules/files/response/test1.json`)
+        expect(resGetDeleted.statusCode).toEqual(500)
       })
       it('Update active rules file, wrong format', async () => {
         const res = await request(app).put(`/api/rules/files/response`)
@@ -269,16 +250,6 @@ describe('API route /api/rules', () => {
             type: 'activeRulesWrong',
             fileName: 'test1.json'
           })
-        expect(res.statusCode).toEqual(500)
-      })
-    })
-    describe('DELETE /api/rules/files/response/:fileName', () => {
-      it('Delete the test file', async () => {
-        const res = await request(app).delete(`/api/rules/files/response/test1.json`)
-        expect(res.statusCode).toEqual(200)
-      })
-      it('Getting the test rule file which is deleted', async () => {
-        const res = await request(app).get(`/api/rules/files/response/test1.json`)
         expect(res.statusCode).toEqual(500)
       })
     })
