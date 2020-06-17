@@ -22,25 +22,83 @@
  --------------
  ******/
 
+const Util = require('util')
+
+const spyPromisify = jest.spyOn(Util, 'promisify')
+
 const loadSamples = require('../../../src/lib/loadSamples')
 
 describe('loadSamples', () => { 
-  describe('loadSamples should not throw an error when', () => {
-    it('sample name should not be \'multi\' if there is only 1 collection', async () => {
+  describe('getSample should not throw an error when', () => {
+    it('sample name should be \'multi\' if there is more than one collection', async () => {
       const queryParams = {
-        collections: [
-          'examples/collections/hub/hub_1_p2p_fundsinout_block_transfers.json'
-        ]
+        collections: ['collection-1.json', 'collection-2.json'],
+        environment: 'environment.json'
       }
-      const sample = await loadSamples.getSample(queryParams)
-      expect(sample.name).not.toBe('multi');
+      spyPromisify
+        .mockReturnValueOnce(() => {return JSON.stringify({
+            name: queryParams.collections[0],
+            test_cases: [{id: 1}]
+        })})
+        .mockReturnValueOnce(() => {return JSON.stringify({
+            name: queryParams.collections[1],
+            test_cases: [{id: 1}]
+        })})
+        .mockReturnValueOnce(() => {return JSON.stringify({inputValues: {}})})
+      const sample = await loadSamples.getSample(queryParams)      
+      expect(sample).toStrictEqual({
+        name: 'multi',
+        inputValues: {},
+        test_cases: [{id : 1}, {id : 2}]
+      })
     })
     it('sample name should not be \'multi\' if there is only 1 collection', async () => {
+      const queryParams = {
+        collections: ['collection.json']
+      }
+      spyPromisify
+        .mockReturnValueOnce(() => {return JSON.stringify({
+          name: queryParams.collections[0],
+          test_cases: [{id: 1}]
+        })})
+      const sample = await loadSamples.getSample(queryParams)
+      expect(sample).toStrictEqual({
+        name: queryParams.collections[0],
+        inputValues: null,
+        test_cases: [{id: 1}]
+      })
+    })
+    it('sample name should be null if there is are no collections', async () => {
       const queryParams = {
         collections: []
       }
       const sample = await loadSamples.getSample(queryParams)
-      expect(sample.name).toBeNull();
+      expect(sample).toStrictEqual({
+        name: null,
+        inputValues: null,
+        test_cases: null
+      })
+    })
+    it('sample name should be null if collections is null', async () => {
+      const queryParams = {
+        collections: null
+      }
+      const sample = await loadSamples.getSample(queryParams)
+      expect(sample).toStrictEqual({
+        name: null,
+        inputValues: null,
+        test_cases: null
+      })
+    })
+  })
+  describe('getCollectionsOrEnvironments should not throw an error when', () => {
+    it('sample name should be \'multi\' if there is more than one collection', async () => {
+      spyPromisify
+        .mockReturnValueOnce(() => {return [
+          "sample.json", "sampleFolder"
+        ]})
+      const collectionsOrEnvironments = await loadSamples.getCollectionsOrEnvironments('exampleType', 'type')
+      expect(collectionsOrEnvironments).toStrictEqual([ 'sample.json' ]);
     })
   })
 })

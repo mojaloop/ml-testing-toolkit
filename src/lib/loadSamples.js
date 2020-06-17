@@ -24,24 +24,11 @@
 const fs = require('fs')
 const { files } = require('node-dir')
 const { promisify } = require('util')
-const readFileAsync = promisify(fs.readFile)
-const dirFilesAsync = promisify(files)
 
 // load collections or environments
 const getCollectionsOrEnvironments = async (exampleType, type) => {
-  let data
-  if (type) {
-    data = await dirFilesAsync(`examples/${exampleType}/${type}`)
-  } else {
-    data = await dirFilesAsync(`examples/${exampleType}`)
-  }
-  const list = []
-  for (const index in data) {
-    if (data[index].endsWith('.json')) {
-      list.push(data[index])
-    }
-  }
-  return list
+  const data = await promisify(files)(`examples/${exampleType}/${type}`)
+  return data.filter(filename => filename.endsWith('.json'))
 }
 
 // load samples content
@@ -49,10 +36,10 @@ const getSample = async (queryParams) => {
   const collections = []
   if (queryParams.collections) {
     for (const i in queryParams.collections) {
-      collections.push(JSON.parse(await readFileAsync(queryParams.collections[i], 'utf8')))
+      const collection = await promisify(fs.readFile)(queryParams.collections[i], 'utf8')
+      collections.push(JSON.parse(collection))
     }
   }
-
   const sample = {
     name: null,
     inputValues: null,
@@ -60,7 +47,7 @@ const getSample = async (queryParams) => {
   }
 
   if (queryParams.environment) {
-    sample.inputValues = JSON.parse(await readFileAsync(queryParams.environment, 'utf8')).inputValues
+    sample.inputValues = JSON.parse(await promisify(fs.readFile)(queryParams.environment, 'utf8')).inputValues
   }
 
   if (collections.length > 1) {
@@ -80,7 +67,6 @@ const getSample = async (queryParams) => {
     sample.name = collections[0].name
     sample.test_cases = collections[0].test_cases
   }
-
   return sample
 }
 
