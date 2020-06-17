@@ -25,10 +25,8 @@
 const fs = require('fs')
 const { promisify } = require('util')
 const AdmZip = require('adm-zip')
-const rmDirAsync = promisify(fs.rmdir)
 const Config = require('./config')
 const { Engine } = require('json-rules-engine')
-
 const CONFIG_FILE_NAME = 'config.json'
 
 const exportSpecFiles = async (ruleTypes) => {
@@ -98,8 +96,6 @@ const validateInputData = (zipEntries, options) => {
           }
           break
         }
-        default:
-          // ignore
       }
     }
   })
@@ -117,6 +113,7 @@ const extractData = async (zip, options, entries) => {
         const entry = entries[index]
         if (entry.startsWith(option)) {
           if (!deleted) {
+            const rmDirAsync = promisify(fs.rmdir)
             await rmDirAsync(`spec_files/${option}`, { recursive: true })
             deleted = true
           }
@@ -135,6 +132,5 @@ const importSpecFiles = async (data, options) => {
 
 module.exports = {
   exportSpecFiles,
-  importSpecFiles,
-  validateRules
+  importSpecFiles
 }
