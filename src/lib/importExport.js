@@ -25,11 +25,8 @@
 const fs = require('fs')
 const { promisify } = require('util')
 const AdmZip = require('adm-zip')
-const rmDirAsync = promisify(fs.rmdir)
 const Config = require('./config')
 const { Engine } = require('json-rules-engine')
-const Server = require('../server')
-
 const CONFIG_FILE_NAME = 'config.json'
 
 const exportSpecFiles = async (ruleTypes) => {
@@ -65,10 +62,7 @@ const validateRules = (entryName, ruleType, ruleVersion, rules) => {
   })
 }
 
-const importSpecFiles = async (data, options) => {
-  const zip = new AdmZip(Buffer.from(data))
-  const zipEntries = zip.getEntries()
-
+const validateInputData = (zipEntries, options) => {
   const entries = []
   zipEntries.forEach((zipEntry) => {
     const entryName = zipEntry.entryName
@@ -102,31 +96,24 @@ const importSpecFiles = async (data, options) => {
           }
           break
         }
-        default:
-          // ignore
       }
     }
   })
+  return entries
+}
+
+const extractData = async (zip, options, entries) => {
   for (const index in options) {
     const option = options[index]
     if (option === 'user_config.json') {
       zip.extractEntryTo(option, 'spec_files', false, true)
-      const runtime = await Config.getUserConfig()
-      const stored = await Config.getStoredUserConfig()
-      let reloadServer = false
-      if (runtime.INBOUND_MUTUAL_TLS_ENABLED !== stored.INBOUND_MUTUAL_TLS_ENABLED) {
-        reloadServer = true
-      }
-      await Config.loadUserConfig()
-      if (reloadServer) {
-        Server.restartServer()
-      }
     } else {
-      let deleted
+      let deleted = false
       for (const index in entries) {
         const entry = entries[index]
         if (entry.startsWith(option)) {
           if (!deleted) {
+            const rmDirAsync = promisify(fs.rmdir)
             await rmDirAsync(`spec_files/${option}`, { recursive: true })
             deleted = true
           }
@@ -137,8 +124,13 @@ const importSpecFiles = async (data, options) => {
   }
 }
 
+const importSpecFiles = async (data, options) => {
+  const zip = new AdmZip(Buffer.from(data))
+  const entries = validateInputData(zip.getEntries(), options)
+  await extractData(zip, options, entries)
+}
+
 module.exports = {
   exportSpecFiles,
-  importSpecFiles,
-  validateRules
+  importSpecFiles
 }

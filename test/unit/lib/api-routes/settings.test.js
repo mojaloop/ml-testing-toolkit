@@ -25,86 +25,89 @@
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
-const config = require('../../../../src/lib/config')
+const Server = require('../../../../src/server')
+const ImportExport = require('../../../../src/lib/importExport')
+const Config = require('../../../../src/lib/config')
+const RulesEngineModel = require('../../../../src/lib/rulesEngineModel')
+
+const SpyServer = jest.spyOn(Server, 'restartServer')
+const SpyImportSpecFiles = jest.spyOn(ImportExport, 'importSpecFiles')
+const SpyExportSpecFiles = jest.spyOn(ImportExport, 'exportSpecFiles')
+const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
+const SpyGetStoredUserConfig = jest.spyOn(Config, 'getStoredUserConfig')
+const SpyLoadUserConfig = jest.spyOn(Config, 'loadUserConfig')
+const SpyReloadResponseRules = jest.spyOn(RulesEngineModel, 'reloadResponseRules')
+const SpyReloadCallbackRules = jest.spyOn(RulesEngineModel, 'reloadCallbackRules')
+const SpyReloadValidationRules = jest.spyOn(RulesEngineModel, 'reloadValidationRules')
 
 describe('API route /api/settings', () => {
-  describe('import more options than exported', () => {
-    let exportResponse
+  describe('import', () => {
     describe('GET /api/settings/export', () => {
       it('Send a proper request', async () => {
-        exportResponse = await request(app)
+        const options = ['rules_response','rules_callback']
+        SpyExportSpecFiles.mockResolvedValueOnce()
+        const exportResponse = await request(app)
           .get(`/api/settings/export`)
-          .query({options: ['rules_response','rules_callback']})
+          .query({options})
           .send()
         expect(exportResponse.statusCode).toEqual(200)
+      })
+      it('Send a bad request - no options', async () => {
+        SpyExportSpecFiles.mockResolvedValueOnce()
+        const exportResponse = await request(app)
+          .get(`/api/settings/export`)
+          .send()
+        expect(exportResponse.statusCode).toEqual(400)
+      })
+      it('Send a bad request - not found', async () => {
+        const options = ['rules_response','rules_callback']
+        SpyExportSpecFiles.mockRejectedValueOnce()
+        const exportResponse = await request(app)
+          .get(`/api/settings/export`)
+          .query({options})
+          .send()
+        expect(exportResponse.statusCode).toEqual(404)
       })
     })
     describe('POST /api/settings/import', () => {
       it('Send a proper request', async () => {
-        const config = require('../../../../src/lib/config')
-        if (Object.keys(config.getSystemConfig() ).length === 0){
-          await config.loadSystemConfig()
-        }
+        SpyReloadResponseRules.mockResolvedValueOnce()
+        SpyReloadCallbackRules.mockResolvedValueOnce()
+        SpyReloadValidationRules.mockResolvedValueOnce()
+        SpyGetUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
+        SpyGetStoredUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: false})
+        SpyLoadUserConfig.mockResolvedValueOnce()
+        SpyServer.mockResolvedValueOnce()
+        const options = ['rules_response','rules_callback','rules_validation','user_config.json']
+        SpyImportSpecFiles.mockResolvedValueOnce()
         const res = await request(app)
           .post(`/api/settings/import`)
-          .query({options: ['rules_response', 'rules_callback', 'rules_validation']})
-          .send({buffer: Buffer.from(exportResponse.body.body.buffer.data)})
+          .query({options})
+          .send({buffer: Buffer.from([])})
         expect(res.statusCode).toEqual(200)
       })
-    })
-  })
-  describe('import less options than exported', () => {
-    let exportResponse
-    describe('GET /api/settings/export', () => {
-      it('Send a proper request', async () => {
-        exportResponse = await request(app)
-          .get(`/api/settings/export`)
-          .query({options: ['rules_response', 'rules_callback', 'rules_validation','user_config.json']})
-          .send()
-        expect(exportResponse.statusCode).toEqual(200)
-      })
-    })
-    describe('POST /api/settings/import', () => {
-      it('Send a proper request', async () => {
-        if (Object.keys(config.getSystemConfig() ).length === 0){
-          await config.loadSystemConfig()
-        }
+      it('Send a bad request - server error', async () => {
+        SpyReloadResponseRules.mockResolvedValueOnce()
+        SpyReloadCallbackRules.mockResolvedValueOnce()
+        SpyReloadValidationRules.mockResolvedValueOnce()
+        SpyGetUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
+        SpyGetStoredUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
+        SpyLoadUserConfig.mockResolvedValueOnce()
+        const options = ['rules_response','rules_callback','rules_validation','user_config.json']
+        SpyImportSpecFiles.mockResolvedValueOnce()
         const res = await request(app)
           .post(`/api/settings/import`)
-          .query({options: ['rules_response', 'rules_callback']})
-          .send({buffer: Buffer.from(exportResponse.body.body.buffer.data)})
+          .query({options})
+          .send({buffer: Buffer.from([])})
         expect(res.statusCode).toEqual(200)
       })
-    })
-  })
-  describe('import the same options as exported', () => {
-    let exportResponse
-    describe('GET /api/settings/export', () => {
-      it('Send a proper request', async () => {
-        exportResponse = await request(app)
-          .get(`/api/settings/export`)
-          .query({options: ['rules_response', 'rules_callback', 'rules_validation','user_config.json']})
-          .send()
-        expect(exportResponse.statusCode).toEqual(200)
-      })
-      it('Send a bad request', async () => {
-        const res = await request(app).get(`/api/settings/export`).send()
-        expect(res.statusCode).toEqual(400)
-      })
-    })
-    describe('POST /api/settings/import', () => {
-      it('Send a proper request', async () => {
-        if (Object.keys(config.getSystemConfig() ).length === 0){
-          await config.loadSystemConfig()
-        }
+      it('Send a bad request - server error', async () => {
+        const options = ['rules_response','rules_callback','rules_validation','user_config.json']
+        SpyImportSpecFiles.mockRejectedValueOnce({message: ''})
         const res = await request(app)
           .post(`/api/settings/import`)
-          .query({options: ['rules_response', 'rules_callback', 'rules_validation','user_config.json']})
-          .send({buffer: Buffer.from(exportResponse.body.body.buffer.data)})
-        expect(res.statusCode).toEqual(200)
-      })
-      it('Send a bad request', async () => {
-        const res = await request(app).post(`/api/settings/import`).send({})
+          .query({options})
+          .send({buffer: Buffer.from([])})
         expect(res.statusCode).toEqual(400)
       })
     })

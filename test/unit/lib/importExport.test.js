@@ -22,211 +22,283 @@
  --------------
  ******/
 
+
+
+const AdmZip = require('adm-zip')
+const Util = require('util')
+const Config = require('../../../src/lib/config')
+
+const spyPromisify = jest.spyOn(Util, 'promisify')
+const spyConfig = jest.spyOn(Config, 'getSystemConfig')
+
+jest.mock('adm-zip')
+
 const importExport = require('../../../src/lib/importExport')
 
+
 describe('importExport', () => {
-  describe('validateRules should not throw an error when', () => {
-    it('rule types matched, version supported and rule is valid', async () => {
-      const rule = {
-        "type": "response",
-        "version": 1,
-        "ruleId": 1,
-        "priority": 1,
-        "description": "post /settlementWindows/{id}",
-        "apiVersion": {
-          "minorVersion": 0,
-          "majorVersion": 1,
-          "type": "settlements",
-          "asynchronous": false
-        },
-        "conditions": {
-          "all": [
-            {
-              "fact": "operationPath",
-              "operator": "equal",
-              "value": "/settlementWindows/{id}"
-            },
-            {
-              "fact": "method",
-              "operator": "equal",
-              "value": "post"
-            }
-          ]
-        },
-        "event": {
-          "method": null,
-          "path": null,
-          "params": {
-            "body": {
-              "state": "OPEN"
-            },
-            "statusCode": "200"
-          },
-          "delay": 0,
-          "type": "MOCK_RESPONSE"
-        }
-      }
-      expect(() => {
-        importExport.validateRules('test', 'response', 1.0, [rule])
-      }).not.toThrowError();
-    })
-  })
-  describe('validateRules should throw an error when', () => {
-    it('rule types not matched, version supported and rule is valid', () => {
-      const rule = {
-        "type": "not-response",
-        "version": 1,
-        "ruleId": 1,
-        "priority": 1,
-        "description": "post /settlementWindows/{id}",
-        "apiVersion": {
-          "minorVersion": 0,
-          "majorVersion": 1,
-          "type": "settlements",
-          "asynchronous": false
-        },
-        "conditions": {
-          "all": [
-            {
-              "fact": "operationPath",
-              "operator": "equal",
-              "value": "/settlementWindows/{id}"
-            },
-            {
-              "fact": "method",
-              "operator": "equal",
-              "value": "post"
-            }
-          ]
-        },
-        "event": {
-          "method": null,
-          "path": null,
-          "params": {
-            "body": {
-              "state": "OPEN"
-            },
-            "statusCode": "200"
-          },
-          "delay": 0,
-          "type": "MOCK_RESPONSE"
-        }
-      }
-      let error
-      try {
-        importExport.validateRules('test', 'response', 1.0, [rule])
-      } catch (err) {
-        error = err
-      }
-      expect(error.message).toBe('validation error: rule 1 in test should be of type response');
-    })
-    it('rule types matched, version is not supported and rule is valid', () => {
-      const rule = {
-        "type": "response",
-        "version": 1.1,
-        "ruleId": 1,
-        "priority": 1,
-        "description": "post /settlementWindows/{id}",
-        "apiVersion": {
-          "minorVersion": 0,
-          "majorVersion": 1,
-          "type": "settlements",
-          "asynchronous": false
-        },
-        "conditions": {
-          "all": [
-            {
-              "fact": "operationPath",
-              "operator": "equal",
-              "value": "/settlementWindows/{id}"
-            },
-            {
-              "fact": "method",
-              "operator": "equal",
-              "value": "post"
-            }
-          ]
-        },
-        "event": {
-          "method": null,
-          "path": null,
-          "params": {
-            "body": {
-              "state": "OPEN"
-            },
-            "statusCode": "200"
-          },
-          "delay": 0,
-          "type": "MOCK_RESPONSE"
-        }
-      }
-      let error
-      try {
-        importExport.validateRules('test', 'response', 1.0, [rule])
-      } catch (err) {
-        error = err
-      }
-      expect(error.message).toBe('validation error: rule 1 in test version should at most 1');
-    })
-    it('rule types matched, version is supported and rule is not valid', () => {
-      const rule = {
-        "type": "response",
-        "version": 1.0,
-        "ruleId": 1,
-        "priority": 1,
-        "description": "post /settlementWindows/{id}",
-        "apiVersion": {
-          "minorVersion": 0,
-          "majorVersion": 1,
-          "type": "settlements",
-          "asynchronous": false
-        },
-        "conditions": {
-          "all": [
-            {
-              "fact": "operationPath",
-              "operator": "equal",
-              "value": "/settlementWindows/{id}"
-            },
-            {
-              "fact": "method",
-              "operator": "equal",
-              "value": "post"
-            }
-          ]
-        }
-      }
-      let error
-      try {
-        importExport.validateRules('test', 'response', 1.0, [rule])
-      } catch (err) {
-        error = err
-      }
-      expect(error.message).toBe('validation error: rule 1 in test is not valid: Engine: addRule() argument requires \"event\" property');
-    })
-  })
   describe('exportSpecFiles should not throw an error when', () => {
     it('export 1 file', async () => {
-      expect(() => {
-        importExport.exportSpecFiles(['rules_response'])
-      }).not.toThrowError();
-    })
-    it('export more than 1 file', async () => {
-      expect(() => {
-        importExport.exportSpecFiles(['rules_response','rules_callbacks'])
-      }).not.toThrowError();
-    })
-  })
-  describe('importSpecFiles should not throw an error when', () => {
-    it('export 1 file', async () => {
-      expect(() => {
-        importExport.exportSpecFiles(['rules_response'])
-      }).not.toThrowError();
+      AdmZip.mockImplementationOnce(() => {
+        return ({
+          addLocalFolder: () => {},
+          toBuffer: () => {return []}
+        })
+      })
+      const exportSpecFiles = await importExport.exportSpecFiles(['rules_response'])
+      expect(exportSpecFiles.namePrefix).toBe('rules_response');
+      expect(exportSpecFiles.buffer).toHaveLength(0);
     })
     it('export more than 1 files', async () => {
-      expect(() => {
-        importExport.exportSpecFiles(['rules_response','rules_callbacks'])
-      }).not.toThrowError();
+      AdmZip.mockImplementationOnce(() => {
+        return ({
+          addLocalFile: () => {},
+          addLocalFolder: () => {},
+          toBuffer: () => {return []}
+        })
+      })
+      const exportSpecFiles = await importExport.exportSpecFiles(['rules_response','user_config.json'])
+      expect(exportSpecFiles.namePrefix).toBe('spec_files');
+      expect(exportSpecFiles.buffer).toHaveLength(0);
+    })
+  })
+
+  describe('importSpecFiles', () => {
+    it('should not throw an error when import all files', async () => {
+      spyConfig.mockReturnValue({CONFIG_VERSIONS: {response: 1.0, validation: 1.0, callback: 1.0, userSettings: 1.0}})
+      AdmZip.mockImplementationOnce(() => {
+        return ({
+          extractEntryTo: () => {},
+          getEntries: () => {
+            return [
+              {
+                entryName: 'rules_response/example-1.json',
+                getData: () => {return {
+                  toString: () => { return JSON.stringify([{
+                    "type": "response",
+                    "version": 1.0,
+                    "conditions": {
+                      "all": [
+                        {
+                          "fact": "operationPath",
+                          "operator": "equal",
+                          "value": "/settlementWindows/{id}"
+                        }
+                      ]
+                    },
+                    "event": {
+                      "type": "MOCK_RESPONSE"
+                    }
+                  }])}
+                }}
+              },
+              {
+                entryName: 'rules_response/config.json',
+                getData: () => {return {
+                  toString: () => { return '{}'}
+                }}
+              },
+              {
+                entryName: 'rules_validation/example-1.json',
+                getData: () => {return {
+                  toString: () => { return JSON.stringify([{
+                    "type": "validation",
+                    "version": 1.0,
+                    "conditions": {
+                      "all": [
+                        {
+                          "fact": "operationPath",
+                          "operator": "equal",
+                          "value": "/settlementWindows/{id}"
+                        }
+                      ]
+                    },
+                    "event": {
+                      "type": "MOCK_RESPONSE"
+                    }
+                  }])}
+                }}
+              },
+              {
+                entryName: 'rules_validation/config.json',
+                getData: () => {return {
+                  toString: () => { return '{}'}
+                }}
+              },
+              {
+                entryName: 'rules_callback/example-1.json',
+                getData: () => {return {
+                  toString: () => { return JSON.stringify([{
+                    "type": "callback",
+                    "version": 1.0,
+                    "conditions": {
+                      "all": [
+                        {
+                          "fact": "operationPath",
+                          "operator": "equal",
+                          "value": "/settlementWindows/{id}"
+                        }
+                      ]
+                    },
+                    "event": {
+                      "type": "MOCK_RESPONSE"
+                    }
+                  }])}
+                }}
+              },
+              {
+                entryName: 'rules_callback/config.json',
+                getData: () => {return {
+                  toString: () => { return '{}'}
+                }}
+              },
+              {
+                entryName: 'user_config.json',
+                getData: () => {return {
+                  toString: () => {
+                    return JSON.stringify({
+                      VERSION: 1.0
+                    })
+                  }
+                }}
+              },
+              {
+                entryName: 'ignore.json',
+                getData: () => {return {
+                  toString: () => {return '{}'}
+                }}
+              }
+            ]
+          },
+          addLocalFile: () => {},
+          addLocalFolder: () => {},
+          toBuffer: () => {return []}
+        })
+      })
+      // spyPromisify.mockReturnValueOnce(jest.fn()).mockReturnValueOnce(jest.fn()).mockReturnValueOnce(jest.fn()).mockReturnValueOnce(jest.fn())
+      spyPromisify.mockReturnValue(jest.fn())
+
+      await expect(importExport.importSpecFiles([],['rules_response', 'rules_callback', 'rules_validation','user_config.json'])).resolves.toBe(undefined)
+    })
+
+    it('should throw an error when type not matched', async () => {
+      spyConfig.mockReturnValue({CONFIG_VERSIONS: {response: 1.0}})
+      AdmZip.mockImplementationOnce(() => {
+        return ({
+          getEntries: () => {
+            return [
+              {
+                entryName: 'rules_response/example-1.json',
+                getData: () => {return {
+                  toString: () => { return JSON.stringify([{
+                    "type": "not-response",
+                    "ruleId": 1,
+                    "version": 1.0,
+                    "conditions": {
+                      "all": [
+                        {
+                          "fact": "operationPath",
+                          "operator": "equal",
+                          "value": "/settlementWindows/{id}"
+                        }
+                      ]
+                    },
+                    "event": {
+                      "type": "MOCK_RESPONSE"
+                    }
+                  }])}
+                }}
+              }
+            ]
+          }
+        })
+      })
+      await expect(importExport.importSpecFiles([],['rules_response'])).rejects.toThrow('validation error: rule 1 in rules_response/example-1.json should be of type response')
+    })
+    it('should throw an error when version is not supported', async () => {
+      spyConfig.mockReturnValue({CONFIG_VERSIONS: {response: 1.0}})
+      AdmZip.mockImplementationOnce(() => {
+        return ({
+          getEntries: () => {
+            return [
+              {
+                entryName: 'rules_response/example-1.json',
+                getData: () => {return {
+                  toString: () => { return JSON.stringify([{
+                    "type": "response",
+                    "ruleId": 1,
+                    "version": 999.0,
+                    "conditions": {
+                      "all": [
+                        {
+                          "fact": "operationPath",
+                          "operator": "equal",
+                          "value": "/settlementWindows/{id}"
+                        }
+                      ]
+                    },
+                    "event": {
+                      "type": "MOCK_RESPONSE"
+                    }
+                  }])}
+                }}
+              }
+            ]
+          }
+        })
+      })
+      await expect(importExport.importSpecFiles([],['rules_response'])).rejects.toThrow('validation error: rule 1 in rules_response/example-1.json version should at most 1')
+    })
+    it('should throw an error when rule.event is missing', async () => {
+      spyConfig.mockReturnValue({CONFIG_VERSIONS: {response: 1.0}})
+      AdmZip.mockImplementationOnce(() => {
+        return ({
+          getEntries: () => {
+            return [
+              {
+                entryName: 'rules_response/example-1.json',
+                getData: () => {return {
+                  toString: () => { return JSON.stringify([{
+                    "type": "response",
+                    "ruleId": 1,
+                    "version": 1.0,
+                    "conditions": {
+                      "all": [
+                        {
+                          "fact": "operationPath",
+                          "operator": "equal",
+                          "value": "/settlementWindows/{id}"
+                        }
+                      ]
+                    }
+                  }])}
+                }}
+              }
+            ]
+          }
+        })
+      })
+      await expect(importExport.importSpecFiles([],['rules_response'])).rejects.toThrow('validation error: rule 1 in rules_response/example-1.json is not valid: Engine: addRule() argument requires \"event\" property')
+    })
+    it('should throw an error when user config version is not supported', async () => {
+      spyConfig.mockReturnValue({CONFIG_VERSIONS: {userSettings: 1.0}})
+      AdmZip.mockImplementationOnce(() => {
+        return ({
+          getEntries: () => {
+            return [
+              {
+                entryName: 'user_config.json',
+                getData: () => {return {
+                  toString: () => { return JSON.stringify({
+                    VERSION: 2.0
+                  })}
+                }}
+              }
+            ]
+          }
+        })
+      })
+      await expect(importExport.importSpecFiles([],['user_config.json'])).rejects.toThrow('validation error: user_config.json version 2 not supproted be at most 1')
     })
   })
 })

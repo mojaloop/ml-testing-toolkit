@@ -26,44 +26,34 @@
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
-const axios = require('axios').default
-jest.mock('axios')
-axios.mockImplementation(() => Promise.resolve(true))
+const loadSamples = require('../../../../src/lib/loadSamples')
+
+const spyGetSample = jest.spyOn(loadSamples, 'getSample')
+const spyGetCollectionsOrEnvironments = jest.spyOn(loadSamples, 'getCollectionsOrEnvironments')
+
 
 describe('API route /api/samples', () => {
-  describe('GET /api/samples', () => {
+  describe('GET /api/samples/load', () => {
     it('Send a proper request', async () => {
-      const res = await request(app).get(`/api/samples/load/collections`).send()
+      spyGetSample.mockResolvedValueOnce()
+      const res = await request(app).get(`/api/samples/load`).send()
       expect(res.statusCode).toEqual(200)
     })
     it('Send a proper request with type: hub', async () => {
-      const res = await request(app).get(`/api/samples/load/collections?type=hub`).send()
-      expect(res.statusCode).toEqual(200)
-    })
-    it('Send a proper request with type: hub', async () => {
-      const res = await request(app).get(`/api/samples/load/environments`).send()
-      expect(res.statusCode).toEqual(200)
-    })
-    it('Send a bad request with type: huba', async () => {
-      const res = await request(app).get(`/api/samples/load/collections?type=huba`).send()
+      spyGetSample.mockRejectedValueOnce({message: ''})
+      const res = await request(app).get(`/api/samples/load`).send()
       expect(res.statusCode).toEqual(500)
     })
   })
   describe('GET /api/samples', () => {
     it('Send a proper request with missing collections query param', async () => {
-      const res = await request(app).get(`/api/samples/load`).query({
-        collections: [
-          'examples/collections/hub/hub_1_p2p_fundsinout_block_transfers.json',
-          'examples/collections/hub/hub_2_settlements.json'
-        ],
-        environment: 'examples/environments/hub_local_environment.json'
-      }).send()
+      spyGetCollectionsOrEnvironments.mockResolvedValueOnce()
+      const res = await request(app).get(`/api/samples/load/collections`).send()
       expect(res.statusCode).toEqual(200)
     })
     it('Send a bad request with not existing environment', async () => {
-      const res = await request(app).get(`/api/samples/load`).query({
-        environment: 'examples/environments/not-existing.json'
-      }).send()
+      spyGetCollectionsOrEnvironments.mockRejectedValueOnce({message: ''})
+      const res = await request(app).get(`/api/samples/load/collections`).send()
       expect(res.statusCode).toEqual(500)
     })
   })
