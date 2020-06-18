@@ -52,7 +52,11 @@ class RulesEngine {
    */
   loadRules (rules) {
     try {
-      rules.forEach((r) => { this.engine.addRule(r) })
+      const rulesLength = rules.length
+      rules.forEach((r, index) => {
+        r.priority = rulesLength - index
+        this.engine.addRule(r)
+      })
       // customLogger.logMessage('info', `Rules loaded: ${util.inspect(rules, { depth: 20 })}`)
     } catch (err) {
       customLogger.logMessage('error', 'Error loading rules ' + err)
