@@ -109,7 +109,8 @@ describe('JwsSigning', () => {
       Accept: 'application/vnd.interoperability.parties+json;version=1.0',
       'Content-Type': 'application/vnd.interoperability.parties+json;version=1.0',
       Date: '2019-01-01 00:00:00',
-      'FSPIOP-Source': 'payerfsp'
+      'FSPIOP-Source': 'payerfsp',
+      'FSPIOP-Destination': 'payeefsp'
     },
     body: {
       test: 'test'
@@ -141,6 +142,42 @@ describe('JwsSigning', () => {
       expect(() => {
         const validationResult = JwsSigning.validate(reqOpts)
       }).not.toThrowError()
+    })
+  })
+
+  describe('Validation request should fail when', () => {
+    it('request method is get', async () => {
+      const req = {
+        method: 'get'
+      }
+      const signed = await JwsSigning.validate(req)
+      expect(signed).toBe(false)
+    })
+    it('request method is put and path starts with /parties/', async () => {
+      const req = {
+        method: 'put',
+        path: '/parties/'
+      }
+      const signed = await JwsSigning.validate(req)
+      expect(signed).toBe(false)
+    })
+  })
+
+  describe('Signed request should fail when', () => {
+    it('request method is get', async () => {
+      const req = {
+        method: 'get'
+      }
+      const signed = await JwsSigning.sign(req)
+      expect(signed).toBe(false)
+    })
+    it('request method is put and path starts with /parties/', async () => {
+      const req = {
+        method: 'put',
+        path: '/parties/'
+      }
+      const signed = await JwsSigning.sign(req)
+      expect(signed).toBe(false)
     })
   })
 
@@ -192,6 +229,7 @@ describe('JwsSigning', () => {
     var reqOpts = JSON.parse(JSON.stringify(origReqOpts))
     // Rename the body prop with data
     reqOpts.data = reqOpts.body
+    delete reqOpts.headers['FSPIOP-Destination']
     JwsSigning.sign(reqOpts)
     // Replace the data prop with payload
     reqOpts.payload = reqOpts.data

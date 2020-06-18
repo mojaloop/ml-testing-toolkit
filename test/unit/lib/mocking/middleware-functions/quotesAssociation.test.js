@@ -60,7 +60,7 @@ describe('QuotesAssociation', () => {
         }
       }
       ObjectStore.saveTransaction.mockClear()
-      QuotesAssociation.handleQuotes(sampleContext, request, fulfilment)
+      QuotesAssociation.handleQuotes(sampleContext, request)
       expect(ObjectStore.saveTransaction).not.toHaveBeenCalledWith(sampleTransactionId)
     })
   })
@@ -123,7 +123,7 @@ describe('QuotesAssociation', () => {
       const sampleContext = {}
       const request = {
         method: 'post',
-        path: '/asdf'
+        path: '/transfers'
       }
       QuotesAssociation.handleTransfers(sampleContext, request)
       expect(ObjectStore.searchTransaction).not.toHaveBeenCalledWith('123')
