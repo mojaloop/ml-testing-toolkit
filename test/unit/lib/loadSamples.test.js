@@ -100,5 +100,13 @@ describe('loadSamples', () => {
       const collectionsOrEnvironments = await loadSamples.getCollectionsOrEnvironments('exampleType', 'type')
       expect(collectionsOrEnvironments).toStrictEqual([ 'sample.json' ]);
     })
+    it('should not throw an error when type is not provided', async () => {
+      spyPromisify
+        .mockReturnValueOnce(() => {return [
+          "sample.json", "sampleFolder"
+        ]})
+      const collectionsOrEnvironments = await loadSamples.getCollectionsOrEnvironments('exampleType')
+      expect(collectionsOrEnvironments).toStrictEqual([ 'sample.json' ]);
+    })
   })
 })
