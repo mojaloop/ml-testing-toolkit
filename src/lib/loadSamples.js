@@ -27,7 +27,7 @@ const { promisify } = require('util')
 
 // load collections or environments
 const getCollectionsOrEnvironments = async (exampleType, type) => {
-  const data = await promisify(files)(`examples/${exampleType}/${type}`)
+  const data = await promisify(files)(`examples/${exampleType}/${type || ''}`)
   return data.filter(filename => filename.endsWith('.json'))
 }
 
