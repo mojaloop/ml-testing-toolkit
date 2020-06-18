@@ -179,6 +179,9 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
         }
       }
 
+      if (request.delay) {
+        await new Promise(resolve => setTimeout(resolve, request.delay))
+      }
       const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks)
 
       if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
