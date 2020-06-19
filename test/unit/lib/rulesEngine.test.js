@@ -27,74 +27,247 @@
 const RulesEngine = require('../../../src/lib/rulesEngine')
 
 describe('RulesEngine', () => {
-  const sampleRule1 = {
-      conditions: {
-        all: [
-          {
-            fact: 'name',
-            operator: 'equal',
-            value: 'a'
-          }
-        ]
-      },
-      event: {
-        type: 'test1'
-      }
+  const numberStringLessThanInclusiveRule = {
+    conditions: {
+      all: [
+        {
+          fact: 'amount',
+          operator: 'numberStringLessThanInclusive',
+          value: '50'
+        }
+      ]
+    },
+    event: {
+      type: 'numberStringLessThanInclusive'
+    }
   }
-  const sampleRule2 = {
-      conditions: {
-        all: [
-          {
-            fact: 'name',
-            operator: 'equal',
-            value: 'b'
-          }
-        ]
-      },
-      event: {
-        type: 'test2'
-      }
+  const numberStringGreaterThanInclusiveRule = {
+    conditions: {
+      all: [
+        {
+          fact: 'amount',
+          operator: 'numberStringGreaterThanInclusive',
+          value: '50'
+        }
+      ]
+    },
+    event: {
+      type: 'numberStringGreaterThanInclusive'
+    }
+  }
+  const numericEqualRule = {
+    conditions: {
+      all: [
+        {
+          fact: 'amount',
+          operator: 'numericEqual',
+          value: '50'
+        }
+      ]
+    },
+    event: {
+      type: 'numericEqual'
+    }
+  }
+  const numericNotEqualRule = {
+    conditions: {
+      all: [
+        {
+          fact: 'amount',
+          operator: 'numericNotEqual',
+          value: '50'
+        }
+      ]
+    },
+    event: {
+      type: 'numericNotEqual'
+    }
+  }
+  const numericLessThanRule = {
+    conditions: {
+      all: [
+        {
+          fact: 'amount',
+          operator: 'numericLessThan',
+          value: '50'
+        }
+      ]
+    },
+    event: {
+      type: 'numericLessThan'
+    }
+  }
+  const numericGreaterThanRule = {
+    conditions: {
+      all: [
+        {
+          fact: 'amount',
+          operator: 'numericGreaterThan',
+          value: '50'
+        }
+      ]
+    },
+    event: {
+      type: 'numericGreaterThan'
+    }
+  }
+  const numericLessThanInclusiveRule = {
+    conditions: {
+      all: [
+        {
+          fact: 'amount',
+          operator: 'numericLessThanInclusive',
+          value: '50'
+        }
+      ]
+    },
+    event: {
+      type: 'numericLessThanInclusive'
+    }
+  }
+  const numericGreaterThanInclusiveRule = {
+    conditions: {
+      all: [
+        {
+          fact: 'amount',
+          operator: 'numericGreaterThanInclusive',
+          value: '50'
+        }
+      ]
+    },
+    event: {
+      type: 'numericGreaterThanInclusive'
+    }
   }
   describe('Load Rules Engine', () => {
     const sampleRulesEngine = new RulesEngine()
     it('Load a rule without event', async () => {
-      const {event, ...wrongRule} = sampleRule1
+      const {event, ...wrongRule} = numericLessThanRule
       expect( () => { 
         sampleRulesEngine.loadRules([wrongRule])
       }).toThrow()
     })
     it('Load a rule without conditions', async () => {
-      const {conditions, ...wrongRule} = sampleRule1
+      const {conditions, ...wrongRule} = numericLessThanRule
       expect( () => { 
         sampleRulesEngine.loadRules([wrongRule])
       }).toThrow()
     })
     it('Load a sample rule', async () => {
       expect( () => { 
-        sampleRulesEngine.loadRules([sampleRule1])
+        sampleRulesEngine.loadRules([numericLessThanRule])
       }).not.toThrow()
     })
   })
   describe('Evaluate Facts in Rules Engine', () => {
     const sampleRulesEngine = new RulesEngine()
-    it('Load two sample rules', async () => {
+    it('Prioritize rules', async () => {
       expect( () => { 
-        sampleRulesEngine.loadRules([sampleRule1, sampleRule2])
+        sampleRulesEngine.loadRules([
+          numberStringLessThanInclusiveRule,
+          numberStringGreaterThanInclusiveRule,
+          numericEqualRule,
+          numericNotEqualRule,
+          numericLessThanRule,
+          numericGreaterThanRule,
+          numericLessThanInclusiveRule,
+          numericGreaterThanInclusiveRule
+        ])
       }).not.toThrow()
     })
     it('Evaluate matching facts', async () => {
-      const facts1 = {
-        name: 'a'
+      const numberStringLessThanInclusiveFacts = {
+        amount: '50'
       }
-      const facts2 = {
-        name: 'b'
+      const numberStringGreaterThanInclusiveFacts = {
+        amount: '50'
       }
-      await expect(sampleRulesEngine.evaluate(facts1)).resolves.toEqual([{type: 'test1'}])
-      await expect(sampleRulesEngine.evaluate(facts2)).resolves.toEqual([{type: 'test2'}])
+      const numericEqualFacts = {
+        amount: '50'
+      }
+      const numericNotEqualFacts = {
+        amount: '51'
+      }
+      const numericLessThanFacts = {
+        amount: '49',
+      }
+      const numericGreaterThanFacts = {
+        amount: '51',
+      }
+      const numericLessThanInclusiveRuleFacts = {
+        amount: '50',
+      }
+      const numericGreaterThanInclusiveRuleFacts = {
+        amount: '50',
+      }
+      await expect(sampleRulesEngine.evaluate(numberStringLessThanInclusiveFacts)).resolves.toEqual([
+        {type: 'numberStringLessThanInclusive'},
+        {type: 'numberStringGreaterThanInclusive'},
+        {type: 'numericEqual'},
+        {type: 'numericLessThanInclusive'},
+        {type: 'numericGreaterThanInclusive'}
+      ])
+      await expect(sampleRulesEngine.evaluate(numberStringGreaterThanInclusiveFacts)).resolves.toEqual([
+        {type: 'numberStringLessThanInclusive'},
+        {type: 'numberStringGreaterThanInclusive'},
+        {type: 'numericEqual'},
+        {type: 'numericLessThanInclusive'},
+        {type: 'numericGreaterThanInclusive'}
+      ])
+      await expect(sampleRulesEngine.evaluate(numericEqualFacts)).resolves.toEqual([
+        {type: 'numberStringLessThanInclusive'},
+        {type: 'numberStringGreaterThanInclusive'},
+        {type: 'numericEqual'},
+        {type: 'numericLessThanInclusive'},
+        {type: 'numericGreaterThanInclusive'}
+      ])
+      await expect(sampleRulesEngine.evaluate(numericNotEqualFacts)).resolves.toEqual([
+        {type: 'numberStringGreaterThanInclusive'},
+        {type: 'numericNotEqual'},
+        {type: 'numericGreaterThan'},
+        {type: 'numericGreaterThanInclusive'}
+      ])
+      await expect(sampleRulesEngine.evaluate(numericLessThanFacts)).resolves.toEqual([
+        {type: 'numberStringLessThanInclusive'},
+        {type: 'numericNotEqual'},
+        {type: 'numericLessThan'},
+        {type: 'numericLessThanInclusive'}
+      ])
+      await expect(sampleRulesEngine.evaluate(numericGreaterThanFacts)).resolves.toEqual([
+        {type: 'numberStringGreaterThanInclusive'},
+        {type: 'numericNotEqual'},
+        {type: 'numericGreaterThan'},
+        {type: 'numericGreaterThanInclusive'}
+      ])
+      await expect(sampleRulesEngine.evaluate(numericLessThanInclusiveRuleFacts)).resolves.toEqual([
+        {type: 'numberStringLessThanInclusive'},
+        {type: 'numberStringGreaterThanInclusive'},
+        {type: 'numericEqual'},
+        {type: 'numericLessThanInclusive'},
+        {type: 'numericGreaterThanInclusive'}
+      ])
+      await expect(sampleRulesEngine.evaluate(numericGreaterThanInclusiveRuleFacts)).resolves.toEqual([
+        {type: 'numberStringLessThanInclusive'},
+        {type: 'numberStringGreaterThanInclusive'},
+        {type: 'numericEqual'},
+        {type: 'numericLessThanInclusive'},
+        {type: 'numericGreaterThanInclusive'}
+      ])
+    })
+  })
+  describe('Evaluate Facts in Rules Engine', () => {
+    const sampleRulesEngine = new RulesEngine()
+    it('Prioritize rules', async () => {
+      expect( () => { 
+        sampleRulesEngine.loadRules([
+          numericLessThanRule,
+          numberStringLessThanInclusiveRule
+        ])
+      }).not.toThrow()
     })
     it('Evaluate non matching facts', async () => {
       const facts1 = {
-        name: 'c'
+        amount: 150
       }
       await expect(sampleRulesEngine.evaluate(facts1)).resolves.toEqual(null)
     })
