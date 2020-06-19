@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -27,14 +28,6 @@ const apiServer = require('../../../../src/lib/api-server')
 const assertionStore = require('../../../../src/lib/assertionStore')
 jest.mock('../../../../src/lib/assertionStore')
 
-assertionStore.popRequest.mockImplementation(() => Promise.resolve({
-  headers: {},
-  body: {}
-})) 
-assertionStore.popCallback.mockImplementation(() => Promise.resolve({
-  headers: {},
-  body: {}
-})) 
 
 const app = apiServer.getApp()
 jest.setTimeout(30000)
@@ -42,18 +35,36 @@ jest.setTimeout(30000)
 describe('API route /longpolling/requests/*', () => {
   describe('GET /longpolling/requests/123', () => {
     it('Getting stored requests', async () => {
+      assertionStore.popRequest.mockResolvedValueOnce({
+        headers: {},
+        body: {}
+      })
       const res = await request(app).get(`/longpolling/requests/123`)
       expect(res.statusCode).toEqual(200)
       expect(res).toHaveProperty('headers')
       expect(res).toHaveProperty('body')
     })
+    it('Getting stored requests should throw an error', async () => {
+      assertionStore.popRequest.mockRejectedValueOnce()
+      const res = await request(app).get(`/longpolling/requests/123`)
+      expect(res.statusCode).toEqual(404)
+    })
   })
   describe('GET /longpolling/callbacks/123', () => {
     it('Getting stored callbacks', async () => {
+      assertionStore.popCallback.mockResolvedValueOnce({
+        headers: {},
+        body: {}
+      })
       const res = await request(app).get(`/longpolling/callbacks/123`)
       expect(res.statusCode).toEqual(200)
       expect(res).toHaveProperty('headers')
       expect(res).toHaveProperty('body')
+    })
+    it('Getting stored callbacks should throw an error', async () => {
+      assertionStore.popCallback.mockRejectedValueOnce()
+      const res = await request(app).get(`/longpolling/callbacks/123`)
+      expect(res.statusCode).toEqual(404)
     })
   })
  

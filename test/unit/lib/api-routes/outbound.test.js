@@ -92,8 +92,12 @@ describe('API route /api/outbound', () => {
         }
       ]
     }
-    it('Send a proper template', async () => {
+    it('Send a proper template with id 123', async () => {
       const res = await request(app).post(`/api/outbound/template/123`).send(properTemplate)
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Send a proper template with id aabb123aabb', async () => {
+      const res = await request(app).post(`/api/outbound/template/aabb123aabb`).send(properTemplate)
       expect(res.statusCode).toEqual(200)
     })
     it('Send a template without name', async () => {
@@ -108,8 +112,12 @@ describe('API route /api/outbound', () => {
     })
   })
   describe('DELETE /api/outbound/template/:outboundID', () => {
-    it('Send request', async () => {
+    it('Send request to delete template with outboundID 123', async () => {
       const res = await request(app).delete(`/api/outbound/template/123`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Send request to delete template with outboundID aabb123aabb', async () => {
+      const res = await request(app).delete(`/api/outbound/template/aabb123aabb`).send()
       expect(res.statusCode).toEqual(200)
     })
   })

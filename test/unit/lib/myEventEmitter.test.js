@@ -18,34 +18,35 @@
  * Gates Foundation
 
  * ModusBox
- * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
- * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
 
-const request = require('supertest')
-const apiServer = require('../../../../src/lib/api-server')
-const OpenApiMockHandler = require('../../../../src/lib/mocking/openApiMockHandler')
-const jwt = require('jsonwebtoken')
+const MyEventEmitter = require('../../../src/lib/MyEventEmitter')
 
-const SpySign = jest.spyOn(jwt, 'sign')
-
-const app = apiServer.getApp()
-jest.setTimeout(30000)
-
-describe('API route /api/oauth2', () => {
-  describe('GET /api/oauth2/token', () => {
-    it('Verify oauth credentials', async () => {
-      SpySign.mockReturnValueOnce('idToken')
-      const res = await request(app).post(`/api/oauth2/token`)
-      expect(res.statusCode).toEqual(200)
-      expect(res.body).toHaveProperty('access_token')
-      expect(res.body).toHaveProperty('id_token')
+describe('MyEventEmitter', () => { 
+  describe('when getTestOutboundEmitter is called', () => {
+    it('testOutbound should be created', async () => {
+      expect(() => MyEventEmitter.getTestOutboundEmitter()).not.toThrowError()
     })
-    it('Verify oauth credentials should throw an error if sign fails', async () => {
-      SpySign.mockImplementationOnce(() => {throw new Error()})
-      const res = await request(app).post(`/api/oauth2/token`)
-      expect(res.statusCode).toEqual(500)
+    it('testOutbound should be not created', async () => {
+      expect(() => MyEventEmitter.getTestOutboundEmitter()).not.toThrowError()
+    })
+  })
+  describe('when getAssertionRequestEmitter is called', () => {
+    it('assertionRequest should be created', async () => {
+      expect(() => MyEventEmitter.getAssertionRequestEmitter()).not.toThrowError()
+    })
+    it('assertionRequest should be not created', async () => {
+      expect(() => MyEventEmitter.getAssertionRequestEmitter()).not.toThrowError()
+    })
+  })
+  describe('when getAssertionCallbackEmitter is called', () => {
+    it('assertionCallback should be created', async () => {
+      expect(() => MyEventEmitter.getAssertionCallbackEmitter()).not.toThrowError()
+    })
+    it('assertionCallback should be not created', async () => {
+      expect(() => MyEventEmitter.getAssertionCallbackEmitter()).not.toThrowError()
     })
   })
 })

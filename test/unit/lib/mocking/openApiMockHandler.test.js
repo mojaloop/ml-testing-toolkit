@@ -106,7 +106,8 @@ const sampleContext = {
         status: 200,
         mock: {
           test: 'test'
-        }
+        },
+        delay: 500
       }
     }
   }

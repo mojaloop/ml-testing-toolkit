@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -37,12 +38,6 @@ jest.mock('fs')
 jest.mock('jsreport-core')
 
 fs.readFile.mockImplementation((_, callback) => callback(null, Buffer.from('Sample')))
-jsreportCore.mockImplementation( () => {
-  return {
-    init: jest.fn(),
-    render: () => Promise.resolve({ content: 'asdf'})
-  }
-})
 
 const properJsonReport = {
   name: 'dfsp-p2p-tests',
@@ -226,9 +221,48 @@ const properJsonReport = {
 describe('API route /api/reports', () => {
   describe('POST /api/reports/testcase/:format', () => {
     it('Send a proper html request', async () => {
+      jsreportCore.mockImplementationOnce( () => {
+        return {
+          init: jest.fn(),
+          render: () => Promise.resolve({ content: 'asdf'})
+        }
+      })
       const res = await request(app).post(`/api/reports/testcase/html`).send(properJsonReport)
       expect(res.statusCode).toEqual(200)
       expect(res.text).toEqual('asdf')
+    })
+    it('Send a proper pdf request', async () => {
+      jsreportCore.mockImplementationOnce( () => {
+        return {
+          init: jest.fn(),
+          render: () => Promise.resolve({ content: 'asdf'})
+        }
+      })
+      const res = await request(app).post(`/api/reports/testcase/pdf`).send(properJsonReport)
+      expect(res.statusCode).toEqual(200)
+      expect(res.text).toEqual('asdf')
+    })
+    it('Send a proper printhtml request', async () => {
+      jsreportCore.mockImplementationOnce( () => {
+        return {
+          init: jest.fn(),
+          render: () => Promise.resolve({ content: 'asdf'})
+        }
+      })
+      const res = await request(app).post(`/api/reports/testcase/printhtml`).send(properJsonReport)
+      expect(res.statusCode).toEqual(200)
+      expect(res.text).toEqual('asdf')
+    })
+    it('Send a bad request html request', async () => {
+      jsreportCore.mockImplementationOnce( () => {
+        return {
+          init: jest.fn(),
+          render: () => Promise.reject({ content: 'asdf'})
+        }
+      })
+      const {runtimeInformation, ...data} = properJsonReport
+      const res = await request(app).post(`/api/reports/testcase/printhtml`).send(data)
+      expect(res.statusCode).toEqual(500)
     })
   })
 

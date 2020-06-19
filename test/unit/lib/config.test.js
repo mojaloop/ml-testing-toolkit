@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+  * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -25,6 +26,9 @@
 'use strict'
 
 const Config = require('../../../src/lib/config')
+const Utils = require('../../../src/lib/utils')
+const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
+const SpyWriteFileAsync = jest.spyOn(Utils, 'writeFileAsync')
 
 describe('Config', () => {
   describe('loadUserConfig', () => {
@@ -47,6 +51,44 @@ describe('Config', () => {
       expect(newConfig).toHaveProperty('CALLBACK_ENDPOINT')
       expect(newConfig.CALLBACK_ENDPOINT).toEqual('test')
       await Config.setStoredUserConfig(userConfig)
+    })
+  })
+  describe('when getUserConfig is called', () => {
+    it('should not throw an error ', () => {
+      expect(() => Config.getUserConfig()).not.toThrowError()
+    })
+  })
+  describe('when getSystemConfig is called', () => {
+    it('should not throw an error ', () => {
+      expect(() => Config.getSystemConfig()).not.toThrowError()
+    })
+  })
+  describe('when getStoredUserConfig throws an error', () => {
+    it('the response should be empty object', async () => {
+      SpyReadFileAsync.mockRejectedValueOnce({})
+      const userConfig = await Config.getStoredUserConfig()
+      expect(userConfig).toStrictEqual({})
+    })
+  })
+  describe('when setStoredUserConfig throws an error', () => {
+    it('the response should be false', async () => {
+      SpyWriteFileAsync.mockRejectedValueOnce()
+      const storedUserConfig = await Config.setStoredUserConfig()
+      expect(storedUserConfig).toBe(false)
+    })
+  })
+  describe('when loadUserConfig throws an error', () => {
+    it('the response should be true', async () => {
+      SpyReadFileAsync.mockRejectedValueOnce()
+      const loadUserConfig = await Config.loadUserConfig()
+      expect(loadUserConfig).toBe(true)
+    })
+  })
+  describe('when loadSystemConfig throws an error', () => {
+    it('the response should be true', async () => {
+      SpyReadFileAsync.mockRejectedValueOnce()
+      const loadSystemConfig = await Config.loadSystemConfig()
+      expect(loadSystemConfig).toBe(true)
     })
   })
 })

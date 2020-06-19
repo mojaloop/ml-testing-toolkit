@@ -18,34 +18,17 @@
  * Gates Foundation
 
  * ModusBox
- * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
- * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
 
-const request = require('supertest')
-const apiServer = require('../../../../src/lib/api-server')
-const OpenApiMockHandler = require('../../../../src/lib/mocking/openApiMockHandler')
-const jwt = require('jsonwebtoken')
+const apiServer = require('../../../src/lib/api-server')
 
-const SpySign = jest.spyOn(jwt, 'sign')
-
-const app = apiServer.getApp()
-jest.setTimeout(30000)
-
-describe('API route /api/oauth2', () => {
-  describe('GET /api/oauth2/token', () => {
-    it('Verify oauth credentials', async () => {
-      SpySign.mockReturnValueOnce('idToken')
-      const res = await request(app).post(`/api/oauth2/token`)
-      expect(res.statusCode).toEqual(200)
-      expect(res.body).toHaveProperty('access_token')
-      expect(res.body).toHaveProperty('id_token')
-    })
-    it('Verify oauth credentials should throw an error if sign fails', async () => {
-      SpySign.mockImplementationOnce(() => {throw new Error()})
-      const res = await request(app).post(`/api/oauth2/token`)
-      expect(res.statusCode).toEqual(500)
+describe('api-server', () => { 
+  describe('when getApp is called', () => {
+    it('the server should be initialized if not already', async () => {
+      expect(() => apiServer.getApp()).not.toThrowError()
+      expect(() => apiServer.getApp()).not.toThrowError()
     })
   })
 })

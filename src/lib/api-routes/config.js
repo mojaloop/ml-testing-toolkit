@@ -65,33 +65,4 @@ router.put('/user', [
   }
 })
 
-// // Route to delete a validation rule file
-// router.delete('/files/validation/:fileName', async (req, res, next) => {
-//   const fileName = req.params.fileName
-
-//   try {
-//     await rulesEngineModel.deleteValidationRulesFile(fileName)
-//     res.status(200).json({ status: 'OK' })
-//   } catch (err) {
-//     next(err)
-//   }
-// })
-
-// // Route to modify configuration in validation rules
-// router.put('/files/validation', async (req, res, next) => {
-//   const reqType = req.body.type
-//   try {
-//     switch (reqType) {
-//       case 'activeRulesFile':
-//         await rulesEngineModel.setActiveValidationRulesFile(req.body.fileName)
-//         res.status(200).json({ status: 'OK' })
-//         break
-//       default:
-//         throw (new Error('Unknown update type'))
-//     }
-//   } catch (err) {
-//     next(err)
-//   }
-// })
-
 module.exports = router

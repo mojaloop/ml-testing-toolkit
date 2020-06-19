@@ -18,56 +18,82 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
 
 const request = require('supertest')
 const app = require('../../../../src/lib/api-server').getApp()
+const Config = require('../../../../src/lib/config')
+const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
+const SpyGetStoredUserConfig = jest.spyOn(Config, 'getStoredUserConfig')
+const SpySetStoredUserConfig = jest.spyOn(Config, 'setStoredUserConfig')
+const SpyLoadUserConfig = jest.spyOn(Config, 'loadUserConfig')
+const Server = require('../../../../src/server')
+const SpyServer = jest.spyOn(Server, 'restartServer')
 
 
 
 describe('API route /config', () => {
   describe('GET /api/config/user', () => {
     it('Getting config', async () => {
+      SpyGetUserConfig.mockResolvedValueOnce({})
+      SpyGetStoredUserConfig.mockResolvedValueOnce({})
       const res = await request(app).get(`/api/config/user`)
       expect(res.statusCode).toEqual(200)
       expect(res.body).toHaveProperty('runtime')
       expect(res.body).toHaveProperty('stored')
+    })
+    it('Getting config throws an error', async () => {
+      SpyGetUserConfig.mockRejectedValueOnce({})
+      const res = await request(app).get(`/api/config/user`)
+      expect(res.statusCode).toEqual(500)
     })
   })
   describe('PUT /api/config/user', () => {
-    let userConfig, newConfig
-    it('Get Stored Config', async () => {
-      const res = await request(app).get(`/api/config/user`)
-      expect(res.statusCode).toEqual(200)
-      expect(res.body).toHaveProperty('runtime')
-      expect(res.body).toHaveProperty('stored')
-      expect(res.body.stored).toHaveProperty('CALLBACK_ENDPOINT')
-      userConfig = res.body.stored
-    })
-    it('Set new Config', async () => {
-      newConfig = JSON.parse(JSON.stringify(userConfig))
-      newConfig.CALLBACK_ENDPOINT = 'test'
+    it('Editting config', async () => {
+      const newConfig = {
+        CALLBACK_ENDPOINT: 'http://localhost:5000/'
+      }
+      SpySetStoredUserConfig.mockResolvedValueOnce()
+      SpyGetUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
+      SpyGetStoredUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
+      SpyLoadUserConfig.mockResolvedValueOnce()
+
       const res = await request(app).put(`/api/config/user`).send(newConfig)
       expect(res.statusCode).toEqual(200)
+      expect(res.body.status).toBe('OK')
     })
-    it('Set new Config without CALLBACK_ENDPOINT', async () => {
-      const {CALLBACK_ENDPOINT, ...wrongConfig} = userConfig
-      const res = await request(app).put(`/api/config/user`).send(wrongConfig)
+    it('Editting config should relaod the server if INBOUND_MUTUAL_TLS_ENABLED was updated ', async () => {
+      const newConfig = {
+        CALLBACK_ENDPOINT: 'http://localhost:5000/'
+      }
+      SpySetStoredUserConfig.mockResolvedValueOnce()
+      SpyGetUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
+      SpyGetStoredUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: false})
+      SpyLoadUserConfig.mockResolvedValueOnce()
+      SpyServer.mockResolvedValueOnce()
+
+      const res = await request(app).put(`/api/config/user`).send(newConfig)
+      expect(res.statusCode).toEqual(200)
+      expect(res.body.status).toBe('OK')
+    })
+    it('Editting config should return 422 if CALLBACK_ENDPOINT is empty', async () => {
+      const newConfig = {
+        CALLBACK_ENDPOINT: ''
+      }
+      const res = await request(app).put(`/api/config/user`).send(newConfig)
       expect(res.statusCode).toEqual(422)
+      expect(res.body.errors).toStrictEqual([{"location": "body", "msg": "Invalid value", "param": "CALLBACK_ENDPOINT", "value": ""}])
     })
-    it('Get Stored Config again', async () => {
-      const res = await request(app).get(`/api/config/user`)
-      expect(res.statusCode).toEqual(200)
-      expect(res.body).toHaveProperty('runtime')
-      expect(res.body).toHaveProperty('stored')
-      expect(res.body.stored).toHaveProperty('CALLBACK_ENDPOINT')
-      expect(res.body.stored.CALLBACK_ENDPOINT).toEqual('test')
-    })
-    it('Set old Config', async () => {
-      const res = await request(app).put(`/api/config/user`).send(userConfig)
-      expect(res.statusCode).toEqual(200)
+    it('Editting config should throw 404 if setStoredUserConfig fails', async () => {
+      const newConfig = {
+        CALLBACK_ENDPOINT: 'http://localhost:5000/'
+      }
+      SpySetStoredUserConfig.mockRejectedValueOnce()
+      const res = await request(app).put(`/api/config/user`).send(newConfig)
+      expect(res.statusCode).toEqual(404)
     })
   })
 })
