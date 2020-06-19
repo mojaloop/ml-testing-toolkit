@@ -235,6 +235,9 @@ const openApiBackendNotImplementedHandler = (item) => {
     responseStatus = +generatedResponse.status
     responseBody = generatedResponse.body
     customLogger.logMessage('info', 'Generated response', generatedResponse, true, req)
+    if (generatedResponse.delay) {
+      await new Promise(resolve => setTimeout(resolve, generatedResponse.delay))
+    }
     if (!responseBody) {
       // Generate mock response from openAPI spec file
       const { status, mock } = context.api.mockResponseForOperation(context.operation.operationId)
