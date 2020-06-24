@@ -59,6 +59,76 @@ describe('Test Outbound Context', () => {
           "var amountAfter = Number(pm.environment.get('amountBefore') + 100)",
           "pm.environment.set('amountAfter', amountAfter)",
           "console.log('amountAfter: ', pm.environment.get('amountAfter'))",
+          "pm.sendRequest({ url: 'http://localhost:3999/test?state=OPEN', body: { mode: 'raw', raw: '{}'}, header: {'Accept': 'application/json'}}, function (err, response) {})"
+        ],
+        data: { context: {...contextObj}, id: uuid.v4()},
+        contextObj: contextObj
+      }
+
+      let scriptResult
+      try {
+        scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
+      } finally {
+        contextObj.ctx.dispose()
+        contextObj.ctx = null
+      }
+
+      expect(scriptResult.consoleLog[0][1]).toEqual('log')
+      expect(scriptResult.consoleLog[0][2]).toEqual('amountAfter: ')
+      expect(scriptResult.consoleLog[0][3]).toEqual(expectedAmount)
+
+      expect(scriptResult.environment[0]).toEqual({type: 'any', key: 'amountBefore', value: amountBefore})
+      expect(scriptResult.environment[1]).toEqual({type: 'any', key: 'amountAfter', value: expectedAmount})
+
+    })
+
+    it('executeAsync should return consoleLog and environment', async () => {
+
+      axios.mockImplementation(() => Promise.resolve(true))
+      const amountBefore = 100
+      const expectedAmount = 200
+      const contextObj = await Context.generageContextObj([{type: 'any', key: 'amountBefore', value: amountBefore}])
+
+      const args = {
+        script: [
+          "var amountAfter = Number(pm.environment.get('amountBefore') + 100)",
+          "pm.environment.set('amountAfter', amountAfter)",
+          "console.log('amountAfter: ', pm.environment.get('amountAfter'))",
+          "pm.sendRequest({ url: 'http://localhost/test'}, function (err, response) {})"
+        ],
+        data: { context: {...contextObj}, id: uuid.v4()},
+        contextObj: contextObj
+      }
+
+      let scriptResult
+      try {
+        scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
+      } finally {
+        contextObj.ctx.dispose()
+        contextObj.ctx = null
+      }
+
+      expect(scriptResult.consoleLog[0][1]).toEqual('log')
+      expect(scriptResult.consoleLog[0][2]).toEqual('amountAfter: ')
+      expect(scriptResult.consoleLog[0][3]).toEqual(expectedAmount)
+
+      expect(scriptResult.environment[0]).toEqual({type: 'any', key: 'amountBefore', value: amountBefore})
+      expect(scriptResult.environment[1]).toEqual({type: 'any', key: 'amountAfter', value: expectedAmount})
+
+    })
+
+    it('executeAsync should return consoleLog and environment', async () => {
+
+      axios.mockImplementation(() => Promise.reject(true))
+      const amountBefore = 100
+      const expectedAmount = 200
+      const contextObj = await Context.generageContextObj([{type: 'any', key: 'amountBefore', value: amountBefore}])
+
+      const args = {
+        script: [
+          "var amountAfter = Number(pm.environment.get('amountBefore') + 100)",
+          "pm.environment.set('amountAfter', amountAfter)",
+          "console.log('amountAfter: ', pm.environment.get('amountAfter'))",
           "pm.sendRequest({ url: 'http://localhost:3999/test?state=OPEN', header: {'Accept': 'application/json'}}, function (err, response) {})"
         ],
         data: { context: {...contextObj}, id: uuid.v4()},
@@ -81,9 +151,12 @@ describe('Test Outbound Context', () => {
       expect(scriptResult.environment[1]).toEqual({type: 'any', key: 'amountAfter', value: expectedAmount})
 
     })
+
     it('executeAsync should return consoleLog and environment', async () => {
 
-      axios.mockImplementation(() => Promise.reject(true))
+      axios.mockImplementation(() => Promise.reject({
+        response: {}
+      }))
       const amountBefore = 100
       const expectedAmount = 200
       const contextObj = await Context.generageContextObj([{type: 'any', key: 'amountBefore', value: amountBefore}])

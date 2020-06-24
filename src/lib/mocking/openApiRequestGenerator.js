@@ -132,6 +132,9 @@ const generateMockResponseBody = async (method, name, data, jsfRefs) => {
   const responseSchema = findResponseSchema(data.responses)
   // Create a new copy of object without copying by references
   const newResponseSchema = JSON.parse(JSON.stringify(responseSchema))
+  if (!newResponseSchema) {
+    return {}
+  }
   jsfRefs.forEach(ref => {
     const convertedId = ref.id.replace(/\.(?!items)/g, '.properties.')
     let targetObject = null

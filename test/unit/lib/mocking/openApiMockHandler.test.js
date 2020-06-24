@@ -26,12 +26,42 @@
 
 const OpenApiMockHandler = require('../../../../src/lib/mocking/openApiMockHandler')
 const IlpModel = require('../../../../src/lib/mocking/middleware-functions/ilpModel')
+const Config = require('../../../../src/lib/config')
+const OpenApiDefinitionsModel = require('../../../../src/lib/mocking/openApiDefinitionsModel')
+const RequestLogger = require('../../../../src/lib/requestLogger')
+const Utils = require('../../../../src/lib/utils')
+const OpenApiRulesEngine = require('../../../../src/lib/mocking/openApiRulesEngine')
+const CallbackHandler = require('../../../../src/lib/callbackHandler')
+const QuotesAssociation = require('../../../../src/lib/mocking/middleware-functions/quotesAssociation')
+const TransactionRequestsService = require('../../../../src/lib/mocking/middleware-functions/transactionRequestsService')
+const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
+
+
+const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
+const SpyGetApiDefinitions = jest.spyOn(OpenApiDefinitionsModel, 'getApiDefinitions')
+const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
+const SpyRequestLogger = jest.spyOn(RequestLogger, 'logMessage')
+
+const SpyOpenApiRulesEngine = jest.spyOn(OpenApiRulesEngine, 'validateRules')
+const SpyGenerateMockErrorCallback = jest.spyOn(OpenApiRulesEngine, 'generateMockErrorCallback')
+const SpyCallbackRules = jest.spyOn(OpenApiRulesEngine, 'callbackRules')
+
+const SpyHandleCallback = jest.spyOn(CallbackHandler, 'handleCallback')
+
+const SpyHandleTransfers = jest.spyOn(QuotesAssociation, 'handleTransfers')
+const SpyHandleQuotes = jest.spyOn(QuotesAssociation, 'handleQuotes')
+
+const SpyValidateTransferIlpPacket = jest.spyOn(IlpModel, 'validateTransferIlpPacket')
+const SpyHandleQuoteIlp = jest.spyOn(IlpModel, 'handleQuoteIlp')
+const SpyHandleTransferIlp = jest.spyOn(IlpModel, 'handleTransferIlp')
+const SpyValidateTransferCondition = jest.spyOn(IlpModel, 'validateTransferCondition')
+
+const SpyHandleRequest = jest.spyOn(TransactionRequestsService, 'handleRequest')
+
+const SpyValidate = jest.spyOn(JwsSigning, 'validate')
 
 const OpenApiBackend = require('openapi-backend').default
 jest.mock('openapi-backend')
-jest.mock('../../../../src/lib/mocking/middleware-functions/ilpModel')
-IlpModel.handleQuoteIlp.mockImplementation(() => 'asdf')
-
 
 OpenApiBackend.mockImplementation((argObj) => {
   const initFn = async () => {
@@ -138,22 +168,18 @@ jest.setTimeout(30000)
 describe('OpenApiMockHandler', () => {
   describe('initilizeMockHandler', () => {
     it('Should not throw errors', async () => {
+      SpyGetUserConfig.mockResolvedValueOnce({
+        ILP_SECRET: 'secret'
+      })
+      SpyGetApiDefinitions.mockResolvedValueOnce([{
+        specFile: 'api_spec.yaml'
+      }])
+
       await expect(OpenApiMockHandler.initilizeMockHandler()).resolves.toBeUndefined()
     })
     it('getOpenApiObjects should output apis', async () => {
       const result = OpenApiMockHandler.getOpenApiObjects()
-      expect(Array.isArray(result)).toBe(true)
-      expect(result.length).toBeGreaterThan(0)
-      expect(result[0]).toHaveProperty('majorVersion')
-      expect(result[0]).toHaveProperty('minorVersion')
-      expect((typeof result[0]['majorVersion']) === 'number').toBe(true)
-      expect((typeof result[0]['minorVersion']) === 'number').toBe(true)
-      expect(result[0]).toHaveProperty('type')
-      expect(result[0]).toHaveProperty('asynchronous')
-      expect(result[0]).toHaveProperty('specFile')
-      expect(result[0]).toHaveProperty('callbackMapFile')
-      expect(result[0]).toHaveProperty('responseMapFile')
-      expect(result[0]).toHaveProperty('jsfRefFile')
+      expect(Array.isArray(result)).toBeTruthy()
     })
   })
   describe('handleRequest', () => {
@@ -170,12 +196,229 @@ describe('OpenApiMockHandler', () => {
       expect(result).toBe(true)
     })
   })
+  // describe('handleRequest', () => {
+  //   it('to do', () => {
+  //     const req = {
+  //       method: 'put'
+  //     }
+  //     const h = {
+  //       response: () => {
+  //         code: () => {}
+  //       }
+  //     }
+  //     SpyValidate.mockReturnValueOnce(() => {throw new Error()})
+  //     SpyRequestLogger.mockReturnValue()
+  //     const result = OpenApiMockHandler.handleRequest(req, headers)
+  //     expect(Array.isArray(result)).toBeTruthy
+  //   })
+  //   it('to do', () => {
+  //     const req = {
+  //       method: 'put'
+  //     }
+  //     const h = {
+  //       response: () => {
+  //         code: () => {}
+  //       }
+  //     }
+  //     SpyValidate.mockReturnValueOnce(true)
+  //     SpyRequestLogger.mockReturnValue()
+  //     const result = OpenApiMockHandler.handleRequest(req, headers)
+  //     expect(Array.isArray(result)).toBeTruthy
+  //   })
+  // })
   describe('generateAsyncCallback', () => {
-    it('Check for the returned value', async () => {
-      const apis = OpenApiMockHandler.getOpenApiObjects()
-      const result = await OpenApiMockHandler.generateAsyncCallback(apis[0], sampleContext, sampleRequest)
-      // expect(result).toBe(true)
-      console.log(result)
+    it('Check for the returned value - not existing path', async () => {
+      const item = {}
+      const sampleContext = {
+        operation: {
+          path: '/transfers'
+        }
+      }
+      const sampleRequest = {}
+      SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({}))
+      SpyRequestLogger.mockReturnValue()
+      const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+    })
+    it('Check for the returned value - existing path', async () => {
+      const item = {}
+      const sampleContext = {
+        operation: {
+          path: '/transfers'
+        },
+        request: {
+          method: 'post'
+        }
+      }
+      const sampleRequest = {}
+      SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+        '/transfers': {
+          put: {}
+        }
+      }))
+      SpyRequestLogger.mockReturnValue()
+      const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+    })
+    it('Check for the returned value - existing path', async () => {
+      const item = {}
+      const sampleContext = {}
+      const sampleRequest = {}
+      SpyReadFileAsync.mockImplementationOnce(() => {throw new Error()})
+      SpyRequestLogger.mockReturnValue()
+      const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+    })
+    it('Check for the returned value - existing path', async () => {
+      const item = {}
+      const sampleContext = {
+        operation: {
+          path: '/transfers'
+        },
+        request: {
+          method: 'post'
+        }
+      }
+      const sampleRequest = {
+        customInfo: {}
+      }
+      SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+        '/transfers': {
+          'post': {}
+        }
+      }))
+      SpyRequestLogger.mockReturnValue()
+      SpyOpenApiRulesEngine.mockResolvedValueOnce({
+        body: {}
+      })
+      SpyHandleCallback.mockResolvedValueOnce()
+      const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+    })
+    it('Check for the returned value - existing path', async () => {
+      const item = {}
+      const sampleContext = {
+        operation: {
+          path: '/transfers'
+        },
+        request: {
+          method: 'post'
+        }
+      }
+      const sampleRequest = {
+        customInfo: {}
+      }
+      SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+        '/transfers': {
+          'post': {}
+        }
+      }))
+      SpyRequestLogger.mockReturnValue()
+      SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+      SpyHandleCallback.mockResolvedValueOnce()
+      SpyGetUserConfig.mockReturnValueOnce({
+        TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true
+      })
+      SpyHandleTransfers.mockReturnValueOnce(false)
+      SpyGenerateMockErrorCallback.mockResolvedValueOnce({})
+      SpyHandleCallback.mockResolvedValueOnce()
+      const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+    })
+    it('Check for the returned value - existing path', async () => {
+      const item = {}
+      const sampleContext = {
+        operation: {
+          path: '/transfers'
+        },
+        request: {
+          method: 'post'
+        }
+      }
+      const sampleRequest = {
+        customInfo: {}
+      }
+      SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+        '/transfers': {
+          'post': {}
+        }
+      }))
+      SpyRequestLogger.mockReturnValue()
+      SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+      SpyHandleCallback.mockResolvedValueOnce()
+      SpyGetUserConfig.mockReturnValueOnce({
+        TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true,
+        TRANSFERS_VALIDATION_ILP_PACKET: true
+      })
+      SpyHandleTransfers.mockReturnValueOnce(true)
+      SpyValidateTransferIlpPacket.mockReturnValueOnce(false)
+      SpyGenerateMockErrorCallback.mockResolvedValueOnce({})
+      SpyHandleCallback.mockResolvedValueOnce()
+      const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+    })
+    it('Check for the returned value - existing path', async () => {
+      const item = {}
+      const sampleContext = {
+        operation: {
+          path: '/transfers'
+        },
+        request: {
+          method: 'post'
+        }
+      }
+      const sampleRequest = {
+        customInfo: {}
+      }
+      SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+        '/transfers': {
+          'post': {}
+        }
+      }))
+      SpyRequestLogger.mockReturnValue()
+      SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+      SpyHandleCallback.mockResolvedValueOnce()
+      SpyGetUserConfig.mockReturnValueOnce({
+        TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true,
+        TRANSFERS_VALIDATION_ILP_PACKET: true,
+        TRANSFERS_VALIDATION_CONDITION: true
+      })
+      SpyHandleTransfers.mockReturnValueOnce(true)
+      SpyValidateTransferIlpPacket.mockReturnValueOnce(true)
+      SpyValidateTransferCondition.mockReturnValueOnce(false)
+      SpyGenerateMockErrorCallback.mockResolvedValueOnce({})
+      SpyHandleCallback.mockResolvedValueOnce()
+      const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+    })
+    it('Check for the returned value - existing path', async () => {
+      const item = {}
+      const sampleContext = {
+        operation: {
+          path: '/transfers'
+        },
+        request: {
+          method: 'post'
+        }
+      }
+      const sampleRequest = {
+        customInfo: {}
+      }
+      SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+        '/transfers': {
+          'post': {}
+        }
+      }))
+      SpyRequestLogger.mockReturnValue()
+      SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+      SpyHandleCallback.mockResolvedValueOnce()
+      SpyGetUserConfig.mockReturnValueOnce({
+        TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true,
+        TRANSFERS_VALIDATION_ILP_PACKET: true,
+        TRANSFERS_VALIDATION_CONDITION: true
+      })
+      SpyHandleTransfers.mockReturnValueOnce(true)
+      SpyValidateTransferIlpPacket.mockReturnValueOnce(true)
+      SpyCallbackRules.mockResolvedValueOnce({body: {}})
+      SpyHandleCallback.mockResolvedValueOnce()
+      SpyHandleQuoteIlp.mockReturnValueOnce('')
+      SpyHandleTransferIlp.mockReturnValueOnce()
+      SpyHandleQuotes.mockReturnValueOnce()
+      SpyHandleRequest.mockReturnValueOnce()
+      const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
     })
   })
 })

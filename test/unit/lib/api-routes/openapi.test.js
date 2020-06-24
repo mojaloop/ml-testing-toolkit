@@ -27,46 +27,197 @@ const apiServer = require('../../../../src/lib/api-server')
 const OpenApiMockHandler = require('../../../../src/lib/mocking/openApiMockHandler')
 
 const app = apiServer.getApp()
-jest.setTimeout(30000)
+
+const Utils = require('../../../../src/lib/utils')
+const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
+const OpenApiDefinitionsModel = require('../../../../src/lib/mocking/openApiDefinitionsModel')
+const SpyGetApiDefinitions = jest.spyOn(OpenApiDefinitionsModel, 'getApiDefinitions')
+const SpyGetOpenApiObjects = jest.spyOn(OpenApiMockHandler, 'getOpenApiObjects')
 
 describe('API route /api/openapi', () => {
   describe('GET /api/openapi/api_versions', () => {
     it('Getting all api versions', async () => {
+      const mockGetApiDefinitionsResponse = [{
+        minorVersion: '0',
+        majorVersion: '1',
+        type: 'fspiop',
+        asynchronous: false
+      }]
+      SpyGetApiDefinitions.mockResolvedValueOnce(mockGetApiDefinitionsResponse)
       const res = await request(app).get(`/api/openapi/api_versions`)
       expect(res.statusCode).toEqual(200)
-      expect(Array.isArray(res.body)).toBe(true)
+      expect(res.body).toStrictEqual(mockGetApiDefinitionsResponse)
       expect(res.body.length).toBeGreaterThan(0)
-      const firstItem = res.body[0]
-      expect(firstItem).toHaveProperty('minorVersion')
-      expect(firstItem).toHaveProperty('majorVersion')
-      expect(firstItem).toHaveProperty('type')
+    })
+    it('Getting none api versions', async () => {
+      mockGetApiDefinitionsResponse = null
+      SpyGetApiDefinitions.mockResolvedValueOnce(mockGetApiDefinitionsResponse)
+      const res = await request(app).get(`/api/openapi/api_versions`)
+      expect(res.statusCode).toEqual(404)
+    })
+    it('Getting error', async () => {
+      mockGetApiDefinitionsResponse = null
+      SpyGetApiDefinitions.mockRejectedValueOnce()
+      const res = await request(app).get(`/api/openapi/api_versions`)
+      expect(res.statusCode).toEqual(404)
     })
   })
   describe('GET /api/openapi/definition/:type/:version', () => {
-    let firstItem
-    it('Getting all api versions', async () => {
-      const res = await request(app).get(`/api/openapi/api_versions`)
-      firstItem = res.body[0]
-      await OpenApiMockHandler.initilizeMockHandler()
-    })
     it('Getting api definition', async () => {
-      const res = await request(app).get(`/api/openapi/definition/${firstItem.type}/${firstItem.majorVersion}.${firstItem.minorVersion}`)
+      const mockGetApiDefinitionsResponse = [{
+        minorVersion: 1,
+        majorVersion: 1,
+        type: 'fspiop',
+        asynchronous: false,
+        openApiBackendObject: {
+          definition: {
+            paths: []
+          }
+        }
+      }]
+      SpyGetOpenApiObjects.mockReturnValueOnce(mockGetApiDefinitionsResponse)
+      const reqItem = mockGetApiDefinitionsResponse[0]
+      const res = await request(app).get(`/api/openapi/definition/${reqItem.type}/${reqItem.majorVersion}.${reqItem.minorVersion}`)
       expect(res.statusCode).toEqual(200)
       expect(res.body).toHaveProperty('paths')
     })
-    it('Getting callback map', async () => {
-      const res = await request(app).get(`/api/openapi/callback_map/${firstItem.type}/${firstItem.majorVersion}.${firstItem.minorVersion}`)
-      if (firstItem.asynchronous) {
-        expect(res.statusCode).toEqual(200)
-      } else {
-        expect(res.statusCode).toEqual(404)
-      }
+    it('Getting api definition - not found', async () => {
+      const mockGetApiDefinitionsResponse = [{
+        minorVersion: 0,
+        majorVersion: 1,
+        type: 'fspiop',
+        asynchronous: false
+      }]
+      SpyGetOpenApiObjects.mockReturnValueOnce(mockGetApiDefinitionsResponse)
+      const reqItem = mockGetApiDefinitionsResponse[0]
+      const res = await request(app).get(`/api/openapi/definition/settlements/${reqItem.majorVersion}.${reqItem.minorVersion}`)
+      expect(res.statusCode).toEqual(404)
     })
-    it('Getting response map', async () => {
-      const res = await request(app).get(`/api/openapi/response_map/${firstItem.type}/${firstItem.majorVersion}.${firstItem.minorVersion}`)
-      if (!firstItem.asynchronous) {
-        expect(res.statusCode).toEqual(200)
-      }
+    it('Getting api definition - error', async () => {
+      const mockGetApiDefinitionsResponse = [{
+        minorVersion: 0,
+        majorVersion: 1,
+        type: 'fspiop',
+        asynchronous: false
+      }]
+      SpyGetOpenApiObjects.mockImplementationOnce(() => {throw new Error()})
+      const reqItem = mockGetApiDefinitionsResponse[0]
+      const res = await request(app).get(`/api/openapi/definition/${reqItem.type}/${reqItem.majorVersion}.${reqItem.minorVersion}`)
+      expect(res.statusCode).toEqual(500)
+    })
+  })
+  describe('GET /api/openapi/callback_map/:type/:version', () => {
+    it('Getting api definition', async () => {
+      const mockGetApiDefinitionsResponse = [{
+        minorVersion: 0,
+        majorVersion: 1,
+        type: 'fspiop',
+        asynchronous: true,
+        callbackMapFile: 'callback_map.json'
+      }]
+      SpyGetApiDefinitions.mockReturnValueOnce(mockGetApiDefinitionsResponse)
+      SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({}))
+      const reqItem = mockGetApiDefinitionsResponse[0]
+      const res = await request(app).get(`/api/openapi/callback_map/${reqItem.type}/${reqItem.majorVersion}.${reqItem.minorVersion}`)
+      expect(res.statusCode).toEqual(200)
+    })
+    
+    it('Getting api definition - not found api definition', async () => {
+      const mockGetApiDefinitionsResponse = [{
+        minorVersion: 0,
+        majorVersion: 1,
+        type: 'fspiop',
+        asynchronous: true,
+        callbackMapFile: 'callback_map.json'
+      }]
+      SpyGetApiDefinitions.mockReturnValueOnce(mockGetApiDefinitionsResponse)
+      const reqItem = mockGetApiDefinitionsResponse[0]
+      const res = await request(app).get(`/api/openapi/callback_map/settlements/${reqItem.majorVersion}.${reqItem.minorVersion}`)
+      expect(res.statusCode).toEqual(404)
+    })
+
+    it('Getting api definition - not found map file', async () => {
+      const mockGetApiDefinitionsResponse = [{
+        minorVersion: 0,
+        majorVersion: 1,
+        type: 'fspiop',
+        asynchronous: true,
+        callbackMapFile: 'callback_map.json'
+      }]
+      SpyGetApiDefinitions.mockReturnValueOnce(mockGetApiDefinitionsResponse)
+      SpyReadFileAsync.mockImplementationOnce(() => {throw new Error()})
+      const reqItem = mockGetApiDefinitionsResponse[0]
+      const res = await request(app).get(`/api/openapi/callback_map/${reqItem.type}/${reqItem.majorVersion}.${reqItem.minorVersion}`)
+      expect(res.statusCode).toEqual(404)
+    })
+
+    it('Getting api definition - error', async () => {
+      const mockGetApiDefinitionsResponse = [{
+        minorVersion: 0,
+        majorVersion: 1,
+        type: 'fspiop'
+      }]
+      SpyGetApiDefinitions.mockImplementationOnce(() => {throw new Error()})
+      const reqItem = mockGetApiDefinitionsResponse[0]
+      const res = await request(app).get(`/api/openapi/callback_map/${reqItem.type}/${reqItem.majorVersion}.${reqItem.minorVersion}`)
+      expect(res.statusCode).toEqual(500)
+    })
+  })
+  describe('GET /api/openapi/response_map/:type/:version', () => {
+    it('Getting api definition', async () => {
+      const mockGetApiDefinitionsResponse = [{
+        minorVersion: 0,
+        majorVersion: 1,
+        type: 'fspiop',
+        asynchronous: false,
+        callbackMapFile: 'response_map.json'
+      }]
+      SpyGetApiDefinitions.mockReturnValueOnce(mockGetApiDefinitionsResponse)
+      SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({}))
+      const reqItem = mockGetApiDefinitionsResponse[0]
+      const res = await request(app).get(`/api/openapi/response_map/${reqItem.type}/${reqItem.majorVersion}.${reqItem.minorVersion}`)
+      expect(res.statusCode).toEqual(200)
+    })
+    
+    it('Getting api definition - not found api definition', async () => {
+      const mockGetApiDefinitionsResponse = [{
+        minorVersion: 0,
+        majorVersion: 1,
+        type: 'fspiop',
+        asynchronous: false,
+        callbackMapFile: 'response_map.json'
+      }]
+      SpyGetApiDefinitions.mockReturnValueOnce(mockGetApiDefinitionsResponse)
+      const reqItem = mockGetApiDefinitionsResponse[0]
+      const res = await request(app).get(`/api/openapi/response_map/settlements/${reqItem.majorVersion}.${reqItem.minorVersion}`)
+      expect(res.statusCode).toEqual(404)
+    })
+
+    it('Getting api definition - not found map file', async () => {
+      const mockGetApiDefinitionsResponse = [{
+        minorVersion: 0,
+        majorVersion: 1,
+        type: 'fspiop',
+        asynchronous: false,
+        callbackMapFile: 'response_map.json'
+      }]
+      SpyGetApiDefinitions.mockReturnValueOnce(mockGetApiDefinitionsResponse)
+      SpyReadFileAsync.mockImplementationOnce(() => {throw new Error()})
+      const reqItem = mockGetApiDefinitionsResponse[0]
+      const res = await request(app).get(`/api/openapi/response_map/${reqItem.type}/${reqItem.majorVersion}.${reqItem.minorVersion}`)
+      expect(res.statusCode).toEqual(404)
+    })
+
+    it('Getting api definition - error', async () => {
+      const mockGetApiDefinitionsResponse = [{
+        minorVersion: 0,
+        majorVersion: 1,
+        type: 'fspiop'
+      }]
+      SpyGetApiDefinitions.mockImplementationOnce(() => {throw new Error()})
+      const reqItem = mockGetApiDefinitionsResponse[0]
+      const res = await request(app).get(`/api/openapi/response_map/${reqItem.type}/${reqItem.majorVersion}.${reqItem.minorVersion}`)
+      expect(res.statusCode).toEqual(500)
     })
   })
 })

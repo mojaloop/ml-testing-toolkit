@@ -31,7 +31,7 @@ const { check, validationResult } = require('express-validator')
 // Get runtime and stored user config
 router.get('/user', async (req, res, next) => {
   try {
-    const runtime = await Config.getUserConfig()
+    const runtime = Config.getUserConfig()
     const stored = await Config.getStoredUserConfig()
     res.status(200).json({ runtime, stored })
   } catch (err) {

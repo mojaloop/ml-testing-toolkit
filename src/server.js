@@ -64,7 +64,7 @@ const createServer = async (port) => {
       return null
     }
     const tlsConfig = ConnectionProvider.getTlsConfig()
-    server = await new Hapi.Server({
+    server = new Hapi.Server({
       port,
       tls: {
         cert: tlsConfig.hubServerCert,
@@ -75,52 +75,18 @@ const createServer = async (port) => {
       }
     })
   } else {
-    server = await new Hapi.Server({
+    server = new Hapi.Server({
       port
-      // routes: {
-      //   payload: {
-      //     parse: true,
-      //     output: 'stream'
-      //   }
-      // }
     })
   }
-  // console.log(server)
-  // await Plugins.registerPlugins(server)
-  // await server.register([
-  //   {
-  //     plugin: HapiOpenAPI,
-  //     options:  openAPIOptions
-  //   },
-  //   {
-  //     plugin: HeaderValidator
-  //   }
-  // ])
 
-  await server.route({
+  server.route({
     method: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     path: '/{path*}',
     handler: (req, h) => OpenApiMockHandler.handleRequest(req, h)
   })
 
-  // await server.ext([
-  //   {
-  //     type: 'onRequest',
-  //     method: (request, h) => {
-  //       RequestLogger.logRequest(request)
-  //       return h.continue
-  //     }
-  //   },
-  //   {
-  //     type: 'onPreResponse',
-  //     method: (request, h) => {
-  //       RequestLogger.logResponse(request.response)
-  //       return h.continue
-  //     }
-  //   }
-  // ])
-
-  await server.ext([
+  server.ext([
     {
       type: 'onPreHandler',
       method: (request, h) => {
@@ -160,11 +126,10 @@ const createServer = async (port) => {
 const initialize = async () => {
   await OpenApiMockHandler.initilizeMockHandler()
   serverInstance = await createServer(Config.getSystemConfig().API_PORT)
-  // serverInstance.plugins.openapi.setHost(serverInstance.info.host + ':' + serverInstance.info.port)
-  // Logger.info(`serverInstance running on ${serverInstance.info.host}:${serverInstance.info.port}`)
 
   objectStore.initObjectStore()
-  assertionStore.initAssertionStore()
+  const clearInterval = 10 * 60 * 1000
+  assertionStore.initAssertionStore(clearInterval)
 
   console.log(`Toolkit Server running on port ${serverInstance.info.port}`)
   return serverInstance

@@ -22,18 +22,25 @@
  --------------
  ******/
 
-const fs = require('fs')
-const { promisify } = require('util')
-const readFileAsync = promisify(fs.readFile)
-const writeFileAsync = promisify(fs.writeFile)
-const accessFileAsync = promisify(fs.access)
-const readDirAsync = promisify(fs.readdir)
-const deleteFileAsync = promisify(fs.unlink)
+'use strict'
 
-module.exports = {
-  readFileAsync,
-  writeFileAsync,
-  accessFileAsync,
-  readDirAsync,
-  deleteFileAsync
-}
+const NotificationEmitter = require('../../../src/lib/notificationEmitter')
+
+describe('NotificationEmitter', () => {
+  describe('boradcastLog', () => {
+    it('should not throw an error when sessionID is missing', () => {
+      expect(() => NotificationEmitter.broadcastLog({})).not.toThrowError()
+    })
+    it('should not throw an error', () => {
+      expect(() => NotificationEmitter.broadcastLog({}, 'sessionID')).not.toThrowError()
+    })
+  })
+  describe('broadcastOutboundProgress', () => {
+    it('should not throw an error when sessionID is missing', () => {
+      expect(() => NotificationEmitter.broadcastOutboundProgress({})).not.toThrowError()
+    })
+    it('should not throw an error', () => {
+      expect(() => NotificationEmitter.broadcastOutboundProgress({}, 'sessionID')).not.toThrowError()
+    })
+  })
+})

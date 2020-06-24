@@ -75,7 +75,7 @@ router.post('/template/:traceID', async (req, res, next) => {
       return res.status(422).json({ errors: 'Template test cases are missing' })
     }
     const outbound = require('../test-outbound/outbound-initiator')
-    outbound.OutboundSend(inputJson, traceID)
+    await outbound.OutboundSend(inputJson, traceID)
 
     return res.status(200).json({ status: 'OK' })
   } catch (err) {
@@ -88,7 +88,7 @@ router.delete('/template/:traceID', async (req, res, next) => {
   try {
     const traceID = req.params.traceID
     const outbound = require('../test-outbound/outbound-initiator')
-    outbound.terminateOutbound(traceID)
+    await outbound.terminateOutbound(traceID)
 
     return res.status(200).json({ status: 'OK' })
   } catch (err) {

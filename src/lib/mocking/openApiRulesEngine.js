@@ -33,10 +33,12 @@ const Config = require('../config')
 // const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
 
 const removeEmpty = obj => {
-  Object.keys(obj).forEach(key => {
-    if (obj[key] && typeof obj[key] === 'object') removeEmpty(obj[key])
-    else if (obj[key] == null) delete obj[key]
-  })
+  if (obj) {
+    Object.keys(obj).forEach(key => {
+      if (obj[key] && typeof obj[key] === 'object') removeEmpty(obj[key])
+      else if (obj[key] == null) delete obj[key]
+    })
+  }
 }
 
 const validateRules = async (context, req) => {
@@ -132,7 +134,6 @@ const callbackRules = async (context, req) => {
 
   const res = await rulesEngine.evaluate(facts)
   const generatedCallback = {}
-
   if (res) {
     customLogger.logMessage('debug', 'Callback rules are matched', res, true, req)
     const curEvent = res[0]

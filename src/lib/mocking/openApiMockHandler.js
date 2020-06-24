@@ -28,13 +28,11 @@ const OpenApiBackend = require('openapi-backend').default
 const OpenApiDefinitionsModel = require('./openApiDefinitionsModel')
 const OpenApiVersionTools = require('./openApiVersionTools')
 const customLogger = require('../requestLogger')
-const fs = require('fs')
-const { promisify } = require('util')
 const OpenApiRulesEngine = require('./openApiRulesEngine')
 const CallbackHandler = require('../callbackHandler')
 const _ = require('lodash')
 const MyEventEmitter = require('../MyEventEmitter')
-const readFileAsync = promisify(fs.readFile)
+const utils = require('../utils')
 const Config = require('../config')
 const assertionStore = require('../assertionStore')
 const JwsSigning = require('../jws/JwsSigning')
@@ -51,7 +49,7 @@ var apis = []
 /**
  * Operations on /
  */
-module.exports.initilizeMockHandler = async () => {
+const initilizeMockHandler = async () => {
   // Initialize ILP
   IlpModel.init(Config.getUserConfig().ILP_SECRET)
   // Get API Definitions from configuration
@@ -108,7 +106,7 @@ module.exports.initilizeMockHandler = async () => {
   }
 }
 
-module.exports.handleRequest = (req, h) => {
+const handleRequest = (req, h) => {
   // JWS Validation
   try {
     const jwsValidated = JwsSigning.validate(req)
@@ -197,7 +195,7 @@ const errorResponseBuilder = (errorCode, errorDescription, additionalProperties 
   }
 }
 
-module.exports.getOpenApiObjects = () => {
+const getOpenApiObjects = () => {
   return apis
 }
 
@@ -221,7 +219,7 @@ const openApiBackendNotImplementedHandler = (item) => {
     let responseBody, responseStatus
     // Check for response map file
     try {
-      const respMapRawdata = await readFileAsync(item.responseMapFile)
+      const respMapRawdata = await utils.readFileAsync(item.responseMapFile)
       const responseMap = JSON.parse(respMapRawdata)
       const responseInfo = responseMap[context.operation.path][context.request.method]
       if (!responseInfo) {
@@ -257,7 +255,7 @@ const openApiBackendNotImplementedHandler = (item) => {
 const generateAsyncCallback = async (item, context, req) => {
   // Getting callback info from callback map file
   try {
-    const cbMapRawdata = await readFileAsync(item.callbackMapFile)
+    const cbMapRawdata = await utils.readFileAsync(item.callbackMapFile)
     const callbackMap = JSON.parse(cbMapRawdata)
     if (!callbackMap[context.operation.path]) {
       customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, null, true, req)
@@ -268,10 +266,6 @@ const generateAsyncCallback = async (item, context, req) => {
       return
     }
     const callbackInfo = callbackMap[context.operation.path][context.request.method]
-    if (!callbackInfo) {
-      customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method, null, true, req)
-      return
-    }
     req.customInfo.callbackInfo = callbackInfo
   } catch (err) {
     customLogger.logMessage('error', 'Callback file not found.', null, true, req)
@@ -286,8 +280,10 @@ const generateAsyncCallback = async (item, context, req) => {
     return
   }
 
+  const userConfig = Config.getUserConfig()
+
   // Handle quotes and transfer association - should do this first to get the associated quote
-  if (Config.getUserConfig().TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
+  if (userConfig.TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
     const matchFound = require('./middleware-functions/quotesAssociation').handleTransfers(context, req)
     if (!matchFound) {
       customLogger.logMessage('error', 'Matching Quote Not Found', null, true, req)
@@ -304,7 +300,7 @@ const generateAsyncCallback = async (item, context, req) => {
   }
 
   // Handle transfer validation against decoded ILP Packet
-  if (Config.getUserConfig().TRANSFERS_VALIDATION_ILP_PACKET) {
+  if (userConfig.TRANSFERS_VALIDATION_ILP_PACKET) {
     const validated = IlpModel.validateTransferIlpPacket(context, req)
     if (!validated) {
       customLogger.logMessage('error', 'ILP Packet is not matching with the content', null, true, req)
@@ -321,7 +317,7 @@ const generateAsyncCallback = async (item, context, req) => {
   }
 
   // Handle condition validation in transfer request
-  if (Config.getUserConfig().TRANSFERS_VALIDATION_CONDITION) {
+  if (userConfig.TRANSFERS_VALIDATION_CONDITION) {
     const validated = IlpModel.validateTransferCondition(context, req)
     if (!validated) {
       customLogger.logMessage('error', 'Condition can not be validated', null, true, req)
@@ -343,7 +339,7 @@ const generateAsyncCallback = async (item, context, req) => {
     // Append ILP properties to callback
     const fulfilment = IlpModel.handleQuoteIlp(context, generatedCallback)
     IlpModel.handleTransferIlp(context, generatedCallback)
-    if (Config.getUserConfig().TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
+    if (userConfig.TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
       require('./middleware-functions/quotesAssociation').handleQuotes(context, req, fulfilment)
     }
     // TODO: Handle method and path verifications against the generated ones
@@ -353,5 +349,10 @@ const generateAsyncCallback = async (item, context, req) => {
   }
 }
 
-module.exports.openApiBackendNotImplementedHandler = openApiBackendNotImplementedHandler
-module.exports.generateAsyncCallback = generateAsyncCallback
+module.exports = {
+  openApiBackendNotImplementedHandler,
+  generateAsyncCallback,
+  initilizeMockHandler,
+  handleRequest,
+  getOpenApiObjects
+}

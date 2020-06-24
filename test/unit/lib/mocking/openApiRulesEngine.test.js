@@ -70,7 +70,9 @@ rulesEngineModel.getValidationRulesEngine.mockImplementation(() => {
 }) 
 rulesEngineModel.getCallbackRulesEngine.mockImplementation(() => {
   const evaluateFn = async (facts) => {
-    if (facts.method === 'get') {
+    if (facts.method === 'get' && facts.path === 'not_supported') { 
+      return null
+    } else if (facts.method === 'get') {
       return [
         {
           type: 'MOCK_CALLBACK',
@@ -188,7 +190,7 @@ const sampleRequest ={
           'FSPIOP-Source': '{$config.FSPID}',
           'FSPIOP-Destination': '{$request.headers.fspiop-source}',
           'Content-Type': '{$session.negotiatedContentType}',
-          Date: '{$request.headers.date}'
+          Date: '{$function.curDate}'
         },
         bodyOverride: {
           transferAmount: {
@@ -215,8 +217,9 @@ const sampleRequest ={
     responseInfo: {
       response: {
         bodyOverride: {
-          id: '{$request.params.id}',
-          reason: '{$request.body.reason}'
+          id: '{$function.generic.generateUUID}',
+          reason: '{$request.body.reason}',
+          quiteID: '{$function.generica.generateUUID}'
         }
       }
     }
@@ -232,6 +235,22 @@ describe('OpenApiRulesEngine', () => {
       expect(result).toHaveProperty('method')
       expect(result).toHaveProperty('body')
       expect(result).toHaveProperty('headers')
+    })
+    it('Mock Error Callback', async () => {
+      sampleContext.request.method = 'get'
+      const temp = sampleRequest.customInfo.specFile
+      delete sampleRequest.customInfo.specFile
+      const result = await OpenApiRulesEngine.validateRules(sampleContext, sampleRequest)
+      sampleRequest.customInfo.specFile = temp
+      expect(result).toStrictEqual({})
+    })
+    it('Mock Error Callback', async () => {
+      sampleContext.request.method = 'get'
+      const realPathPattern = sampleRequest.customInfo.callbackInfo.errorCallback.pathPattern
+      delete sampleRequest.customInfo.callbackInfo.errorCallback.pathPattern
+      const result = await OpenApiRulesEngine.validateRules(sampleContext, sampleRequest)
+      sampleRequest.customInfo.callbackInfo.errorCallback.pathPattern = realPathPattern
+      expect(result.path).toBe(sampleRequest.customInfo.callbackInfo.errorCallback.path)
     })
     it('Fixed Error Callback', async () => {
       sampleContext.request.method = 'post'
@@ -251,6 +270,41 @@ describe('OpenApiRulesEngine', () => {
       expect(result).toHaveProperty('body')
       expect(result).toHaveProperty('headers')
     })
+    it('Mock Callback', async () => {
+      sampleContext.request.method = 'get'
+      const temp = sampleRequest.customInfo.callbackInfo.successCallback.pathPattern
+      delete sampleRequest.customInfo.callbackInfo.successCallback.pathPattern
+      const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
+      sampleRequest.customInfo.callbackInfo.successCallback.pathPattern = temp 
+      expect(result).toHaveProperty('path')
+      expect(result).toHaveProperty('method')
+      expect(result).toHaveProperty('body')
+      expect(result).toHaveProperty('headers')
+    })
+    it('Mock Callback', async () => {
+      sampleContext.request.method = 'get'
+      const temp = sampleRequest.customInfo.specFile
+      delete sampleRequest.customInfo.specFile
+      const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
+      sampleRequest.customInfo.specFile = temp 
+      expect(result).toStrictEqual({})
+    })
+    it('Mock Callback', async () => {
+      sampleContext.request.method = 'get'
+      const temp = sampleContext.request.path
+      sampleContext.request.path = 'not_supported'
+      const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
+      sampleContext.request.path = temp 
+      expect(result).toStrictEqual({})
+    })
+    it('Mock Callback', async () => {
+      sampleContext.request.method = 'get'
+      const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
+      expect(result).toHaveProperty('path')
+      expect(result).toHaveProperty('method')
+      expect(result).toHaveProperty('body')
+      expect(result).toHaveProperty('headers')
+    })
     it('Fixed Callback', async () => {
       sampleContext.request.method = 'post'
       const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
@@ -259,8 +313,23 @@ describe('OpenApiRulesEngine', () => {
       expect(result).toHaveProperty('body')
       expect(result).toHaveProperty('headers')
     })
+    it('Fixed Callback', async () => {
+      sampleContext.request.method = 'post'
+      const temp = sampleRequest.customInfo.callbackInfo.successCallback.pathPattern
+      delete sampleRequest.customInfo.callbackInfo.successCallback.pathPattern
+      const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
+      sampleRequest.customInfo.callbackInfo.successCallback.pathPattern = temp 
+      expect(result).toHaveProperty('path')
+      expect(result).toHaveProperty('method')
+      expect(result).toHaveProperty('body')
+      expect(result).toHaveProperty('headers')
+    })
   })
   describe('responseRules', () => {
+    it('Mocked Response', async () => {
+      sampleContext.request.method = 'get'
+      const result = await OpenApiRulesEngine.responseRules(sampleContext, sampleRequest)
+    })
     it('Fixed Response', async () => {
       sampleContext.request.method = 'post'
       const result = await OpenApiRulesEngine.responseRules(sampleContext, sampleRequest)

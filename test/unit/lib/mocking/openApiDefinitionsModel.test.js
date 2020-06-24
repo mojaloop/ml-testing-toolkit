@@ -24,11 +24,28 @@
 
 'use strict'
 
+const Config = require('../../../../src/lib/config')
+
+const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
+const SpyloadSystemConfig = jest.spyOn(Config, 'loadSystemConfig')
+
 const OpenApiDefinitionsModel = require('../../../../src/lib/mocking/openApiDefinitionsModel')
 
 describe('OpenApiDefinitionsModel', () => {
   describe('getApiDefinitions', () => {
     it('Result must contain the required properties', async () => {
+      SpyGetSystemConfig.mockReturnValueOnce({
+        API_DEFINITIONS: null
+      })
+      SpyloadSystemConfig.mockResolvedValue()
+      SpyGetSystemConfig.mockReturnValueOnce({
+        API_DEFINITIONS: [{
+          version: '1.0',
+          type: 'response',
+          asynchronous: false,
+          folderPath: 'central_admin_9.3'
+        }]
+      })
       const result = await OpenApiDefinitionsModel.getApiDefinitions()
       expect(Array.isArray(result)).toBe(true)
       expect(result.length).toBeGreaterThan(0)

@@ -38,7 +38,7 @@ const SpyServer = jest.spyOn(Server, 'restartServer')
 describe('API route /config', () => {
   describe('GET /api/config/user', () => {
     it('Getting config', async () => {
-      SpyGetUserConfig.mockResolvedValueOnce({})
+      SpyGetUserConfig.mockReturnValueOnce({})
       SpyGetStoredUserConfig.mockResolvedValueOnce({})
       const res = await request(app).get(`/api/config/user`)
       expect(res.statusCode).toEqual(200)
@@ -46,9 +46,10 @@ describe('API route /config', () => {
       expect(res.body).toHaveProperty('stored')
     })
     it('Getting config throws an error', async () => {
-      SpyGetUserConfig.mockRejectedValueOnce({})
+      SpyGetUserConfig.mockReturnValueOnce({})
+      SpyGetStoredUserConfig.mockRejectedValueOnce()
       const res = await request(app).get(`/api/config/user`)
-      expect(res.statusCode).toEqual(500)
+      expect(res.statusCode).toEqual(404)
     })
   })
   describe('PUT /api/config/user', () => {

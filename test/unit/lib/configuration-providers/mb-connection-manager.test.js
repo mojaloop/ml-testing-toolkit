@@ -82,6 +82,16 @@ axios.post.mockImplementation((url) => {
       })
       break
 
+    case '/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign':
+      return Promise.resolve({
+        status: 200,
+        data: {
+          id: 1,
+          certificate: 'asdf',
+          validationState: 'VALID'
+        }
+      })
+      break
       // Upload Hub Server certs
     case '/api/environments/1/hub/servercerts':
       return Promise.resolve({
@@ -112,6 +122,23 @@ axios.post.mockImplementation((url) => {
 
 axios.get.mockImplementation((url) => {
   switch(url) {
+    case '/api/environments':
+      return Promise.resolve({
+        status: 200,
+        data: [{
+          name: 'NOT-TESTING-TOOLKIT'
+        }]
+      })
+      break
+
+      case '/api/environments/1/dfsps':
+        return Promise.resolve({
+          status: 200,
+          data: [{
+            id: 0
+          }]
+        })
+        break
     // Get DFSP CA
     case '/api/environments/1/dfsps/userdfsp/ca':
       return Promise.resolve({
@@ -123,7 +150,32 @@ axios.get.mockImplementation((url) => {
       })
       break
 
+    case '/api/environments/1/dfsps/userdfsp/servercerts':
+      return Promise.resolve({
+          status: 200,
+          data: {
+            rootCertificate: 'asdf',
+            validationState: 'VALID',
+            intermediateChain: 'asdf',
+            serverCertificate: 'asdf'
+          }
+      })
+      break
+
+      case '/api/environments/1/hub/servercerts':
+        return Promise.resolve({
+            status: 200,
+            data: {
+              rootCertificate: 'asdf',
+              validationState: 'VALID',
+              intermediateChain: 'asdf',
+              serverCertificate: 'asdf'
+            }
+        })
+        break
+
     // Get Hub CSR
+
     case '/api/environments/1/dfsps/userdfsp/enrollments/outbound':
       return Promise.resolve({
           status: 200,
@@ -131,6 +183,20 @@ axios.get.mockImplementation((url) => {
             {
               id: 1,
               state: 'CERT_SIGNED',
+              validationState: 'VALID',
+              certificate: 'asdf'
+            }
+          ]
+      })
+      break
+
+    case '/api/environments/1/dfsps/userdfsp/enrollments/inbound':
+      return Promise.resolve({
+          status: 200,
+          data: [
+            {
+              id: 1,
+              state: 'CSR_LOADED',
               validationState: 'VALID',
               certificate: 'asdf'
             }
@@ -151,12 +217,43 @@ axios.get.mockImplementation((url) => {
       })
       break
 
+    case '/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts':
+      return Promise.resolve({
+          status: 200,
+          data: {
+            rootCertificate: 'asdf',
+            intermediateChain: 'asdf',
+            jwsCertificate: 'asdf'
+          }
+      })
+      break
+
+    case '/api/environments/1/dfsps/userdfsp/enrollments/inbound':
+      return Promise.resolve({
+          status: 200,
+          data: [{
+            id: 1,
+            state: 'CSR_LOADED',
+            validationState: 'VALID'
+          },{
+            id: 2,
+            state: 'CSR_LOADED',
+            validationState: 'INVALID'
+          }]
+      })
+      break
     default:
       return Promise.reject(new Error('not found'))
   }
 })
 
 describe('mb-connection-manager', () => {
+  describe('waitForTlsHubCerts', () => {
+    it('should wait for tls certs', async () => {
+      MBConnectionManagerProvider.waitForTlsHubCerts()
+      await new Promise(resolve => setTimeout(resolve, 500))
+    })
+  })
   describe('initialize', () => {
     it('should not throw error', async () => {
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()

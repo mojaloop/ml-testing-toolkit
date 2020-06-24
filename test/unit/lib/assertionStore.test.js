@@ -26,6 +26,8 @@
 
 const AssertionStore = require('../../../src/lib/assertionStore')
 
+jest.setTimeout(20000)
+
 describe('AssertionStore', () => {
   describe('Requests', () => {
     const path = '/assertionStoreRequests'
@@ -64,7 +66,9 @@ describe('AssertionStore', () => {
       AssertionStore.pushRequest(path, data)
       AssertionStore.pushCallback(path, data)
       AssertionStore.initAssertionStore()
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      AssertionStore.popRequest(path)
+      AssertionStore.popCallback(path)
     })
   })
 })
