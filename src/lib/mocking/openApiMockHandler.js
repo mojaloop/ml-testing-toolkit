@@ -118,7 +118,6 @@ const handleRequest = (req, h) => {
     customLogger.logMessage('error', 'Resource not found', null, true, req)
     return h.response({ error: 'Not Found' }).code(404)
   }
-
   if (apis[selectedVersion].type === 'fspiop' && Config.getUserConfig().VERSIONING_SUPPORT_ENABLE) {
     const fspiopApis = apis.filter(item => {
       return item.type === 'fspiop'
@@ -219,6 +218,9 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
   responseStatus = +generatedResponse.status
   responseBody = generatedResponse.body
   customLogger.logMessage('info', 'Generated response', generatedResponse, true, req)
+  if (generatedResponse.delay) {
+    await new Promise(resolve => setTimeout(resolve, generatedResponse.delay))
+  }
   if (!responseBody) {
     // Generate mock response from openAPI spec file
     const { status, mock } = context.api.mockResponseForOperation(context.operation.operationId)

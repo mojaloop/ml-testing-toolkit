@@ -226,6 +226,9 @@ const responseRules = async (context, req) => {
     if (curEvent.type === 'FIXED_RESPONSE') {
       generatedResponse.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
       generatedResponse.status = +curEvent.params.statusCode
+      if (curEvent.params.delay) {
+        generatedResponse.delay = curEvent.params.delay
+      }
       // generatedResponse.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req)
     } else if (curEvent.type === 'MOCK_RESPONSE') {
       if (req.customInfo.specFile) {
@@ -256,6 +259,9 @@ const responseRules = async (context, req) => {
         _.merge(generatedResponse.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
         removeEmpty(generatedResponse.body)
         _.merge(generatedResponse.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
+        if (curEvent.params.delay) {
+          generatedResponse.delay = curEvent.params.delay
+        }
       } else {
         customLogger.logMessage('error', 'No Specification file provided for responseRules function', null, true, req)
       }
