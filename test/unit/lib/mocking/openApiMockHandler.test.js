@@ -69,6 +69,7 @@ const SpyValidateContentTypeHeader = jest.spyOn(OpenApiVersionTools, 'validateCo
 
 jest.mock('../../../../src/lib/assertionStore')
 
+jest.setTimeout(10000)
 const quoteRequestBody = {
   quoteId: 'f27456e9-fffb-47c0-9f28-5c727434873d',
   transactionId: '49618fcc-8b13-49b1-8126-2a0cda6472ce',
