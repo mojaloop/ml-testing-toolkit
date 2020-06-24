@@ -35,7 +35,8 @@ const CallbackHandler = require('../../../../src/lib/callbackHandler')
 const QuotesAssociation = require('../../../../src/lib/mocking/middleware-functions/quotesAssociation')
 const TransactionRequestsService = require('../../../../src/lib/mocking/middleware-functions/transactionRequestsService')
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
-
+const AssertionStore = require('../../../../src/lib/assertionStore')
+const OpenApiVersionTools = require('../../../../src/lib/mocking/openApiVersionTools')
 
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 const SpyGetApiDefinitions = jest.spyOn(OpenApiDefinitionsModel, 'getApiDefinitions')
@@ -45,6 +46,7 @@ const SpyRequestLogger = jest.spyOn(RequestLogger, 'logMessage')
 const SpyOpenApiRulesEngine = jest.spyOn(OpenApiRulesEngine, 'validateRules')
 const SpyGenerateMockErrorCallback = jest.spyOn(OpenApiRulesEngine, 'generateMockErrorCallback')
 const SpyCallbackRules = jest.spyOn(OpenApiRulesEngine, 'callbackRules')
+const SpyResponseRules = jest.spyOn(OpenApiRulesEngine, 'responseRules')
 
 const SpyHandleCallback = jest.spyOn(CallbackHandler, 'handleCallback')
 
@@ -54,31 +56,17 @@ const SpyHandleQuotes = jest.spyOn(QuotesAssociation, 'handleQuotes')
 const SpyValidateTransferIlpPacket = jest.spyOn(IlpModel, 'validateTransferIlpPacket')
 const SpyHandleQuoteIlp = jest.spyOn(IlpModel, 'handleQuoteIlp')
 const SpyHandleTransferIlp = jest.spyOn(IlpModel, 'handleTransferIlp')
+const SpyInit = jest.spyOn(IlpModel, 'init')
 const SpyValidateTransferCondition = jest.spyOn(IlpModel, 'validateTransferCondition')
 
 const SpyHandleRequest = jest.spyOn(TransactionRequestsService, 'handleRequest')
 
 const SpyValidate = jest.spyOn(JwsSigning, 'validate')
 
-const OpenApiBackend = require('openapi-backend').default
-jest.mock('openapi-backend')
+const SpyValidateAcceptHeader = jest.spyOn(OpenApiVersionTools, 'validateAcceptHeader')
+const SpyNegotiateVersion = jest.spyOn(OpenApiVersionTools, 'negotiateVersion')
 
-OpenApiBackend.mockImplementation((argObj) => {
-  const initFn = async () => {
-
-  }
-  const matchOperationFn = () => {
-    return true
-  }
-  const handleRequestFn = () => {
-    return true
-  }
-  return {
-    init: initFn,
-    handleRequest: handleRequestFn,
-    matchOperation: matchOperationFn
-  }
-})
+jest.mock('../../../../src/lib/assertionStore')
 
 const quoteRequestBody = {
   quoteId: 'f27456e9-fffb-47c0-9f28-5c727434873d',
@@ -149,6 +137,8 @@ const sampleRequest = {
   headers: {
     'Accept': 'asdf'
   },
+  majorVersion: 1,
+  minorVersion: 0,
   payload: {...quoteRequestBody},
   customInfo: {
     sessionID: '123'
@@ -163,69 +153,113 @@ const h = {
   }
 }
 
-jest.setTimeout(30000)
-
 describe('OpenApiMockHandler', () => {
   describe('initilizeMockHandler', () => {
     it('Should not throw errors', async () => {
+      SpyInit.mockReturnValueOnce()
       SpyGetUserConfig.mockResolvedValueOnce({
         ILP_SECRET: 'secret'
       })
       SpyGetApiDefinitions.mockResolvedValueOnce([{
-        specFile: 'api_spec.yaml'
+        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+        type: 'fspiop'
       }])
 
-      await expect(OpenApiMockHandler.initilizeMockHandler()).resolves.toBeUndefined()
-    })
-    it('getOpenApiObjects should output apis', async () => {
-      const result = OpenApiMockHandler.getOpenApiObjects()
-      expect(Array.isArray(result)).toBeTruthy()
+      await OpenApiMockHandler.initilizeMockHandler()
+      const apis = OpenApiMockHandler.getOpenApiObjects()
+      const openApiBackendObject = apis[0].openApiBackendObject
+      const contextValidationFail = {
+        validation: {
+          errors: [{
+            keyword: 'keyword',
+            dataPath: 'dataPath',
+            params: {
+              'key1': 'value1'
+            },
+            message: 'error message'
+          }]
+        }
+      }
+      await openApiBackendObject.handlers.validationFail(contextValidationFail, {}, h)
+      
+      SpyRequestLogger.mockReturnValue()
+      await openApiBackendObject.handlers.notFound(null, {}, h)
+
+      const req = {
+        type: 'fspiop',
+        method: 'put',
+        path: '/quotes',
+        customInfo: {}
+      }
+      const context = {
+        operation: {
+          path: '/quotes'
+        },
+        request: {
+          method: 'put'
+        },
+        api: {
+          mockResponseForOperation: () => {
+            return {
+              status: 200,
+              mock: {
+                test: 'test'
+              },
+              delay: 500
+            }
+          }
+        } 
+      }
+      AssertionStore.pushRequest.mockReturnValueOnce()
+      SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
+        '/quotes': {
+          put: {}
+        }
+      }))
+      SpyResponseRules.mockResolvedValueOnce({
+        status: '200'
+      })
+      await openApiBackendObject.handlers.notImplemented(context, req, h)
+      req.path = '/quotes/{ID}/error'
+
+      AssertionStore.pushRequest.mockReturnValueOnce()
+      SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
+        '/quotes/{ID}/error': {
+          get: {}
+        }
+      }))
+      SpyGetUserConfig.mockReturnValueOnce({
+        VERSIONING_SUPPORT_ENABLE: true
+      })
+      await openApiBackendObject.handlers.notImplemented(context, req, h)
     })
   })
   describe('handleRequest', () => {
     it('Check for the returned value', () => {
+      SpyValidate.mockImplementationOnce(() => {throw new Error('')})
       const result = OpenApiMockHandler.handleRequest(sampleRequest, h)
-      expect(result).toBe(true)
+      expect(result).toBeDefined()
+    })
+    it('Check for the returned value', () => {
+      SpyValidate.mockResolvedValueOnce(true)
+      sampleRequest.path = '/test'
+      const result = OpenApiMockHandler.handleRequest(sampleRequest, h)
+      sampleRequest.path = '/quotes'
+      expect(result).toBeDefined()
+    })
+    it('Check for the returned value', () => {
+      SpyValidate.mockResolvedValueOnce(true)
+      SpyValidateAcceptHeader.mockReturnValueOnce({
+        validationFailed: false
+      })
+      SpyNegotiateVersion.mockReturnValueOnce({
+        negotiationFailed: true,
+        negotiatedIndex: 0
+      })
+      const result = OpenApiMockHandler.handleRequest(sampleRequest, h)
+      expect(result).toBeDefined()
     })
   })
-  describe('openApiBackendNotImplementedHandler', () => {
-    it('Check for the returned value', async () => {
-      const apis = OpenApiMockHandler.getOpenApiObjects()
-      const fnNotImplemented = OpenApiMockHandler.openApiBackendNotImplementedHandler(apis[0])
-      const result = await fnNotImplemented(sampleContext, sampleRequest, h)
-      expect(result).toBe(true)
-    })
-  })
-  // describe('handleRequest', () => {
-  //   it('to do', () => {
-  //     const req = {
-  //       method: 'put'
-  //     }
-  //     const h = {
-  //       response: () => {
-  //         code: () => {}
-  //       }
-  //     }
-  //     SpyValidate.mockReturnValueOnce(() => {throw new Error()})
-  //     SpyRequestLogger.mockReturnValue()
-  //     const result = OpenApiMockHandler.handleRequest(req, headers)
-  //     expect(Array.isArray(result)).toBeTruthy
-  //   })
-  //   it('to do', () => {
-  //     const req = {
-  //       method: 'put'
-  //     }
-  //     const h = {
-  //       response: () => {
-  //         code: () => {}
-  //       }
-  //     }
-  //     SpyValidate.mockReturnValueOnce(true)
-  //     SpyRequestLogger.mockReturnValue()
-  //     const result = OpenApiMockHandler.handleRequest(req, headers)
-  //     expect(Array.isArray(result)).toBeTruthy
-  //   })
-  // })
   describe('generateAsyncCallback', () => {
     it('Check for the returned value - not existing path', async () => {
       const item = {}
