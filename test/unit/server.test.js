@@ -30,25 +30,44 @@ const ConnectionProvider = require('../../src/lib/configuration-providers/mb-con
 const ObjectStore = require('../../src/lib/objectStore')
 const AssertionStore = require('../../src/lib/assertionStore')
 const OpenApiMockHandler = require('../../src/lib/mocking/openApiMockHandler')
+const { default: Axios } = require('axios')
+const { setActiveResponseRulesFile } = require('../../src/lib/rulesEngineModel')
 
 
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
+const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
+
 const SpyWaitForTlsHubCerts = jest.spyOn(ConnectionProvider, 'waitForTlsHubCerts')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
 const SpyInitObjectStore = jest.spyOn(ObjectStore, 'initObjectStore')
 const SpyInitAssertionStore = jest.spyOn(AssertionStore, 'initAssertionStore')
 const SpyInitilizeMockHandler = jest.spyOn(OpenApiMockHandler, 'initilizeMockHandler')
+const SpyHandleRequest = jest.spyOn(OpenApiMockHandler, 'handleRequest')
 
 
 jest.setTimeout(30000)
 
 describe('Server', () => {
+  describe('restartServer', () => {
+    it('restartServer should not throw an error', async () => {
+      SpyGetSystemConfig.mockReturnValueOnce({
+        API_PORT: 5051
+      })
+      SpyGetUserConfig.mockReturnValueOnce({
+        INBOUND_MUTUAL_TLS_ENABLED: true
+      })
+      SpyWaitForTlsHubCerts.mockRejectedValue()
+      const server = await Server.restartServer()
+      expect(server).toBeUndefined()
+    })
+  })
   describe('initialize', () => {
     it('initialize should not throw an error', async () => {
       SpyInitilizeMockHandler.mockResolvedValueOnce()
-      SpyGetUserConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValueOnce({
         API_PORT: 5051
-      }).mockReturnValueOnce({
+      })
+      SpyGetUserConfig.mockReturnValueOnce({
         INBOUND_MUTUAL_TLS_ENABLED: true
       })
       SpyWaitForTlsHubCerts.mockResolvedValueOnce()
@@ -59,12 +78,68 @@ describe('Server', () => {
       })
       SpyInitObjectStore.mockReturnValueOnce()
       SpyInitAssertionStore.mockReturnValueOnce()
-      await expect(Server.initialize()).resolves.toBeTruthy()
+      const server = await Server.initialize()
+      await server.inject({
+        method: 'POST',
+        url: '/',
+        payload: {
+          customInfo: {
+            negotiatedContentType: 'application/json'
+          }
+        },   
+        headers: {
+          traceparent: 'aabb-aabb123213'
+        }
+      })
+      await server.inject({
+        method: 'GET',
+        url: '/',
+        headers: {
+          traceparent: 'aabb-aa'
+        }
+      })
+      await server.inject({
+        method: 'GET',
+        url: '/'
+      })
+      server.stop()
+    })
+    it('initialize should not throw an error', async () => {
+      SpyInitilizeMockHandler.mockResolvedValueOnce()
+      SpyGetSystemConfig.mockReturnValueOnce({
+        API_PORT: 5051
+      })
+      SpyGetUserConfig.mockReturnValueOnce({
+        INBOUND_MUTUAL_TLS_ENABLED: true
+      })
+      SpyWaitForTlsHubCerts.mockRejectedValueOnce()
+      const server = await Server.initialize()
+      expect(server).toBeNull()
+    })
+    it('initialize should not throw an error', async () => {
+      SpyInitilizeMockHandler.mockResolvedValueOnce()
+      SpyGetSystemConfig.mockReturnValueOnce({
+        API_PORT: 5051
+      })
+      SpyGetUserConfig.mockReturnValueOnce({
+        INBOUND_MUTUAL_TLS_ENABLED: false
+      })
+      const server = await Server.initialize()
+      expect(server).toBeDefined()
+      server.stop()
     })
   })
   describe('restartServer', () => {
     it('restartServer should not throw an error', async () => {
-      await expect(Server.restartServer()).resolves.toBeUndefined()
+      SpyGetSystemConfig.mockReturnValueOnce({
+        API_PORT: 5051
+      })
+      SpyGetUserConfig.mockReturnValueOnce({
+        INBOUND_MUTUAL_TLS_ENABLED: true
+      })
+      SpyWaitForTlsHubCerts.mockRejectedValue()
+      const server = await Server.restartServer()
+      expect(server).toBeUndefined()
     })
   })
 })

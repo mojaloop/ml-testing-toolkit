@@ -26,8 +26,6 @@
 
 const Utils = require('../../../src/lib/utils')
 const Config = require('../../../src/lib/config')
-const RulesEngine = require('../../../src/lib/rulesEngine')
-
 
 const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
 const SpyReadDirAsync = jest.spyOn(Utils, 'readDirAsync')
@@ -42,13 +40,21 @@ const RulesEngineModel = require('../../../src/lib/rulesEngineModel')
 
 describe('RulesEngineModel', () => {
   describe('response', () => {
+    it('getResponseRulesEngine should return rulesEngine', async () => {
+      SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
+        activeRulesFile: 'activeRulesFile'
+      }))
+      SpyAccessFileAsync.mockResolvedValueOnce()
+      SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify([]))
+      const result = await RulesEngineModel.getResponseRulesEngine()
+      expect(result).not.toBeUndefined()      
+    })
     it('reloadResponseRules when active rules file is found', async () => {
       SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
         activeRulesFile: 'activeRulesFile'
       }))
       SpyAccessFileAsync.mockResolvedValueOnce()
       SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify([]))
-      
       const result = await RulesEngineModel.reloadResponseRules()
       expect(result).toBeUndefined()      
     })
@@ -105,14 +111,7 @@ describe('RulesEngineModel', () => {
       const result = await RulesEngineModel.setActiveResponseRulesFile('test.json')
       expect(result).toBeUndefined()      
     })
-    it('getResponseRules should return stored rules', async () => {
-      const result = await RulesEngineModel.getResponseRules()
-      expect(result).not.toBeUndefined()      
-    })
-    it('getResponseRulesEngine should return rulesEngine', async () => {
-      const result = await RulesEngineModel.getResponseRulesEngine()
-      expect(result).not.toBeUndefined()      
-    })
+    
     it('getResponseRulesFiles should return activeRulesFile', async () => {
       SpyReadDirAsync.mockResolvedValueOnce(['test.json', 'config.json'])
       const result = await RulesEngineModel.getResponseRulesFiles()

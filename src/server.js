@@ -91,7 +91,7 @@ const createServer = async (port) => {
       type: 'onPreHandler',
       method: (request, h) => {
         // Generate UniqueID
-        request.customInfo = {}
+        request.customInfo = request.payload ? request.payload.customInfo : {}
         request.customInfo.uniqueId = UniqueIdGenerator.generateUniqueId(request)
         // Parse the traceparent header if present
         if (request.headers.traceparent) {
@@ -103,7 +103,6 @@ const createServer = async (port) => {
             request.customInfo.sessionID = traceHeaderUtils.getSessionID(traceID)
           }
         }
-
         RequestLogger.logRequest(request)
         return h.continue
       }
@@ -127,11 +126,12 @@ const initialize = async () => {
   await OpenApiMockHandler.initilizeMockHandler()
   serverInstance = await createServer(Config.getSystemConfig().API_PORT)
 
-  objectStore.initObjectStore()
-  const clearInterval = 10 * 60 * 1000
-  assertionStore.initAssertionStore(clearInterval)
+  if (serverInstance) {
+    objectStore.initObjectStore()
+    assertionStore.initAssertionStore()
 
-  console.log(`Toolkit Server running on port ${serverInstance.info.port}`)
+    console.log(`Toolkit Server running on port ${serverInstance.info.port}`)
+  }
   return serverInstance
 }
 
