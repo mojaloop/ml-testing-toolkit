@@ -35,14 +35,15 @@ const handleCallback = async (callbackObject, context, req) => {
   if (callbackObject.delay) {
     await new Promise(resolve => setTimeout(resolve, callbackObject.delay))
   }
+  const userConfig = Config.getUserConfig()
 
-  let callbackEndpoint = Config.getUserConfig().CALLBACK_ENDPOINT
-  if (Config.getUserConfig().CALLBACK_RESOURCE_ENDPOINTS && Config.getUserConfig().CALLBACK_RESOURCE_ENDPOINTS.enabled) {
-    const callbackEndpoints = Config.getUserConfig().CALLBACK_RESOURCE_ENDPOINTS
+  let callbackEndpoint = userConfig.CALLBACK_ENDPOINT
+  if (userConfig.CALLBACK_RESOURCE_ENDPOINTS && userConfig.CALLBACK_RESOURCE_ENDPOINTS.enabled) {
+    const callbackEndpoints = userConfig.CALLBACK_RESOURCE_ENDPOINTS
     const matchedObject = callbackEndpoints.endpoints.find(item => {
       if (item.method === callbackObject.method) {
-        const patt = new RegExp(item.path.replace(/{.*}/, '.*'))
-        return patt.test(callbackObject.path)
+        const path = new RegExp(item.path.replace(/{.*}/, '.*'))
+        return path.test(callbackObject.path)
       }
       return false
     })
@@ -53,7 +54,7 @@ const handleCallback = async (callbackObject, context, req) => {
 
   const httpsProps = {}
   let urlGenerated = callbackEndpoint + callbackObject.path
-  if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
+  if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED) {
     const tlsConfig = ConnectionProvider.getTlsConfig()
     const httpsAgent = new https.Agent({
       cert: tlsConfig.hubClientCert,
@@ -85,7 +86,6 @@ const handleCallback = async (callbackObject, context, req) => {
   } catch (err) {
     console.log(err)
   }
-
   // Validate callback against openapi
   const validationResult = await context.api.validateRequest(callbackObject)
   if (validationResult.valid) {
@@ -93,7 +93,6 @@ const handleCallback = async (callbackObject, context, req) => {
   } else {
     customLogger.logMessage('error', 'Callback schema is invalid ' + callbackObject.method + ' ' + callbackObject.path, validationResult.errors, true, req)
   }
-
   // Store callbacks for assertion
   let assertionPath = callbackObject.path
   const assertionData = { headers: callbackObject.headers, body: callbackObject.body }
@@ -105,7 +104,7 @@ const handleCallback = async (callbackObject, context, req) => {
   MyEventEmitter.getAssertionCallbackEmitter().emit(assertionPath, assertionData)
 
   // Send callback
-  if (Config.getUserConfig().SEND_CALLBACK_ENABLE) {
+  if (userConfig.SEND_CALLBACK_ENABLE) {
     customLogger.logMessage('info', 'Sending callback ' + callbackObject.method + ' ' + callbackObject.path, callbackObject, true, req)
     axios(reqOpts).then((result) => {
       customLogger.logMessage('info', 'Received callback response ' + result.status + ' ' + result.statusText, null, true, req)

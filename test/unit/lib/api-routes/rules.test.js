@@ -24,93 +24,86 @@
 
 const request = require('supertest')
 const app = require('../../../../src/lib/api-server').getApp()
+const RulesEngineModel = require('../../../../src/lib/rulesEngineModel')
 
-
+jest.mock('../../../../src/lib/rulesEngineModel')
 
 describe('API route /api/rules', () => {
   describe('Validation Rules', () => {
     describe('GET /api/rules/files/validation', () => {
       it('Getting all rules files', async () => {
+        RulesEngineModel.getValidationRulesFiles.mockResolvedValueOnce([])
         const res = await request(app).get(`/api/rules/files/validation`)
         expect(res.statusCode).toEqual(200)
-        expect(res.body).toHaveProperty('files')
-        expect(res.body).toHaveProperty('activeRulesFile')
+        expect(Array.isArray(res.body)).toBeTruthy()
+      })
+      it('Getting all rules files fails if there is an error', async () => {
+        RulesEngineModel.getValidationRulesFiles.mockRejectedValueOnce({})
+        const res = await request(app).get(`/api/rules/files/validation`)
+        expect(res.statusCode).toEqual(500)
       })
     })
     describe('GET /api/rules/files/validation/:fileName', () => {
-      let activeRulesFile
-      it('Getting all rules files', async () => {
-        const res = await request(app).get(`/api/rules/files/validation`)
-        expect(res.statusCode).toEqual(200)
-        expect(res.body).toHaveProperty('files')
-        expect(res.body).toHaveProperty('activeRulesFile')
-        activeRulesFile = res.body.activeRulesFile
-      })
       it('Getting the activated rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/validation/${activeRulesFile}`)
+        RulesEngineModel.getValidationRulesFileContent.mockResolvedValueOnce([])
+        const res = await request(app).get(`/api/rules/files/validation/test`)
         expect(res.statusCode).toEqual(200)
-        expect(Array.isArray(res.body)).toBe(true)
+        expect(Array.isArray(res.body)).toBeTruthy()
+      })
+      it('Getting the activated rule file fails if there is an error', async () => {
+        RulesEngineModel.getValidationRulesFileContent.mockRejectedValueOnce([])
+        const res = await request(app).get(`/api/rules/files/validation/test`)
+        expect(res.statusCode).toEqual(500)
+        expect(Array.isArray(res.body)).not.toBeTruthy()
+      })
+    })
+    describe('PUT /api/rules/files/validation', () => {
+      it('set an active rules file', async () => {
+        RulesEngineModel.setActiveValidationRulesFile.mockResolvedValueOnce()
+        const res = await request(app).put('/api/rules/files/validation').send({
+          type: 'activeRulesFile'
+        })
+        expect(res.statusCode).toEqual(200)
+      })
+      it('Create a test file with wrong content', async () => {
+        const res = await request(app).put('/api/rules/files/validation').send({
+          type: 'NotActiveRulesFile'
+        })
+        expect(res.statusCode).toEqual(500)
+      })
+      it('Create a test file', async () => {
+        RulesEngineModel.setActiveValidationRulesFile.mockRejectedValueOnce({})
+        const res = await request(app).put('/api/rules/files/validation').send({
+          type: 'activeRulesFile'
+        })        
+        expect(res.statusCode).toEqual(500)
       })
     })
     describe('PUT /api/rules/files/validation/:fileName', () => {
+      it('Create a test file', async () => {
+        RulesEngineModel.setValidationRulesFileContent.mockResolvedValueOnce()
+        const res = await request(app).put(`/api/rules/files/validation/test1.json`).send([])
+        expect(res.statusCode).toEqual(200)
+      })
       it('Create a test file with wrong content', async () => {
         const res = await request(app).put(`/api/rules/files/validation/test1.json`).send({})
         expect(res.statusCode).toEqual(422)
       })
-      it('Create a test file', async () => {
+      it('Create a test file fails if there is an error', async () => {
+        RulesEngineModel.setValidationRulesFileContent.mockRejectedValueOnce({})
         const res = await request(app).put(`/api/rules/files/validation/test1.json`).send([])
-        expect(res.statusCode).toEqual(200)
-      })
-      it('Getting the test rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/validation/test1.json`)
-        expect(res.statusCode).toEqual(200)
-        expect(Array.isArray(res.body)).toBe(true)
-      })
-      it('Getting the wrong rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/validation/test2.json`)
         expect(res.statusCode).toEqual(500)
       })
     })
-    describe('UPDATE /api/rules/files/validation', () => {
-      it('Update active rules file', async () => {
-        const res = await request(app).put(`/api/rules/files/validation`)
-          .send({
-            type: 'activeRulesFile',
-            fileName: 'test1.json'
-          })
-        expect(res.statusCode).toEqual(200)
-      })
-      it('Checking active rules file is test1.json', async () => {
-        const res = await request(app).get(`/api/rules/files/validation`)
-        expect(res.statusCode).toEqual(200)
-        expect(res.body).toHaveProperty('files')
-        expect(res.body).toHaveProperty('activeRulesFile')
-        expect(res.body.activeRulesFile).toEqual('test1.json')
-      })
-      it('Restore active rules file to default', async () => {
-        const res = await request(app).put(`/api/rules/files/validation`)
-          .send({
-            type: 'activeRulesFile',
-            fileName: 'default.json'
-          })
-        expect(res.statusCode).toEqual(200)
-      })
-    })
-    it('Update active rules file, wrong format', async () => {
-      const res = await request(app).put(`/api/rules/files/validation`)
-        .send({
-          type: 'activeRulesWrong',
-          fileName: 'test1.json'
-        })
-      expect(res.statusCode).toEqual(500)
-    })
     describe('DELETE /api/rules/files/validation/:fileName', () => {
       it('Delete the test file', async () => {
+        RulesEngineModel.deleteValidationRulesFile.mockResolvedValueOnce()
         const res = await request(app).delete(`/api/rules/files/validation/test1.json`)
         expect(res.statusCode).toEqual(200)
       })
-      it('Getting the test rule file which is deleted', async () => {
-        const res = await request(app).get(`/api/rules/files/validation/test1.json`)
+      it('Delete the test file fails if there is an error', async () => {
+        RulesEngineModel.deleteValidationRulesFile.mockRejectedValueOnce({})
+        const res = await request(app).delete(`/api/rules/files/validation/test1.json`)
         expect(res.statusCode).toEqual(500)
       })
     })
@@ -119,82 +112,74 @@ describe('API route /api/rules', () => {
   describe('Callback Rules', () => {
     describe('GET /api/rules/files/callback', () => {
       it('Getting all rules files', async () => {
+        RulesEngineModel.getCallbackRulesFiles.mockResolvedValueOnce([])
         const res = await request(app).get(`/api/rules/files/callback`)
         expect(res.statusCode).toEqual(200)
-        expect(res.body).toHaveProperty('files')
-        expect(res.body).toHaveProperty('activeRulesFile')
+        expect(Array.isArray(res.body)).toBeTruthy()
+      })
+      it('Getting all rules files fails if there is an error', async () => {
+        RulesEngineModel.getCallbackRulesFiles.mockRejectedValueOnce({})
+        const res = await request(app).get(`/api/rules/files/callback`)
+        expect(res.statusCode).toEqual(500)
       })
     })
     describe('GET /api/rules/files/callback/:fileName', () => {
-      let activeRulesFile
-      it('Getting all rules files', async () => {
-        const res = await request(app).get(`/api/rules/files/callback`)
-        expect(res.statusCode).toEqual(200)
-        expect(res.body).toHaveProperty('files')
-        expect(res.body).toHaveProperty('activeRulesFile')
-        activeRulesFile = res.body.activeRulesFile
-      })
       it('Getting the activated rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/callback/${activeRulesFile}`)
+        RulesEngineModel.getCallbackRulesFileContent.mockResolvedValueOnce([])
+        const res = await request(app).get(`/api/rules/files/callback/test`)
         expect(res.statusCode).toEqual(200)
-        expect(Array.isArray(res.body)).toBe(true)
+        expect(Array.isArray(res.body)).toBeTruthy()
+      })
+      it('Getting the activated rule file fails if there is an error', async () => {
+        RulesEngineModel.getCallbackRulesFileContent.mockRejectedValueOnce([])
+        const res = await request(app).get(`/api/rules/files/callback/test`)
+        expect(res.statusCode).toEqual(500)
+        expect(Array.isArray(res.body)).not.toBeTruthy()
+      })
+    })
+    describe('PUT /api/rules/files/callback', () => {
+      it('set an active rules file', async () => {
+        RulesEngineModel.setActiveCallbackRulesFile.mockResolvedValueOnce()
+        const res = await request(app).put('/api/rules/files/callback').send({
+          type: 'activeRulesFile'
+        })
+        expect(res.statusCode).toEqual(200)
+      })
+      it('Create a test file with wrong content', async () => {
+        const res = await request(app).put('/api/rules/files/callback').send({
+          type: 'NotActiveRulesFile'
+        })
+        expect(res.statusCode).toEqual(500)
+      })
+      it('Create a test file', async () => {
+        RulesEngineModel.setActiveCallbackRulesFile.mockRejectedValueOnce({})
+        const res = await request(app).put('/api/rules/files/callback').send({
+          type: 'activeRulesFile'
+        })        
+        expect(res.statusCode).toEqual(500)
       })
     })
     describe('PUT /api/rules/files/callback/:fileName', () => {
       it('Create a test file', async () => {
+        RulesEngineModel.setCallbackRulesFileContent.mockResolvedValueOnce()
         const res = await request(app).put(`/api/rules/files/callback/test1.json`).send([])
         expect(res.statusCode).toEqual(200)
       })
-      it('Getting the test rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/callback/test1.json`)
-        expect(res.statusCode).toEqual(200)
-        expect(Array.isArray(res.body)).toBe(true)
-      })
-      it('Getting the wrong rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/callback/test2.json`)
-        expect(res.statusCode).toEqual(500)
-      })
-    })
-    describe('UPDATE /api/rules/files/callback', () => {
-      it('Update active rules file', async () => {
-        const res = await request(app).put(`/api/rules/files/callback`)
-          .send({
-            type: 'activeRulesFile',
-            fileName: 'test1.json'
-          })
-        expect(res.statusCode).toEqual(200)
-      })
-      it('Checking active rules file is test1.json', async () => {
-        const res = await request(app).get(`/api/rules/files/callback`)
-        expect(res.statusCode).toEqual(200)
-        expect(res.body).toHaveProperty('files')
-        expect(res.body).toHaveProperty('activeRulesFile')
-        expect(res.body.activeRulesFile).toEqual('test1.json')
-      })
-      it('Restore active rules file to default', async () => {
-        const res = await request(app).put(`/api/rules/files/callback`)
-          .send({
-            type: 'activeRulesFile',
-            fileName: 'default.json'
-          })
-        expect(res.statusCode).toEqual(200)
-      })
-      it('Update active rules file, wrong format', async () => {
-        const res = await request(app).put(`/api/rules/files/callback`)
-          .send({
-            type: 'activeRulesWrong',
-            fileName: 'test1.json'
-          })
+      it('Create a test file fails if there is an error', async () => {
+        RulesEngineModel.setCallbackRulesFileContent.mockRejectedValueOnce({})
+        const res = await request(app).put(`/api/rules/files/callback/test1.json`).send([])
         expect(res.statusCode).toEqual(500)
       })
     })
     describe('DELETE /api/rules/files/callback/:fileName', () => {
       it('Delete the test file', async () => {
+        RulesEngineModel.deleteCallbackRulesFile.mockResolvedValueOnce()
         const res = await request(app).delete(`/api/rules/files/callback/test1.json`)
         expect(res.statusCode).toEqual(200)
       })
-      it('Getting the test rule file which is deleted', async () => {
-        const res = await request(app).get(`/api/rules/files/callback/test1.json`)
+      it('Delete the test file fails if there is an error', async () => {
+        RulesEngineModel.deleteCallbackRulesFile.mockRejectedValueOnce({})
+        const res = await request(app).delete(`/api/rules/files/callback/test1.json`)
         expect(res.statusCode).toEqual(500)
       })
     })
@@ -203,82 +188,74 @@ describe('API route /api/rules', () => {
   describe('Response Rules', () => {
     describe('GET /api/rules/files/response', () => {
       it('Getting all rules files', async () => {
+        RulesEngineModel.getResponseRulesFiles.mockResolvedValueOnce([])
         const res = await request(app).get(`/api/rules/files/response`)
         expect(res.statusCode).toEqual(200)
-        expect(res.body).toHaveProperty('files')
-        expect(res.body).toHaveProperty('activeRulesFile')
+        expect(Array.isArray(res.body)).toBeTruthy()
+      })
+      it('Getting all rules files fails if there is an error', async () => {
+        RulesEngineModel.getResponseRulesFiles.mockRejectedValueOnce({})
+        const res = await request(app).get(`/api/rules/files/response`)
+        expect(res.statusCode).toEqual(500)
       })
     })
     describe('GET /api/rules/files/response/:fileName', () => {
-      let activeRulesFile
-      it('Getting all rules files', async () => {
-        const res = await request(app).get(`/api/rules/files/response`)
-        expect(res.statusCode).toEqual(200)
-        expect(res.body).toHaveProperty('files')
-        expect(res.body).toHaveProperty('activeRulesFile')
-        activeRulesFile = res.body.activeRulesFile
-      })
       it('Getting the activated rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/response/${activeRulesFile}`)
+        RulesEngineModel.getResponseRulesFileContent.mockResolvedValueOnce([])
+        const res = await request(app).get(`/api/rules/files/response/test`)
         expect(res.statusCode).toEqual(200)
-        expect(Array.isArray(res.body)).toBe(true)
+        expect(Array.isArray(res.body)).toBeTruthy()
+      })
+      it('Getting the activated rule file fails if there is an error', async () => {
+        RulesEngineModel.getResponseRulesFileContent.mockRejectedValueOnce([])
+        const res = await request(app).get(`/api/rules/files/response/test`)
+        expect(res.statusCode).toEqual(500)
+        expect(Array.isArray(res.body)).not.toBeTruthy()
+      })
+    })
+    describe('PUT /api/rules/files/response', () => {
+      it('set an active rules file', async () => {
+        RulesEngineModel.setActiveResponseRulesFile.mockResolvedValueOnce()
+        const res = await request(app).put('/api/rules/files/response').send({
+          type: 'activeRulesFile'
+        })
+        expect(res.statusCode).toEqual(200)
+      })
+      it('Create a test file with wrong content', async () => {
+        const res = await request(app).put('/api/rules/files/response').send({
+          type: 'NotActiveRulesFile'
+        })
+        expect(res.statusCode).toEqual(500)
+      })
+      it('Create a test file', async () => {
+        RulesEngineModel.setActiveResponseRulesFile.mockRejectedValueOnce({})
+        const res = await request(app).put('/api/rules/files/response').send({
+          type: 'activeRulesFile'
+        })        
+        expect(res.statusCode).toEqual(500)
       })
     })
     describe('PUT /api/rules/files/response/:fileName', () => {
       it('Create a test file', async () => {
+        RulesEngineModel.setResponseRulesFileContent.mockResolvedValueOnce()
         const res = await request(app).put(`/api/rules/files/response/test1.json`).send([])
         expect(res.statusCode).toEqual(200)
       })
-      it('Getting the test rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/response/test1.json`)
-        expect(res.statusCode).toEqual(200)
-        expect(Array.isArray(res.body)).toBe(true)
-      })
-      it('Getting the wrong rule file', async () => {
-        const res = await request(app).get(`/api/rules/files/response/test2.json`)
-        expect(res.statusCode).toEqual(500)
-      })
-    })
-    describe('UPDATE /api/rules/files/response', () => {
-      it('Update active rules file', async () => {
-        const res = await request(app).put(`/api/rules/files/response`)
-          .send({
-            type: 'activeRulesFile',
-            fileName: 'test1.json'
-          })
-        expect(res.statusCode).toEqual(200)
-      })
-      it('Checking active rules file is test1.json', async () => {
-        const res = await request(app).get(`/api/rules/files/response`)
-        expect(res.statusCode).toEqual(200)
-        expect(res.body).toHaveProperty('files')
-        expect(res.body).toHaveProperty('activeRulesFile')
-        expect(res.body.activeRulesFile).toEqual('test1.json')
-      })
-      it('Restore active rules file to default', async () => {
-        const res = await request(app).put(`/api/rules/files/response`)
-          .send({
-            type: 'activeRulesFile',
-            fileName: 'default.json'
-          })
-        expect(res.statusCode).toEqual(200)
-      })
-      it('Update active rules file, wrong format', async () => {
-        const res = await request(app).put(`/api/rules/files/response`)
-          .send({
-            type: 'activeRulesWrong',
-            fileName: 'test1.json'
-          })
+      it('Create a test file fails if there is an error', async () => {
+        RulesEngineModel.setResponseRulesFileContent.mockRejectedValueOnce({})
+        const res = await request(app).put(`/api/rules/files/response/test1.json`).send([])
         expect(res.statusCode).toEqual(500)
       })
     })
     describe('DELETE /api/rules/files/response/:fileName', () => {
       it('Delete the test file', async () => {
+        RulesEngineModel.deleteResponseRulesFile.mockResolvedValueOnce()
         const res = await request(app).delete(`/api/rules/files/response/test1.json`)
         expect(res.statusCode).toEqual(200)
       })
-      it('Getting the test rule file which is deleted', async () => {
-        const res = await request(app).get(`/api/rules/files/response/test1.json`)
+      it('Delete the test file fails if there is an error', async () => {
+        RulesEngineModel.deleteResponseRulesFile.mockRejectedValueOnce({})
+        const res = await request(app).delete(`/api/rules/files/response/test1.json`)
         expect(res.statusCode).toEqual(500)
       })
     })

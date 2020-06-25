@@ -89,7 +89,7 @@ const OutboundSend = async (inputTemplate, traceID) => {
   }
 }
 
-const terminateOutbound = async (traceID) => {
+const terminateOutbound = (traceID) => {
   terminateTraceIds[traceID] = true
 }
 

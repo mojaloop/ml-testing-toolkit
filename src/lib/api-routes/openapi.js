@@ -24,9 +24,7 @@
 
 const express = require('express')
 const router = new express.Router()
-const fs = require('fs')
-const { promisify } = require('util')
-const readFileAsync = promisify(fs.readFile)
+const utils = require('../utils')
 
 router.get('/api_versions', async (req, res, next) => {
   try {
@@ -87,7 +85,7 @@ router.get('/callback_map/:type/:version', async (req, res, next) => {
     })
     if (reqApiDefinition) {
       try {
-        const rawdata = await readFileAsync(reqApiDefinition.callbackMapFile)
+        const rawdata = await utils.readFileAsync(reqApiDefinition.callbackMapFile)
         const reqCallbackMap = JSON.parse(rawdata)
 
         res.status(200).json(reqCallbackMap)
@@ -118,7 +116,7 @@ router.get('/response_map/:type/:version', async (req, res, next) => {
     })
     if (reqApiDefinition) {
       try {
-        const rawdata = await readFileAsync(reqApiDefinition.responseMapFile)
+        const rawdata = await utils.readFileAsync(reqApiDefinition.responseMapFile)
         const reqResponseMap = JSON.parse(rawdata)
         res.status(200).json(reqResponseMap)
       } catch (err) {

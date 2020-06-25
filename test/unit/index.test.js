@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -32,6 +33,7 @@ describe('Index', () => {
       expect(() => {
         require('../../src/index')
       }).not.toThrowError();
+      await new Promise(resolve => setTimeout(resolve, 2000))
     })
   })
 })

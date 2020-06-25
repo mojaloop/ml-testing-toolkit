@@ -18,14 +18,12 @@
  * Gates Foundation
 
  * ModusBox
+  * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
 
-const fs = require('fs')
-const { promisify } = require('util')
-const readFileAsync = promisify(fs.readFile)
-const writeFileAsync = promisify(fs.writeFile)
+const utils = require('./utils')
 const RequestLogger = require('./requestLogger')
 
 const SYSTEM_CONFIG_FILE = 'spec_files/system_config.json'
@@ -45,7 +43,7 @@ const getUserConfig = () => {
 const getStoredUserConfig = async () => {
   let storedConfig = {}
   try {
-    const contents = await readFileAsync(USER_CONFIG_FILE)
+    const contents = await utils.readFileAsync(USER_CONFIG_FILE)
     storedConfig = JSON.parse(contents)
   } catch (err) {
     RequestLogger.logMessage('error', 'Can not read the file spec_files/user_config.json', null, true, null)
@@ -55,7 +53,7 @@ const getStoredUserConfig = async () => {
 
 const setStoredUserConfig = async (newConfig) => {
   try {
-    await writeFileAsync(USER_CONFIG_FILE, JSON.stringify(newConfig, null, 2))
+    await utils.writeFileAsync(USER_CONFIG_FILE, JSON.stringify(newConfig, null, 2))
     return true
   } catch (err) {
     return false
@@ -64,7 +62,7 @@ const setStoredUserConfig = async (newConfig) => {
 
 const loadUserConfig = async () => {
   try {
-    const contents = await readFileAsync(USER_CONFIG_FILE)
+    const contents = await utils.readFileAsync(USER_CONFIG_FILE)
     USER_CONFIG = JSON.parse(contents)
   } catch (err) {
     RequestLogger.logMessage('error', 'Can not read the file ' + USER_CONFIG_FILE, null, true, null)
@@ -75,7 +73,7 @@ const loadUserConfig = async () => {
 // Function to load system configuration
 const loadSystemConfig = async () => {
   try {
-    const contents = await readFileAsync(SYSTEM_CONFIG_FILE)
+    const contents = await utils.readFileAsync(SYSTEM_CONFIG_FILE)
     SYSTEM_CONFIG = JSON.parse(contents)
   } catch (err) {
     RequestLogger.logMessage('error', 'Can not read the file ' + SYSTEM_CONFIG_FILE, null, true, null)

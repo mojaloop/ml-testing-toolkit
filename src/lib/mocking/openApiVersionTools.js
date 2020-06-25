@@ -74,7 +74,6 @@ module.exports.negotiateVersion = (req, apis) => {
           if (accumulatorIndex) {
             compareValue = apis[accumulatorIndex].minorVersion
           }
-
           if (currentValue.majorVersion === parsedAcceptHeader.majorVersion && currentValue.minorVersion > compareValue) {
             return currentIndex
           } else {
@@ -92,7 +91,6 @@ module.exports.negotiateVersion = (req, apis) => {
         if (accumulatorIndex) {
           compareValue = apis[accumulatorIndex].majorVersion * 10 + apis[accumulatorIndex].minorVersion
         }
-
         if ((currentValue.majorVersion * 10 + currentValue.minorVersion) > compareValue) {
           return currentIndex
         } else {

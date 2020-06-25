@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -25,28 +26,64 @@
 'use strict'
 
 const Config = require('../../../src/lib/config')
+const Utils = require('../../../src/lib/utils')
+const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
+const SpyWriteFileAsync = jest.spyOn(Utils, 'writeFileAsync')
 
 describe('Config', () => {
-  describe('loadUserConfig', () => {
-    it('Get getUserConfig', async () => {
-      await Config.loadUserConfig()
-      const userConfig = Config.getUserConfig()
-      expect(userConfig).toHaveProperty('CALLBACK_ENDPOINT')
+  describe('when getUserConfig is called', () => {
+    it('should not throw an error ', () => {
+      expect(() => Config.getUserConfig()).toBeDefined()
     })
   })
-  describe('Get and set user config', () => {
-    let userConfig, newConfig
-    it('Get getStoredUserConfig', async () => {
-      userConfig = await Config.getStoredUserConfig()
-      expect(userConfig).toHaveProperty('CALLBACK_ENDPOINT')
+  describe('when getSystemConfig is called', () => {
+    it('should not throw an error ', () => {
+      expect(() => Config.getSystemConfig()).toBeDefined()
     })
-    it('Get setStoredUserConfig', async () => {
-      newConfig = JSON.parse(JSON.stringify(userConfig))
-      newConfig.CALLBACK_ENDPOINT = 'test'
-      await Config.setStoredUserConfig(newConfig)
-      expect(newConfig).toHaveProperty('CALLBACK_ENDPOINT')
-      expect(newConfig.CALLBACK_ENDPOINT).toEqual('test')
-      await Config.setStoredUserConfig(userConfig)
+  })
+  describe('when getStoredUserConfig throws an error', () => {
+    it('the response should not be empty object', async () => {
+      const userConfig = await Config.getStoredUserConfig()
+      expect(userConfig).toBeDefined()
+    })
+    it('the response should be empty object', async () => {
+      SpyReadFileAsync.mockRejectedValueOnce({})
+      const userConfig = await Config.getStoredUserConfig()
+      expect(userConfig).toStrictEqual({})
+    })
+  })
+  describe('when setStoredUserConfig throws an error', () => {
+    it('the response should be false', async () => {
+      SpyWriteFileAsync.mockResolvedValueOnce()
+      const storedUserConfig = await Config.setStoredUserConfig({})
+      expect(storedUserConfig).toBe(true)
+    })
+    it('the response should be false', async () => {
+      SpyWriteFileAsync.mockRejectedValueOnce()
+      const storedUserConfig = await Config.setStoredUserConfig()
+      expect(storedUserConfig).toBe(false)
+    })
+  })
+  describe('when loadUserConfig throws an error', () => {
+    it('the response should be true', async () => {
+      const loadUserConfig = await Config.loadUserConfig()
+      expect(loadUserConfig).toBe(true)
+    })
+    it('the response should be true', async () => {
+      SpyReadFileAsync.mockRejectedValueOnce()
+      const loadUserConfig = await Config.loadUserConfig()
+      expect(loadUserConfig).toBe(true)
+    })
+  })
+  describe('when loadSystemConfig throws an error', () => {
+    it('the response should be true', async () => {
+      const loadSystemConfig = await Config.loadSystemConfig()
+      expect(loadSystemConfig).toBe(true)
+    })
+    it('the response should be true', async () => {
+      SpyReadFileAsync.mockRejectedValueOnce()
+      const loadSystemConfig = await Config.loadSystemConfig()
+      expect(loadSystemConfig).toBe(true)
     })
   })
 })

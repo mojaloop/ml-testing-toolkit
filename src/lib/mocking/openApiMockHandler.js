@@ -28,13 +28,11 @@ const OpenApiBackend = require('openapi-backend').default
 const OpenApiDefinitionsModel = require('./openApiDefinitionsModel')
 const OpenApiVersionTools = require('./openApiVersionTools')
 const customLogger = require('../requestLogger')
-const fs = require('fs')
-const { promisify } = require('util')
 const OpenApiRulesEngine = require('./openApiRulesEngine')
 const CallbackHandler = require('../callbackHandler')
 const _ = require('lodash')
 const MyEventEmitter = require('../MyEventEmitter')
-const readFileAsync = promisify(fs.readFile)
+const utils = require('../utils')
 const Config = require('../config')
 const assertionStore = require('../assertionStore')
 const JwsSigning = require('../jws/JwsSigning')
@@ -56,30 +54,27 @@ module.exports.initilizeMockHandler = async () => {
   IlpModel.init(Config.getUserConfig().ILP_SECRET)
   // Get API Definitions from configuration
   const apiDefinitions = await OpenApiDefinitionsModel.getApiDefinitions()
-
   // Create create openApiBackend objects for all the api definitions
   apis = apiDefinitions.map(item => {
     const tempObj = new OpenApiBackend({
       definition: path.join(item.specFile),
       strict: true,
       handlers: {
-        notImplemented: openApiBackendNotImplementedHandler(item),
+        notImplemented: async (context, req, h) => {
+          const resp = await openApiBackendNotImplementedHandler(context, req, h, item)
+          return resp
+        },
         validationFail: async (context, req, h) => {
-          const extensionList = [
-            {
-              key: 'keyword',
-              value: context.validation.errors[0].keyword
-            },
-            {
-              key: 'dataPath',
-              value: context.validation.errors[0].dataPath
-            }
-          ]
+          const extensionList = [{
+            key: 'keyword',
+            value: context.validation.errors[0].keyword
+          },
+          {
+            key: 'dataPath',
+            value: context.validation.errors[0].dataPath
+          }]
           for (const [key, value] of Object.entries(context.validation.errors[0].params)) {
-            extensionList.push({
-              key,
-              value
-            })
+            extensionList.push({ key, value })
           }
           return h.response(errorResponseBuilder('3100', context.validation.errors[0].message, { extensionList })).code(400)
         },
@@ -95,12 +90,6 @@ module.exports.initilizeMockHandler = async () => {
       openApiBackendObject: tempObj
     }
   })
-
-  // Loop through the apis and initialize them
-  // apis.forEach(api => {
-  //   customLogger.logMessage('info', 'Initializing the api spec file: ' + api.specFile, null, false)
-  //   api.openApiBackendObject.init()
-  // })
 
   for (const api of apis) {
     customLogger.logMessage('info', 'Initializing the api spec file: ' + api.specFile, null, false)
@@ -124,12 +113,12 @@ module.exports.handleRequest = (req, h) => {
   let selectedVersion = 0
   // Pick a right api definition by searching for the requested resource in the definitions sequentially
   // TODO: This should be optimized by defining a hash table (object) of all the resources in all definition files on startup.
+
   selectedVersion = pickApiByMethodAndPath(req)
   if (selectedVersion === -1) {
     customLogger.logMessage('error', 'Resource not found', null, true, req)
     return h.response({ error: 'Not Found' }).code(404)
   }
-
   if (apis[selectedVersion].type === 'fspiop' && Config.getUserConfig().VERSIONING_SUPPORT_ENABLE) {
     const fspiopApis = apis.filter(item => {
       return item.type === 'fspiop'
@@ -148,7 +137,6 @@ module.exports.handleRequest = (req, h) => {
         return h.response(errorResponseBuilder('3001', contentTypeHeaderValidationResult.message)).code(400)
       }
     }
-
     // Pick the right API object based on the major and minor versions (Version negotiation as per the API Definition file)
     const versionNegotiationResult = OpenApiVersionTools.negotiateVersion(req, fspiopApis)
     if (versionNegotiationResult.negotiationFailed) {
@@ -179,11 +167,7 @@ module.exports.handleRequest = (req, h) => {
 
 const pickApiByMethodAndPath = (req) => {
   return apis.findIndex(item => {
-    if (item.openApiBackendObject.matchOperation(req)) {
-      return true
-    } else {
-      return false
-    }
+    return item.openApiBackendObject.matchOperation(req)
   })
 }
 
@@ -201,66 +185,65 @@ module.exports.getOpenApiObjects = () => {
   return apis
 }
 
-const openApiBackendNotImplementedHandler = (item) => {
-  return async (context, req, h) => {
-    customLogger.logMessage('debug', 'Schema Validation Passed', null, true, req)
-    if (req.method === 'put') {
-      // MyEventEmitter.getTestOutboundEmitter().emit('incoming', req.payload)
-      MyEventEmitter.getTestOutboundEmitter().emit(req.method + ' ' + req.path, req.headers, req.payload)
-      let assertionPath = req.path
-      const assertionData = { headers: req.headers, body: req.payload }
-      if (assertionPath.endsWith('/error')) {
-        assertionPath = assertionPath.replace('/error', '')
-        assertionData.error = true
-      }
-      assertionStore.pushRequest(assertionPath, assertionData)
-      MyEventEmitter.getAssertionRequestEmitter().emit(assertionPath, assertionData)
+const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
+  customLogger.logMessage('debug', 'Schema Validation Passed', null, true, req)
+  if (req.method === 'put') {
+    // MyEventEmitter.getTestOutboundEmitter().emit('incoming', req.payload)
+    MyEventEmitter.getTestOutboundEmitter().emit(req.method + ' ' + req.path, req.headers, req.payload)
+    let assertionPath = req.path
+    const assertionData = { headers: req.headers, body: req.payload }
+    if (assertionPath.endsWith('/error')) {
+      assertionPath = assertionPath.replace('/error', '')
+      assertionData.error = true
     }
-    req.customInfo.specFile = item.specFile
-    req.customInfo.jsfRefFile = item.jsfRefFile
-    let responseBody, responseStatus
-    // Check for response map file
-    try {
-      const respMapRawdata = await readFileAsync(item.responseMapFile)
-      const responseMap = JSON.parse(respMapRawdata)
+    assertionStore.pushRequest(assertionPath, assertionData)
+    MyEventEmitter.getAssertionRequestEmitter().emit(assertionPath, assertionData)
+  }
+  req.customInfo.specFile = item.specFile
+  req.customInfo.jsfRefFile = item.jsfRefFile
+  let responseBody, responseStatus
+  // Check for response map file
+  try {
+    const respMapRawdata = await utils.readFileAsync(item.responseMapFile)
+    const responseMap = JSON.parse(respMapRawdata)
+    if (responseMap && responseMap[context.operation.path] && responseMap[context.operation.path][context.request.method]) {
       const responseInfo = responseMap[context.operation.path][context.request.method]
-      if (!responseInfo) {
-        customLogger.logMessage('error', 'Response info not found for method in response map file for ' + context.operation.path + context.request.method, null, true, req)
-        return
-      }
       req.customInfo.responseInfo = responseInfo
-    } catch (err) { }
-    // Check for the synchronous response rules
-    const generatedResponse = await OpenApiRulesEngine.responseRules(context, req)
-    responseStatus = +generatedResponse.status
-    responseBody = generatedResponse.body
-    customLogger.logMessage('info', 'Generated response', generatedResponse, true, req)
-    if (generatedResponse.delay) {
-      await new Promise(resolve => setTimeout(resolve, generatedResponse.delay))
-    }
-    if (!responseBody) {
-      // Generate mock response from openAPI spec file
-      const { status, mock } = context.api.mockResponseForOperation(context.operation.operationId)
-      responseBody = mock
-      responseStatus = +status
-    }
-    // Verify that it is a success code, then generate callback and only if the method is post or get
-    if ((req.method === 'post' || req.method === 'get') && responseStatus >= 200 && responseStatus <= 299) {
-      // Generate callback asynchronously
-      setImmediate(generateAsyncCallback, item, context, req)
-    }
-    if (_.isEmpty(responseBody)) {
-      return h.response().code(responseStatus)
     } else {
-      return h.response(responseBody).code(responseStatus)
+      customLogger.logMessage('error', 'Response info not found for method in response map file for ' + context.operation.path + context.request.method, null, true, req)
+      return
     }
+  } catch (err) { }
+  // Check for the synchronous response rules
+  const generatedResponse = await OpenApiRulesEngine.responseRules(context, req)
+  responseStatus = +generatedResponse.status
+  responseBody = generatedResponse.body
+  customLogger.logMessage('info', 'Generated response', generatedResponse, true, req)
+  if (generatedResponse.delay) {
+    await new Promise(resolve => setTimeout(resolve, generatedResponse.delay))
+  }
+  if (!responseBody) {
+    // Generate mock response from openAPI spec file
+    const { status, mock } = context.api.mockResponseForOperation(context.operation.operationId)
+    responseBody = mock
+    responseStatus = +status
+  }
+  // Verify that it is a success code, then generate callback and only if the method is post or get
+  if ((req.method === 'post' || req.method === 'get') && responseStatus >= 200 && responseStatus <= 299) {
+    // Generate callback asynchronously
+    setImmediate(generateAsyncCallback, item, context, req)
+  }
+  if (_.isEmpty(responseBody)) {
+    return h.response().code(responseStatus)
+  } else {
+    return h.response(responseBody).code(responseStatus)
   }
 }
 
 const generateAsyncCallback = async (item, context, req) => {
   // Getting callback info from callback map file
   try {
-    const cbMapRawdata = await readFileAsync(item.callbackMapFile)
+    const cbMapRawdata = await utils.readFileAsync(item.callbackMapFile)
     const callbackMap = JSON.parse(cbMapRawdata)
     if (!callbackMap[context.operation.path]) {
       customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, null, true, req)
@@ -289,8 +272,10 @@ const generateAsyncCallback = async (item, context, req) => {
     return
   }
 
+  const userConfig = Config.getUserConfig()
+
   // Handle quotes and transfer association - should do this first to get the associated quote
-  if (Config.getUserConfig().TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
+  if (userConfig.TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
     const matchFound = require('./middleware-functions/quotesAssociation').handleTransfers(context, req)
     if (!matchFound) {
       customLogger.logMessage('error', 'Matching Quote Not Found', null, true, req)
@@ -307,7 +292,7 @@ const generateAsyncCallback = async (item, context, req) => {
   }
 
   // Handle transfer validation against decoded ILP Packet
-  if (Config.getUserConfig().TRANSFERS_VALIDATION_ILP_PACKET) {
+  if (userConfig.TRANSFERS_VALIDATION_ILP_PACKET) {
     const validated = IlpModel.validateTransferIlpPacket(context, req)
     if (!validated) {
       customLogger.logMessage('error', 'ILP Packet is not matching with the content', null, true, req)
@@ -324,7 +309,7 @@ const generateAsyncCallback = async (item, context, req) => {
   }
 
   // Handle condition validation in transfer request
-  if (Config.getUserConfig().TRANSFERS_VALIDATION_CONDITION) {
+  if (userConfig.TRANSFERS_VALIDATION_CONDITION) {
     const validated = IlpModel.validateTransferCondition(context, req)
     if (!validated) {
       customLogger.logMessage('error', 'Condition can not be validated', null, true, req)
@@ -346,7 +331,7 @@ const generateAsyncCallback = async (item, context, req) => {
     // Append ILP properties to callback
     const fulfilment = IlpModel.handleQuoteIlp(context, generatedCallback)
     IlpModel.handleTransferIlp(context, generatedCallback)
-    if (Config.getUserConfig().TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
+    if (userConfig.TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
       require('./middleware-functions/quotesAssociation').handleQuotes(context, req, fulfilment)
     }
     // TODO: Handle method and path verifications against the generated ones
