@@ -26,7 +26,7 @@ const io = require('./api-server').socketIO
 
 const broadcastLog = (log, sessionID) => {
   io.emit(`newLog${sessionID ? `/${sessionID}` : ''}`, {
-    reportTime: new Date(),
+    logTime: new Date(),
     ...log
   })
 }

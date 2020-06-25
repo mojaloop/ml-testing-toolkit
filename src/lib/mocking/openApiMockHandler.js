@@ -49,7 +49,7 @@ var apis = []
 /**
  * Operations on /
  */
-const initilizeMockHandler = async () => {
+module.exports.initilizeMockHandler = async () => {
   // Initialize ILP
   IlpModel.init(Config.getUserConfig().ILP_SECRET)
   // Get API Definitions from configuration
@@ -96,7 +96,7 @@ const initilizeMockHandler = async () => {
   }
 }
 
-const handleRequest = (req, h) => {
+module.exports.handleRequest = (req, h) => {
   // JWS Validation
   try {
     const jwsValidated = JwsSigning.validate(req)
@@ -180,7 +180,7 @@ const errorResponseBuilder = (errorCode, errorDescription, additionalProperties 
   }
 }
 
-const getOpenApiObjects = () => {
+module.exports.getOpenApiObjects = () => {
   return apis
 }
 
@@ -253,6 +253,10 @@ const generateAsyncCallback = async (item, context, req) => {
       return
     }
     const callbackInfo = callbackMap[context.operation.path][context.request.method]
+    if (!callbackInfo) {
+      customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method, null, true, req)
+      return
+    }
     req.customInfo.callbackInfo = callbackInfo
   } catch (err) {
     customLogger.logMessage('error', 'Callback file not found.', null, true, req)
@@ -336,9 +340,5 @@ const generateAsyncCallback = async (item, context, req) => {
   }
 }
 
-module.exports = {
-  generateAsyncCallback,
-  initilizeMockHandler,
-  handleRequest,
-  getOpenApiObjects
-}
+module.exports.openApiBackendNotImplementedHandler = openApiBackendNotImplementedHandler
+module.exports.generateAsyncCallback = generateAsyncCallback

@@ -119,7 +119,6 @@ const initJWSCertificate = async (environmentId, dfspId, jwsCertificate = null, 
   let certResult = null
   // Check whether a jws certificate exists for the dfspId testing-toolkit
   try {
-    console.log(dfspId)
     certResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps/' + dfspId + '/jwscerts', { headers: { 'Content-Type': 'application/json' } })
     if (certResult.status === 200) {
       certExists = (certResult.data && certResult.data.id)
@@ -348,11 +347,14 @@ const checkDfspServerCerts = async (environmentId, dfspId) => {
 
 const tlsLoadHubServerCertificates = async () => {
   // Read Hub Server root CA
-  currentTlsConfig.hubServerCaRootCert = (await readFileAsync('secrets/tls/hub_server_cacert.pem')).toString()
+  const tmpHubServerCaRootCert = await readFileAsync('secrets/tls/hub_server_cacert.pem')
+  currentTlsConfig.hubServerCaRootCert = tmpHubServerCaRootCert.toString()
   // Read Hub server cert
-  currentTlsConfig.hubServerCert = (await readFileAsync('secrets/tls/hub_server_cert.pem')).toString()
+  const tmpHubServerCert = await readFileAsync('secrets/tls/hub_server_cert.pem')
+  currentTlsConfig.hubServerCert = tmpHubServerCert.toString()
   // Read Hub server key
-  currentTlsConfig.hubServerKey = (await readFileAsync('secrets/tls/hub_server_key.key')).toString()
+  const tmpHubServerKey = await readFileAsync('secrets/tls/hub_server_key.key')
+  currentTlsConfig.hubServerKey = tmpHubServerKey.toString()
 }
 
 const tlsChecker = async () => {

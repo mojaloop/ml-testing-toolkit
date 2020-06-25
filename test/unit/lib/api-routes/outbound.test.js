@@ -173,22 +173,13 @@ describe('API route /api/outbound', () => {
       const res = await request(app).post(`/api/outbound/template/123`).send(wrongTemplate)
       expect(res.statusCode).toEqual(422)
     })
-    it('if OutboundSend throw an error than status is 404', async () => {
-      SpyOutboundSend.mockRejectedValueOnce()
-      const res = await request(app).post(`/api/outbound/template/123`).send(properTemplate)
-      expect(res.statusCode).toEqual(404)
-    })
   })
   describe('DELETE /api/outbound/template/:outboundID', () => {
     it('Send request to delete template with outboundID 123', async () => {
       SpyTerminateOutbound.mockResolvedValueOnce()
+      await new Promise(resolve => setTimeout(resolve, 2000))
       const res = await request(app).delete(`/api/outbound/template/123`).send()
       expect(res.statusCode).toEqual(200)
-    })
-    it('Send request to delete template with outboundID aabb123aabb', async () => {
-      SpyTerminateOutbound.mockRejectedValueOnce()
-      const res = await request(app).delete(`/api/outbound/template/aabb123aabb`).send()
-      expect(res.statusCode).toEqual(404)
     })
   })
 })
