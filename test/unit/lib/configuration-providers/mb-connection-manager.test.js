@@ -38,213 +38,172 @@ Config.getUserConfig.mockImplementation(() => {
     CONNECTION_MANAGER_API_URL: ''
   }
 })
-
-axios.post.mockImplementation((url) => {
-  switch(url) {
-    // Create Environment
-    case '/api/environments':
-      return Promise.resolve({
-          status: 200,
-          data: {
-            id: 1
-          }
-      })
-      break
-    // Create DFSP
-    case '/api/environments/1/dfsps':
-      return Promise.resolve({
-          status: 200,
-          data: {
-            id: 1
-          }
-      })
-      break
-    // Create Hub CA
-    case '/api/environments/1/cas':
-      return Promise.resolve({
-          status: 200,
-          data: {
-            id: 1,
-            certificate: 'asdf'
-          }
-      })
-      break
-
-      // Upload Hub CSR
-    case '/api/environments/1/dfsps/userdfsp/enrollments/outbound':
-      return Promise.resolve({
-          status: 200,
-          data: {
-            id: 1,
-            certificate: '',
-            validationState: 'VALID'
-          }
-      })
-      break
-
-    case '/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign':
-      return Promise.resolve({
-        status: 200,
-        data: {
+const mapping = {
+  post: {
+    '/api/environments': Promise.resolve({
+      status: 200,
+      data: {
+        id: 1
+      }
+    }),
+    '/api/environments/1/dfsps': Promise.resolve({
+      status: 200,
+      data: {
+        id: 1
+      }
+    }),
+    '/api/environments/1/cas': Promise.resolve({
+      status: 200,
+      data: {
+        id: 1,
+        certificate: 'asdf'
+      }
+    }),
+    '/api/environments/1/dfsps/userdfsp/enrollments/outbound': Promise.resolve({
+      status: 200,
+      data: {
+        id: 1,
+        certificate: '',
+        validationState: 'VALID'
+      }
+    }),
+    '/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign': Promise.resolve({
+      status: 200,
+      data: {
+        id: 1,
+        certificate: 'asdf',
+        validationState: 'VALID'
+      }
+    }),
+    '/api/environments/1/hub/servercerts': Promise.resolve({
+      status: 200,
+      data: {
+        id: 1,
+        certificate: ''
+      }
+    }),
+    '/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts': Promise.resolve({
+      status: 200,
+      data: {
+        rootCertificate: 'asdf',
+        intermediateChain: 'asdf',
+        jwsCertificate: 'asdf'
+      }
+    })
+  },
+  get: {
+    '/api/environments': Promise.resolve({
+      status: 200,
+      data: [{
+        name: 'NOT-TESTING-TOOLKIT'
+      }]
+    }),
+    '/api/environments/1/dfsps': Promise.resolve({
+      status: 200,
+      data: [{
+        id: 0
+      }]
+    }),
+    '/api/environments/1/dfsps/userdfsp/ca': Promise.resolve({
+      status: 200,
+      data: {
+        rootCertificate: 'asdf',
+        validationState: 'VALID'
+      }
+    }),
+    '/api/environments/1/dfsps/userdfsp/servercerts': Promise.resolve({
+      status: 200,
+      data: {
+        rootCertificate: 'asdf',
+        validationState: 'VALID',
+        intermediateChain: 'asdf',
+        serverCertificate: 'asdf'
+      }
+    }),
+    '/api/environments/1/hub/servercerts': Promise.resolve({
+      status: 200,
+      data: {
+        rootCertificate: 'asdf',
+        validationState: 'VALID',
+        intermediateChain: 'asdf',
+        serverCertificate: 'asdf'
+      }
+    }),
+    '/api/environments/1/dfsps/userdfsp/enrollments/outbound': Promise.resolve({
+      status: 200,
+      data: [
+        {
           id: 1,
-          certificate: 'asdf',
-          validationState: 'VALID'
+          state: 'CERT_SIGNED',
+          validationState: 'VALID',
+          certificate: 'asdf'
         }
-      })
-      break
-      // Upload Hub Server certs
-    case '/api/environments/1/hub/servercerts':
-      return Promise.resolve({
-          status: 200,
-          data: {
-            id: 1,
-            certificate: ''
-          }
-      })
-      break
-
-      // Upload Testing Toolkit JWS certs
-    case '/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts':
-      return Promise.resolve({
-          status: 200,
-          data: {
-            rootCertificate: 'asdf',
-            intermediateChain: 'asdf',
-            jwsCertificate: 'asdf'
-          }
-      })
-      break
-
-    default:
-      return Promise.reject(new Error('not found'))
+      ]
+    }),
+    '/api/environments/1/dfsps/userdfsp/enrollments/inbound': Promise.resolve({
+      status: 200,
+      data: [
+        {
+          id: 1,
+          state: 'CSR_LOADED',
+          validationState: 'VALID',
+          certificate: 'asdf'
+        }
+      ]
+    }),
+    '/api/environments/1/dfsps/userdfsp/jwscerts': Promise.resolve({
+      status: 200,
+      data: {
+        id: 1,
+        rootCertificate: 'asdf',
+        intermediateChain: 'asdf',
+        jwsCertificate: 'asdf'
+      }
+    }),
+    '/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts': Promise.resolve({
+      status: 200,
+      data: {
+        rootCertificate: 'asdf',
+        intermediateChain: 'asdf',
+        jwsCertificate: 'asdf'
+      }
+    }),
+    '/api/environments/1/dfsps/userdfsp/enrollments/inbound': Promise.resolve({
+      status: 200,
+      data: [{
+        id: 1,
+        state: 'CSR_LOADED',
+        validationState: 'VALID'
+      },{
+        id: 2,
+        state: 'CSR_LOADED',
+        validationState: 'INVALID'
+      }]
+    })
+  },
+  put: {
+    '/api/environments/1/dfsps/userdfsp/jwscerts': Promise.resolve({
+      status: 200,
+      data: {
+        rootCertificate: 'asdf',
+        intermediateChain: 'asdf',
+        jwsCertificate: 'asdf'
+      }
+    })
   }
+}
+axios.post.mockImplementation((url) => {
+  if (mapping.post[url]) {
+    return mapping.post[url]
+  }
+  return Promise.reject(new Error('not found'))
 })
 
 axios.get.mockImplementation((url) => {
-  switch(url) {
-    case '/api/environments':
-      return Promise.resolve({
-        status: 200,
-        data: [{
-          name: 'NOT-TESTING-TOOLKIT'
-        }]
-      })
-      break
-
-      case '/api/environments/1/dfsps':
-        return Promise.resolve({
-          status: 200,
-          data: [{
-            id: 0
-          }]
-        })
-        break
-    // Get DFSP CA
-    case '/api/environments/1/dfsps/userdfsp/ca':
-      return Promise.resolve({
-          status: 200,
-          data: {
-            rootCertificate: 'asdf',
-            validationState: 'VALID'
-          }
-      })
-      break
-
-    case '/api/environments/1/dfsps/userdfsp/servercerts':
-      return Promise.resolve({
-          status: 200,
-          data: {
-            rootCertificate: 'asdf',
-            validationState: 'VALID',
-            intermediateChain: 'asdf',
-            serverCertificate: 'asdf'
-          }
-      })
-      break
-
-      case '/api/environments/1/hub/servercerts':
-        return Promise.resolve({
-            status: 200,
-            data: {
-              rootCertificate: 'asdf',
-              validationState: 'VALID',
-              intermediateChain: 'asdf',
-              serverCertificate: 'asdf'
-            }
-        })
-        break
-
-    // Get Hub CSR
-
-    case '/api/environments/1/dfsps/userdfsp/enrollments/outbound':
-      return Promise.resolve({
-          status: 200,
-          data: [
-            {
-              id: 1,
-              state: 'CERT_SIGNED',
-              validationState: 'VALID',
-              certificate: 'asdf'
-            }
-          ]
-      })
-      break
-
-    case '/api/environments/1/dfsps/userdfsp/enrollments/inbound':
-      return Promise.resolve({
-          status: 200,
-          data: [
-            {
-              id: 1,
-              state: 'CSR_LOADED',
-              validationState: 'VALID',
-              certificate: 'asdf'
-            }
-          ]
-      })
-      break
-
-    // Get User DFSP JWS certs
-    case '/api/environments/1/dfsps/userdfsp/jwscerts':
-      return Promise.resolve({
-          status: 200,
-          data: {
-            id: 1,
-            rootCertificate: 'asdf',
-            intermediateChain: 'asdf',
-            jwsCertificate: 'asdf'
-          }
-      })
-      break
-
-    case '/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts':
-      return Promise.resolve({
-          status: 200,
-          data: {
-            rootCertificate: 'asdf',
-            intermediateChain: 'asdf',
-            jwsCertificate: 'asdf'
-          }
-      })
-      break
-
-    case '/api/environments/1/dfsps/userdfsp/enrollments/inbound':
-      return Promise.resolve({
-          status: 200,
-          data: [{
-            id: 1,
-            state: 'CSR_LOADED',
-            validationState: 'VALID'
-          },{
-            id: 2,
-            state: 'CSR_LOADED',
-            validationState: 'INVALID'
-          }]
-      })
-      break
-    default:
-      return Promise.reject(new Error('not found'))
+  if (mapping.get[url]) {
+    return mapping.get[url]
   }
+  return Promise.reject(new Error('not found'))
 })
 
 describe('mb-connection-manager', () => {
@@ -257,6 +216,108 @@ describe('mb-connection-manager', () => {
   describe('initialize', () => {
     it('should not throw error', async () => {
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments'] 
+      mapping.get['/api/environments'] = Promise.resolve({
+        status: 200,
+        data: []
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.post['/api/environments'] 
+      mapping.post['/api/environments'] = Promise.resolve({
+        status: 400,
+        data: []
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.post['/api/environments'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps'] 
+      mapping.get['/api/environments/1/dfsps'] = Promise.resolve({
+        status: 200,
+        data: [{
+          id: 'userdfsp'
+        }]
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.post['/api/environments/1/dfsps'] 
+      mapping.post['/api/environments/1/dfsps'] = Promise.resolve({
+        status: 400
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.post['/api/environments/1/dfsps'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] 
+      mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = Promise.resolve({
+        status: 200,
+        data: {
+          id: 1,
+          rootCertificate: 'asdf',
+          intermediateChain: 'asdf',
+          jwsCertificate: 'asdf'
+        }
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] 
+      mapping.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = Promise.resolve({
+        status: 400
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/ca/rootCert'] 
+      mapping.get['/api/environments/1/ca/rootCert'] = Promise.resolve({
+        status: 200,
+        data: {
+          certificate: 'asdf'
+        }
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/ca/rootCert'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.post['/api/environments/1/cas'] 
+      mapping.post['/api/environments/1/cas'] = Promise.resolve({
+        status: 400
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.post['/api/environments/1/cas'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] 
+      mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = Promise.resolve({
+        status: 400
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
+      mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = Promise.resolve({
+        status: 400
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/hub/servercerts'] 
+      mapping.get['/api/environments/1/hub/servercerts'] = Promise.resolve({
+        status: 400
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/hub/servercerts'] = original
     })
   })
   describe('getTlsConfig', () => {

@@ -646,4 +646,11 @@ describe('Outbound Initiator Functions', () => {
       expect(testResult.passedCount).toEqual(1)
     })
   })
+  describe('terminateOutbound', () => {
+    // Positive Scenarios
+    it('terminateOutbound should terminate outbound', async () => {
+      const terminateOutbound = OutboundInitiator.terminateOutbound('traceId')
+      expect(terminateOutbound).toBeUndefined()
+    })
+  })
 })

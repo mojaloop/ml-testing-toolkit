@@ -110,6 +110,9 @@ rulesEngineModel.getCallbackRulesEngine.mockImplementation(() => {
 }) 
 rulesEngineModel.getResponseRulesEngine.mockImplementation(() => {
   const evaluateFn = async (facts) => {
+    if (facts.method === '') {
+      return null
+    }
     if (facts.method === 'get') {
       return [
         {
@@ -327,8 +330,19 @@ describe('OpenApiRulesEngine', () => {
     })
   })
   describe('responseRules', () => {
-    it('Mocked Response', async () => {
+    it('Mocked Response with no specFile', async () => {
       sampleContext.request.method = 'get'
+      const original = sampleRequest.customInfo.specFile
+      sampleRequest.customInfo.specFile = null
+      const result = await OpenApiRulesEngine.responseRules(sampleContext, sampleRequest)
+      sampleRequest.customInfo.specFile = original
+    })
+    it('Mocked Response with specFile', async () => {
+      sampleContext.request.method = 'get'
+      const result = await OpenApiRulesEngine.responseRules(sampleContext, sampleRequest)
+    })
+    it('Mocked Response', async () => {
+      sampleContext.request.method = ''
       const result = await OpenApiRulesEngine.responseRules(sampleContext, sampleRequest)
     })
     it('Fixed Response', async () => {
