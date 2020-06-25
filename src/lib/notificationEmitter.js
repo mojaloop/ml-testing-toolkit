@@ -24,18 +24,30 @@
 
 const io = require('./api-server').socketIO
 
-const broadcastLog = (log, sessionID) => {
-  io.emit(`newLog${sessionID ? `/${sessionID}` : ''}`, {
+const broadcastLog = (log, sessionID = null) => {
+  io.emit('newLog', {
     logTime: new Date(),
     ...log
   })
+  if (sessionID) {
+    io.emit('newLog/' + sessionID, {
+      logTime: new Date(),
+      ...log
+    })
+  }
 }
 
-const broadcastOutboundProgress = (status, sessionID) => {
-  io.emit(`outboundProgress${sessionID ? `/${sessionID}` : ''}`, {
+const broadcastOutboundProgress = (status, sessionID = null) => {
+  io.emit('outboundProgress', {
     reportTime: new Date(),
     ...status
   })
+  if (sessionID) {
+    io.emit('outboundProgress/' + sessionID, {
+      reportTime: new Date(),
+      ...status
+    })
+  }
 }
 
 module.exports = {
