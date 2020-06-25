@@ -26,12 +26,10 @@
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
-const MyEventEmitter = require('../../../../src/lib/MyEventEmitter')
 const assertionStore = require('../../../../src/lib/assertionStore')
 const SpyPopRequest = jest.spyOn(assertionStore, 'popRequest')
 const SpyPopCallback = jest.spyOn(assertionStore, 'popCallback')
 
-const SpyGetAssertionRequestEmitter = jest.spyOn(MyEventEmitter, 'getAssertionRequestEmitter')
 jest.setTimeout(10000);
 
 describe('API route /longpolling/requests/*', () => {

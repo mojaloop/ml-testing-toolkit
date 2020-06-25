@@ -69,7 +69,7 @@ describe('API route /api/outbound', () => {
       })
       expect(res.statusCode).toEqual(422)
     })
-    it('Send a proper request', async () => {
+    it('when the server throws an error, statusCode is 500', async () => {
       axios.mockImplementationOnce(() => {throw new Error()})
       const res = await request(app).post(`/api/outbound/request`).send({
         method: 'get',
@@ -77,7 +77,7 @@ describe('API route /api/outbound', () => {
       })
       expect(res.statusCode).toEqual(500)
     })
-    it('Send a proper request', async () => {
+    it('when the server reject the request, statusCode is 500', async () => {
       axios.mockImplementationOnce(() => Promise.reject(true))
       const res = await request(app).post(`/api/outbound/request`).send({
         method: 'get',

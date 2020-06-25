@@ -37,7 +37,7 @@ describe('API route /api/rules', () => {
         expect(res.statusCode).toEqual(200)
         expect(Array.isArray(res.body)).toBeTruthy()
       })
-      it('Getting all rules files', async () => {
+      it('Getting all rules files fails if there is an error', async () => {
         RulesEngineModel.getValidationRulesFiles.mockRejectedValueOnce({})
         const res = await request(app).get(`/api/rules/files/validation`)
         expect(res.statusCode).toEqual(500)
@@ -50,7 +50,7 @@ describe('API route /api/rules', () => {
         expect(res.statusCode).toEqual(200)
         expect(Array.isArray(res.body)).toBeTruthy()
       })
-      it('Getting the activated rule file', async () => {
+      it('Getting the activated rule file fails if there is an error', async () => {
         RulesEngineModel.getValidationRulesFileContent.mockRejectedValueOnce([])
         const res = await request(app).get(`/api/rules/files/validation/test`)
         expect(res.statusCode).toEqual(500)
@@ -89,7 +89,7 @@ describe('API route /api/rules', () => {
         const res = await request(app).put(`/api/rules/files/validation/test1.json`).send({})
         expect(res.statusCode).toEqual(422)
       })
-      it('Create a test file', async () => {
+      it('Create a test file fails if there is an error', async () => {
         RulesEngineModel.setValidationRulesFileContent.mockRejectedValueOnce({})
         const res = await request(app).put(`/api/rules/files/validation/test1.json`).send([])
         expect(res.statusCode).toEqual(500)
@@ -101,7 +101,7 @@ describe('API route /api/rules', () => {
         const res = await request(app).delete(`/api/rules/files/validation/test1.json`)
         expect(res.statusCode).toEqual(200)
       })
-      it('Delete the test file', async () => {
+      it('Delete the test file fails if there is an error', async () => {
         RulesEngineModel.deleteValidationRulesFile.mockRejectedValueOnce({})
         const res = await request(app).delete(`/api/rules/files/validation/test1.json`)
         expect(res.statusCode).toEqual(500)
@@ -117,7 +117,7 @@ describe('API route /api/rules', () => {
         expect(res.statusCode).toEqual(200)
         expect(Array.isArray(res.body)).toBeTruthy()
       })
-      it('Getting all rules files', async () => {
+      it('Getting all rules files fails if there is an error', async () => {
         RulesEngineModel.getCallbackRulesFiles.mockRejectedValueOnce({})
         const res = await request(app).get(`/api/rules/files/callback`)
         expect(res.statusCode).toEqual(500)
@@ -130,7 +130,7 @@ describe('API route /api/rules', () => {
         expect(res.statusCode).toEqual(200)
         expect(Array.isArray(res.body)).toBeTruthy()
       })
-      it('Getting the activated rule file', async () => {
+      it('Getting the activated rule file fails if there is an error', async () => {
         RulesEngineModel.getCallbackRulesFileContent.mockRejectedValueOnce([])
         const res = await request(app).get(`/api/rules/files/callback/test`)
         expect(res.statusCode).toEqual(500)
@@ -165,7 +165,7 @@ describe('API route /api/rules', () => {
         const res = await request(app).put(`/api/rules/files/callback/test1.json`).send([])
         expect(res.statusCode).toEqual(200)
       })
-      it('Create a test file', async () => {
+      it('Create a test file fails if there is an error', async () => {
         RulesEngineModel.setCallbackRulesFileContent.mockRejectedValueOnce({})
         const res = await request(app).put(`/api/rules/files/callback/test1.json`).send([])
         expect(res.statusCode).toEqual(500)
@@ -177,7 +177,7 @@ describe('API route /api/rules', () => {
         const res = await request(app).delete(`/api/rules/files/callback/test1.json`)
         expect(res.statusCode).toEqual(200)
       })
-      it('Delete the test file', async () => {
+      it('Delete the test file fails if there is an error', async () => {
         RulesEngineModel.deleteCallbackRulesFile.mockRejectedValueOnce({})
         const res = await request(app).delete(`/api/rules/files/callback/test1.json`)
         expect(res.statusCode).toEqual(500)
@@ -193,7 +193,7 @@ describe('API route /api/rules', () => {
         expect(res.statusCode).toEqual(200)
         expect(Array.isArray(res.body)).toBeTruthy()
       })
-      it('Getting all rules files', async () => {
+      it('Getting all rules files fails if there is an error', async () => {
         RulesEngineModel.getResponseRulesFiles.mockRejectedValueOnce({})
         const res = await request(app).get(`/api/rules/files/response`)
         expect(res.statusCode).toEqual(500)
@@ -206,7 +206,7 @@ describe('API route /api/rules', () => {
         expect(res.statusCode).toEqual(200)
         expect(Array.isArray(res.body)).toBeTruthy()
       })
-      it('Getting the activated rule file', async () => {
+      it('Getting the activated rule file fails if there is an error', async () => {
         RulesEngineModel.getResponseRulesFileContent.mockRejectedValueOnce([])
         const res = await request(app).get(`/api/rules/files/response/test`)
         expect(res.statusCode).toEqual(500)
@@ -241,7 +241,7 @@ describe('API route /api/rules', () => {
         const res = await request(app).put(`/api/rules/files/response/test1.json`).send([])
         expect(res.statusCode).toEqual(200)
       })
-      it('Create a test file', async () => {
+      it('Create a test file fails if there is an error', async () => {
         RulesEngineModel.setResponseRulesFileContent.mockRejectedValueOnce({})
         const res = await request(app).put(`/api/rules/files/response/test1.json`).send([])
         expect(res.statusCode).toEqual(500)
@@ -253,7 +253,7 @@ describe('API route /api/rules', () => {
         const res = await request(app).delete(`/api/rules/files/response/test1.json`)
         expect(res.statusCode).toEqual(200)
       })
-      it('Delete the test file', async () => {
+      it('Delete the test file fails if there is an error', async () => {
         RulesEngineModel.deleteResponseRulesFile.mockRejectedValueOnce({})
         const res = await request(app).delete(`/api/rules/files/response/test1.json`)
         expect(res.statusCode).toEqual(500)

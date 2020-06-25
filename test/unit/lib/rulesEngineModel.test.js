@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -49,7 +50,7 @@ describe('RulesEngineModel', () => {
       const result = await RulesEngineModel.getResponseRulesEngine()
       expect(result).not.toBeUndefined()      
     })
-    it('reloadResponseRules when active rules file is found', async () => {
+    it('reloadResponseRules when active rules file is found with no rule conditions', async () => {
       SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
         activeRulesFile: 'activeRulesFile'
       }))
@@ -58,7 +59,7 @@ describe('RulesEngineModel', () => {
       const result = await RulesEngineModel.reloadResponseRules()
       expect(result).toBeUndefined()      
     })
-    it('reloadResponseRules when active rules file is found', async () => {
+    it('reloadResponseRules when active rules file is found with rule conditions', async () => {
       SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
         activeRulesFile: 'activeRulesFile'
       }))

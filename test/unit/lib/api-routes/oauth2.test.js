@@ -25,7 +25,6 @@
 
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
-const OpenApiMockHandler = require('../../../../src/lib/mocking/openApiMockHandler')
 const jwt = require('jsonwebtoken')
 
 const SpySign = jest.spyOn(jwt, 'sign')

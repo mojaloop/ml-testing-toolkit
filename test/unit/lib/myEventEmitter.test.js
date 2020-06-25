@@ -29,7 +29,7 @@ describe('MyEventEmitter', () => {
     it('testOutbound should be created', async () => {
       expect(() => MyEventEmitter.getTestOutboundEmitter()).not.toThrowError()
     })
-    it('testOutbound should be not created', async () => {
+    it('testOutbound should be not created if exists', async () => {
       expect(() => MyEventEmitter.getTestOutboundEmitter()).not.toThrowError()
     })
   })
@@ -37,7 +37,7 @@ describe('MyEventEmitter', () => {
     it('assertionRequest should be created', async () => {
       expect(() => MyEventEmitter.getAssertionRequestEmitter()).not.toThrowError()
     })
-    it('assertionRequest should be not created', async () => {
+    it('assertionRequest should be not created if exists', async () => {
       expect(() => MyEventEmitter.getAssertionRequestEmitter()).not.toThrowError()
     })
   })
@@ -45,7 +45,7 @@ describe('MyEventEmitter', () => {
     it('assertionCallback should be created', async () => {
       expect(() => MyEventEmitter.getAssertionCallbackEmitter()).not.toThrowError()
     })
-    it('assertionCallback should be not created', async () => {
+    it('assertionCallback should be not created if exists', async () => {
       expect(() => MyEventEmitter.getAssertionCallbackEmitter()).not.toThrowError()
     })
   })
