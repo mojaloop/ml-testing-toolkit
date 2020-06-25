@@ -61,7 +61,8 @@ module.exports.initilizeMockHandler = async () => {
       strict: true,
       handlers: {
         notImplemented: async (context, req, h) => {
-          await openApiBackendNotImplementedHandler(context, req, h, item)
+          const resp = await openApiBackendNotImplementedHandler(context, req, h, item)
+          return resp
         },
         validationFail: async (context, req, h) => {
           const extensionList = [{

@@ -91,7 +91,7 @@ const createServer = async (port) => {
       type: 'onPreHandler',
       method: (request, h) => {
         // Generate UniqueID
-        request.customInfo = request.payload ? request.payload.customInfo : {}
+        request.customInfo = {}
         request.customInfo.uniqueId = UniqueIdGenerator.generateUniqueId(request)
         // Parse the traceparent header if present
         if (request.headers.traceparent) {
@@ -112,7 +112,11 @@ const createServer = async (port) => {
       method: (request, h) => {
         RequestLogger.logResponse(request)
         if (request.customInfo && request.customInfo.negotiatedContentType) {
-          request.response.header('content-type', request.customInfo.negotiatedContentType)
+          if (request.response.isBoom) {
+            request.response.output.headers['content-type'] = request.customInfo.negotiatedContentType
+          } else {
+            request.response.header('content-type', request.customInfo.negotiatedContentType)
+          }
         }
         return h.continue
       }
