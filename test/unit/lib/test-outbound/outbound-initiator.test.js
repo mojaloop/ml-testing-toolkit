@@ -27,6 +27,16 @@
 
 const OutboundInitiator = require('../../../../src/lib/test-outbound/outbound-initiator')
 const axios = require('axios').default
+const https = require('https')
+const ConnectionProvider = require('../../../../src/lib/configuration-providers/mb-connection-manager')
+const Config = require('../../../../src/lib/config')
+
+const SpyAgent = jest.spyOn(https, 'Agent')
+const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
+const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
+
+
+
 jest.mock('axios')
 
 
@@ -123,16 +133,6 @@ describe('Outbound Initiator Functions', () => {
       expect(request.body.transactionAmount.currency).toEqual('USD')
       expect(request.headers.TimeStamp).toEqual('2020-01-01 01:01:01')
     })
-    // it('replaceRequestVariables should replace request variables properly incase the headers are referred using a special syntax', async () => {
-    //   const sampleRequest = {
-    //     headers: {
-    //       'FSPIOP-Source': 'payerfsp',
-    //       'source': '${request.headers.FSPIOP-Source}'
-    //     }
-    //   }
-    //   const request = OutboundInitiator.replaceRequestVariables(sampleRequest)
-    //   expect(request.headers.source).toEqual('payerfsp')
-    // })
     // Negative Scenarios
     it('replaceRequestVariables should not replace request variables which does not exist', async () => {
       const sampleRequest = {
@@ -147,6 +147,24 @@ describe('Outbound Initiator Functions', () => {
       const request = OutboundInitiator.replaceRequestVariables(sampleRequest)
       expect(request.body.transactionAmount.amount).toEqual('{$request.body.amount.amount}')
       expect(request.body.transactionAmount.currency).toEqual('{$request.body.amount.currency}')
+    })
+    it('replaceRequestVariables should not replace request variables which does not exist', async () => {
+      const sampleRequest = {
+        body: {
+          transactionId: '123',
+          transactionAmount: {
+            amount: '{$environment.body.amount.amount}',
+            currency: '{$environment.body.amount.currency}'
+          }
+        }
+      }
+      const request = OutboundInitiator.replaceRequestVariables(JSON.stringify(sampleRequest))
+      expect(JSON.parse(request)).toStrictEqual(sampleRequest)
+    })
+    it('replaceRequestVariables should not replace request variables which does not exist', async () => {
+      const sampleRequest = true
+      const request = OutboundInitiator.replaceRequestVariables(sampleRequest)
+      expect(request).toStrictEqual(sampleRequest)
     })
   })
 
@@ -184,6 +202,30 @@ describe('Outbound Initiator Functions', () => {
       const request = OutboundInitiator.replaceEnvironmentVariables(sampleRequest,environment)
       expect(request.body.transactionId).toEqual('{$environment.transactionId}')
     })
+    it('replaceEnvironmentVariables should not replace request variables which does not exist', async () => {
+      const environment = {
+        quoteId: '123'
+      }
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'payerfsp',
+          Date: '2020-01-01 01:01:01'
+        },
+        body: {
+          transactionId: '{$request.transactionId}'
+        }
+      }
+      const request = OutboundInitiator.replaceEnvironmentVariables(JSON.stringify(sampleRequest),environment)
+      expect(JSON.parse(request)).toStrictEqual(sampleRequest)
+    })
+    it('replaceEnvironmentVariables should not replace request variables which does not exist', async () => {
+      const environment = {
+        quoteId: '123'
+      }
+      const sampleRequest = true
+      const request = OutboundInitiator.replaceEnvironmentVariables(sampleRequest,environment)
+      expect(request).toStrictEqual(sampleRequest)
+    })
   })
 
   describe('replaceVariables', () => {
@@ -210,6 +252,20 @@ describe('Outbound Initiator Functions', () => {
       expect(request.body.transactionAmount.amount).toEqual('100')
       expect(request.body.transactionAmount.currency).toEqual('USD')
       expect(request.headers.Date).toEqual('2020-01-01 01:01:01')
+    })
+    it('replaceVariables should replace function properly', async () => {
+      const sampleRequest = {
+        headers: {
+          Date: '{$function.curDate}'
+        }
+      }
+      const request = OutboundInitiator.replaceVariables(JSON.stringify(sampleRequest), null, null, null)
+      expect(JSON.parse(request)).toStrictEqual(sampleRequest)
+    })
+    it('replaceVariables should return the value if its not an object or a string', async () => {
+      const sampleRequest = true
+      const request = OutboundInitiator.replaceVariables(sampleRequest, null, null, null)
+      expect(request).toStrictEqual(sampleRequest)
     })
     it('replaceVariables should replace request variables properly', async () => {
       const sampleRequest = {
@@ -304,12 +360,54 @@ describe('Outbound Initiator Functions', () => {
       expect(request.body.transactionAmount.amount).toEqual('{$request.body.amount.amount}')
       expect(request.body.transactionAmount.currency).toEqual('{$request.body.amount.currency}')
     })
+    it('replaceVariables should not replace previous response variables properly if key not matched', async () => {
+      const responsesObject = {
+        1: {
+          appended: {
+            response: {
+              body: {
+                party:{
+                  fspId: '123'
+                }
+              }
+            }
+          }
+        }
+      }
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Destination': '{$prev.2.response.body.party.fspId}'
+        }
+      }
+      const request = OutboundInitiator.replaceVariables(sampleRequest, null, null, responsesObject)
+      expect(request.headers['FSPIOP-Destination']).toEqual('{$prev.2.response.body.party.fspId}')
+    })
   })
 
   describe('sendRequest', () => {
     // Positive Scenarios
     it('sendRequest should call axios with appropriate params', async () => {
-      axios.mockImplementation(() => Promise.resolve(true))
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpyAgent.mockImplementationOnce(() => {
+        return {httpsAgent: {}}
+      })
+      SpyGetTlsConfig.mockReturnValueOnce({
+        hubClientCert: 'cert',
+        hubClientKey: 'key',
+        dfspServerCaRootCert: 'ca'
+      })
+      SpyGetUserConfig.mockReturnValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
+      }).mockReturnValueOnce({        
+        OUTBOUND_MUTUAL_TLS_ENABLED: true,
+      })
       const sampleRequest = {
         headers: {
           'FSPIOP-Source': 'payerfsp',
@@ -328,7 +426,7 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      OutboundInitiator.sendRequest(null, 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null)
+      OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null)
       expect(axios).toHaveBeenCalledTimes(1);
     })
   })
@@ -418,6 +516,37 @@ describe('Outbound Initiator Functions', () => {
       }
       const testResult = await OutboundInitiator.handleTests(sampleRequest)
       expect(testResult.passedCount).toEqual(1)
+    })
+    it('handleTests should execute test cases about request and return results', async () => {
+      const sampleRequest = {
+        body: {
+          transactionId: '123'
+        },
+        tests: {
+          assertions: [
+            {
+              id: 1,
+              exec: [
+                "expect(request.body.transactionId).to.equal('123')"
+              ]
+            }
+          ]
+        }
+      }
+      const testResult = await OutboundInitiator.handleTests(sampleRequest)
+      expect(testResult.passedCount).toEqual(1)
+    })
+    it('handleTests should return null if there is an error', async () => {
+      const sampleRequest = {
+        body: {
+          transactionId: '123'
+        },
+        tests: {
+          assertions: null
+        }
+      }
+      const testResult = await OutboundInitiator.handleTests(sampleRequest)
+      expect(testResult).toBeNull()
     })
     it('handleTests should execute test cases about response and return results', async () => {
       const sampleResponse = {
@@ -515,6 +644,13 @@ describe('Outbound Initiator Functions', () => {
       expect(testResult.results['2'].status).toEqual('SUCCESS')
       expect(testResult.results['3'].status).toEqual('FAILED')
       expect(testResult.passedCount).toEqual(1)
+    })
+  })
+  describe('terminateOutbound', () => {
+    // Positive Scenarios
+    it('terminateOutbound should terminate outbound', async () => {
+      const terminateOutbound = OutboundInitiator.terminateOutbound('traceId')
+      expect(terminateOutbound).toBeUndefined()
     })
   })
 })

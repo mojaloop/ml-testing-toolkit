@@ -18,42 +18,69 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
 
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
-const assertionStore = require('../../../../src/lib/assertionStore')
-jest.mock('../../../../src/lib/assertionStore')
-
-assertionStore.popRequest.mockImplementation(() => Promise.resolve({
-  headers: {},
-  body: {}
-})) 
-assertionStore.popCallback.mockImplementation(() => Promise.resolve({
-  headers: {},
-  body: {}
-})) 
-
 const app = apiServer.getApp()
-jest.setTimeout(30000)
+const assertionStore = require('../../../../src/lib/assertionStore')
+const SpyPopRequest = jest.spyOn(assertionStore, 'popRequest')
+const SpyPopCallback = jest.spyOn(assertionStore, 'popCallback')
+
+jest.setTimeout(10000);
 
 describe('API route /longpolling/requests/*', () => {
   describe('GET /longpolling/requests/123', () => {
     it('Getting stored requests', async () => {
+      SpyPopRequest.mockResolvedValueOnce({
+        headers: {},
+        body: {}
+      })
       const res = await request(app).get(`/longpolling/requests/123`)
       expect(res.statusCode).toEqual(200)
       expect(res).toHaveProperty('headers')
       expect(res).toHaveProperty('body')
     })
+    it('Getting empty stored requests should throw an error', async () => {
+      SpyPopRequest.mockResolvedValueOnce()
+      let res
+      try {
+        res = await request(app).get(`/longpolling/requests/123`)
+      } catch (error) {}
+      expect(res.statusCode).toEqual(500)
+    })
+    it('Getting stored requests should throw an error', async () => {
+      SpyPopRequest.mockRejectedValueOnce()
+      const res = await request(app).get(`/longpolling/requests/123`)
+      expect(res.statusCode).toEqual(404)
+    })
   })
   describe('GET /longpolling/callbacks/123', () => {
     it('Getting stored callbacks', async () => {
+      SpyPopCallback.mockResolvedValueOnce({
+        headers: {},
+        body: {}
+      })
       const res = await request(app).get(`/longpolling/callbacks/123`)
       expect(res.statusCode).toEqual(200)
       expect(res).toHaveProperty('headers')
       expect(res).toHaveProperty('body')
+    })
+    it('Getting empty stored callbacks should throw an error', async () => {
+      SpyPopCallback.mockResolvedValueOnce()
+      let res
+      try {
+        res = await request(app).get(`/longpolling/callbacks/123`)
+      } catch (error) {}
+      expect(res.statusCode).toEqual(500)
+    })
+    it('Getting stored callbacks should throw an error', async () => {
+      SpyPopCallback.mockRejectedValueOnce()
+      const res = await request(app).get(`/longpolling/callbacks/123`)
+      expect(res.statusCode).toEqual(404)
     })
   })
  

@@ -22,8 +22,6 @@
  --------------
  ******/
 
-
-
 const AdmZip = require('adm-zip')
 const Util = require('util')
 const Config = require('../../../src/lib/config')

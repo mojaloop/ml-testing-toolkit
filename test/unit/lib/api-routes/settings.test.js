@@ -59,7 +59,7 @@ describe('API route /api/settings', () => {
           .send()
         expect(exportResponse.statusCode).toEqual(400)
       })
-      it('Send a bad request - not found', async () => {
+      it('Send a bad request - export spec files fails', async () => {
         const options = ['rules_response','rules_callback']
         SpyExportSpecFiles.mockRejectedValueOnce()
         const exportResponse = await request(app)
@@ -70,7 +70,7 @@ describe('API route /api/settings', () => {
       })
     })
     describe('POST /api/settings/import', () => {
-      it('Send a proper request', async () => {
+      it('Send a proper request with INBOUND_MUTUAL_TLS_ENABLED: false', async () => {
         SpyReloadResponseRules.mockResolvedValueOnce()
         SpyReloadCallbackRules.mockResolvedValueOnce()
         SpyReloadValidationRules.mockResolvedValueOnce()
@@ -86,7 +86,7 @@ describe('API route /api/settings', () => {
           .send({buffer: Buffer.from([])})
         expect(res.statusCode).toEqual(200)
       })
-      it('Send a bad request - server error', async () => {
+      it('Send a proper request with INBOUND_MUTUAL_TLS_ENABLED: true', async () => {
         SpyReloadResponseRules.mockResolvedValueOnce()
         SpyReloadCallbackRules.mockResolvedValueOnce()
         SpyReloadValidationRules.mockResolvedValueOnce()
@@ -101,7 +101,7 @@ describe('API route /api/settings', () => {
           .send({buffer: Buffer.from([])})
         expect(res.statusCode).toEqual(200)
       })
-      it('Send a bad request - server error', async () => {
+      it('Send a bad request - import spec files fails', async () => {
         const options = ['rules_response','rules_callback','rules_validation','user_config.json']
         SpyImportSpecFiles.mockRejectedValueOnce({message: ''})
         const res = await request(app)
