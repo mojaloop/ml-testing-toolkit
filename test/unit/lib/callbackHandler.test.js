@@ -37,7 +37,7 @@ const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 const SpySign = jest.spyOn(JwsSigning, 'sign')
 const SpyPushCallback = jest.spyOn(AssertionStore, 'pushCallback')
 const SpyRequestLogger = jest.spyOn(RequestLogger, 'logMessage')
-const SpyMyEventEmitter = jest.spyOn(MyEventEmitter, 'getAssertionCallbackEmitter')
+const SpyMyEventEmitter = jest.spyOn(MyEventEmitter, 'getEmitter')
 const SpyAgent = jest.spyOn(https, 'Agent')
 const SpyConnectionProvider = jest.spyOn(ConnectionProvider, 'getTlsConfig')
 

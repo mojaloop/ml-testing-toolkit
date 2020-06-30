@@ -18,25 +18,37 @@
  * Gates Foundation
 
  * ModusBox
- * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
+const customLogger = require('./requestLogger')
 
-const EventEmitter = require('events')
-class MyEmitter extends EventEmitter {}
-const emitters = {
-  testOutbound: null,
-  assertionRequest: null,
-  assertionCallback: null
-}
-
-const getEmitter = (emitter) => {
-  if (!emitters[emitter]) {
-    emitters[emitter] = new MyEmitter()
+const getFunctionResult = (param, fromObject, request) => {
+  const temp = param.replace(/{\$function\.(.*)}/, '$1').split('.')
+  if (temp.length === 2) {
+    const fileName = temp[0]
+    const functionName = temp[1]
+    try {
+      const fn = require('./mocking/custom-functions/' + fileName)[functionName]
+      if (!fn) {
+        customLogger.logMessage('error', 'The specified custom function does not exist', param, false)
+        return param
+      }
+      return fn(fromObject, request)
+    } catch (e) {
+      if (e.code === 'MODULE_NOT_FOUND') {
+        customLogger.logMessage('error', 'The specified custom function does not exist', param, false)
+      } else {
+        throw e
+      }
+      return param
+    }
+  } else {
+    customLogger.logMessage('error', 'The specified custom function format is not correct', param, false)
+    return param
   }
-  return emitters[emitter]
 }
 
 module.exports = {
-  getEmitter
+  getFunctionResult
 }

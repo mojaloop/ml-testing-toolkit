@@ -26,6 +26,8 @@
 const MBConnectionManagerProvider = require('../../../../src/lib/configuration-providers/mb-connection-manager')
 const Config = require('../../../../src/lib/config')
 const axios = require('axios').default
+const { readFileAsync }  = require('../../../../src/lib/utils')
+
 jest.mock('axios')
 jest.mock('../../../../src/lib/config')
 
@@ -38,80 +40,85 @@ Config.getUserConfig.mockImplementation(() => {
     CONNECTION_MANAGER_API_URL: ''
   }
 })
+const reject = {
+  post: {},
+  get: {},
+  put: {}
+}
 const mapping = {
   post: {
-    '/api/environments': Promise.resolve({
+    '/api/environments': {
       status: 200,
       data: {
         id: 1
       }
-    }),
-    '/api/environments/1/dfsps': Promise.resolve({
+    },
+    '/api/environments/1/dfsps': {
       status: 200,
       data: {
         id: 1
       }
-    }),
-    '/api/environments/1/cas': Promise.resolve({
+    },
+    '/api/environments/1/cas': {
       status: 200,
       data: {
         id: 1,
         certificate: 'asdf'
       }
-    }),
-    '/api/environments/1/dfsps/userdfsp/enrollments/outbound': Promise.resolve({
+    },
+    '/api/environments/1/dfsps/userdfsp/enrollments/outbound': {
       status: 200,
       data: {
         id: 1,
         certificate: '',
         validationState: 'VALID'
       }
-    }),
-    '/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign': Promise.resolve({
+    },
+    '/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign': {
       status: 200,
       data: {
         id: 1,
         certificate: 'asdf',
         validationState: 'VALID'
       }
-    }),
-    '/api/environments/1/hub/servercerts': Promise.resolve({
+    },
+    '/api/environments/1/hub/servercerts': {
       status: 200,
       data: {
         id: 1,
         certificate: ''
       }
-    }),
-    '/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts': Promise.resolve({
+    },
+    '/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts': {
       status: 200,
       data: {
         rootCertificate: 'asdf',
         intermediateChain: 'asdf',
         jwsCertificate: 'asdf'
       }
-    })
+    }
   },
   get: {
-    '/api/environments': Promise.resolve({
+    '/api/environments': {
       status: 200,
       data: [{
         name: 'NOT-TESTING-TOOLKIT'
       }]
-    }),
-    '/api/environments/1/dfsps': Promise.resolve({
+    },
+    '/api/environments/1/dfsps': {
       status: 200,
       data: [{
         id: 0
       }]
-    }),
-    '/api/environments/1/dfsps/userdfsp/ca': Promise.resolve({
+    },
+    '/api/environments/1/dfsps/userdfsp/ca': {
       status: 200,
       data: {
         rootCertificate: 'asdf',
         validationState: 'VALID'
       }
-    }),
-    '/api/environments/1/dfsps/userdfsp/servercerts': Promise.resolve({
+    },
+    '/api/environments/1/dfsps/userdfsp/servercerts': {
       status: 200,
       data: {
         rootCertificate: 'asdf',
@@ -119,8 +126,8 @@ const mapping = {
         intermediateChain: 'asdf',
         serverCertificate: 'asdf'
       }
-    }),
-    '/api/environments/1/hub/servercerts': Promise.resolve({
+    },
+    '/api/environments/1/hub/servercerts': {
       status: 200,
       data: {
         rootCertificate: 'asdf',
@@ -128,8 +135,8 @@ const mapping = {
         intermediateChain: 'asdf',
         serverCertificate: 'asdf'
       }
-    }),
-    '/api/environments/1/dfsps/userdfsp/enrollments/outbound': Promise.resolve({
+    },
+    '/api/environments/1/dfsps/userdfsp/enrollments/outbound': {
       status: 200,
       data: [
         {
@@ -139,8 +146,8 @@ const mapping = {
           certificate: 'asdf'
         }
       ]
-    }),
-    '/api/environments/1/dfsps/userdfsp/enrollments/inbound': Promise.resolve({
+    },
+    '/api/environments/1/dfsps/userdfsp/enrollments/inbound': {
       status: 200,
       data: [
         {
@@ -150,8 +157,8 @@ const mapping = {
           certificate: 'asdf'
         }
       ]
-    }),
-    '/api/environments/1/dfsps/userdfsp/jwscerts': Promise.resolve({
+    },
+    '/api/environments/1/dfsps/userdfsp/jwscerts': {
       status: 200,
       data: {
         id: 1,
@@ -159,16 +166,16 @@ const mapping = {
         intermediateChain: 'asdf',
         jwsCertificate: 'asdf'
       }
-    }),
-    '/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts': Promise.resolve({
+    },
+    '/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts': {
       status: 200,
       data: {
         rootCertificate: 'asdf',
         intermediateChain: 'asdf',
         jwsCertificate: 'asdf'
       }
-    }),
-    '/api/environments/1/dfsps/userdfsp/enrollments/inbound': Promise.resolve({
+    },
+    '/api/environments/1/dfsps/userdfsp/enrollments/inbound': {
       status: 200,
       data: [{
         id: 1,
@@ -179,38 +186,79 @@ const mapping = {
         state: 'CSR_LOADED',
         validationState: 'INVALID'
       }]
-    })
+    }
   },
   put: {
-    '/api/environments/1/dfsps/userdfsp/jwscerts': Promise.resolve({
+    '/api/environments/1/dfsps/userdfsp/jwscerts': {
       status: 200,
       data: {
         rootCertificate: 'asdf',
         intermediateChain: 'asdf',
         jwsCertificate: 'asdf'
       }
-    })
+    },
+    '/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts': {
+      status: 200,
+      data: {
+        rootCertificate: 'asdf',
+        intermediateChain: 'asdf',
+        jwsCertificate: 'asdf'
+      }
+    },
+    '/api/environments/1/hub/servercerts': {
+      status: 200,
+      data: {
+        rootCertificate: 'asdf',
+        validationState: 'VALID',
+        intermediateChain: 'asdf',
+        serverCertificate: 'asdf'
+      }
+    },
   }
 }
+
 axios.post.mockImplementation((url) => {
-  if (mapping.post[url]) {
-    return mapping.post[url]
-  }
-  return Promise.reject(new Error('not found'))
+  return axiosHelper('post', url)
 })
 
 axios.get.mockImplementation((url) => {
-  if (mapping.get[url]) {
-    return mapping.get[url]
-  }
-  return Promise.reject(new Error('not found'))
+  return axiosHelper('get', url)
 })
 
+axios.put.mockImplementation((url) => {
+  return axiosHelper('put', url)
+})
+
+const axiosHelper = (type, url) => {
+  if (mapping[type] && mapping[type][url]) {
+    if (reject[type][url]) {
+      return Promise.reject(reject[type][url])
+    }
+    return Promise.resolve(mapping[type][url])
+  }
+  return Promise.reject(new Error('not found'))
+}
+
 describe('mb-connection-manager', () => {
+  describe('getTestingToolkitDfspJWSCerts', () => {
+    it('should return null', async () => {
+      const getTestingToolkitDfspJWSCerts = MBConnectionManagerProvider.getTestingToolkitDfspJWSCerts()
+      expect(getTestingToolkitDfspJWSCerts).toBeNull()
+    })
+  })
+  describe('getUserDfspJWSCerts', () => {
+    it('should return null', async () => {
+      const getUserDfspJWSCerts = MBConnectionManagerProvider.getUserDfspJWSCerts()
+      expect(getUserDfspJWSCerts).toBeNull()
+    })
+  })
   describe('waitForTlsHubCerts', () => {
     it('should wait for tls certs', async () => {
       MBConnectionManagerProvider.waitForTlsHubCerts()
       await new Promise(resolve => setTimeout(resolve, 500))
+    })
+    it('should throw an error', async () => {
+      await expect(MBConnectionManagerProvider.waitForTlsHubCerts(0)).rejects.toThrowError()
     })
   })
   describe('initialize', () => {
@@ -219,44 +267,81 @@ describe('mb-connection-manager', () => {
     })
     it('should not throw error', async () => {
       const original = mapping.get['/api/environments'] 
-      mapping.get['/api/environments'] = Promise.resolve({
+      mapping.get['/api/environments'] = {
         status: 200,
         data: []
-      })
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments'] 
+      mapping.get['/api/environments'] = {
+        status: 400
+      }
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       mapping.get['/api/environments'] = original
     })
     it('should not throw error', async () => {
       const original = mapping.post['/api/environments'] 
-      mapping.post['/api/environments'] = Promise.resolve({
+      mapping.post['/api/environments'] = {
         status: 400,
         data: []
-      })
+      }
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       mapping.post['/api/environments'] = original
     })
     it('should not throw error', async () => {
       const original = mapping.get['/api/environments/1/dfsps'] 
-      mapping.get['/api/environments/1/dfsps'] = Promise.resolve({
+      mapping.get['/api/environments/1/dfsps'] = {
         status: 200,
         data: [{
           id: 'userdfsp'
         }]
-      })
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps'] 
+      mapping.get['/api/environments/1/dfsps'] = {
+        status: 400
+      }
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps'] = original
     })
     it('should not throw error', async () => {
       const original = mapping.post['/api/environments/1/dfsps'] 
-      mapping.post['/api/environments/1/dfsps'] = Promise.resolve({
+      mapping.post['/api/environments/1/dfsps'] = {
         status: 400
-      })
+      }
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       mapping.post['/api/environments/1/dfsps'] = original
     })
     it('should not throw error', async () => {
+      reject.post['/api/environments/1/dfsps'] = {}
+      const original = mapping.post['/api/environments/1/dfsps'] 
+      mapping.post['/api/environments/1/dfsps'] = {
+        status: 400
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.post['/api/environments/1/dfsps'] = original
+      reject.post['/api/environments/1/dfsps'] = false
+    })
+    it('should not throw error', async () => {
+      reject.post['/api/environments/1/dfsps'] = {response: {data: {}}}
+      const original = mapping.post['/api/environments/1/dfsps'] 
+      mapping.post['/api/environments/1/dfsps'] = {
+        status: 400
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.post['/api/environments/1/dfsps'] = original
+      reject.post['/api/environments/1/dfsps'] = false
+    })
+    
+    it('should not throw error', async () => {
       const original = mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] 
-      mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = Promise.resolve({
+      mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = {
         status: 200,
         data: {
           id: 1,
@@ -264,59 +349,253 @@ describe('mb-connection-manager', () => {
           intermediateChain: 'asdf',
           jwsCertificate: 'asdf'
         }
-      })
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] 
+      mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = {
+        status: 400
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] 
+      const mockData = {
+        status: 200,
+        data: {
+          id: 1,
+          rootCertificate: null,
+          intermediateChain: null,
+          jwsCertificate: (await readFileAsync('secrets/publickey.cer')).toString()
+        }
+      }
+      mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = mockData
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
     })
     it('should not throw error', async () => {
       const original = mapping.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] 
-      mapping.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = Promise.resolve({
+      mapping.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = {
         status: 400
-      })
+      }
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       mapping.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
     })
+
+    it('should not throw error', async () => {
+      reject.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts']  = {}
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      reject.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts']  = false
+    })
+    it('should not throw error', async () => {
+      reject.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts']  = {response: {data: {}}}
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      reject.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts']  = false
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/jwscerts'] 
+      mapping.get['/api/environments/1/dfsps/userdfsp/jwscerts'] = {
+        status: 400
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps/userdfsp/jwscerts'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/ca'] 
+      mapping.get['/api/environments/1/dfsps/userdfsp/ca'] = {
+        status: 400
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps/userdfsp/ca'] = original
+    })
     it('should not throw error', async () => {
       const original = mapping.get['/api/environments/1/ca/rootCert'] 
-      mapping.get['/api/environments/1/ca/rootCert'] = Promise.resolve({
+      mapping.get['/api/environments/1/ca/rootCert'] = {
         status: 200,
         data: {
           certificate: 'asdf'
         }
-      })
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/ca/rootCert'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/ca/rootCert'] 
+      mapping.get['/api/environments/1/ca/rootCert'] = {
+        status: 400
+      }
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/ca/rootCert'] = original
     })
     it('should not throw error', async () => {
       const original = mapping.post['/api/environments/1/cas'] 
-      mapping.post['/api/environments/1/cas'] = Promise.resolve({
+      mapping.post['/api/environments/1/cas'] = {
         status: 400
-      })
+      }
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       mapping.post['/api/environments/1/cas'] = original
     })
     it('should not throw error', async () => {
+      reject.post['/api/environments/1/cas'] = {}
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      reject.post['/api/environments/1/cas'] = false
+    })
+    it('should not throw error', async () => {
+      reject.post['/api/environments/1/cas'] = {response: {data: {}}}
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      reject.post['/api/environments/1/cas'] = false
+    })
+    it('should not throw error', async () => {
       const original = mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] 
-      mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = Promise.resolve({
-        status: 400
-      })
+      mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = {
+        status: 200,
+        data: {
+          id: 1,
+          validationState: 'VALID'
+        }
+      }
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
-      mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = Promise.resolve({
+      const original = mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] 
+      mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = {
         status: 400
-      })
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/inbound'] 
+      mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/inbound'] = {
+        status: 400
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/inbound'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
+      mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {
+        status: 400
+      }
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = original
     })
     it('should not throw error', async () => {
       const original = mapping.get['/api/environments/1/hub/servercerts'] 
-      mapping.get['/api/environments/1/hub/servercerts'] = Promise.resolve({
+      mapping.get['/api/environments/1/hub/servercerts'] = {
         status: 400
-      })
+      }
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/hub/servercerts'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/servercerts'] 
+      mapping.get['/api/environments/1/dfsps/userdfsp/servercerts'] = {
+        status: 400
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps/userdfsp/servercerts'] = original
+    })
+    it('should not throw error', async () => {
+      reject.post['/api/environments/1/dfsps'] = {}
+      reject.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = {}
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      reject.post['/api/environments/1/dfsps'] = false
+      reject.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = false
+    })
+    it('should not throw error', async () => {
+      reject.post['/api/environments/1/dfsps'] = {response: {data: {}}}
+      reject.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = {response: {data: {}}}
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      reject.post['/api/environments/1/dfsps'] = false
+      reject.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = false
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
+      mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {
+        status: 400
+      }
+      reject.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {}
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = original
+      reject.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = false
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
+      mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {
+        status: 400
+      }
+      reject.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {response: {data: {}}}
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = original
+      reject.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = false
+    })
+    it('should not throw error', async () => {
+      const originalGet = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
+      mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {
+        status: 400
+      }
+      const originalPost = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
+      mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {
+        status: 400
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = originalGet
+      mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = originalPost
+    })
+    it('should not throw error', async () => {
+      const original = mapping.put['/api/environments/1/hub/servercerts'] 
+      mapping.put['/api/environments/1/hub/servercerts'] = {
+        status: 400
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.put['/api/environments/1/hub/servercerts'] = original
+    })
+    it('should not throw error', async () => {
+      reject.put['/api/environments/1/hub/servercerts'] = {}
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      reject.put['/api/environments/1/hub/servercerts'] = false
+    })
+    it('should not throw error', async () => {
+      reject.put['/api/environments/1/hub/servercerts'] = {response: {data: {}}}
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      reject.put['/api/environments/1/hub/servercerts'] = false
+    })
+    it('should not throw error', async () => {
+      const originalGet = mapping.get['/api/environments/1/hub/servercerts'] 
+      mapping.get['/api/environments/1/hub/servercerts'] = {
+        status: 400
+      }
+      const originalPost = mapping.post['/api/environments/1/hub/servercerts'] 
+      mapping.post['/api/environments/1/hub/servercerts'] = {
+        status: 400
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/hub/servercerts'] = originalGet
+      mapping.post['/api/environments/1/hub/servercerts'] = originalPost
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/hub/servercerts'] 
+      mapping.get['/api/environments/1/hub/servercerts'] = {
+        status: 400
+      }
+      reject.post['/api/environments/1/hub/servercerts'] = {}
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      reject.post['/api/environments/1/hub/servercerts'] = false
+      mapping.get['/api/environments/1/hub/servercerts'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/hub/servercerts'] 
+      mapping.get['/api/environments/1/hub/servercerts'] = {
+        status: 400
+      }
+      reject.post['/api/environments/1/hub/servercerts'] = {response: {data: {}}}
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      reject.post['/api/environments/1/hub/servercerts'] = false
       mapping.get['/api/environments/1/hub/servercerts'] = original
     })
   })

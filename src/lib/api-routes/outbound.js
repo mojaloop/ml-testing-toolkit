@@ -29,6 +29,7 @@ const router = new express.Router()
 const axios = require('axios').default
 const Config = require('../config')
 const customLogger = require('../requestLogger')
+const outbound = require('../test-outbound/outbound-initiator')
 const { check, validationResult } = require('express-validator')
 
 // Route to send a single outbound request
@@ -49,7 +50,7 @@ async (req, res, next) => {
       data: req.body.body,
       timeout: 3000,
       validateStatus: function (status) {
-        return status < 900 // Reject only if the status code is greater than or equal to 900
+        return status >= 200 && status < 900 // Reject only if the status code is greater than or equal to 900
       }
     }).then((result) => {
       customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
@@ -74,7 +75,6 @@ router.post('/template/:traceID', async (req, res, next) => {
     if (!inputJson.test_cases) {
       return res.status(422).json({ errors: 'Template test cases are missing' })
     }
-    const outbound = require('../test-outbound/outbound-initiator')
     outbound.OutboundSend(inputJson, traceID)
 
     return res.status(200).json({ status: 'OK' })
@@ -87,7 +87,6 @@ router.post('/template/:traceID', async (req, res, next) => {
 router.delete('/template/:traceID', async (req, res, next) => {
   try {
     const traceID = req.params.traceID
-    const outbound = require('../test-outbound/outbound-initiator')
     outbound.terminateOutbound(traceID)
 
     return res.status(200).json({ status: 'OK' })

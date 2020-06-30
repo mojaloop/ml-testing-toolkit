@@ -163,6 +163,11 @@ describe('API route /api/outbound', () => {
       const res = await request(app).post(`/api/outbound/template/aabb123aabb`).send(properTemplate)
       expect(res.statusCode).toEqual(200)
     })
+    it('Send a proper template with id aabb123aabb', async () => {
+      SpyOutboundSend.mockImplementationOnce(() => {throw new Error()})
+      const res = await request(app).post(`/api/outbound/template/aabb123aabb`).send(properTemplate)
+      expect(res.statusCode).toEqual(500)
+    })
     it('Send a template without name', async () => {
       const {name, ...wrongTemplate} = properTemplate
       const res = await request(app).post(`/api/outbound/template/123`).send(wrongTemplate)
@@ -176,10 +181,16 @@ describe('API route /api/outbound', () => {
   })
   describe('DELETE /api/outbound/template/:outboundID', () => {
     it('Send request to delete template with outboundID 123', async () => {
-      SpyTerminateOutbound.mockResolvedValueOnce()
+      SpyTerminateOutbound.mockReturnValueOnce()
       await new Promise(resolve => setTimeout(resolve, 2000))
       const res = await request(app).delete(`/api/outbound/template/123`).send()
       expect(res.statusCode).toEqual(200)
+    })
+    it('Send request to delete template with outboundID 123', async () => {
+      SpyTerminateOutbound.mockImplementationOnce(() => {throw new Error()})
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      const res = await request(app).delete(`/api/outbound/template/123`).send()
+      expect(res.statusCode).toEqual(500)
     })
   })
 })

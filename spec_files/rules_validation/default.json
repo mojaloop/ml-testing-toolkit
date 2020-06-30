@@ -1,1 +1,63 @@
-[]
+[
+  {
+    "ruleId": 1,
+    "priority": 1,
+    "description": "post /quotes",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "body",
+          "operator": "numericGreaterThan",
+          "value": "{$environment.amountLimit}",
+          "path": "amount.amount"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/quotes"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/quotes/{ID}/error",
+      "params": {
+        "body": {
+          "errorInformation": {
+            "errorCode": "5100",
+            "errorDescription": "should be greater than {$environment.amountLimit}",
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "errorDescription",
+                  "value": "This is a more detailed error description"
+                },
+                {
+                  "key": "errorDescription",
+                  "value": "This is a more detailed error description"
+                }
+              ]
+            }
+          }
+        },
+        "scripts": {
+          "enabled": false
+        }
+      },
+      "type": "MOCK_ERROR_CALLBACK"
+    },
+    "type": "validation",
+    "version": 1
+  }
+]

@@ -145,6 +145,7 @@ const initJWSCertificate = async (environmentId, dfspId, jwsCertificate = null, 
     if (jwsCertResponse.status === 200) {
       return jwsCertResponse.data
     } else {
+      console.log('---------------------------here')
       console.log('Some error creating / updating JWS cert for DFSP')
     }
   } catch (err) {
@@ -436,20 +437,16 @@ const initialize = async () => {
   setInterval(checkConnectionManager, CM_CHECK_INTERVAL)
 }
 
-const waitForFewSecs = async (secs) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(true)
-    }, secs * 1000)
-  })
-}
-
-const waitForTlsHubCerts = async () => {
+const waitForTlsHubCerts = async (interval = 2) => {
   for (let i = 0; i < 10; i++) {
     if (currentTlsConfig.hubCaCert && currentTlsConfig.hubServerCert && currentTlsConfig.hubServerKey) {
       return true
     }
-    await waitForFewSecs(2)
+    await new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(true)
+      }, interval * 1000)
+    })
   }
   throw new Error('Timeout Hub Init')
 }

@@ -23,7 +23,8 @@
  ******/
 
 var storedObject = {
-  transactions: {}
+  transactions: {},
+  inboundEnvironment: {}
 }
 
 const set = (key, value) => {
@@ -34,13 +35,30 @@ const get = (key) => {
   return { ...storedObject[key] }
 }
 
+const push = (object, objectId, data) => {
+  const curDateMillis = Date.now()
+  storedObject[object][objectId] = {
+    insertedDate: curDateMillis,
+    ...data
+  }
+}
+
+const getObject = (object, objectId) => {
+  return storedObject[object][objectId] || null
+}
+
+const clear = (object, interval) => {
+  for (const objectId in storedObject[object]) {
+    const timeDiff = Date.now() - storedObject[object][objectId].insertedDate
+    if (timeDiff > interval) { // Remove the old transactions greater than 10min
+      delete storedObject[object][objectId]
+    }
+  }
+}
+
 const saveTransaction = (transactionId, fulfilment) => {
   // Append the current transaction to transactions
-  const curDateMillis = Date.now()
-  storedObject.transactions[transactionId] = {
-    transactionDate: curDateMillis,
-    fulfilment: fulfilment
-  }
+  push('transactions', transactionId, { fulfilment })
 }
 
 const searchTransaction = (transactionId) => {
@@ -50,28 +68,20 @@ const searchTransaction = (transactionId) => {
 
 const getTransaction = (transactionId) => {
   // get the transaction for the transactionId
-  if (searchTransaction(transactionId)) {
-    return storedObject.transactions[transactionId]
-  } else {
-    return null
-  }
+  return getObject('transactions', transactionId)
 }
 
 const deleteTransaction = (transactionId) => {
   delete storedObject.transactions[transactionId]
 }
 
-const clearOldTransactions = () => {
-  for (const transactionId in storedObject.transactions) {
-    const timeDiff = Date.now() - storedObject.transactions[transactionId].transactionDate
-    if (timeDiff > 10 * 60 * 1000) { // Remove the old transactions greater than 10min
-      delete storedObject.transactions[transactionId]
-    }
-  }
+const clearOldObjects = () => {
+  clear('transactions', 10 * 60 * 1000)
+  clear('inboundEnvironment', 10 * 60 * 1000)
 }
 
 const initObjectStore = () => {
-  setInterval(clearOldTransactions, 1000)
+  setInterval(clearOldObjects, 1000)
 }
 
 module.exports = {
@@ -81,5 +91,8 @@ module.exports = {
   searchTransaction,
   getTransaction,
   deleteTransaction,
-  initObjectStore
+  initObjectStore,
+  push,
+  getObject,
+  clear
 }

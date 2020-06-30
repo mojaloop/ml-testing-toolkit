@@ -28,129 +28,182 @@
 const OpenApiRulesEngine = require('../../../../src/lib/mocking/openApiRulesEngine')
 
 const rulesEngineModel = require('../../../../src/lib/rulesEngineModel')
+const { reject } = require('lodash')
 jest.mock('../../../../src/lib/rulesEngineModel')
 
 jest.setTimeout(30000)
 
+const mapping = {
+  validation: {
+    get: [
+      {
+        type: 'MOCK_ERROR_CALLBACK',
+        params: {
+          body: {
+  
+          },
+          delay: 100
+        }
+      }
+    ],
+    put: [
+      {
+        type: 'MOCK_ERROR_CALLBACK',
+        params: {
+          body: {
+            removeEmpty: null
+          }
+        }
+      }
+    ],
+    patch: [
+      {
+        type: 'NOT_SUPPORTED',
+        params: {}
+      }
+    ],
+    delete: null,
+    default: [
+      {
+        type: 'FIXED_ERROR_CALLBACK',
+        params: {
+          method: 'put',
+          path: '/quotes/{ID}',
+          body: {
+            quoteId: '123',
+            transferId: null
+          },
+          headers: {
+            Date: '2020-01-01 00:00:00 GMT'
+          },
+          delay: 100
+        }
+      }
+    ]  
+  },
+  callback: {
+    get: [
+      {
+        type: 'MOCK_CALLBACK',
+        params: {
+          body: {
+
+          },
+          delay: 100
+        }
+      }
+    ],
+    put: [
+      {
+        type: 'MOCK_CALLBACK',
+        params: {
+          body: {
+
+          }
+        }
+      }
+    ],
+    patch: [
+      {
+        type: 'NOT_SUPPORTED',
+        params: {}
+      }
+    ],
+    delete: null,
+    default: [
+      {
+        type: 'FIXED_CALLBACK',
+        params: {
+          method: 'put',
+          path: '/quotes/{ID}',
+          body: {
+            quoteId: '123'
+          },
+          headers: {
+            Date: '2020-01-01 00:00:00 GMT'
+          },
+          delay: 100
+        }
+      }
+    ]    
+  },
+  response: {
+    get: [
+      {
+        type: 'MOCK_RESPONSE',
+        params: {
+          statusCode: 200,
+          method: 'put',
+          path: '/quotes/{ID}',
+          body: {
+            quouteId: null
+          },
+          delay: 100
+        }
+      }
+    ],
+    put: [
+      {
+        type: 'MOCK_RESPONSE',
+        params: {
+          statusCode: 200,
+          method: 'put',
+          path: '/quotes/{ID}',
+          body: {
+            quouteId: null
+          }
+        }
+      }
+    ],
+    patch: [
+      {
+        type: 'NOT_SUPPORTED',
+        params: {}
+      }
+    ],
+    delete: null,
+    default: [
+      {
+        type: 'FIXED_RESPONSE',
+        params: {
+          statusCode: 200,
+          method: 'put',
+          path: '/quotes/{ID}',
+          body: {
+            quoteId: '123'
+          },
+          headers: {
+            Date: '2020-01-01 00:00:00 GMT'
+          },
+          delay: 100
+        }
+      }
+    ]
+  }
+}
+
+const getRulesEngineHelper = (type) => {
+  const evaluateFn = async (facts) => {
+    console.log(type)
+    if (mapping[type][facts.method] !== undefined) {
+      return mapping[type][facts.method]
+    }
+    return mapping[type].default   
+  }
+  return Promise.resolve({
+    evaluate: evaluateFn
+  })
+}
+
 rulesEngineModel.getValidationRulesEngine.mockImplementation(() => {
-  const evaluateFn = async (facts) => {
-    if (facts.method === 'get') {
-      return [
-        {
-          type: 'MOCK_ERROR_CALLBACK',
-          params: {
-            body: {
-  
-            },
-            delay: 100
-          }
-        }
-      ]
-    } else {
-      return [
-        {
-          type: 'FIXED_ERROR_CALLBACK',
-          params: {
-            method: 'put',
-            path: '/quotes/{ID}',
-            body: {
-              quoteId: '123'
-            },
-            headers: {
-              Date: '2020-01-01 00:00:00 GMT'
-            },
-            delay: 100
-          }
-        }
-      ]      
-    }
-  }
-  return Promise.resolve({
-    evaluate: evaluateFn
-  })
-}) 
+  return getRulesEngineHelper('validation')
+})
+
 rulesEngineModel.getCallbackRulesEngine.mockImplementation(() => {
-  const evaluateFn = async (facts) => {
-    if (facts.method === 'get' && facts.path === 'not_supported') { 
-      return null
-    } else if (facts.method === 'get') {
-      return [
-        {
-          type: 'MOCK_CALLBACK',
-          params: {
-            body: {
-  
-            },
-            delay: 100
-          }
-        }
-      ]
-    } else {
-      return [
-        {
-          type: 'FIXED_CALLBACK',
-          params: {
-            method: 'put',
-            path: '/quotes/{ID}',
-            body: {
-              quoteId: '123'
-            },
-            headers: {
-              Date: '2020-01-01 00:00:00 GMT'
-            },
-            delay: 100
-          }
-        }
-      ]      
-    }
-  }
-  return Promise.resolve({
-    evaluate: evaluateFn
-  })
+  return getRulesEngineHelper('callback')
 }) 
 rulesEngineModel.getResponseRulesEngine.mockImplementation(() => {
-  const evaluateFn = async (facts) => {
-    if (facts.method === '') {
-      return null
-    }
-    if (facts.method === 'get') {
-      return [
-        {
-          type: 'MOCK_RESPONSE',
-          params: {
-            statusCode: 200,
-            method: 'put',
-            path: '/quotes/{ID}',
-            body: {
-  
-            },
-            delay: 100
-          }
-        }
-      ]
-    } else {
-      return [
-        {
-          type: 'FIXED_RESPONSE',
-          params: {
-            statusCode: 200,
-            method: 'put',
-            path: '/quotes/{ID}',
-            body: {
-              quoteId: '123'
-            },
-            headers: {
-              Date: '2020-01-01 00:00:00 GMT'
-            },
-            delay: 100
-          }
-        }
-      ]      
-    }
-  }
-  return Promise.resolve({
-    evaluate: evaluateFn
-  })
+  return getRulesEngineHelper('response')
 }) 
 
 const specFilePrefix = 'spec_files/api_definitions/'
@@ -232,6 +285,11 @@ const sampleRequest ={
 
 describe('OpenApiRulesEngine', () => {
   describe('validateRules', () => {
+    it('no facts', async () => {
+      sampleContext.request.method = 'delete'
+      const result = await OpenApiRulesEngine.validateRules(sampleContext, sampleRequest)
+      expect(result).toStrictEqual({})
+    })
     it('Mock Error Callback', async () => {
       sampleContext.request.method = 'get'
       const result = await OpenApiRulesEngine.validateRules(sampleContext, sampleRequest)
@@ -242,11 +300,42 @@ describe('OpenApiRulesEngine', () => {
     })
     it('Mock Error Callback', async () => {
       sampleContext.request.method = 'get'
+      const bodyOverride = {...sampleRequest.customInfo.callbackInfo.errorCallback.bodyOverride}
+      const headerOverride = {...sampleRequest.customInfo.callbackInfo.errorCallback.headerOverride}
+      const jsfRefFile = sampleRequest.customInfo.jsfRefFile
+
+      sampleRequest.customInfo.callbackInfo.errorCallback.bodyOverride = null
+      sampleRequest.customInfo.callbackInfo.errorCallback.headerOverride = null
+      sampleRequest.customInfo.jsfRefFile = null
+      const result = await OpenApiRulesEngine.validateRules(sampleContext, sampleRequest)
+      sampleRequest.customInfo.callbackInfo.errorCallback.bodyOverride = bodyOverride
+      sampleRequest.customInfo.callbackInfo.errorCallback.headerOverride = headerOverride
+      sampleRequest.customInfo.jsfRefFile = jsfRefFile
+      expect(result).toHaveProperty('path')
+      expect(result).toHaveProperty('method')
+      expect(result).toHaveProperty('body')
+      expect(result).toHaveProperty('headers')
+    })
+    it('Mock Error Callback', async () => {
+      sampleContext.request.method = 'put'
+      const result = await OpenApiRulesEngine.validateRules(sampleContext, sampleRequest)
+      expect(result).toHaveProperty('path')
+      expect(result).toHaveProperty('method')
+      expect(result).toHaveProperty('body')
+      expect(result).toHaveProperty('headers')
+    })
+    it('Mock Error Callback', async () => {
+      sampleContext.request.method = 'patch'
+      const result = await OpenApiRulesEngine.validateRules(sampleContext, sampleRequest)
+      expect(result).toStrictEqual({})
+    })
+    it('Mock Error Callback', async () => {
+      sampleContext.request.method = 'get'
       const temp = sampleRequest.customInfo.specFile
       delete sampleRequest.customInfo.specFile
       const result = await OpenApiRulesEngine.validateRules(sampleContext, sampleRequest)
       sampleRequest.customInfo.specFile = temp
-      expect(result).toStrictEqual({})
+      expect(result).toStrictEqual({delay: 100})
     })
     it('Mock Error Callback', async () => {
       sampleContext.request.method = 'get'
@@ -266,6 +355,11 @@ describe('OpenApiRulesEngine', () => {
     })
   })
   describe('callbackRules', () => {
+    it('no facts', async () => {
+      sampleContext.request.method = 'delete'
+      const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
+      expect(result).toStrictEqual({})
+    })
     it('Mock Callback', async () => {
       sampleContext.request.method = 'get'
       const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
@@ -273,6 +367,44 @@ describe('OpenApiRulesEngine', () => {
       expect(result).toHaveProperty('method')
       expect(result).toHaveProperty('body')
       expect(result).toHaveProperty('headers')
+    })
+    it('Mock Callback', async () => {
+      sampleContext.request.method = 'get'
+      
+      const bodyOverride = {...sampleRequest.customInfo.callbackInfo.successCallback.bodyOverride}
+      const headerOverride = {...sampleRequest.customInfo.callbackInfo.successCallback.headerOverride}
+      const jsfRefFile = sampleRequest.customInfo.jsfRefFile
+      sampleRequest.customInfo.callbackInfo.successCallback.bodyOverride = null
+      sampleRequest.customInfo.callbackInfo.successCallback.headerOverride = null
+      sampleRequest.customInfo.jsfRefFile = null
+      
+      const body = {...sampleContext.request.body}
+      const query = {...sampleContext.request.query}
+      sampleContext.request.body = null
+      sampleContext.request.query = null
+      const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
+      sampleRequest.customInfo.callbackInfo.successCallback.bodyOverride = bodyOverride
+      sampleRequest.customInfo.callbackInfo.successCallback.headerOverride = headerOverride
+      sampleRequest.customInfo.jsfRefFile = jsfRefFile
+      sampleContext.request.body = body
+      sampleContext.request.query = query
+      expect(result).toHaveProperty('path')
+      expect(result).toHaveProperty('method')
+      expect(result).toHaveProperty('body')
+      expect(result).toHaveProperty('headers')
+    })
+    it('Mock Callback', async () => {
+      sampleContext.request.method = 'put'
+      const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
+      expect(result).toHaveProperty('path')
+      expect(result).toHaveProperty('method')
+      expect(result).toHaveProperty('body')
+      expect(result).toHaveProperty('headers')
+    })
+    it('Mock Callback', async () => {
+      sampleContext.request.method = 'patch'
+      const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
+      expect(result).toStrictEqual({})
     })
     it('Mock Callback', async () => {
       sampleContext.request.method = 'get'
@@ -291,15 +423,7 @@ describe('OpenApiRulesEngine', () => {
       delete sampleRequest.customInfo.specFile
       const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
       sampleRequest.customInfo.specFile = temp 
-      expect(result).toStrictEqual({})
-    })
-    it('Mock Callback', async () => {
-      sampleContext.request.method = 'get'
-      const temp = sampleContext.request.path
-      sampleContext.request.path = 'not_supported'
-      const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
-      sampleContext.request.path = temp 
-      expect(result).toStrictEqual({})
+      expect(result).toStrictEqual({delay: 100})
     })
     it('Mock Callback', async () => {
       sampleContext.request.method = 'get'
@@ -330,6 +454,11 @@ describe('OpenApiRulesEngine', () => {
     })
   })
   describe('responseRules', () => {
+    it('no facts', async () => {
+      sampleContext.request.method = 'delete'
+      const result = await OpenApiRulesEngine.responseRules(sampleContext, sampleRequest)
+      expect(result).toStrictEqual({})
+    })
     it('Mocked Response with no specFile', async () => {
       sampleContext.request.method = 'get'
       const original = sampleRequest.customInfo.specFile
@@ -337,13 +466,28 @@ describe('OpenApiRulesEngine', () => {
       const result = await OpenApiRulesEngine.responseRules(sampleContext, sampleRequest)
       sampleRequest.customInfo.specFile = original
     })
+    it('Mock Response', async () => {
+      sampleContext.request.method = 'get'
+      const responseInfo = {...sampleRequest.customInfo.responseInfo}
+      const jsfRefFile = sampleRequest.customInfo.jsfRefFile
+      sampleRequest.customInfo.responseInfo = null
+      sampleRequest.customInfo.jsfRefFile = null
+      const result = await OpenApiRulesEngine.responseRules(sampleContext, sampleRequest)
+      sampleRequest.customInfo.responseInfo = responseInfo
+      sampleRequest.customInfo.jsfRefFile = jsfRefFile
+    })
     it('Mocked Response with specFile', async () => {
       sampleContext.request.method = 'get'
       const result = await OpenApiRulesEngine.responseRules(sampleContext, sampleRequest)
     })
-    it('Mocked Response', async () => {
-      sampleContext.request.method = ''
+    it('Mocked Response with specFile', async () => {
+      sampleContext.request.method = 'put'
       const result = await OpenApiRulesEngine.responseRules(sampleContext, sampleRequest)
+    })
+    it('Mocked Response with specFile', async () => {
+      sampleContext.request.method = 'patch'
+      const result = await OpenApiRulesEngine.responseRules(sampleContext, sampleRequest)
+      expect(result).toStrictEqual({})
     })
     it('Fixed Response', async () => {
       sampleContext.request.method = 'post'

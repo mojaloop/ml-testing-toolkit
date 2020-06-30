@@ -89,41 +89,45 @@ const createServer = async (port) => {
   server.ext([
     {
       type: 'onPreHandler',
-      method: (request, h) => {
-        // Generate UniqueID
-        request.customInfo = {}
-        request.customInfo.uniqueId = UniqueIdGenerator.generateUniqueId(request)
-        // Parse the traceparent header if present
-        if (request.headers.traceparent) {
-          const traceparentHeaderArr = request.headers.traceparent.split('-')
-          const traceID = traceparentHeaderArr[1]
-          request.customInfo.traceID = traceID
-          if (traceHeaderUtils.isCustomTraceID(traceID)) {
-            request.customInfo.endToEndID = traceHeaderUtils.getEndToEndID(traceID)
-            request.customInfo.sessionID = traceHeaderUtils.getSessionID(traceID)
-          }
-        }
-        RequestLogger.logRequest(request)
-        return h.continue
-      }
+      method: (request, h) => onPreHandler(request, h)
     },
     {
       type: 'onPreResponse',
-      method: (request, h) => {
-        RequestLogger.logResponse(request)
-        if (request.customInfo && request.customInfo.negotiatedContentType) {
-          if (request.response.isBoom) {
-            request.response.output.headers['content-type'] = request.customInfo.negotiatedContentType
-          } else {
-            request.response.header('content-type', request.customInfo.negotiatedContentType)
-          }
-        }
-        return h.continue
-      }
+      method: (request, h) => onPreResponse(request, h)
     }
   ])
   await server.start()
   return server
+}
+
+const onPreHandler = (request, h) => {
+  // Generate UniqueID
+  request.customInfo = {}
+  request.customInfo.uniqueId = UniqueIdGenerator.generateUniqueId(request)
+  // Parse the traceparent header if present
+  if (request.headers.traceparent) {
+    const traceparentHeaderArr = request.headers.traceparent.split('-')
+    const traceID = traceparentHeaderArr[1]
+    request.customInfo.traceID = traceID
+    if (traceHeaderUtils.isCustomTraceID(traceID)) {
+      request.customInfo.endToEndID = traceHeaderUtils.getEndToEndID(traceID)
+      request.customInfo.sessionID = traceHeaderUtils.getSessionID(traceID)
+    }
+  }
+  RequestLogger.logRequest(request)
+  return h.continue
+}
+
+const onPreResponse = (request, h) => {
+  RequestLogger.logResponse(request)
+  if (request.customInfo && request.customInfo.negotiatedContentType) {
+    if (request.response.isBoom) {
+      request.response.output.headers['content-type'] = request.customInfo.negotiatedContentType
+    } else {
+      request.response.header('content-type', request.customInfo.negotiatedContentType)
+    }
+  }
+  return h.continue
 }
 
 const initialize = async () => {
@@ -149,5 +153,7 @@ const restartServer = async () => {
 
 module.exports = {
   initialize,
-  restartServer
+  restartServer,
+  onPreHandler,
+  onPreResponse
 }

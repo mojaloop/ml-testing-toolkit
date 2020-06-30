@@ -80,13 +80,8 @@ describe('Server', () => {
       SpyInitAssertionStore.mockReturnValueOnce()
       const server = await Server.initialize()
       await server.inject({
-        method: 'POST',
+        method: 'GET',
         url: '/',
-        payload: {
-          customInfo: {
-            negotiatedContentType: 'application/json'
-          }
-        },   
         headers: {
           traceparent: 'aabb-aabb123213'
         }
@@ -140,6 +135,32 @@ describe('Server', () => {
       SpyWaitForTlsHubCerts.mockRejectedValue()
       const server = await Server.restartServer()
       expect(server).toBeUndefined()
+    })
+  })
+  describe('onPreResponse', () => {
+    const h = {
+      continue: () => {}
+    }
+    const req = {
+      customInfo: {
+        negotiatedContentType: 'application/json'
+      },
+      response: {
+        header: () => {},
+        output: {
+          headers: {
+            'content-type': 'application/json'
+          }
+        }
+      }
+    }
+    it('onPreResponse should not throw an error', async () => {
+      req.response.isBoom = true
+      await Server.onPreResponse(req, h)
+    })
+    it('onPreResponse should not throw an error', async () => {
+      req.response.isBoom = false
+      await Server.onPreResponse(req, h)
     })
   })
 })

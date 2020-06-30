@@ -18,25 +18,16 @@
  * Gates Foundation
 
  * ModusBox
- * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
 
-const EventEmitter = require('events')
-class MyEmitter extends EventEmitter {}
-const emitters = {
-  testOutbound: null,
-  assertionRequest: null,
-  assertionCallback: null
-}
+const utilsInternal = require('../../../src/lib/utilsInternal')
 
-const getEmitter = (emitter) => {
-  if (!emitters[emitter]) {
-    emitters[emitter] = new MyEmitter()
-  }
-  return emitters[emitter]
-}
-
-module.exports = {
-  getEmitter
-}
+describe('api-server', () => { 
+  describe('when getApp is called', () => {
+    it('the server should be initialized if not already', async () => {
+      utilsInternal.getFunctionResult('{$function.generic.generateUUID}')
+    })
+  })
+})
