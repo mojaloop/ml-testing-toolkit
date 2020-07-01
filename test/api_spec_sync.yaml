@@ -77,6 +77,59 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       deprecated: false
+  /settlementWindows/{id}:
+    get:
+      tags:
+      - getSettlementWindowById
+      summary: getSettlementWindowById
+      description: Returns a Settlement Window by id.
+      operationId: getSettlementWindowById
+      parameters:
+      - name: id
+        in: path
+        description: |
+          A valid settlement window id to be supplied in the query.
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: A settlement window's data returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettlementWindow'
+        400:
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Authorisation information is missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: No data found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        415:
+          description: Unsupported Media Type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      deprecated: false
   /settlements:
     get:
       tags:
@@ -151,6 +204,12 @@ paths:
           type: string
           format: date-time
       responses:
+        100:
+          description: Settlement window(s) returned by the filtering parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settlements'
         200:
           description: Settlement window(s) returned by the filtering parameters.
           content:

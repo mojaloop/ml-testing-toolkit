@@ -34,6 +34,60 @@
     }
   },
   {
+    "ruleId": 21,
+    "priority": 1,
+    "description": "post /transfers testingtoolkitdfsp",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "testingtoolkitdfsp",
+          "path": "payerFsp"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transfers/{ID}",
+      "params": {
+        "scripts": {
+          "enabled": true,
+          "exec": [
+            "if (pm.environment.get('payerFspId') === '27713803912') {",
+            "  var ttkdfspTotalAmount = pm.environment.get('ttkdfspTotalAmount')",
+            "  if (!ttkdfspTotalAmount) {",
+            "    ttkdfspTotalAmount = 0",
+            "  }",
+            "  const body = JSON.parse(pm.request.body)",
+            "  ttkdfspTotalAmount += +body.amount.amount",
+            "  pm.environment.set('ttkdfspTotalAmount', ttkdfspTotalAmount)",
+            "}"
+          ]
+        }
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
     "type": "callback",
     "version": 1,
     "ruleId": 2,
@@ -104,7 +158,8 @@
         "scripts": {
           "enabled": true,
           "exec": [
-            "pm.environment.set('amountLimit', '100')"
+            "pm.environment.set('amountLimit', '100')",
+            "pm.environment.set('payerFspId', '27713803912')"
           ]
         }
       },
@@ -151,7 +206,8 @@
         "scripts": {
           "enabled": true,
           "exec": [
-            "pm.environment.set('amountLimit', '200')"
+            "pm.environment.set('amountLimit', '200')",
+            "pm.environment.set('payerFspId', '27713803911')"
           ]
         }
       },

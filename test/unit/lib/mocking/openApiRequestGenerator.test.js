@@ -75,9 +75,14 @@ describe('OpenApiRequestGenerator', () => {
       expect(result).toHaveProperty('body')
       expect(result).toHaveProperty('status')
     })
-    it('generateResponseBody should generate a request body', async () => {
+    
+    it('generateResponseBody should generate a request body if response type is array', async () => {
       const result = await callbackGenerator.generateResponseBody( '/settlementWindows', 'get', jsfRef)
       expect(result).toStrictEqual({})
+    })
+    it('generateResponseBody should generate a request body if response type is object', async () => {
+      const result = await callbackGenerator.generateResponseBody( '/settlementWindows/{id}', 'get', jsfRef)
+      expect(result.status).toBe('200')
     })
   })
 })

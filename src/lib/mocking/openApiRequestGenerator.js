@@ -165,7 +165,6 @@ const generateMockOperation = async (method, name, data, jsfRefs) => {
   const requestSchema = findRequestSchema(data.requestBody)
   // Create a new copy of object without copying by references
   const newRequestSchema = JSON.parse(JSON.stringify(requestSchema))
-  console.log(newRequestSchema.properties)
   jsfRefs.forEach(ref => {
     const convertedId = ref.id.replace(/\./g, '.properties.')
     const targetObject = _.get(newRequestSchema.properties, convertedId)
@@ -229,6 +228,7 @@ class OpenApiRequestGenerator {
   }
 
   async generateResponseBody (path, httpMethod, jsfRefs) {
+    console.log(this.schema.paths)
     const pathValue = this.schema.paths[path]
     const operation = pathValue[httpMethod]
     const id = operation.operationId || operation.summary

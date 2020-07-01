@@ -46,46 +46,50 @@ const removeEmpty = obj => {
   }
 }
 
-const executeScripts = async (curEvent) => {
-  let environment = objectStore.get('inboundEnvironment')
+const executeScripts = async (curEvent, req) => {
+  const postmanRequest = {
+    body: JSON.stringify(req.payload),
+    method: req.method,
+    headers: req.headers
+  }
   if (curEvent.params.scripts && curEvent.params.scripts.enabled && curEvent.params.scripts.exec.length > 0 && curEvent.params.scripts.exec !== ['']) {
-    const contextObj = await postmanContext.generageContextObj(environment)
+    // convert inboundEnvironment from JSON to sandbox environment format
+    const sandboxEnvironment = Object.entries(objectStore.get('inboundEnvironment')).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
 
-    const preRequest = await postmanContext.executeAsync(curEvent.params.scripts.exec, { context: { ...contextObj }, id: uuid.v4() }, contextObj)
+    const contextObj = await postmanContext.generageContextObj(sandboxEnvironment)
+    const postmanSandbox = await postmanContext.executeAsync(curEvent.params.scripts.exec, { context: { ...contextObj, request: postmanRequest }, id: uuid.v4() }, contextObj)
 
-    environment = preRequest.environment.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
-    objectStore.set('inboundEnvironment', environment)
-
+    // replace inbound environment with the sandbox environment
+    const mergedInboundEnvironment = postmanSandbox.environment.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
+    objectStore.set('inboundEnvironment', mergedInboundEnvironment)
     contextObj.ctx.dispose()
     contextObj.ctx = null
   }
-  return environment
 }
 
-const getRulesEngine = async (rulesObject) => {
-  let updated = false
-
+const replaceEnvironmentsFromRules = async (rulesObject) => {
   const rules = JSON.parse(JSON.stringify(rulesObject || []))
   const environment = objectStore.get('inboundEnvironment')
 
+  let reloadRules = false
   rules.forEach(rule => {
     Object.keys(rule.conditions).forEach(conditionType => {
       rule.conditions[conditionType].forEach((condition) => {
         if (condition.value && condition.value.split('.')[0] === '{$environment') {
           condition.value = getEnvironmentValue(condition.value, environment)
-          updated = true
+          reloadRules = true
         }
       })
     })
   })
 
-  return updated ? rules : undefined
+  return reloadRules ? rules : undefined
 }
 
 const validateRules = async (context, req) => {
   const rules = await rulesEngineModel.getValidationRules()
 
-  const newRules = await getRulesEngine(rules)
+  const newRules = await replaceEnvironmentsFromRules(rules)
   const rulesEngine = await rulesEngineModel.getValidationRulesEngine(newRules)
 
   const facts = generageFacts(context)
@@ -100,20 +104,20 @@ const validateRules = async (context, req) => {
       generatedErrorCallback.delay = curEvent.params.delay
     }
 
-    const environment = await executeScripts(curEvent)
+    await executeScripts(curEvent, req)
 
     if (curEvent.type === 'FIXED_ERROR_CALLBACK') {
       generatedErrorCallback.method = curEvent.params.method
-      generatedErrorCallback.path = replaceVariablesFromRequest(curEvent.params.path, context, req, environment)
-      generatedErrorCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req, environment)
-      generatedErrorCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req, environment)
-      generatedErrorCallback.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req, environment)
+      generatedErrorCallback.path = replaceVariablesFromRequest(curEvent.params.path, context, req)
+      generatedErrorCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
+      generatedErrorCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
+      generatedErrorCallback.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req)
     } else if (curEvent.type === 'MOCK_ERROR_CALLBACK') {
       if (req.customInfo.specFile) {
-        generatedErrorCallback = await generateMockErrorCallback(context, req, environment)
+        generatedErrorCallback = await generateMockErrorCallback(context, req)
 
-        _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(curEvent.params.body, context, req, environment))
-        _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req, environment))
+        _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
+        _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
         removeEmpty(generatedErrorCallback.body)
       } else {
         customLogger.logMessage('error', 'No Specification file provided for validateRules function', null, true, req)
@@ -123,7 +127,7 @@ const validateRules = async (context, req) => {
   return generatedErrorCallback
 }
 
-const generateMockErrorCallback = async (context, req, environment) => {
+const generateMockErrorCallback = async (context, req) => {
   const generatedErrorCallback = {}
   const callbackGenerator = new (require('./openApiRequestGenerator'))()
   await callbackGenerator.load(path.join(req.customInfo.specFile))
@@ -137,7 +141,7 @@ const generateMockErrorCallback = async (context, req, environment) => {
   const operationCallback = req.customInfo.callbackInfo.errorCallback.path
 
   if (req.customInfo.callbackInfo.errorCallback.pathPattern) {
-    generatedErrorCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.pathPattern, context, req, environment)
+    generatedErrorCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.pathPattern, context, req)
   } else {
     generatedErrorCallback.path = operationCallback
   }
@@ -147,11 +151,11 @@ const generateMockErrorCallback = async (context, req, environment) => {
 
   // Override the values in generated callback with the values from callback map file
   if (req.customInfo.callbackInfo.errorCallback.bodyOverride) {
-    _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.bodyOverride, context, req, environment))
+    _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.bodyOverride, context, req))
     removeEmpty(generatedErrorCallback.body)
   }
   if (req.customInfo.callbackInfo.errorCallback.headerOverride) {
-    _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.headerOverride, context, req, environment))
+    _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.headerOverride, context, req))
   }
   return generatedErrorCallback
 }
@@ -171,7 +175,7 @@ const generageFacts = (context) => {
 const callbackRules = async (context, req) => {
   const rules = await rulesEngineModel.getCallbackRules()
 
-  const newRules = await getRulesEngine(rules)
+  const newRules = await replaceEnvironmentsFromRules(rules)
   const rulesEngine = await rulesEngineModel.getCallbackRulesEngine(newRules)
 
   const facts = generageFacts(context)
@@ -186,7 +190,7 @@ const callbackRules = async (context, req) => {
       generatedCallback.delay = curEvent.params.delay
     }
 
-    const environment = await executeScripts(curEvent)
+    await executeScripts(curEvent, req)
 
     if (curEvent.type === 'FIXED_CALLBACK') {
       // generatedCallback.method = curEvent.params.method
@@ -195,13 +199,13 @@ const callbackRules = async (context, req) => {
 
       // Check if pathPattern from callback_map file exists and determine the callback path
       if (req.customInfo.callbackInfo.successCallback.pathPattern) {
-        generatedCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.pathPattern, context, req, environment)
+        generatedCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.pathPattern, context, req)
       } else {
         generatedCallback.path = operationCallback
       }
       generatedCallback.method = req.customInfo.callbackInfo.successCallback.method
-      generatedCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req, environment)
-      generatedCallback.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req, environment)
+      generatedCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
+      generatedCallback.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req)
     } else if (curEvent.type === 'MOCK_CALLBACK') {
       if (req.customInfo.specFile) {
         const callbackGenerator = new (require('./openApiRequestGenerator'))()
@@ -217,7 +221,7 @@ const callbackRules = async (context, req) => {
 
         // Check if pathPattern from callback_map file exists and determine the callback path
         if (req.customInfo.callbackInfo.successCallback.pathPattern) {
-          generatedCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.pathPattern, context, req, environment)
+          generatedCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.pathPattern, context, req)
         } else {
           generatedCallback.path = operationCallback
         }
@@ -227,17 +231,17 @@ const callbackRules = async (context, req) => {
 
         // Override the values in generated callback with the values from callback map file
         if (req.customInfo.callbackInfo.successCallback.bodyOverride) {
-          _.merge(generatedCallback.body, replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.bodyOverride, context, req, environment))
+          _.merge(generatedCallback.body, replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.bodyOverride, context, req))
           removeEmpty(generatedCallback.body)
         }
         if (req.customInfo.callbackInfo.successCallback.headerOverride) {
-          _.merge(generatedCallback.headers, replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.headerOverride, context, req, environment))
+          _.merge(generatedCallback.headers, replaceVariablesFromRequest(req.customInfo.callbackInfo.successCallback.headerOverride, context, req))
         }
 
         // Override the values in generated callback with the values from event params
-        _.merge(generatedCallback.body, replaceVariablesFromRequest(curEvent.params.body, context, req, environment))
+        _.merge(generatedCallback.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
         removeEmpty(generatedCallback.body)
-        _.merge(generatedCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req, environment))
+        _.merge(generatedCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
       } else {
         customLogger.logMessage('error', 'No Specification file provided for validateRules function', null, true, req)
       }
@@ -252,7 +256,7 @@ const callbackRules = async (context, req) => {
 const responseRules = async (context, req) => {
   const rules = await rulesEngineModel.getResponseRules()
 
-  const newRules = await getRulesEngine(rules)
+  const newRules = await replaceEnvironmentsFromRules(rules)
   const rulesEngine = await rulesEngineModel.getResponseRulesEngine(newRules)
 
   const facts = generageFacts(context)
@@ -267,7 +271,7 @@ const responseRules = async (context, req) => {
       generatedResponse.delay = curEvent.params.delay
     }
 
-    const environment = await executeScripts(curEvent)
+    await executeScripts(curEvent, req)
 
     if (curEvent.type === 'FIXED_RESPONSE') {
       generatedResponse.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
@@ -291,7 +295,7 @@ const responseRules = async (context, req) => {
 
         // Override the values in generated callback with the values from callback map file
         if (req.customInfo.responseInfo && req.customInfo.responseInfo.response.bodyOverride) {
-          _.merge(generatedResponse.body, replaceVariablesFromRequest(req.customInfo.responseInfo.response.bodyOverride, context, req, environment))
+          _.merge(generatedResponse.body, replaceVariablesFromRequest(req.customInfo.responseInfo.response.bodyOverride, context, req))
           removeEmpty(generatedResponse.body)
         }
         // if (req.customInfo.responseInfo.response.headerOverride) {
@@ -299,9 +303,9 @@ const responseRules = async (context, req) => {
         // }
 
         // Override the values in generated callback with the values from event params
-        _.merge(generatedResponse.body, replaceVariablesFromRequest(curEvent.params.body, context, req, environment))
+        _.merge(generatedResponse.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
         removeEmpty(generatedResponse.body)
-        _.merge(generatedResponse.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req, environment))
+        _.merge(generatedResponse.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
       } else {
         customLogger.logMessage('error', 'No Specification file provided for responseRules function', null, true, req)
       }
@@ -312,7 +316,7 @@ const responseRules = async (context, req) => {
   return generatedResponse
 }
 
-const replaceVariablesFromRequest = (inputObject, context, req, environment) => {
+const replaceVariablesFromRequest = (inputObject, context, req) => {
   var resultObject
   // Check whether inputObject is string or object. If it is object, then convert that to JSON string and parse it while return
   if (typeof inputObject === 'string') {
@@ -338,9 +342,6 @@ const replaceVariablesFromRequest = (inputObject, context, req, environment) => 
           break
         case '{$session':
           resultObject = resultObject.replace(element, getSessionValue(element, req.customInfo))
-          break
-        case '{$environment':
-          resultObject = resultObject.replace(element, getEnvironmentValue(element, environment))
           break
         case '{$request':
         default:

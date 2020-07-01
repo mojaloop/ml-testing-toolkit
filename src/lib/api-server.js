@@ -59,6 +59,7 @@ const initServer = () => {
   app.use('/api/reports', require('./api-routes/reports'))
   app.use('/api/settings', require('./api-routes/settings'))
   app.use('/api/samples', require('./api-routes/samples'))
+  app.use('/api/objectstore', require('./api-routes/objectstore'))
 
   // // For front-end UI
   // app.use('/ui', express.static(path.join('client/build')))

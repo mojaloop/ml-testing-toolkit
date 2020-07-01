@@ -72,7 +72,6 @@ const pop = (object, path) => {
 const clear = (object, interval) => {
   for (const objectId in storedObject[object]) {
     const timeDiff = Date.now() - storedObject[object][objectId].insertedDate
-    console.log(timeDiff)
     if (timeDiff > interval) { // Remove the old transactions greater than 10min
       delete storedObject[object][objectId]
     }

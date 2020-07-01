@@ -90,10 +90,10 @@ paths:
               - key: errorDescription
                 value: This is a more detailed error description
       responses:
-        '202':
-          $ref: '#/components/responses/Response202'
         '400':
           $ref: '#/components/responses/ErrorResponse400'
+        '202':
+          $ref: '#/components/responses/Response202'
         '401':
           $ref: '#/components/responses/ErrorResponse401'
         '403':
@@ -153,10 +153,10 @@ paths:
       parameters:
         - $ref: '#/components/parameters/Accept'
       responses:
-        '202':
-          $ref: '#/components/responses/Response202'
         '400':
           $ref: '#/components/responses/ErrorResponse400'
+        '202':
+          $ref: '#/components/responses/Response202'
         '401':
           $ref: '#/components/responses/ErrorResponse401'
         '403':

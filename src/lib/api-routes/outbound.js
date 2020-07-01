@@ -50,7 +50,7 @@ async (req, res, next) => {
       data: req.body.body,
       timeout: 3000,
       validateStatus: function (status) {
-        return status >= 200 && status < 900 // Reject only if the status code is greater than or equal to 900
+        return status < 900 // Reject only if the status code is greater than or equal to 900
       }
     }).then((result) => {
       customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)

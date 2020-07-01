@@ -42,7 +42,13 @@ const mapping = {
           body: {
   
           },
-          delay: 100
+          delay: 100,
+          scripts: {
+            enabled: true,
+            exec: [
+              "pm.environment.set('operationPath', '/quotes')"
+            ]
+          },
         }
       }
     ],
@@ -184,7 +190,6 @@ const mapping = {
 
 const getRulesEngineHelper = (type) => {
   const evaluateFn = async (facts) => {
-    console.log(type)
     if (mapping[type][facts.method] !== undefined) {
       return mapping[type][facts.method]
     }
@@ -292,6 +297,22 @@ describe('OpenApiRulesEngine', () => {
     })
     it('Mock Error Callback', async () => {
       sampleContext.request.method = 'get'
+      rulesEngineModel.getValidationRules.mockResolvedValueOnce([{
+        conditions: {
+          all: [
+            {
+              "fact": "operationPath",
+              "operator": "equal",
+              "value": "/quotes"
+            },
+            {
+              "fact": "operationPath",
+              "operator": "equal",
+              "value": "{$environment.operationPath}"
+            }
+          ]
+        }
+      }])
       const result = await OpenApiRulesEngine.validateRules(sampleContext, sampleRequest)
       expect(result).toHaveProperty('path')
       expect(result).toHaveProperty('method')
