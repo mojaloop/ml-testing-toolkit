@@ -22,9 +22,11 @@
  --------------
  ******/
 
-const Util = require('util')
+const Utils = require('../../../src/lib/utils')
 
-const spyPromisify = jest.spyOn(Util, 'promisify')
+const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
+const SpyReadRecursiveAsync = jest.spyOn(Utils, 'readRecursiveAsync')
+
 
 const loadSamples = require('../../../src/lib/loadSamples')
 
@@ -35,16 +37,16 @@ describe('loadSamples', () => {
         collections: ['collection-1.json', 'collection-2.json'],
         environment: 'environment.json'
       }
-      spyPromisify
-        .mockReturnValueOnce(() => {return JSON.stringify({
+      SpyReadFileAsync
+        .mockResolvedValueOnce(JSON.stringify({
             name: queryParams.collections[0],
             test_cases: [{id: 1}]
-        })})
-        .mockReturnValueOnce(() => {return JSON.stringify({
+        }))
+        .mockResolvedValueOnce(JSON.stringify({
             name: queryParams.collections[1],
             test_cases: [{id: 1}]
-        })})
-        .mockReturnValueOnce(() => {return JSON.stringify({inputValues: {}})})
+        }))
+        .mockResolvedValueOnce(JSON.stringify({inputValues: {}}))
       const sample = await loadSamples.getSample(queryParams)      
       expect(sample).toStrictEqual({
         name: 'multi',
@@ -56,11 +58,11 @@ describe('loadSamples', () => {
       const queryParams = {
         collections: ['collection.json']
       }
-      spyPromisify
-        .mockReturnValueOnce(() => {return JSON.stringify({
+      SpyReadFileAsync
+        .mockResolvedValueOnce(JSON.stringify({
           name: queryParams.collections[0],
           test_cases: [{id: 1}]
-        })})
+        }))
       const sample = await loadSamples.getSample(queryParams)
       expect(sample).toStrictEqual({
         name: queryParams.collections[0],
@@ -93,18 +95,18 @@ describe('loadSamples', () => {
   })
   describe('getCollectionsOrEnvironments should not throw an error when', () => {
     it('sample name should be \'multi\' if there is more than one collection', async () => {
-      spyPromisify
-        .mockReturnValueOnce(() => {return [
+      SpyReadRecursiveAsync
+        .mockResolvedValueOnce([
           "sample.json", "sampleFolder"
-        ]})
+        ])
       const collectionsOrEnvironments = await loadSamples.getCollectionsOrEnvironments('exampleType', 'type')
       expect(collectionsOrEnvironments).toStrictEqual([ 'sample.json' ]);
     })
     it('should not throw an error when type is not provided', async () => {
-      spyPromisify
-        .mockReturnValueOnce(() => {return [
+      SpyReadRecursiveAsync
+        .mockResolvedValueOnce([
           "sample.json", "sampleFolder"
-        ]})
+        ])
       const collectionsOrEnvironments = await loadSamples.getCollectionsOrEnvironments('exampleType')
       expect(collectionsOrEnvironments).toStrictEqual([ 'sample.json' ]);
     })

@@ -49,7 +49,7 @@ async (req, res, next) => {
       headers: req.body.headers,
       data: req.body.body,
       timeout: 3000,
-      validateStatus: function (status) {
+      validateStatus: (status) => {
         return status < 900 // Reject only if the status code is greater than or equal to 900
       }
     }).then((result) => {
@@ -64,17 +64,17 @@ async (req, res, next) => {
 })
 
 // Route to send series of outbound requests based on the given template
-router.post('/template/:traceID', async (req, res, next) => {
+router.post('/template/:traceID', [
+  check('name').notEmpty(),
+  check('test_cases').notEmpty()
+], async (req, res, next) => {
   try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() })
+    }
     const traceID = req.params.traceID
     const inputJson = JSON.parse(JSON.stringify(req.body))
-    // Validate the template format
-    if (!inputJson.name) {
-      return res.status(422).json({ errors: 'Template name is missing' })
-    }
-    if (!inputJson.test_cases) {
-      return res.status(422).json({ errors: 'Template test cases are missing' })
-    }
     outbound.OutboundSend(inputJson, traceID)
 
     return res.status(200).json({ status: 'OK' })

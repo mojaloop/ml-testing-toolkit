@@ -22,21 +22,31 @@
  --------------
  ******/
 
-const utilsInternal = require('../../../src/lib/utilsInternal')
+const MyEventEmitter = require('./MyEventEmitter')
+const assertionStore = require('./assertionStore')
 
-describe('api-server', () => { 
-  describe('when getApp is called', () => {
-    it('the server should be initialized if not already', async () => {
-      const functionResult = utilsInternal.getFunctionResult('{$function.generic.generateUUID}')
-      expect(functionResult).not.toBe('{$function.generic.generateUUID}')
-    })
-    it('the server should be initialized if not already', async () => {
-      const functionResult = utilsInternal.getFunctionResult('{$function.generica.generateUUID}')
-      expect(functionResult).toBe('{$function.generica.generateUUID}')
-    })
-    it('the server should be initialized if not already', async () => {
-      const functionResult = utilsInternal.getFunctionResult('{$function.generic.}')
-      expect(functionResult).toBe('{$function.generic.}')
-    })
+const LONGPOLLING_TIMEOUT = 5000
+
+const setAssertionStoreEmitter = (storedObject, eventPath, res) => {
+  switch (storedObject) {
+    case 'requests': setEmitter(storedObject, MyEventEmitter.getEmitter('assertionRequest'), eventPath, res); break
+    case 'callbacks': setEmitter(storedObject, MyEventEmitter.getEmitter('assertionCallback'), eventPath, res); break
+  }
+}
+
+const setEmitter = (storedObject, emitter, eventPath, res) => {
+  const timer = setTimeout(() => {
+    emitter.removeAllListeners(eventPath)
+    res.status(500).json({ error: 'Timed out' })
+  }, LONGPOLLING_TIMEOUT)
+
+  emitter.once(eventPath, (data) => {
+    clearTimeout(timer)
+    assertionStore.pop(storedObject, eventPath)
+    res.status(200).json(data)
   })
-})
+}
+
+module.exports = {
+  setAssertionStoreEmitter
+}

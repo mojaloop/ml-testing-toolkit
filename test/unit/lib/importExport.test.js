@@ -23,10 +23,11 @@
  ******/
 
 const AdmZip = require('adm-zip')
-const Util = require('util')
+const Utils = require('../../../src/lib/utils')
+
 const Config = require('../../../src/lib/config')
 
-const spyPromisify = jest.spyOn(Util, 'promisify')
+const SpyRmdirAsync = jest.spyOn(Utils, 'rmdirAsync')
 const spyConfig = jest.spyOn(Config, 'getSystemConfig')
 
 jest.mock('adm-zip')
@@ -173,8 +174,7 @@ describe('importExport', () => {
           toBuffer: () => {return []}
         })
       })
-      // spyPromisify.mockReturnValueOnce(jest.fn()).mockReturnValueOnce(jest.fn()).mockReturnValueOnce(jest.fn()).mockReturnValueOnce(jest.fn())
-      spyPromisify.mockReturnValue(jest.fn())
+      SpyRmdirAsync.mockResolvedValue()
 
       await expect(importExport.importSpecFiles([],['rules_response', 'rules_callback', 'rules_validation','user_config.json'])).resolves.toBe(undefined)
     })

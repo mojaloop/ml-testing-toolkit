@@ -68,6 +68,7 @@ const executeScripts = async (curEvent, req) => {
 }
 
 const replaceEnvironmentsFromRules = async (rulesObject) => {
+  console.log('----------------here')
   const rules = JSON.parse(JSON.stringify(rulesObject || []))
   const environment = objectStore.get('inboundEnvironment')
 
@@ -328,6 +329,7 @@ const replaceVariablesFromRequest = (inputObject, context, req) => {
   }
 
   // Check the string for any inclusions like {$some_param}
+  const environment = objectStore.get('inboundEnvironment')
   const matchedArray = resultObject.match(/{\$([^}]+)}/g)
   if (matchedArray) {
     matchedArray.forEach(element => {
@@ -342,6 +344,9 @@ const replaceVariablesFromRequest = (inputObject, context, req) => {
           break
         case '{$session':
           resultObject = resultObject.replace(element, getSessionValue(element, req.customInfo))
+          break
+        case '{$environment':
+          resultObject = resultObject.replace(element, getEnvironmentValue(element, environment))
           break
         case '{$request':
         default:

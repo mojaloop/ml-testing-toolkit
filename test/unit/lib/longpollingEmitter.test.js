@@ -22,21 +22,26 @@
  --------------
  ******/
 
-const utilsInternal = require('../../../src/lib/utilsInternal')
+const longpollingEmitter = require('../../../src/lib/longpollingEmitter')
+const MyEventEmitter = require('../../../src/lib/MyEventEmitter')
 
-describe('api-server', () => { 
-  describe('when getApp is called', () => {
-    it('the server should be initialized if not already', async () => {
-      const functionResult = utilsInternal.getFunctionResult('{$function.generic.generateUUID}')
-      expect(functionResult).not.toBe('{$function.generic.generateUUID}')
+describe('longpollingEmitter', () => { 
+  describe('when setAssertionStoreEmitter is called', () => {
+    const res = {
+      status: () => {
+        return {
+          json: () => {}
+        }
+      }
+    }
+    it('should not throw an error', async () => {
+      longpollingEmitter.setAssertionStoreEmitter('requests','/123', res)
+      const emitter = MyEventEmitter.getEmitter('assertionRequest')
+      emitter.emit('/123')
     })
-    it('the server should be initialized if not already', async () => {
-      const functionResult = utilsInternal.getFunctionResult('{$function.generica.generateUUID}')
-      expect(functionResult).toBe('{$function.generica.generateUUID}')
-    })
-    it('the server should be initialized if not already', async () => {
-      const functionResult = utilsInternal.getFunctionResult('{$function.generic.}')
-      expect(functionResult).toBe('{$function.generic.}')
+    it('should not throw an error', async () => {
+      longpollingEmitter.setAssertionStoreEmitter('callbacks','/123', res)
+      await new Promise(resolve => setTimeout(resolve, 5000))
     })
   })
 })

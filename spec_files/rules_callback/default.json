@@ -70,15 +70,65 @@
         "scripts": {
           "enabled": true,
           "exec": [
-            "if (pm.environment.get('payerFspId') === '27713803912') {",
-            "  var ttkdfspTotalAmount = pm.environment.get('ttkdfspTotalAmount')",
-            "  if (!ttkdfspTotalAmount) {",
-            "    ttkdfspTotalAmount = 0",
-            "  }",
-            "  const body = JSON.parse(pm.request.body)",
-            "  ttkdfspTotalAmount += +body.amount.amount",
-            "  pm.environment.set('ttkdfspTotalAmount', ttkdfspTotalAmount)",
-            "}"
+            "const body = JSON.parse(pm.request.body)",
+            "var ttkdfspTotalAmount = pm.environment.get('ttkdfspTotalAmount')",
+            "if (!ttkdfspTotalAmount) {",
+            "  ttkdfspTotalAmount = 0",
+            "}",
+            "ttkdfspTotalAmount += +body.amount.amount",
+            "pm.environment.set('ttkdfspTotalAmount', ttkdfspTotalAmount)"
+          ]
+        }
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 23,
+    "priority": 1,
+    "description": "post /transfers payerfsp",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "body",
+          "operator": "equal",
+          "value": "payerfsp",
+          "path": "payerFsp"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transfers/{ID}",
+      "params": {
+        "scripts": {
+          "enabled": true,
+          "exec": [
+            "const body = JSON.parse(pm.request.body)",
+            "var payerfspTotalAmount = pm.environment.get('payerfspTotalAmount')",
+            "if (!payerfspTotalAmount) {",
+            "  payerfspTotalAmount = 0",
+            "}",
+            "payerfspTotalAmount += +body.amount.amount",
+            "pm.environment.set('payerfspTotalAmount', payerfspTotalAmount)"
           ]
         }
       },
@@ -122,9 +172,9 @@
     }
   },
   {
-    "ruleId": 3,
+    "ruleId": 22,
     "priority": 1,
-    "description": "get /parties/{Type}/27713803912",
+    "description": "get /parties/{Type}/{ID}",
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 1,
@@ -133,12 +183,6 @@
     },
     "conditions": {
       "all": [
-        {
-          "fact": "pathParams",
-          "operator": "equal",
-          "value": "27713803912",
-          "path": "ID"
-        },
         {
           "fact": "operationPath",
           "operator": "equal",
@@ -155,61 +199,7 @@
       "method": "put",
       "path": "/parties/{Type}/{ID}",
       "params": {
-        "scripts": {
-          "enabled": true,
-          "exec": [
-            "pm.environment.set('amountLimit', '100')",
-            "pm.environment.set('payerFspId', '27713803912')"
-          ]
-        }
-      },
-      "delay": 0,
-      "type": "MOCK_CALLBACK"
-    },
-    "type": "callback",
-    "version": 1
-  },
-  {
-    "ruleId": 20,
-    "priority": 1,
-    "description": "get /parties/{Type}/27713803911",
-    "apiVersion": {
-      "minorVersion": 0,
-      "majorVersion": 1,
-      "type": "fspiop",
-      "asynchronous": true
-    },
-    "conditions": {
-      "all": [
-        {
-          "fact": "pathParams",
-          "operator": "equal",
-          "value": "27713803911",
-          "path": "ID"
-        },
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/parties/{Type}/{ID}"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "get"
-        }
-      ]
-    },
-    "event": {
-      "method": "put",
-      "path": "/parties/{Type}/{ID}",
-      "params": {
-        "scripts": {
-          "enabled": true,
-          "exec": [
-            "pm.environment.set('amountLimit', '200')",
-            "pm.environment.set('payerFspId', '27713803911')"
-          ]
-        }
+        "scripts": {}
       },
       "type": "MOCK_CALLBACK"
     },

@@ -268,7 +268,7 @@ const sampleRequest ={
         headerOverride: {
           'FSPIOP-Source': '{$config.FSPID}',
           'FSPIOP-Destination': '{$request.headers.fspiop-source}',
-          'Content-Type': '{$session.negotiatedContentType}',
+          'Content-Type': '{$environment.negotiatedContentType}',
           Date: '{$request.headers.date}'
         },
         bodyOverride: {

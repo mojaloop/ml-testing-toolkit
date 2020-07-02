@@ -359,33 +359,29 @@ const tlsLoadHubServerCertificates = async () => {
 }
 
 const tlsChecker = async () => {
-  try {
-    // Initialize HUB CA
-    currentTlsConfig.hubCaCert = await initHubCa(currentEnvironment.id)
+  // Initialize HUB CA
+  currentTlsConfig.hubCaCert = await initHubCa(currentEnvironment.id)
 
-    // TODO: Download DFSP CA and place it in trusted store
-    await checkDfspCa(currentEnvironment.id, DEFAULT_USER_FSPID)
+  // TODO: Download DFSP CA and place it in trusted store
+  await checkDfspCa(currentEnvironment.id, DEFAULT_USER_FSPID)
 
-    // Check for DFSP CSRs
-    await checkDfspCsrs(currentEnvironment.id, DEFAULT_USER_FSPID)
+  // Check for DFSP CSRs
+  await checkDfspCsrs(currentEnvironment.id, DEFAULT_USER_FSPID)
 
-    // Upload HUB CSRs and also Check for Signed HUB CSRs and get outbound certificate
-    await checkHubCsrs(currentEnvironment.id, DEFAULT_USER_FSPID)
+  // Upload HUB CSRs and also Check for Signed HUB CSRs and get outbound certificate
+  await checkHubCsrs(currentEnvironment.id, DEFAULT_USER_FSPID)
 
-    // Read Hub Server Certificates
-    await tlsLoadHubServerCertificates()
+  // Read Hub Server Certificates
+  await tlsLoadHubServerCertificates()
 
-    // Upload Hub Server root CA and Hub Server cert
-    await uploadHubServerCerts(currentEnvironment.id, currentTlsConfig.hubServerCaRootCert, null, currentTlsConfig.hubServerCert)
-    // Check for DFSP Server root CA and server cert
-    await checkDfspServerCerts(currentEnvironment.id, DEFAULT_USER_FSPID)
+  // Upload Hub Server root CA and Hub Server cert
+  await uploadHubServerCerts(currentEnvironment.id, currentTlsConfig.hubServerCaRootCert, null, currentTlsConfig.hubServerCert)
+  // Check for DFSP Server root CA and server cert
+  await checkDfspServerCerts(currentEnvironment.id, DEFAULT_USER_FSPID)
 
-    // Read Hub Client Key
-    const hubClientKeyData = await readFileAsync('secrets/tls/hub_client_key.key')
-    currentTlsConfig.hubClientKey = hubClientKeyData.toString()
-  } catch (err) {
-    console.log(err)
-  }
+  // Read Hub Client Key
+  const hubClientKeyData = await readFileAsync('secrets/tls/hub_client_key.key')
+  currentTlsConfig.hubClientKey = hubClientKeyData.toString()
 }
 
 const checkConnectionManager = async () => {

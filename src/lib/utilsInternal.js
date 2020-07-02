@@ -28,21 +28,18 @@ const getFunctionResult = (param, fromObject, request) => {
   if (temp.length === 2) {
     const fileName = temp[0]
     const functionName = temp[1]
+    let fn
     try {
-      const fn = require('./mocking/custom-functions/' + fileName)[functionName]
-      if (!fn) {
-        customLogger.logMessage('error', 'The specified custom function does not exist', param, false)
-        return param
-      }
-      return fn(fromObject, request)
+      fn = require('./mocking/custom-functions/' + fileName)[functionName]
     } catch (e) {
-      if (e.code === 'MODULE_NOT_FOUND') {
-        customLogger.logMessage('error', 'The specified custom function does not exist', param, false)
-      } else {
-        throw e
-      }
+      customLogger.logMessage('error', 'The specified module does not exist', param, false)
       return param
     }
+    if (!fn) {
+      customLogger.logMessage('error', 'The specified custom function does not exist', param, false)
+      return param
+    }
+    return fn(fromObject, request)
   } else {
     customLogger.logMessage('error', 'The specified custom function format is not correct', param, false)
     return param
