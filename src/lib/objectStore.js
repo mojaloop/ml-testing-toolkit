@@ -77,7 +77,6 @@ const deleteTransaction = (transactionId) => {
 
 const clearOldObjects = () => {
   clear('transactions', 10 * 60 * 1000)
-  clear('inboundEnvironment', 10 * 60 * 1000)
 }
 
 const initObjectStore = () => {
