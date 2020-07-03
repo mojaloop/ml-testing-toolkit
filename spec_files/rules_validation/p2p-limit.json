@@ -42,21 +42,10 @@
         "body": {
           "errorInformation": {
             "errorCode": "5100",
-            "errorDescription": "The total allowed amount for the dfsp has been reached",
-            "extensionList": {
-              "extension": [
-                {
-                  "key": "errorDescription",
-                  "value": "This is a more detailed error description"
-                },
-                {
-                  "key": "errorDescription",
-                  "value": "This is a more detailed error description"
-                }
-              ]
-            }
+            "errorDescription": "The total allowed amount for the dfsp has been reached"
           }
-        }
+        },
+        "scripts": {}
       },
       "type": "MOCK_ERROR_CALLBACK"
     },

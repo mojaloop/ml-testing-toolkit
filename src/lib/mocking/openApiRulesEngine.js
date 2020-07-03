@@ -52,7 +52,7 @@ const executeScripts = async (curEvent, req) => {
     method: req.method,
     headers: req.headers
   }
-  if (curEvent.params.scripts && curEvent.params.scripts.exec.length > 0 && curEvent.params.scripts.exec !== ['']) {
+  if (curEvent.params.scripts && curEvent.params.scripts.exec && curEvent.params.scripts.exec.length > 0 && curEvent.params.scripts.exec !== ['']) {
     // convert inboundEnvironment from JSON to sandbox environment format
     const sandboxEnvironment = Object.entries(objectStore.get('inboundEnvironment')).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
 
