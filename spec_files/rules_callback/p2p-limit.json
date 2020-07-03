@@ -12,18 +12,6 @@
     "conditions": {
       "all": [
         {
-          "fact": "pathParams",
-          "operator": "equal",
-          "value": "MSISDN",
-          "path": "Type"
-        },
-        {
-          "fact": "pathParams",
-          "operator": "equal",
-          "value": "27713803912",
-          "path": "ID"
-        },
-        {
           "fact": "operationPath",
           "operator": "equal",
           "value": "/parties/{Type}/{ID}"
@@ -56,7 +44,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 1,
+    "ruleId": 2,
     "priority": 1,
     "description": "post /quotes",
     "apiVersion": {
