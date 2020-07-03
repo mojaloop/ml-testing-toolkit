@@ -36,4 +36,13 @@ router.get('/:object', async (req, res, next) => {
   }
 })
 
+router.delete('/:object', async (req, res, next) => {
+  try {
+    objectStore.set(req.params.object, {})
+    res.status(200).json({})
+  } catch (err) {
+    next(err)
+  }
+})
+
 module.exports = router

@@ -56,8 +56,7 @@
               ]
             }
           }
-        },
-        "scripts": {}
+        }
       },
       "type": "MOCK_ERROR_CALLBACK"
     },

@@ -29,6 +29,7 @@ const app = apiServer.getApp()
 const objectStore = require('../../../../src/lib/objectStore')
 
 const SpyGet = jest.spyOn(objectStore, 'get')
+const SpySet = jest.spyOn(objectStore, 'set')
 
 describe('API route /api/objectstore', () => {
   describe('GET /api/objectstore/:object', () => {
@@ -41,6 +42,19 @@ describe('API route /api/objectstore', () => {
     it('should throw an error if there is an issue getting the inboundEnvironment', async () => {
       SpyGet.mockImplementationOnce(() => {throw new Error()})
       const res = await request(app).get(`/api/objectstore/inboundEnvironment`)
+      expect(res.statusCode).toEqual(500)
+    })
+  })
+  describe('DELETE /api/objectstore/:object', () => {
+    it('should not throw if the object is deleted', async () => {
+      SpySet.mockReturnValueOnce()
+      const res = await request(app).delete(`/api/objectstore/inboundEnvironment`)
+      expect(res.statusCode).toEqual(200)
+      expect(res.body).toStrictEqual({})
+    })
+    it('should throw an error if there is an issue deleting the inboundEnvironment', async () => {
+      SpySet.mockImplementationOnce(() => {throw new Error()})
+      const res = await request(app).delete(`/api/objectstore/inboundEnvironment`)
       expect(res.statusCode).toEqual(500)
     })
   })

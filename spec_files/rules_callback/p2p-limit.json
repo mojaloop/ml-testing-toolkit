@@ -40,7 +40,6 @@
       "path": "/parties/{Type}/{ID}",
       "params": {
         "scripts": {
-          "enabled": true,
           "exec": [
             "const ttkAllowedAmount = pm.environment.get('ttkAllowedAmount')",
             "if (ttkAllowedAmount === undefined) {",
@@ -123,7 +122,6 @@
       "path": "/transfers/{ID}",
       "params": {
         "scripts": {
-          "enabled": true,
           "exec": [
             "const body = JSON.parse(pm.request.body)",
             "var ttkdfspTotalAmount = pm.environment.get('ttkdfspTotalAmount') || 0",
