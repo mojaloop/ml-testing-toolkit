@@ -47,16 +47,17 @@ const removeEmpty = obj => {
 }
 
 const executeScripts = async (curEvent, req) => {
-  const postmanRequest = {
-    body: JSON.stringify(req.payload),
-    method: req.method,
-    headers: req.headers
-  }
   if (curEvent.params.scripts && curEvent.params.scripts.exec && curEvent.params.scripts.exec.length > 0 && curEvent.params.scripts.exec !== ['']) {
     // convert inboundEnvironment from JSON to sandbox environment format
     const sandboxEnvironment = Object.entries(objectStore.get('inboundEnvironment')).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
 
     const contextObj = await postmanContext.generageContextObj(sandboxEnvironment)
+
+    const postmanRequest = {
+      body: JSON.stringify(req.payload),
+      method: req.method,
+      headers: req.headers
+    }
     const postmanSandbox = await postmanContext.executeAsync(curEvent.params.scripts.exec, { context: { ...contextObj, request: postmanRequest }, id: uuid.v4() }, contextObj)
 
     // replace inbound environment with the sandbox environment
@@ -68,7 +69,6 @@ const executeScripts = async (curEvent, req) => {
 }
 
 const replaceEnvironmentsFromRules = async (rulesObject) => {
-  console.log('----------------here')
   const rules = JSON.parse(JSON.stringify(rulesObject || []))
   const environment = objectStore.get('inboundEnvironment')
 
