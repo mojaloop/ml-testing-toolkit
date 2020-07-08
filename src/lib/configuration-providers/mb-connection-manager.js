@@ -28,6 +28,7 @@ const fs = require('fs')
 const _ = require('lodash')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
+const objectStore = require('../objectStore/objectStoreInterface')
 
 const DEFAULT_ENVIRONMENT_NAME = 'TESTING-TOOLKIT'
 const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
@@ -39,11 +40,24 @@ var currentEnvironment = null
 // var currentTestingToolkitDFSP = null
 // var currentUserDFSP = null
 
-var currentTestingToolkitDfspJWSCerts = null
-var currentUserDfspJWSCerts = null
-var currentTestingToolkitDfspJWSPrivateKey = null
-
+var currentJWSConfig = {}
 var currentTlsConfig = {}
+
+const setJWSConfig = async () => {
+  await objectStore.set('jwsConfig', currentJWSConfig)
+}
+
+const getJWSConfig = async () => {
+  return await objectStore.get('jwsConfig')
+}
+
+const setTLSConfig = async () => {
+  await objectStore.set('tlsConfig', currentTlsConfig)
+}
+
+const getTLSConfig = async () => {
+  return await objectStore.get('tlsConfig')
+}
 
 const initEnvironment = async () => {
   // Check whether an environment exists with the name testing-toolkit
@@ -159,13 +173,14 @@ const fetchUserDFSPJwsCerts = async (environmentId, dfspId) => {
     const certResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps/' + dfspId + '/jwscerts', { headers: { 'Content-Type': 'application/json' } })
     if (certResult.status === 200 && (certResult.data && certResult.data.id)) {
       const fetchedJwsCerts = certResult.data
-      if (!_.isEqual(fetchedJwsCerts, currentUserDfspJWSCerts)) {
-        currentUserDfspJWSCerts = fetchedJwsCerts
+      if (!_.isEqual(fetchedJwsCerts, currentJWSConfig.userDfspCerts)) {
+        currentJWSConfig.userDfspCerts = fetchedJwsCerts
+        await setJWSConfig()
         // console.log('User DFSP JWS Certificate updated', fetchedJwsCerts.jwsCert)
       }
     }
   } catch (err) {}
-  return currentUserDfspJWSCerts
+  return currentJWSConfig.userDfspCerts
 }
 
 // TLS Related
@@ -232,6 +247,7 @@ const checkDfspCa = async (environmentId, dfspId) => {
       if (currentTlsConfig.dfspCaRootCert !== dfspCaResult.data.rootCertificate) {
         console.log('New DFSP CA Root CERT Found')
         currentTlsConfig.dfspCaRootCert = dfspCaResult.data.rootCertificate
+        await setTLSConfig()
       }
     }
   } catch (err) {}
@@ -282,6 +298,7 @@ const checkHubCsrs = async (environmentId, dfspId) => {
     if (hubSignedCsrs.length > 0 && currentTlsConfig.hubClientCert !== hubSignedCsrs[0].certificate) {
       console.log('New Signed Hub client CERT Found')
       currentTlsConfig.hubClientCert = hubSignedCsrs[0].certificate
+      await setTLSConfig()
     }
   } else {
     try {
@@ -342,6 +359,7 @@ const checkDfspServerCerts = async (environmentId, dfspId) => {
       currentTlsConfig.dfspServerCaRootCert = dfspServerCertsResult.data.rootCertificate
       currentTlsConfig.dfspServerCaIntermediateCert = dfspServerCertsResult.data.intermediateChain
       currentTlsConfig.dfspServerCert = dfspServerCertsResult.data.serverCertificate
+      await setTLSConfig()
     }
   } catch (err) {}
 }
@@ -356,6 +374,8 @@ const tlsLoadHubServerCertificates = async () => {
   // Read Hub server key
   const tmpHubServerKey = await readFileAsync('secrets/tls/hub_server_key.key')
   currentTlsConfig.hubServerKey = tmpHubServerKey.toString()
+
+  await setTLSConfig()
 }
 
 const tlsChecker = async () => {
@@ -382,6 +402,7 @@ const tlsChecker = async () => {
   // Read Hub Client Key
   const hubClientKeyData = await readFileAsync('secrets/tls/hub_client_key.key')
   currentTlsConfig.hubClientKey = hubClientKeyData.toString()
+  await setTLSConfig()
 }
 
 const checkConnectionManager = async () => {
@@ -389,14 +410,14 @@ const checkConnectionManager = async () => {
   if (Config.getUserConfig().JWS_SIGN || Config.getUserConfig().VALIDATE_INBOUND_JWS) {
     try {
       // Get private key for signing
-      currentTestingToolkitDfspJWSPrivateKey = await readFileAsync('secrets/privatekey.pem')
-
+      currentJWSConfig.testingToolkitDfspPrivateKey = await readFileAsync('secrets/privatekey.pem')
+      await setJWSConfig()
       // Initialize HUB environment
       await initDFSPHelper()
       // Initialize JWS certificate for testing toolkit dfsp
       const certData = await readFileAsync('secrets/publickey.cer')
-      currentTestingToolkitDfspJWSCerts = await initJWSCertificate(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, certData.toString())
-
+      currentJWSConfig.testingToolkitDfspCerts = await initJWSCertificate(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, certData.toString())
+      await setJWSConfig()
       // Fetch the user DFSP Jws certs once and then periodically check
       await fetchUserDFSPJwsCerts(currentEnvironment.id, DEFAULT_USER_FSPID)
     } catch (err) {
@@ -429,6 +450,7 @@ const initDFSPHelper = async () => {
 }
 
 const initialize = async () => {
+  await objectStore.init()
   await checkConnectionManager()
   setInterval(checkConnectionManager, CM_CHECK_INTERVAL)
 }
@@ -447,20 +469,23 @@ const waitForTlsHubCerts = async (interval = 2) => {
   throw new Error('Timeout Hub Init')
 }
 
-const getTestingToolkitDfspJWSCerts = () => {
-  return currentTestingToolkitDfspJWSCerts ? currentTestingToolkitDfspJWSCerts.jwsCertificate : null
+const getTestingToolkitDfspJWSCerts = async () => {
+  const jwsConfig = await getJWSConfig()
+  return jwsConfig.testingToolkitDfspCerts ? jwsConfig.testingToolkitDfspCerts.jwsCertificate : null
 }
 
-const getTestingToolkitDfspJWSPrivateKey = () => {
-  return currentTestingToolkitDfspJWSPrivateKey
+const getTestingToolkitDfspJWSPrivateKey = async () => {
+  const jwsConfig = await getJWSConfig()
+  return jwsConfig.testingToolkitDfspPrivateKey
 }
 
-const getUserDfspJWSCerts = () => {
-  return currentUserDfspJWSCerts ? currentUserDfspJWSCerts.jwsCertificate : null
+const getUserDfspJWSCerts = async () => {
+  const jwsConfig = await getJWSConfig()
+  return jwsConfig.userDfspCerts ? jwsConfig.userDfspCerts.jwsCertificate : null
 }
 
-const getTlsConfig = () => {
-  return currentTlsConfig
+const getTlsConfig = async () => {
+  return await getTLSConfig()
 }
 
 module.exports = {

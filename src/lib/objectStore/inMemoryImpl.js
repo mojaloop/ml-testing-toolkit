@@ -27,11 +27,11 @@ var storedObject = {
   transactions: {}
 }
 
-const set = (key, value) => {
+const set = async (key, value) => {
   storedObject[key] = { ...value }
 }
 
-const get = (key) => {
+const get = async (key) => {
   return { ...storedObject[key] }
 }
 

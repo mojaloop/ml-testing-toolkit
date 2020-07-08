@@ -55,7 +55,7 @@ const handleCallback = async (callbackObject, context, req) => {
   const httpsProps = {}
   let urlGenerated = callbackEndpoint + callbackObject.path
   if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED) {
-    const tlsConfig = ConnectionProvider.getTlsConfig()
+    const tlsConfig = await ConnectionProvider.getTlsConfig()
     const httpsAgent = new https.Agent({
       cert: tlsConfig.hubClientCert,
       key: tlsConfig.hubClientKey,
@@ -82,7 +82,7 @@ const handleCallback = async (callbackObject, context, req) => {
     ...httpsProps
   }
   try {
-    JwsSigning.sign(reqOpts)
+    await JwsSigning.sign(reqOpts)
   } catch (err) {
     console.log(err)
   }

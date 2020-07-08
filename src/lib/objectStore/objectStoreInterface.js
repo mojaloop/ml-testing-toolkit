@@ -24,12 +24,15 @@
 
 const objectStoreImpl = require('./inMemoryImpl')
 
-const set = (key, value) => {
-  objectStoreImpl.set(key, value)
+const set = async (key, value) => {
+  // console.log('### OBJECT_STORE #### Setting key', key, 'Value', value )
+  await objectStoreImpl.set(key, value)
 }
 
-const get = (key) => {
-  return objectStoreImpl.get(key)
+const get = async (key) => {
+  const value = await objectStoreImpl.get(key)
+  // console.log('### OBJECT_STORE #### Getting key', key, 'Value', value )
+  return await objectStoreImpl.get(key)
 }
 
 const init = async () => {

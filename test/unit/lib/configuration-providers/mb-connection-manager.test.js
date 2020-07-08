@@ -239,16 +239,16 @@ const axiosHelper = (type, url) => {
   return Promise.reject(new Error('not found'))
 }
 
-describe('mb-connection-manager', () => {
+describe('mb-connection-manager', async () => {
   describe('getTestingToolkitDfspJWSCerts', () => {
     it('should return null', async () => {
-      const getTestingToolkitDfspJWSCerts = MBConnectionManagerProvider.getTestingToolkitDfspJWSCerts()
+      const getTestingToolkitDfspJWSCerts = await MBConnectionManagerProvider.getTestingToolkitDfspJWSCerts()
       expect(getTestingToolkitDfspJWSCerts).toBeNull()
     })
   })
   describe('getUserDfspJWSCerts', () => {
     it('should return null', async () => {
-      const getUserDfspJWSCerts = MBConnectionManagerProvider.getUserDfspJWSCerts()
+      const getUserDfspJWSCerts = await MBConnectionManagerProvider.getUserDfspJWSCerts()
       expect(getUserDfspJWSCerts).toBeNull()
     })
   })
@@ -599,9 +599,9 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/hub/servercerts'] = original
     })
   })
-  describe('getTlsConfig', () => {
+  describe('getTlsConfig', async () => {
     it('should have required properties', async () => {
-      const tlsConfig = MBConnectionManagerProvider.getTlsConfig()
+      const tlsConfig = await MBConnectionManagerProvider.getTlsConfig()
       expect(tlsConfig).toHaveProperty('hubCaCert')
       expect(tlsConfig).toHaveProperty('dfspCaRootCert')
       expect(tlsConfig).toHaveProperty('hubClientCert')
@@ -611,21 +611,21 @@ describe('mb-connection-manager', () => {
       expect(tlsConfig).toHaveProperty('hubClientKey')
     })
   })
-  describe('getTestingToolkitDfspJWSCerts', () => {
+  describe('getTestingToolkitDfspJWSCerts', async () => {
     it('should return certificate value', async () => {
-      const dfspJwsCerts = MBConnectionManagerProvider.getTestingToolkitDfspJWSCerts()
+      const dfspJwsCerts = await MBConnectionManagerProvider.getTestingToolkitDfspJWSCerts()
       expect(dfspJwsCerts).toEqual('asdf')
     })
   })
   describe('getUserDfspJWSCerts', () => {
     it('should return certificate value', async () => {
-      const dfspJwsCerts = MBConnectionManagerProvider.getUserDfspJWSCerts()
+      const dfspJwsCerts = await MBConnectionManagerProvider.getUserDfspJWSCerts()
       expect(dfspJwsCerts).toEqual('asdf')
     })
   })
   describe('getTestingToolkitDfspJWSPrivateKey', () => {
     it('should return certificate value', async () => {
-      const dfspJwsCerts = MBConnectionManagerProvider.getTestingToolkitDfspJWSPrivateKey()
+      const dfspJwsCerts = await MBConnectionManagerProvider.getTestingToolkitDfspJWSPrivateKey()
       expect(dfspJwsCerts).toBeTruthy()
     })
   })

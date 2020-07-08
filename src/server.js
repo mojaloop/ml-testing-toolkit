@@ -63,7 +63,7 @@ const createServer = async (port) => {
       console.log('Tls certificates initiation failed.')
       return null
     }
-    const tlsConfig = ConnectionProvider.getTlsConfig()
+    const tlsConfig = await ConnectionProvider.getTlsConfig()
     server = new Hapi.Server({
       port,
       tls: {

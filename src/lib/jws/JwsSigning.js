@@ -28,7 +28,7 @@ const Config = require('../config')
 const { Jws } = require('@mojaloop/sdk-standard-components')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
 
-const validate = (req) => {
+const validate = async (req) => {
   if (Config.getUserConfig().VALIDATE_INBOUND_JWS) {
     if (req.method === 'get') {
       return false
@@ -44,7 +44,7 @@ const validate = (req) => {
       simple: false
     }
     const keys = {}
-    keys[req.headers['fspiop-source']] = ConnectionProvider.getUserDfspJWSCerts()
+    keys[req.headers['fspiop-source']] = await ConnectionProvider.getUserDfspJWSCerts()
     const jwsValidator = new Jws.validator({ // eslint-disable-line
       validationKeys: keys
     })
@@ -58,7 +58,7 @@ const validate = (req) => {
   }
 }
 
-const sign = (req) => {
+const sign = async (req) => {
   if (Config.getUserConfig().JWS_SIGN) {
     if (req.method === 'get') {
       return false
@@ -67,7 +67,7 @@ const sign = (req) => {
     if (req.method === 'put' && req.path.startsWith('/parties/') && !Config.getUserConfig().JWS_SIGN_PUT_PARTIES) {
       return false
     }
-    const jwsSigningKey = ConnectionProvider.getTestingToolkitDfspJWSPrivateKey()
+    const jwsSigningKey = await ConnectionProvider.getTestingToolkitDfspJWSPrivateKey()
     const jwsSigner = new Jws.signer({ // eslint-disable-line
       signingKey: jwsSigningKey
     })

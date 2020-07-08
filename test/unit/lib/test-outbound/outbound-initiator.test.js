@@ -389,7 +389,7 @@ describe('Outbound Initiator Functions', () => {
 
   describe('sendRequest', () => {
     // Positive Scenarios
-    it('sendRequest should call axios with appropriate params', async () => {
+    it('sendRequest should call axios with appropriate params 1', async () => {
       axios.mockImplementation(() => Promise.resolve({
         status: 200,
         statusText: 'OK',
@@ -398,15 +398,15 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
-      SpySign.mockReturnValueOnce()
+      SpySign.mockReturnValueOnce( Promise.resolve() )
       SpyAgent.mockImplementationOnce(() => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockReturnValueOnce({
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
         hubClientCert: 'cert',
         hubClientKey: 'key',
         dfspServerCaRootCert: 'ca'
-      })
+      }))
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000'
       }).mockReturnValueOnce({        
@@ -442,15 +442,15 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
-      SpySign.mockReturnValueOnce()
+      SpySign.mockReturnValueOnce(Promise.resolve())
       SpyAgent.mockImplementationOnce(() => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockReturnValueOnce({
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
         hubClientCert: 'cert',
         hubClientKey: 'key',
         dfspServerCaRootCert: 'ca'
-      })
+      }))
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000'
       }).mockReturnValueOnce({        
@@ -491,15 +491,15 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
-      SpySign.mockReturnValueOnce()
+      SpySign.mockReturnValueOnce(Promise.resolve())
       SpyAgent.mockImplementationOnce(() => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockReturnValueOnce({
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
         hubClientCert: 'cert',
         hubClientKey: 'key',
         dfspServerCaRootCert: 'ca'
-      })
+      }))
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000'
       }).mockReturnValueOnce({        
@@ -540,15 +540,15 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
-      SpySign.mockReturnValueOnce()
+      SpySign.mockReturnValueOnce(Promise.resolve())
       SpyAgent.mockImplementationOnce(() => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockReturnValueOnce({
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
         hubClientCert: 'cert',
         hubClientKey: 'key',
         dfspServerCaRootCert: 'ca'
-      })
+      }))
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000'
       }).mockReturnValueOnce({        
@@ -592,15 +592,15 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
-      SpySign.mockImplementationOnce(() => {throw new Error()})
-      SpyAgent.mockImplementationOnce(() => {
+      SpySign.mockImplementationOnce(async () => {throw new Error()})
+      SpyAgent.mockImplementationOnce(async () => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockReturnValueOnce({
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
         hubClientCert: 'cert',
         hubClientKey: 'key',
         dfspServerCaRootCert: 'ca'
-      })
+      }))
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000'
       }).mockReturnValueOnce({        
@@ -636,15 +636,15 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
-      SpySign.mockImplementationOnce(() => {throw new Error()})
-      SpyAgent.mockImplementationOnce(() => {
+      SpySign.mockImplementationOnce(async () => {throw new Error()})
+      SpyAgent.mockImplementationOnce(async () => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockReturnValueOnce({
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
         hubClientCert: 'cert',
         hubClientKey: 'key',
         dfspServerCaRootCert: 'ca'
-      })
+      }))
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000'
       }).mockReturnValueOnce({        

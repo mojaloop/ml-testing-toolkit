@@ -97,10 +97,10 @@ module.exports.initilizeMockHandler = async () => {
   }
 }
 
-module.exports.handleRequest = (req, h) => {
+module.exports.handleRequest = async (req, h) => {
   // JWS Validation
   try {
-    const jwsValidated = JwsSigning.validate(req)
+    const jwsValidated = await JwsSigning.validate(req)
     if (jwsValidated) {
       customLogger.logMessage('debug', 'JWS Signature Validated', null, true, req)
     }

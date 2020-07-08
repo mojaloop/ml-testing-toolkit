@@ -307,79 +307,81 @@ const getUrlPrefix = (baseUrl) => {
 
 const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks) => {
   return new Promise((resolve, reject) => {
-    const httpsProps = {}
-    let urlGenerated = Config.getUserConfig().CALLBACK_ENDPOINT + path
-    if (baseUrl) {
-      urlGenerated = getUrlPrefix(baseUrl) + path
-    }
-    if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
-      const tlsConfig = ConnectionProvider.getTlsConfig()
-      const httpsAgent = new https.Agent({
-        cert: tlsConfig.hubClientCert,
-        key: tlsConfig.hubClientKey,
-        ca: [tlsConfig.dfspServerCaRootCert],
-        rejectUnauthorized: true
+    (async () => {
+      const httpsProps = {}
+      let urlGenerated = Config.getUserConfig().CALLBACK_ENDPOINT + path
+      if (baseUrl) {
+        urlGenerated = getUrlPrefix(baseUrl) + path
+      }
+      if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
+        const tlsConfig = await ConnectionProvider.getTlsConfig()
+        const httpsAgent = new https.Agent({
+          cert: tlsConfig.hubClientCert,
+          key: tlsConfig.hubClientKey,
+          ca: [tlsConfig.dfspServerCaRootCert],
+          rejectUnauthorized: true
+        })
+        httpsProps.httpsAgent = httpsAgent
+        urlGenerated = urlGenerated.replace('http:', 'https:')
+      }
+
+      const reqOpts = {
+        method: method,
+        url: urlGenerated,
+        path: path,
+        params: queryParams,
+        headers: headers,
+        data: body,
+        timeout: 3000,
+        validateStatus: function (status) {
+          return status < 900 // Reject only if the status code is greater than or equal to 900
+        },
+        ...httpsProps
+      }
+      try {
+        await JwsSigning.sign(reqOpts)
+      } catch (err) {
+        console.log(err)
+      }
+      axios(reqOpts).then((result) => {
+        const syncResponse = {
+          status: result.status,
+          statusText: result.statusText,
+          data: result.data
+        }
+        const curlRequest = result.request ? result.request.toCurl() : ''
+
+        if (result.status > 299) {
+          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
+        }
+
+        customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
+        if (successCallbackUrl && errorCallbackUrl && (ignoreCallbacks !== true)) {
+          const timer = setTimeout(() => {
+            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
+            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
+            reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
+          }, Config.getUserConfig().CALLBACK_TIMEOUT)
+          // Listen for success callback
+          MyEventEmitter.getEmitter('testOutbound').once(successCallbackUrl, (callbackHeaders, callbackBody) => {
+            clearTimeout(timer)
+            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
+            resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { headers: callbackHeaders, body: callbackBody } })
+          })
+          // Listen for error callback
+          MyEventEmitter.getEmitter('testOutbound').once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
+            clearTimeout(timer)
+            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
+            reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { body: callbackBody } })))
+          })
+        } else {
+          resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
+        }
+      }, (err) => {
+        customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, err, false)
+        reject(new Error(JSON.stringify({ errorCode: 4000 })))
       })
-      httpsProps.httpsAgent = httpsAgent
-      urlGenerated = urlGenerated.replace('http:', 'https:')
-    }
-
-    const reqOpts = {
-      method: method,
-      url: urlGenerated,
-      path: path,
-      params: queryParams,
-      headers: headers,
-      data: body,
-      timeout: 3000,
-      validateStatus: function (status) {
-        return status < 900 // Reject only if the status code is greater than or equal to 900
-      },
-      ...httpsProps
-    }
-    try {
-      JwsSigning.sign(reqOpts)
-    } catch (err) {
-      console.log(err)
-    }
-    axios(reqOpts).then((result) => {
-      const syncResponse = {
-        status: result.status,
-        statusText: result.statusText,
-        data: result.data
-      }
-      const curlRequest = result.request ? result.request.toCurl() : ''
-
-      if (result.status > 299) {
-        reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
-      }
-
-      customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
-      if (successCallbackUrl && errorCallbackUrl && (ignoreCallbacks !== true)) {
-        const timer = setTimeout(() => {
-          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
-          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
-          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
-        }, Config.getUserConfig().CALLBACK_TIMEOUT)
-        // Listen for success callback
-        MyEventEmitter.getEmitter('testOutbound').once(successCallbackUrl, (callbackHeaders, callbackBody) => {
-          clearTimeout(timer)
-          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
-          resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { headers: callbackHeaders, body: callbackBody } })
-        })
-        // Listen for error callback
-        MyEventEmitter.getEmitter('testOutbound').once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
-          clearTimeout(timer)
-          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
-          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { body: callbackBody } })))
-        })
-      } else {
-        resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
-      }
-    }, (err) => {
-      customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, err, false)
-      reject(new Error(JSON.stringify({ errorCode: 4000 })))
-    })
+    })()
   })
 }
 
