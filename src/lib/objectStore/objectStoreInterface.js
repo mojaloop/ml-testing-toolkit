@@ -32,7 +32,7 @@ const set = async (key, value) => {
 const get = async (key) => {
   const value = await objectStoreImpl.get(key)
   // console.log('### OBJECT_STORE #### Getting key', key, 'Value', value )
-  return await objectStoreImpl.get(key)
+  return value
 }
 
 const init = async () => {

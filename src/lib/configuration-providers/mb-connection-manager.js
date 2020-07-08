@@ -48,7 +48,8 @@ const setJWSConfig = async () => {
 }
 
 const getJWSConfig = async () => {
-  return await objectStore.get('jwsConfig')
+  const config = await objectStore.get('jwsConfig')
+  return config
 }
 
 const setTLSConfig = async () => {
@@ -56,7 +57,8 @@ const setTLSConfig = async () => {
 }
 
 const getTLSConfig = async () => {
-  return await objectStore.get('tlsConfig')
+  const config = await objectStore.get('tlsConfig')
+  return config
 }
 
 const initEnvironment = async () => {
@@ -485,7 +487,8 @@ const getUserDfspJWSCerts = async () => {
 }
 
 const getTlsConfig = async () => {
-  return await getTLSConfig()
+  const config = await getTLSConfig()
+  return config
 }
 
 module.exports = {
