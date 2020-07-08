@@ -50,6 +50,10 @@ describe('RulesEngineModel', () => {
       const result = await RulesEngineModel.getResponseRulesEngine()
       expect(result).not.toBeUndefined()      
     })
+    it('getResponseRulesEngine with a parameter should not reload rules', async () => {
+      const result = await RulesEngineModel.getResponseRulesEngine([])
+      expect(result).not.toBeUndefined()      
+    })
     it('reloadResponseRules when active rules file is found with no rule conditions', async () => {
       SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
         activeRulesFile: 'activeRulesFile'

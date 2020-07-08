@@ -101,7 +101,7 @@ const handleCallback = async (callbackObject, context, req) => {
     assertionData.error = true
   }
   assertionStore.pushCallback(assertionPath, assertionData)
-  MyEventEmitter.getAssertionCallbackEmitter().emit(assertionPath, assertionData)
+  MyEventEmitter.getEmitter('assertionCallback').emit(assertionPath, assertionData)
 
   // Send callback
   if (userConfig.SEND_CALLBACK_ENABLE) {

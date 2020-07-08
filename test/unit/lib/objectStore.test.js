@@ -79,4 +79,24 @@ describe('ObjectStore', () => {
       expect(result['name']).toEqual('test')
     })
   })
+  describe('inbound environment Related Functions', () => {
+    it('Save inbound environment should not throw error', async () => {
+      expect(() => {
+        const result = ObjectStore.push('inboundEnvironment', '123')
+      }).not.toThrowError();
+    })
+    it('Get existing inbound environment', async () => {
+      const result = ObjectStore.getObject('inboundEnvironment', '123')
+      expect(result).not.toBe(null)
+    })
+    it('Get not existing inbound environment', async () => {
+      const result = ObjectStore.getObject('inboundEnvironment', '1234')
+      expect(result).toBe(null)
+    })
+    it('Delete the inbound environment', async () => {
+      expect(() => {
+        const result = ObjectStore.clear('inboundEnvironment', 0)
+      }).not.toThrowError();
+    })
+  })
 })

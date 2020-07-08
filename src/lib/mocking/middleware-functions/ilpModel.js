@@ -117,8 +117,7 @@ const validateTransferCondition = (context, request) => {
 // Decoding functions
 
 const getIlpTransactionObject = (ilpPacket) => {
-  const ilpTransactionObject = ilpObj.getTransactionObject(ilpPacket)
-  return ilpTransactionObject
+  return ilpObj.getTransactionObject(ilpPacket)
 }
 
 module.exports = {

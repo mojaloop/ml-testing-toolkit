@@ -30,6 +30,11 @@ const customLogger = require('../requestLogger')
 const _ = require('lodash')
 const rulesEngineModel = require('../rulesEngineModel')
 const Config = require('../config')
+const objectStore = require('../objectStore')
+const utilsInternal = require('../utilsInternal')
+const uuid = require('uuid')
+const postmanContext = require('../test-outbound/context')
+
 // const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
 
 const removeEmpty = obj => {
@@ -41,18 +46,54 @@ const removeEmpty = obj => {
   }
 }
 
-const validateRules = async (context, req) => {
-  const rulesEngine = await rulesEngineModel.getValidationRulesEngine()
+const executeScripts = async (curEvent, req) => {
+  if (curEvent.params.scripts && curEvent.params.scripts.exec && curEvent.params.scripts.exec.length > 0 && curEvent.params.scripts.exec !== ['']) {
+    // convert inboundEnvironment from JSON to sandbox environment format
+    const sandboxEnvironment = Object.entries(objectStore.get('inboundEnvironment')).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
 
-  const facts = {
-    operationPath: context.operation.path,
-    path: context.request.path,
-    method: context.request.method,
-    body: context.request.body ? context.request.body : {},
-    pathParams: context.request.params ? context.request.params : {},
-    headers: context.request.headers ? context.request.headers : {},
-    queryParams: context.request.query ? JSON.parse(JSON.stringify(context.request.query)) : {}
+    const contextObj = await postmanContext.generageContextObj(sandboxEnvironment)
+
+    const postmanRequest = {
+      body: JSON.stringify(req.payload),
+      method: req.method,
+      headers: req.headers
+    }
+    const postmanSandbox = await postmanContext.executeAsync(curEvent.params.scripts.exec, { context: { ...contextObj, request: postmanRequest }, id: uuid.v4() }, contextObj)
+
+    // replace inbound environment with the sandbox environment
+    const mergedInboundEnvironment = postmanSandbox.environment.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
+    objectStore.set('inboundEnvironment', mergedInboundEnvironment)
+    contextObj.ctx.dispose()
+    contextObj.ctx = null
   }
+}
+
+const replaceEnvironmentsFromRules = async (rulesObject) => {
+  const rules = JSON.parse(JSON.stringify(rulesObject || []))
+  const environment = objectStore.get('inboundEnvironment')
+
+  let reloadRules = false
+  rules.forEach(rule => {
+    Object.keys(rule.conditions).forEach(conditionType => {
+      rule.conditions[conditionType].forEach((condition) => {
+        if (condition.value && condition.value.split('.')[0] === '{$environment') {
+          condition.value = getEnvironmentValue(condition.value, environment)
+          reloadRules = true
+        }
+      })
+    })
+  })
+
+  return reloadRules ? rules : undefined
+}
+
+const validateRules = async (context, req) => {
+  const rules = await rulesEngineModel.getValidationRules()
+
+  const newRules = await replaceEnvironmentsFromRules(rules)
+  const rulesEngine = await rulesEngineModel.getValidationRulesEngine(newRules)
+
+  const facts = generageFacts(context)
 
   const res = await rulesEngine.evaluate(facts)
   let generatedErrorCallback = {}
@@ -60,14 +101,18 @@ const validateRules = async (context, req) => {
   if (res) {
     customLogger.logMessage('debug', 'Validation rules matched', res, true, req)
     const curEvent = res[0]
+    if (curEvent.params.delay) {
+      generatedErrorCallback.delay = curEvent.params.delay
+    }
+
+    await executeScripts(curEvent, req)
+
     if (curEvent.type === 'FIXED_ERROR_CALLBACK') {
       generatedErrorCallback.method = curEvent.params.method
       generatedErrorCallback.path = replaceVariablesFromRequest(curEvent.params.path, context, req)
       generatedErrorCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
+      generatedErrorCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
       generatedErrorCallback.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req)
-      if (curEvent.params.delay) {
-        generatedErrorCallback.delay = curEvent.params.delay
-      }
     } else if (curEvent.type === 'MOCK_ERROR_CALLBACK') {
       if (req.customInfo.specFile) {
         generatedErrorCallback = await generateMockErrorCallback(context, req)
@@ -75,9 +120,6 @@ const validateRules = async (context, req) => {
         _.merge(generatedErrorCallback.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
         _.merge(generatedErrorCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
         removeEmpty(generatedErrorCallback.body)
-        if (curEvent.params.delay) {
-          generatedErrorCallback.delay = curEvent.params.delay
-        }
       } else {
         customLogger.logMessage('error', 'No Specification file provided for validateRules function', null, true, req)
       }
@@ -119,24 +161,38 @@ const generateMockErrorCallback = async (context, req) => {
   return generatedErrorCallback
 }
 
-const callbackRules = async (context, req) => {
-  const rulesEngine = await rulesEngineModel.getCallbackRulesEngine()
-
-  const facts = {
+const generageFacts = (context) => {
+  return {
     operationPath: context.operation.path,
     path: context.request.path,
     method: context.request.method,
-    body: context.request.body ? context.request.body : {},
-    pathParams: context.request.params ? context.request.params : {},
-    headers: context.request.headers ? context.request.headers : {},
+    body: context.request.body || {},
+    pathParams: context.request.params || {},
+    headers: context.request.headers || {},
     queryParams: context.request.query ? JSON.parse(JSON.stringify(context.request.query)) : {}
   }
+}
+
+const callbackRules = async (context, req) => {
+  const rules = await rulesEngineModel.getCallbackRules()
+
+  const newRules = await replaceEnvironmentsFromRules(rules)
+  const rulesEngine = await rulesEngineModel.getCallbackRulesEngine(newRules)
+
+  const facts = generageFacts(context)
 
   const res = await rulesEngine.evaluate(facts)
   const generatedCallback = {}
   if (res) {
     customLogger.logMessage('debug', 'Callback rules are matched', res, true, req)
     const curEvent = res[0]
+
+    if (curEvent.params.delay) {
+      generatedCallback.delay = curEvent.params.delay
+    }
+
+    await executeScripts(curEvent, req)
+
     if (curEvent.type === 'FIXED_CALLBACK') {
       // generatedCallback.method = curEvent.params.method
       // generatedCallback.path = replaceVariablesFromRequest(curEvent.params.path, context, req)
@@ -151,9 +207,6 @@ const callbackRules = async (context, req) => {
       generatedCallback.method = req.customInfo.callbackInfo.successCallback.method
       generatedCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
       generatedCallback.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req)
-      if (curEvent.params.delay) {
-        generatedCallback.delay = curEvent.params.delay
-      }
     } else if (curEvent.type === 'MOCK_CALLBACK') {
       if (req.customInfo.specFile) {
         const callbackGenerator = new (require('./openApiRequestGenerator'))()
@@ -190,9 +243,6 @@ const callbackRules = async (context, req) => {
         _.merge(generatedCallback.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
         removeEmpty(generatedCallback.body)
         _.merge(generatedCallback.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
-        if (curEvent.params.delay) {
-          generatedCallback.delay = curEvent.params.delay
-        }
       } else {
         customLogger.logMessage('error', 'No Specification file provided for validateRules function', null, true, req)
       }
@@ -205,17 +255,12 @@ const callbackRules = async (context, req) => {
 }
 
 const responseRules = async (context, req) => {
-  const rulesEngine = await rulesEngineModel.getResponseRulesEngine()
+  const rules = await rulesEngineModel.getResponseRules()
 
-  const facts = {
-    operationPath: context.operation.path,
-    path: context.request.path,
-    method: context.request.method,
-    body: context.request.body ? context.request.body : {},
-    pathParams: context.request.params ? context.request.params : {},
-    headers: context.request.headers ? context.request.headers : {},
-    queryParams: context.request.query ? JSON.parse(JSON.stringify(context.request.query)) : {}
-  }
+  const newRules = await replaceEnvironmentsFromRules(rules)
+  const rulesEngine = await rulesEngineModel.getResponseRulesEngine(newRules)
+
+  const facts = generageFacts(context)
 
   const res = await rulesEngine.evaluate(facts)
   const generatedResponse = {}
@@ -223,12 +268,15 @@ const responseRules = async (context, req) => {
   if (res) {
     customLogger.logMessage('debug', 'Response rules are matched', res, true, req)
     const curEvent = res[0]
+    if (curEvent.params.delay) {
+      generatedResponse.delay = curEvent.params.delay
+    }
+
+    await executeScripts(curEvent, req)
+
     if (curEvent.type === 'FIXED_RESPONSE') {
       generatedResponse.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
       generatedResponse.status = +curEvent.params.statusCode
-      if (curEvent.params.delay) {
-        generatedResponse.delay = curEvent.params.delay
-      }
       // generatedResponse.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req)
     } else if (curEvent.type === 'MOCK_RESPONSE') {
       if (req.customInfo.specFile) {
@@ -259,9 +307,6 @@ const responseRules = async (context, req) => {
         _.merge(generatedResponse.body, replaceVariablesFromRequest(curEvent.params.body, context, req))
         removeEmpty(generatedResponse.body)
         _.merge(generatedResponse.headers, replaceVariablesFromRequest(curEvent.params.headers, context, req))
-        if (curEvent.params.delay) {
-          generatedResponse.delay = curEvent.params.delay
-        }
       } else {
         customLogger.logMessage('error', 'No Specification file provided for responseRules function', null, true, req)
       }
@@ -284,6 +329,7 @@ const replaceVariablesFromRequest = (inputObject, context, req) => {
   }
 
   // Check the string for any inclusions like {$some_param}
+  const environment = objectStore.get('inboundEnvironment')
   const matchedArray = resultObject.match(/{\$([^}]+)}/g)
   if (matchedArray) {
     matchedArray.forEach(element => {
@@ -298,6 +344,9 @@ const replaceVariablesFromRequest = (inputObject, context, req) => {
           break
         case '{$session':
           resultObject = resultObject.replace(element, getSessionValue(element, req.customInfo))
+          break
+        case '{$environment':
+          resultObject = resultObject.replace(element, getEnvironmentValue(element, environment))
           break
         case '{$request':
         default:
@@ -333,25 +382,12 @@ const getSessionValue = (param, fromObject) => {
 
 // Execute the function and return the result
 const getFunctionResult = (param, fromObject, req) => {
-  const temp = param.replace(/{\$function\.(.*)}/, '$1').split('.')
-  if (temp.length === 2) {
-    const fileName = temp[0]
-    const functionName = temp[1]
-    try {
-      const fn = require('./custom-functions/' + fileName)[functionName]
-      return fn(fromObject)
-    } catch (e) {
-      if (e.code === 'MODULE_NOT_FOUND') {
-        customLogger.logMessage('error', 'The specified custom function does not exist', param, true, req)
-      } else {
-        throw e
-      }
-      return param
-    }
-  } else {
-    customLogger.logMessage('error', 'The specified custom function format is not correct', param, true, req)
-    return param
-  }
+  return utilsInternal.getFunctionResult(param, fromObject, req)
+}
+
+const getEnvironmentValue = (param, fromObject) => {
+  const temp = param.replace(/{\$environment.(.*)}/, '$1')
+  return _.get(fromObject, temp)
 }
 
 module.exports = {

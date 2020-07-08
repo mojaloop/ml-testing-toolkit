@@ -23,17 +23,22 @@
  ******/
 
 const fs = require('fs')
+const { files } = require('node-dir')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const writeFileAsync = promisify(fs.writeFile)
 const accessFileAsync = promisify(fs.access)
 const readDirAsync = promisify(fs.readdir)
 const deleteFileAsync = promisify(fs.unlink)
+const readRecursiveAsync = promisify(files)
+const rmdirAsync = promisify(fs.rmdir)
 
 module.exports = {
   readFileAsync,
   writeFileAsync,
   accessFileAsync,
   readDirAsync,
-  deleteFileAsync
+  deleteFileAsync,
+  readRecursiveAsync,
+  rmdirAsync
 }

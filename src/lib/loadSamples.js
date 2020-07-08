@@ -21,13 +21,11 @@
  * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
-const fs = require('fs')
-const { files } = require('node-dir')
-const { promisify } = require('util')
+const { readFileAsync, readRecursiveAsync } = require('./utils')
 
 // load collections or environments
 const getCollectionsOrEnvironments = async (exampleType, type) => {
-  const data = await promisify(files)(`examples/${exampleType}/${type || ''}`)
+  const data = await readRecursiveAsync(`examples/${exampleType}/${type || ''}`)
   return data.filter(filename => filename.endsWith('.json'))
 }
 
@@ -36,7 +34,7 @@ const getSample = async (queryParams) => {
   const collections = []
   if (queryParams.collections) {
     for (const i in queryParams.collections) {
-      const collection = await promisify(fs.readFile)(queryParams.collections[i], 'utf8')
+      const collection = await readFileAsync(queryParams.collections[i], 'utf8')
       collections.push(JSON.parse(collection))
     }
   }
@@ -47,7 +45,7 @@ const getSample = async (queryParams) => {
   }
 
   if (queryParams.environment) {
-    sample.inputValues = JSON.parse(await promisify(fs.readFile)(queryParams.environment, 'utf8')).inputValues
+    sample.inputValues = JSON.parse(await readFileAsync(queryParams.environment, 'utf8')).inputValues
   }
 
   if (collections.length > 1) {

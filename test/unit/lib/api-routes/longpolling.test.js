@@ -27,6 +27,7 @@ const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
 const assertionStore = require('../../../../src/lib/assertionStore')
+
 const SpyPopRequest = jest.spyOn(assertionStore, 'popRequest')
 const SpyPopCallback = jest.spyOn(assertionStore, 'popCallback')
 
@@ -35,7 +36,7 @@ jest.setTimeout(10000);
 describe('API route /longpolling/requests/*', () => {
   describe('GET /longpolling/requests/123', () => {
     it('Getting stored requests', async () => {
-      SpyPopRequest.mockResolvedValueOnce({
+      SpyPopRequest.mockReturnValueOnce({
         headers: {},
         body: {}
       })
@@ -45,7 +46,7 @@ describe('API route /longpolling/requests/*', () => {
       expect(res).toHaveProperty('body')
     })
     it('Getting empty stored requests should throw an error', async () => {
-      SpyPopRequest.mockResolvedValueOnce()
+      SpyPopRequest.mockReturnValueOnce()
       let res
       try {
         res = await request(app).get(`/longpolling/requests/123`)
@@ -53,14 +54,14 @@ describe('API route /longpolling/requests/*', () => {
       expect(res.statusCode).toEqual(500)
     })
     it('Getting stored requests should throw an error', async () => {
-      SpyPopRequest.mockRejectedValueOnce()
+      SpyPopRequest.mockImplementationOnce(() => {throw new Error()})
       const res = await request(app).get(`/longpolling/requests/123`)
-      expect(res.statusCode).toEqual(404)
+      expect(res.statusCode).toEqual(500)
     })
   })
   describe('GET /longpolling/callbacks/123', () => {
     it('Getting stored callbacks', async () => {
-      SpyPopCallback.mockResolvedValueOnce({
+      SpyPopCallback.mockReturnValueOnce({
         headers: {},
         body: {}
       })
@@ -70,7 +71,7 @@ describe('API route /longpolling/requests/*', () => {
       expect(res).toHaveProperty('body')
     })
     it('Getting empty stored callbacks should throw an error', async () => {
-      SpyPopCallback.mockResolvedValueOnce()
+      SpyPopCallback.mockReturnValueOnce()
       let res
       try {
         res = await request(app).get(`/longpolling/callbacks/123`)
@@ -78,9 +79,9 @@ describe('API route /longpolling/requests/*', () => {
       expect(res.statusCode).toEqual(500)
     })
     it('Getting stored callbacks should throw an error', async () => {
-      SpyPopCallback.mockRejectedValueOnce()
+      SpyPopCallback.mockImplementationOnce(() => {throw new Error()})
       const res = await request(app).get(`/longpolling/callbacks/123`)
-      expect(res.statusCode).toEqual(404)
+      expect(res.statusCode).toEqual(500)
     })
   })
  
