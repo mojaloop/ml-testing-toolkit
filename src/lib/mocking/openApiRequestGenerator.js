@@ -132,17 +132,15 @@ const generateMockResponseBody = async (method, name, data, jsfRefs) => {
   const responseSchema = findResponseSchema(data.responses)
   // Create a new copy of object without copying by references
   const newResponseSchema = JSON.parse(JSON.stringify(responseSchema))
-  if (!newResponseSchema && jsfRefs && jsfRefs.length > 0) {
+
+  if (!newResponseSchema) {
     return {}
   }
   jsfRefs.forEach(ref => {
     const convertedId = ref.id.replace(/\.(?!items)/g, '.properties.')
-    let targetObject = null
-    if (newResponseSchema.type === 'array') {
-      targetObject = _.get(newResponseSchema.items.properties, convertedId)
-    } else {
-      targetObject = _.get(newResponseSchema.properties, convertedId)
-    }
+
+    const targetObject = _.get(newResponseSchema.type === 'array' ? newResponseSchema.items.properties : newResponseSchema.properties, convertedId)
+
     if (targetObject) {
       targetObject.$ref = ref.id
       if (ref.pattern) {
@@ -152,19 +150,13 @@ const generateMockResponseBody = async (method, name, data, jsfRefs) => {
     }
   })
 
-  if (newResponseSchema == null) {
-    return {}
-  }
-
   const fakedResponse = {}
   fakedResponse.body = await jsf.resolve(newResponseSchema, jsfRefs)
   for (const key in data.responses) {
+    fakedResponse.status = key
     if (key >= 200 && key <= 299) {
-      fakedResponse.status = key
       break
     }
-    // Just in-case
-    fakedResponse.status = key
   }
   return fakedResponse
 }
@@ -185,10 +177,6 @@ const generateMockOperation = async (method, name, data, jsfRefs) => {
     }
   })
 
-  if (newRequestSchema == null) {
-    return {}
-  }
-
   const fakedResponse = await jsf.resolve(newRequestSchema, jsfRefs)
 
   return fakedResponse
@@ -198,11 +186,7 @@ const generateMockHeaders = async (method, name, data, jsfRefs) => {
   const headers = {}
   data.parameters.forEach(param => {
     if (param.in === 'header') {
-      if (param.schema.type) {
-        headers[param.name] = { type: param.schema.type }
-      } else {
-        headers[param.name] = {}
-      }
+      headers[param.name] = (param.schema && param.schema.type) ? { type: param.schema.type } : {}
     }
   })
   jsfRefs.forEach(ref => {
@@ -211,7 +195,7 @@ const generateMockHeaders = async (method, name, data, jsfRefs) => {
     }
   })
 
-  if (headers === {}) {
+  if (Object.keys(headers).length === 0) {
     return {}
   }
 
@@ -244,6 +228,7 @@ class OpenApiRequestGenerator {
   }
 
   async generateResponseBody (path, httpMethod, jsfRefs) {
+    console.log(this.schema.paths)
     const pathValue = this.schema.paths[path]
     const operation = pathValue[httpMethod]
     const id = operation.operationId || operation.summary

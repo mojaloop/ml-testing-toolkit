@@ -28,18 +28,16 @@ const fs = require('fs')
 
 const OpenApiRequestGenerator = require('../../../../src/lib/mocking/openApiRequestGenerator')
 const callbackGenerator = new OpenApiRequestGenerator()
-const specFilePrefix = 'spec_files/api_definitions/'
-const specFileAsync = specFilePrefix + 'fspiop_1.0/api_spec.yaml'
-const specFileSync = specFilePrefix + 'settlements_1.0/api_spec.yaml'
+const specFilePrefix = 'test/'
 
-const content = fs.readFileSync(specFilePrefix + 'fspiop_1.0/mockRef.json')
+const content = fs.readFileSync(specFilePrefix + 'mockRef.json')
 const jsfRef = JSON.parse(content)
 
 
 describe('OpenApiRequestGenerator', () => {
   describe('load a async api file', () => {
     it('Load method should not throw error', async () => {
-      await expect(callbackGenerator.load(specFileAsync)).resolves.toBeUndefined()
+      await expect(callbackGenerator.load(specFilePrefix + 'api_spec_async.yaml')).resolves.toBeUndefined()
     })
     it('generateRequestBody should generate a request body', async () => {
       const result = await callbackGenerator.generateRequestBody( '/quotes', 'post', jsfRef)
@@ -51,10 +49,16 @@ describe('OpenApiRequestGenerator', () => {
       expect(result).toHaveProperty('Content-Type')
       expect(result).toHaveProperty('Date')
     })
+    it('generateRequestHeaders should generate a request headers', async () => {
+      const result = await callbackGenerator.generateRequestHeaders( '/transfers', 'post', [])
+    })
   })
   describe('load a sync api file', () => {
     it('Load method should not throw error', async () => {
-      await expect(callbackGenerator.load(specFileSync)).resolves.toBeUndefined()
+      await expect(callbackGenerator.load(specFilePrefix + 'api_spec_sync_empty.yaml')).resolves.toBeUndefined()
+    })
+    it('Load method should not throw error', async () => {
+      await expect(callbackGenerator.load(specFilePrefix + 'api_spec_sync.yaml')).resolves.toBeUndefined()
     })
     it('generateRequestBody should generate a request body', async () => {
       const result = await callbackGenerator.generateRequestBody( '/settlements', 'post', jsfRef)
@@ -65,6 +69,20 @@ describe('OpenApiRequestGenerator', () => {
       const result = await callbackGenerator.generateResponseBody( '/settlements', 'get', jsfRef)
       expect(result).toHaveProperty('body')
       expect(result).toHaveProperty('status')
+    })
+    it('generateResponseBody should generate a request body', async () => {
+      const result = await callbackGenerator.generateResponseBody( '/settlements', 'get', jsfRef)
+      expect(result).toHaveProperty('body')
+      expect(result).toHaveProperty('status')
+    })
+    
+    it('generateResponseBody should generate a request body if response type is array', async () => {
+      const result = await callbackGenerator.generateResponseBody( '/settlementWindows', 'get', jsfRef)
+      expect(result).toStrictEqual({})
+    })
+    it('generateResponseBody should generate a request body if response type is object', async () => {
+      const result = await callbackGenerator.generateResponseBody( '/settlementWindows/{id}', 'get', jsfRef)
+      expect(result.status).toBe('200')
     })
   })
 })

@@ -23,35 +23,23 @@
  ******/
 
 const express = require('express')
-const MyEventEmitter = require('../MyEventEmitter')
 const assertionStore = require('../assertionStore')
+const longpollingEmitter = require('../longpollingEmitter')
 // const Config = require('../config')
 
 const router = new express.Router()
 // const { check, validationResult } = require('express-validator')
-
-const LONGPOLLING_TIMEOUT = 5000
 
 // Method to monitor requests came to toolkit
 router.get('/requests/*', async (req, res, next) => {
   const eventPath = req.path.replace('/requests', '')
   try {
     // Check if the required path is already in the assertion store
-    const storedAssertion = await assertionStore.popRequest(eventPath)
+    const storedAssertion = assertionStore.popRequest(eventPath)
     if (storedAssertion) {
       res.status(200).json({ headers: storedAssertion.headers, data: storedAssertion.body })
     } else {
-      const timer = setTimeout(() => {
-        MyEventEmitter.getAssertionRequestEmitter().removeAllListeners(eventPath)
-        res.status(500).json({ error: 'Timed out' })
-      }, LONGPOLLING_TIMEOUT)
-
-      // Listen for success callback
-      MyEventEmitter.getAssertionRequestEmitter().once(eventPath, async (data) => {
-        clearTimeout(timer)
-        await assertionStore.popRequest(eventPath)
-        res.status(200).json(data)
-      })
+      longpollingEmitter.setAssertionStoreEmitter('requests', eventPath, res)
     }
   } catch (err) {
     next(err)
@@ -63,21 +51,11 @@ router.get('/callbacks/*', async (req, res, next) => {
   const eventPath = req.path.replace('/callbacks', '')
   try {
     // Check if the required path is already in the assertion store
-    const storedAssertion = await assertionStore.popCallback(eventPath)
+    const storedAssertion = assertionStore.popCallback(eventPath)
     if (storedAssertion) {
       res.status(200).json({ headers: storedAssertion.headers, data: storedAssertion.body })
     } else {
-      const timer = setTimeout(() => {
-        MyEventEmitter.getAssertionCallbackEmitter().removeAllListeners(eventPath)
-        res.status(500).json({ error: 'Timed out' })
-      }, LONGPOLLING_TIMEOUT)
-
-      // Listen for success callback
-      MyEventEmitter.getAssertionCallbackEmitter().once(eventPath, async (data) => {
-        clearTimeout(timer)
-        await assertionStore.popCallback(eventPath)
-        res.status(200).json(data)
-      })
+      longpollingEmitter.setAssertionStoreEmitter('callbacks', eventPath, res)
     }
   } catch (err) {
     next(err)

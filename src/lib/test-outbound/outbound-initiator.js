@@ -43,6 +43,7 @@ delete axios.defaults.headers.common.Accept
 const context = require('./context')
 const openApiDefinitionsModel = require('../mocking/openApiDefinitionsModel')
 const uuid = require('uuid')
+const utilsInternal = require('../utilsInternal')
 
 var terminateTraceIds = {}
 
@@ -354,23 +355,22 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
       }
 
       customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
-
       if (successCallbackUrl && errorCallbackUrl && (ignoreCallbacks !== true)) {
         const timer = setTimeout(() => {
-          MyEventEmitter.getTestOutboundEmitter().removeAllListeners(successCallbackUrl)
-          MyEventEmitter.getTestOutboundEmitter().removeAllListeners(errorCallbackUrl)
+          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
+          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
         }, Config.getUserConfig().CALLBACK_TIMEOUT)
         // Listen for success callback
-        MyEventEmitter.getTestOutboundEmitter().once(successCallbackUrl, (callbackHeaders, callbackBody) => {
+        MyEventEmitter.getEmitter('testOutbound').once(successCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)
-          MyEventEmitter.getTestOutboundEmitter().removeAllListeners(errorCallbackUrl)
+          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
           resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { headers: callbackHeaders, body: callbackBody } })
         })
         // Listen for error callback
-        MyEventEmitter.getTestOutboundEmitter().once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
+        MyEventEmitter.getEmitter('testOutbound').once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)
-          MyEventEmitter.getTestOutboundEmitter().removeAllListeners(successCallbackUrl)
+          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { body: callbackBody } })))
         })
       } else {
@@ -536,29 +536,7 @@ const replacePathVariables = (operationPath, params) => {
 
 // Execute the function and return the result
 const getFunctionResult = (param, inputValues, request) => {
-  const temp = param.replace(/{\$function\.(.*)}/, '$1').split('.')
-  if (temp.length === 2) {
-    const fileName = temp[0]
-    const functionName = temp[1]
-    try {
-      const fn = require('./custom-functions/' + fileName)[functionName]
-      if (!fn) {
-        customLogger.logMessage('error', 'The specified custom function does not exist', param, false)
-        return param
-      }
-      return fn(inputValues, request)
-    } catch (e) {
-      if (e.code === 'MODULE_NOT_FOUND') {
-        customLogger.logMessage('error', 'The specified custom function does not exist', param, false)
-      } else {
-        throw e
-      }
-      return param
-    }
-  } else {
-    customLogger.logMessage('error', 'The specified custom function format is not correct', param, false)
-    return param
-  }
+  return utilsInternal.getFunctionResult(param, inputValues, request)
 }
 
 // Generate consolidated final report

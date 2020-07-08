@@ -1,0 +1,21 @@
+[
+  {
+    "id": "quoteId"
+  },
+  {
+    "id": "id"
+  },
+  {
+    "id": "state",
+    "pattern": "Created|Closed"
+  },
+  {
+    "id": "reason",
+    "pattern": "Created|Closed"
+  },
+  
+  {
+    "id": "Content-Length",
+    "pattern": "123"
+  }
+]

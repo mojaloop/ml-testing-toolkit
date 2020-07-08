@@ -52,7 +52,6 @@ const handleTransfers = (context, request) => {
       // Transaction not found, throw error callback
       return false
     }
-    // console.log(ObjectStore.get('transactions'))
   }
 
   return true

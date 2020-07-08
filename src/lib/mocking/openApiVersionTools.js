@@ -37,10 +37,10 @@ module.exports.validateAcceptHeader = (acceptHeader) => {
   }
 }
 
-module.exports.validateContentTypeHeader = (acceptHeader) => {
-  const validationFailed = !acceptHeaderRE.test(acceptHeader)
+module.exports.validateContentTypeHeader = (contentTypeHeader) => {
+  const validationFailed = !acceptHeaderRE.test(contentTypeHeader)
   if (validationFailed) {
-    customLogger.logMessage('debug', 'Invalid content-type header ' + acceptHeader)
+    customLogger.logMessage('debug', 'Invalid content-type header ' + contentTypeHeader)
   }
   return {
     validationFailed: validationFailed,
@@ -103,9 +103,7 @@ module.exports.negotiateVersion = (req, apis) => {
       }
     }
     if (!negotiationFailed) {
-      responseContentTypeHeader = 'application/vnd.interoperability.' + parsedAcceptHeader.resource +
-      '+json;version=' + apis[negotiatedIndex].majorVersion +
-      '.' + apis[negotiatedIndex].minorVersion
+      responseContentTypeHeader = `application/vnd.interoperability.${parsedAcceptHeader.resource}+json;version=${apis[negotiatedIndex].majorVersion}.${apis[negotiatedIndex].minorVersion}`
     }
   }
   customLogger.logMessage('debug', negotiationFailed ? 'Version negotiation failed for the Accept / Content-Type header ' + acceptHeader : 'Version negotiation succeeded, picked up the version ' + apis[negotiatedIndex].majorVersion + '.' + apis[negotiatedIndex].minorVersion, null, true, req)
@@ -122,13 +120,10 @@ const parseAcceptHeader = (acceptHeader) => {
   if (!parsedArray) {
     return null
   }
-  const resource = parsedArray[1]
-  const majorVersion = +parsedArray[6]
-  const minorVersion = +parsedArray[8]
   return {
-    resource,
-    majorVersion,
-    minorVersion
+    resource: parsedArray[1],
+    majorVersion: +parsedArray[6],
+    minorVersion: +parsedArray[8]
   }
 }
 
