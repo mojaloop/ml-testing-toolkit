@@ -25,9 +25,14 @@
 const express = require('express')
 const router = new express.Router()
 const jwt = require('jsonwebtoken')
+const Config = require('../config')
 
 router.post('/token', async (req, res, next) => {
   try {
+    let userDfspId = 'userdfsp'
+    if (Config.getSystemConfig().HOSTING_ENABLED) {
+      userDfspId = req.body.username
+    }
     const idToken = jwt.sign(
       {
         at_hash: 'bJi28CeD9HLPf1ouOVkQTA',
@@ -46,7 +51,7 @@ router.post('/token', async (req, res, next) => {
         ],
         exp: 1558713100,
         iat: 1558709500,
-        dfspId: 'userdfsp',
+        dfspId: userDfspId,
         userguid: 'userguid'
       }
       , 'password')

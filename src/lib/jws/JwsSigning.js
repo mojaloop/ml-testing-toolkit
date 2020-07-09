@@ -44,7 +44,7 @@ const validate = async (req) => {
       simple: false
     }
     const keys = {}
-    keys[req.headers['fspiop-source']] = await ConnectionProvider.getUserDfspJWSCerts()
+    keys[req.headers['fspiop-source']] = await ConnectionProvider.getUserDfspJWSCerts(req.headers['fspiop-source'])
     const jwsValidator = new Jws.validator({ // eslint-disable-line
       validationKeys: keys
     })

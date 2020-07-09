@@ -34,7 +34,32 @@ const DEFAULT_ENVIRONMENT_NAME = 'TESTING-TOOLKIT'
 const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
 const DEFAULT_USER_FSPID = 'userdfsp'
 const CM_CHECK_INTERVAL = 10000
+const DEFAULT_USER_DFSPS = [
+  {
+    id: 'userdfsp',
+    name: 'User DFSP'
+  }
+]
 var CONNECTION_MANAGER_API_URL = null
+
+const tempDfspList = [
+  {
+    id: 'userdfsp1',
+    name: 'User DFSP 1'
+  },
+  {
+    id: 'userdfsp2',
+    name: 'User DFSP 2'
+  }
+]
+
+const getDFSPs = async () => {
+  if (Config.getSystemConfig().HOSTING_ENABLED) {
+    return tempDfspList
+  } else {
+    return DEFAULT_USER_DFSPS
+  }
+}
 
 var currentEnvironment = null
 // var currentTestingToolkitDFSP = null
@@ -154,18 +179,21 @@ const initJWSCertificate = async (environmentId, dfspId, jwsCertificate = null, 
 
 const fetchUserDFSPJwsCerts = async (environmentId, dfspId) => {
   // Check whether an environment exists with the name testing-toolkit
+  if (!currentJWSConfig.userDfspCerts) {
+    currentJWSConfig.userDfspCerts = {}
+  }
   try {
     const certResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps/' + dfspId + '/jwscerts', { headers: { 'Content-Type': 'application/json' } })
     if (certResult.status === 200 && (certResult.data && certResult.data.id)) {
       const fetchedJwsCerts = certResult.data
-      if (!_.isEqual(fetchedJwsCerts, currentJWSConfig.userDfspCerts)) {
-        currentJWSConfig.userDfspCerts = fetchedJwsCerts
+      if (!_.isEqual(fetchedJwsCerts, currentJWSConfig.userDfspCerts[dfspId])) {
+        currentJWSConfig.userDfspCerts[dfspId] = fetchedJwsCerts
         await setJWSConfig()
         // console.log('User DFSP JWS Certificate updated', fetchedJwsCerts.jwsCert)
       }
     }
   } catch (err) {}
-  return currentJWSConfig.userDfspCerts
+  return currentJWSConfig.userDfspCerts[dfspId]
 }
 
 // TLS Related
@@ -438,7 +466,10 @@ const checkConnectionManager = async () => {
       currentJWSConfig.testingToolkitDfspCerts = await initJWSCertificate(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, certData.toString())
       await setJWSConfig()
       // Fetch the user DFSP Jws certs once and then periodically check
-      await fetchUserDFSPJwsCerts(currentEnvironment.id, DEFAULT_USER_FSPID)
+      const dfspList = await getDFSPs()
+      for (let i = 0; i < dfspList.length; i++) {
+        await fetchUserDFSPJwsCerts(currentEnvironment.id, dfspList[i].id)
+      }
     } catch (err) {
       console.log(err)
     }
@@ -477,7 +508,10 @@ const initDFSPHelper = async () => {
   // Initialize the DFSPs
   if (currentEnvironment) {
     await initDFSP(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, 'Testing Toolkit DFSP')
-    await initDFSP(currentEnvironment.id, DEFAULT_USER_FSPID, 'User DFSP')
+    const dfspList = await getDFSPs()
+    for (let i = 0; i < dfspList.length; i++) {
+      await initDFSP(currentEnvironment.id, dfspList[i].id, dfspList[i].name)
+    }
   }
 }
 
@@ -511,9 +545,9 @@ const getTestingToolkitDfspJWSPrivateKey = async () => {
   return jwsConfig.testingToolkitDfspPrivateKey
 }
 
-const getUserDfspJWSCerts = async () => {
+const getUserDfspJWSCerts = async (dfspId) => {
   const jwsConfig = await objectStore.get('jwsConfig')
-  return jwsConfig.userDfspCerts ? jwsConfig.userDfspCerts.jwsCertificate : null
+  return jwsConfig.userDfspCerts[dfspId] ? jwsConfig.userDfspCerts[dfspId].jwsCertificate : null
 }
 
 const getTlsConfig = async () => {
