@@ -146,6 +146,7 @@ const generateMockErrorCallback = async (context, req) => {
   } else {
     generatedErrorCallback.path = operationCallback
   }
+  generatedErrorCallback.callbackInfo = replaceVariablesFromRequest(req.customInfo.callbackInfo, context, req)
   generatedErrorCallback.method = req.customInfo.callbackInfo.errorCallback.method
   generatedErrorCallback.body = await callbackGenerator.generateRequestBody(operationCallback, generatedErrorCallback.method, jsfRefs1)
   generatedErrorCallback.headers = await callbackGenerator.generateRequestHeaders(operationCallback, generatedErrorCallback.method, jsfRefs1)
@@ -204,6 +205,7 @@ const callbackRules = async (context, req) => {
       } else {
         generatedCallback.path = operationCallback
       }
+      generatedCallback.callbackInfo = replaceVariablesFromRequest(req.customInfo.callbackInfo, context, req)
       generatedCallback.method = req.customInfo.callbackInfo.successCallback.method
       generatedCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
       generatedCallback.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req)
@@ -226,6 +228,7 @@ const callbackRules = async (context, req) => {
         } else {
           generatedCallback.path = operationCallback
         }
+        generatedCallback.callbackInfo = replaceVariablesFromRequest(req.customInfo.callbackInfo, context, req)
         generatedCallback.method = req.customInfo.callbackInfo.successCallback.method
         generatedCallback.body = await callbackGenerator.generateRequestBody(operationCallback, generatedCallback.method, jsfRefs1)
         generatedCallback.headers = await callbackGenerator.generateRequestHeaders(operationCallback, generatedCallback.method, jsfRefs1)

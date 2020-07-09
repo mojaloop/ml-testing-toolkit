@@ -40,8 +40,8 @@ const handleCallback = async (callbackObject, context, req) => {
   let callbackEndpoint = userConfig.CALLBACK_ENDPOINT
   if (Config.getSystemConfig().HOSTING_ENABLED) {
     const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
-    if (endpointsConfig.dfspEndpoints && endpointsConfig.dfspEndpoints[callbackObject.headers['FSPIOP-Destination']]) {
-      callbackEndpoint = endpointsConfig.dfspEndpoints[callbackObject.headers['FSPIOP-Destination']]
+    if (endpointsConfig.dfspEndpoints && callbackObject.callbackInfo.fspid && endpointsConfig.dfspEndpoints[callbackObject.callbackInfo.fspid]) {
+      callbackEndpoint = endpointsConfig.dfspEndpoints[callbackObject.callbackInfo.fspid]
     }
   } else {
     if (userConfig.CALLBACK_RESOURCE_ENDPOINTS && userConfig.CALLBACK_RESOURCE_ENDPOINTS.enabled) {
