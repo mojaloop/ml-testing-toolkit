@@ -398,12 +398,12 @@ const endpointChecker = async () => {
       const dfspList = dfspsResult.data
       const tempEndpoints = {}
       // Iterate through all dfsps and get the endpoints
-      for(let i=0; i < dfspList.length; i++) {
+      for (let i = 0; i < dfspList.length; i++) {
         const dfspId = dfspList[i].id
         const endpointResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + currentEnvironment.id + '/dfsps/' + dfspId + '/endpoints', { headers: { 'Content-Type': 'application/json' } })
         if (endpointResult.status === 200) {
           const fetchedEndpoints = endpointResult.data
-          for(let j=0; j < fetchedEndpoints.length; j++) {
+          for (let j = 0; j < fetchedEndpoints.length; j++) {
             if (fetchedEndpoints[j].state === 'NEW') {
               // Confirm endpoint
               await axios.post(CONNECTION_MANAGER_API_URL + '/api/environments/' + currentEnvironment.id + '/dfsps/' + dfspId + '/endpoints/' + fetchedEndpoints[j].id + '/confirmation', null, { headers: { 'Content-Type': 'application/json' } })
