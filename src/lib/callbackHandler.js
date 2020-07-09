@@ -38,17 +38,24 @@ const handleCallback = async (callbackObject, context, req) => {
   const userConfig = Config.getUserConfig()
 
   let callbackEndpoint = userConfig.CALLBACK_ENDPOINT
-  if (userConfig.CALLBACK_RESOURCE_ENDPOINTS && userConfig.CALLBACK_RESOURCE_ENDPOINTS.enabled) {
-    const callbackEndpoints = userConfig.CALLBACK_RESOURCE_ENDPOINTS
-    const matchedObject = callbackEndpoints.endpoints.find(item => {
-      if (item.method === callbackObject.method) {
-        const path = new RegExp(item.path.replace(/{.*}/, '.*'))
-        return path.test(callbackObject.path)
+  if (Config.getSystemConfig().HOSTING_ENABLED) {
+    const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
+    if (endpointsConfig.dfspEndpoints && endpointsConfig.dfspEndpoints[callbackObject.headers['FSPIOP-Destination']]) {
+      callbackEndpoint = endpointsConfig.dfspEndpoints[callbackObject.headers['FSPIOP-Destination']]
+    }
+  } else {
+    if (userConfig.CALLBACK_RESOURCE_ENDPOINTS && userConfig.CALLBACK_RESOURCE_ENDPOINTS.enabled) {
+      const callbackEndpoints = userConfig.CALLBACK_RESOURCE_ENDPOINTS
+      const matchedObject = callbackEndpoints.endpoints.find(item => {
+        if (item.method === callbackObject.method) {
+          const path = new RegExp(item.path.replace(/{.*}/, '.*'))
+          return path.test(callbackObject.path)
+        }
+        return false
+      })
+      if (matchedObject && matchedObject.endpoint) {
+        callbackEndpoint = matchedObject.endpoint
       }
-      return false
-    })
-    if (matchedObject && matchedObject.endpoint) {
-      callbackEndpoint = matchedObject.endpoint
     }
   }
 

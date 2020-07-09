@@ -42,24 +42,7 @@ var currentEnvironment = null
 
 var currentJWSConfig = {}
 var currentTlsConfig = {}
-
-const setJWSConfig = async () => {
-  await objectStore.set('jwsConfig', currentJWSConfig)
-}
-
-const getJWSConfig = async () => {
-  const config = await objectStore.get('jwsConfig')
-  return config
-}
-
-const setTLSConfig = async () => {
-  await objectStore.set('tlsConfig', currentTlsConfig)
-}
-
-const getTLSConfig = async () => {
-  const config = await objectStore.get('tlsConfig')
-  return config
-}
+var currentEndpoints = {}
 
 const initEnvironment = async () => {
   // Check whether an environment exists with the name testing-toolkit
@@ -407,6 +390,40 @@ const tlsChecker = async () => {
   await setTLSConfig()
 }
 
+const endpointChecker = async () => {
+  // Check whether an environment exists with the name testing-toolkit
+  try {
+    const dfspsResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + currentEnvironment.id + '/dfsps', { headers: { 'Content-Type': 'application/json' } })
+    if (dfspsResult.status === 200) {
+      const dfspList = dfspsResult.data
+      const tempEndpoints = {}
+      // Iterate through all dfsps and get the endpoints
+      for(let i=0; i < dfspList.length; i++) {
+        const dfspId = dfspList[i].id
+        const endpointResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + currentEnvironment.id + '/dfsps/' + dfspId + '/endpoints', { headers: { 'Content-Type': 'application/json' } })
+        if (endpointResult.status === 200) {
+          const fetchedEndpoints = endpointResult.data
+          for(let j=0; j < fetchedEndpoints.length; j++) {
+            if (fetchedEndpoints[j].state === 'NEW') {
+              // Confirm endpoint
+              await axios.post(CONNECTION_MANAGER_API_URL + '/api/environments/' + currentEnvironment.id + '/dfsps/' + dfspId + '/endpoints/' + fetchedEndpoints[j].id + '/confirmation', null, { headers: { 'Content-Type': 'application/json' } })
+            }
+            if (fetchedEndpoints[j].direction === 'INGRESS' && fetchedEndpoints[j].type === 'URL') {
+              // Store the URL for this DFSP
+              tempEndpoints[dfspId] = fetchedEndpoints[j].value.url
+            }
+          }
+        }
+      }
+      if (!_.isEqual(tempEndpoints, currentEndpoints.dfspEndpoints)) {
+        currentEndpoints.dfspEndpoints = tempEndpoints
+        await setEndpointsConfig()
+      }
+    }
+  } catch (err) {}
+  return currentEndpoints
+}
+
 const checkConnectionManager = async () => {
   CONNECTION_MANAGER_API_URL = Config.getUserConfig().CONNECTION_MANAGER_API_URL
   if (Config.getUserConfig().JWS_SIGN || Config.getUserConfig().VALIDATE_INBOUND_JWS) {
@@ -435,6 +452,19 @@ const checkConnectionManager = async () => {
         await initDFSPHelper()
       }
       await tlsChecker()
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  if (Config.getSystemConfig().HOSTING_ENABLED) {
+    try {
+      // Do TLS related stuff
+      if (!currentEnvironment) {
+        // Initialize HUB environment
+        await initDFSPHelper()
+      }
+      await endpointChecker()
     } catch (err) {
       console.log(err)
     }
@@ -472,23 +502,40 @@ const waitForTlsHubCerts = async (interval = 2) => {
 }
 
 const getTestingToolkitDfspJWSCerts = async () => {
-  const jwsConfig = await getJWSConfig()
+  const jwsConfig = await objectStore.get('jwsConfig')
   return jwsConfig.testingToolkitDfspCerts ? jwsConfig.testingToolkitDfspCerts.jwsCertificate : null
 }
 
 const getTestingToolkitDfspJWSPrivateKey = async () => {
-  const jwsConfig = await getJWSConfig()
+  const jwsConfig = await objectStore.get('jwsConfig')
   return jwsConfig.testingToolkitDfspPrivateKey
 }
 
 const getUserDfspJWSCerts = async () => {
-  const jwsConfig = await getJWSConfig()
+  const jwsConfig = await objectStore.get('jwsConfig')
   return jwsConfig.userDfspCerts ? jwsConfig.userDfspCerts.jwsCertificate : null
 }
 
 const getTlsConfig = async () => {
-  const config = await getTLSConfig()
+  const config = await objectStore.get('tlsConfig')
   return config
+}
+
+const getEndpointsConfig = async () => {
+  const config = await objectStore.get('endpointsConfig')
+  return config
+}
+
+const setJWSConfig = async () => {
+  await objectStore.set('jwsConfig', currentJWSConfig)
+}
+
+const setTLSConfig = async () => {
+  await objectStore.set('tlsConfig', currentTlsConfig)
+}
+
+const setEndpointsConfig = async () => {
+  await objectStore.set('endpointsConfig', currentEndpoints)
 }
 
 module.exports = {
@@ -497,5 +544,6 @@ module.exports = {
   getUserDfspJWSCerts,
   getTestingToolkitDfspJWSPrivateKey,
   getTlsConfig,
+  getEndpointsConfig,
   waitForTlsHubCerts
 }

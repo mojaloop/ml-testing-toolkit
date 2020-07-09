@@ -1,5 +1,6 @@
 {
   "API_PORT": 5000,
+  "HOSTING_ENABLED": true,
   "CONFIG_VERSIONS": {
     "response": 1.0,
     "callback": 1.0,
