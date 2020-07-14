@@ -47,7 +47,7 @@ const utilsInternal = require('../utilsInternal')
 
 var terminateTraceIds = {}
 
-const OutboundSend = async (inputTemplate, traceID) => {
+const OutboundSend = async (inputTemplate, traceID, dfspId) => {
   const startedTimeStamp = new Date()
   let outboundID = traceID
   let sessionID = null
@@ -61,7 +61,7 @@ const OutboundSend = async (inputTemplate, traceID) => {
   }
   try {
     for (const i in inputTemplate.test_cases) {
-      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, environmentVariables)
+      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, environmentVariables, dfspId)
     }
 
     const completedTimeStamp = new Date()
@@ -94,7 +94,7 @@ const terminateOutbound = (traceID) => {
   terminateTraceIds[traceID] = true
 }
 
-const processTestCase = async (testCase, traceID, inputValues, environmentVariables) => {
+const processTestCase = async (testCase, traceID, inputValues, environmentVariables, dfspId) => {
   let outboundID = traceID
   let sessionID = null
   if (traceID && traceHeaderUtils.isCustomTraceID(traceID)) {
@@ -183,7 +183,7 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
       if (request.delay) {
         await new Promise(resolve => setTimeout(resolve, request.delay))
       }
-      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks)
+      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId)
 
       if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
         const response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
@@ -305,20 +305,33 @@ const getUrlPrefix = (baseUrl) => {
   return returnUrl
 }
 
-const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks) => {
+const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId) => {
   return new Promise((resolve, reject) => {
     (async () => {
       const httpsProps = {}
       let urlGenerated = Config.getUserConfig().CALLBACK_ENDPOINT + path
+      if (Config.getSystemConfig().HOSTING_ENABLED) {
+        const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
+        if (endpointsConfig.dfspEndpoints && dfspId && endpointsConfig.dfspEndpoints[dfspId]) {
+          urlGenerated = endpointsConfig.dfspEndpoints[dfspId] + path
+        } else {
+          customLogger.logMessage('warning', 'Hosting is enabled, But there is no endpoint configuration found for DFSP ID: ' + dfspId, null, true, null)
+        }
+      }
       if (baseUrl) {
         urlGenerated = getUrlPrefix(baseUrl) + path
       }
       if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
         const tlsConfig = await ConnectionProvider.getTlsConfig()
+        if (!tlsConfig.dfsps[dfspId]) {
+          const errorMsg = 'Outbound TLS is enabled, but there is no TLS config found for DFSP ID: ' + dfspId
+          customLogger.logMessage('error', errorMsg, null, true, null)
+          reject(new Error(JSON.stringify({ errorCode: 4000, errorDescription: errorMsg })))
+        }
         const httpsAgent = new https.Agent({
-          cert: tlsConfig.hubClientCert,
+          cert: tlsConfig.dfsps[dfspId].hubClientCert,
           key: tlsConfig.hubClientKey,
-          ca: [tlsConfig.dfspServerCaRootCert],
+          ca: [tlsConfig.dfsps[dfspId].dfspServerCaRootCert],
           rejectUnauthorized: true
         })
         httpsProps.httpsAgent = httpsAgent

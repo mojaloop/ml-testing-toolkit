@@ -36,7 +36,7 @@ const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
 const CM_CHECK_INTERVAL = 10000
 const DEFAULT_USER_DFSPS = [
   {
-    id: 'userdfsp',
+    id: Config.getUserConfig().DEFAULT_USER_FSPID,
     name: 'User DFSP'
   }
 ]
