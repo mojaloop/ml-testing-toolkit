@@ -29,6 +29,7 @@ const _ = require('lodash')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const objectStore = require('../objectStore/objectStoreInterface')
+const dfspDB = require('../db/dfspMockUsers')
 
 const DEFAULT_ENVIRONMENT_NAME = 'TESTING-TOOLKIT'
 const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
@@ -41,18 +42,8 @@ const DEFAULT_USER_DFSPS = [
 ]
 var CONNECTION_MANAGER_API_URL = null
 
-const tempDfspList = [
-  {
-    id: 'userdfsp1',
-    name: 'User DFSP 1'
-  },
-  {
-    id: 'userdfsp2',
-    name: 'User DFSP 2'
-  }
-]
-
 const getDFSPs = async () => {
+  const tempDfspList = await dfspDB.getDFSPList()
   if (Config.getSystemConfig().HOSTING_ENABLED) {
     return tempDfspList
   } else {

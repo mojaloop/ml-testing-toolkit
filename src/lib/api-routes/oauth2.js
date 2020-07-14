@@ -31,6 +31,12 @@ router.post('/token', async (req, res, next) => {
   try {
     let userDfspId = 'userdfsp'
     if (Config.getSystemConfig().HOSTING_ENABLED) {
+      // Check whether the DFSP exists in mock list
+      const dfspDB = require('../db/dfspMockUsers')
+      const dfspValid = await dfspDB.checkDFSP(req.body.username)
+      if (!dfspValid) {
+        throw (new Error('Invalid DFSP ID'))
+      }
       userDfspId = req.body.username
     }
     const idToken = jwt.sign(

@@ -42,6 +42,8 @@ const handleCallback = async (callbackObject, context, req) => {
     const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
     if (endpointsConfig.dfspEndpoints && callbackObject.callbackInfo.fspid && endpointsConfig.dfspEndpoints[callbackObject.callbackInfo.fspid]) {
       callbackEndpoint = endpointsConfig.dfspEndpoints[callbackObject.callbackInfo.fspid]
+    } else {
+      customLogger.logMessage('warning', 'Hosting is enabled, But there is no endpoint configuration found for DFSP ID: ' + callbackObject.callbackInfo.fspid, null, true, req)
     }
   } else {
     if (userConfig.CALLBACK_RESOURCE_ENDPOINTS && userConfig.CALLBACK_RESOURCE_ENDPOINTS.enabled) {
@@ -63,6 +65,11 @@ const handleCallback = async (callbackObject, context, req) => {
   let urlGenerated = callbackEndpoint + callbackObject.path
   if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED) {
     const tlsConfig = await ConnectionProvider.getTlsConfig()
+    if (!tlsConfig.dfsps[callbackObject.callbackInfo.fspid]) {
+      const errorMsg = 'Outbound TLS is enabled, but there is no TLS config found for DFSP ID: ' + callbackObject.callbackInfo.fspid
+      customLogger.logMessage('error', errorMsg, null, true, req)
+      throw errorMsg
+    }
     const httpsAgent = new https.Agent({
       cert: tlsConfig.dfsps[callbackObject.callbackInfo.fspid].hubClientCert,
       key: tlsConfig.hubClientKey,
