@@ -64,9 +64,9 @@ const handleCallback = async (callbackObject, context, req) => {
   if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED) {
     const tlsConfig = await ConnectionProvider.getTlsConfig()
     const httpsAgent = new https.Agent({
-      cert: tlsConfig.hubClientCert,
+      cert: tlsConfig.dfsps[callbackObject.callbackInfo.fspid].hubClientCert,
       key: tlsConfig.hubClientKey,
-      ca: [tlsConfig.dfspServerCaRootCert],
+      ca: [tlsConfig.dfsps[callbackObject.callbackInfo.fspid].dfspServerCaRootCert],
       rejectUnauthorized: true
     })
     httpsProps.httpsAgent = httpsAgent

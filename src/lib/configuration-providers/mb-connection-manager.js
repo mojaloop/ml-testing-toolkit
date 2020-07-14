@@ -32,7 +32,6 @@ const objectStore = require('../objectStore/objectStoreInterface')
 
 const DEFAULT_ENVIRONMENT_NAME = 'TESTING-TOOLKIT'
 const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
-const DEFAULT_USER_FSPID = 'userdfsp'
 const CM_CHECK_INTERVAL = 10000
 const DEFAULT_USER_DFSPS = [
   {
@@ -65,8 +64,12 @@ var currentEnvironment = null
 // var currentTestingToolkitDFSP = null
 // var currentUserDFSP = null
 
-var currentJWSConfig = {}
-var currentTlsConfig = {}
+var currentJWSConfig = {
+  dfsps: {}
+}
+var currentTlsConfig = {
+  dfsps: {}
+}
 var currentEndpoints = {}
 
 const initEnvironment = async () => {
@@ -179,21 +182,18 @@ const initJWSCertificate = async (environmentId, dfspId, jwsCertificate = null, 
 
 const fetchUserDFSPJwsCerts = async (environmentId, dfspId) => {
   // Check whether an environment exists with the name testing-toolkit
-  if (!currentJWSConfig.userDfspCerts) {
-    currentJWSConfig.userDfspCerts = {}
-  }
   try {
     const certResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps/' + dfspId + '/jwscerts', { headers: { 'Content-Type': 'application/json' } })
     if (certResult.status === 200 && (certResult.data && certResult.data.id)) {
       const fetchedJwsCerts = certResult.data
-      if (!_.isEqual(fetchedJwsCerts, currentJWSConfig.userDfspCerts[dfspId])) {
-        currentJWSConfig.userDfspCerts[dfspId] = fetchedJwsCerts
+      if (!_.isEqual(fetchedJwsCerts, currentJWSConfig.dfsps[dfspId])) {
+        currentJWSConfig.dfsps[dfspId] = fetchedJwsCerts
         await setJWSConfig()
         // console.log('User DFSP JWS Certificate updated', fetchedJwsCerts.jwsCert)
       }
     }
   } catch (err) {}
-  return currentJWSConfig.userDfspCerts[dfspId]
+  return currentJWSConfig.dfsps[dfspId]
 }
 
 // TLS Related
@@ -257,9 +257,9 @@ const checkDfspCa = async (environmentId, dfspId) => {
   try {
     const dfspCaResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps/' + dfspId + '/ca', { headers: { 'Content-Type': 'application/json' } })
     if (dfspCaResult.status === 200 && dfspCaResult.data.rootCertificate && dfspCaResult.data.validationState === 'VALID') {
-      if (currentTlsConfig.dfspCaRootCert !== dfspCaResult.data.rootCertificate) {
+      if (currentTlsConfig.dfsps[dfspId].dfspCaRootCert !== dfspCaResult.data.rootCertificate) {
         console.log('New DFSP CA Root CERT Found')
-        currentTlsConfig.dfspCaRootCert = dfspCaResult.data.rootCertificate
+        currentTlsConfig.dfsps[dfspId].dfspCaRootCert = dfspCaResult.data.rootCertificate
         await setTLSConfig()
       }
     }
@@ -308,9 +308,9 @@ const checkHubCsrs = async (environmentId, dfspId) => {
   // Store if any signed CSRs found or create a CSR if no CSR found
   if (hubCsrs.length > 0) {
     const hubSignedCsrs = hubCsrs.filter(item => (item.validationState === 'VALID' && item.state === 'CERT_SIGNED' && item.certificate !== null))
-    if (hubSignedCsrs.length > 0 && currentTlsConfig.hubClientCert !== hubSignedCsrs[0].certificate) {
+    if (hubSignedCsrs.length > 0 && currentTlsConfig.dfsps[dfspId].hubClientCert !== hubSignedCsrs[0].certificate) {
       console.log('New Signed Hub client CERT Found')
-      currentTlsConfig.hubClientCert = hubSignedCsrs[0].certificate
+      currentTlsConfig.dfsps[dfspId].hubClientCert = hubSignedCsrs[0].certificate
       await setTLSConfig()
     }
   } else {
@@ -369,9 +369,9 @@ const checkDfspServerCerts = async (environmentId, dfspId) => {
   try {
     const dfspServerCertsResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps/' + dfspId + '/servercerts', { headers: { 'Content-Type': 'application/json' } })
     if (dfspServerCertsResult.status === 200 && dfspServerCertsResult.data.validationState === 'VALID') {
-      currentTlsConfig.dfspServerCaRootCert = dfspServerCertsResult.data.rootCertificate
-      currentTlsConfig.dfspServerCaIntermediateCert = dfspServerCertsResult.data.intermediateChain
-      currentTlsConfig.dfspServerCert = dfspServerCertsResult.data.serverCertificate
+      currentTlsConfig.dfsps[dfspId].dfspServerCaRootCert = dfspServerCertsResult.data.rootCertificate
+      currentTlsConfig.dfsps[dfspId].dfspServerCaIntermediateCert = dfspServerCertsResult.data.intermediateChain
+      currentTlsConfig.dfsps[dfspId].dfspServerCert = dfspServerCertsResult.data.serverCertificate
       await setTLSConfig()
     }
   } catch (err) {}
@@ -395,22 +395,26 @@ const tlsChecker = async () => {
   // Initialize HUB CA
   currentTlsConfig.hubCaCert = await initHubCa(currentEnvironment.id)
 
-  // TODO: Download DFSP CA and place it in trusted store
-  await checkDfspCa(currentEnvironment.id, DEFAULT_USER_FSPID)
+  const dfspList = await getDFSPs()
+  for (let i = 0; i < dfspList.length; i++) {
+    // TODO: Download DFSP CA and place it in trusted store
+    await checkDfspCa(currentEnvironment.id, dfspList[i].id)
 
-  // Check for DFSP CSRs
-  await checkDfspCsrs(currentEnvironment.id, DEFAULT_USER_FSPID)
+    // Check for DFSP CSRs
+    await checkDfspCsrs(currentEnvironment.id, dfspList[i].id)
 
-  // Upload HUB CSRs and also Check for Signed HUB CSRs and get outbound certificate
-  await checkHubCsrs(currentEnvironment.id, DEFAULT_USER_FSPID)
+    // Upload HUB CSRs and also Check for Signed HUB CSRs and get outbound certificate
+    await checkHubCsrs(currentEnvironment.id, dfspList[i].id)
+
+    // Check for DFSP Server root CA and server cert
+    await checkDfspServerCerts(currentEnvironment.id, dfspList[i].id)
+  }
 
   // Read Hub Server Certificates
   await tlsLoadHubServerCertificates()
 
   // Upload Hub Server root CA and Hub Server cert
   await uploadHubServerCerts(currentEnvironment.id, currentTlsConfig.hubServerCaRootCert, null, currentTlsConfig.hubServerCert)
-  // Check for DFSP Server root CA and server cert
-  await checkDfspServerCerts(currentEnvironment.id, DEFAULT_USER_FSPID)
 
   // Read Hub Client Key
   const hubClientKeyData = await readFileAsync('secrets/tls/hub_client_key.key')
@@ -515,8 +519,17 @@ const initDFSPHelper = async () => {
   }
 }
 
+const initDFSPListStuff = async () => {
+  const dfspList = await getDFSPs()
+  for (let i = 0; i < dfspList.length; i++) {
+    currentJWSConfig.dfsps[dfspList[i].id] = {}
+    currentTlsConfig.dfsps[dfspList[i].id] = {}
+  }
+}
+
 const initialize = async () => {
   await objectStore.init()
+  await initDFSPListStuff()
   await checkConnectionManager()
   setInterval(checkConnectionManager, CM_CHECK_INTERVAL)
 }
@@ -547,7 +560,7 @@ const getTestingToolkitDfspJWSPrivateKey = async () => {
 
 const getUserDfspJWSCerts = async (dfspId) => {
   const jwsConfig = await objectStore.get('jwsConfig')
-  return jwsConfig.userDfspCerts[dfspId] ? jwsConfig.userDfspCerts[dfspId].jwsCertificate : null
+  return jwsConfig.dfsps[dfspId] ? jwsConfig.dfsps[dfspId].jwsCertificate : null
 }
 
 const getTlsConfig = async () => {
