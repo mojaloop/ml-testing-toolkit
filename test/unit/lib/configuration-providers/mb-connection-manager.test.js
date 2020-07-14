@@ -37,7 +37,8 @@ Config.getUserConfig.mockImplementation(() => {
     VALIDATE_INBOUND_JWS: true,
     OUTBOUND_MUTUAL_TLS_ENABLED: true,
     INBOUND_MUTUAL_TLS_ENABLED: true,
-    CONNECTION_MANAGER_API_URL: ''
+    CONNECTION_MANAGER_API_URL: '',
+    DEFAULT_USER_FSPID: 'userdfsp'
   }
 })
 const reject = {

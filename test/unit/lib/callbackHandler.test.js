@@ -49,6 +49,9 @@ describe('callbackHandler', () => {
       const callbackObject = {
         delay: 100,
         method: 'post',
+        callbackInfo: {
+          fspid: 'userdfsp'
+        },
         path: '/transfers/{ID}/error',
         headers: {},
         body: {}

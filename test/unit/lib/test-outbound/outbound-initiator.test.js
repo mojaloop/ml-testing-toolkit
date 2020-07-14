@@ -36,6 +36,7 @@ const MyEventEmitter = require('../../../../src/lib/MyEventEmitter')
 const SpyAgent = jest.spyOn(https, 'Agent')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
+const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 const SpySign = jest.spyOn(JwsSigning, 'sign')
 
 
@@ -403,18 +404,24 @@ describe('Outbound Initiator Functions', () => {
         return {httpsAgent: {}}
       })
       SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
-        hubClientCert: 'cert',
-        hubClientKey: 'key',
-        dfspServerCaRootCert: 'ca'
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
       }))
       SpyGetUserConfig.mockReturnValueOnce({
-        CALLBACK_ENDPOINT: 'http://localhost:5000'
-      }).mockReturnValueOnce({        
-        OUTBOUND_MUTUAL_TLS_ENABLED: true,
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
+      })
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
       })
       const sampleRequest = {
         headers: {
-          'FSPIOP-Source': 'payerfsp',
+          'FSPIOP-Source': 'userdfsp',
           Date: '2020-01-01 01:01:01',
           TimeStamp: '{$request.headers.Date}'
         },
@@ -430,7 +437,10 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null)
+      axios.mockClear()
+      try {
+        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'userdfsp')
+      } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
     })
     it('sendRequest should call axios with appropriate params', async () => {
@@ -447,10 +457,17 @@ describe('Outbound Initiator Functions', () => {
         return {httpsAgent: {}}
       })
       SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
-        hubClientCert: 'cert',
-        hubClientKey: 'key',
-        dfspServerCaRootCert: 'ca'
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
       }))
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000'
       }).mockReturnValueOnce({        
@@ -460,7 +477,7 @@ describe('Outbound Initiator Functions', () => {
       })
       const sampleRequest = {
         headers: {
-          'FSPIOP-Source': 'payerfsp',
+          'FSPIOP-Source': 'userdfsp',
           Date: '2020-01-01 01:01:01',
           TimeStamp: '{$request.headers.Date}'
         },
@@ -476,11 +493,12 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
+      axios.mockClear()
       try{
-        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, {}, {})
+        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, {}, {}, null, 'userdfsp')
 
       } catch (err) {}
-      expect(axios).toHaveBeenCalledTimes(2);
+      expect(axios).toHaveBeenCalledTimes(1);
     })
     it('sendRequest should call axios with appropriate params', async () => {
       axios.mockImplementation(() => Promise.resolve({
@@ -496,10 +514,17 @@ describe('Outbound Initiator Functions', () => {
         return {httpsAgent: {}}
       })
       SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
-        hubClientCert: 'cert',
-        hubClientKey: 'key',
-        dfspServerCaRootCert: 'ca'
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
       }))
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000'
       }).mockReturnValueOnce({        
@@ -509,7 +534,7 @@ describe('Outbound Initiator Functions', () => {
       })
       const sampleRequest = {
         headers: {
-          'FSPIOP-Source': 'payerfsp',
+          'FSPIOP-Source': 'userdfsp',
           Date: '2020-01-01 01:01:01',
           TimeStamp: '{$request.headers.Date}'
         },
@@ -525,11 +550,12 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, 'successCallback', 'errorCallback')
+      axios.mockClear()
+      OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, 'successCallback', 'errorCallback', null, 'userdfsp')
       await new Promise(resolve => setTimeout(resolve, 1000))
       const testOutboundEmitter = MyEventEmitter.getEmitter('testOutbound')
       testOutboundEmitter.emit('successCallback')
-      expect(axios).toHaveBeenCalledTimes(3);
+      expect(axios).toHaveBeenCalledTimes(1);
     })
     it('sendRequest should call axios with appropriate params', async () => {
       axios.mockImplementation(() => Promise.resolve({
@@ -545,10 +571,17 @@ describe('Outbound Initiator Functions', () => {
         return {httpsAgent: {}}
       })
       SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
-        hubClientCert: 'cert',
-        hubClientKey: 'key',
-        dfspServerCaRootCert: 'ca'
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
       }))
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000'
       }).mockReturnValueOnce({        
@@ -558,7 +591,7 @@ describe('Outbound Initiator Functions', () => {
       })
       const sampleRequest = {
         headers: {
-          'FSPIOP-Source': 'payerfsp',
+          'FSPIOP-Source': 'userdfsp',
           Date: '2020-01-01 01:01:01',
           TimeStamp: '{$request.headers.Date}'
         },
@@ -574,14 +607,15 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
+      axios.mockClear()
       try {
-        OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, 'successCallback', 'errorCallback')
+        OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, 'successCallback', 'errorCallback', null, 'userdfsp')
         await new Promise(resolve => setTimeout(resolve, 1000))
         const testOutboundEmitter = MyEventEmitter.getEmitter('testOutbound')
         testOutboundEmitter.emit('errorCallback')
       } catch (err) {}
         
-      expect(axios).toHaveBeenCalledTimes(4);
+      expect(axios).toHaveBeenCalledTimes(1);
     })
     it('sendRequest should call axios with appropriate params', async () => {
       axios.mockImplementation(() => Promise.resolve({
@@ -597,10 +631,17 @@ describe('Outbound Initiator Functions', () => {
         return {httpsAgent: {}}
       })
       SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
-        hubClientCert: 'cert',
-        hubClientKey: 'key',
-        dfspServerCaRootCert: 'ca'
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
       }))
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000'
       }).mockReturnValueOnce({        
@@ -608,7 +649,7 @@ describe('Outbound Initiator Functions', () => {
       })
       const sampleRequest = {
         headers: {
-          'FSPIOP-Source': 'payerfsp',
+          'FSPIOP-Source': 'userdfsp',
           Date: '2020-01-01 01:01:01',
           TimeStamp: '{$request.headers.Date}'
         },
@@ -624,8 +665,11 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body)
-      expect(axios).toHaveBeenCalledTimes(5);
+      axios.mockClear()
+      try {
+        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'userdfsp')
+      } catch (err) {}
+      expect(axios).toHaveBeenCalledTimes(1);
     })
     it('sendRequest should call axios with appropriate params', async () => {
       axios.mockImplementation(() => Promise.reject({
@@ -641,10 +685,17 @@ describe('Outbound Initiator Functions', () => {
         return {httpsAgent: {}}
       })
       SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
-        hubClientCert: 'cert',
-        hubClientKey: 'key',
-        dfspServerCaRootCert: 'ca'
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
       }))
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000'
       }).mockReturnValueOnce({        
@@ -652,7 +703,7 @@ describe('Outbound Initiator Functions', () => {
       })
       const sampleRequest = {
         headers: {
-          'FSPIOP-Source': 'payerfsp',
+          'FSPIOP-Source': 'userdfsp',
           Date: '2020-01-01 01:01:01',
           TimeStamp: '{$request.headers.Date}'
         },
@@ -668,8 +719,11 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body)
-      expect(axios).toHaveBeenCalledTimes(6);
+      axios.mockClear()
+      try {
+        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, {}, {}, null, 'userdfsp')
+      } catch (err) {}
+      expect(axios).toHaveBeenCalledTimes(1);
     })
   })
 

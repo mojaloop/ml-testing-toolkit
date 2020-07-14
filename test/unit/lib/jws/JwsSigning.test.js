@@ -34,7 +34,8 @@ jest.mock('../../../../src/lib/configuration-providers/mb-connection-manager')
 Config.getUserConfig.mockImplementation(() => {
   return {
     JWS_SIGN: true,
-    VALIDATE_INBOUND_JWS: true
+    VALIDATE_INBOUND_JWS: true,
+    DEFAULT_USER_FSPID: 'userdfsp'
   }
 })
 

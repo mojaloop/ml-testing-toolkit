@@ -34,12 +34,6 @@ const dfspDB = require('../db/dfspMockUsers')
 const DEFAULT_ENVIRONMENT_NAME = 'TESTING-TOOLKIT'
 const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
 const CM_CHECK_INTERVAL = 10000
-const DEFAULT_USER_DFSPS = [
-  {
-    id: Config.getUserConfig().DEFAULT_USER_FSPID,
-    name: 'User DFSP'
-  }
-]
 var CONNECTION_MANAGER_API_URL = null
 
 const getDFSPs = async () => {
@@ -47,7 +41,10 @@ const getDFSPs = async () => {
   if (Config.getSystemConfig().HOSTING_ENABLED) {
     return tempDfspList
   } else {
-    return DEFAULT_USER_DFSPS
+    return {
+      id: Config.getUserConfig().DEFAULT_USER_FSPID,
+      name: 'User DFSP'
+    }
   }
 }
 
