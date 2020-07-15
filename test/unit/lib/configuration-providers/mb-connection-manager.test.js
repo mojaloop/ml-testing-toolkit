@@ -41,6 +41,11 @@ Config.getUserConfig.mockImplementation(() => {
     DEFAULT_USER_FSPID: 'userdfsp'
   }
 })
+Config.getSystemConfig.mockImplementation(() => {
+  return {
+    HOSTING_ENABLED: true
+  }
+})
 const reject = {
   post: {},
   get: {},
@@ -81,6 +86,12 @@ const mapping = {
         id: 1,
         certificate: 'asdf',
         validationState: 'VALID'
+      }
+    },
+    '/api/environments/1/dfsps/userdfsp/endpoints/1/confirmation': {
+      status: 200,
+      data: {
+        id: 1
       }
     },
     '/api/environments/1/hub/servercerts': {
@@ -127,6 +138,22 @@ const mapping = {
         intermediateChain: 'asdf',
         serverCertificate: 'asdf'
       }
+    },
+    '/api/environments/1/dfsps/userdfsp/endpoints': {
+      status: 200,
+      data: [
+        {
+          direction: 'INGRESS',
+          type: 'URL',
+          value: {
+            url: 'http://localhost/'
+          }
+        },
+        {
+          state: 'NEW',
+          id: '1'
+        }
+      ]
     },
     '/api/environments/1/hub/servercerts': {
       status: 200,
@@ -245,12 +272,6 @@ describe('mb-connection-manager', async () => {
     it('should return null', async () => {
       const getTestingToolkitDfspJWSCerts = await MBConnectionManagerProvider.getTestingToolkitDfspJWSCerts()
       expect(getTestingToolkitDfspJWSCerts).toBeNull()
-    })
-  })
-  describe('getUserDfspJWSCerts', () => {
-    it('should return null', async () => {
-      const getUserDfspJWSCerts = await MBConnectionManagerProvider.getUserDfspJWSCerts()
-      expect(getUserDfspJWSCerts).toBeNull()
     })
   })
   describe('waitForTlsHubCerts', () => {
@@ -604,8 +625,8 @@ describe('mb-connection-manager', async () => {
     it('should have required properties', async () => {
       const tlsConfig = await MBConnectionManagerProvider.getTlsConfig()
       expect(tlsConfig).toHaveProperty('hubCaCert')
-      expect(tlsConfig).toHaveProperty('dfspCaRootCert')
-      expect(tlsConfig).toHaveProperty('hubClientCert')
+      // expect(tlsConfig).toHaveProperty('dfspCaRootCert')
+      // expect(tlsConfig).toHaveProperty('hubClientCert')
       expect(tlsConfig).toHaveProperty('hubServerCaRootCert')
       expect(tlsConfig).toHaveProperty('hubServerCert')
       expect(tlsConfig).toHaveProperty('hubServerKey')
@@ -615,12 +636,6 @@ describe('mb-connection-manager', async () => {
   describe('getTestingToolkitDfspJWSCerts', async () => {
     it('should return certificate value', async () => {
       const dfspJwsCerts = await MBConnectionManagerProvider.getTestingToolkitDfspJWSCerts()
-      expect(dfspJwsCerts).toEqual('asdf')
-    })
-  })
-  describe('getUserDfspJWSCerts', () => {
-    it('should return certificate value', async () => {
-      const dfspJwsCerts = await MBConnectionManagerProvider.getUserDfspJWSCerts()
       expect(dfspJwsCerts).toEqual('asdf')
     })
   })

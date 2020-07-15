@@ -26,16 +26,43 @@
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const jwt = require('jsonwebtoken')
+const Config = require('../../../../src/lib/config')
+const LoginService = require('../../../../src/lib/oauth/LoginService')
 
 const SpySign = jest.spyOn(jwt, 'sign')
+const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
+const SpyLogin = jest.spyOn(LoginService, 'loginUser')
+const SpyLogout = jest.spyOn(LoginService, 'logoutUser')
 
 const app = apiServer.getApp()
 jest.setTimeout(30000)
 
 describe('API route /api/oauth2', () => {
   describe('GET /api/oauth2/token', () => {
-    it('Verify oauth credentials', async () => {
+    it('Verify oauth credentials when HOSTING_ENABLED is enabled', async () => {
       SpySign.mockReturnValueOnce('idToken')
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: true,
+        OAUTH: {
+          EMBEDDED_CERTIFICATE: 'password'
+        }
+      })
+      const res = await request(app).post(`/api/oauth2/token`).send({
+        username: 'userdfsp'
+      })
+      console.log(res)
+      expect(res.statusCode).toEqual(200)
+      expect(res.body).toHaveProperty('access_token')
+      expect(res.body).toHaveProperty('id_token')
+    })
+    it('Verify oauth credentials when HOSTING_ENABLED is not enabled', async () => {
+      SpySign.mockReturnValueOnce('idToken')
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false,
+        OAUTH: {
+          EMBEDDED_CERTIFICATE: 'password'
+        }
+      })
       const res = await request(app).post(`/api/oauth2/token`)
       expect(res.statusCode).toEqual(200)
       expect(res.body).toHaveProperty('access_token')
@@ -44,6 +71,35 @@ describe('API route /api/oauth2', () => {
     it('Verify oauth credentials should throw an error if sign fails', async () => {
       SpySign.mockImplementationOnce(() => {throw new Error()})
       const res = await request(app).post(`/api/oauth2/token`)
+      expect(res.statusCode).toEqual(500)
+    })
+  })
+  describe('GET /api/oauth2/logout', () => {
+    it('logout should return 200 if successful', async () => {
+      SpyLogout.mockResolvedValueOnce()
+      const res = await request(app).get(`/api/oauth2/logout`)
+      console.log(res.body)
+      expect(res.statusCode).toEqual(200)
+    })
+    it('logout should return an error if not successful', async () => {
+      SpyLogout.mockImplementationOnce(() => {throw new Error()})
+      const res = await request(app).get(`/api/oauth2/logout`)
+      expect(res.statusCode).toEqual(500)
+    })
+  })
+  describe('POST /api/oauth2/login', () => {
+    it('login should return 200 if successful', async () => {
+      SpyLogin.mockResolvedValueOnce({})
+      const res = await request(app).post(`/api/oauth2/login`).send({
+        username: 'username',
+        passwrod: 'password'
+      })
+      expect(res.statusCode).toEqual(200)
+      expect(res.body).toStrictEqual({})
+    })
+    it('login should return an error if not successful', async () => {
+      SpyLogin.mockImplementationOnce(() => {throw new Error()})
+      const res = await request(app).post(`/api/oauth2/login`)
       expect(res.statusCode).toEqual(500)
     })
   })

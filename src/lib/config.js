@@ -18,7 +18,7 @@
  * Gates Foundation
 
  * ModusBox
-  * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -81,11 +81,16 @@ const loadSystemConfig = async () => {
   return true
 }
 
+const loadSystemConfigMiddleware = () => {
+  SYSTEM_CONFIG = require('../../' + SYSTEM_CONFIG_FILE)
+}
+
 module.exports = {
   getUserConfig: getUserConfig,
   getStoredUserConfig: getStoredUserConfig,
   setStoredUserConfig: setStoredUserConfig,
   loadUserConfig: loadUserConfig,
   getSystemConfig: getSystemConfig,
-  loadSystemConfig: loadSystemConfig
+  loadSystemConfig: loadSystemConfig,
+  loadSystemConfigMiddleware: loadSystemConfigMiddleware
 }
