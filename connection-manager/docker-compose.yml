@@ -27,9 +27,10 @@ services:
       #- OAUTH2_ISSUER=http://mojaloop-testing-toolkit:5050/api/oauth2/token
       #- OAUTH2_ISSUER=http://host.docker.internal:5050/api/oauth2/token
       - OAUTH2_ISSUER=http://docker.for.mac.localhost:5050/api/oauth2/token
-      - AUTH_ENABLED=false
+      - AUTH_ENABLED=true
       - APP_OAUTH_CLIENT_KEY=asdf
       - APP_OAUTH_CLIENT_SECRET=asdf
+      - EMBEDDED_CERTIFICATE=password
     tty: true
     stdin_open: true
     ports:
@@ -42,6 +43,7 @@ services:
     hostname: connection-manager-ui
     environment:
       - API_BASE_URL=http://localhost:5061
+      - AUTH_ENABLED=true
     tty: true
     stdin_open: true  
     ports:
