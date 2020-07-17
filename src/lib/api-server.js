@@ -30,6 +30,11 @@ const OAuthHelper = require('./oauth/OAuthHelper')
 const passport = require('passport')
 
 const initServer = () => {
+  const Config = require('./config')
+  if (Object.keys(Config.getSystemConfig()).length === 0) {
+    Config.loadSystemConfigMiddleware()
+  }
+
   // For CORS policy
   app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*')
@@ -45,13 +50,16 @@ const initServer = () => {
       'Access-Control-Allow-Methods',
       'GET, POST, PATCH, PUT, DELETE, OPTIONS'
     )
+    if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
+      res.setHeader('Access-Control-Allow-Origin', Config.getSystemConfig().OAUTH.ORIGIN)
+      res.setHeader('Access-Control-Allow-Credentials', 'true')
+    }
     next()
   })
 
   // For parsing incoming JSON requests
   app.use(express.json({ limit: '50mb' }))
   app.use(express.urlencoded({ extended: true }))
-
   // For oauth
   OAuthHelper.handleMiddleware()
 

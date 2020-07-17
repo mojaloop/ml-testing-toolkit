@@ -94,9 +94,10 @@ const buildJWTResponse = (decodedIdToken, accessToken, req, res) => {
   console.log('LoginService.loginUser returning decodedIdToken: ', decodedIdToken)
 
   const cookies = new Cookies(req, res)
-  const maxAge = 3600 * 1000 // ms
-  const cookieOptions = { maxAge: maxAge, httpOnly: true, sameSite: 'strict' } // secure is automatic based on HTTP or HTTPS used
+  const maxAge = 3600 // seconds
+  const cookieOptions = { maxAge: maxAge * 1000, httpOnly: true, sameSite: 'strict' } // secure is automatic based on HTTP or HTTPS used
   cookies.set(Constants.OAUTH.JWT_COOKIE_NAME, accessToken, cookieOptions)
+  decodedIdToken.maxAge = maxAge
   return {
     ok: true,
     token: {

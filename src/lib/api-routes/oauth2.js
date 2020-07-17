@@ -32,7 +32,6 @@ const LoginService = require('../oauth/LoginService')
 router.post('/login', async (req, res, next) => {
   try {
     const response = await LoginService.loginUser(req.body.username, req.body.password, req, res)
-    console.log(response)
     res.status(200).json(response)
   } catch (err) {
     next(err)
