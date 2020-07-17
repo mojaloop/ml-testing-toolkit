@@ -95,7 +95,7 @@
     "node-dir": "0.1.17",
     "node-strings": "^1.0.2",
     "npm-run-all": "4.1.5",
-    "openapi-backend": "^2.3.5",
+    "openapi-backend": "3.5.1",
     "parse-strings-in-object": "1.2.0",
     "passport": "0.4.1",
     "passport-jwt": "4.0.0",
