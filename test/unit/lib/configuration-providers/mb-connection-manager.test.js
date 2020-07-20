@@ -31,15 +31,19 @@ const { readFileAsync }  = require('../../../../src/lib/utils')
 jest.mock('axios')
 jest.mock('../../../../src/lib/config')
 
+const userConfig = {
+  JWS_SIGN: true,
+  VALIDATE_INBOUND_JWS: true,
+  OUTBOUND_MUTUAL_TLS_ENABLED: true,
+  INBOUND_MUTUAL_TLS_ENABLED: true,
+  CONNECTION_MANAGER_API_URL: '',
+  DEFAULT_USER_FSPID: 'userdfsp',
+  CONNECTION_MANAGER_AUTH_ENABLED: true,
+  CONNECTION_MANAGER_HUB_USERNAME: 'hub',
+  CONNECTION_MANAGER_HUB_PASSWORD: 'hub'
+}
 Config.getUserConfig.mockImplementation(() => {
-  return {
-    JWS_SIGN: true,
-    VALIDATE_INBOUND_JWS: true,
-    OUTBOUND_MUTUAL_TLS_ENABLED: true,
-    INBOUND_MUTUAL_TLS_ENABLED: true,
-    CONNECTION_MANAGER_API_URL: '',
-    DEFAULT_USER_FSPID: 'userdfsp'
-  }
+  return userConfig
 })
 Config.getSystemConfig.mockImplementation(() => {
   return {
@@ -53,6 +57,12 @@ const reject = {
 }
 const mapping = {
   post: {
+    '/api/login': {
+      status: 200,
+      headers: {
+        'set-cookie': 'JWT'
+      }
+    },
     '/api/environments': {
       status: 200,
       data: {
@@ -120,7 +130,7 @@ const mapping = {
     '/api/environments/1/dfsps': {
       status: 200,
       data: [{
-        id: 0
+        id: 'userdfsp'
       }]
     },
     '/api/environments/1/dfsps/userdfsp/ca': {
@@ -288,6 +298,61 @@ describe('mb-connection-manager', async () => {
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
     })
     it('should not throw error', async () => {
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          HOSTING_ENABLED: false
+        }
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          HOSTING_ENABLED: true
+        }
+      })
+    })
+    it('should not throw error', async () => {
+      const newUserConfig = {...userConfig}
+      newUserConfig.CONNECTION_MANAGER_AUTH_ENABLED = false
+      Config.getUserConfig.mockImplementation(() => {
+        return newUserConfig
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      Config.getUserConfig.mockImplementation(() => {
+        return userConfig
+      })
+    })
+    it('should not throw error', async () => {
+      const newUserConfig = {...userConfig}
+      newUserConfig.JWS_SIGN = false
+      newUserConfig.VALIDATE_INBOUND_JWS = false
+      newUserConfig.OUTBOUND_MUTUAL_TLS_ENABLED = false
+      newUserConfig.INBOUND_MUTUAL_TLS_ENABLED = false
+      Config.getUserConfig.mockImplementation(() => {
+        return newUserConfig
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      Config.getUserConfig.mockImplementation(() => {
+        return userConfig
+      })
+    })
+    it('should not throw error', async () => {
+      const original = mapping.post['/api/login'] 
+      mapping.post['/api/login'] = {
+        status: 200,
+        headers: {}
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.post['/api/login'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.post['/api/login'] 
+      mapping.post['/api/login'] = {
+        status: 400
+      }
+      await expect(MBConnectionManagerProvider.initialize()).rejects.toBeDefined()
+      mapping.post['/api/login'] = original
+    })
+    it('should not throw error', async () => {
       const original = mapping.get['/api/environments'] 
       mapping.get['/api/environments'] = {
         status: 200,
@@ -382,6 +447,14 @@ describe('mb-connection-manager', async () => {
       }
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/endpoints'] 
+      mapping.get['/api/environments/1/dfsps/userdfsp/endpoints'] = {
+        status: 400
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps/userdfsp/endpoints'] = original
     })
     it('should not throw error', async () => {
       const original = mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] 
@@ -497,6 +570,22 @@ describe('mb-connection-manager', async () => {
       }
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/inbound'] = original
+    })
+    it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
+      mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {
+        status: 200,
+        data: [
+          {
+            id: 1,
+            state: 'CERT_NOT_SIGNED',
+            validationState: 'VALID',
+            certificate: 'asdf'
+          }
+        ]
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = original
     })
     it('should not throw error', async () => {
       const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
@@ -650,4 +739,18 @@ describe('mb-connection-manager', async () => {
       await expect(MBConnectionManagerProvider.waitForTlsHubCerts()).resolves.toBe(true)
     })
   })
+  describe('getUserDfspJWSCerts', () => {
+    it('should get user dfsp jws certs', async () => {
+      await expect(MBConnectionManagerProvider.getUserDfspJWSCerts()).resolves.toBeNull()
+    })
+    it('should get user dfsp jws certs', async () => {
+      await expect(MBConnectionManagerProvider.getUserDfspJWSCerts('userdfsp')).resolves.toBe('asdf')
+    })
+  })
+  describe('getEndpointsConfig', () => {
+    it('get endpooints config', async () => {
+      await expect(MBConnectionManagerProvider.getEndpointsConfig()).resolves.toBeDefined()
+    })
+  })
+
 })

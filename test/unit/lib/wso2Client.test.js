@@ -44,7 +44,7 @@ describe('Wso2Client tests', () => {
       rp.post.mockReturnValueOnce({
         form: () => {
           return {
-            auth: () => {throw new Error()}
+            auth: () => {throw {}}
           }
         }
       })
@@ -61,7 +61,10 @@ describe('Wso2Client tests', () => {
       rp.post.mockReturnValueOnce({
         form: () => {
           return {
-            auth: () => {throw new Error('Authentication failed')}
+            auth: () => {throw {
+              statusCode: 400,
+              message: 'Authentication failed'
+            }}
           }
         }
       })

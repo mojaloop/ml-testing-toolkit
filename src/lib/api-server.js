@@ -50,15 +50,7 @@ const initServer = () => {
       'Access-Control-Allow-Methods',
       'GET, POST, PATCH, PUT, DELETE, OPTIONS'
     )
-    if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
-      res.setHeader('Access-Control-Allow-Credentials', 'true')
-      res.setHeader('Access-Control-Allow-Origin', Config.getSystemConfig().OAUTH.ORIGIN)
-      if (req.method === 'OPTIONS') {
-        res.send(200)
-      }
-    } else {
-      res.setHeader('Access-Control-Allow-Origin', '*')
-    }
+    setOriginHeader(req, res)
     next()
   })
 
@@ -110,9 +102,22 @@ const verifyUser = () => {
   return (req, res, next) => { next() }
 }
 
+const setOriginHeader = (req, res) => {
+  const Config = require('./config')
+  if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
+    res.setHeader('Access-Control-Allow-Credentials', 'true')
+    res.setHeader('Access-Control-Allow-Origin', Config.getSystemConfig().OAUTH.ORIGIN)
+    if (req.method === 'OPTIONS') {
+      res.send(200)
+    }
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*')
+  }
+}
 module.exports = {
   startServer,
   socketIO,
   getApp,
-  verifyUser
+  verifyUser,
+  setOriginHeader
 }

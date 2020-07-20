@@ -24,7 +24,7 @@
 
 'use strict'
 const Config = require('../config')
-const Constants = Config.getSystemConfig()
+let Constants = Config.getSystemConfig()
 const Cookies = require('cookies')
 const jwt = require('jsonwebtoken')
 const wso2Client = require('./Wso2Client')
@@ -34,7 +34,7 @@ const wso2Client = require('./Wso2Client')
  * If successful, sets the JWT token in a cookie and returns the token payload
  */
 exports.loginUser = async function (username, password, req, res) {
-  const Constants = Config.getSystemConfig()
+  Constants = Config.getSystemConfig()
   if (!Constants.OAUTH.AUTH_ENABLED) {
     return {
       ok: false,
