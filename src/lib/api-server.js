@@ -18,7 +18,7 @@
  * Gates Foundation
 
  * ModusBox
- * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -26,11 +26,18 @@ const express = require('express')
 const app = express()
 const http = require('http').Server(app)
 const socketIO = require('socket.io')(http)
+const OAuthHelper = require('./oauth/OAuthHelper')
+const passport = require('passport')
+const cookieParser = require('cookie-parser')
 
 const initServer = () => {
+  const Config = require('./config')
+  if (Object.keys(Config.getSystemConfig()).length === 0) {
+    Config.loadSystemConfigMiddleware()
+  }
+
   // For CORS policy
   app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader(
       'Access-Control-Allow-Headers',
       'Origin, X-Requested-With, Content-Type, Accept, Authorization'
@@ -43,22 +50,36 @@ const initServer = () => {
       'Access-Control-Allow-Methods',
       'GET, POST, PATCH, PUT, DELETE, OPTIONS'
     )
+    if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
+      res.setHeader('Access-Control-Allow-Credentials', 'true')
+      res.setHeader('Access-Control-Allow-Origin', Config.getSystemConfig().OAUTH.ORIGIN)
+      if (req.method === 'OPTIONS') {
+        res.send(200)
+      }
+    } else {
+      res.setHeader('Access-Control-Allow-Origin', '*')
+    }
     next()
   })
 
   // For parsing incoming JSON requests
   app.use(express.json({ limit: '50mb' }))
+  app.use(express.urlencoded({ extended: true }))
+  app.use(cookieParser())
+  // For oauth
+  OAuthHelper.handleMiddleware()
 
   // For admin API
-  app.use('/api/rules', require('./api-routes/rules'))
-  app.use('/api/openapi', require('./api-routes/openapi'))
-  app.use('/api/outbound', require('./api-routes/outbound'))
-  app.use('/api/config', require('./api-routes/config'))
+  app.use('/api/rules', verifyUser(), require('./api-routes/rules'))
+  app.use('/api/openapi', verifyUser(), require('./api-routes/openapi'))
+  app.use('/api/outbound', verifyUser(), require('./api-routes/outbound'))
+  app.use('/api/config', verifyUser(), require('./api-routes/config'))
   app.use('/longpolling', require('./api-routes/longpolling'))
   app.use('/api/oauth2', require('./api-routes/oauth2'))
-  app.use('/api/reports', require('./api-routes/reports'))
-  app.use('/api/settings', require('./api-routes/settings'))
-  app.use('/api/samples', require('./api-routes/samples'))
+  app.use('/api/reports', verifyUser(), require('./api-routes/reports'))
+  app.use('/api/settings', verifyUser(), require('./api-routes/settings'))
+  app.use('/api/samples', verifyUser(), require('./api-routes/samples'))
+  app.use('/api/objectstore', verifyUser(), require('./api-routes/objectstore'))
 
   // // For front-end UI
   // app.use('/ui', express.static(path.join('client/build')))
@@ -81,8 +102,17 @@ const getApp = () => {
   return app
 }
 
+const verifyUser = () => {
+  const Config = require('./config')
+  if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
+    return passport.authenticate('jwt', { session: false })
+  }
+  return (req, res, next) => { next() }
+}
+
 module.exports = {
   startServer,
   socketIO,
-  getApp
+  getApp,
+  verifyUser
 }

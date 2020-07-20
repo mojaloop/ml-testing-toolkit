@@ -70,5 +70,10 @@ describe('AssertionStore', () => {
       AssertionStore.popRequest(path)
       AssertionStore.popCallback(path)
     })
+    it('should not throw an error', async () => {
+      AssertionStore.pushRequest(path, data)
+      await new Promise(resolve => setTimeout(resolve, 10))
+      AssertionStore.clear('requests', 0)
+    })
   })
 })

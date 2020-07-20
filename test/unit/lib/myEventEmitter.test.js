@@ -25,28 +25,28 @@
 const MyEventEmitter = require('../../../src/lib/MyEventEmitter')
 
 describe('MyEventEmitter', () => { 
-  describe('when getTestOutboundEmitter is called', () => {
+  describe('when getEmitter(testOutbound) is called', () => {
     it('testOutbound should be created', async () => {
-      expect(() => MyEventEmitter.getTestOutboundEmitter()).not.toThrowError()
+      expect(() => MyEventEmitter.getEmitter('testOutbound')).not.toThrowError()
     })
     it('testOutbound should be not created if exists', async () => {
-      expect(() => MyEventEmitter.getTestOutboundEmitter()).not.toThrowError()
+      expect(() => MyEventEmitter.getEmitter('testOutbound')).not.toThrowError()
     })
   })
-  describe('when getAssertionRequestEmitter is called', () => {
+  describe('when getEmitter is called', () => {
     it('assertionRequest should be created', async () => {
-      expect(() => MyEventEmitter.getAssertionRequestEmitter()).not.toThrowError()
+      expect(() => MyEventEmitter.getEmitter('assertionRequest')).not.toThrowError()
     })
     it('assertionRequest should be not created if exists', async () => {
-      expect(() => MyEventEmitter.getAssertionRequestEmitter()).not.toThrowError()
+      expect(() => MyEventEmitter.getEmitter('assertionRequest')).not.toThrowError()
     })
   })
-  describe('when getAssertionCallbackEmitter is called', () => {
+  describe('when getEmitter is called', () => {
     it('assertionCallback should be created', async () => {
-      expect(() => MyEventEmitter.getAssertionCallbackEmitter()).not.toThrowError()
+      expect(() => MyEventEmitter.getEmitter('assertionCallback')).not.toThrowError()
     })
     it('assertionCallback should be not created if exists', async () => {
-      expect(() => MyEventEmitter.getAssertionCallbackEmitter()).not.toThrowError()
+      expect(() => MyEventEmitter.getEmitter('assertionCallback')).not.toThrowError()
     })
   })
 })

@@ -17,13 +17,15 @@ services:
       - -c
       - "npm start"
   mojaloop-testing-toolkit-ui:
-    image: mojaloop/ml-testing-toolkit-ui:v10.4.1
+    image: mojaloop/ml-testing-toolkit-ui:v10.6.0
     ports:
       - "6060:6060"
+    environment:
+      - API_BASE_URL=http://localhost:5050
+      - AUTH_ENABLED=FALSE
     command:
-      - nginx
-      - -g
-      - "daemon off;"
+      - sh
+      - /usr/share/nginx/start.sh
 networks:
   default:
     name: mojaloop-testing-toolkit

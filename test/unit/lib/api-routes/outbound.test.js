@@ -36,7 +36,11 @@ const SpyOutboundSend = jest.spyOn(OutboundInitiator, 'OutboundSend')
 
 jest.mock('axios')
 
-
+const axiosMockedResponse = {
+  status: 200,
+  statusText: 'OK',
+  data: {}
+}
 describe('API route /api/outbound', () => {
   describe('POST /api/outbound/request', () => {
     it('Send a proper request', async () => {
@@ -88,9 +92,9 @@ describe('API route /api/outbound', () => {
       expect(res.statusCode).toEqual(200)
     })
   })
-  // SpyBroadcastOutboundProgress.mockRestore()
   describe('POST /api/outbound/template/:outboundID', () => {
-    const properTemplate = {
+    axios.mockResolvedValue(axiosMockedResponse)
+    const properTemplateAsync = {
       "name": "Test1",
       "inputValues": {
         "accept": "test"
@@ -118,19 +122,7 @@ describe('API route /api/outbound', () => {
                 "Type": "MSISDN",
                 "ID": "1234567890"
               },
-              "delay": 1,
-              "scripts": {
-                "preRequest": {
-                  "exec": [
-                    "pm.environment.set('preRequest', 5000)"
-                  ]
-                },
-                "postRequest": {
-                  "exec": [
-                    "pm.environment.set('postRequest', 5000)"
-                  ]
-                }
-              }
+              "delay": 1
             },
             {
               "id": 1,
@@ -155,31 +147,104 @@ describe('API route /api/outbound', () => {
         }
       ]
     }
+    const properTemplateSync = {
+      "name": "Test1",
+      "inputValues": {
+        "accept": "test"
+      },
+      "test_cases": [
+        {
+          "id": 1,
+          "name": "Settlements",
+          "requests": [
+            {
+              "id": 1,
+              "description": "Get Settlements",
+              "apiVersion": {
+                "minorVersion": 3,
+                "majorVersion": 9,
+                "type": "settlements",
+                "asynchronous": false
+              },
+              "operationPath": "/settlements",
+              "method": "get",
+              "headers": {
+                "Accept": "{$inputs.accept}",
+              },
+              "scripts": {
+                "preRequest": {
+                  "exec": [
+                    "pm.environment.set('preRequest', 5000)"
+                  ]
+                },
+                "postRequest": {
+                  "exec": [
+                    "pm.environment.set('postRequest', 5000)"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+    it('Send a proper template with id 12', async () => {
+      const res = await request(app).post(`/api/outbound/template/12`).send(properTemplateSync)
+      expect(res.statusCode).toEqual(200)
+    })
     it('Send a proper template with id 123', async () => {
-      const res = await request(app).post(`/api/outbound/template/123`).send(properTemplate)
+      const res = await request(app).post(`/api/outbound/template/123`).send(properTemplateAsync)
       expect(res.statusCode).toEqual(200)
     })
     it('Send a proper template with id aabb123aabb', async () => {
-      const res = await request(app).post(`/api/outbound/template/aabb123aabb`).send(properTemplate)
+      const res = await request(app).post(`/api/outbound/template/aabb123aabb`).send(properTemplateAsync)
       expect(res.statusCode).toEqual(200)
     })
+    it('Send a proper template with id aabb123aabb', async () => {
+      SpyOutboundSend.mockImplementationOnce(() => {throw new Error()})
+      const res = await request(app).post(`/api/outbound/template/aabb123aabb`).send(properTemplateAsync)
+      expect(res.statusCode).toEqual(500)
+    })
     it('Send a template without name', async () => {
-      const {name, ...wrongTemplate} = properTemplate
+      const {name, ...wrongTemplate} = properTemplateAsync
       const res = await request(app).post(`/api/outbound/template/123`).send(wrongTemplate)
       expect(res.statusCode).toEqual(422)
     })
     it('Send a template without test_cases', async () => {
-      const {test_cases, ...wrongTemplate} = properTemplate
+      const {test_cases, ...wrongTemplate} = properTemplateAsync
       const res = await request(app).post(`/api/outbound/template/123`).send(wrongTemplate)
       expect(res.statusCode).toEqual(422)
     })
+    it('Send a proper template with id 123', async () => {
+      const deleteResponse = await request(app).delete(`/api/outbound/template/123`).send()
+      const postResponse = await request(app).post(`/api/outbound/template/123`).send(properTemplateAsync)
+      expect(postResponse.statusCode).toEqual(200)
+    })
   })
   describe('DELETE /api/outbound/template/:outboundID', () => {
-    it('Send request to delete template with outboundID 123', async () => {
-      SpyTerminateOutbound.mockResolvedValueOnce()
+    it('Send request to delete template with outboundID 12', async () => {
+      SpyTerminateOutbound.mockReturnValueOnce()
       await new Promise(resolve => setTimeout(resolve, 2000))
       const res = await request(app).delete(`/api/outbound/template/123`).send()
       expect(res.statusCode).toEqual(200)
+    })
+    it('Send request to delete template with outboundID 123', async () => {
+      SpyTerminateOutbound.mockReturnValueOnce()
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      const res = await request(app).delete(`/api/outbound/template/123`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Send request to delete template with outboundID aabb123aabb', async () => {
+      SpyTerminateOutbound.mockReturnValueOnce()
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      const res = await request(app).delete(`/api/outbound/template/aabb123aabb`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Send request to delete template with outboundID 123', async () => {
+      SpyTerminateOutbound.mockImplementationOnce(() => {throw new Error()})
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      const res = await request(app).delete(`/api/outbound/template/123`).send()
+      expect(res.statusCode).toEqual(500)
     })
   })
 })

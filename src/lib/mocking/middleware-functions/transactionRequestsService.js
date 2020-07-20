@@ -53,9 +53,9 @@ const handleRequest = async (context, request, callback, triggerFolder) => {
         // Replace the transaction ID from the generated callback
         outboundTemplate.inputValues.transactionId = callback.body.transactionId
         if (request.customInfo.sessionID) {
-          outbound.OutboundSend(outboundTemplate, TraceHeaderUtils.getTraceIdPrefix() + request.customInfo.sessionID + '0000')
+          outbound.OutboundSend(outboundTemplate, TraceHeaderUtils.getTraceIdPrefix() + request.customInfo.sessionID + '0000', callback.fspId)
         } else {
-          outbound.OutboundSend(outboundTemplate)
+          outbound.OutboundSend(outboundTemplate, null, callback.fspId)
         }
       } catch (err) {
         console.log(err)

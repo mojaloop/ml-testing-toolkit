@@ -1,7 +1,7 @@
 [
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 1,
     "priority": 1,
     "description": "post /quotes",
@@ -35,7 +35,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 2,
     "priority": 1,
     "description": "post /transfers",
@@ -68,9 +68,7 @@
     }
   },
   {
-    "type": "callback",
-    "version": 1.0,
-    "ruleId": 3,
+    "ruleId": 22,
     "priority": 1,
     "description": "get /parties/{Type}/{ID}",
     "apiVersion": {
@@ -96,14 +94,17 @@
     "event": {
       "method": "put",
       "path": "/parties/{Type}/{ID}",
-      "params": {},
-      "delay": 0,
+      "params": {
+        "scripts": {}
+      },
       "type": "MOCK_CALLBACK"
-    }
+    },
+    "type": "callback",
+    "version": 1
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 4,
     "priority": 1,
     "description": "post /transactionRequests",
@@ -141,7 +142,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 5,
     "priority": 1,
     "description": "get /quotes/{ID}",
@@ -175,7 +176,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 6,
     "priority": 1,
     "description": "get /participants/{Type}/{ID}/{SubId}",
@@ -209,7 +210,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 7,
     "priority": 1,
     "description": "post /participants/{Type}/{ID}/{SubId}",
@@ -243,7 +244,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 8,
     "priority": 1,
     "description": "get /participants/{Type}/{ID}",
@@ -277,7 +278,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 9,
     "priority": 1,
     "description": "post /participants/{Type}/{ID}",
@@ -311,7 +312,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 10,
     "priority": 1,
     "description": "post /participants",
@@ -345,7 +346,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 11,
     "priority": 1,
     "description": "get /parties/{Type}/{ID}/{SubId}",
@@ -379,7 +380,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 12,
     "priority": 1,
     "description": "get /transactionRequests/{ID}",
@@ -413,7 +414,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 13,
     "priority": 1,
     "description": "get /authorizations/{ID}",
@@ -451,7 +452,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 14,
     "priority": 1,
     "description": "get /transfers/{ID}",
@@ -485,7 +486,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 15,
     "priority": 1,
     "description": "get /transactions/{ID}",
@@ -523,7 +524,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 16,
     "priority": 1,
     "description": "get /bulkQuotes/{ID}",
@@ -557,7 +558,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 17,
     "priority": 1,
     "description": "post /bulkQuotes",
@@ -591,7 +592,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 18,
     "priority": 1,
     "description": "get /bulkTransfers/{ID}",
@@ -625,7 +626,7 @@
   },
   {
     "type": "callback",
-    "version": 1.0,
+    "version": 1,
     "ruleId": 19,
     "priority": 1,
     "description": "post /bulkTransfers",

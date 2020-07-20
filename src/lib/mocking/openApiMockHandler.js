@@ -59,6 +59,7 @@ module.exports.initilizeMockHandler = async () => {
     const tempObj = new OpenApiBackend({
       definition: path.join(item.specFile),
       strict: true,
+      quick: true,
       handlers: {
         notImplemented: async (context, req, h) => {
           const resp = await openApiBackendNotImplementedHandler(context, req, h, item)
@@ -97,10 +98,10 @@ module.exports.initilizeMockHandler = async () => {
   }
 }
 
-module.exports.handleRequest = (req, h) => {
+module.exports.handleRequest = async (req, h) => {
   // JWS Validation
   try {
-    const jwsValidated = JwsSigning.validate(req)
+    const jwsValidated = await JwsSigning.validate(req)
     if (jwsValidated) {
       customLogger.logMessage('debug', 'JWS Signature Validated', null, true, req)
     }
@@ -188,8 +189,7 @@ module.exports.getOpenApiObjects = () => {
 const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
   customLogger.logMessage('debug', 'Schema Validation Passed', null, true, req)
   if (req.method === 'put') {
-    // MyEventEmitter.getTestOutboundEmitter().emit('incoming', req.payload)
-    MyEventEmitter.getTestOutboundEmitter().emit(req.method + ' ' + req.path, req.headers, req.payload)
+    MyEventEmitter.getEmitter('testOutbound').emit(req.method + ' ' + req.path, req.headers, req.payload)
     let assertionPath = req.path
     const assertionData = { headers: req.headers, body: req.payload }
     if (assertionPath.endsWith('/error')) {
@@ -197,7 +197,7 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
       assertionData.error = true
     }
     assertionStore.pushRequest(assertionPath, assertionData)
-    MyEventEmitter.getAssertionRequestEmitter().emit(assertionPath, assertionData)
+    MyEventEmitter.getEmitter('assertionRequest').emit(assertionPath, assertionData)
   }
   req.customInfo.specFile = item.specFile
   req.customInfo.jsfRefFile = item.jsfRefFile
@@ -247,10 +247,6 @@ const generateAsyncCallback = async (item, context, req) => {
     const callbackMap = JSON.parse(cbMapRawdata)
     if (!callbackMap[context.operation.path]) {
       customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, null, true, req)
-      return
-    }
-    if (!callbackMap[context.operation.path][context.request.method]) {
-      customLogger.logMessage('error', 'Callback not found for method in callback map file for ' + context.request.method, null, true, req)
       return
     }
     const callbackInfo = callbackMap[context.operation.path][context.request.method]

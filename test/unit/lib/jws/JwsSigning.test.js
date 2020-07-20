@@ -34,7 +34,8 @@ jest.mock('../../../../src/lib/configuration-providers/mb-connection-manager')
 Config.getUserConfig.mockImplementation(() => {
   return {
     JWS_SIGN: true,
-    VALIDATE_INBOUND_JWS: true
+    VALIDATE_INBOUND_JWS: true,
+    DEFAULT_USER_FSPID: 'userdfsp'
   }
 })
 
@@ -89,14 +90,14 @@ i0dWSdTWoseAbUqp2ACc6aF/
 -----END CERTIFICATE-----`
 
 const mockDefinePrivateKey = (key) => {
-  ConnectionProvider.getTestingToolkitDfspJWSPrivateKey.mockImplementation(() => {
-    return key
+  ConnectionProvider.getTestingToolkitDfspJWSPrivateKey.mockImplementation(async () => {
+    return Promise.resolve(key)
   })
 }
 
 const mockDefinePublicCert = (cert) => {
-  ConnectionProvider.getUserDfspJWSCerts.mockImplementation(() => {
-    return cert
+  ConnectionProvider.getUserDfspJWSCerts.mockImplementation(async () => {
+    return Promise.resolve(cert)
   })
 }
 
@@ -190,15 +191,11 @@ describe('JwsSigning', () => {
       reqOpts.data = reqOpts.body
       it('Without data property', async () => {
         const { data, tmpReqOpts } = reqOpts
-        expect(() => {
-          JwsSigning.sign(tmpReqOpts)
-        }).toThrowError()
+        await expect(JwsSigning.sign(tmpReqOpts)).rejects.toThrowError()
       })
       it('Without header property', async () => {
         const { header, tmpReqOpts } = reqOpts
-        expect(() => {
-          JwsSigning.sign(tmpReqOpts)
-        }).toThrowError()
+        await expect(JwsSigning.sign(tmpReqOpts)).rejects.toThrowError()
       })
     })
     describe('Passing invalid key', () => {
@@ -208,20 +205,16 @@ describe('JwsSigning', () => {
       reqOpts.data = reqOpts.body
       it('Without private key', async () => {
         mockDefinePrivateKey(null)
-        expect(() => {
-          JwsSigning.sign(reqOpts)
-        }).toThrowError()
+        await expect(JwsSigning.sign(reqOpts)).rejects.toThrowError()
       })
       it('With invalid key', async () => {
         mockDefinePrivateKey('asdf')
-        expect(() => {
-          JwsSigning.sign(reqOpts)
-        }).toThrowError()
+        await expect(JwsSigning.sign(reqOpts)).rejects.toThrowError()
       })
     })
   })
 
-  describe('Validation negative scenarios', () => {
+  describe('Validation negative scenarios', async () => {
 
     // Signing
     mockDefinePrivateKey(privateKey)
@@ -230,7 +223,7 @@ describe('JwsSigning', () => {
     // Rename the body prop with data
     reqOpts.data = reqOpts.body
     delete reqOpts.headers['FSPIOP-Destination']
-    JwsSigning.sign(reqOpts)
+    await JwsSigning.sign(reqOpts)
     // Replace the data prop with payload
     reqOpts.payload = reqOpts.data
   

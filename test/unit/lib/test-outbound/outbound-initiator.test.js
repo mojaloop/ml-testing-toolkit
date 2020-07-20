@@ -30,10 +30,14 @@ const axios = require('axios').default
 const https = require('https')
 const ConnectionProvider = require('../../../../src/lib/configuration-providers/mb-connection-manager')
 const Config = require('../../../../src/lib/config')
+const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
+const MyEventEmitter = require('../../../../src/lib/MyEventEmitter')
 
 const SpyAgent = jest.spyOn(https, 'Agent')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
+const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
+const SpySign = jest.spyOn(JwsSigning, 'sign')
 
 
 
@@ -386,7 +390,7 @@ describe('Outbound Initiator Functions', () => {
 
   describe('sendRequest', () => {
     // Positive Scenarios
-    it('sendRequest should call axios with appropriate params', async () => {
+    it('sendRequest should call axios with appropriate params 1', async () => {
       axios.mockImplementation(() => Promise.resolve({
         status: 200,
         statusText: 'OK',
@@ -395,22 +399,29 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
+      SpySign.mockReturnValueOnce( Promise.resolve() )
       SpyAgent.mockImplementationOnce(() => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockReturnValueOnce({
-        hubClientCert: 'cert',
-        hubClientKey: 'key',
-        dfspServerCaRootCert: 'ca'
-      })
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
+      }))
       SpyGetUserConfig.mockReturnValueOnce({
-        CALLBACK_ENDPOINT: 'http://localhost:5000'
-      }).mockReturnValueOnce({        
-        OUTBOUND_MUTUAL_TLS_ENABLED: true,
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
+      })
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
       })
       const sampleRequest = {
         headers: {
-          'FSPIOP-Source': 'payerfsp',
+          'FSPIOP-Source': 'userdfsp',
           Date: '2020-01-01 01:01:01',
           TimeStamp: '{$request.headers.Date}'
         },
@@ -426,7 +437,292 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null)
+      axios.mockClear()
+      try {
+        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'userdfsp')
+      } catch (err) {}
+      expect(axios).toHaveBeenCalledTimes(1);
+    })
+    it('sendRequest should call axios with appropriate params', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpySign.mockReturnValueOnce(Promise.resolve())
+      SpyAgent.mockImplementationOnce(() => {
+        return {httpsAgent: {}}
+      })
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
+      }))
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
+      SpyGetUserConfig.mockReturnValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
+      }).mockReturnValueOnce({        
+        OUTBOUND_MUTUAL_TLS_ENABLED: true,
+      }).mockReturnValueOnce({        
+        CALLBACK_TIMEOUT: 5,
+      })
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'userdfsp',
+          Date: '2020-01-01 01:01:01',
+          TimeStamp: '{$request.headers.Date}'
+        },
+        body: {
+          transactionId: '123',
+          amount: {
+            amount: '100',
+            currency: 'USD'
+          },
+          transactionAmount: {
+            amount: '{$request.body.amount.amount}',
+            currency: '{$request.body.amount.currency}'
+          }
+        }
+      }
+      axios.mockClear()
+      try{
+        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, {}, {}, null, 'userdfsp')
+
+      } catch (err) {}
+      expect(axios).toHaveBeenCalledTimes(1);
+    })
+    it('sendRequest should call axios with appropriate params', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpySign.mockReturnValueOnce(Promise.resolve())
+      SpyAgent.mockImplementationOnce(() => {
+        return {httpsAgent: {}}
+      })
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
+      }))
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
+      SpyGetUserConfig.mockReturnValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
+      }).mockReturnValueOnce({        
+        OUTBOUND_MUTUAL_TLS_ENABLED: true,
+      }).mockReturnValueOnce({        
+        CALLBACK_TIMEOUT: 5000,
+      })
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'userdfsp',
+          Date: '2020-01-01 01:01:01',
+          TimeStamp: '{$request.headers.Date}'
+        },
+        body: {
+          transactionId: '123',
+          amount: {
+            amount: '100',
+            currency: 'USD'
+          },
+          transactionAmount: {
+            amount: '{$request.body.amount.amount}',
+            currency: '{$request.body.amount.currency}'
+          }
+        }
+      }
+      axios.mockClear()
+      OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, 'successCallback', 'errorCallback', null, 'userdfsp')
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      const testOutboundEmitter = MyEventEmitter.getEmitter('testOutbound')
+      testOutboundEmitter.emit('successCallback')
+      expect(axios).toHaveBeenCalledTimes(1);
+    })
+    it('sendRequest should call axios with appropriate params', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpySign.mockReturnValueOnce(Promise.resolve())
+      SpyAgent.mockImplementationOnce(() => {
+        return {httpsAgent: {}}
+      })
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
+      }))
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
+      SpyGetUserConfig.mockReturnValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
+      }).mockReturnValueOnce({        
+        OUTBOUND_MUTUAL_TLS_ENABLED: true,
+      }).mockReturnValueOnce({        
+        CALLBACK_TIMEOUT: 5000,
+      })
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'userdfsp',
+          Date: '2020-01-01 01:01:01',
+          TimeStamp: '{$request.headers.Date}'
+        },
+        body: {
+          transactionId: '123',
+          amount: {
+            amount: '100',
+            currency: 'USD'
+          },
+          transactionAmount: {
+            amount: '{$request.body.amount.amount}',
+            currency: '{$request.body.amount.currency}'
+          }
+        }
+      }
+      axios.mockClear()
+      try {
+        OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, 'successCallback', 'errorCallback', null, 'userdfsp')
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        const testOutboundEmitter = MyEventEmitter.getEmitter('testOutbound')
+        testOutboundEmitter.emit('errorCallback')
+      } catch (err) {}
+        
+      expect(axios).toHaveBeenCalledTimes(1);
+    })
+    it('sendRequest should call axios with appropriate params', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 300,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpySign.mockImplementationOnce(async () => {throw new Error()})
+      SpyAgent.mockImplementationOnce(async () => {
+        return {httpsAgent: {}}
+      })
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
+      }))
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
+      SpyGetUserConfig.mockReturnValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
+      }).mockReturnValueOnce({        
+        OUTBOUND_MUTUAL_TLS_ENABLED: true,
+      })
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'userdfsp',
+          Date: '2020-01-01 01:01:01',
+          TimeStamp: '{$request.headers.Date}'
+        },
+        body: {
+          transactionId: '123',
+          amount: {
+            amount: '100',
+            currency: 'USD'
+          },
+          transactionAmount: {
+            amount: '{$request.body.amount.amount}',
+            currency: '{$request.body.amount.currency}'
+          }
+        }
+      }
+      axios.mockClear()
+      try {
+        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'userdfsp')
+      } catch (err) {}
+      expect(axios).toHaveBeenCalledTimes(1);
+    })
+    it('sendRequest should call axios with appropriate params', async () => {
+      axios.mockImplementation(() => Promise.reject({
+        status: 300,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpySign.mockImplementationOnce(async () => {throw new Error()})
+      SpyAgent.mockImplementationOnce(async () => {
+        return {httpsAgent: {}}
+      })
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
+      }))
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
+      SpyGetUserConfig.mockReturnValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
+      }).mockReturnValueOnce({        
+        OUTBOUND_MUTUAL_TLS_ENABLED: true,
+      })
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'userdfsp',
+          Date: '2020-01-01 01:01:01',
+          TimeStamp: '{$request.headers.Date}'
+        },
+        body: {
+          transactionId: '123',
+          amount: {
+            amount: '100',
+            currency: 'USD'
+          },
+          transactionAmount: {
+            amount: '{$request.body.amount.amount}',
+            currency: '{$request.body.amount.currency}'
+          }
+        }
+      }
+      axios.mockClear()
+      try {
+        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, {}, {}, null, 'userdfsp')
+      } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
     })
   })

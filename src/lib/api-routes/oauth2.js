@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -25,40 +26,118 @@
 const express = require('express')
 const router = new express.Router()
 const jwt = require('jsonwebtoken')
+const Config = require('../config')
+const LoginService = require('../oauth/LoginService')
 
-router.post('/token', async (req, res, next) => {
+router.post('/login', async (req, res, next) => {
   try {
-    const idToken = jwt.sign(
-      {
-        at_hash: 'bJi28CeD9HLPf1ouOVkQTA',
-        aud: 'CLIENT_KEY',
-        sub: 'dfsp1',
-        nbf: 1558709500,
-        azp: 'CLIENT_KEY',
-        amr: [
-          'password'
-        ],
-        iss: 'https://SERVERIP:9443/oauth2/token',
-        groups: [
-          'Application/MTA',
-          'Application/DFSP:DFSP1',
-          'Internal/everyone'
-        ],
-        exp: 1558713100,
-        iat: 1558709500,
-        dfspId: 'userdfsp',
-        userguid: 'userguid'
-      }
-      , 'password')
-    res.status(200).json(
-      {
-        access_token: 'sometoken',
-        id_token: idToken
-      }
-    )
+    const response = await LoginService.loginUser(req.body.username, req.body.password, req, res)
+    res.status(200).json(response)
   } catch (err) {
     next(err)
   }
 })
+
+router.get('/logout', async (req, res, next) => {
+  try {
+    await LoginService.logoutUser(req, res)
+    res.status(200).json({ message: 'logout successful' })
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.post('/token', async (req, res, next) => {
+  try {
+    const plainIdToken = {
+      username: req.body.username,
+      dfspId: req.body.username,
+      userguid: 'userguid'
+    }
+    let groupsData = [
+      'Application/MTA',
+      'Application/DFSP:' + req.body.username,
+      'Internal/everyone'
+    ]
+    const systemConfig = Config.getSystemConfig()
+    const userConfig = Config.getUserConfig()
+    if (req.body.username === userConfig.CONNECTION_MANAGER_HUB_USERNAME) {
+      plainIdToken.dfspId = req.body.username
+      groupsData = [
+        'Application/PTA',
+        'Internal/everyone'
+      ]
+    } else if (systemConfig.HOSTING_ENABLED) {
+      // Check whether the DFSP exists in mock list
+      const dfspDB = require('../db/dfspMockUsers')
+      const dfspValid = await dfspDB.checkDFSP(req.body.username)
+      if (!dfspValid) {
+        throw (new Error('Invalid DFSP ID'))
+      }
+      plainIdToken.dfspId = req.body.username
+    }
+    const plainAccessToken = {
+      expires_in: 3600,
+      iat: Date.now() / 1000,
+      aud: systemConfig.OAUTH.APP_OAUTH_CLIENT_KEY,
+      sub: plainIdToken.username,
+      iss: systemConfig.OAUTH.OAUTH2_ISSUER,
+      groups: groupsData,
+      dfspId: plainIdToken.dfspId,
+      userguid: plainIdToken.userguid
+    }
+    res.status(200).json({
+      access_token: jwt.sign(plainAccessToken, systemConfig.OAUTH.EMBEDDED_CERTIFICATE),
+      id_token: jwt.sign(plainIdToken, systemConfig.OAUTH.EMBEDDED_CERTIFICATE)
+    })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// router.post('/token', async (req, res, next) => {
+//   try {
+//     let userDfspId = 'userdfsp'
+//     if (Config.getSystemConfig().HOSTING_ENABLED) {
+//       // Check whether the DFSP exists in mock list
+//       const dfspDB = require('../db/dfspMockUsers')
+//       const dfspValid = await dfspDB.checkDFSP(req.body.username)
+//       if (!dfspValid) {
+//         throw (new Error('Invalid DFSP ID'))
+//       }
+//       userDfspId = req.body.username
+//     }
+//     const idToken = jwt.sign(
+//       {
+//         at_hash: 'bJi28CeD9HLPf1ouOVkQTA',
+//         aud: 'CLIENT_KEY',
+//         sub: 'dfsp1',
+//         nbf: 1558709500,
+//         azp: 'CLIENT_KEY',
+//         amr: [
+//           'password'
+//         ],
+//         iss: 'https://SERVERIP:9443/oauth2/token',
+//         groups: [
+//           'Application/MTA',
+//           'Application/DFSP:DFSP1',
+//           'Internal/everyone'
+//         ],
+//         exp: 1558713100,
+//         iat: 1558709500,
+//         dfspId: userDfspId,
+//         userguid: 'userguid'
+//       }
+//       , 'password')
+//     res.status(200).json(
+//       {
+//         access_token: 'sometoken',
+//         id_token: idToken
+//       }
+//     )
+//   } catch (err) {
+//     next(err)
+//   }
+// })
 
 module.exports = router

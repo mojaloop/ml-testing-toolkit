@@ -22,8 +22,7 @@
  --------------
  ******/
 
-const fs = require('fs')
-const { promisify } = require('util')
+const { rmdirAsync } = require('./utils')
 const AdmZip = require('adm-zip')
 const Config = require('./config')
 const { Engine } = require('json-rules-engine')
@@ -113,8 +112,7 @@ const extractData = async (zip, options, entries) => {
         const entry = entries[index]
         if (entry.startsWith(option)) {
           if (!deleted) {
-            const rmDirAsync = promisify(fs.rmdir)
-            await rmDirAsync(`spec_files/${option}`, { recursive: true })
+            await rmdirAsync(`spec_files/${option}`, { recursive: true })
             deleted = true
           }
           zip.extractEntryTo(entry, `spec_files/${option}`, false)

@@ -1,6 +1,7 @@
 {
   "/transfers": {
     "post": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/transfers/{ID}",
@@ -32,6 +33,7 @@
   },
   "/transfers/{ID}": {
     "get": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/transfers/{ID}",
@@ -58,6 +60,7 @@
   },
   "/quotes": {
     "post": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/quotes/{ID}",
@@ -92,6 +95,7 @@
   },
   "/quotes/{ID}": {
     "get": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/quotes/{ID}",
@@ -118,6 +122,7 @@
   },
   "/parties/{Type}/{ID}": {
     "get": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/parties/{Type}/{ID}",
@@ -153,6 +158,7 @@
   },
   "/parties/{Type}/{ID}/{SubId}": {
     "get": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/parties/{Type}/{ID}/{SubId}",
@@ -189,6 +195,7 @@
   },
   "/transactionRequests": {
     "post": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/transactionRequests/{ID}",
@@ -215,6 +222,7 @@
   },
   "/transactionRequests/{ID}": {
     "get": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/transactionRequests/{ID}",
@@ -241,6 +249,7 @@
   },
   "/participants": {
     "post": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/participants/{ID}",
@@ -267,6 +276,7 @@
   },
   "/participants/{Type}/{ID}": {
     "get": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/participants/{Type}/{ID}",
@@ -291,6 +301,7 @@
       }
     },
     "post": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/participants/{Type}/{ID}",
@@ -317,6 +328,7 @@
   },
   "/participants/{Type}/{ID}/{SubId}": {
     "get": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/participants/{Type}/{ID}/{SubId}",
@@ -341,6 +353,7 @@
       }
     },
     "post": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/participants/{Type}/{ID}/{SubId}",
@@ -367,6 +380,7 @@
   },
   "/authorizations/{ID}": {
     "get": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/authorizations/{ID}",
@@ -393,6 +407,7 @@
   },
   "/transactions/{ID}": {
     "get": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/transactions/{ID}",
@@ -419,6 +434,7 @@
   },
   "/bulkQuotes": {
     "post": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/bulkQuotes/{ID}",
@@ -445,6 +461,7 @@
   },
   "/bulkQuotes/{ID}": {
     "get": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/bulkQuotes/{ID}",
@@ -471,6 +488,7 @@
   },
   "/bulkTransfers": {
     "post": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/bulkTransfers/{ID}",
@@ -497,6 +515,7 @@
   },
   "/bulkTransfers/{ID}": {
     "get": {
+      "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",
         "path": "/bulkTransfers/{ID}",

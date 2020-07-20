@@ -43,10 +43,11 @@ delete axios.defaults.headers.common.Accept
 const context = require('./context')
 const openApiDefinitionsModel = require('../mocking/openApiDefinitionsModel')
 const uuid = require('uuid')
+const utilsInternal = require('../utilsInternal')
 
 var terminateTraceIds = {}
 
-const OutboundSend = async (inputTemplate, traceID) => {
+const OutboundSend = async (inputTemplate, traceID, dfspId) => {
   const startedTimeStamp = new Date()
   let outboundID = traceID
   let sessionID = null
@@ -60,7 +61,7 @@ const OutboundSend = async (inputTemplate, traceID) => {
   }
   try {
     for (const i in inputTemplate.test_cases) {
-      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, environmentVariables)
+      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, environmentVariables, dfspId)
     }
 
     const completedTimeStamp = new Date()
@@ -93,7 +94,7 @@ const terminateOutbound = (traceID) => {
   terminateTraceIds[traceID] = true
 }
 
-const processTestCase = async (testCase, traceID, inputValues, environmentVariables) => {
+const processTestCase = async (testCase, traceID, inputValues, environmentVariables, dfspId) => {
   let outboundID = traceID
   let sessionID = null
   if (traceID && traceHeaderUtils.isCustomTraceID(traceID)) {
@@ -182,7 +183,7 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
       if (request.delay) {
         await new Promise(resolve => setTimeout(resolve, request.delay))
       }
-      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks)
+      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId)
 
       if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
         const response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
@@ -304,82 +305,96 @@ const getUrlPrefix = (baseUrl) => {
   return returnUrl
 }
 
-const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks) => {
+const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId) => {
   return new Promise((resolve, reject) => {
-    const httpsProps = {}
-    let urlGenerated = Config.getUserConfig().CALLBACK_ENDPOINT + path
-    if (baseUrl) {
-      urlGenerated = getUrlPrefix(baseUrl) + path
-    }
-    if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
-      const tlsConfig = ConnectionProvider.getTlsConfig()
-      const httpsAgent = new https.Agent({
-        cert: tlsConfig.hubClientCert,
-        key: tlsConfig.hubClientKey,
-        ca: [tlsConfig.dfspServerCaRootCert],
-        rejectUnauthorized: true
+    (async () => {
+      const httpsProps = {}
+      let urlGenerated = Config.getUserConfig().CALLBACK_ENDPOINT + path
+      if (Config.getSystemConfig().HOSTING_ENABLED) {
+        const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
+        if (endpointsConfig.dfspEndpoints && dfspId && endpointsConfig.dfspEndpoints[dfspId]) {
+          urlGenerated = endpointsConfig.dfspEndpoints[dfspId] + path
+        } else {
+          customLogger.logMessage('warning', 'Hosting is enabled, But there is no endpoint configuration found for DFSP ID: ' + dfspId, null, true, null)
+        }
+      }
+      if (baseUrl) {
+        urlGenerated = getUrlPrefix(baseUrl) + path
+      }
+      if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
+        const tlsConfig = await ConnectionProvider.getTlsConfig()
+        if (!tlsConfig.dfsps[dfspId]) {
+          const errorMsg = 'Outbound TLS is enabled, but there is no TLS config found for DFSP ID: ' + dfspId
+          customLogger.logMessage('error', errorMsg, null, true, null)
+          reject(new Error(JSON.stringify({ errorCode: 4000, errorDescription: errorMsg })))
+        }
+        const httpsAgent = new https.Agent({
+          cert: tlsConfig.dfsps[dfspId].hubClientCert,
+          key: tlsConfig.hubClientKey,
+          ca: [tlsConfig.dfsps[dfspId].dfspServerCaRootCert],
+          rejectUnauthorized: true
+        })
+        httpsProps.httpsAgent = httpsAgent
+        urlGenerated = urlGenerated.replace('http:', 'https:')
+      }
+
+      const reqOpts = {
+        method: method,
+        url: urlGenerated,
+        path: path,
+        params: queryParams,
+        headers: headers,
+        data: body,
+        timeout: 3000,
+        validateStatus: function (status) {
+          return status < 900 // Reject only if the status code is greater than or equal to 900
+        },
+        ...httpsProps
+      }
+      try {
+        await JwsSigning.sign(reqOpts)
+      } catch (err) {
+        console.log(err)
+      }
+      axios(reqOpts).then((result) => {
+        const syncResponse = {
+          status: result.status,
+          statusText: result.statusText,
+          data: result.data
+        }
+        const curlRequest = result.request ? result.request.toCurl() : ''
+
+        if (result.status > 299) {
+          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
+        }
+
+        customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
+        if (successCallbackUrl && errorCallbackUrl && (ignoreCallbacks !== true)) {
+          const timer = setTimeout(() => {
+            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
+            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
+            reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
+          }, Config.getUserConfig().CALLBACK_TIMEOUT)
+          // Listen for success callback
+          MyEventEmitter.getEmitter('testOutbound').once(successCallbackUrl, (callbackHeaders, callbackBody) => {
+            clearTimeout(timer)
+            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
+            resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { headers: callbackHeaders, body: callbackBody } })
+          })
+          // Listen for error callback
+          MyEventEmitter.getEmitter('testOutbound').once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
+            clearTimeout(timer)
+            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
+            reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { body: callbackBody } })))
+          })
+        } else {
+          resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
+        }
+      }, (err) => {
+        customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, err, false)
+        reject(new Error(JSON.stringify({ errorCode: 4000 })))
       })
-      httpsProps.httpsAgent = httpsAgent
-      urlGenerated = urlGenerated.replace('http:', 'https:')
-    }
-
-    const reqOpts = {
-      method: method,
-      url: urlGenerated,
-      path: path,
-      params: queryParams,
-      headers: headers,
-      data: body,
-      timeout: 3000,
-      validateStatus: function (status) {
-        return status < 900 // Reject only if the status code is greater than or equal to 900
-      },
-      ...httpsProps
-    }
-    try {
-      JwsSigning.sign(reqOpts)
-    } catch (err) {
-      console.log(err)
-    }
-    axios(reqOpts).then((result) => {
-      const syncResponse = {
-        status: result.status,
-        statusText: result.statusText,
-        data: result.data
-      }
-      const curlRequest = result.request ? result.request.toCurl() : ''
-
-      if (result.status > 299) {
-        reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
-      }
-
-      customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
-
-      if (successCallbackUrl && errorCallbackUrl && (ignoreCallbacks !== true)) {
-        const timer = setTimeout(() => {
-          MyEventEmitter.getTestOutboundEmitter().removeAllListeners(successCallbackUrl)
-          MyEventEmitter.getTestOutboundEmitter().removeAllListeners(errorCallbackUrl)
-          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
-        }, Config.getUserConfig().CALLBACK_TIMEOUT)
-        // Listen for success callback
-        MyEventEmitter.getTestOutboundEmitter().once(successCallbackUrl, (callbackHeaders, callbackBody) => {
-          clearTimeout(timer)
-          MyEventEmitter.getTestOutboundEmitter().removeAllListeners(errorCallbackUrl)
-          resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { headers: callbackHeaders, body: callbackBody } })
-        })
-        // Listen for error callback
-        MyEventEmitter.getTestOutboundEmitter().once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
-          clearTimeout(timer)
-          MyEventEmitter.getTestOutboundEmitter().removeAllListeners(successCallbackUrl)
-          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { body: callbackBody } })))
-        })
-      } else {
-        resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
-      }
-    }, (err) => {
-      customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, err, false)
-      reject(new Error(JSON.stringify({ errorCode: 4000 })))
-    })
+    })()
   })
 }
 
@@ -536,29 +551,7 @@ const replacePathVariables = (operationPath, params) => {
 
 // Execute the function and return the result
 const getFunctionResult = (param, inputValues, request) => {
-  const temp = param.replace(/{\$function\.(.*)}/, '$1').split('.')
-  if (temp.length === 2) {
-    const fileName = temp[0]
-    const functionName = temp[1]
-    try {
-      const fn = require('./custom-functions/' + fileName)[functionName]
-      if (!fn) {
-        customLogger.logMessage('error', 'The specified custom function does not exist', param, false)
-        return param
-      }
-      return fn(inputValues, request)
-    } catch (e) {
-      if (e.code === 'MODULE_NOT_FOUND') {
-        customLogger.logMessage('error', 'The specified custom function does not exist', param, false)
-      } else {
-        throw e
-      }
-      return param
-    }
-  } else {
-    customLogger.logMessage('error', 'The specified custom function format is not correct', param, false)
-    return param
-  }
+  return utilsInternal.getFunctionResult(param, inputValues, request)
 }
 
 // Generate consolidated final report

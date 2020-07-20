@@ -1,0 +1,7 @@
+openapi: 3.0.1
+info:
+  title: MOJALOOP Central Settlements
+  description: Mojaloop API for Settlements.
+  version: 1.1.0
+servers:
+- url: /v1

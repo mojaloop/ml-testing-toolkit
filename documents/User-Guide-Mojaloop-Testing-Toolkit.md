@@ -159,6 +159,14 @@ Next, select the _operationId_ you require for the new rule in the **Resource** 
 
 ![Resource selection](/assets/images/resource-selection.png)
 
+You have the option to enable or disable inbound requests scripts. You can use Scripts tab to set dfsp positions and do validations later. In the given example we are updating the ttkdfspTotalAmount if the transfer request is successfull for testingtoolkit dfsp. You could execute p2p-happy-path with fromFspId equal to testingtoolkitdfsp and go back to Environment tab to see the total amount.
+
+![Inbound Requests Scripts](/assets/images/inbound-requests-scripts.png)
+
+In the Environment tab you could observe the current environment state. 
+
+![Inbound Requests Environment](/assets/images/inbound-requests-environment.png)
+
 You have the option to include one or more **CONDITIONS** for the new rule. Select the _**Add Condition**_ button should you wish to add an additional condition to your rule. 
 
 ![Add Condition Button](/assets/images/add-condition-button.png)
@@ -172,7 +180,11 @@ You will be presented with 4 boxes each with a dropdown list to select from;
 
 For each of the above mentioned items, click on the down arrow in the item box to list the selection options to select from. These selection options are as per the Swagger definition for the selected **API** above.
 
-![Sample Condition](/assets/images/sample-condition.png) 
+![Sample Condition](/assets/images/sample-condition.png)
+
+You can use configurable param in Value field. You can select one by clicking on **Add Configuration Params** button. 
+
+![Sample Condition add configurable params](/assets/images/sample-condition-add-configurable-params.png) 
 
 Next step would be to select the **EVENT Type** detail below. Click on the down arrow in the item box to list the option.  Select either _**Mock Response**_ or _**Fixed Response**_.
 

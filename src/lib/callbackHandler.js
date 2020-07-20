@@ -38,28 +38,42 @@ const handleCallback = async (callbackObject, context, req) => {
   const userConfig = Config.getUserConfig()
 
   let callbackEndpoint = userConfig.CALLBACK_ENDPOINT
-  if (userConfig.CALLBACK_RESOURCE_ENDPOINTS && userConfig.CALLBACK_RESOURCE_ENDPOINTS.enabled) {
-    const callbackEndpoints = userConfig.CALLBACK_RESOURCE_ENDPOINTS
-    const matchedObject = callbackEndpoints.endpoints.find(item => {
-      if (item.method === callbackObject.method) {
-        const path = new RegExp(item.path.replace(/{.*}/, '.*'))
-        return path.test(callbackObject.path)
+  if (Config.getSystemConfig().HOSTING_ENABLED) {
+    const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
+    if (endpointsConfig.dfspEndpoints && callbackObject.callbackInfo.fspid && endpointsConfig.dfspEndpoints[callbackObject.callbackInfo.fspid]) {
+      callbackEndpoint = endpointsConfig.dfspEndpoints[callbackObject.callbackInfo.fspid]
+    } else {
+      customLogger.logMessage('warning', 'Hosting is enabled, But there is no endpoint configuration found for DFSP ID: ' + callbackObject.callbackInfo.fspid, null, true, req)
+    }
+  } else {
+    if (userConfig.CALLBACK_RESOURCE_ENDPOINTS && userConfig.CALLBACK_RESOURCE_ENDPOINTS.enabled) {
+      const callbackEndpoints = userConfig.CALLBACK_RESOURCE_ENDPOINTS
+      const matchedObject = callbackEndpoints.endpoints.find(item => {
+        if (item.method === callbackObject.method) {
+          const path = new RegExp(item.path.replace(/{.*}/, '.*'))
+          return path.test(callbackObject.path)
+        }
+        return false
+      })
+      if (matchedObject && matchedObject.endpoint) {
+        callbackEndpoint = matchedObject.endpoint
       }
-      return false
-    })
-    if (matchedObject && matchedObject.endpoint) {
-      callbackEndpoint = matchedObject.endpoint
     }
   }
 
   const httpsProps = {}
   let urlGenerated = callbackEndpoint + callbackObject.path
   if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED) {
-    const tlsConfig = ConnectionProvider.getTlsConfig()
+    const tlsConfig = await ConnectionProvider.getTlsConfig()
+    if (!tlsConfig.dfsps[callbackObject.callbackInfo.fspid]) {
+      const errorMsg = 'Outbound TLS is enabled, but there is no TLS config found for DFSP ID: ' + callbackObject.callbackInfo.fspid
+      customLogger.logMessage('error', errorMsg, null, true, req)
+      throw errorMsg
+    }
     const httpsAgent = new https.Agent({
-      cert: tlsConfig.hubClientCert,
+      cert: tlsConfig.dfsps[callbackObject.callbackInfo.fspid].hubClientCert,
       key: tlsConfig.hubClientKey,
-      ca: [tlsConfig.dfspServerCaRootCert],
+      ca: [tlsConfig.dfsps[callbackObject.callbackInfo.fspid].dfspServerCaRootCert],
       rejectUnauthorized: true
     })
     httpsProps.httpsAgent = httpsAgent
@@ -82,7 +96,7 @@ const handleCallback = async (callbackObject, context, req) => {
     ...httpsProps
   }
   try {
-    JwsSigning.sign(reqOpts)
+    await JwsSigning.sign(reqOpts)
   } catch (err) {
     console.log(err)
   }
@@ -101,7 +115,7 @@ const handleCallback = async (callbackObject, context, req) => {
     assertionData.error = true
   }
   assertionStore.pushCallback(assertionPath, assertionData)
-  MyEventEmitter.getAssertionCallbackEmitter().emit(assertionPath, assertionData)
+  MyEventEmitter.getEmitter('assertionCallback').emit(assertionPath, assertionData)
 
   // Send callback
   if (userConfig.SEND_CALLBACK_ENABLE) {
@@ -109,7 +123,7 @@ const handleCallback = async (callbackObject, context, req) => {
     axios(reqOpts).then((result) => {
       customLogger.logMessage('info', 'Received callback response ' + result.status + ' ' + result.statusText, null, true, req)
     }, (err) => {
-      customLogger.logMessage('error', 'Failed to send callback ' + callbackObject.method + ' ' + callbackObject.path, err, true, req)
+      customLogger.logMessage('error', 'Failed to send callback ' + callbackObject.method + ' ' + callbackObject.path, err.message, true, req)
     })
   } else {
     customLogger.logMessage('info', 'Log callback ' + callbackObject.method + ' ' + callbackObject.path, callbackObject, true, req)

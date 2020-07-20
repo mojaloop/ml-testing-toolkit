@@ -34,7 +34,7 @@ const CONFIG_FILE_NAME = 'config.json'
 
 const response = {
   rulesFilePathPrefix: 'spec_files/rules_response/',
-  responseRules: null,
+  rules: null,
   rulesEngine: null,
   activeRulesFile: null,
   ruleType: 'response'
@@ -42,7 +42,7 @@ const response = {
 
 const validation = {
   rulesFilePathPrefix: 'spec_files/rules_validation/',
-  responseRules: null,
+  rules: null,
   rulesEngine: null,
   activeRulesFile: null,
   ruleType: 'validation'
@@ -50,7 +50,7 @@ const validation = {
 
 const callback = {
   rulesFilePathPrefix: 'spec_files/rules_callback/',
-  responseRules: null,
+  rules: null,
   rulesEngine: null,
   activeRulesFile: null,
   ruleType: 'callback'
@@ -70,8 +70,8 @@ const getResponseRules = async () => {
   return rules
 }
 
-const getResponseRulesEngine = async () => {
-  const rulesEngine = await getRulesEngine(response)
+const getResponseRulesEngine = async (convertedRules) => {
+  const rulesEngine = await getRulesEngine(response, convertedRules)
   return rulesEngine
 }
 
@@ -110,8 +110,8 @@ const getValidationRules = async () => {
   return rules
 }
 
-const getValidationRulesEngine = async () => {
-  const rulesEngine = await getRulesEngine(validation)
+const getValidationRulesEngine = async (convertedRules) => {
+  const rulesEngine = await getRulesEngine(validation, convertedRules)
   return rulesEngine
 }
 
@@ -150,8 +150,8 @@ const getCallbackRules = async () => {
   return rules
 }
 
-const getCallbackRulesEngine = async () => {
-  const rulesEngine = await getRulesEngine(callback)
+const getCallbackRulesEngine = async (convertedRules) => {
+  const rulesEngine = await getRulesEngine(callback, convertedRules)
   return rulesEngine
 }
 
@@ -214,8 +214,11 @@ const getRules = async (objStore) => {
   return objStore.rules
 }
 
-const getRulesEngine = async (objStore) => {
-  if (!objStore.rulesEngine) {
+const getRulesEngine = async (objStore, convertedRules) => {
+  if (convertedRules) {
+    objStore.rulesEngine = new RulesEngine()
+    objStore.rulesEngine.loadRules(convertedRules)
+  } else if (!objStore.rulesEngine) {
     objStore.rulesEngine = new RulesEngine()
     const rules = await getRules(objStore)
     objStore.rulesEngine.loadRules(rules)

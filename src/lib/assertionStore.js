@@ -37,14 +37,7 @@ const pushRequest = (path, data) => {
 }
 
 const popRequest = (path) => {
-  // Search for the path
-  if (Object.prototype.hasOwnProperty.call(storedObject.requests, path)) {
-    const foundData = JSON.parse(JSON.stringify(storedObject.requests[path].data))
-    delete storedObject.requests[path]
-    return foundData
-  } else {
-    return null
-  }
+  return pop('requests', path)
 }
 
 const pushCallback = (path, data) => {
@@ -57,27 +50,30 @@ const pushCallback = (path, data) => {
 }
 
 const popCallback = (path) => {
+  return pop('callbacks', path)
+}
+
+const clearOldAssertions = () => {
+  clear('requests', 10 * 60 * 1000)
+  clear('callbacks', 10 * 60 * 1000)
+}
+
+const pop = (object, path) => {
   // Search for the path
-  if (Object.prototype.hasOwnProperty.call(storedObject.callbacks, path)) {
-    const foundData = JSON.parse(JSON.stringify(storedObject.callbacks[path].data))
-    delete storedObject.callbacks[path]
+  if (Object.prototype.hasOwnProperty.call(storedObject[object], path)) {
+    const foundData = JSON.parse(JSON.stringify(storedObject[object][path].data))
+    delete storedObject[object][path]
     return foundData
   } else {
     return null
   }
 }
 
-const clearOldAssertions = () => {
-  for (const path in storedObject.requests) {
-    const timeDiff = Date.now() - storedObject.requests[path].insertedDate
-    if (timeDiff > 10 * 60 * 1000) { // Remove the old requests greater than 10min
-      delete storedObject.requests[path]
-    }
-  }
-  for (const path in storedObject.callbacks) {
-    const timeDiff = Date.now() - storedObject.callbacks[path].insertedDate
-    if (timeDiff > 10 * 60 * 1000) { // Remove the old callbacks greater than 10min
-      delete storedObject.callbacks[path]
+const clear = (object, interval) => {
+  for (const objectId in storedObject[object]) {
+    const timeDiff = Date.now() - storedObject[object][objectId].insertedDate
+    if (timeDiff > interval) { // Remove the old transactions greater than 10min
+      delete storedObject[object][objectId]
     }
   }
 }
@@ -91,5 +87,7 @@ module.exports = {
   popRequest,
   pushCallback,
   popCallback,
-  initAssertionStore
+  initAssertionStore,
+  pop,
+  clear
 }
