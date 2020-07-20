@@ -24,7 +24,6 @@
  ******/
 
 const utils = require('./utils')
-const RequestLogger = require('./requestLogger')
 
 const SYSTEM_CONFIG_FILE = 'spec_files/system_config.json'
 const USER_CONFIG_FILE = 'spec_files/user_config.json'
@@ -46,7 +45,7 @@ const getStoredUserConfig = async () => {
     const contents = await utils.readFileAsync(USER_CONFIG_FILE)
     storedConfig = JSON.parse(contents)
   } catch (err) {
-    RequestLogger.logMessage('error', 'Can not read the file spec_files/user_config.json', null, true, null)
+    console.log('Error: Can not read the file spec_files/user_config.json')
   }
   return storedConfig
 }
@@ -65,7 +64,7 @@ const loadUserConfig = async () => {
     const contents = await utils.readFileAsync(USER_CONFIG_FILE)
     USER_CONFIG = JSON.parse(contents)
   } catch (err) {
-    RequestLogger.logMessage('error', 'Can not read the file ' + USER_CONFIG_FILE, null, true, null)
+    console.log('Error: Can not read the file ' + USER_CONFIG_FILE)
   }
   return true
 }
@@ -76,7 +75,7 @@ const loadSystemConfig = async () => {
     const contents = await utils.readFileAsync(SYSTEM_CONFIG_FILE)
     SYSTEM_CONFIG = JSON.parse(contents)
   } catch (err) {
-    RequestLogger.logMessage('error', 'Can not read the file ' + SYSTEM_CONFIG_FILE, null, true, null)
+    console.log('Error: Can not read the file ' + SYSTEM_CONFIG_FILE)
   }
   return true
 }
