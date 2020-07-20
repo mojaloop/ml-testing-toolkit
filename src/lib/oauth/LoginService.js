@@ -34,7 +34,8 @@ const wso2Client = require('./Wso2Client')
  * If successful, sets the JWT token in a cookie and returns the token payload
  */
 exports.loginUser = async function (username, password, req, res) {
-  if (Constants.OAUTH.AUTH_ENABLED == null || Constants.OAUTH.AUTH_ENABLED === 'DISABLED') {
+  const Constants = Config.getSystemConfig()
+  if (!Constants.OAUTH.AUTH_ENABLED) {
     return {
       ok: false,
       token: {

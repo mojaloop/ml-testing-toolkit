@@ -28,6 +28,7 @@ const http = require('http').Server(app)
 const socketIO = require('socket.io')(http)
 const OAuthHelper = require('./oauth/OAuthHelper')
 const passport = require('passport')
+const cookieParser = require('cookie-parser')
 
 const initServer = () => {
   const Config = require('./config')
@@ -37,7 +38,6 @@ const initServer = () => {
 
   // For CORS policy
   app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader(
       'Access-Control-Allow-Headers',
       'Origin, X-Requested-With, Content-Type, Accept, Authorization'
@@ -51,8 +51,13 @@ const initServer = () => {
       'GET, POST, PATCH, PUT, DELETE, OPTIONS'
     )
     if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
-      res.setHeader('Access-Control-Allow-Origin', Config.getSystemConfig().OAUTH.ORIGIN)
       res.setHeader('Access-Control-Allow-Credentials', 'true')
+      res.setHeader('Access-Control-Allow-Origin', Config.getSystemConfig().OAUTH.ORIGIN)
+      if (req.method === 'OPTIONS') {
+        res.send(200)
+      }
+    } else {
+      res.setHeader('Access-Control-Allow-Origin', '*')
     }
     next()
   })
@@ -60,13 +65,14 @@ const initServer = () => {
   // For parsing incoming JSON requests
   app.use(express.json({ limit: '50mb' }))
   app.use(express.urlencoded({ extended: true }))
+  app.use(cookieParser())
   // For oauth
   OAuthHelper.handleMiddleware()
 
   // For admin API
   app.use('/api/rules', verifyUser(), require('./api-routes/rules'))
   app.use('/api/openapi', verifyUser(), require('./api-routes/openapi'))
-  app.use('/api/outbound', require('./api-routes/outbound'))
+  app.use('/api/outbound', verifyUser(), require('./api-routes/outbound'))
   app.use('/api/config', verifyUser(), require('./api-routes/config'))
   app.use('/longpolling', require('./api-routes/longpolling'))
   app.use('/api/oauth2', require('./api-routes/oauth2'))

@@ -1,7 +1,7 @@
 {
   "name": "ml-testing-toolkit",
   "description": "Testing Toolkit for Mojaloop implementations",
-  "version": "10.5.1",
+  "version": "10.6.0",
   "license": "Apache-2.0",
   "author": "Vijaya Kumar Guthi, ModusBox Inc.",
   "contributors": [
@@ -71,6 +71,7 @@
     "cli-progress": "3.8.2",
     "cli-table3": "0.6.0",
     "commander": "4.0.0",
+    "cookie-parser": "^1.4.5",
     "cookies": "0.8.0",
     "docdash": "1.1.1",
     "dotenv": "^8.2.0",
