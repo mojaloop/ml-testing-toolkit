@@ -28,6 +28,7 @@ const router = new express.Router()
 const jwt = require('jsonwebtoken')
 const Config = require('../config')
 const LoginService = require('../oauth/LoginService')
+const { verifyUser } = require('../api-server')
 
 router.post('/login', async (req, res, next) => {
   try {
@@ -38,7 +39,7 @@ router.post('/login', async (req, res, next) => {
   }
 })
 
-router.get('/logout', async (req, res, next) => {
+router.get('/logout', verifyUser(), async (req, res, next) => {
   try {
     await LoginService.logoutUser(req, res)
     res.status(200).json({ message: 'logout successful' })

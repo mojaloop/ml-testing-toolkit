@@ -66,7 +66,7 @@ const initServer = () => {
   app.use('/api/openapi', verifyUser(), require('./api-routes/openapi'))
   app.use('/api/outbound', verifyUser(), require('./api-routes/outbound'))
   app.use('/api/config', verifyUser(), require('./api-routes/config'))
-  app.use('/longpolling', require('./api-routes/longpolling'))
+  app.use('/longpolling', verifyUser(), require('./api-routes/longpolling'))
   app.use('/api/oauth2', require('./api-routes/oauth2'))
   app.use('/api/reports', verifyUser(), require('./api-routes/reports'))
   app.use('/api/settings', verifyUser(), require('./api-routes/settings'))
