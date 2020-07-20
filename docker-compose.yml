@@ -23,6 +23,9 @@ services:
       - AUTH_ENABLED=FALSE
     ports:
       - "6060:6060"
+    environment:
+      - API_BASE_URL=http://localhost:5050
+      - AUTH_ENABLED=FALSE
     command:
       - sh
       - /usr/share/nginx/start.sh

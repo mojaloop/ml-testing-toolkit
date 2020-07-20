@@ -28,6 +28,14 @@
 var bunyan = require('bunyan')
 var Logger = bunyan.createLogger({ name: 'ml-testing-toolkit', level: 'debug' })
 const notificationEmitter = require('./notificationEmitter.js')
+const Config = require('../lib/config.js')
+const getSessionID = function (request) {
+  if (Config.getSystemConfig().HOSTING_ENABLED) {
+    return request && request.headers && request.headers['fspiop-source'] ? request.headers['fspiop-source'] : null
+  } else {
+    return request && request.customInfo ? request.customInfo.sessionID : null
+  }
+}
 
 const logRequest = function (request) {
   let logMessage = `Request: ${request.method} ${request.path}`
@@ -43,7 +51,8 @@ const logRequest = function (request) {
     }
   }
   Logger.info(logObject, logMessage)
-  notificationEmitter.broadcastLog({ uniqueId: request.customInfo ? request.customInfo.uniqueId : null, resource: { method: request.method, path: request.path }, messageType: 'request', verbosity: 'info', message: logMessage, additionalData: logObject }, request && request.customInfo ? request.customInfo.sessionID : null)
+
+  notificationEmitter.broadcastLog({ uniqueId: request.customInfo ? request.customInfo.uniqueId : null, resource: { method: request.method, path: request.path }, messageType: 'request', verbosity: 'info', message: logMessage, additionalData: logObject }, getSessionID(request))
 }
 
 const logResponse = function (request) {
@@ -56,7 +65,7 @@ const logResponse = function (request) {
     }
     const logMessage = `Response: ${request.method} ${request.path} Status: ${request.response.statusCode}`
     Logger.info(logObject, logMessage)
-    notificationEmitter.broadcastLog({ uniqueId: request.customInfo ? request.customInfo.uniqueId : null, resource: { method: request.method, path: request.path }, messageType: 'response', verbosity: 'info', message: logMessage, additionalData: logObject }, request && request.customInfo ? request.customInfo.sessionID : null)
+    notificationEmitter.broadcastLog({ uniqueId: request.customInfo ? request.customInfo.uniqueId : null, resource: { method: request.method, path: request.path }, messageType: 'response', verbosity: 'info', message: logMessage, additionalData: logObject }, getSessionID(request))
   }
 }
 
@@ -77,7 +86,7 @@ const logMessage = (verbosity, message, additionalData = null, notification = tr
   }
 
   if (notification) {
-    notificationEmitter.broadcastLog({ uniqueId: request ? request.customInfo.uniqueId : null, resource: request ? { method: request.method, path: request.path } : null, messageType: 'generic', verbosity, message: message, additionalData }, request && request.customInfo ? request.customInfo.sessionID : null)
+    notificationEmitter.broadcastLog({ uniqueId: request ? request.customInfo.uniqueId : null, resource: request ? { method: request.method, path: request.path } : null, messageType: 'generic', verbosity, message: message, additionalData }, getSessionID(request))
   }
 }
 
