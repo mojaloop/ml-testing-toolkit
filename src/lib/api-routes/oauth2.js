@@ -51,11 +51,23 @@ router.post('/token', async (req, res, next) => {
   try {
     const plainIdToken = {
       username: req.body.username,
-      dfspId: 'userdfsp',
+      dfspId: req.body.username,
       userguid: 'userguid'
     }
+    let groupsData = [
+      'Application/MTA',
+      'Application/DFSP:' + req.body.username,
+      'Internal/everyone'
+    ]
     const systemConfig = Config.getSystemConfig()
-    if (systemConfig.HOSTING_ENABLED) {
+    const userConfig = Config.getUserConfig()
+    if (req.body.username === userConfig.CONNECTION_MANAGER_HUB_USERNAME) {
+      plainIdToken.dfspId = req.body.username
+      groupsData = [
+        'Application/PTA',
+        'Internal/everyone'
+      ]
+    } else if (systemConfig.HOSTING_ENABLED) {
       // Check whether the DFSP exists in mock list
       const dfspDB = require('../db/dfspMockUsers')
       const dfspValid = await dfspDB.checkDFSP(req.body.username)
@@ -70,7 +82,7 @@ router.post('/token', async (req, res, next) => {
       aud: systemConfig.OAUTH.APP_OAUTH_CLIENT_KEY,
       sub: plainIdToken.username,
       iss: systemConfig.OAUTH.OAUTH2_ISSUER,
-      groups: [],
+      groups: groupsData,
       dfspId: plainIdToken.dfspId,
       userguid: plainIdToken.userguid
     }
