@@ -50,15 +50,7 @@ const initServer = () => {
       'Access-Control-Allow-Methods',
       'GET, POST, PATCH, PUT, DELETE, OPTIONS'
     )
-    if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
-      res.setHeader('Access-Control-Allow-Credentials', 'true')
-      res.setHeader('Access-Control-Allow-Origin', Config.getSystemConfig().OAUTH.ORIGIN)
-      if (req.method === 'OPTIONS') {
-        res.send(200)
-      }
-    } else {
-      res.setHeader('Access-Control-Allow-Origin', '*')
-    }
+    setOriginHeader(req, res)
     next()
   })
 
@@ -74,7 +66,7 @@ const initServer = () => {
   app.use('/api/openapi', verifyUser(), require('./api-routes/openapi'))
   app.use('/api/outbound', verifyUser(), require('./api-routes/outbound'))
   app.use('/api/config', verifyUser(), require('./api-routes/config'))
-  app.use('/longpolling', require('./api-routes/longpolling'))
+  app.use('/longpolling', verifyUser(), require('./api-routes/longpolling'))
   app.use('/api/oauth2', require('./api-routes/oauth2'))
   app.use('/api/reports', verifyUser(), require('./api-routes/reports'))
   app.use('/api/settings', verifyUser(), require('./api-routes/settings'))
@@ -110,9 +102,22 @@ const verifyUser = () => {
   return (req, res, next) => { next() }
 }
 
+const setOriginHeader = (req, res) => {
+  const Config = require('./config')
+  if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
+    res.setHeader('Access-Control-Allow-Credentials', 'true')
+    res.setHeader('Access-Control-Allow-Origin', Config.getSystemConfig().OAUTH.ORIGIN)
+    if (req.method === 'OPTIONS') {
+      res.send(200)
+    }
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*')
+  }
+}
 module.exports = {
   startServer,
   socketIO,
   getApp,
-  verifyUser
+  verifyUser,
+  setOriginHeader
 }

@@ -23,14 +23,16 @@
  ******/
 
 const notificationEmitter = require('../../../src/lib/notificationEmitter.js')
+const Config = require('../../../src/lib/config')
 
 const SpyNotificationEmitter = jest.spyOn(notificationEmitter, 'broadcastLog')
+const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 
 const requestLogger = require('../../../src/lib/requestLogger')
 
 describe('requestLogger', () => { 
   describe('when logRequest is called', () => {
-    it('should not throw an error', async () => {
+    it('should take session id from customInfo.sessionId if HOSTING_ENABLED is true', async () => {
       const req = {
         method: 'post',
         path: '/',
@@ -44,6 +46,30 @@ describe('requestLogger', () => {
         payload: {}
       }
       SpyNotificationEmitter.mockReturnValueOnce()
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: true
+      })
+      expect(() => requestLogger.logRequest(req)).not.toThrowError()
+    })
+    it('should take session id from fspiop-source header if HOSTING_ENABLED is true', async () => {
+      const req = {
+        method: 'post',
+        path: '/',
+        body: {},
+        customInfo: {
+          uniqueId: '',
+          sessionID: ''
+        },
+        headers: {
+          'fspiop-source': 'userdfsp'
+        },
+        query: {},
+        payload: {}
+      }
+      SpyNotificationEmitter.mockReturnValueOnce()
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: true
+      })
       expect(() => requestLogger.logRequest(req)).not.toThrowError()
     })
     it('should not throw an error if body is missing', async () => {

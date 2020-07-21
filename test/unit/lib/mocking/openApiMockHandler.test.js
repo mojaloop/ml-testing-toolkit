@@ -230,19 +230,21 @@ describe('OpenApiMockHandler', () => {
     })
   })
   describe('handleRequest', () => {
-    it('Check for the returned value', () => {
+    it('Check for the returned value', async () => {
       SpyValidate.mockImplementationOnce(() => {throw new Error('')})
-      const result = OpenApiMockHandler.handleRequest(sampleRequest, h)
+      const result = await OpenApiMockHandler.handleRequest(sampleRequest, h)
       expect(result).toBeDefined()
     })
-    it('Check for the returned value', () => {
+    it('Check for the returned value', async () => {
       SpyValidate.mockReturnValueOnce(true)
+      sampleRequest.method = 'put'
       sampleRequest.path = '/test'
-      const result = OpenApiMockHandler.handleRequest(sampleRequest, h)
+      const result = await OpenApiMockHandler.handleRequest(sampleRequest, h)
+      sampleRequest.method = 'post'
       sampleRequest.path = '/quotes'
-      expect(result).toBeDefined()
+      expect(result).toBeDefined
     })
-    it('Check for the returned value', () => {
+    it('Check for the returned value', async () => {
       SpyValidate.mockReturnValueOnce(false)
       SpyValidateAcceptHeader.mockReturnValueOnce({
         validationFailed: false
@@ -254,10 +256,10 @@ describe('OpenApiMockHandler', () => {
       SpyGetUserConfig.mockReturnValueOnce({
         VERSIONING_SUPPORT_ENABLE: true
       })
-      const result = OpenApiMockHandler.handleRequest(sampleRequest, h)
+      const result = await OpenApiMockHandler.handleRequest(sampleRequest, h)
       expect(result).toBeDefined()
     })
-    it('Check for the returned value', () => {
+    it('Check for the returned value', async () => {
       SpyValidate.mockReturnValueOnce(true)
       SpyValidateAcceptHeader.mockReturnValueOnce({
         validationFailed: false
@@ -269,10 +271,10 @@ describe('OpenApiMockHandler', () => {
       SpyGetUserConfig.mockReturnValueOnce({
         VERSIONING_SUPPORT_ENABLE: true
       })
-      const result = OpenApiMockHandler.handleRequest(sampleRequest, h)
+      const result = await OpenApiMockHandler.handleRequest(sampleRequest, h)
       expect(result).toBeDefined()
     })
-    it('Check for the returned value', () => {
+    it('Check for the returned value', async () => {
       SpyValidate.mockReturnValueOnce(true)
       SpyValidateAcceptHeader.mockReturnValueOnce({
         validationFailed: true
@@ -280,10 +282,10 @@ describe('OpenApiMockHandler', () => {
       SpyGetUserConfig.mockReturnValueOnce({
         VERSIONING_SUPPORT_ENABLE: true
       })
-      const result = OpenApiMockHandler.handleRequest(sampleRequest, h)
+      const result = await OpenApiMockHandler.handleRequest(sampleRequest, h)
       expect(result).toBeDefined()
     })
-    it('Check for the returned value', () => {
+    it('Check for the returned value', async () => {
       SpyValidate.mockReturnValueOnce(true)
       SpyValidateContentTypeHeader.mockReturnValueOnce({
         validationFailed: true
@@ -293,12 +295,12 @@ describe('OpenApiMockHandler', () => {
       })
       sampleRequest.method = 'put'
       sampleRequest.path = '/quotes/{ID}'
-      const result = OpenApiMockHandler.handleRequest(sampleRequest, h)
+      const result = await OpenApiMockHandler.handleRequest(sampleRequest, h)
       expect(result).toBeDefined()
       sampleRequest.method = 'post'
       sampleRequest.path = '/quotes'
     })
-    it('Check for the returned value', () => {
+    it('Check for the returned value', async () => {
       SpyValidate.mockReturnValueOnce(true)
       SpyValidateContentTypeHeader.mockReturnValueOnce({
         validationFailed: false
@@ -306,22 +308,19 @@ describe('OpenApiMockHandler', () => {
       SpyGetUserConfig.mockReturnValueOnce({
         VERSIONING_SUPPORT_ENABLE: true
       })
-      SpyNegotiateVersion.mockReturnValueOnce({
-        negotiationFailed: true
-      })
       sampleRequest.method = 'put'
       sampleRequest.path = '/quotes/{ID}'
-      const result = OpenApiMockHandler.handleRequest(sampleRequest, h)
+      const result = await OpenApiMockHandler.handleRequest(sampleRequest, h)
       expect(result).toBeDefined()
       sampleRequest.method = 'post'
       sampleRequest.path = '/quotes'
     })
-    it('Check for the returned value', () => {
+    it('Check for the returned value', async () => {
       SpyValidate.mockReturnValueOnce(false)
       SpyGetUserConfig.mockReturnValueOnce({
         VERSIONING_SUPPORT_ENABLE: false
       })
-      const result = OpenApiMockHandler.handleRequest(sampleRequest, h)
+      const result = await OpenApiMockHandler.handleRequest(sampleRequest, h)
       expect(result).toBeDefined()
     })
   })

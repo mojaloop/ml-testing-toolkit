@@ -20,15 +20,34 @@ const utils = require('../../../src/lib/utils')
 
 const Cookies = require('cookies')
 const Config = require('../../../src/lib/config')
+const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 
 jest.mock('cookies')
 
 Cookies.mockImplementation()
 describe('OAuthHelper tests', () => {
   it('handleMiddleware', async () => {
+    SpyGetSystemConfig
+      .mockReturnValueOnce({})
+      .mockReturnValueOnce({
+        OAUTH: {
+          AUTH_ENABLED: true
+        }
+      })
     OAuthHelper.handleMiddleware()
   });
-
+  it('handleMiddleware', async () => {
+    SpyGetSystemConfig
+      .mockReturnValueOnce({
+        OAUTH: {}
+      })
+      .mockReturnValueOnce({
+        OAUTH: {
+          AUTH_ENABLED: false
+        }
+      })
+    OAuthHelper.handleMiddleware()
+  });
   describe('cookieExtractor', () => {
     it('should not throw an error', async () => {
       OAuthHelper.cookieExtractor({})
@@ -63,6 +82,20 @@ describe('OAuthHelper tests', () => {
       systemConfig.OAUTH.CERTIFICATE_FILE_NAME = CERTIFICATE_FILE_NAME
       await utils.writeFileAsync(SYSTEM_CONFIG_FILE, JSON.stringify(systemConfig, null, 2))
     });
+    it('should not throw an error', async () => {
+      const systemConfig = Config.getSystemConfig()
+      const EMBEDDED_CERTIFICATE = systemConfig.OAUTH.EMBEDDED_CERTIFICATE
+      const CERTIFICATE_FILE_NAME = systemConfig.OAUTH.CERTIFICATE_FILE_NAME
+      systemConfig.OAUTH.EMBEDDED_CERTIFICATE = ''
+      systemConfig.OAUTH.CERTIFICATE_FILE_NAME = '/' + CERTIFICATE_FILE_NAME
+      await utils.writeFileAsync(SYSTEM_CONFIG_FILE, JSON.stringify(systemConfig, null, 2))
+      try {
+        OAuthHelper.createJwtStrategy()
+      } catch (err) {}
+      systemConfig.OAUTH.EMBEDDED_CERTIFICATE = EMBEDDED_CERTIFICATE
+      systemConfig.OAUTH.CERTIFICATE_FILE_NAME = CERTIFICATE_FILE_NAME
+      await utils.writeFileAsync(SYSTEM_CONFIG_FILE, JSON.stringify(systemConfig, null, 2))
+    });
   });
   describe('verifyCallback', () => {
     it('should not throw an error', async () => {
@@ -83,7 +116,11 @@ describe('OAuthHelper tests', () => {
       OAuthHelper.verifyCallback({},{sub: 'sub', iss: issuer, groups: ['openid']}, jest.fn())
     });
   });
-  
+  describe('getOAuth2Middleware', () => {
+    it('should not throw an error', async () => {
+      OAuthHelper.getOAuth2Middleware()
+    });
+  });
   // it('should fail because of an invalid algorithm', async () => {
   //   await Config.loadSystemConfig()
   //   let callbackCalled = false;

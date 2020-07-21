@@ -2440,7 +2440,7 @@
 									"    pm.response.to.have.status(202);",
 									"    ",
 									"    pm.test(\"Response headers to have proper content-type\", function () {",
-									"        pm.response.to.have.header(\"Content-Type\",\"application/vnd.interoperability.quotes+json;version=1.0\");     ",
+									"        pm.response.to.have.header(\"Content-Type\",\"application/vnd.interoperability.quotes+json;version=1.1\");     ",
 									"    });",
 									"    ",
 									"});",

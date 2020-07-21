@@ -211,6 +211,52 @@ describe('callbackHandler', () => {
             },
             {
               method: 'post',
+              path: '/transfers/{ID}',
+              endpoint: 'http://localhost:3000'
+            }
+          ]
+        },
+        OUTBOUND_MUTUAL_TLS_ENABLED: false,
+        SEND_CALLBACK_ENABLE: true
+      })
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
+      SpySign.mockImplementationOnce(() => {
+        throw new Error('log error if jws signign fails')
+      })
+      SpyPushCallback.mockReturnValueOnce()
+      SpyMyEventEmitter.mockReturnValueOnce({
+        emit: () => {}
+      })
+      SpyRequestLogger.mockReturnValue()
+      axios.mockRejectedValueOnce({err: {}})
+      await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
+    })
+    it('when CALLBACK_RESOURCE_ENDPOINTS and SEND_CALLBACK_ENABLE is enabled and OUTBOUND_MUTUAL_TLS_ENABLED disabled', async () => {
+      const callbackObject = {
+        method: 'post',
+        path: '/transfers/{ID}',
+        headers: {},
+        body: {}
+      }
+      const context = {
+        api: {
+          validateRequest: async () => {
+            return {valid: false}
+          }
+        }
+      }
+      const req = {
+        headers: {}
+      }
+      SpyGetUserConfig.mockReturnValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CALLBACK_RESOURCE_ENDPOINTS: {
+          enabled: true,
+          endpoints: [
+            {
+              method: 'get',
               path: '/transfers/{ID}'
             }
           ]

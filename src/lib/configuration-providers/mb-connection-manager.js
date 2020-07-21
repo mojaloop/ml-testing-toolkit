@@ -130,7 +130,8 @@ const initDFSP = async (environmentId, dfspId, dfspName) => {
   }
 }
 
-const initJWSCertificate = async (environmentId, dfspId, jwsCertificate = null, intermediateCertificate = null) => {
+const initJWSCertificate = async (environmentId, dfspId, jwsCertificate) => {
+  const intermediateCertificate = null
   const rootCertificate = null
   let certExists = false
   let certResult = null

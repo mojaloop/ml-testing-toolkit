@@ -17,7 +17,7 @@ services:
       - -c
       - "npm start"
   mojaloop-testing-toolkit-ui:
-    image: mojaloop/ml-testing-toolkit-ui:v10.6.0
+    image: mojaloop/ml-testing-toolkit-ui:v10.6.1
     ports:
       - "6060:6060"
     environment:
