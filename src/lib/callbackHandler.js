@@ -30,6 +30,7 @@ const assertionStore = require('./assertionStore')
 const MyEventEmitter = require('./MyEventEmitter')
 const JwsSigning = require('./jws/JwsSigning')
 const ConnectionProvider = require('../lib/configuration-providers/mb-connection-manager')
+const traceHeaderUtils = require('./traceHeaderUtils')
 
 const handleCallback = async (callbackObject, context, req) => {
   if (callbackObject.delay) {
@@ -83,6 +84,10 @@ const handleCallback = async (callbackObject, context, req) => {
   // Pass on the traceparent header if exists
   if (req.headers.traceparent) {
     callbackObject.headers.traceparent = req.headers.traceparent
+  } else {
+    if (req.customInfo.traceID) {
+      callbackObject.headers.traceparent = traceHeaderUtils.getTraceParentHeader(req.customInfo.traceID)
+    }
   }
 
   // JwsSigning

@@ -113,6 +113,9 @@ const onPreHandler = (request, h) => {
       request.customInfo.endToEndID = traceHeaderUtils.getEndToEndID(traceID)
       request.customInfo.sessionID = traceHeaderUtils.getSessionID(traceID)
     }
+  } else {
+    request.customInfo.traceID = traceHeaderUtils.generateRandTraceId()
+    RequestLogger.logMessage('info', 'Traceparent header not found. Generated a random traceID.', { traceID: request.customInfo.traceID }, true, request)
   }
   RequestLogger.logRequest(request)
   return h.continue
