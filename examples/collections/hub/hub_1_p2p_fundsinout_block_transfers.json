@@ -186,10 +186,10 @@
             "ID": "{$prev.1.request.body.transferId}"
           },
           "headers": {
-            "Content-Type": "{$inputs.contentType}",
+            "Content-Type": "{$inputs.contentTransfers}",
             "Date": "{$function.generic.curDate}",
             "FSPIOP-Source": "{$inputs.fromFspId}",
-            "Accept": "{$inputs.accept}"
+            "Accept": "{$inputs.acceptTransfers}"
           },
           "url": "{$inputs.HOST_ML_API_ADAPTER}",
           "tests": {
@@ -397,10 +397,10 @@
             "ID": "{$prev.1.request.body.transferId}"
           },
           "headers": {
-            "Content-Type": "{$inputs.contentType}",
+            "Content-Type": "{$inputs.contentTransfers}",
             "Date": "{$function.generic.curDate}",
             "FSPIOP-Source": "{$inputs.fromFspId}",
-            "Accept": "{$inputs.accept}"
+            "Accept": "{$inputs.acceptTransfers}"
           },
           "url": "{$inputs.HOST_ML_API_ADAPTER}",
           "tests": {
@@ -580,10 +580,10 @@
             "ID": "{$prev.1.request.body.transferId}"
           },
           "headers": {
-            "Content-Type": "{$inputs.contentType}",
+            "Content-Type": "{$inputs.contentTransfers}",
             "Date": "{$function.generic.curDate}",
             "FSPIOP-Source": "{$inputs.fromFspId}",
-            "Accept": "{$inputs.accept}"
+            "Accept": "{$inputs.acceptTransfers}"
           },
           "url": "{$inputs.HOST_ML_API_ADAPTER}",
           "tests": {
@@ -784,10 +784,10 @@
             "ID": "{$prev.1.request.body.transferId}"
           },
           "headers": {
-            "Content-Type": "{$inputs.contentType}",
+            "Content-Type": "{$inputs.contentTransfers}",
             "Date": "{$function.generic.curDate}",
             "FSPIOP-Source": "{$inputs.fromFspId}",
-            "Accept": "{$inputs.accept}"
+            "Accept": "{$inputs.acceptTransfers}"
           },
           "url": "{$inputs.HOST_ML_API_ADAPTER}",
           "tests": {
@@ -968,10 +968,10 @@
             "ID": "{$prev.1.request.body.transferId}"
           },
           "headers": {
-            "Content-Type": "{$inputs.contentType}",
+            "Content-Type": "{$inputs.contentTransfers}",
             "Date": "{$function.generic.curDate}",
             "FSPIOP-Source": "{$inputs.fromFspId}",
-            "Accept": "{$inputs.accept}"
+            "Accept": "{$inputs.acceptTransfers}"
           },
           "url": "{$inputs.HOST_ML_API_ADAPTER}",
           "tests": {
