@@ -148,6 +148,9 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
 
     // Insert traceparent header if sessionID passed
     if (sessionID) {
+      if (!convertedRequest.headers) {
+        convertedRequest.headers = {}
+      }
       convertedRequest.headers.traceparent = '00-' + traceID + '-0123456789abcdef0-00'
     }
 
