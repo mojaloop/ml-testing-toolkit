@@ -80,6 +80,7 @@ spec_files/rules_callback/*
 !spec_files/rules_callback/config.json
 !spec_files/rules_callback/default.json
 !spec_files/rules_callback/p2p-limit.json
+!spec_files/rules_callback/fspiop-1.1.json
 
 spec_files/rules_validation/*
 !spec_files/rules_validation/config.json

@@ -30,14 +30,14 @@ const outbound = () => {
   const config = objectStore.get('config')
   const socket = socketIOClient(config.baseURL)
   socket.on('outboundProgress', outboundMode.handleIncomingProgress)
-  console.log(`Listening on ${config.baseURL}...`)
+  console.log(`Listening on ${config.baseURL} outboundProgress events...`)
 }
 
 const monitoring = () => {
   const config = objectStore.get('config')
-  const socket = socketIOClient(config.baseUrl)
+  const socket = socketIOClient(config.baseURL)
   socket.on('newLog', monitoringMode.handleIncomingProgress)
-  console.log('Listening on newLog events...')
+  console.log(`Listening on ${config.baseURL} newLog events...`)
 }
 
 module.exports = {
