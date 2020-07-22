@@ -3,11 +3,11 @@
   "test_cases": [
     {
       "id": 1,
-      "name": "payee_abort",
+      "name": "payee_abort_v.1.1",
       "requests": [
         {
           "id": 1,
-          "description": "Get payerfsp position before TheTransfer",
+          "description": "Store Payerfsp position before prepare",
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
@@ -41,7 +41,7 @@
         },
         {
           "id": 2,
-          "description": "Get payerfsp position before TheTransfer Copy",
+          "description": "Store Payeefsp position before prepare",
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
@@ -77,7 +77,7 @@
           "id": 3,
           "description": "Send transfer",
           "apiVersion": {
-            "minorVersion": 0,
+            "minorVersion": 1,
             "majorVersion": 1,
             "type": "fspiop",
             "asynchronous": true
@@ -159,74 +159,8 @@
             "postRequest": {
               "exec": [
                 "var jsonData = pm.response.body;",
-                "pm.environment.set(\"payerfspPositionAfterTransfer\", jsonData[0].value)"
-              ]
-            },
-            "preRequest": {
-              "exec": [
-                "setTimeout(() => {}, 500)"
-              ]
-            }
-          }
-        },
-        {
-          "id": 5,
-          "description": "Check Transfer status - ABORTED",
-          "apiVersion": {
-            "minorVersion": 0,
-            "majorVersion": 1,
-            "type": "fspiop",
-            "asynchronous": true
-          },
-          "operationPath": "/transfers/{ID}",
-          "path": "/transfers/{$environment.transfer_ID}",
-          "method": "get",
-          "params": {
-            "ID": "{$environment.transfer_ID}"
-          },
-          "url": "{$inputs.HOST_ML_API_ADAPTER}",
-          "headers": {
-            "Accept": "application/vnd.interoperability.transfers+json;version=1.0",
-            "Content-Type": "application/vnd.interoperability.transfers+json;version=1.0",
-            "Date": "{$environment.transferDate}",
-            "FSPIOP-Source": "payerfsp"
-          },
-          "ignoreCallbacks": true,
-          "tests": {
-            "assertions": [
-              {
-                "id": 1,
-                "description": "Send Payee Abort Status code is 200",
-                "exec": [
-                  "expect(environment.sendPayeeAbortResponse.code).to.equal(200)"
-                ]
-              },
-              {
-                "id": 2,
-                "description": "Send Payee Abort Response code should be ABORTED",
-                "exec": [
-                  "expect(environment.sendPayeeAbortCallbackBody.transferState).to.equal('ABORTED')"
-                ]
-              },
-              {
-                "id": 3,
-                "description": "Status code is 202",
-                "exec": [
-                  "expect(response.status).to.equal(202)"
-                ]
-              },
-              {
-                "id": 4,
-                "description": "Callback status is ABORTED",
-                "exec": [
-                  "expect(environment.checkTransferStatusCallback.transferState).to.equal('ABORTED')"
-                ]
-              }
-            ]
-          },
-          "scripts": {
-            "preRequest": {
-              "exec": [
+                "pm.environment.set(\"payerfspPositionAfterPrepare\", jsonData[0].value)",
+                "",
                 "pm.environment.set(\"completedTimestamp\",new Date().toISOString());",
                 "",
                 "setTimeout(function () {",
@@ -235,7 +169,7 @@
                 "      url: pm.environment.get(\"HOST_ML_API_ADAPTER\")+\"/transfers/\"+pm.environment.get(\"transfer_ID\"),",
                 "      method: \"PUT\",",
                 "      header: {",
-                "        \"Content-Type\": \"application/vnd.interoperability.transfers+json;version=1\",",
+                "        \"Content-Type\": \"application/vnd.interoperability.transfers+json;version=1.1\",",
                 "        \"Date\": \"Thu, 24 Jan 2019 10:22:12 GMT\",",
                 "        \"FSPIOP-Source\": \"noresponsepayeefsp\",",
                 "        \"FSPIOP-Destination\": \"payerfsp\"",
@@ -248,38 +182,228 @@
                 "          \"transferState\": \"ABORTED\"",
                 "        })",
                 "      }",
+                "    }, function (err, response) {});",
+                "}, 2000)"
+              ]
+            },
+            "preRequest": {
+              "exec": [
+                "setTimeout(() => {}, 500)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 5,
+          "description": "Check Payeefsp position after Abort",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/positions",
+          "path": "/participants/payeefsp/positions",
+          "method": "get",
+          "params": {
+            "name": "payeefsp",
+            "ID": ""
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 200",
+                "exec": [
+                  "expect(response.status).to.equal(200)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Payeefsp position after Payee ABORT should be same as position before prepare.",
+                "exec": [
+                  "expect(response.data[0].value).to.equal(+environment.payeefspPositionBeforePrepare)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "fspiop-source is noresponsepayeefsp",
+                "exec": [
+                  "expect(environment.sendPayeeFulfillRejectCallbackBody.headers['fspiop-source']).to.equal('noresponsepayeefsp')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "fspiop-destination is payerfsp",
+                "exec": [
+                  "expect(environment.sendPayeeFulfillRejectCallbackBody.headers['fspiop-destination']).to.equal('payerfsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "payeefsp content-type is same as sent in the request",
+                "exec": [
+                  "expect(environment.sendPayeeFulfillRejectCallbackBody.headers['content-type']).to.equal('application/vnd.interoperability.transfers+json;version=1.1')"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "date header should not be empty",
+                "exec": [
+                  "expect(environment.sendPayeeFulfillRejectCallbackBody.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "accept header should not be sent in the response",
+                "exec": [
+                  "expect(environment.sendPayeeFulfillRejectCallbackBody.headers).to.not.have.property('accept')"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Response Error Code is 5101",
+                "exec": [
+                  "expect(environment.sendPayeeFulfillRejectCallbackBody.data.errorInformation.errorCode).to.not.have.property('5101')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "Response Error Desription is 'Payee transaction limit reached",
+                "exec": [
+                  "expect(environment.sendPayeeFulfillRejectCallbackBody.data.errorInformation.errorDescription).to.include('Payee transaction limit reached')"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "pm.environment.set(\"completedTimestamp\",new Date().toISOString());",
+                "",
+                "setTimeout(function () {",
+                "  pm.sendRequest(",
+                "    {",
+                "      url: pm.environment.get(\"HOST_ML_API_ADAPTER\")+\"/transfers/\"+pm.environment.get(\"transfer_ID\") + '/error',",
+                "      method: \"PUT\",",
+                "      header: {",
+                "        \"Content-Type\": \"application/vnd.interoperability.transfers+json;version=1.1\",",
+                "        \"Date\": \"Thu, 24 Jan 2019 10:22:12 GMT\",",
+                "        \"FSPIOP-Source\": \"noresponsepayeefsp\",",
+                "        \"FSPIOP-Destination\": \"payerfsp\"",
+                "      },",
+                "      body: {",
+                "        mode: 'raw',",
+                "        raw: JSON.stringify({",
+                "        \t\"errorInformation\": {",
+                "        \t\t\"errorCode\": \"5101\",",
+                "        \t\t\"errorDescription\": \"Payee transaction limit reached\",",
+                "        \t\t\"extensionList\": {",
+                "        \t\t\t\"extension\": [{",
+                "        \t\t\t\t\"key\": \"errorDetail\",",
+                "        \t\t\t\t\"value\": \"This is an abort extension\"",
+                "        \t\t\t}]",
+                "        \t\t}",
+                "        \t}",
+                "        })",
+                "      }",
                 "    }, function (err, response) {",
-                "    pm.environment.set(\"sendPayeeAbortResponse\", response)",
-                "    pm.environment.set(\"sendPayeeAbortResponseBody\", response.json())",
-                "    console.log(\"sendPayeeAbortResponse: \", pm.environment.get(\"sendPayeeAbortResponse\"))",
+                "    pm.environment.set(\"sendPayeeFulfillRejectResponse\", response)",
+                "    pm.environment.set(\"sendPayeeFulfillRejectResponseBody\", response.json())",
+                "    console.log(\"sendPayeeFulfillRejectResponse: \", response)",
                 "   });",
                 "}, 500)",
                 "",
                 "setTimeout(function () {",
-                "  pm.sendRequest(pm.environment.get(\"HOST_SIMULATOR\")+\"/payerfsp/correlationid/\"+pm.environment.get(\"transfer_ID\"), function (err, response) {",
-                "    console.log(response)",
-                "    pm.environment.set(\"sendPayeeAbortCallbackBody\", response.json())",
-                "    pm.environment.set(\"sendPayeeAbortCallback\", response)",
-                "    console.log(\"sendPayeeAbortCallback: \", pm.environment.get(\"sendPayeeAbortCallback\"))",
+                "  pm.sendRequest(",
+                "    {",
+                "      url: pm.environment.get(\"HOST_SIMULATOR\")+\"/payerfsp/callbacks/\"+pm.environment.get(\"transfer_ID\"),",
+                "      method: \"GET\"",
+                "    }, function (err, response) {",
+                "      pm.environment.set(\"sendPayeeFulfillRejectCallback\", response)",
+                "      pm.environment.set(\"sendPayeeFulfillRejectCallbackBody\", response.json())",
+                "      console.log(response)",
                 "   });",
-                "}, 1000)"
+                "}, 1500)",
+                ""
               ]
             },
-            "postRequest": {
+            "preRequest": {
               "exec": [
-                "setTimeout(function () {",
-                "  pm.sendRequest(pm.environment.get(\"HOST_SIMULATOR\")+\"/payerfsp/correlationid/\"+pm.variables.get(\"transfer_ID\"), function (err, response) {",
-                "    pm.environment.set(\"checkTransferStatusCallback\", response.json())",
-                "    console.log(\"checkTransferStatusCallback: \", pm.environment.get(\"checkTransferStatusCallback\"))",
-                "  });",
-                "}, 500)"
+                ""
               ]
             }
           }
         },
         {
           "id": 6,
-          "description": "Check Payerfsp position after Abort",
+          "description": "get transfers",
+          "apiVersion": {
+            "minorVersion": 1,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transfers/{ID}",
+          "path": "/transfers/{$environment.transfer_ID}",
+          "method": "get",
+          "params": {
+            "ID": "{$environment.transfer_ID}",
+            "name": ""
+          },
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
+          "headers": {
+            "Accept": "application/vnd.interoperability.transfers+json;version=1.0",
+            "Content-Type": "application/vnd.interoperability.transfers+json;version=1.1",
+            "Date": "{$environment.transferDate}",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "noresponsepayeefsp"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Response status is ABORTED",
+                "exec": [
+                  "expect(environment.getTransfersCallbackBody.transferState).to.equal('ABORTED')"
+                ]
+              }
+            ]
+          },
+          "ignoreCallbacks": true,
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                ""
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {",
+                "  pm.sendRequest(",
+                "    {",
+                "      url: pm.environment.get(\"HOST_SIMULATOR\")+\"/payerfsp/correlationid/\"+pm.environment.get(\"transfer_ID\"),",
+                "      method: \"GET\"",
+                "    }, function (err, response) {",
+                "      pm.environment.set(\"getTransfersCallback\", response)",
+                "      pm.environment.set(\"getTransfersCallbackBody\", response.json())",
+                "      console.log(response)",
+                "   });",
+                "}, 500)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 7,
+          "description": "Store Payerfsp position before prepare",
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
@@ -303,30 +427,17 @@
               },
               {
                 "id": 2,
-                "description": "Payerfsp position after Payee ABORT should be same as position before prepare.",
+                "description": "Payerfsp position after Payer ABORT should be same as position before prepare.",
                 "exec": [
                   "expect(response.data[0].value).to.equal(+environment.payerfspPositionBeforePrepare)"
                 ]
               }
             ]
-          },
-          "scripts": {
-            "postRequest": {
-              "exec": [
-                "",
-                ""
-              ]
-            },
-            "preRequest": {
-              "exec": [
-                "setTimeout(() => {}, 3000)"
-              ]
-            }
           }
         },
         {
-          "id": 7,
-          "description": "Check Payeefsp position after Abort",
+          "id": 8,
+          "description": "Store Payeefsp position before prepare",
           "apiVersion": {
             "minorVersion": 3,
             "majorVersion": 9,
@@ -356,19 +467,6 @@
                 ]
               }
             ]
-          },
-          "scripts": {
-            "postRequest": {
-              "exec": [
-                "",
-                ""
-              ]
-            },
-            "preRequest": {
-              "exec": [
-                "setTimeout(() => {}, 3000)"
-              ]
-            }
           }
         }
       ]
