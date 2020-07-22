@@ -52,7 +52,7 @@ const logRequest = function (request) {
   }
   Logger.info(logObject, logMessage)
 
-  notificationEmitter.broadcastLog({ uniqueId: request.customInfo ? request.customInfo.uniqueId : null, traceID: request.customInfo ? request.customInfo.traceID : null, resource: { method: request.method, path: request.path }, messageType: 'request', verbosity: 'info', message: logMessage, additionalData: logObject }, getSessionID(request))
+  notificationEmitter.broadcastLog({ uniqueId: request.customInfo ? request.customInfo.uniqueId : null, traceID: (request && request.customInfo) ? request.customInfo.traceID : null, resource: { method: request.method, path: request.path }, messageType: 'request', verbosity: 'info', message: logMessage, additionalData: logObject }, getSessionID(request))
 }
 
 const logResponse = function (request) {
@@ -65,7 +65,7 @@ const logResponse = function (request) {
     }
     const logMessage = `Response: ${request.method} ${request.path} Status: ${request.response.statusCode}`
     Logger.info(logObject, logMessage)
-    notificationEmitter.broadcastLog({ uniqueId: request.customInfo ? request.customInfo.uniqueId : null, traceID: request.customInfo ? request.customInfo.traceID : null, resource: { method: request.method, path: request.path }, messageType: 'response', verbosity: 'info', message: logMessage, additionalData: logObject }, getSessionID(request))
+    notificationEmitter.broadcastLog({ uniqueId: request.customInfo ? request.customInfo.uniqueId : null, traceID: (request && request.customInfo) ? request.customInfo.traceID : null, resource: { method: request.method, path: request.path }, messageType: 'response', verbosity: 'info', message: logMessage, additionalData: logObject }, getSessionID(request))
   }
 }
 
@@ -86,7 +86,7 @@ const logMessage = (verbosity, message, additionalData = null, notification = tr
   }
 
   if (notification) {
-    notificationEmitter.broadcastLog({ uniqueId: request ? request.customInfo.uniqueId : null, traceID: request.customInfo ? request.customInfo.traceID : null, resource: request ? { method: request.method, path: request.path } : null, messageType: 'generic', verbosity, message: message, additionalData }, getSessionID(request))
+    notificationEmitter.broadcastLog({ uniqueId: request ? request.customInfo.uniqueId : null, traceID: (request && request.customInfo) ? request.customInfo.traceID : null, resource: request ? { method: request.method, path: request.path } : null, messageType: 'generic', verbosity, message: message, additionalData }, getSessionID(request))
   }
 }
 

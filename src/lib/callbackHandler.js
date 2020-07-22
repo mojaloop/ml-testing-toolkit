@@ -85,7 +85,7 @@ const handleCallback = async (callbackObject, context, req) => {
   if (req.headers.traceparent) {
     callbackObject.headers.traceparent = req.headers.traceparent
   } else {
-    if (req.customInfo.traceID) {
+    if (req.customInfo && req.customInfo.traceID) {
       callbackObject.headers.traceparent = traceHeaderUtils.getTraceParentHeader(req.customInfo.traceID)
     }
   }
