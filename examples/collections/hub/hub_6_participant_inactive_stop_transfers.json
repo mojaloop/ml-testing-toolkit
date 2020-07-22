@@ -401,7 +401,7 @@
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
                 "partyIdentifier": "27713803905",
-                "fspId": "{$environment.payerfsp}"
+                "fspId": "payerfsp"
               },
               "personalInfo": {
                 "complexName": {
