@@ -33,7 +33,7 @@ const cli = (commander) => {
     environmentFile: commander.environmentFile,
     reportFormat: commander.reportFormat || configFile.reportFormat,
     reportFilename: commander.reportFilename,
-    baseURL: commander.baseURL || configFile.baseURL
+    baseURL: commander.baseUrl || configFile.baseURL
   }
 
   objectStore.set('config', config)
