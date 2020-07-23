@@ -1,0 +1,1845 @@
+{
+  "name": "hub-bulk-transfers-tests",
+  "test_cases": [
+    {
+      "id": 1,
+      "name": "positive scenario - fulfil",
+      "requests": [
+        {
+          "id": 3,
+          "description": "POST Bulk Transfer",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "method": "post",
+          "url": "{$inputs.HOST_BULK_ADAPTER}",
+          "headers": {
+            "Accept": "application/vnd.interoperability.bulkTransfers+json;version=1.0",
+            "Content-Type": "application/vnd.interoperability.bulkTransfers+json;version=1.0",
+            "Date": "{$environment.headerDate}",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "payeefsp"
+          },
+          "body": {
+            "bulkTransferId": "{$environment.bulkTransferId}",
+            "bulkQuoteId": "{$environment.bulkQuoteId}",
+            "payeeFsp": "payeefsp",
+            "payerFsp": "payerfsp",
+            "individualTransfers": [
+              {
+                "transferId": "{$environment.transferId}",
+                "transferAmount": {
+                  "currency": "{$environment.currency}",
+                  "amount": "{$environment.amount}"
+                },
+                "ilpPacket": "{$environment.validIlpPacket2}",
+                "condition": "{$environment.validCondition2}",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "extKey1",
+                      "value": "extValue1"
+                    },
+                    {
+                      "key": "extKey2",
+                      "value": "extValue2"
+                    }
+                  ]
+                }
+              },
+              {
+                "transferId": "{$environment.transferId2}",
+                "transferAmount": {
+                  "currency": "{$environment.currency2}",
+                  "amount": "{$environment.amount2}"
+                },
+                "ilpPacket": "{$environment.validIlpPacket2}",
+                "condition": "{$environment.validCondition2}"
+              }
+            ],
+            "expiration": "{$environment.expirationDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "payerfsp callback - date header should be set",
+                "exec": [
+                  "expect(environment.payerCallback.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "payerfsp callback - payer callback fspiop-source should be payeefsp",
+                "exec": [
+                  "expect(environment.payerCallback.headers['fspiop-source']).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "payerfsp callback - fspiop-destination should be payerfsp",
+                "exec": [
+                  "expect(environment.payerCallback.headers['fspiop-destination']).to.equal('payerfsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "payerfsp callback - fspiop-http-method should be PUT",
+                "exec": [
+                  "expect(environment.payerCallback.headers['fspiop-http-method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "payerfsp callback - fspiop-uri should be /payerfsp/bulkTransfers/",
+                "exec": [
+                  "expect(environment.payerCallback.headers['fspiop-uri']).to.equal(`/payerfsp/bulkTransfers/${environment.bulkTransferId}`)"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "payerfsp callback - Bulk Transfer state should be COMPLETED on Payer side",
+                "exec": [
+                  "expect(environment.payerCallback.data.bulkTransferState).to.equal('COMPLETED')"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "payerfsp callback - Completed timestamp should be set",
+                "exec": [
+                  "expect(environment.payerCallback.data).to.have.property('completedTimestamp')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "payerfsp callback - All individual transfer results (failed & successful) should be returned",
+                "exec": [
+                  "expect(environment.payerCallback.data.individualTransferResults.length).to.equal(2)"
+                ]
+              },
+              {
+                "id": 10,
+                "description": "payerfsp callback - 1st individual transfer should have fulfilment",
+                "exec": [
+                  "const transfer1 = environment.payerCallback.data.individualTransferResults.find(t => t.transferId === environment.transferId);",
+                  "expect(transfer1).to.have.property('fulfilment')"
+                ]
+              },
+              {
+                "id": 11,
+                "description": "payerfsp callback - 2nd individual transfer should have fulfilment",
+                "exec": [
+                  "const transfer2 = environment.payerCallback.data.individualTransferResults.find(t => t.transferId === environment.transferId2);",
+                  "expect(transfer2).to.have.property('fulfilment')"
+                ]
+              },
+              {
+                "id": 12,
+                "description": "payeefsp callback - date header should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 13,
+                "description": "payeefsp callback - fspiop-source should be switch",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-source']).to.equal('switch')"
+                ]
+              },
+              {
+                "id": 14,
+                "description": "payeefsp callback - fspiop-destination should be payeefsp",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-destination']).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 15,
+                "description": "payeefsp callback - fspiop-http-method should be PUT",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-http-method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 16,
+                "description": "payeefsp callback - fspiop-uri should be as expected",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-uri']).to.equal(`/payeefsp/bulkTransfers/${environment.bulkTransferId}`)"
+                ]
+              },
+              {
+                "id": 17,
+                "description": "payeefsp callback - Bulk Transfer state should be COMPLETED on Payee side",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.bulkTransferState).to.equal('COMPLETED')"
+                ]
+              },
+              {
+                "id": 18,
+                "description": "payeefsp callback - Completed timestamp should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data).to.have.property('completedTimestamp')"
+                ]
+              },
+              {
+                "id": 19,
+                "description": "payeefsp callback - All individual transfer results (fulfilments) should be returned",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.individualTransferResults.length).to.equal(2)"
+                ]
+              },
+              {
+                "id": 20,
+                "description": "payeefsp callback - 1st individual transfer should have fulfilment",
+                "exec": [
+                  "const transfer1 = environment.bulkTransfersNegativeCallback.data.individualTransferResults.find(t => t.transferId === environment.transferId);",
+                  "expect(transfer1).to.have.property('fulfilment')"
+                ]
+              },
+              {
+                "id": 21,
+                "description": "payeefsp callback - 2nd individual transfer should have fulfilment",
+                "exec": [
+                  "const transfer2 = environment.bulkTransfersNegativeCallback.data.individualTransferResults.find(t => t.transferId === environment.transferId2);",
+                  "expect(transfer2).to.have.property('fulfilment')"
+                ]
+              },
+              {
+                "id": 22,
+                "description": "payeefsp request - date header should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 23,
+                "description": "payeefsp request - fspiop-source should be payerfsp",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers['fspiop-source']).to.equal('payerfsp')"
+                ]
+              },
+              {
+                "id": 24,
+                "description": "payeefsp request - fspiop-destination should be payeefsp",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers['fspiop-destination']).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 25,
+                "description": "payeefsp request - fspiop-http-method should be POST",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers['fspiop-http-method']).to.equal('POST')"
+                ]
+              },
+              {
+                "id": 26,
+                "description": "payeefsp request - fspiop-uri should be as expected",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers['fspiop-uri']).to.equal('/bulkTransfers')"
+                ]
+              },
+              {
+                "id": 27,
+                "description": "payeefsp request - Bulk transfer Id should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data.bulkTransferId).to.equal(environment.bulkTransferId)"
+                ]
+              },
+              {
+                "id": 28,
+                "description": "payeefsp request - Bulk quote Id should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data.bulkQuoteId).to.equal(environment.bulkQuoteId)"
+                ]
+              },
+              {
+                "id": 29,
+                "description": "payeefsp request - PayerFsp should be 'payerfsp'",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data.payerFsp).to.equal('payerfsp')"
+                ]
+              },
+              {
+                "id": 30,
+                "description": "payeefsp request - PayeeFsp should be 'payeefsp'",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data.payeeFsp).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 31,
+                "description": "payeefsp request - expiration should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data).to.have.property('expiration')"
+                ]
+              },
+              {
+                "id": 32,
+                "description": "payeefsp request - All individual transfers (prepare) should be sent",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data.individualTransfers.length).to.equal(2)"
+                ]
+              },
+              {
+                "id": 33,
+                "description": "payeefsp request - 1st individual transfer should have valid ilpPacket",
+                "exec": [
+                  "const transfer1 = environment.bulkTransfersNegativeRequest.data.individualTransfers.find(t => t.transferId === environment.transferId);",
+                  "expect(transfer1.ilpPacket).to.equal(environment.validIlpPacket2)"
+                ]
+              },
+              {
+                "id": 34,
+                "description": "payeefsp request - 1st individual transfer should have valid condition",
+                "exec": [
+                  "const transfer1 = environment.bulkTransfersNegativeRequest.data.individualTransfers.find(t => t.transferId === environment.transferId);",
+                  "expect(transfer1.condition).to.equal(environment.validCondition2)"
+                ]
+              },
+              {
+                "id": 35,
+                "description": "payeefsp request - 1st individual transfer should have valid transferAmount",
+                "exec": [
+                  "const transfer1 = environment.bulkTransfersNegativeRequest.data.individualTransfers.find(t => t.transferId === environment.transferId);",
+                  "expect(JSON.stringify(transfer1.transferAmount)).to.equal(JSON.stringify({ amount: \"1\", currency: \"USD\" }))"
+                ]
+              },
+              {
+                "id": 36,
+                "description": "payeefsp request - 1st individual transfer should have valid extensionList",
+                "exec": [
+                  "const transfer1 = environment.bulkTransfersNegativeRequest.data.individualTransfers.find(t => t.transferId === environment.transferId);",
+                  "expect(JSON.stringify(transfer1.extensionList)).to.equal(JSON.stringify({ extension: [{key: \"extKey1\", value: \"extValue1\"}, { key: \"extKey2\", value: \"extValue2\" }]}))"
+                ]
+              },
+              {
+                "id": 37,
+                "description": "payeefsp request - 2nd individual transfer should have valid ilpPacket",
+                "exec": [
+                  "const transfer2 = environment.bulkTransfersNegativeRequest.data.individualTransfers.find(t => t.transferId === environment.transferId);",
+                  "expect(transfer2.ilpPacket).to.equal(environment.validIlpPacket2)"
+                ]
+              },
+              {
+                "id": 38,
+                "description": "payeefsp request - 2nd individual transfer should have valid condition",
+                "exec": [
+                  "const transfer2 = environment.bulkTransfersNegativeRequest.data.individualTransfers.find(t => t.transferId === environment.transferId);",
+                  "expect(transfer2.condition).to.equal(environment.validCondition2)"
+                ]
+              },
+              {
+                "id": 39,
+                "description": "payeefsp request - 2nd individual transfer should have valid transferAmount",
+                "exec": [
+                  "const transfer2 = environment.bulkTransfersNegativeRequest.data.individualTransfers.find(t => t.transferId === environment.transferId2)",
+                  "expect(JSON.stringify(transfer2.transferAmount)).to.equal(JSON.stringify({ amount: \"1\", currency: \"USD\" }))"
+                ]
+              }
+            ]
+          },
+          "ignoreCallbacks": true,
+          "params": {
+            "name": "testingtoolkitdfsp"
+          },
+          "path": "/bulkTransfers",
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "const uuid = require('uuid');",
+                "",
+                "const delay = 1000 * 3600 * 24",
+                "const bulkTransferId = uuid.v4();",
+                "const bulkQuoteId = uuid.v4();",
+                "const transferId = uuid.v4();",
+                "const transferId2 = uuid.v4();",
+                "const now = new Date();",
+                "const headerDate = now.toUTCString();",
+                "const expirationDate = new Date(now.getTime() + delay).toISOString();",
+                "const completedTimestamp = now.toISOString();",
+                "",
+                "pm.environment.set(\"bulkTransferId\", bulkTransferId);",
+                "pm.environment.set(\"bulkQuoteId\", bulkQuoteId);",
+                "pm.environment.set(\"transferId\", transferId);",
+                "pm.environment.set(\"transferId2\", transferId2);",
+                "pm.environment.set(\"headerDate\", headerDate);",
+                "pm.environment.set(\"expirationDate\", expirationDate);",
+                "pm.environment.set(\"completedTimestamp\", completedTimestamp);",
+                "pm.environment.set(\"amount\", 1);",
+                "pm.environment.set(\"amount2\", 1);",
+                "pm.environment.set(\"currency2\", \"USD\");"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"PAYERFSP_SDK_TESTAPI_URL\") + \"/callbacks/\" + pm.environment.get(\"bulkTransferId\"), function (err, response) {",
+                "    pm.environment.set(\"payerCallback\", response.json())",
+                "    console.log('payerCallback:', response.json())",
+                "  });",
+                "  pm.sendRequest(pm.environment.get(\"PAYEEFSP_SDK_TESTAPI_URL\") + \"/callbacks/\" + pm.environment.get(\"bulkTransferId\"), function (err, response) {",
+                "    pm.environment.set(\"bulkTransfersNegativeCallback\", response.json())",
+                "    console.log('bulkTransfersNegativeCallback:', response.json())",
+                "  });",
+                "  pm.sendRequest(pm.environment.get(\"PAYEEFSP_SDK_TESTAPI_URL\") + \"/requests/\" + pm.environment.get(\"bulkTransferId\"), function (err, response) {",
+                "    pm.environment.set(\"bulkTransfersNegativeRequest\", response.json())",
+                "    console.log('bulkTransfersNegativeRequest:', response.json())",
+                "  });",
+                "}, 3000)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 5,
+          "description": "GET Bulk Transfer - PayeeFSP",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers/{ID}",
+          "path": "/bulkTransfers/{$environment.bulkTransferId}",
+          "method": "get",
+          "params": {
+            "ID": "{$environment.bulkTransferId}",
+            "name": ""
+          },
+          "url": "{$inputs.HOST_BULK_ADAPTER}",
+          "headers": {
+            "Accept": "application/vnd.interoperability.transfers+json;version=1.0",
+            "Content-Type": "application/vnd.interoperability.transfers+json;version=1.1",
+            "Date": "{$environment.headerDate}",
+            "FSPIOP-Source": "payeefsp",
+            "FSPIOP-Destination": "switch"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback date header should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback fspiop-source should be switch",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-source']).to.equal('switch')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback fspiop-destination should be payeefsp",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-destination']).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "Callback fspiop-uri should be as expected",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-uri']).to.equal(`/payeefsp/bulkTransfers/${environment.bulkTransferId}`)"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "Callback fspiop-http-method should be PUT",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-http-method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "Callback Bulk Transfer state should be COMPLETED on Payee side",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.bulkTransferState).to.equal('COMPLETED')"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Callback Completed timestamp should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data).to.have.property('completedTimestamp')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "Callback All individual transfer results (fulfilments) should be returned",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.individualTransferResults.length).to.equal(2)"
+                ]
+              },
+              {
+                "id": 10,
+                "description": "Callback 1st individual transfer should have fulfilment",
+                "exec": [
+                  "const transfer1 = environment.bulkTransfersNegativeCallback.data.individualTransferResults.find(t => t.transferId === environment.transferId);",
+                  "expect(transfer1).to.have.property('fulfilment')"
+                ]
+              },
+              {
+                "id": 11,
+                "description": "Callback 2nd individual transfer should have fulfilment",
+                "exec": [
+                  "const transfer2 = environment.bulkTransfersNegativeCallback.data.individualTransferResults.find(t => t.transferId === environment.transferId2);",
+                  "expect(transfer2).to.have.property('fulfilment')"
+                ]
+              }
+            ]
+          },
+          "ignoreCallbacks": true,
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"PAYEEFSP_SDK_TESTAPI_URL\") + \"/callbacks/\" + pm.environment.get(\"bulkTransferId\"), function (err, response) {",
+                "    pm.environment.set(\"bulkTransfersNegativeCallback\", response.json())",
+                "    console.log('bulkTransfersNegativeCallback:', response.json())",
+                "  });",
+                "}, 3000)"
+              ]
+            },
+            "preRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "id": 6,
+          "description": "GET Bulk Transfer - PayerFSP",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers/{ID}",
+          "path": "/bulkTransfers/{$environment.bulkTransferId}",
+          "method": "get",
+          "params": {
+            "ID": "{$environment.bulkTransferId}",
+            "name": ""
+          },
+          "url": "{$inputs.HOST_BULK_ADAPTER}",
+          "headers": {
+            "Accept": "application/vnd.interoperability.transfers+json;version=1.0",
+            "Content-Type": "application/vnd.interoperability.transfers+json;version=1.1",
+            "Date": "{$environment.headerDate}",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "switch"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback date header should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback fspiop-source should be payeefsp",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-source']).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback fspiop-destination should be payerfsp",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-destination']).to.equal('payerfsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "Callback fspiop-uri should be as expected",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-uri']).to.equal(`/payerfsp/bulkTransfers/${environment.bulkTransferId}`)"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "Callback fspiop-http-method should be PUT",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-http-method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "Callback Bulk Transfer state should be COMPLETED on Payer side",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.bulkTransferState).to.equal('COMPLETED')"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Callback Completed timestamp should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data).to.have.property('completedTimestamp')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "Callback All individual transfer results (fulfilments) should be returned",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.individualTransferResults.length).to.equal(2)"
+                ]
+              },
+              {
+                "id": 10,
+                "description": "Callback 1st individual transfer should have fulfilment",
+                "exec": [
+                  "const transfer1 = environment.bulkTransfersNegativeCallback.data.individualTransferResults.find(t => t.transferId === environment.transferId);",
+                  "expect(transfer1).to.have.property('fulfilment')"
+                ]
+              },
+              {
+                "id": 11,
+                "description": "Callback 2nd individual transfer should have fulfilment",
+                "exec": [
+                  "const transfer2 = environment.bulkTransfersNegativeCallback.data.individualTransferResults.find(t => t.transferId === environment.transferId2);",
+                  "expect(transfer2).to.have.property('fulfilment')"
+                ]
+              }
+            ]
+          },
+          "ignoreCallbacks": true,
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"PAYERFSP_SDK_TESTAPI_URL\") + \"/callbacks/\" + pm.environment.get(\"bulkTransferId\"), function (err, response) {",
+                "    pm.environment.set(\"bulkTransfersNegativeCallback\", response.json())",
+                "    console.log('bulkTransfersNegativeCallback:', response.json())",
+                "  });",
+                "}, 3000)"
+              ]
+            },
+            "preRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "negative scenario - payee_abort",
+      "requests": [
+        {
+          "id": 1,
+          "description": "Store Payerfsp position before prepare",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/positions",
+          "path": "/participants/payerfsp/positions",
+          "method": "get",
+          "params": {
+            "name": "payerfsp"
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 200",
+                "exec": [
+                  "expect(response.status).to.equal(200)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "pm.environment.set(\"payerfspPositionBeforePrepare\", pm.response.body[0].value);"
+              ]
+            }
+          }
+        },
+        {
+          "id": 2,
+          "description": "Store Payeefsp position before prepare",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/positions",
+          "path": "/participants/noresponsepayeefsp/positions",
+          "method": "get",
+          "params": {
+            "name": "noresponsepayeefsp"
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 200",
+                "exec": [
+                  "expect(response.status).to.equal(200)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "pm.environment.set(\"payeefspPositionBeforePrepare\", pm.response.body[0].value);"
+              ]
+            }
+          }
+        },
+        {
+          "id": 3,
+          "description": "Send Prepare",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "method": "post",
+          "url": "{$inputs.HOST_BULK_ADAPTER}",
+          "headers": {
+            "Accept": "application/vnd.interoperability.bulkTransfers+json;version=1.0",
+            "Content-Type": "application/vnd.interoperability.bulkTransfers+json;version=1.0",
+            "Date": "{$environment.headerDate}",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "noresponsepayeefsp"
+          },
+          "body": {
+            "bulkTransferId": "{$environment.bulkTransferId}",
+            "bulkQuoteId": "{$environment.bulkQuoteId}",
+            "payeeFsp": "noresponsepayeefsp",
+            "payerFsp": "payerfsp",
+            "individualTransfers": [
+              {
+                "transferId": "{$environment.transferId}",
+                "transferAmount": {
+                  "currency": "{$environment.currency}",
+                  "amount": "{$environment.amount}"
+                },
+                "ilpPacket": "{$environment.validIlpPacket2}",
+                "condition": "{$environment.validCondition2}",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "extKey1",
+                      "value": "extValue1"
+                    },
+                    {
+                      "key": "extKey2",
+                      "value": "extValue2"
+                    }
+                  ]
+                }
+              },
+              {
+                "transferId": "{$environment.transferId2}",
+                "transferAmount": {
+                  "currency": "{$environment.currency2}",
+                  "amount": "{$environment.amount2}"
+                },
+                "ilpPacket": "{$environment.validIlpPacket2}",
+                "condition": "{$environment.validCondition2}"
+              }
+            ],
+            "expiration": "{$environment.expirationDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              }
+            ]
+          },
+          "ignoreCallbacks": true,
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "",
+                "const delay = 1000 * 3600 * 24",
+                "const bulkTransferId = uuid.v4();",
+                "const bulkQuoteId = uuid.v4();",
+                "const transferId = uuid.v4();",
+                "const transferId2 = uuid.v4();",
+                "const now = new Date();",
+                "const headerDate = now.toUTCString();",
+                "const expirationDate = new Date(now.getTime() + delay).toISOString();",
+                "const completedTimestamp = now.toISOString();",
+                "const amount = 1;",
+                "const amount2 = 2;",
+                "pm.environment.set('bulkTransferId', bulkTransferId);",
+                "pm.environment.set('bulkQuoteId', bulkQuoteId);",
+                "pm.environment.set('transferId', transferId);",
+                "pm.environment.set('transferId2', transferId2);",
+                "pm.environment.set('headerDate', headerDate);",
+                "pm.environment.set('expirationDate', expirationDate);",
+                "pm.environment.set('completedTimestamp', completedTimestamp);",
+                "pm.environment.set('amount', amount);",
+                "pm.environment.set('amount2', amount2);",
+                "pm.environment.set('currency2', 'USD');"
+              ]
+            }
+          }
+        },
+        {
+          "id": 4,
+          "description": "Store Payerfsp position after Prepare",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/positions",
+          "path": "/participants/payerfsp/positions",
+          "method": "get",
+          "params": {
+            "name": "payerfsp"
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 200",
+                "exec": [
+                  "expect(response.status).to.equal(200)"
+                ]
+              }
+            ]
+          },
+          "ignoreCallbacks": true,
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "var jsonData = pm.response.body;",
+                "pm.environment.set(\"payerfspPositionAfterPrepare\", jsonData[0].value)"
+              ]
+            },
+            "preRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "id": 5,
+          "description": "GET Bulk Transfer - PayerFSP",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers/{ID}",
+          "path": "/bulkTransfers/{$environment.bulkTransferId}",
+          "method": "get",
+          "params": {
+            "ID": "{$environment.bulkTransferId}",
+            "name": ""
+          },
+          "url": "{$inputs.HOST_BULK_ADAPTER}",
+          "headers": {
+            "Accept": "application/vnd.interoperability.transfers+json;version=1.0",
+            "Content-Type": "application/vnd.interoperability.transfers+json;version=1.1",
+            "Date": "{$environment.headerDate}",
+            "FSPIOP-Source": "testgingtoolkit",
+            "FSPIOP-Destination": "switch"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "payerfsp callback - date header should be set",
+                "exec": [
+                  "expect(environment.payerCallback.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "payerfsp callback - fspiop-source should be noresponsepayeefsp",
+                "exec": [
+                  "expect(environment.payerCallback.headers['fspiop-source']).to.equal('noresponsepayeefsp')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "payerfsp callback - fspiop-destination should be payerfsp",
+                "exec": [
+                  "expect(environment.payerCallback.headers['fspiop-destination']).to.equal('payerfsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "payerfsp callback - fspiop-uri should be as expected",
+                "exec": [
+                  "expect(environment.payerCallback.headers['fspiop-uri']).to.equal(`/payerfsp/bulkTransfers/${environment.bulkTransferId}/error`)"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "payerfsp callback - fspiop-http-method should be PUT",
+                "exec": [
+                  "expect(environment.payerCallback.headers['fspiop-http-method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "payerfsp callback - accept header should be undefined",
+                "exec": [
+                  "expect(environment.payerCallback.headers['accept']).to.equal(undefined)"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "payerfsp callback - errorCode to be 5100",
+                "exec": [
+                  "expect(environment.payerCallback.data.errorInformation.errorCode).to.equal(\"5100\")"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "payerfsp callback - errorDescription to be 'An error occured'",
+                "exec": [
+                  "expect(environment.payerCallback.data.errorInformation.errorDescription).to.equal(\"An error occured\")"
+                ]
+              },
+              {
+                "id": 10,
+                "description": "payeefsp callback - date header should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 11,
+                "description": "payeefsp callback - fspiop-source should be switch",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-source']).to.equal('switch')"
+                ]
+              },
+              {
+                "id": 12,
+                "description": "payeefsp callback - fspiop-destination should be payerfsp",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-destination']).to.equal('noresponsepayeefsp')"
+                ]
+              },
+              {
+                "id": 13,
+                "description": "payeefsp callback - fspiop-uri should be as expected",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-uri']).to.equal(`/noresponsepayeefsp/bulkTransfers/${environment.bulkTransferId}/error`)"
+                ]
+              },
+              {
+                "id": 14,
+                "description": "payeefsp callback - fspiop-http-method should be PUT",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-http-method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 15,
+                "description": "payeefsp callback - accept header should be undefined",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['accept']).to.equal(undefined)"
+                ]
+              },
+              {
+                "id": 16,
+                "description": "payeefsp callback - errorCode to be 5100",
+                "exec": [
+                  "expect(environment.payerCallback.data.errorInformation.errorCode).to.equal(\"5100\")"
+                ]
+              },
+              {
+                "id": 17,
+                "description": "payeefsp callback - errorDescription to be 'An error occured'",
+                "exec": [
+                  "expect(environment.payerCallback.data.errorInformation.errorDescription).to.equal(\"An error occured\")"
+                ]
+              },
+              {
+                "id": 18,
+                "description": "payeefsp request - date header should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 19,
+                "description": "payeefsp request - fspiop-source should be switch",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers['fspiop-source']).to.equal('payerfsp')"
+                ]
+              },
+              {
+                "id": 20,
+                "description": "payeefsp request - fspiop-destination should be payerfsp",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers['fspiop-destination']).to.equal('noresponsepayeefsp')"
+                ]
+              },
+              {
+                "id": 21,
+                "description": "payeefsp request - fspiop-uri should be as expected",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers['fspiop-uri']).to.equal('/bulkTransfers')"
+                ]
+              },
+              {
+                "id": 22,
+                "description": "payeefsp request - fspiop-http-method should be POST",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers['fspiop-http-method']).to.equal('POST')"
+                ]
+              },
+              {
+                "id": 23,
+                "description": "payeefsp request - accept header should be undefined",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers['accept']).to.equal('application/vnd.interoperability.bulkTransfers+json;version=1.0')"
+                ]
+              },
+              {
+                "id": 24,
+                "description": "payeefsp request -Request body should be sent correctly",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data.bulkTransferId).to.equal(environment.bulkTransferId)",
+                  "expect(environment.bulkTransfersNegativeRequest.data.bulkQuoteId).to.equal(environment.bulkQuoteId)",
+                  "expect(environment.bulkTransfersNegativeRequest.data.payeeFsp).to.equal(\"noresponsepayeefsp\")",
+                  "expect(environment.bulkTransfersNegativeRequest.data.payerFsp).to.equal(\"payerfsp\")",
+                  "expect(environment.bulkTransfersNegativeRequest.data.individualTransfers.length).to.equal(2)",
+                  "",
+                  "const data = environment.bulkTransfersNegativeRequest.data",
+                  "",
+                  "const transfer1 = data.individualTransfers.find(t => t.extensionList !== undefined )",
+                  "",
+                  "expect(transfer1).to.have.property(\"transferId\", environment.transferId)",
+                  "expect(JSON.stringify(transfer1.transferAmount)).to.equal(JSON.stringify({ amount: \"1\", currency: \"USD\" }))",
+                  "expect(transfer1).to.have.property(\"ilpPacket\", environment.validIlpPacket2)",
+                  "expect(transfer1).to.have.property(\"condition\", environment.validCondition2)",
+                  "expect(JSON.stringify(transfer1.extensionList)).to.equal(JSON.stringify({ extension: [{key: \"extKey1\", value: \"extValue1\"}, { key: \"extKey2\", value: \"extValue2\" }]}))",
+                  "  ",
+                  "const transfer2 = data.individualTransfers.find(t => t.extensionList === undefined )",
+                  "",
+                  "expect(transfer2).to.have.property(\"transferId\", environment.transferId2)",
+                  "expect(JSON.stringify(transfer2.transferAmount)).to.equal(JSON.stringify({ amount: \"2\", currency: \"USD\" }))",
+                  "expect(transfer2).to.have.property(\"ilpPacket\", environment.validIlpPacket2)",
+                  "expect(transfer2).to.have.property(\"condition\", environment.validCondition2)",
+                  ""
+                ]
+              }
+            ]
+          },
+          "ignoreCallbacks": true,
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"PAYERFSP_SDK_TESTAPI_URL\") + \"/callbacks/\" + pm.environment.get(\"bulkTransferId\"), function (err, response) {",
+                "    console.log(response)",
+                "  });",
+                "}, 1000)"
+              ]
+            },
+            "preRequest": {
+              "exec": [
+                "setTimeout(function () {",
+                "  pm.sendRequest(",
+                "    {",
+                "      url: pm.environment.get(\"HOST_BULK_ADAPTER\")+\"/bulkTransfers/\"+pm.environment.get(\"bulkTransferId\")+\"/error\",",
+                "      method: \"PUT\",",
+                "      header: {",
+                "        \"Content-Type\": \"application/vnd.interoperability.bulkTransfers+json;version=1.0\",",
+                "        \"Date\": \"Tue, 07 Jul 2020 16:34:24 GMT\",",
+                "        \"FSPIOP-Source\": \"noresponsepayeefsp\",",
+                "        \"FSPIOP-Destination\": \"payerfsp\"",
+                "      },",
+                "      body: {",
+                "        mode: 'raw',",
+                "        raw: JSON.stringify({",
+                "          \"errorInformation\": {",
+                "            \"errorCode\": \"5100\",",
+                "            \"errorDescription\": \"An error occured\"",
+                "          }",
+                "        })",
+                "      }",
+                "    }, function (err, response) {});",
+                "}, 1000)",
+                "",
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"PAYERFSP_SDK_TESTAPI_URL\") + \"/callbacks/\" + pm.environment.get(\"bulkTransferId\"), function (err, response) {",
+                "    pm.environment.set(\"payerCallback\", response.json())",
+                "    console.log('payerCallback:', response.json())",
+                "  });",
+                "  pm.sendRequest(pm.environment.get(\"HOST_SIMULATOR\") + \"/bulkTransfersNegative/callbacks/\" + pm.environment.get(\"bulkTransferId\"), function (err, response) {",
+                "    pm.environment.set(\"bulkTransfersNegativeCallback\", response.json())",
+                "    console.log('bulkTransfersNegativeCallback:', response.json())",
+                "  });",
+                "  pm.sendRequest(pm.environment.get(\"HOST_SIMULATOR\") + \"/bulkTransfersNegative/requests/\" + pm.environment.get(\"bulkTransferId\"), function (err, response) {",
+                "    pm.environment.set(\"bulkTransfersNegativeRequest\", response.json())",
+                "    console.log('bulkTransfersNegativeRequest:', response.json())",
+                "  });",
+                "}, 3000)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 6,
+          "description": "Check Payerfsp position after Abort",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/positions",
+          "path": "/participants/payerfsp/positions",
+          "method": "get",
+          "params": {
+            "name": "payerfsp"
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 200",
+                "exec": [
+                  "expect(response.status).to.equal(200)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Payerfsp position after Payer ABORT should be same as position before prepare.",
+                "exec": [
+                  "expect(response.data[0].value).to.equal(+environment.payerfspPositionBeforePrepare)"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 7,
+          "description": "Check Payeefsp position after Abort",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/positions",
+          "path": "/participants/noresponsepayeefsp/positions",
+          "method": "get",
+          "params": {
+            "name": "noresponsepayeefsp"
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 200",
+                "exec": [
+                  "expect(response.status).to.equal(200)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Payeefsp position after Payee ABORT should be same as position before prepare.",
+                "exec": [
+                  "expect(response.data[0].value).to.equal(+environment.payeefspPositionBeforePrepare)"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "negative scenario - partial fulfil",
+      "requests": [
+        {
+          "id": 3,
+          "description": "Send Prepare",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers",
+          "method": "post",
+          "url": "{$inputs.HOST_BULK_ADAPTER}",
+          "headers": {
+            "Accept": "application/vnd.interoperability.bulkTransfers+json;version=1.0",
+            "Content-Type": "application/vnd.interoperability.bulkTransfers+json;version=1.0",
+            "Date": "{$environment.headerDate}",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "payeefsp"
+          },
+          "body": {
+            "bulkTransferId": "{$environment.bulkTransferId}",
+            "bulkQuoteId": "{$environment.bulkQuoteId}",
+            "payeeFsp": "payeefsp",
+            "payerFsp": "payerfsp",
+            "individualTransfers": [
+              {
+                "transferId": "{$environment.transferId}",
+                "transferAmount": {
+                  "currency": "{$environment.currency}",
+                  "amount": "{$environment.amount}"
+                },
+                "ilpPacket": "{$environment.validIlpPacket2}",
+                "condition": "{$environment.validCondition2}",
+                "extensionList": {
+                  "extension": [
+                    {
+                      "key": "extKey1",
+                      "value": "extValue1"
+                    },
+                    {
+                      "key": "extKey2",
+                      "value": "extValue2"
+                    }
+                  ]
+                }
+              },
+              {
+                "transferId": "{$environment.transferId2}",
+                "transferAmount": {
+                  "currency": "AED",
+                  "amount": "{$environment.amount2}"
+                },
+                "ilpPacket": "{$environment.validIlpPacket2}",
+                "condition": "{$environment.validCondition2}"
+              }
+            ],
+            "expiration": "{$environment.expirationDate}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "payer callback date header should be set",
+                "exec": [
+                  "expect(environment.payerCallback.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "payer callback fspiop-source should be payeefsp",
+                "exec": [
+                  "expect(environment.payerCallback.headers['fspiop-source']).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "payer callback fspiop-destination should be payerfsp",
+                "exec": [
+                  "expect(environment.payerCallback.headers['fspiop-destination']).to.equal('payerfsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "payer callback fspiop-http-method should be PUT",
+                "exec": [
+                  "expect(environment.payerCallback.headers['fspiop-http-method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "payer callback fspiop-uri should be as expected",
+                "exec": [
+                  "expect(environment.payerCallback.headers['fspiop-uri']).to.equal(`/payerfsp/bulkTransfers/${environment.bulkTransferId}`)"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "payer callback Bulk Transfer state should be COMPLETED on Payer side",
+                "exec": [
+                  "expect(environment.payerCallback.data.bulkTransferState).to.equal('COMPLETED')"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "payer callback Completed timestamp should be set",
+                "exec": [
+                  "expect(environment.payerCallback.data).to.have.property('completedTimestamp')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "payer callback All individual transfer results (failed & successful) should be returned",
+                "exec": [
+                  "expect(environment.payerCallback.data.individualTransferResults.length).to.equal(2)"
+                ]
+              },
+              {
+                "id": 10,
+                "description": "payer callback One individual transfer result should contain successful transfer fulfilment",
+                "exec": [
+                  "const successTransfer = environment.payerCallback.data.individualTransferResults.find(t => t.transferId === environment.transferId)",
+                  "expect(successTransfer).to.have.property('transferId')",
+                  "expect(successTransfer).to.have.property('fulfilment')"
+                ]
+              },
+              {
+                "id": 11,
+                "description": "payer callback One individual transfer result should contain errorInformation",
+                "exec": [
+                  "const failedTransfer = environment.payerCallback.data.individualTransferResults.find(t => t.transferId === environment.transferId2)",
+                  "expect(failedTransfer.errorInformation.errorCode).to.equal('3100')",
+                  "expect(failedTransfer.errorInformation.errorDescription).to.equal('Generic validation error - Participant payerfsp AED account not found')"
+                ]
+              },
+              {
+                "id": 12,
+                "description": "payee callback - date header should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 13,
+                "description": "payee callback - fspiop-source should be switch",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-source']).to.equal('switch')"
+                ]
+              },
+              {
+                "id": 14,
+                "description": "payee callback - fspiop-destination should be payeefsp",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-destination']).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 15,
+                "description": "payee callback - fspiop-uri should be as expected",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-uri']).to.equal(`/payeefsp/bulkTransfers/${environment.bulkTransferId}`)"
+                ]
+              },
+              {
+                "id": 16,
+                "description": "payee callback - fspiop-http-method should be PUT",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-http-method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 17,
+                "description": "payee callback - Bulk Transfer state should be COMPLETED on Payee side",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.bulkTransferState).to.equal('COMPLETED')"
+                ]
+              },
+              {
+                "id": 18,
+                "description": "payee callback - Completed timestamp should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data).to.have.property('completedTimestamp')"
+                ]
+              },
+              {
+                "id": 19,
+                "description": "payee callback - Only one (1) individual transfer result (fulfilments) should be returned",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.individualTransferResults.length).to.equal(1)"
+                ]
+              },
+              {
+                "id": 20,
+                "description": "payee callback - Individual transfer result should have transferId",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.individualTransferResults[0]).to.have.property('transferId')"
+                ]
+              },
+              {
+                "id": 21,
+                "description": "payee callback Individual transfer result should have fulfilment",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.individualTransferResults[0]).to.have.property('fulfilment')"
+                ]
+              },
+              {
+                "id": 22,
+                "description": "request to payee - date header should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 23,
+                "description": "request to payee - fspiop-source should be payerfsp",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers['fspiop-source']).to.equal('payerfsp')"
+                ]
+              },
+              {
+                "id": 24,
+                "description": "request to payee - fspiop-destination should be payeefsp",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers['fspiop-destination']).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 25,
+                "description": "request to payee - fspiop-uri should be as expected",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers['fspiop-uri']).to.equal('/bulkTransfers')"
+                ]
+              },
+              {
+                "id": 26,
+                "description": "request to payee - fspiop-http-method should be POST",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.headers['fspiop-http-method']).to.equal('POST')"
+                ]
+              },
+              {
+                "id": 27,
+                "description": "request to payee - Bulk transfer Id should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data.bulkTransferId).to.equal(environment.bulkTransferId)"
+                ]
+              },
+              {
+                "id": 28,
+                "description": "request to payee - Bulk quote Id should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data.bulkQuoteId).to.equal(environment.bulkQuoteId)"
+                ]
+              },
+              {
+                "id": 29,
+                "description": "request to payee - PayerFsp should be 'payerfsp'",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data.payerFsp).to.equal('payerfsp')"
+                ]
+              },
+              {
+                "id": 30,
+                "description": "request to payee - PayeeFsp should be 'payeefsp'",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data.payeeFsp).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 31,
+                "description": "request to payee - expiration should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data).to.have.property('expiration')"
+                ]
+              },
+              {
+                "id": 32,
+                "description": "request to payee - Individual transfers (prepare) should be one (1)",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data.individualTransfers.length).to.equal(1)"
+                ]
+              },
+              {
+                "id": 33,
+                "description": "request to payee - Individual transfer should have transferId",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data.individualTransfers[0]).to.have.property('transferId')"
+                ]
+              },
+              {
+                "id": 34,
+                "description": "request to payee - Individual transfer should have ilpPacket",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data.individualTransfers[0]).to.have.property('ilpPacket')"
+                ]
+              },
+              {
+                "id": 35,
+                "description": "request to payee - Individual transfer should have condition",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeRequest.data.individualTransfers[0]).to.have.property('condition')"
+                ]
+              }
+            ]
+          },
+          "ignoreCallbacks": true,
+          "params": {
+            "name": "testingtoolkitdfsp"
+          },
+          "path": "/bulkTransfers",
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "",
+                "const delay = 1000 * 3600 * 24",
+                "const bulkTransferId = uuid.v4();",
+                "const bulkQuoteId = uuid.v4();",
+                "const transferId = uuid.v4();",
+                "const transferId2 = uuid.v4();",
+                "const now = new Date();",
+                "const headerDate = now.toUTCString();",
+                "const expirationDate = new Date(now.getTime() + delay).toISOString();",
+                "const completedTimestamp = now.toISOString();",
+                "const amount = 1;",
+                "const amount2 = 2;",
+                "pm.environment.set('bulkTransferId', bulkTransferId);",
+                "pm.environment.set('bulkQuoteId', bulkQuoteId);",
+                "pm.environment.set('transferId', transferId);",
+                "pm.environment.set('transferId2', transferId2);",
+                "pm.environment.set('headerDate', headerDate);",
+                "pm.environment.set('expirationDate', expirationDate);",
+                "pm.environment.set('completedTimestamp', completedTimestamp);",
+                "pm.environment.set('amount', amount);",
+                "pm.environment.set('amount2', amount2);",
+                "pm.environment.set('currency2', 'USD');"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"PAYERFSP_SDK_TESTAPI_URL\") + \"/callbacks/\" + pm.environment.get(\"bulkTransferId\"), function (err, response) {",
+                "    pm.environment.set(\"payerCallback\", response.json())",
+                "    console.log('payerCallback:', response.json())",
+                "  });",
+                "  pm.sendRequest(pm.environment.get(\"PAYEEFSP_SDK_TESTAPI_URL\") + \"/callbacks/\" + pm.environment.get(\"bulkTransferId\"), function (err, response) {",
+                "    pm.environment.set(\"bulkTransfersNegativeCallback\", response.json())",
+                "    console.log('bulkTransfersNegativeCallback:', response.json())",
+                "  });",
+                "  pm.sendRequest(pm.environment.get(\"PAYEEFSP_SDK_TESTAPI_URL\") + \"/requests/\" + pm.environment.get(\"bulkTransferId\"), function (err, response) {",
+                "    pm.environment.set(\"bulkTransfersNegativeRequest\", response.json())",
+                "    console.log('bulkTransfersNegativeRequest:', response.json())",
+                "  });",
+                "}, 3000)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 5,
+          "description": "GET Bulk Transfer - PayeeFSP",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers/{ID}",
+          "path": "/bulkTransfers/{$environment.bulkTransferId}",
+          "method": "get",
+          "params": {
+            "ID": "{$environment.bulkTransferId}",
+            "name": ""
+          },
+          "url": "{$inputs.HOST_BULK_ADAPTER}",
+          "headers": {
+            "Accept": "application/vnd.interoperability.transfers+json;version=1.0",
+            "Content-Type": "application/vnd.interoperability.transfers+json;version=1.1",
+            "Date": "{$environment.headerDate}",
+            "FSPIOP-Source": "payeefsp",
+            "FSPIOP-Destination": "switch"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback - date header should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback - fspiop-source should be switch",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-source']).to.equal('switch')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback - fspiop-destination should be payeefsp",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-destination']).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "Callback - fspiop-uri should be as expected",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-uri']).to.equal(`/payeefsp/bulkTransfers/${environment.bulkTransferId}`)"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "Callback - fspiop-http-method should be PUT",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-http-method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "Callback - Bulk Transfer state should be COMPLETED on Payee side",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.bulkTransferState).to.equal('COMPLETED')"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Callback - Completed timestamp should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data).to.have.property('completedTimestamp')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "Callback - Only one (1) individual transfer result (fulfilments) should be returned",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.individualTransferResults.length).to.equal(1)"
+                ]
+              },
+              {
+                "id": 10,
+                "description": "Callback - Individual transfer result should have transferId",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.individualTransferResults[0]).to.have.property('transferId')"
+                ]
+              },
+              {
+                "id": 11,
+                "description": "Callback - Individual transfer result should have fulfilment",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.individualTransferResults[0]).to.have.property('fulfilment')"
+                ]
+              }
+            ]
+          },
+          "ignoreCallbacks": true,
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"PAYEEFSP_SDK_TESTAPI_URL\") + \"/callbacks/\" + pm.environment.get(\"bulkTransferId\"), function (err, response) {",
+                "    pm.environment.set(\"bulkTransfersNegativeCallback\", response.json())",
+                "    console.log('bulkTransfersNegativeCallback:', response.json())",
+                "  });",
+                "}, 3000)"
+              ]
+            },
+            "preRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "id": 6,
+          "description": "GET Bulk Transfer - PayerFSP",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers/{ID}",
+          "path": "/bulkTransfers/{$environment.bulkTransferId}",
+          "method": "get",
+          "params": {
+            "ID": "{$environment.bulkTransferId}",
+            "name": ""
+          },
+          "url": "{$inputs.HOST_BULK_ADAPTER}",
+          "headers": {
+            "Accept": "application/vnd.interoperability.transfers+json;version=1.0",
+            "Content-Type": "application/vnd.interoperability.transfers+json;version=1.1",
+            "Date": "{$environment.headerDate}",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "switch"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Callback - date header should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers).to.have.property('date')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Callback - fspiop-source should be payeefsp",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-source']).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Callback - fspiop-destination should be payerfsp",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-destination']).to.equal('payerfsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "Callback - fspiop-uri should be as expected",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-uri']).to.equal(`/payerfsp/bulkTransfers/${environment.bulkTransferId}`)"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "Callback - fspiop-http-method should be PUT",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.headers['fspiop-http-method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "Callback - Bulk Transfer state should be COMPLETED on Payer side",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.bulkTransferState).to.equal('COMPLETED')"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Callback - Completed timestamp should be set",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data).to.have.property('completedTimestamp')"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "Callback - All individual transfer results (fulfilments) should be returned",
+                "exec": [
+                  "expect(environment.bulkTransfersNegativeCallback.data.individualTransferResults.length).to.equal(2)"
+                ]
+              },
+              {
+                "id": 10,
+                "description": "Callback - 1st individual transfer should have fulfilment",
+                "exec": [
+                  "const transfer1 = environment.bulkTransfersNegativeCallback.data.individualTransferResults.find(t => t.transferId === environment.transferId);",
+                  "expect(transfer1).to.have.property('fulfilment')"
+                ]
+              },
+              {
+                "id": 11,
+                "description": "Callback - 2nd individual transfer should not have fulfilment",
+                "exec": [
+                  "const transfer2 = environment.bulkTransfersNegativeCallback.data.individualTransferResults.find(t => t.transferId === environment.transferId2);",
+                  "expect(transfer2).to.not.have.property('fulfilment')"
+                ]
+              },
+              {
+                "id": 12,
+                "description": "Callback - 2nd individual transfer should contain valid error information",
+                "exec": [
+                  "const transfer2 = environment.bulkTransfersNegativeCallback.data.individualTransferResults.find(t => t.transferId === environment.transferId2);",
+                  "expect(transfer2.errorInformation.errorCode).to.eql(\"3100\");",
+                  "expect(transfer2.errorInformation.errorDescription).to.eql(\"Generic validation error - Participant payerfsp AED account not found\");"
+                ]
+              }
+            ]
+          },
+          "ignoreCallbacks": true,
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"PAYERFSP_SDK_TESTAPI_URL\") + \"/callbacks/\" + pm.environment.get(\"bulkTransferId\"), function (err, response) {",
+                "    pm.environment.set(\"bulkTransfersNegativeCallback\", response.json())",
+                "    console.log('bulkTransfersNegativeCallback:', response.json())",
+                "  });",
+                "}, 3000)"
+              ]
+            },
+            "preRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
