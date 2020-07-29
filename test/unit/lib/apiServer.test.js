@@ -43,6 +43,32 @@ describe('api-server', () => {
       })
       expect(() => apiServer.verifyUser()).not.toThrowError()
     })
+    it('should return a function which can be executed with 401 status code', async () => {
+      SpyGetSystemConfig.mockReturnValueOnce({
+        OAUTH: {
+          AUTH_ENABLED: true
+        }
+      })
+      const req = {}
+      const res = {
+        statusCode: 401
+      }
+      const retFn = apiServer.verifyUser()
+      expect(() => retFn(req, res, () => {})).not.toThrowError()
+    })
+    it('should return a function which can be executed with 200 status code', async () => {
+      SpyGetSystemConfig.mockReturnValueOnce({
+        OAUTH: {
+          AUTH_ENABLED: true
+        }
+      })
+      const req = {}
+      const res = {
+        statusCode: 200
+      }
+      const retFn = apiServer.verifyUser()
+      expect(() => retFn(req, res, () => {})).not.toThrowError()
+    })
   })
   describe('when startServer is called', () => {
     it('the server should be initialized', async () => {
@@ -50,47 +76,6 @@ describe('api-server', () => {
         OAUTH: {}
       })
       expect(() => apiServer.startServer()).not.toThrowError()
-    })
-  })
-  describe('when setOriginHeader is called', () => {
-    it('the server should be initialized', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
-        OAUTH: {
-          AUTH_ENABLED: true
-        }
-      }).mockReturnValueOnce({
-        OAUTH: {
-          AUTH_ENABLED: true,
-          ORIGIN: 'http://localhost:3000'
-        }
-      })
-      const req = {
-        method: 'OPTIONS'
-      }
-      const res = {
-        setHeader: () => {},
-        send: () => {}
-      }
-      expect(() => apiServer.setOriginHeader(req,res)).not.toThrowError()
-    })
-    it('the server should be initialized', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
-        OAUTH: {
-          AUTH_ENABLED: true
-        }
-      }).mockReturnValueOnce({
-        OAUTH: {
-          AUTH_ENABLED: true,
-          ORIGIN: 'http://localhost:3000'
-        }
-      })
-      const req = {
-        method: 'POST'
-      }
-      const res = {
-        setHeader: () => {}
-      }
-      expect(() => apiServer.setOriginHeader(req,res)).not.toThrowError()
     })
   })
 })

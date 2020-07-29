@@ -29,6 +29,8 @@ const socketIO = require('socket.io')(http)
 const OAuthHelper = require('./oauth/OAuthHelper')
 const passport = require('passport')
 const cookieParser = require('cookie-parser')
+const util = require('util')
+const cors = require('cors')
 
 const initServer = () => {
   const Config = require('./config')
@@ -37,22 +39,7 @@ const initServer = () => {
   }
 
   // For CORS policy
-  app.use((req, res, next) => {
-    res.setHeader(
-      'Access-Control-Allow-Headers',
-      'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-    )
-    res.setHeader(
-      'Access-Control-Expose-Headers',
-      'Content-Disposition'
-    )
-    res.setHeader(
-      'Access-Control-Allow-Methods',
-      'GET, POST, PATCH, PUT, DELETE, OPTIONS'
-    )
-    setOriginHeader(req, res)
-    next()
-  })
+  app.use(cors({ origin: true, credentials: true }))
 
   // For parsing incoming JSON requests
   app.use(express.json({ limit: '50mb' }))
@@ -97,27 +84,23 @@ const getApp = () => {
 const verifyUser = () => {
   const Config = require('./config')
   if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
-    return passport.authenticate('jwt', { session: false })
+    return (req, res, next) => {
+      req.session = {}
+      passport.authenticate('jwt', { session: false, failureMessage: true })(req, res, next)
+      // failWithError: true returns awful html error. , failureMessage: True to store failure message in req.session.messages, or a string to use as override message for failure.
+      if (res.statusCode === 401) {
+        const customLogger = require('./requestLogger')
+        customLogger.logMessage('error', `Unable to authenticate with passport.authenticate - ${util.inspect(req.session.messages)}`, req.session.messages, false)
+      }
+    }
+    // return passport.authenticate('jwt', { session: false, failWithError: true })
   }
   return (req, res, next) => { next() }
 }
 
-const setOriginHeader = (req, res) => {
-  const Config = require('./config')
-  if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
-    res.setHeader('Access-Control-Allow-Credentials', 'true')
-    res.setHeader('Access-Control-Allow-Origin', Config.getSystemConfig().OAUTH.ORIGIN)
-    if (req.method === 'OPTIONS') {
-      res.send(200)
-    }
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', '*')
-  }
-}
 module.exports = {
   startServer,
   socketIO,
   getApp,
-  verifyUser,
-  setOriginHeader
+  verifyUser
 }

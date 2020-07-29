@@ -96,6 +96,20 @@ describe('OAuthHelper tests', () => {
       systemConfig.OAUTH.CERTIFICATE_FILE_NAME = CERTIFICATE_FILE_NAME
       await utils.writeFileAsync(SYSTEM_CONFIG_FILE, JSON.stringify(systemConfig, null, 2))
     });
+    it('should throw an error if certificate file not found at root level', async () => {
+      const systemConfig = Config.getSystemConfig()
+      const EMBEDDED_CERTIFICATE = systemConfig.OAUTH.EMBEDDED_CERTIFICATE
+      const CERTIFICATE_FILE_NAME = systemConfig.OAUTH.CERTIFICATE_FILE_NAME
+      systemConfig.OAUTH.EMBEDDED_CERTIFICATE = ''
+      systemConfig.OAUTH.CERTIFICATE_FILE_NAME = 'test/' + CERTIFICATE_FILE_NAME
+      await utils.writeFileAsync(SYSTEM_CONFIG_FILE, JSON.stringify(systemConfig, null, 2))
+      try {
+        OAuthHelper.createJwtStrategy()
+      } catch (err) {}
+      systemConfig.OAUTH.EMBEDDED_CERTIFICATE = EMBEDDED_CERTIFICATE
+      systemConfig.OAUTH.CERTIFICATE_FILE_NAME = CERTIFICATE_FILE_NAME
+      await utils.writeFileAsync(SYSTEM_CONFIG_FILE, JSON.stringify(systemConfig, null, 2))
+    });
   });
   describe('verifyCallback', () => {
     it('should not throw an error', async () => {
