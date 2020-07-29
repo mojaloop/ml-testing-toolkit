@@ -43,6 +43,32 @@ describe('api-server', () => {
       })
       expect(() => apiServer.verifyUser()).not.toThrowError()
     })
+    it('should return a function which can be executed with 401 status code', async () => {
+      SpyGetSystemConfig.mockReturnValueOnce({
+        OAUTH: {
+          AUTH_ENABLED: true
+        }
+      })
+      const req = {}
+      const res = {
+        statusCode: 401
+      }
+      const retFn = apiServer.verifyUser()
+      expect(() => retFn(req, res, () => {})).not.toThrowError()
+    })
+    it('should return a function which can be executed with 200 status code', async () => {
+      SpyGetSystemConfig.mockReturnValueOnce({
+        OAUTH: {
+          AUTH_ENABLED: true
+        }
+      })
+      const req = {}
+      const res = {
+        statusCode: 200
+      }
+      const retFn = apiServer.verifyUser()
+      expect(() => retFn(req, res, () => {})).not.toThrowError()
+    })
   })
   describe('when startServer is called', () => {
     it('the server should be initialized', async () => {
