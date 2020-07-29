@@ -15,10 +15,8 @@
     "PTA_ROLE": "Application/PTA",
     "EVERYONE_ROLE": "Internal/everyone",
     "OAUTH2_ISSUER": "http://172.17.0.1:5050/api/oauth2/token",
-    "CERTIFICATE_FILE_NAME": "resources/wso2carbon-publickey.cert",
     "JWT_COOKIE_NAME": "TTK-API_ACCESS_TOKEN",
-    "EMBEDDED_CERTIFICATE": "password",
-    "ORIGIN": "http://localhost:3000"
+    "EMBEDDED_CERTIFICATE": "password"
   },
   "API_DEFINITIONS": [
     {

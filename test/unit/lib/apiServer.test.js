@@ -78,45 +78,4 @@ describe('api-server', () => {
       expect(() => apiServer.startServer()).not.toThrowError()
     })
   })
-  describe('when setOriginHeader is called', () => {
-    it('the server should be initialized', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
-        OAUTH: {
-          AUTH_ENABLED: true
-        }
-      }).mockReturnValueOnce({
-        OAUTH: {
-          AUTH_ENABLED: true,
-          ORIGIN: 'http://localhost:3000'
-        }
-      })
-      const req = {
-        method: 'OPTIONS'
-      }
-      const res = {
-        setHeader: () => {},
-        send: () => {}
-      }
-      expect(() => apiServer.setOriginHeader(req,res)).not.toThrowError()
-    })
-    it('the server should be initialized', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
-        OAUTH: {
-          AUTH_ENABLED: true
-        }
-      }).mockReturnValueOnce({
-        OAUTH: {
-          AUTH_ENABLED: true,
-          ORIGIN: 'http://localhost:3000'
-        }
-      })
-      const req = {
-        method: 'POST'
-      }
-      const res = {
-        setHeader: () => {}
-      }
-      expect(() => apiServer.setOriginHeader(req,res)).not.toThrowError()
-    })
-  })
 })

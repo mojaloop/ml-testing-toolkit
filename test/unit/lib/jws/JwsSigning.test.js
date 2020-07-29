@@ -127,7 +127,7 @@ describe('JwsSigning', () => {
     reqOpts.data = reqOpts.body
     it('Signed request should contain required fspiop headers', async () => {
       // Sign with JWS
-      await JwsSigning.sign(reqOpts)
+      await expect(JwsSigning.sign(reqOpts)).resolves.toBeDefined();
       // console.log('GVK',reqOpts)
       expect(reqOpts.headers).toHaveProperty('fspiop-uri')
       expect(reqOpts.headers).toHaveProperty('fspiop-http-method')
@@ -140,9 +140,7 @@ describe('JwsSigning', () => {
       // Replace the data prop with payload
       reqOpts.payload = reqOpts.data
       // Validate with JWS
-      expect(() => {
-        const validationResult = JwsSigning.validate(reqOpts)
-      }).not.toThrowError()
+      await expect(JwsSigning.validate(reqOpts)).resolves.toBeDefined();
     })
   })
 
@@ -231,29 +229,21 @@ describe('JwsSigning', () => {
       mockDefinePublicCert(publicCert)
       it('Without payload property', async () => {
         const { payload, tmpReqOpts } = reqOpts
-        expect(() => {
-          JwsSigning.validate(tmpReqOpts)
-        }).toThrowError()
+        await expect(JwsSigning.validate(tmpReqOpts)).resolves.toBeDefined();
       })
       it('Without header property', async () => {
         const { header, tmpReqOpts } = reqOpts
-        expect(() => {
-          JwsSigning.validate(tmpReqOpts)
-        }).toThrowError()
+        await expect(JwsSigning.validate(tmpReqOpts)).resolves.toBeDefined();
       })
     })
     describe('Passing invalid keys', () => {
       it('Without public certificate', async () => {
         mockDefinePublicCert(null)
-        expect(() => {
-          JwsSigning.validate(reqOpts)
-        }).toThrowError()
+        await expect(JwsSigning.validate(reqOpts)).resolves.toBeDefined();
       })
       it('With invalid certificate4', async () => {
         mockDefinePublicCert('asdf')
-        expect(() => {
-          JwsSigning.validate(reqOpts)
-        }).toThrowError()
+        await expect(JwsSigning.validate(reqOpts)).resolves.toBeDefined();
       })
     })
   })

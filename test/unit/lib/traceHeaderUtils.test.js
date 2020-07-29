@@ -65,4 +65,11 @@ describe('TraceHeaderUtils', () => {
       expect(result).toBeDefined()
     })
   })
+  describe('getTraceParentHeader', () => {
+    it('Should get the session ID properly', () => {
+      const result = TraceHeaderUtils.getTraceParentHeader('aabb')
+      console.log(result)
+      expect(result).toBeDefined()
+    })
+  })
 })
