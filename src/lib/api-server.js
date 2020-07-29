@@ -29,6 +29,7 @@ const socketIO = require('socket.io')(http)
 const OAuthHelper = require('./oauth/OAuthHelper')
 const passport = require('passport')
 const cookieParser = require('cookie-parser')
+const util = require('util')
 
 const initServer = () => {
   const Config = require('./config')
@@ -97,7 +98,16 @@ const getApp = () => {
 const verifyUser = () => {
   const Config = require('./config')
   if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
-    return passport.authenticate('jwt', { session: false })
+    return (req, res, next) => {
+      req.session = {}
+      passport.authenticate('jwt', { session: false, failureMessage: true })(req, res, next)
+      // failWithError: true returns awful html error. , failureMessage: True to store failure message in req.session.messages, or a string to use as override message for failure.
+      if (res.statusCode === 401) {
+        const customLogger = require('./requestLogger')
+        customLogger.logMessage('error', `Unable to authenticate with passport.authenticate - ${util.inspect(req.session.messages)}`, req.session.messages, false)
+      }
+    }
+    // return passport.authenticate('jwt', { session: false, failWithError: true })
   }
   return (req, res, next) => { next() }
 }

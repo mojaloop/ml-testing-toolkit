@@ -119,7 +119,6 @@ function verifyCallback (req, jwtPayload, done) {
     console.log(`OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`)
     return done(null, false, message)
   }
-  console.log(`verifyCallback: user ${jwtPayload.sub} with roles ${jwtPayload.groups}`)
   const foundMTA = jwtPayload.groups.includes(Constants.OAUTH.MTA_ROLE)
   const foundPTA = jwtPayload.groups.includes(Constants.OAUTH.PTA_ROLE)
   const foundEveryone = jwtPayload.groups.includes(Constants.OAUTH.EVERYONE_ROLE)
@@ -129,7 +128,6 @@ function verifyCallback (req, jwtPayload, done) {
     roles[group] = true
   }
   const authInfo = { roles: roles }
-  console.log(`verifyCallback: returning authInfo: ${JSON.stringify(authInfo)} `)
   return done(null, client, authInfo)
 }
 
