@@ -60,7 +60,7 @@ exports.loginUser = async function (username, password, req, res) {
 
     const decodedIdToken = jwt.decode(loginResponseObj.id_token)
 
-    const response = buildJWTResponse(decodedIdToken, loginResponseObj.access_token, req, res)
+    const response = buildJWTResponse(decodedIdToken, loginResponseObj.access_token, loginResponseObj.expires_in, req, res)
 
     return response
   } catch (error) {
@@ -72,7 +72,7 @@ exports.loginUser = async function (username, password, req, res) {
   }
 }
 
-const buildJWTResponse = (decodedIdToken, accessToken, req, res) => {
+const buildJWTResponse = (decodedIdToken, accessToken, expiresIn, req, res) => {
   // If the user is a DFSP admin, set the dfspId so the UI can send it
   let dfspId = null
   if (decodedIdToken.dfspId != null) {
@@ -95,14 +95,15 @@ const buildJWTResponse = (decodedIdToken, accessToken, req, res) => {
   console.log('LoginService.loginUser returning decodedIdToken: ', decodedIdToken)
 
   const cookies = new Cookies(req, res)
-  const maxAge = 3600 // seconds
-  const cookieOptions = { maxAge: maxAge * 1000, httpOnly: true, sameSite: 'strict' } // secure is automatic based on HTTP or HTTPS used
+  const cookieOptions = { maxAge: expiresIn * 1000, httpOnly: true, sameSite: 'strict' } // secure is automatic based on HTTP or HTTPS used
   cookies.set(Constants.OAUTH.JWT_COOKIE_NAME, accessToken, cookieOptions)
-  decodedIdToken.maxAge = maxAge
   return {
     ok: true,
     token: {
-      payload: decodedIdToken
+      payload: {
+        maxAge: expiresIn,
+        ...decodedIdToken
+      }
     }
   }
 }
