@@ -6,7 +6,7 @@
 
 This document provides a basic user guide to **install and configure an oAuth server and configure for the testing toolkit**. .
 
-To use **Hosting Capability** in the testing toolkit a scheme / hub should provide their oAuth server details in the toolkit for providing user authentication in the toolkit web UI and connection manager UI. Generally schemes / hub might already have their own oAuth server. This guide is just incase if they want to implement it from scratch or to have a reference about flow.
+To use **Hosting Capability** in the testing toolkit a Scheme / Hub should provide their OAuth server details in the toolkit for providing user authentication in the toolkit web UI and connection manager UI. Typically Schemes / Hubs may already have their own OAuth servers. This guide is just in case they want to implement it from scratch and in any case, to have a reference about the flow.
 
 We are using an open source oAuth server called **Keycloak**. Keycloak is "Open Source Identity and Access Management" software and the documentation can be found at https://www.keycloak.org/
 
