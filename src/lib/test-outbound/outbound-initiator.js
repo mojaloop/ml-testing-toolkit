@@ -275,13 +275,12 @@ const executePreRequestScript = async (request, convertedRequest, scriptsExecuti
 
 const executePostRequestScript = async (request, resp, scriptsExecution, contextObj, environmentVariables) => {
   if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
-    // let response
-    // if (_.isString(resp)) {
-    //   response = resp
-    // } else if (resp.syncResponse) {
-    //   response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
-    // }
-    const response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
+    let response
+    if (_.isString(resp)) {
+      response = resp
+    } else if (resp.syncResponse) {
+      response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
+    }
     scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, response }, id: uuid.v4() }, contextObj)
     environmentVariables.items = scriptsExecution.postRequest.environment
   }
