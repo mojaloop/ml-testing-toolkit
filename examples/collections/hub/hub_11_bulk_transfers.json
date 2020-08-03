@@ -733,7 +733,7 @@
           "method": "post",
           "url": "{$inputs.HOST_BULK_ADAPTER}",
           "headers": {
-            "Accept": "application/vnd.interoperability.bulkTransfers+json;version=1.0",
+            "Accept": "application/vnd.interoperability.bulkTransfers+json;version=1",
             "Content-Type": "application/vnd.interoperability.bulkTransfers+json;version=1.0",
             "Date": "{$environment.headerDate}",
             "FSPIOP-Source": "testingtoolkitdfsp",
@@ -846,7 +846,7 @@
               }
             ]
           },
-          "ignoreCallbacks": true,
+          "ignoreCallbacks": false,
           "scripts": {
             "postRequest": {
               "exec": [
@@ -879,8 +879,8 @@
           },
           "url": "{$inputs.HOST_BULK_ADAPTER}",
           "headers": {
-            "Accept": "application/vnd.interoperability.bulkTransfers+json;version=1.0",
-            "Content-Type": "application/vnd.interoperability.bulkTransfers+json;version=1.1",
+            "Accept": "application/vnd.interoperability.bulkTransfers+json;version=1",
+            "Content-Type": "application/vnd.interoperability.bulkTransfers+json;version=1.0",
             "Date": "{$environment.headerDate}",
             "FSPIOP-Source": "testingtoolkitdfsp",
             "FSPIOP-Destination": "switch"
@@ -903,14 +903,14 @@
               },
               {
                 "id": 3,
-                "description": "payerfsp callback - fspiop-source should be noresponsepayeefsp",
+                "description": "payerfsp callback - fspiop-source should be switch",
                 "exec": [
                   "expect(callback.headers['fspiop-source']).to.equal('switch')"
                 ]
               },
               {
                 "id": 4,
-                "description": "payerfsp callback - fspiop-destination should be payerfsp",
+                "description": "payerfsp callback - fspiop-destination should be testingtoolkitdfsp",
                 "exec": [
                   "expect(callback.headers['fspiop-destination']).to.equal('testingtoolkitdfsp')"
                 ]
@@ -919,7 +919,7 @@
                 "id": 5,
                 "description": "payerfsp callback - fspiop-uri should be as expected",
                 "exec": [
-                  "expect(callback.headers['fspiop-uri']).to.equal(`/testingtoolkitdfsp/bulkTransfers/${environment.bulkTransferId}`)"
+                  "expect(callback.headers['fspiop-uri']).to.equal(`/testingtoolkitdfsp/bulkTransfers/${environment.bulkTransferId}/error`)"
                 ]
               },
               {
@@ -930,35 +930,84 @@
                 ]
               },
               {
-                "id": 7,
-                "description": "payerfsp callback - accept header should be undefined",
-                "exec": [
-                  "expect(callback.headers['accept']).to.equal(undefined)"
-                ]
-              },
-              {
                 "id": 8,
-                "description": "payerfsp callback - should have 2 failed transfers",
+                "description": "payerfsp callback - errorInformation should be set correctly",
                 "exec": [
-                  "const data = callback.body",
-                  "",
-                  "expect(data.individualTransferResults.length).to.equal(2)",
-                  "",
-                  "const transfer1 = data.individualTransferResults.find(t => t.transferId === environment.transferId )",
-                  "",
-                  "expect(transfer1).to.have.property(\"transferId\", environment.transferId)",
-                  "expect(JSON.stringify(transfer1.errorInformation)).to.equal(JSON.stringify({",
-                  "  errorCode: \"5100\",",
-                  "  errorDescription: \"An error occured\"",
-                  "}))",
-                  "  ",
-                  "const transfer2 = data.individualTransferResults.find(t => t.transferId === environment.transferId2 )",
-                  "",
-                  "expect(transfer2).to.have.property(\"transferId\", environment.transferId2)",
-                  "expect(JSON.stringify(transfer2.errorInformation)).to.equal(JSON.stringify({",
+                  "expect(callback.body).to.have.property(\"errorInformation\")",
+                  "expect(JSON.stringify(callback.body.errorInformation)).to.equal(JSON.stringify({",
                   "  errorCode: \"5100\",",
                   "  errorDescription: \"An error occured\"",
                   "}))"
+                ]
+              }
+            ]
+          },
+          "ignoreCallbacks": false,
+          "delay": "1000",
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                ""
+              ]
+            },
+            "preRequest": {
+              "exec": [
+                "pm.sendRequest({",
+                "  url: pm.environment.get(\"HOST_BULK_ADAPTER\")+\"/bulkTransfers/\"+pm.environment.get(\"bulkTransferId\")+\"/error\",",
+                "  method: \"PUT\",",
+                "  header: {",
+                "    \"Content-Type\": \"application/vnd.interoperability.bulkTransfers+json;version=1.0\",",
+                "    \"Date\": \"Tue, 07 Jul 2020 16:34:24 GMT\",",
+                "    \"FSPIOP-Source\": \"noresponsepayeefsp\",",
+                "    \"FSPIOP-Destination\": \"testingtoolkitdfsp\"",
+                "  },",
+                "  body: {",
+                "    mode: 'raw',",
+                "    raw: JSON.stringify({",
+                "      \"errorInformation\": {",
+                "        \"errorCode\": \"5100\",",
+                "        \"errorDescription\": \"An error occured\"",
+                "      }",
+                "    })",
+                "  }",
+                "}, function (err, response) {});",
+                "",
+                "setTimeout(() => {}, 1000)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 6,
+          "description": "GET Bulk Transfer - PayeeFSP",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/bulkTransfers/{ID}",
+          "path": "/bulkTransfers/{$environment.bulkTransferId}",
+          "method": "get",
+          "params": {
+            "ID": "{$environment.bulkTransferId}",
+            "name": ""
+          },
+          "url": "{$inputs.HOST_BULK_ADAPTER}",
+          "headers": {
+            "Accept": "application/vnd.interoperability.bulkTransfers+json;version=1",
+            "Content-Type": "application/vnd.interoperability.bulkTransfers+json;version=1.0",
+            "Date": "{$environment.headerDate}",
+            "FSPIOP-Source": "noresponsepayeefsp",
+            "FSPIOP-Destination": "switch"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
                 ]
               },
               {
@@ -1054,9 +1103,9 @@
               },
               {
                 "id": 23,
-                "description": "payeefsp request - accept header should be undefined",
+                "description": "payeefsp request - accept header should be application/vnd.interoperability.bulkTransfers+json;version=1",
                 "exec": [
-                  "expect(environment.bulkTransfersNegativeRequest.headers['accept']).to.equal('application/vnd.interoperability.bulkTransfers+json;version=1.0')"
+                  "expect(environment.bulkTransfersNegativeRequest.headers['accept']).to.equal('application/vnd.interoperability.bulkTransfers+json;version=1')"
                 ]
               },
               {
@@ -1090,8 +1139,8 @@
               }
             ]
           },
-          "ignoreCallbacks": false,
-          "delay": "1000",
+          "ignoreCallbacks": true,
+          "delay": "3000",
           "scripts": {
             "postRequest": {
               "exec": [
@@ -1104,36 +1153,18 @@
                 "    pm.environment.set(\"bulkTransfersNegativeRequest\", response.json())",
                 "    console.log('bulkTransfersNegativeRequest:', response.json())",
                 "  });",
-                "}, 1500)"
+                "}, 3000)"
               ]
             },
             "preRequest": {
               "exec": [
-                "pm.sendRequest({",
-                "  url: pm.environment.get(\"HOST_BULK_ADAPTER\")+\"/bulkTransfers/\"+pm.environment.get(\"bulkTransferId\")+\"/error\",",
-                "  method: \"PUT\",",
-                "  header: {",
-                "    \"Content-Type\": \"application/vnd.interoperability.bulkTransfers+json;version=1.0\",",
-                "    \"Date\": \"Tue, 07 Jul 2020 16:34:24 GMT\",",
-                "    \"FSPIOP-Source\": \"noresponsepayeefsp\",",
-                "    \"FSPIOP-Destination\": \"testingtoolkitdfsp\"",
-                "  },",
-                "  body: {",
-                "    mode: 'raw',",
-                "    raw: JSON.stringify({",
-                "      \"errorInformation\": {",
-                "        \"errorCode\": \"5100\",",
-                "        \"errorDescription\": \"An error occured\"",
-                "      }",
-                "    })",
-                "  }",
-                "}, function (err, response) {});"
+                ""
               ]
             }
           }
         },
         {
-          "id": 6,
+          "id": 7,
           "description": "Check Payerfsp position after Abort",
           "apiVersion": {
             "minorVersion": 3,
@@ -1167,7 +1198,7 @@
           }
         },
         {
-          "id": 7,
+          "id": 8,
           "description": "Check Payeefsp position after Abort",
           "apiVersion": {
             "minorVersion": 3,

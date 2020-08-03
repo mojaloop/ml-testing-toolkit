@@ -156,14 +156,12 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
 
     const scriptsExecution = {}
     let environment
+    let contextObj
     // Send http request
     try {
-      const contextObj = await context.generageContextObj(environmentVariables.items)
+      contextObj = await context.generageContextObj(environmentVariables.items)
 
-      if (request.scripts && request.scripts.preRequest && request.scripts.preRequest.exec.length > 0 && request.scripts.preRequest.exec !== ['']) {
-        scriptsExecution.preRequest = await context.executeAsync(request.scripts.preRequest.exec, { context: { ...contextObj, request: convertedRequest }, id: uuid.v4() }, contextObj)
-        environmentVariables.items = scriptsExecution.preRequest.environment
-      }
+      await executePreRequestScript(request, convertedRequest, scriptsExecution, contextObj, environmentVariables)
 
       environment = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
       convertedRequest = replaceEnvironmentVariables(convertedRequest, environment)
@@ -188,16 +186,9 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
       }
       const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId)
 
-      if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
-        const response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
-        scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, response }, id: uuid.v4() }, contextObj)
-        environmentVariables.items = scriptsExecution.postRequest.environment
-      }
+      await executePostRequestScript(request, resp, scriptsExecution, contextObj, environmentVariables)
 
       environment = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
-
-      contextObj.ctx.dispose()
-      contextObj.ctx = null
 
       const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environment)
       request.appended = {
@@ -233,6 +224,10 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
       } catch (err) {
         resp = err.message
       }
+
+      await executePostRequestScript(request, resp, scriptsExecution, contextObj, environmentVariables)
+      environment = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
+
       const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environment)
       request.appended = {
         status: 'ERROR',
@@ -260,13 +255,35 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
           testResult
         }, sessionID)
       }
-      // break
+    } finally {
+      contextObj.ctx.dispose()
+      contextObj.ctx = null
     }
   }
 
   // Return status report of this test case
   return testCase
   // Set a timeout if the response callback is not received in a particular time
+}
+
+const executePreRequestScript = async (request, convertedRequest, scriptsExecution, contextObj, environmentVariables) => {
+  if (request.scripts && request.scripts.preRequest && request.scripts.preRequest.exec.length > 0 && request.scripts.preRequest.exec !== ['']) {
+    scriptsExecution.preRequest = await context.executeAsync(request.scripts.preRequest.exec, { context: { ...contextObj, request: convertedRequest }, id: uuid.v4() }, contextObj)
+    environmentVariables.items = scriptsExecution.preRequest.environment
+  }
+}
+
+const executePostRequestScript = async (request, resp, scriptsExecution, contextObj, environmentVariables) => {
+  if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
+    let response
+    if (_.isString(resp)) {
+      response = resp
+    } else if (resp.syncResponse) {
+      response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
+    }
+    scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, response }, id: uuid.v4() }, contextObj)
+    environmentVariables.items = scriptsExecution.postRequest.environment
+  }
 }
 
 const handleTests = async (request, response = null, callback = null, environment = []) => {
@@ -388,7 +405,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           MyEventEmitter.getEmitter('testOutbound').once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
             clearTimeout(timer)
             MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
-            reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { body: callbackBody } })))
+            reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { headers: callbackHeaders, body: callbackBody } })))
           })
         } else {
           resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
