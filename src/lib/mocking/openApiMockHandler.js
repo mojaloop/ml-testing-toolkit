@@ -276,8 +276,8 @@ const generateAsyncCallback = async (item, context, req) => {
   }
 
   // forward request after validation
-  const forwardRequest = await OpenApiRulesEngine.forwardRules(context, req)
   if (userConfig.ENDPOINTS_DFSP_WISE.enabled) {
+    const forwardRequest = await OpenApiRulesEngine.forwardRules(context, req)
     if (forwardRequest) {
       CallbackHandler.handleCallback(forwardRequest, context, req)
     }
