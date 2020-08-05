@@ -36,7 +36,7 @@ const response = {
   rulesFilePathPrefix: 'spec_files/rules_response/',
   rules: null,
   rulesEngine: null,
-  activeRulesFile: null,
+  activeRulesFile: DEFAULT_RULES_FILE_NAME,
   ruleType: 'response'
 }
 
@@ -44,7 +44,7 @@ const validation = {
   rulesFilePathPrefix: 'spec_files/rules_validation/',
   rules: null,
   rulesEngine: null,
-  activeRulesFile: null,
+  activeRulesFile: DEFAULT_RULES_FILE_NAME,
   ruleType: 'validation'
 }
 
@@ -52,8 +52,16 @@ const callback = {
   rulesFilePathPrefix: 'spec_files/rules_callback/',
   rules: null,
   rulesEngine: null,
-  activeRulesFile: null,
+  activeRulesFile: DEFAULT_RULES_FILE_NAME,
   ruleType: 'callback'
+}
+
+const forward = {
+  rulesFilePathPrefix: 'spec_files/rules_forward/',
+  rules: null,
+  rulesEngine: null,
+  activeRulesFile: DEFAULT_RULES_FILE_NAME,
+  ruleType: 'forward'
 }
 
 // response rules
@@ -176,6 +184,46 @@ const deleteCallbackRulesFile = async (fileName) => {
   return deleted
 }
 
+// forward rules
+const reloadForwardRules = async () => {
+  await reloadRules(forward)
+}
+
+const setActiveForwardRulesFile = async (fileName) => {
+  await setActiveRulesFile(forward, fileName)
+}
+
+const getForwardRules = async () => {
+  const rules = await getRules(forward)
+  return rules
+}
+
+const getForwardRulesEngine = async (convertedRules) => {
+  const rulesEngine = await getRulesEngine(forward, convertedRules)
+  return rulesEngine
+}
+
+const getForwardRulesFiles = async () => {
+  await getCallbackRules()
+  const rulesFiles = await getRulesFiles(forward)
+  return rulesFiles
+}
+
+const getForwardRulesFileContent = async (fileName) => {
+  const rulesFileContent = await getRulesFileContent(forward.rulesFilePathPrefix, fileName)
+  return rulesFileContent
+}
+
+const setForwardRulesFileContent = async (fileName, fileContent) => {
+  const rulesFileContent = await setRulesFileContent(forward, fileName, fileContent)
+  return rulesFileContent
+}
+
+const deleteForwardRulesFile = async (fileName) => {
+  const deleted = await deleteRulesFile(forward, fileName)
+  return deleted
+}
+
 // common functions
 const reloadRules = async (objStore) => {
   const rulesConfigRawData = await utils.readFileAsync(objStore.rulesFilePathPrefix + CONFIG_FILE_NAME)
@@ -279,28 +327,39 @@ const addTypeAndVersion = (ruleType, fileContent) => {
 }
 
 module.exports = {
-  getResponseRulesEngine,
-  getValidationRulesEngine,
-  getCallbackRulesEngine,
+  reloadResponseRules,
+  setActiveResponseRulesFile,
   getResponseRules,
-  getValidationRules,
-  getCallbackRules,
+  getResponseRulesEngine,
   getResponseRulesFiles,
   getResponseRulesFileContent,
   setResponseRulesFileContent,
   deleteResponseRulesFile,
+
+  reloadValidationRules,
+  setActiveValidationRulesFile,
+  getValidationRules,
+  getValidationRulesEngine,
   getValidationRulesFiles,
   getValidationRulesFileContent,
   setValidationRulesFileContent,
   deleteValidationRulesFile,
+
+  reloadCallbackRules,
+  setActiveCallbackRulesFile,
+  getCallbackRules,
+  getCallbackRulesEngine,
   getCallbackRulesFiles,
   getCallbackRulesFileContent,
   setCallbackRulesFileContent,
   deleteCallbackRulesFile,
-  setActiveValidationRulesFile,
-  setActiveCallbackRulesFile,
-  setActiveResponseRulesFile,
-  reloadResponseRules,
-  reloadCallbackRules,
-  reloadValidationRules
+
+  reloadForwardRules,
+  setActiveForwardRulesFile,
+  getForwardRules,
+  getForwardRulesEngine,
+  getForwardRulesFiles,
+  getForwardRulesFileContent,
+  setForwardRulesFileContent,
+  deleteForwardRulesFile
 }

@@ -47,7 +47,16 @@ const handleCallback = async (callbackObject, context, req) => {
       customLogger.logMessage('warning', 'Hosting is enabled, But there is no endpoint configuration found for DFSP ID: ' + callbackObject.callbackInfo.fspid, null, true, req)
     }
   } else {
-    if (userConfig.CALLBACK_RESOURCE_ENDPOINTS && userConfig.CALLBACK_RESOURCE_ENDPOINTS.enabled) {
+    const endpointsDfspWise = userConfig.ENDPOINTS_DFSP_WISE
+    if (callbackObject.callbackInfo.dfspId && endpointsDfspWise.enabled && endpointsDfspWise.dfsps[callbackObject.callbackInfo.dfspId]) {
+      const dfspEndpoints = endpointsDfspWise.dfsps[callbackObject.callbackInfo.dfspId]
+      const dfspEndpoint = dfspEndpoints.endpoints.find(endpoint => endpoint.method === callbackObject.method && endpoint.path && callbackObject.path && endpoint.endpoint)
+      if (dfspEndpoint) {
+        callbackEndpoint = dfspEndpoint.endpoint
+      } else {
+        callbackEndpoint = dfspEndpoints.defaultEndpoint
+      }
+    } else if (userConfig.CALLBACK_RESOURCE_ENDPOINTS && userConfig.CALLBACK_RESOURCE_ENDPOINTS.enabled) {
       const callbackEndpoints = userConfig.CALLBACK_RESOURCE_ENDPOINTS
       const matchedObject = callbackEndpoints.endpoints.find(item => {
         if (item.method === callbackObject.method) {
@@ -106,11 +115,13 @@ const handleCallback = async (callbackObject, context, req) => {
     console.log(err)
   }
   // Validate callback against openapi
-  const validationResult = await context.api.validateRequest(callbackObject)
-  if (validationResult.valid) {
-    customLogger.logMessage('info', 'Callback schema is valid ' + callbackObject.method + ' ' + callbackObject.path, null, true, req)
-  } else {
-    customLogger.logMessage('error', 'Callback schema is invalid ' + callbackObject.method + ' ' + callbackObject.path, validationResult.errors, true, req)
+  if (callbackObject.method !== 'put') {
+    const validationResult = await context.api.validateRequest(callbackObject)
+    if (validationResult.valid) {
+      customLogger.logMessage('info', 'Callback schema is valid ' + callbackObject.method + ' ' + callbackObject.path, null, true, req)
+    } else {
+      customLogger.logMessage('error', 'Callback schema is invalid ' + callbackObject.method + ' ' + callbackObject.path, validationResult.errors, true, req)
+    }
   }
   // Store callbacks for assertion
   let assertionPath = callbackObject.path

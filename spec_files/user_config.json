@@ -21,6 +21,46 @@
       }
     ]
   },
+  "ENDPOINTS_DFSP_WISE": {
+    "enabled": true,
+    "dfsps": {
+      "userdfsp": {
+        "defaultEndpoint": "http://localhost:4000",
+        "endpoints": [
+          {
+            "method": "get",
+            "path": "/parties/{Type}/{ID}",
+            "endpoint": "http://localhost:4000"
+          },
+          {
+            "method": "post",
+            "path": "/quotes/{ID}",
+            "endpoint": "http://localhost:4000"
+          }
+        ]
+      },
+      "userdfsp2": {
+        "defaultEndpoint": "http://localhost:24000",
+        "endpoints": [
+          {
+            "method": "put",
+            "path": "/parties/{Type}/{ID}",
+            "endpoint": "http://localhost:24000"
+          },
+          {
+            "method": "put",
+            "path": "/quotes/{ID}",
+            "endpoint": "http://localhost:24000"
+          },
+          {
+            "method": "put",
+            "path": "/transfers/{ID}",
+            "endpoint": "http://localhost:24000"
+          }
+        ]
+      }
+    }
+  },
   "SEND_CALLBACK_ENABLE": true,
   "FSPID": "testingtoolkitdfsp",
   "DEFAULT_USER_FSPID": "userdfsp",

@@ -320,6 +320,43 @@ const responseRules = async (context, req) => {
   return generatedResponse
 }
 
+const forwardRules = async (context, req) => {
+  const rules = await rulesEngineModel.getForwardRules()
+
+  const newRules = await replaceEnvironmentsFromRules(rules)
+  const rulesEngine = await rulesEngineModel.getForwardRulesEngine(newRules)
+
+  const facts = generageFacts(context)
+
+  const res = await rulesEngine.evaluate(facts)
+  if (res) {
+    const generatedCallback = {}
+    customLogger.logMessage('debug', 'Forward rules are matched', res, true, req)
+    const curEvent = res[0]
+
+    await executeScripts(curEvent, req)
+
+    if (curEvent.type === 'FORWARD') {
+      if (generatedCallback.callbackInfo) {
+        generatedCallback.callbackInfo = replaceVariablesFromRequest(req.customInfo.callbackInfo, context, req)
+      } else {
+        generatedCallback.callbackInfo = {}
+      }
+      if (curEvent.params && curEvent.params.dfspId) {
+        generatedCallback.callbackInfo.dfspId = curEvent.params.dfspId
+      }
+      generatedCallback.path = req.path
+      generatedCallback.method = req.method
+      generatedCallback.body = req.payload
+      generatedCallback.headers = req.headers
+    }
+    return generatedCallback
+  } else {
+    customLogger.logMessage('error', 'No forward rules are matched', res, true, req)
+    return false
+  }
+}
+
 const replaceVariablesFromRequest = (inputObject, context, req) => {
   var resultObject
   // Check whether inputObject is string or object. If it is object, then convert that to JSON string and parse it while return
@@ -397,5 +434,6 @@ module.exports = {
   validateRules,
   callbackRules,
   responseRules,
+  forwardRules,
   generateMockErrorCallback
 }
