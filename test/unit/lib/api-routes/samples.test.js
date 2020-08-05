@@ -30,6 +30,7 @@ const loadSamples = require('../../../../src/lib/loadSamples')
 
 const spyGetSample = jest.spyOn(loadSamples, 'getSample')
 const spyGetCollectionsOrEnvironments = jest.spyOn(loadSamples, 'getCollectionsOrEnvironments')
+const spyGetCollectionsOrEnvironmentsWithFileSize = jest.spyOn(loadSamples, 'getCollectionsOrEnvironmentsWithFileSize')
 
 
 describe('API route /api/samples', () => {
@@ -54,6 +55,18 @@ describe('API route /api/samples', () => {
     it('Send a bad request with not existing environment', async () => {
       spyGetCollectionsOrEnvironments.mockRejectedValueOnce({message: ''})
       const res = await request(app).get(`/api/samples/load/collections`).send()
+      expect(res.statusCode).toEqual(500)
+    })
+  })
+  describe('GET /api/samples with file sizes', () => {
+    it('Send a proper request with missing collections query param', async () => {
+      spyGetCollectionsOrEnvironmentsWithFileSize.mockResolvedValueOnce()
+      const res = await request(app).get(`/api/samples/list/collections`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Send a bad request with not existing environment', async () => {
+      spyGetCollectionsOrEnvironmentsWithFileSize.mockRejectedValueOnce({message: ''})
+      const res = await request(app).get(`/api/samples/list/collections`).send()
       expect(res.statusCode).toEqual(500)
     })
   })

@@ -23,9 +23,11 @@
  ******/
 
 const Utils = require('../../../src/lib/utils')
+const fs = require('fs')
 
 const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
 const SpyReadRecursiveAsync = jest.spyOn(Utils, 'readRecursiveAsync')
+const SpyFsStatSync = jest.spyOn(fs, 'statSync')
 
 
 const loadSamples = require('../../../src/lib/loadSamples')
@@ -109,6 +111,32 @@ describe('loadSamples', () => {
         ])
       const collectionsOrEnvironments = await loadSamples.getCollectionsOrEnvironments('exampleType')
       expect(collectionsOrEnvironments).toStrictEqual([ 'sample.json' ]);
+    })
+  })
+  describe('getCollectionsOrEnvironmentsWithFileSize should not throw an error when', () => {
+    it('sample name should be \'multi\' if there is more than one collection', async () => {
+      SpyReadRecursiveAsync
+        .mockResolvedValueOnce([
+          "sample.json", "sampleFolder"
+        ])
+      SpyFsStatSync.mockReturnValueOnce({ size: 100 })
+      const collectionsOrEnvironments = await loadSamples.getCollectionsOrEnvironmentsWithFileSize('exampleType', 'type')
+      expect(collectionsOrEnvironments[0]).toHaveProperty('name')
+      expect(collectionsOrEnvironments[0]).toHaveProperty('size')
+      expect(collectionsOrEnvironments[0].name).toBe('sample.json')
+      expect(collectionsOrEnvironments[0].size).toBe(100)
+    })
+    it('should not throw an error when type is not provided', async () => {
+      SpyReadRecursiveAsync
+        .mockResolvedValueOnce([
+          "sample.json", "sampleFolder"
+        ])
+      SpyFsStatSync.mockReturnValueOnce({ size: 100 })
+      const collectionsOrEnvironments = await loadSamples.getCollectionsOrEnvironmentsWithFileSize('exampleType')
+      expect(collectionsOrEnvironments[0]).toHaveProperty('name')
+      expect(collectionsOrEnvironments[0]).toHaveProperty('size')
+      expect(collectionsOrEnvironments[0].name).toBe('sample.json')
+      expect(collectionsOrEnvironments[0].size).toBe(100)
     })
   })
 })
