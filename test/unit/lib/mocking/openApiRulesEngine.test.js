@@ -133,6 +133,30 @@ const mapping = {
       }
     ]    
   },
+  forward: {
+    get: [
+      {
+        type: 'FORWARD',
+        params: {
+          dfspId: 'userdfsp'
+        }
+      }
+    ],
+    put: [
+      {
+        type: 'FORWARD',
+        params: {
+        }
+      }
+    ],
+    patch: [
+      {
+        type: 'NOT_SUPPORTED',
+        params: {}
+      }
+    ],
+    delete: null
+  },
   response: {
     get: [
       {
@@ -211,6 +235,9 @@ rulesEngineModel.getResponseRulesEngine.mockImplementation(() => {
   return getRulesEngineHelper('response')
 }) 
 
+rulesEngineModel.getForwardRulesEngine.mockImplementation(() => {
+  return getRulesEngineHelper('forward')
+}) 
 const specFilePrefix = 'spec_files/api_definitions/'
 const specFileAsync = specFilePrefix + 'fspiop_1.0/api_spec.yaml'
 const jsfRefFile = specFilePrefix + 'fspiop_1.0/mockRef.json'
@@ -515,6 +542,39 @@ describe('OpenApiRulesEngine', () => {
       const result = await OpenApiRulesEngine.responseRules(sampleContext, sampleRequest)
       expect(result).toHaveProperty('body')
       expect(result).toHaveProperty('status')
+    })
+  })
+  describe('forwardRules', () => {
+    it('no forward when delete parties', async () => {
+      sampleContext.request.method = 'delete'
+      const result = await OpenApiRulesEngine.forwardRules(sampleContext, sampleRequest)
+      expect(result).toBeFalsy()
+    })
+    it('forward empty when type not supported', async () => {
+      sampleContext.request.method = 'patch'
+      sampleContext.request.headers = {
+        'fspiop-source': 'userdfsp'
+      }
+      const result = await OpenApiRulesEngine.forwardRules(sampleContext, sampleRequest)
+      expect(result).toStrictEqual({})
+    })
+    it('forward when get parties and callbackInfo provided', async () => {
+      sampleContext.request.method = 'get'
+      sampleContext.request.headers = {
+        'fspiop-source': 'userdfsp'
+      }
+      const result = await OpenApiRulesEngine.forwardRules(sampleContext, sampleRequest)
+      expect(result).toBeDefined()
+    })
+    it('forward when get parties and callbackInfo not provided', async () => {
+      sampleContext.request.method = 'put'
+      sampleContext.request.headers = {
+        'fspiop-source': 'userdfsp'
+      }
+      const newRequest = {...sampleRequest}
+      newRequest.customInfo = {}
+      const result = await OpenApiRulesEngine.forwardRules(sampleContext, newRequest)
+      expect(result).toBeDefined()
     })
   })
 })

@@ -5,6 +5,7 @@
     "response": 1,
     "callback": 1,
     "validation": 1,
+    "forward": 1,
     "userSettings": 1
   },
   "OAUTH": {

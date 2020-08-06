@@ -48,7 +48,7 @@ const handleCallback = async (callbackObject, context, req) => {
     }
   } else {
     const endpointsDfspWise = userConfig.ENDPOINTS_DFSP_WISE
-    if (callbackObject.callbackInfo.dfspId && endpointsDfspWise.enabled && endpointsDfspWise.dfsps[callbackObject.callbackInfo.dfspId]) {
+    if (callbackObject.callbackInfo && callbackObject.callbackInfo.dfspId && endpointsDfspWise.enabled && endpointsDfspWise.dfsps[callbackObject.callbackInfo.dfspId]) {
       const dfspEndpoints = endpointsDfspWise.dfsps[callbackObject.callbackInfo.dfspId]
       const dfspEndpoint = dfspEndpoints.endpoints.find(endpoint => endpoint.method === callbackObject.method && endpoint.path && callbackObject.path && endpoint.endpoint)
       if (dfspEndpoint) {

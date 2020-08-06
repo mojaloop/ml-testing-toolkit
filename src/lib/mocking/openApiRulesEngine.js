@@ -330,27 +330,27 @@ const forwardRules = async (context, req) => {
 
   const res = await rulesEngine.evaluate(facts)
   if (res) {
-    const generatedCallback = {}
+    const forwardedRequest = {}
     customLogger.logMessage('debug', 'Forward rules are matched', res, true, req)
     const curEvent = res[0]
 
     await executeScripts(curEvent, req)
 
     if (curEvent.type === 'FORWARD') {
-      if (generatedCallback.callbackInfo) {
-        generatedCallback.callbackInfo = replaceVariablesFromRequest(req.customInfo.callbackInfo, context, req)
+      if (req.customInfo && req.customInfo.callbackInfo) {
+        forwardedRequest.callbackInfo = replaceVariablesFromRequest(req.customInfo.callbackInfo, context, req)
       } else {
-        generatedCallback.callbackInfo = {}
+        forwardedRequest.callbackInfo = {}
       }
       if (curEvent.params && curEvent.params.dfspId) {
-        generatedCallback.callbackInfo.dfspId = curEvent.params.dfspId
+        forwardedRequest.callbackInfo.dfspId = curEvent.params.dfspId
       }
-      generatedCallback.path = req.path
-      generatedCallback.method = req.method
-      generatedCallback.body = req.payload
-      generatedCallback.headers = req.headers
+      forwardedRequest.path = req.path
+      forwardedRequest.method = req.method
+      forwardedRequest.body = req.payload
+      forwardedRequest.headers = req.headers
     }
-    return generatedCallback
+    return forwardedRequest
   } else {
     customLogger.logMessage('error', 'No forward rules are matched', res, true, req)
     return false
