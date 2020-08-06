@@ -12,10 +12,10 @@
     "conditions": {
       "all": [
         {
-          "fact": "pathParams",
+          "fact": "headers",
           "operator": "equal",
-          "value": "000222",
-          "path": "ID"
+          "value": "userdfsp",
+          "path": "fspiop-source"
         },
         {
           "fact": "operationPath",
@@ -252,10 +252,10 @@
     "conditions": {
       "all": [
         {
-          "fact": "pathParams",
+          "fact": "headers",
           "operator": "equal",
-          "value": "000111",
-          "path": "ID"
+          "value": "userdfsp2",
+          "path": "fspiop-source"
         },
         {
           "fact": "operationPath",
