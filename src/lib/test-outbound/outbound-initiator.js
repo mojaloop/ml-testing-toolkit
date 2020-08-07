@@ -380,7 +380,8 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         const syncResponse = {
           status: result.status,
           statusText: result.statusText,
-          data: result.data
+          body: result.data,
+          headers: result.headers
         }
         const curlRequest = result.request ? result.request.toCurl() : ''
 

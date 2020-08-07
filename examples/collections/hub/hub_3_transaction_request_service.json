@@ -879,14 +879,14 @@
                 "id": 2,
                 "description": "Check Generic validation error ",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.equal(\"Malformed syntax - .requestBody should be object\")"
+                  "expect(response.body.errorInformation.errorDescription).to.equal(\"Malformed syntax - .requestBody should be object\")"
                 ]
               },
               {
                 "id": 3,
                 "description": "Check Error code 3101",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3101')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3101')"
                 ]
               }
             ]
@@ -926,14 +926,14 @@
                 "id": 2,
                 "description": "Missing mandatory element - date is required",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.equal(\"Missing mandatory element - .header should have required property 'date'\")"
+                  "expect(response.body.errorInformation.errorDescription).to.equal(\"Missing mandatory element - .header should have required property 'date'\")"
                 ]
               },
               {
                 "id": 3,
                 "description": "Check Error code 3102",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3102')"
                 ]
               }
             ]
@@ -1089,14 +1089,14 @@
                 "id": 2,
                 "description": "Missing mandatory element - fspiop-source is required",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.equal(\"Missing mandatory element - .header should have required property 'fspiop-source'\")"
+                  "expect(response.body.errorInformation.errorDescription).to.equal(\"Missing mandatory element - .header should have required property 'fspiop-source'\")"
                 ]
               },
               {
                 "id": 3,
                 "description": "Check Error code 3102",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3102')"
                 ]
               }
             ]
@@ -1253,14 +1253,14 @@
                 "id": 2,
                 "description": "Check Unacceptable version requested",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.equal('Unacceptable version requested - Client supplied a protocol version which is not supported by the server')"
+                  "expect(response.body.errorInformation.errorDescription).to.equal('Unacceptable version requested - Client supplied a protocol version which is not supported by the server')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Check Error code 3001",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3001')"
                 ]
               }
             ]
@@ -1301,14 +1301,14 @@
                 "id": 2,
                 "description": "Check Malformed syntax - Unsupported Media Type",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.equal('Malformed syntax - Unsupported Media Type')"
+                  "expect(response.body.errorInformation.errorDescription).to.equal('Malformed syntax - Unsupported Media Type')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Check Error code 3101",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3101')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3101')"
                 ]
               }
             ]

@@ -39,7 +39,7 @@
                 "id": 2,
                 "description": "FSP is inactive",
                 "exec": [
-                  "expect(response.data.isActive).to.equal(0)"
+                  "expect(response.body.isActive).to.equal(0)"
                 ]
               }
             ]
@@ -73,7 +73,7 @@
                 "id": 2,
                 "description": "FSP is inactive",
                 "exec": [
-                  "expect(response.data.isActive).to.equal(0)"
+                  "expect(response.body.isActive).to.equal(0)"
                 ]
               }
             ]
@@ -326,7 +326,7 @@
                 "id": 2,
                 "description": "FSP is active",
                 "exec": [
-                  "expect(response.data.isActive).to.equal(1)"
+                  "expect(response.body.isActive).to.equal(1)"
                 ]
               }
             ]
@@ -360,7 +360,7 @@
                 "id": 2,
                 "description": "FSP is active",
                 "exec": [
-                  "expect(response.data.isActive).to.equal(1)"
+                  "expect(response.body.isActive).to.equal(1)"
                 ]
               }
             ]
