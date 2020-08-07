@@ -216,9 +216,8 @@ describe('callbackHandler', () => {
             }
           ]
         },
-        ENDPOINTS_DFSP_WISE: {
-          enabled: false
-        },
+        HUB_ONLY_MODE: false,
+        ENDPOINTS_DFSP_WISE: {},
         OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
@@ -258,8 +257,8 @@ describe('callbackHandler', () => {
       }
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
+        HUB_ONLY_MODE: true,
         ENDPOINTS_DFSP_WISE: {
-          enabled: true,
           dfsps: {
             userdfsp: {
               defaultEndpoint: 'http://localhost:5000',
@@ -313,8 +312,8 @@ describe('callbackHandler', () => {
       }
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
+        HUB_ONLY_MODE: true,
         ENDPOINTS_DFSP_WISE: {
-          enabled: true,
           dfsps: {
             userdfsp: {
               defaultEndpoint: 'http://localhost:5000',
@@ -361,8 +360,8 @@ describe('callbackHandler', () => {
       }
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
+        HUB_ONLY_MODE: true,
         ENDPOINTS_DFSP_WISE: {
-          enabled: true,
           dfsps: {
             userdfsp: {
               defaultEndpoint: 'http://localhost:5000',
@@ -415,9 +414,8 @@ describe('callbackHandler', () => {
             }
           ]
         },
-        ENDPOINTS_DFSP_WISE: {
-          enabled: false
-        },
+        HUB_ONLY_MODE: false,
+        ENDPOINTS_DFSP_WISE: {},
         OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })

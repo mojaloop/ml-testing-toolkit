@@ -276,11 +276,13 @@ const getRulesEngine = async (objStore, convertedRules) => {
 
 const loadRules = (rules, objStore) => {
   rules.forEach(rule => {
-    rule.conditions.all.forEach(condition => {
-      if (condition.fact === 'headers') {
-        condition.path = condition.path.toLowerCase()
-      }
-    })
+    if (rule.conditions && rule.conditions.all) {
+      rule.conditions.all.forEach(condition => {
+        if (condition.fact === 'headers') {
+          condition.path = condition.path.toLowerCase()
+        }
+      })
+    }
   })
   objStore.rulesEngine.loadRules(rules)
 }
