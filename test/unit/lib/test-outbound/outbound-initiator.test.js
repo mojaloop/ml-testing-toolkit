@@ -35,6 +35,7 @@ const MyEventEmitter = require('../../../../src/lib/MyEventEmitter')
 
 const SpyAgent = jest.spyOn(https, 'Agent')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
+const SpyGetEndpointsConfig= jest.spyOn(ConnectionProvider, 'getEndpointsConfig')
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 const SpySign = jest.spyOn(JwsSigning, 'sign')
@@ -413,7 +414,9 @@ describe('Outbound Initiator Functions', () => {
         hubClientKey: 'key'
       }))
       SpyGetUserConfig.mockReturnValueOnce({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
+      })
+      SpyGetUserConfig.mockReturnValueOnce({
         OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
       SpyGetSystemConfig.mockReturnValueOnce({
@@ -725,6 +728,94 @@ describe('Outbound Initiator Functions', () => {
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
     })
+    it('sendRequest should call axios with appropriate params 1', async () => {
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
+      }))
+      SpyGetUserConfig.mockReturnValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
+      }).mockReturnValueOnce({
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
+      })
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: true
+      })
+      SpyGetEndpointsConfig.mockResolvedValueOnce({
+        dfspEndpoints: {}
+      })
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'userdfsp',
+          Date: '2020-01-01 01:01:01',
+          TimeStamp: '{$request.headers.Date}'
+        },
+        body: {
+          transactionId: '123',
+          amount: {
+            amount: '100',
+            currency: 'USD'
+          },
+          transactionAmount: {
+            amount: '{$request.body.amount.amount}',
+            currency: '{$request.body.amount.currency}'
+          }
+        }
+      }
+      try {
+        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'notExistingDfsp')
+      } catch (err) {}
+    })
+    it('sendRequest should call axios with appropriate params 1', async () => {
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
+      }))
+      SpyGetUserConfig.mockReturnValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
+      }).mockReturnValueOnce({
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
+      })
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: true
+      })
+      SpyGetEndpointsConfig.mockResolvedValueOnce({
+        dfspEndpoints: {
+          userdfsp: 'http://localhost:5000'
+        }
+      })
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'userdfsp',
+          Date: '2020-01-01 01:01:01',
+          TimeStamp: '{$request.headers.Date}'
+        },
+        body: {
+          transactionId: '123',
+          amount: {
+            amount: '100',
+            currency: 'USD'
+          },
+          transactionAmount: {
+            amount: '{$request.body.amount.amount}',
+            currency: '{$request.body.amount.currency}'
+          }
+        }
+      }
+      try {
+        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'userdfsp')
+      } catch (err) {}
+    })
   })
 
   describe('generateFinalReport', () => {
@@ -942,6 +1033,7 @@ describe('Outbound Initiator Functions', () => {
       expect(testResult.passedCount).toEqual(1)
     })
   })
+  
   describe('terminateOutbound', () => {
     // Positive Scenarios
     it('terminateOutbound should terminate outbound', async () => {

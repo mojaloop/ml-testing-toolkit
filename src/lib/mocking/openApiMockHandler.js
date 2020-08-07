@@ -229,7 +229,7 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
     responseStatus = +status
   }
   // Verify that it is a success code, then generate callback and only if the method is post or get
-  if ((req.method === 'post' || req.method === 'get') && responseStatus >= 200 && responseStatus <= 299) {
+  if ((req.method === 'post' || req.method === 'get' || req.method === 'put') && responseStatus >= 200 && responseStatus <= 299) {
     // Generate callback asynchronously
     setImmediate(generateAsyncCallback, item, context, req)
   }
@@ -241,35 +241,48 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
 }
 
 const generateAsyncCallback = async (item, context, req) => {
-  // Getting callback info from callback map file
-  try {
-    const cbMapRawdata = await utils.readFileAsync(item.callbackMapFile)
-    const callbackMap = JSON.parse(cbMapRawdata)
-    if (!callbackMap[context.operation.path]) {
-      customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, null, true, req)
-      return
-    }
-    const callbackInfo = callbackMap[context.operation.path][context.request.method]
-    if (!callbackInfo) {
-      customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method, null, true, req)
-      return
-    }
-    req.customInfo.callbackInfo = callbackInfo
-  } catch (err) {
-    customLogger.logMessage('error', 'Callback file not found.', null, true, req)
-    return
-  }
-  // Additional validation based on the Json Rules Engine, send error callback on failure
-  const generatedErrorCallback = await OpenApiRulesEngine.validateRules(context, req)
-  if (generatedErrorCallback.body) {
-    // TODO: Handle method and path verifications against the generated ones
-    customLogger.logMessage('error', 'Sending error callback', null, true, req)
-    CallbackHandler.handleCallback(generatedErrorCallback, context, req)
-    return
-  }
-
   const userConfig = Config.getUserConfig()
+  if (req.method === 'put') {
+    if (!userConfig.HUB_ONLY_MODE) {
+      return
+    }
+  } else {
+    // Getting callback info from callback map file
+    try {
+      const cbMapRawdata = await utils.readFileAsync(item.callbackMapFile)
+      const callbackMap = JSON.parse(cbMapRawdata)
+      if (!callbackMap[context.operation.path]) {
+        customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, null, true, req)
+        return
+      }
+      const callbackInfo = callbackMap[context.operation.path][context.request.method]
+      if (!callbackInfo) {
+        customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method, null, true, req)
+        return
+      }
+      req.customInfo.callbackInfo = callbackInfo
+    } catch (err) {
+      customLogger.logMessage('error', 'Callback file not found.', null, true, req)
+      return
+    }
+    // Additional validation based on the Json Rules Engine, send error callback on failure
+    const generatedErrorCallback = await OpenApiRulesEngine.validateRules(context, req)
+    if (generatedErrorCallback.body) {
+      // TODO: Handle method and path verifications against the generated ones
+      customLogger.logMessage('error', 'Sending error callback', null, true, req)
+      CallbackHandler.handleCallback(generatedErrorCallback, context, req)
+      return
+    }
+  }
 
+  // forward request after validation
+  if (userConfig.HUB_ONLY_MODE) {
+    const forwardRequest = await OpenApiRulesEngine.forwardRules(context, req)
+    if (forwardRequest) {
+      CallbackHandler.handleCallback(forwardRequest, context, req)
+    }
+    return
+  }
   // Handle quotes and transfer association - should do this first to get the associated quote
   if (userConfig.TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
     const matchFound = require('./middleware-functions/quotesAssociation').handleTransfers(context, req)

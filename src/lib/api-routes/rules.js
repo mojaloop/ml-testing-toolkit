@@ -227,41 +227,67 @@ router.put('/files/response', async (req, res, next) => {
   }
 })
 
-// Old methods
-// router.get('/validation', async (req, res, next) => {
-//   try {
-//     const result = await rulesEngineModel.getValidationRules()
-//     res.status(200).json(result)
-//   } catch (err) {
-//     next(err)
-//   }
-// })
+// Forward Rules
+// Get all forward rules files
+router.get('/files/forward', async (req, res, next) => {
+  try {
+    const result = await rulesEngineModel.getForwardRulesFiles()
+    res.status(200).json(result)
+  } catch (err) {
+    next(err)
+  }
+})
 
-// router.put('/validation', async (req, res, next) => {
-//   try {
-//     await rulesEngineModel.setValidationRules(req.body)
-//     res.status(200).json({ status: 'OK' })
-//   } catch (err) {
-//     next(err)
-//   }
-// })
+// Route to get content of a forward rule file
+router.get('/files/forward/:fileName', async (req, res, next) => {
+  const fileName = req.params.fileName
+  try {
+    const result = await rulesEngineModel.getForwardRulesFileContent(fileName)
+    res.status(200).json(result)
+  } catch (err) {
+    next(err)
+  }
+})
 
-// router.get('/callback', async (req, res, next) => {
-//   try {
-//     const result = await rulesEngineModel.getCallbackRules()
-//     res.status(200).json(result)
-//   } catch (err) {
-//     next(err)
-//   }
-// })
+// Route to edit a forward rule file
+router.put('/files/forward/:fileName', async (req, res, next) => {
+  const fileName = req.params.fileName
 
-// router.put('/callback', async (req, res, next) => {
-//   try {
-//     await rulesEngineModel.setCallbackRules(req.body)
-//     res.status(200).json({ status: 'OK'})
-//   } catch (err) {
-//     next(err)
-//   }
-// })
+  try {
+    await rulesEngineModel.setForwardRulesFileContent(fileName, req.body)
+    res.status(200).json({ status: 'OK' })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Route to delete a callback rule file
+router.delete('/files/forward/:fileName', async (req, res, next) => {
+  const fileName = req.params.fileName
+
+  try {
+    await rulesEngineModel.deleteForwardRulesFile(fileName)
+    res.status(200).json({ status: 'OK' })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Route to modify configuration in forward rules
+router.put('/files/forward', async (req, res, next) => {
+  const reqType = req.body.type
+  try {
+    switch (reqType) {
+      case 'activeRulesFile':
+        await rulesEngineModel.setActiveForwardRulesFile(req.body.fileName)
+        res.status(200).json({ status: 'OK' })
+        break
+      default:
+        throw (new Error('Unknown update type'))
+    }
+  } catch (err) {
+    next(err)
+  }
+})
 
 module.exports = router

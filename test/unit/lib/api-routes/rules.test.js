@@ -109,6 +109,82 @@ describe('API route /api/rules', () => {
     })
   })
 
+  describe('Forward Rules', () => {
+    describe('GET /api/rules/files/forward', () => {
+      it('Getting all rules files', async () => {
+        RulesEngineModel.getForwardRulesFiles.mockResolvedValueOnce([])
+        const res = await request(app).get(`/api/rules/files/forward`)
+        expect(res.statusCode).toEqual(200)
+        expect(Array.isArray(res.body)).toBeTruthy()
+      })
+      it('Getting all rules files fails if there is an error', async () => {
+        RulesEngineModel.getForwardRulesFiles.mockRejectedValueOnce({})
+        const res = await request(app).get(`/api/rules/files/forward`)
+        expect(res.statusCode).toEqual(500)
+      })
+    })
+    describe('GET /api/rules/files/forward/:fileName', () => {
+      it('Getting the activated rule file', async () => {
+        RulesEngineModel.getForwardRulesFileContent.mockResolvedValueOnce([])
+        const res = await request(app).get(`/api/rules/files/forward/test`)
+        expect(res.statusCode).toEqual(200)
+        expect(Array.isArray(res.body)).toBeTruthy()
+      })
+      it('Getting the activated rule file fails if there is an error', async () => {
+        RulesEngineModel.getForwardRulesFileContent.mockRejectedValueOnce([])
+        const res = await request(app).get(`/api/rules/files/forward/test`)
+        expect(res.statusCode).toEqual(500)
+        expect(Array.isArray(res.body)).not.toBeTruthy()
+      })
+    })
+    describe('PUT /api/rules/files/forward', () => {
+      it('set an active rules file', async () => {
+        RulesEngineModel.setActiveForwardRulesFile.mockResolvedValueOnce()
+        const res = await request(app).put('/api/rules/files/forward').send({
+          type: 'activeRulesFile'
+        })
+        expect(res.statusCode).toEqual(200)
+      })
+      it('Create a test file with wrong content', async () => {
+        const res = await request(app).put('/api/rules/files/forward').send({
+          type: 'NotActiveRulesFile'
+        })
+        expect(res.statusCode).toEqual(500)
+      })
+      it('Create a test file', async () => {
+        RulesEngineModel.setActiveForwardRulesFile.mockRejectedValueOnce({})
+        const res = await request(app).put('/api/rules/files/forward').send({
+          type: 'activeRulesFile'
+        })        
+        expect(res.statusCode).toEqual(500)
+      })
+    })
+    describe('PUT /api/rules/files/callback/:fileName', () => {
+      it('Create a test file', async () => {
+        RulesEngineModel.setForwardRulesFileContent.mockResolvedValueOnce()
+        const res = await request(app).put(`/api/rules/files/forward/test1.json`).send([])
+        expect(res.statusCode).toEqual(200)
+      })
+      it('Create a test file fails if there is an error', async () => {
+        RulesEngineModel.setForwardRulesFileContent.mockRejectedValueOnce({})
+        const res = await request(app).put(`/api/rules/files/forward/test1.json`).send([])
+        expect(res.statusCode).toEqual(500)
+      })
+    })
+    describe('DELETE /api/rules/files/forward/:fileName', () => {
+      it('Delete the test file', async () => {
+        RulesEngineModel.deleteForwardRulesFile.mockResolvedValueOnce()
+        const res = await request(app).delete(`/api/rules/files/forward/test1.json`)
+        expect(res.statusCode).toEqual(200)
+      })
+      it('Delete the test file fails if there is an error', async () => {
+        RulesEngineModel.deleteForwardRulesFile.mockRejectedValueOnce({})
+        const res = await request(app).delete(`/api/rules/files/forward/test1.json`)
+        expect(res.statusCode).toEqual(500)
+      })
+    })
+  })
+
   describe('Callback Rules', () => {
     describe('GET /api/rules/files/callback', () => {
       it('Getting all rules files', async () => {

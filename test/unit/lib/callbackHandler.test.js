@@ -216,6 +216,159 @@ describe('callbackHandler', () => {
             }
           ]
         },
+        HUB_ONLY_MODE: false,
+        ENDPOINTS_DFSP_WISE: {},
+        OUTBOUND_MUTUAL_TLS_ENABLED: false,
+        SEND_CALLBACK_ENABLE: true
+      })
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
+      SpySign.mockImplementationOnce(() => {
+        throw new Error('log error if jws signign fails')
+      })
+      SpyPushCallback.mockReturnValueOnce()
+      SpyMyEventEmitter.mockReturnValueOnce({
+        emit: () => {}
+      })
+      SpyRequestLogger.mockReturnValue()
+      axios.mockRejectedValueOnce({err: {}})
+      await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
+    })
+    it('when CALLBACK_RESOURCE_ENDPOINTS and SEND_CALLBACK_ENABLE is enabled and OUTBOUND_MUTUAL_TLS_ENABLED disabled', async () => {
+      const callbackObject = {
+        method: 'post',
+        path: '/transfers/{ID}',
+        headers: {},
+        body: {},
+        callbackInfo: {
+          dfspId: 'userdfsp'
+        }
+      }
+      const context = {
+        api: {
+          validateRequest: async () => {
+            return {valid: false}
+          }
+        }
+      }
+      const req = {
+        headers: {}
+      }
+      SpyGetUserConfig.mockReturnValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        HUB_ONLY_MODE: true,
+        ENDPOINTS_DFSP_WISE: {
+          dfsps: {
+            userdfsp: {
+              defaultEndpoint: 'http://localhost:5000',
+              endpoints: [{
+                method: 'post',
+                path: '/transfers',
+                endpoint: 'http://localhost:5000'
+              }]
+            }
+          }
+        },
+        OUTBOUND_MUTUAL_TLS_ENABLED: false,
+        SEND_CALLBACK_ENABLE: true
+      })
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
+      SpySign.mockImplementationOnce(() => {
+        throw new Error('log error if jws signign fails')
+      })
+      SpyPushCallback.mockReturnValueOnce()
+      SpyMyEventEmitter.mockReturnValueOnce({
+        emit: () => {}
+      })
+      SpyRequestLogger.mockReturnValue()
+      axios.mockRejectedValueOnce({err: {}})
+      await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
+    })
+    it('when CALLBACK_RESOURCE_ENDPOINTS and SEND_CALLBACK_ENABLE is enabled and OUTBOUND_MUTUAL_TLS_ENABLED disabled', async () => {
+      const callbackObject = {
+        method: 'post',
+        path: '/transfers',
+        headers: {},
+        body: {},
+        callbackInfo: {
+          dfspId: 'userdfsp'
+        }
+      }
+      const context = {
+        api: {
+          validateRequest: async () => {
+            return {valid: false}
+          }
+        }
+      }
+      const req = {
+        headers: {},
+        customInfo: {
+          traceID: 'traceID'
+        }
+      }
+      SpyGetUserConfig.mockReturnValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        HUB_ONLY_MODE: true,
+        ENDPOINTS_DFSP_WISE: {
+          dfsps: {
+            userdfsp: {
+              defaultEndpoint: 'http://localhost:5000',
+              endpoints: []
+            }
+          }
+        },
+        OUTBOUND_MUTUAL_TLS_ENABLED: false,
+        SEND_CALLBACK_ENABLE: true
+      })
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
+      SpySign.mockImplementationOnce(() => {
+        throw new Error('log error if jws signign fails')
+      })
+      SpyPushCallback.mockReturnValueOnce()
+      SpyMyEventEmitter.mockReturnValueOnce({
+        emit: () => {}
+      })
+      SpyRequestLogger.mockReturnValue()
+      axios.mockRejectedValueOnce({err: {}})
+      await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
+    })
+    it('when CALLBACK_RESOURCE_ENDPOINTS and SEND_CALLBACK_ENABLE is enabled and OUTBOUND_MUTUAL_TLS_ENABLED disabled', async () => {
+      const callbackObject = {
+        method: 'put',
+        path: '/transfers',
+        headers: {},
+        body: {},
+        callbackInfo: {
+          dfspId: 'userdfsp'
+        }
+      }
+      const context = {
+        api: {
+          validateRequest: async () => {
+            return {valid: false}
+          }
+        }
+      }
+      const req = {
+        headers: {}
+      }
+      SpyGetUserConfig.mockReturnValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        HUB_ONLY_MODE: true,
+        ENDPOINTS_DFSP_WISE: {
+          dfsps: {
+            userdfsp: {
+              defaultEndpoint: 'http://localhost:5000',
+              endpoints: []
+            }
+          }
+        },
         OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
@@ -261,6 +414,8 @@ describe('callbackHandler', () => {
             }
           ]
         },
+        HUB_ONLY_MODE: false,
+        ENDPOINTS_DFSP_WISE: {},
         OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
