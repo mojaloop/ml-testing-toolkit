@@ -243,7 +243,7 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
 const generateAsyncCallback = async (item, context, req) => {
   const userConfig = Config.getUserConfig()
   if (req.method === 'put') {
-    if (!userConfig.ENDPOINTS_DFSP_WISE.enabled) {
+    if (!userConfig.HUB_ONLY_MODE) {
       return
     }
   } else {
@@ -276,7 +276,7 @@ const generateAsyncCallback = async (item, context, req) => {
   }
 
   // forward request after validation
-  if (userConfig.ENDPOINTS_DFSP_WISE.enabled) {
+  if (userConfig.HUB_ONLY_MODE) {
     const forwardRequest = await OpenApiRulesEngine.forwardRules(context, req)
     if (forwardRequest) {
       CallbackHandler.handleCallback(forwardRequest, context, req)

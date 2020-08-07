@@ -21,8 +21,8 @@
       }
     ]
   },
+  "HUB_ONLY_MODE": true,
   "ENDPOINTS_DFSP_WISE": {
-    "enabled": false,
     "dfsps": {
       "userdfsp": {
         "defaultEndpoint": "http://localhost:4000",
