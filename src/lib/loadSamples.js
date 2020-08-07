@@ -22,11 +22,26 @@
  --------------
  ******/
 const { readFileAsync, readRecursiveAsync } = require('./utils')
+const fs = require('fs')
 
 // load collections or environments
 const getCollectionsOrEnvironments = async (exampleType, type) => {
   const data = await readRecursiveAsync(`examples/${exampleType}/${type || ''}`)
   return data.filter(filename => filename.endsWith('.json'))
+}
+
+// load collections or environments with file sizes
+const getCollectionsOrEnvironmentsWithFileSize = async (exampleType, type) => {
+  const dir = `examples/${exampleType}/${type || ''}`
+  const data = await readRecursiveAsync(dir)
+  const jsonFileList = data.filter(filename => filename.endsWith('.json'))
+  const jsonFileListWithFileSize = jsonFileList.map(file => {
+    return {
+      name: file,
+      size: fs.statSync(file).size
+    }
+  })
+  return jsonFileListWithFileSize
 }
 
 // load samples content
@@ -70,5 +85,6 @@ const getSample = async (queryParams) => {
 
 module.exports = {
   getCollectionsOrEnvironments,
+  getCollectionsOrEnvironmentsWithFileSize,
   getSample
 }

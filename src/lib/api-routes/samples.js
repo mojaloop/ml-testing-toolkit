@@ -51,4 +51,16 @@ router.get('/load/:exampleType', async (req, res, next) => {
   }
 })
 
+// Route to get root filenames with file size
+// uri param 'exampleType': supported values: 'collections', 'environments'
+// query param 'type': examples: 'hub', 'dfsp'
+router.get('/list/:exampleType', async (req, res, next) => {
+  try {
+    const fileList = await loadSamples.getCollectionsOrEnvironmentsWithFileSize(req.params.exampleType, req.query.type)
+    return res.status(200).json({ status: 'OK', body: fileList })
+  } catch (err) {
+    next(err)
+  }
+})
+
 module.exports = router
