@@ -265,13 +265,25 @@ const getRules = async (objStore) => {
 const getRulesEngine = async (objStore, convertedRules) => {
   if (convertedRules) {
     objStore.rulesEngine = new RulesEngine()
+    prepareRules(convertedRules)
     objStore.rulesEngine.loadRules(convertedRules)
   } else if (!objStore.rulesEngine) {
     objStore.rulesEngine = new RulesEngine()
     const rules = await getRules(objStore)
+    prepareRules(rules)
     objStore.rulesEngine.loadRules(rules)
   }
   return objStore.rulesEngine
+}
+
+const prepareRules = (rules) => {
+  rules.forEach(rule => {
+    rule.conditions.all.forEach(condition => {
+      if (condition.fact === 'headers') {
+        condition.path = condition.path.toLowerCase()
+      }
+    })
+  })
 }
 
 const getRulesFiles = async (objStore) => {
