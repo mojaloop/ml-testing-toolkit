@@ -243,6 +243,7 @@ const reloadRules = async (objStore) => {
   if (!objStore.rules.length) {
     objStore.rules = []
   }
+  prepareRules(objStore.rules)
   objStore.rulesEngine.loadRules(objStore.rules)
 }
 
