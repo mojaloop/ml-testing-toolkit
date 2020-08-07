@@ -243,8 +243,7 @@ const reloadRules = async (objStore) => {
   if (!objStore.rules.length) {
     objStore.rules = []
   }
-  prepareRules(objStore.rules)
-  objStore.rulesEngine.loadRules(objStore.rules)
+  loadRules(objStore.rules, objStore)
 }
 
 const setActiveRulesFile = async (objStore, fileName) => {
@@ -266,18 +265,16 @@ const getRules = async (objStore) => {
 const getRulesEngine = async (objStore, convertedRules) => {
   if (convertedRules) {
     objStore.rulesEngine = new RulesEngine()
-    prepareRules(convertedRules)
-    objStore.rulesEngine.loadRules(convertedRules)
+    loadRules(convertedRules, objStore)
   } else if (!objStore.rulesEngine) {
     objStore.rulesEngine = new RulesEngine()
     const rules = await getRules(objStore)
-    prepareRules(rules)
-    objStore.rulesEngine.loadRules(rules)
+    loadRules(rules, objStore)
   }
   return objStore.rulesEngine
 }
 
-const prepareRules = (rules) => {
+const loadRules = (rules, objStore) => {
   rules.forEach(rule => {
     rule.conditions.all.forEach(condition => {
       if (condition.fact === 'headers') {
@@ -285,6 +282,7 @@ const prepareRules = (rules) => {
       }
     })
   })
+  objStore.rulesEngine.loadRules(rules)
 }
 
 const getRulesFiles = async (objStore) => {
