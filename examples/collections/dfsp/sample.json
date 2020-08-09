@@ -244,7 +244,7 @@
                 "id": 2,
                 "description": "Callback body should contain party",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3102')"
                 ]
               }
             ]
@@ -393,7 +393,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3001",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3001')"
                 ]
               }
             ]
@@ -434,7 +434,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -475,7 +475,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -516,7 +516,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -617,7 +617,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3001",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3001')"
                 ]
               }
             ]
@@ -657,7 +657,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -697,7 +697,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -737,7 +737,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -848,7 +848,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3001",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3001')"
                 ]
               }
             ]
@@ -892,7 +892,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -937,7 +937,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -982,7 +982,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -1027,7 +1027,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -1136,7 +1136,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3001",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3001')"
                 ]
               }
             ]
@@ -1179,7 +1179,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -1223,7 +1223,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -1267,7 +1267,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -1311,7 +1311,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -1441,7 +1441,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3001",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3001')"
                 ]
               }
             ]
@@ -1496,7 +1496,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -1551,7 +1551,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -1606,7 +1606,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -1662,7 +1662,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -1717,7 +1717,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -1759,7 +1759,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -1862,7 +1862,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3001",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3001')"
                 ]
               }
             ]
@@ -1903,7 +1903,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -1944,7 +1944,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -1985,7 +1985,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -2084,7 +2084,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3001",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3001')"
                 ]
               }
             ]
@@ -2123,7 +2123,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -2162,7 +2162,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -2201,7 +2201,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -2300,7 +2300,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3001",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3001')"
                 ]
               }
             ]
@@ -2339,7 +2339,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -2378,7 +2378,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -2417,7 +2417,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -2516,7 +2516,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3001",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3001')"
                 ]
               }
             ]
@@ -2555,7 +2555,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -2594,7 +2594,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -2633,7 +2633,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -2732,7 +2732,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3001",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3001')"
                 ]
               }
             ]
@@ -2771,7 +2771,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -2810,7 +2810,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -2849,7 +2849,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -2948,7 +2948,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3001",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3001')"
                 ]
               }
             ]
@@ -2987,7 +2987,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -3026,7 +3026,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -3065,7 +3065,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -3333,7 +3333,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3001",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3001')"
                 ]
               }
             ]
@@ -3457,7 +3457,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -3581,7 +3581,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -3705,7 +3705,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -3830,7 +3830,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -3954,7 +3954,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -4061,7 +4061,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -4133,7 +4133,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -4295,7 +4295,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3001",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3001')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3001')"
                 ]
               }
             ]
@@ -4366,7 +4366,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -4437,7 +4437,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -4508,7 +4508,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -4580,7 +4580,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -4651,7 +4651,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -4722,7 +4722,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -4793,7 +4793,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -4864,7 +4864,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -4917,7 +4917,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]
@@ -4988,7 +4988,7 @@
                 "id": 2,
                 "description": "Response data.errorInformation.errorCode to be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]

@@ -616,7 +616,7 @@
                 "id": 3,
                 "description": "errorCode should be 3100",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3100')"
                 ]
               }
             ]

@@ -30,7 +30,7 @@
                 "id": 1,
                 "description": "status to be 201 if not exists or 400 if exists",
                 "exec": [
-                  "if (response.data.errorInformation) {",
+                  "if (response.body.errorInformation) {",
                   "  expect(response.status).to.equal(400)",
                   "} else {",
                   "  expect(response.status).to.equal(201)",
@@ -72,7 +72,7 @@
                 "id": 1,
                 "description": "status to be 201 if not exists or 500 if exists",
                 "exec": [
-                  "if (response.data.errorInformation) {",
+                  "if (response.body.errorInformation) {",
                   "  expect(response.status).to.equal(500)",
                   "} else {",
                   "  expect(response.status).to.equal(201)",

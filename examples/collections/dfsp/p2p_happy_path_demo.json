@@ -389,28 +389,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain fspiop",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('fspiop-source')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('fspiop-source')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3102'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3102')"
                 ]
               }
             ]
@@ -456,28 +456,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain date",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('date')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('date')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3102'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3102')"
                 ]
               }
             ]
@@ -523,28 +523,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain content-type",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('content')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('content')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3102'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3102')"
                 ]
               }
             ]
@@ -590,28 +590,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain '3102'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3102')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain accept",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('accept')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('accept')"
                 ]
               }
             ]
@@ -1009,28 +1009,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain Accept",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('accept')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('accept')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3102'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3102')"
                 ]
               }
             ]
@@ -1113,28 +1113,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain date",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('date')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('date')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3102'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3102')"
                 ]
               }
             ]
@@ -1217,28 +1217,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain fspiop",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('fspiop')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('fspiop')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3102'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3102')"
                 ]
               }
             ]
@@ -1534,28 +1534,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain date-type",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('date')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('date')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3102'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3102')"
                 ]
               },
               {
@@ -1609,28 +1609,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain fspiop-source header",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('fspiop-source')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('fspiop-source')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3102'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3102')"
                 ]
               },
               {
@@ -1684,28 +1684,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain accept header",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('accept')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('accept')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3102'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3102')"
                 ]
               },
               {
@@ -1797,28 +1797,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain quote",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('quote')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('quote')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -1902,28 +1902,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain transaction",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('transaction')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('transaction')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -2003,28 +2003,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain payer",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('payer')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('payer')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -2108,28 +2108,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain amount",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('amount')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('amount')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -2213,28 +2213,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain amount",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('amount')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('amount')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -2318,28 +2318,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain currency",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('currency')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('currency')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -2423,28 +2423,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain transactionType",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('transactionType')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('transactionType')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -2528,28 +2528,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain transactionType",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('transactionType')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('transactionType')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -2633,28 +2633,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain transactionType",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('transactionType')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('transactionType')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -2951,28 +2951,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain transferId-type",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('transferId')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('transferId')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               },
               {
@@ -3027,28 +3027,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain payerFsp",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('payerFsp')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('payerFsp')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               },
               {
@@ -3103,28 +3103,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain payeeFsp",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('payeeFsp')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('payeeFsp')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               },
               {
@@ -3179,28 +3179,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain transferId-type",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('amount')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('amount')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               },
               {
@@ -3255,28 +3255,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain currency",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('currency')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('currency')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               },
               {
@@ -3331,28 +3331,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain expiration",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('expiration')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('expiration')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               },
               {
@@ -3407,28 +3407,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain transferId",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('ilpPacket')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('ilpPacket')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               },
               {
@@ -3483,28 +3483,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain condition",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('condition')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('condition')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               },
               {
@@ -3803,28 +3803,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain currency",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('currency')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('currency')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3102'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               },
               {
@@ -3879,28 +3879,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain amount",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('amount')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('amount')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3102'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               },
               {
@@ -3955,28 +3955,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain transferId",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('transferId')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('transferId')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3102'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               },
               {
@@ -4031,28 +4031,28 @@
                 "id": 2,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain expiration",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('expiration')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('expiration')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain '3102'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               },
               {
@@ -4144,28 +4144,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain partyIdType",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('partyIdType')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('partyIdType')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -4249,28 +4249,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain transaction",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('transaction')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('transaction')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -4354,28 +4354,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain quoteId",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('quoteId')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('quoteId')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -4459,28 +4459,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain amountType",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('amountType')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('amountType')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -4564,28 +4564,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain amount",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('amount')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('amount')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -4669,28 +4669,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain currency",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('currency')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('currency')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -4774,28 +4774,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain transactionType",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('transactionType')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('transactionType')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -4879,28 +4879,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain transactionType",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('transactionType')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('transactionType')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]
@@ -4984,28 +4984,28 @@
                 "id": 3,
                 "description": "Response should contain error information",
                 "exec": [
-                  "expect(response.data).to.have.property('errorInformation')"
+                  "expect(response.body).to.have.property('errorInformation')"
                 ]
               },
               {
                 "id": 4,
                 "description": "Response should contain error code",
                 "exec": [
-                  "expect(response.data.errorInformation).to.have.property('errorCode')"
+                  "expect(response.body.errorInformation).to.have.property('errorCode')"
                 ]
               },
               {
                 "id": 5,
                 "description": "Response should contain transactionType",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('transactionType')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('transactionType')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Response should contain '3100'",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.include('3100')"
+                  "expect(response.body.errorInformation.errorCode).to.include('3100')"
                 ]
               }
             ]

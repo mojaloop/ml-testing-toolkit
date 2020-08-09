@@ -1191,7 +1191,7 @@
                 "id": 2,
                 "description": "Payerfsp position after Payer ABORT should be same as position before prepare.",
                 "exec": [
-                  "expect(response.data[0].value).to.equal(+environment.payerfspPositionBeforePrepare)"
+                  "expect(response.body[0].value).to.equal(+environment.payerfspPositionBeforePrepare)"
                 ]
               }
             ]
@@ -1225,7 +1225,7 @@
                 "id": 2,
                 "description": "Payeefsp position after Payee ABORT should be same as position before prepare.",
                 "exec": [
-                  "expect(response.data[0].value).to.equal(+environment.payeefspPositionBeforePrepare)"
+                  "expect(response.body[0].value).to.equal(+environment.payeefspPositionBeforePrepare)"
                 ]
               }
             ]
