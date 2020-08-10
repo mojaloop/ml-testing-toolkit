@@ -43,7 +43,7 @@ services:
     hostname: connection-manager-ui
     environment:
       - API_BASE_URL=http://localhost:5061
-      - AUTH_ENABLED=FALSE
+      - AUTH_ENABLED=TRUE
     tty: true
     stdin_open: true  
     ports:

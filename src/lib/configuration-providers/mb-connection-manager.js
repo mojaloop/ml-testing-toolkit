@@ -42,14 +42,14 @@ const getDFSPs = async () => {
   if (Config.getSystemConfig().HOSTING_ENABLED) {
     return tempDfspList
   } else {
-    return {
+    return [{
       id: Config.getUserConfig().DEFAULT_USER_FSPID,
       name: 'User DFSP'
-    }
+    }]
   }
 }
 
-var currentCookies = []
+var currentCookies = [null]
 var currentEnvironment = null
 // var currentTestingToolkitDFSP = null
 // var currentUserDFSP = null
@@ -130,8 +130,7 @@ const initDFSP = async (environmentId, dfspId, dfspName) => {
   }
 }
 
-const initJWSCertificate = async (environmentId, dfspId, jwsCertificate) => {
-  const intermediateCertificate = null
+const initJWSCertificate = async (environmentId, dfspId, jwsCertificate = null, intermediateCertificate = null) => {
   const rootCertificate = null
   let certExists = false
   let certResult = null
