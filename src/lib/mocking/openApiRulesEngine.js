@@ -343,7 +343,7 @@ const forwardRules = async (context, req) => {
         forwardedRequest.callbackInfo = {}
       }
       if (curEvent.params && curEvent.params.dfspId) {
-        forwardedRequest.callbackInfo.dfspId = curEvent.params.dfspId
+        forwardedRequest.callbackInfo.fspid = curEvent.params.dfspId
       }
       forwardedRequest.path = req.path
       forwardedRequest.method = req.method

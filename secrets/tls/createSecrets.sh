@@ -15,6 +15,10 @@ openssl req -new -sha256 -config openssl.conf -key hub_server_cakey.key -subj "/
 ## Sign server cert
 openssl x509 -req -days 3650 -sha256 -extfile openssl.conf -extensions v3_req -in hub_server.csr -signkey hub_server_key.key  -CA hub_server_cacert.pem -CAkey hub_server_cakey.key -CAcreateserial -out hub_server_cert.pem
 
+## Sign client cert
+#openssl x509 -req -days 3650 -sha256 -extfile openssl.conf -extensions v3_req -in hub_client.csr -signkey hub_client_key.key  -CA hub_client_cacert.pem -CAkey hub_client_cakey.key -CAcreateserial -out hub_client_cert.pem
+
+
 ## Generating Client CA certificate
 openssl genrsa -out "$OUTPUT_DIR/hub_client_cakey.key" 4096
 openssl req -new -sha256 -config openssl.conf -nodes -x509 -days 10000 -extensions v3_ca -key "$OUTPUT_DIR/hub_client_cakey.key" -out "$OUTPUT_DIR/hub_client_cacert.pem" -subj '/CN=hubclientca/C=US/ST=Ohio/L=Columbus/O=Hub Client CA/OU=Payments'
