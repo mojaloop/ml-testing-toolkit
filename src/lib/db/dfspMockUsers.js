@@ -19,8 +19,8 @@ const getDFSPList = async () => {
   if (Config.getSystemConfig().HOSTING_ENABLED) {
     return tempDfspList
   } else if (Config.getUserConfig().HUB_ONLY_MODE) {
-    const dfsps = Object.keys(Config.getUserConfig().ENDPOINTS_DFSP_WISE.dfsps)
-    if (dfsps) {
+    const dfsps = Object.keys(Config.getUserConfig().ENDPOINTS_DFSP_WISE.dfsps || {})
+    if (dfsps.length > 0) {
       const dfspsList = []
       dfsps.forEach(dfspId => {
         dfspsList.push({
