@@ -80,12 +80,14 @@ const sign = async (req) => {
       resolveWithFullResponse: true,
       simple: false
     }
-    reqOpts.headers['fspiop-source'] = reqOpts.headers['FSPIOP-Source']
+    if (reqOpts.headers['FSPIOP-Source']) {
+      reqOpts.headers['fspiop-source'] = reqOpts.headers['FSPIOP-Source']
+      delete reqOpts.headers['FSPIOP-Source']
+    }
     if (reqOpts.headers['FSPIOP-Destination']) {
       reqOpts.headers['fspiop-destination'] = reqOpts.headers['FSPIOP-Destination']
       delete reqOpts.headers['FSPIOP-Destination']
     }
-    delete reqOpts.headers['FSPIOP-Source']
     delete reqOpts.headers['FSPIOP-Signature']
     delete reqOpts.headers['FSPIOP-URI']
     delete reqOpts.headers['FSPIOP-HTTP-Method']

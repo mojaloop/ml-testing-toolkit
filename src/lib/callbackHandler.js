@@ -71,6 +71,11 @@ const handleCallback = async (callbackObject, context, req) => {
     }
   }
 
+  // Handle the host header for hub-only requests
+  if (userConfig.HUB_ONLY_MODE && callbackObject.headers && callbackObject.headers.host) {
+    delete callbackObject.headers.host
+  }
+
   const httpsProps = {}
   let urlGenerated = callbackEndpoint + callbackObject.path
   if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED) {
@@ -99,7 +104,6 @@ const handleCallback = async (callbackObject, context, req) => {
     }
   }
 
-  // JwsSigning
   const reqOpts = {
     method: callbackObject.method,
     url: urlGenerated,
@@ -109,11 +113,14 @@ const handleCallback = async (callbackObject, context, req) => {
     timeout: 3000,
     ...httpsProps
   }
-  console.log(reqOpts)
-  try {
-    await JwsSigning.sign(reqOpts)
-  } catch (err) {
-    console.log(err)
+
+  // JwsSigning
+  if (!userConfig.HUB_ONLY_MODE) {
+    try {
+      await JwsSigning.sign(reqOpts)
+    } catch (err) {
+      console.log(err)
+    }
   }
   // Validate callback against openapi
   if (callbackObject.method !== 'put') {
