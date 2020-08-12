@@ -807,53 +807,53 @@ paths:
           $ref: '#/components/responses/ErrorResponse501'
         '503':
           $ref: '#/components/responses/ErrorResponse503'
-    put:
-      description: >-
-        The callback PUT /parties// (or PUT /parties///) is used to inform the
-        client of a successful result of the Party information lookup.
-      summary: PartiesSubIdByTypeAndID
-      tags:
-        - parties
-      operationId: PartiesSubIdByTypeAndIDPut
-      parameters:
-        - $ref: '#/components/parameters/Content-Length'
-      x-examples:
-        application/json:
-          party:
-            partyIdInfo:
-              partyIdType: PERSONAL_ID
-              partyIdentifier: '16135551212'
-              partySubIdOrType: DRIVING_LICENSE
-              fspId: '1234'
-            merchantClassificationCode: '4321'
-            name: Justin Trudeau
-            personalInfo:
-              complexName:
-                firstName: Justin
-                middleName: Pierre
-                lastName: Trudeau
-              dateOfBirth: '1971-12-25'
-      responses:
-        '200':
-          $ref: '#/components/responses/Response200'
-        '400':
-          $ref: '#/components/responses/ErrorResponse400'
-        '401':
-          $ref: '#/components/responses/ErrorResponse401'
-        '403':
-          $ref: '#/components/responses/ErrorResponse403'
-        '404':
-          $ref: '#/components/responses/ErrorResponse404'
-        '405':
-          $ref: '#/components/responses/ErrorResponse405'
-        '406':
-          $ref: '#/components/responses/ErrorResponse406'
-        '501':
-          $ref: '#/components/responses/ErrorResponse501'
-        '503':
-          $ref: '#/components/responses/ErrorResponse503'
-      requestBody:
-        $ref: '#/components/requestBodies/PartiesTypeIDPutResponse'
+    # put:
+    #   description: >-
+    #     The callback PUT /parties// (or PUT /parties///) is used to inform the
+    #     client of a successful result of the Party information lookup.
+    #   summary: PartiesSubIdByTypeAndID
+    #   tags:
+    #     - parties
+    #   operationId: PartiesSubIdByTypeAndIDPut
+    #   parameters:
+    #     - $ref: '#/components/parameters/Content-Length'
+    #   x-examples:
+    #     application/json:
+    #       party:
+    #         partyIdInfo:
+    #           partyIdType: PERSONAL_ID
+    #           partyIdentifier: '16135551212'
+    #           partySubIdOrType: DRIVING_LICENSE
+    #           fspId: '1234'
+    #         merchantClassificationCode: '4321'
+    #         name: Justin Trudeau
+    #         personalInfo:
+    #           complexName:
+    #             firstName: Justin
+    #             middleName: Pierre
+    #             lastName: Trudeau
+    #           dateOfBirth: '1971-12-25'
+    #   responses:
+    #     '200':
+    #       $ref: '#/components/responses/Response200'
+    #     '400':
+    #       $ref: '#/components/responses/ErrorResponse400'
+    #     '401':
+    #       $ref: '#/components/responses/ErrorResponse401'
+    #     '403':
+    #       $ref: '#/components/responses/ErrorResponse403'
+    #     '404':
+    #       $ref: '#/components/responses/ErrorResponse404'
+    #     '405':
+    #       $ref: '#/components/responses/ErrorResponse405'
+    #     '406':
+    #       $ref: '#/components/responses/ErrorResponse406'
+    #     '501':
+    #       $ref: '#/components/responses/ErrorResponse501'
+    #     '503':
+    #       $ref: '#/components/responses/ErrorResponse503'
+    #   requestBody:
+    #     $ref: '#/components/requestBodies/PartiesTypeIDPutResponse'
   '/parties/{Type}/{ID}/{SubId}/error':
     put:
       description: >-
