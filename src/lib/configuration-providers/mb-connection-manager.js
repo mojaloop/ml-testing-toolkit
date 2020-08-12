@@ -38,15 +38,8 @@ const CM_CHECK_INTERVAL = 10000
 var CONNECTION_MANAGER_API_URL = null
 
 const getDFSPs = async () => {
-  const tempDfspList = await dfspDB.getDFSPList()
-  if (Config.getSystemConfig().HOSTING_ENABLED) {
-    return tempDfspList
-  } else {
-    return [{
-      id: Config.getUserConfig().DEFAULT_USER_FSPID,
-      name: 'User DFSP'
-    }]
-  }
+  const dfspsFound = await dfspDB.getDFSPList()
+  return dfspsFound
 }
 
 var currentCookies = [null]
@@ -162,7 +155,6 @@ const initJWSCertificate = async (environmentId, dfspId, jwsCertificate = null, 
     if (jwsCertResponse.status === 200) {
       return jwsCertResponse.data
     } else {
-      console.log('---------------------------here')
       console.log('Some error creating / updating JWS cert for DFSP')
     }
   } catch (err) {
@@ -248,7 +240,7 @@ const checkDfspCa = async (environmentId, dfspId) => {
     const dfspCaResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps/' + dfspId + '/ca', { headers: { Cookie: currentCookies[0], 'Content-Type': 'application/json' } })
     if (dfspCaResult.status === 200 && dfspCaResult.data.rootCertificate && dfspCaResult.data.validationState === 'VALID') {
       if (currentTlsConfig.dfsps[dfspId].dfspCaRootCert !== dfspCaResult.data.rootCertificate) {
-        console.log('New DFSP CA Root CERT Found')
+        console.log('New DFSP CA Root CERT Found: ', dfspId)
         currentTlsConfig.dfsps[dfspId].dfspCaRootCert = dfspCaResult.data.rootCertificate
         await setTLSConfig()
       }
@@ -298,8 +290,8 @@ const checkHubCsrs = async (environmentId, dfspId) => {
   // Store if any signed CSRs found or create a CSR if no CSR found
   if (hubCsrs.length > 0) {
     const hubSignedCsrs = hubCsrs.filter(item => (item.validationState === 'VALID' && item.state === 'CERT_SIGNED' && item.certificate !== null))
-    if (hubSignedCsrs.length > 0 && currentTlsConfig.dfsps[dfspId].hubClientCert !== hubSignedCsrs[0].certificate) {
-      console.log('New Signed Hub client CERT Found')
+    if (hubSignedCsrs.length > 0 && currentTlsConfig.dfsps[dfspId] && currentTlsConfig.dfsps[dfspId].hubClientCert !== hubSignedCsrs[0].certificate) {
+      console.log('New Signed Hub client CERT Found: ', dfspId)
       currentTlsConfig.dfsps[dfspId].hubClientCert = hubSignedCsrs[0].certificate
       await setTLSConfig()
     }

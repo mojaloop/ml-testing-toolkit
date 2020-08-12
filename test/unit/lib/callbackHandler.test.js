@@ -71,21 +71,6 @@ describe('callbackHandler', () => {
       }
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
-        CALLBACK_RESOURCE_ENDPOINTS: {
-          enabled: true,
-          endpoints: [
-            {
-              method: 'put',
-              path: '/',
-              endpoint: 'http://localhost:3000'
-            },
-            {
-              method: 'post',
-              path: '/transfers/{ID}/error',
-              endpoint: 'http://localhost:3001'
-            }
-          ]
-        },
         OUTBOUND_MUTUAL_TLS_ENABLED: true,
         SEND_CALLBACK_ENABLE: true
       })
@@ -145,21 +130,6 @@ describe('callbackHandler', () => {
       }
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
-        CALLBACK_RESOURCE_ENDPOINTS: {
-          enabled: true,
-          endpoints: [
-            {
-              method: 'put',
-              path: '/',
-              endpoint: 'http://localhost:3000'
-            },
-            {
-              method: 'post',
-              path: '/transfers/{ID}/error',
-              endpoint: 'http://localhost:3001'
-            }
-          ]
-        },
         OUTBOUND_MUTUAL_TLS_ENABLED: true,
         SEND_CALLBACK_ENABLE: true
       })
@@ -239,10 +209,12 @@ describe('callbackHandler', () => {
       const callbackObject = {
         method: 'post',
         path: '/transfers/{ID}',
-        headers: {},
+        headers: {
+          host: 'http://localhost:5050'
+        },
         body: {},
         callbackInfo: {
-          dfspId: 'userdfsp'
+          fspid: 'userdfsp'
         }
       }
       const context = {
@@ -294,7 +266,7 @@ describe('callbackHandler', () => {
         headers: {},
         body: {},
         callbackInfo: {
-          dfspId: 'userdfsp'
+          fspid: 'userdfsp'
         }
       }
       const context = {
@@ -345,7 +317,7 @@ describe('callbackHandler', () => {
         headers: {},
         body: {},
         callbackInfo: {
-          dfspId: 'userdfsp'
+          fspid: 'userdfsp'
         }
       }
       const context = {

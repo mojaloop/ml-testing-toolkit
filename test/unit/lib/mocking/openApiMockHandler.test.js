@@ -411,9 +411,7 @@ describe('OpenApiMockHandler', () => {
       SpyOpenApiRulesEngine.mockResolvedValueOnce({})
       SpyHandleCallback.mockResolvedValueOnce()
       SpyGetUserConfig.mockReturnValueOnce({
-        ENDPOINTS_DFSP_WISE: {
-          enabled: false
-        },
+        HUB_ONLY_MODE: false,
         TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true
       })
       SpyHandleTransfers.mockReturnValueOnce(false)
@@ -443,9 +441,7 @@ describe('OpenApiMockHandler', () => {
       SpyOpenApiRulesEngine.mockResolvedValueOnce({})
       SpyHandleCallback.mockResolvedValueOnce()
       SpyGetUserConfig.mockReturnValueOnce({
-        ENDPOINTS_DFSP_WISE: {
-          enabled: false
-        },
+        HUB_ONLY_MODE: false,
         TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true
       })
       SpyHandleTransfers.mockReturnValueOnce(true)
@@ -474,9 +470,7 @@ describe('OpenApiMockHandler', () => {
       SpyOpenApiRulesEngine.mockResolvedValueOnce({})
       SpyHandleCallback.mockResolvedValueOnce()
       SpyGetUserConfig.mockReturnValueOnce({
-        ENDPOINTS_DFSP_WISE: {
-          enabled: false
-        },
+        HUB_ONLY_MODE: false,
         TRANSFERS_VALIDATION_ILP_PACKET: true
       })
       SpyValidateTransferIlpPacket.mockReturnValueOnce(false)
@@ -506,9 +500,7 @@ describe('OpenApiMockHandler', () => {
       SpyOpenApiRulesEngine.mockResolvedValueOnce({})
       SpyHandleCallback.mockResolvedValueOnce()
       SpyGetUserConfig.mockReturnValueOnce({
-        ENDPOINTS_DFSP_WISE: {
-          enabled: false
-        },
+        HUB_ONLY_MODE: false,
         TRANSFERS_VALIDATION_ILP_PACKET: true
       })
       SpyValidateTransferIlpPacket.mockReturnValueOnce(true)
@@ -537,9 +529,7 @@ describe('OpenApiMockHandler', () => {
       SpyOpenApiRulesEngine.mockResolvedValueOnce({})
       SpyHandleCallback.mockResolvedValueOnce()
       SpyGetUserConfig.mockReturnValueOnce({
-        ENDPOINTS_DFSP_WISE: {
-          enabled: false
-        },
+        HUB_ONLY_MODE: false,
         TRANSFERS_VALIDATION_CONDITION: true
       })
       SpyValidateTransferCondition.mockReturnValueOnce(false)
@@ -569,9 +559,7 @@ describe('OpenApiMockHandler', () => {
       SpyOpenApiRulesEngine.mockResolvedValueOnce({})
       SpyHandleCallback.mockResolvedValueOnce()
       SpyGetUserConfig.mockReturnValueOnce({
-        ENDPOINTS_DFSP_WISE: {
-          enabled: false
-        },
+        HUB_ONLY_MODE: false,
         TRANSFERS_VALIDATION_CONDITION: true
       })
       SpyValidateTransferCondition.mockReturnValueOnce(true)
@@ -600,9 +588,7 @@ describe('OpenApiMockHandler', () => {
       SpyOpenApiRulesEngine.mockResolvedValueOnce({})
       SpyHandleCallback.mockResolvedValueOnce()
       SpyGetUserConfig.mockReturnValueOnce({
-        ENDPOINTS_DFSP_WISE: {
-          enabled: false
-        },
+        HUB_ONLY_MODE: false,
         TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true
       })
       SpyHandleTransfers.mockReturnValueOnce(true)
@@ -636,9 +622,7 @@ describe('OpenApiMockHandler', () => {
       SpyOpenApiRulesEngine.mockResolvedValueOnce({})
       SpyHandleCallback.mockResolvedValueOnce()
       SpyGetUserConfig.mockReturnValueOnce({
-        ENDPOINTS_DFSP_WISE: {
-          enabled: false
-        }
+        HUB_ONLY_MODE: false
       })
       SpyCallbackRules.mockResolvedValueOnce({body: {}})
       SpyHandleCallback.mockResolvedValueOnce()
@@ -670,9 +654,7 @@ describe('OpenApiMockHandler', () => {
       SpyOpenApiRulesEngine.mockResolvedValueOnce({})
       SpyHandleCallback.mockResolvedValueOnce()
       SpyGetUserConfig.mockReturnValueOnce({
-        ENDPOINTS_DFSP_WISE: {
-          enabled: false
-        },
+        HUB_ONLY_MODE: false,
         TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true
       })
       SpyHandleTransfers.mockReturnValueOnce(true)
@@ -705,9 +687,7 @@ describe('OpenApiMockHandler', () => {
         }
       }))
       SpyGetUserConfig.mockReturnValueOnce({
-        ENDPOINTS_DFSP_WISE: {
-          enabled: false
-        },
+        HUB_ONLY_MODE: false
       })
       const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
     })
@@ -726,9 +706,8 @@ describe('OpenApiMockHandler', () => {
         method: 'put'
       }
       SpyGetUserConfig.mockReturnValueOnce({
-        ENDPOINTS_DFSP_WISE: {
-          enabled: true
-        },
+        HUB_ONLY_MODE: true,
+        ENDPOINTS_DFSP_WISE: {},
       })
       SpyOpenApiRulesEngine.mockResolvedValueOnce({})
       SpyForwardRules.mockResolvedValueOnce({})
@@ -750,9 +729,8 @@ describe('OpenApiMockHandler', () => {
         method: 'put'
       }
       SpyGetUserConfig.mockReturnValueOnce({
-        ENDPOINTS_DFSP_WISE: {
-          enabled: true
-        },
+        HUB_ONLY_MODE: true,
+        ENDPOINTS_DFSP_WISE: {},
       })
       SpyOpenApiRulesEngine.mockResolvedValueOnce({})
       SpyForwardRules.mockResolvedValueOnce()

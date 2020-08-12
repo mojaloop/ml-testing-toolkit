@@ -256,7 +256,7 @@ const setActiveRulesFile = async (objStore, fileName) => {
 }
 
 const getRules = async (objStore) => {
-  if (!objStore.rules) {
+  if (!objStore.rules || objStore.rules.length === 0) {
     await reloadRules(objStore)
   }
   return objStore.rules
@@ -276,13 +276,11 @@ const getRulesEngine = async (objStore, convertedRules) => {
 
 const loadRules = (rules, objStore) => {
   rules.forEach(rule => {
-    if (rule.conditions && rule.conditions.all) {
-      rule.conditions.all.forEach(condition => {
-        if (condition.fact === 'headers') {
-          condition.path = condition.path.toLowerCase()
-        }
-      })
-    }
+    rule.conditions.all.forEach(condition => {
+      if (condition.fact === 'headers') {
+        condition.path = condition.path.toLowerCase()
+      }
+    })
   })
   objStore.rulesEngine.loadRules(rules)
 }

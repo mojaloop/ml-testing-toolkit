@@ -48,8 +48,8 @@ const handleCallback = async (callbackObject, context, req) => {
     }
   } else {
     const endpointsDfspWise = userConfig.ENDPOINTS_DFSP_WISE
-    if (userConfig.HUB_ONLY_MODE && callbackObject.callbackInfo && callbackObject.callbackInfo.dfspId && endpointsDfspWise.dfsps[callbackObject.callbackInfo.dfspId]) {
-      const dfspEndpoints = endpointsDfspWise.dfsps[callbackObject.callbackInfo.dfspId]
+    if (userConfig.HUB_ONLY_MODE && callbackObject.callbackInfo && callbackObject.callbackInfo.fspid && endpointsDfspWise.dfsps[callbackObject.callbackInfo.fspid]) {
+      const dfspEndpoints = endpointsDfspWise.dfsps[callbackObject.callbackInfo.fspid]
       const dfspEndpoint = dfspEndpoints.endpoints.find(endpoint => endpoint.method === callbackObject.method && endpoint.path && callbackObject.path && endpoint.endpoint)
       if (dfspEndpoint) {
         callbackEndpoint = dfspEndpoint.endpoint
@@ -69,6 +69,11 @@ const handleCallback = async (callbackObject, context, req) => {
         callbackEndpoint = matchedObject.endpoint
       }
     }
+  }
+
+  // Handle the host header for hub-only requests
+  if (userConfig.HUB_ONLY_MODE && callbackObject.headers && callbackObject.headers.host) {
+    delete callbackObject.headers.host
   }
 
   const httpsProps = {}
@@ -99,7 +104,6 @@ const handleCallback = async (callbackObject, context, req) => {
     }
   }
 
-  // JwsSigning
   const reqOpts = {
     method: callbackObject.method,
     url: urlGenerated,
@@ -109,10 +113,14 @@ const handleCallback = async (callbackObject, context, req) => {
     timeout: 3000,
     ...httpsProps
   }
-  try {
-    await JwsSigning.sign(reqOpts)
-  } catch (err) {
-    console.log(err)
+
+  // JwsSigning
+  if (!userConfig.HUB_ONLY_MODE) {
+    try {
+      await JwsSigning.sign(reqOpts)
+    } catch (err) {
+      console.log(err)
+    }
   }
   // Validate callback against openapi
   if (callbackObject.method !== 'put') {
@@ -135,11 +143,11 @@ const handleCallback = async (callbackObject, context, req) => {
 
   // Send callback
   if (userConfig.SEND_CALLBACK_ENABLE) {
-    customLogger.logMessage('info', 'Sending callback ' + callbackObject.method + ' ' + callbackObject.path, callbackObject, true, req)
+    customLogger.logMessage('info', 'Sending callback ' + callbackObject.method + ' ' + reqOpts.url, callbackObject, true, req)
     axios(reqOpts).then((result) => {
       customLogger.logMessage('info', 'Received callback response ' + result.status + ' ' + result.statusText, null, true, req)
     }, (err) => {
-      customLogger.logMessage('error', 'Failed to send callback ' + callbackObject.method + ' ' + callbackObject.path, err.message, true, req)
+      customLogger.logMessage('error', 'Failed to send callback ' + callbackObject.method + ' ' + reqOpts.url, err.message, true, req)
     })
   } else {
     customLogger.logMessage('info', 'Log callback ' + callbackObject.method + ' ' + callbackObject.path, callbackObject, true, req)

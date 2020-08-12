@@ -24,17 +24,69 @@
  ******/
 
 const dfspMockUsers = require('../../../../src/lib/db/dfspMockUsers')
+const Config = require('../../../../src/lib/config')
+jest.mock('../../../../src/lib/config')
 
 describe('dfspMockUsers', () => {
   describe('getDFSPList', () => {
-    it('should return dfsp list', async () => {
+    it('should return temp dfsp list if hosting enabled', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: true
+      })
+      Config.getUserConfig.mockReturnValue({
+        JWS_SIGN: true,
+        VALIDATE_INBOUND_JWS: true,
+        DEFAULT_USER_FSPID: 'userdfsp'
+      })
       const dfspList = await dfspMockUsers.getDFSPList()
       expect(Array.isArray(dfspList)).toBeTruthy()
+    })
+    it('should return dfsp wise list if hosting disabled and hub only mode enabled', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false
+      })
+      Config.getUserConfig.mockReturnValue({
+        HUB_ONLY_MODE: true,
+        ENDPOINTS_DFSP_WISE: {
+          dfsps: {
+            userdfsp: {}
+          }
+        }
+      })
+      const dfspList = await dfspMockUsers.getDFSPList()
+      expect(dfspList[0].id).toBe('userdfsp')
+    })
+    it('should return dfsp wise list if hosting disabled and hub only mode enabled', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false
+      })
+      Config.getUserConfig.mockReturnValue({
+        HUB_ONLY_MODE: true,
+        ENDPOINTS_DFSP_WISE: {},
+        DEFAULT_USER_FSPID: 'userdfsp'
+      })
+      const dfspList = await dfspMockUsers.getDFSPList()
+      expect(dfspList[0].id).toBe('userdfsp')
+    })
+    it('should return userdfsp if hosting disabled and hub only mode disabled', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false
+      })
+      Config.getUserConfig.mockReturnValue({
+        HUB_ONLY_MODE: false,
+        DEFAULT_USER_FSPID: 'userdfsp'
+      })
+      const dfspList = await dfspMockUsers.getDFSPList()
+      expect(dfspList[0].id).toBe('userdfsp')
     })
   })
   describe('checkDFSP', () => {
     it('should return true if dfsp exists', async () => {
-      const check = await dfspMockUsers.checkDFSP('userdfsp')
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: true
+      })
+      const dfspList = await dfspMockUsers.getDFSPList()
+      const check = await dfspMockUsers.checkDFSP(dfspList[0].id)
       expect(check).toBeTruthy()
     })
     it('should return false if dfsp not exists', async () => {
