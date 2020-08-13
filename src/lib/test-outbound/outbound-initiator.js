@@ -400,13 +400,13 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           MyEventEmitter.getEmitter('testOutbound').once(successCallbackUrl, (callbackHeaders, callbackBody) => {
             clearTimeout(timer)
             MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
-            resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { headers: callbackHeaders, body: callbackBody } })
+            resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
           })
           // Listen for error callback
           MyEventEmitter.getEmitter('testOutbound').once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
             clearTimeout(timer)
             MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
-            reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { headers: callbackHeaders, body: callbackBody } })))
+            reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
           })
         } else {
           resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
