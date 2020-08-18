@@ -22,12 +22,13 @@
  --------------
  ******/
 
+const Config = require('../../../../src/lib/config')
+const loaded = Config.loadSystemConfigMiddleware()
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
 const Server = require('../../../../src/server')
 const ImportExport = require('../../../../src/lib/importExport')
-const Config = require('../../../../src/lib/config')
 const RulesEngineModel = require('../../../../src/lib/rulesEngineModel')
 
 const SpyServer = jest.spyOn(Server, 'restartServer')

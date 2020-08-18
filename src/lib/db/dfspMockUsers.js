@@ -16,10 +16,11 @@ const tempDfspList = [
 ]
 
 const getDFSPList = async () => {
+  const userConfig = await Config.getUserConfig()
   if (Config.getSystemConfig().HOSTING_ENABLED) {
     return tempDfspList
-  } else if (Config.getUserConfig().HUB_ONLY_MODE) {
-    const dfsps = Object.keys(Config.getUserConfig().ENDPOINTS_DFSP_WISE.dfsps || {})
+  } else if (userConfig.HUB_ONLY_MODE) {
+    const dfsps = Object.keys(userConfig.ENDPOINTS_DFSP_WISE.dfsps || {})
     if (dfsps.length > 0) {
       const dfspsList = []
       dfsps.forEach(dfspId => {
@@ -32,7 +33,7 @@ const getDFSPList = async () => {
     }
   }
   return [{
-    id: Config.getUserConfig().DEFAULT_USER_FSPID,
+    id: userConfig.DEFAULT_USER_FSPID,
     name: 'User DFSP'
   }]
 }

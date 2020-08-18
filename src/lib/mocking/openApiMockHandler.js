@@ -52,7 +52,7 @@ var apis = []
  */
 module.exports.initilizeMockHandler = async () => {
   // Initialize ILP
-  IlpModel.init(Config.getUserConfig().ILP_SECRET)
+  IlpModel.init((await Config.getUserConfig()).ILP_SECRET)
   // Get API Definitions from configuration
   const apiDefinitions = await OpenApiDefinitionsModel.getApiDefinitions()
   // Create create openApiBackend objects for all the api definitions
@@ -121,7 +121,7 @@ module.exports.handleRequest = async (req, h) => {
     customLogger.logMessage('error', 'Resource not found', null, true, req)
     return h.response({ error: 'Not Found' }).code(404)
   }
-  if (apis[selectedVersion].type === 'fspiop' && Config.getUserConfig().VERSIONING_SUPPORT_ENABLE) {
+  if (apis[selectedVersion].type === 'fspiop' && (await Config.getUserConfig()).VERSIONING_SUPPORT_ENABLE) {
     const fspiopApis = apis.filter(item => {
       return item.type === 'fspiop'
     })
@@ -242,7 +242,7 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
 }
 
 const generateAsyncCallback = async (item, context, req) => {
-  const userConfig = Config.getUserConfig()
+  const userConfig = await Config.getUserConfig()
   if (req.method === 'put') {
     if (!userConfig.HUB_ONLY_MODE) {
       return

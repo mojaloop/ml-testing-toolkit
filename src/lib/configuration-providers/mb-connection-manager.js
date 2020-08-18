@@ -88,6 +88,7 @@ const initEnvironment = async () => {
         throw new Error('Some error creating environment')
       }
     } catch (err) {
+      console.log(err)
       throw new Error('Some error creating environment')
     }
   }
@@ -439,12 +440,13 @@ const endpointChecker = async () => {
 }
 
 const checkConnectionManager = async () => {
-  if (Config.getUserConfig().CONNECTION_MANAGER_AUTH_ENABLED) {
+  const userConfig = await Config.getUserConfig()
+  if (userConfig.CONNECTION_MANAGER_AUTH_ENABLED) {
     // Get the cookies from object store
     currentCookies = await objectStore.get('CONNECTION_MANAGER_COOKIES')
   }
-  CONNECTION_MANAGER_API_URL = Config.getUserConfig().CONNECTION_MANAGER_API_URL
-  if (Config.getUserConfig().JWS_SIGN || Config.getUserConfig().VALIDATE_INBOUND_JWS) {
+  CONNECTION_MANAGER_API_URL = userConfig.CONNECTION_MANAGER_API_URL
+  if (userConfig.JWS_SIGN || userConfig.VALIDATE_INBOUND_JWS) {
     try {
       // Get private key for signing
       currentJWSConfig.testingToolkitDfspPrivateKey = await readFileAsync('secrets/privatekey.pem')
@@ -465,7 +467,7 @@ const checkConnectionManager = async () => {
     }
   }
 
-  if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED || Config.getUserConfig().INBOUND_MUTUAL_TLS_ENABLED) {
+  if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED || userConfig.INBOUND_MUTUAL_TLS_ENABLED) {
     try {
       // Do TLS related stuff
       if (!currentEnvironment) {
@@ -514,11 +516,12 @@ const initDFSPListStuff = async () => {
 }
 
 const initAuth = async () => {
-  if (Config.getUserConfig().CONNECTION_MANAGER_AUTH_ENABLED) {
-    CONNECTION_MANAGER_API_URL = Config.getUserConfig().CONNECTION_MANAGER_API_URL
+  const userConfig = await Config.getUserConfig()
+  if (userConfig.CONNECTION_MANAGER_AUTH_ENABLED) {
+    CONNECTION_MANAGER_API_URL = userConfig.CONNECTION_MANAGER_API_URL
     const loginFormData = {
-      username: Config.getUserConfig().CONNECTION_MANAGER_HUB_USERNAME,
-      password: Config.getUserConfig().CONNECTION_MANAGER_HUB_PASSWORD
+      username: userConfig.CONNECTION_MANAGER_HUB_USERNAME,
+      password: userConfig.CONNECTION_MANAGER_HUB_PASSWORD
     }
     const loginResp = await axios.post(CONNECTION_MANAGER_API_URL + '/api/login', querystring.stringify(loginFormData), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
     if (loginResp.status === 200) {

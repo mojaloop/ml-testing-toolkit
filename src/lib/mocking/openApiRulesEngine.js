@@ -372,16 +372,17 @@ const replaceVariablesFromRequest = (inputObject, context, req) => {
   const environment = objectStore.get('inboundEnvironment')
   const matchedArray = resultObject.match(/{\$([^}]+)}/g)
   if (matchedArray) {
-    matchedArray.forEach(element => {
+    matchedArray.forEach(async element => {
       // Check for the function type of param, if its function we need to call a function in custom-functions and replace the returned value
       const splitArr = element.split('.')
       switch (splitArr[0]) {
         case '{$function':
           resultObject = resultObject.replace(element, getFunctionResult(element, context, req))
           break
-        case '{$config':
-          resultObject = resultObject.replace(element, getConfigValue(element, Config.getUserConfig()))
+        case '{$config': {
+          resultObject = resultObject.replace(element, getConfigValue(element, await Config.getUserConfig()))
           break
+        }
         case '{$session':
           resultObject = resultObject.replace(element, getSessionValue(element, req.customInfo))
           break

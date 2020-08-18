@@ -38,6 +38,7 @@ const SpyLogout = jest.spyOn(LoginService, 'logoutUser')
 const systemConfig = {
   "API_PORT": 5000,
   "HOSTING_ENABLED": true,
+  "DB": 'ttk-test',
   "OAUTH": {
     "EMBEDDED_CERTIFICATE": "password"
   }

@@ -36,7 +36,7 @@ const handleCallback = async (callbackObject, context, req) => {
   if (callbackObject.delay) {
     await new Promise(resolve => setTimeout(resolve, callbackObject.delay))
   }
-  const userConfig = Config.getUserConfig()
+  const userConfig = await Config.getUserConfig(Config.getSystemConfig().HOSTING_ENABLED ? callbackObject.callbackInfo.fspid : null)
 
   let callbackEndpoint = userConfig.CALLBACK_ENDPOINT
   if (Config.getSystemConfig().HOSTING_ENABLED) {

@@ -24,251 +24,253 @@
  ******/
 
 const RulesEngine = require('./rulesEngine')
-const fs = require('fs')
-const utils = require('./utils')
 const customLogger = require('./requestLogger')
 const Config = require('./config')
+const dfspWiseDB = require('../lib/db/dfspWiseDB')
 
-const DEFAULT_RULES_FILE_NAME = 'default.json'
-const CONFIG_FILE_NAME = 'config.json'
-
-const response = {
-  rulesFilePathPrefix: 'spec_files/rules_response/',
-  rules: null,
-  rulesEngine: null,
-  activeRulesFile: DEFAULT_RULES_FILE_NAME,
-  ruleType: 'response'
+const local = {
+  data: {
+    response: {
+      document: 'userResponseRules',
+      rules: null,
+      rulesEngine: null,
+      activeRulesFile: 'default.json',
+      ruleType: 'response'
+    },
+    validation: {
+      document: 'userValidationRules',
+      rules: null,
+      rulesEngine: null,
+      activeRulesFile: 'default.json',
+      ruleType: 'validation'
+    },
+    callback: {
+      document: 'userCallbackRules',
+      rules: null,
+      rulesEngine: null,
+      activeRulesFile: 'default.json',
+      ruleType: 'callback'
+    },
+    forward: {
+      document: 'userForwardRules',
+      rules: null,
+      rulesEngine: null,
+      activeRulesFile: 'default.json',
+      ruleType: 'forward'
+    }
+  }
 }
 
-const validation = {
-  rulesFilePathPrefix: 'spec_files/rules_validation/',
-  rules: null,
-  rulesEngine: null,
-  activeRulesFile: DEFAULT_RULES_FILE_NAME,
-  ruleType: 'validation'
-}
-
-const callback = {
-  rulesFilePathPrefix: 'spec_files/rules_callback/',
-  rules: null,
-  rulesEngine: null,
-  activeRulesFile: DEFAULT_RULES_FILE_NAME,
-  ruleType: 'callback'
-}
-
-const forward = {
-  rulesFilePathPrefix: 'spec_files/rules_forward/',
-  rules: null,
-  rulesEngine: null,
-  activeRulesFile: DEFAULT_RULES_FILE_NAME,
-  ruleType: 'forward'
+const getLocalData = async (dfspId = 'data', dfspType) => {
+  if (!local[dfspId]) {
+    local[dfspId] = {}
+  }
+  if (!local[dfspId][dfspType]) {
+    local[dfspId][dfspType] = { ...local.data[dfspType] }
+    const userRules = await dfspWiseDB.getDB().get(local[dfspId][dfspType].document)
+    if (!userRules[dfspId]) {
+      await dfspWiseDB.update(local[dfspId][dfspType].document, userRules.data, dfspId)
+    }
+  }
+  return local[dfspId][dfspType]
 }
 
 // response rules
-const reloadResponseRules = async () => {
-  await reloadRules(response)
+const reloadResponseRules = async (dfspId) => {
+  await reloadRules(await getLocalData(dfspId, 'response'), dfspId)
 }
 
-const setActiveResponseRulesFile = async (fileName) => {
-  await setActiveRulesFile(response, fileName)
+const setActiveResponseRulesFile = async (fileName, dfspId) => {
+  await setActiveRulesFile(await getLocalData(dfspId, 'response'), fileName, dfspId)
 }
 
-const getResponseRules = async () => {
-  const rules = await getRules(response)
+const getResponseRules = async (dfspId) => {
+  const rules = await getRules(await getLocalData(dfspId, 'response'), dfspId)
   return rules
 }
 
-const getResponseRulesEngine = async (convertedRules) => {
-  const rulesEngine = await getRulesEngine(response, convertedRules)
+const getResponseRulesEngine = async (convertedRules, dfspId) => {
+  const rulesEngine = await getRulesEngine(await getLocalData(dfspId, 'response'), convertedRules, dfspId)
   return rulesEngine
 }
 
-const getResponseRulesFiles = async () => {
-  await getResponseRules()
-  const rulesFiles = await getRulesFiles(response)
+const getResponseRulesFiles = async (dfspId) => {
+  await getResponseRules(dfspId)
+  const rulesFiles = await getRulesFiles(await getLocalData(dfspId, 'response'), dfspId)
   return rulesFiles
 }
 
-const getResponseRulesFileContent = async (fileName) => {
-  const rulesFileContent = await getRulesFileContent(response.rulesFilePathPrefix, fileName)
+const getResponseRulesFileContent = async (fileName, dfspId) => {
+  const rulesFileContent = await getRulesFileContent(await getLocalData(dfspId, 'response'), fileName, dfspId)
   return rulesFileContent
 }
 
-const setResponseRulesFileContent = async (fileName, fileContent) => {
-  const rulesFileContent = await setRulesFileContent(response, fileName, fileContent)
+const setResponseRulesFileContent = async (fileName, fileContent, dfspId) => {
+  const rulesFileContent = await setRulesFileContent(await getLocalData(dfspId, 'response'), fileName, fileContent, dfspId)
   return rulesFileContent
 }
 
-const deleteResponseRulesFile = async (fileName) => {
-  const deleted = await deleteRulesFile(response, fileName)
+const deleteResponseRulesFile = async (fileName, dfspId) => {
+  const deleted = await deleteRulesFile(await getLocalData(dfspId, 'response'), fileName, dfspId)
   return deleted
 }
 
 // validation rules
-const reloadValidationRules = async () => {
-  await reloadRules(validation)
+const reloadValidationRules = async (dfspId) => {
+  await reloadRules(await getLocalData(dfspId, 'validation'), dfspId)
 }
 
-const setActiveValidationRulesFile = async (fileName) => {
-  await setActiveRulesFile(validation, fileName)
+const setActiveValidationRulesFile = async (fileName, dfspId) => {
+  await setActiveRulesFile(await getLocalData(dfspId, 'validation'), fileName, dfspId)
 }
 
-const getValidationRules = async () => {
-  const rules = await getRules(validation)
+const getValidationRules = async (dfspId) => {
+  const rules = await getRules(await getLocalData(dfspId, 'validation'), dfspId)
   return rules
 }
 
-const getValidationRulesEngine = async (convertedRules) => {
-  const rulesEngine = await getRulesEngine(validation, convertedRules)
+const getValidationRulesEngine = async (convertedRules, dfspId) => {
+  const rulesEngine = await getRulesEngine(await getLocalData(dfspId, 'validation'), convertedRules, dfspId)
   return rulesEngine
 }
 
-const getValidationRulesFiles = async () => {
-  await getValidationRules()
-  const rulesFiles = await getRulesFiles(validation)
+const getValidationRulesFiles = async (dfspId) => {
+  await getValidationRules(dfspId)
+  const rulesFiles = await getRulesFiles(await getLocalData(dfspId, 'validation'), dfspId)
   return rulesFiles
 }
 
-const getValidationRulesFileContent = async (fileName) => {
-  const rulesFileContent = await getRulesFileContent(validation.rulesFilePathPrefix, fileName)
+const getValidationRulesFileContent = async (fileName, dfspId) => {
+  const rulesFileContent = await getRulesFileContent(await getLocalData(dfspId, 'validation'), fileName, dfspId)
   return rulesFileContent
 }
 
-const setValidationRulesFileContent = async (fileName, fileContent) => {
-  const rulesFileContent = await setRulesFileContent(validation, fileName, fileContent)
+const setValidationRulesFileContent = async (fileName, fileContent, dfspId) => {
+  const rulesFileContent = await setRulesFileContent(await getLocalData(dfspId, 'validation'), fileName, fileContent, dfspId)
   return rulesFileContent
 }
 
-const deleteValidationRulesFile = async (fileName) => {
-  const deleted = await deleteRulesFile(validation, fileName)
+const deleteValidationRulesFile = async (fileName, dfspId) => {
+  const deleted = await deleteRulesFile(await getLocalData(dfspId, 'validation'), fileName, dfspId)
   return deleted
 }
 
 // callback rules
-const reloadCallbackRules = async () => {
-  await reloadRules(callback)
+const reloadCallbackRules = async (dfspId) => {
+  await reloadRules(await getLocalData(dfspId, 'callback'), dfspId)
 }
 
-const setActiveCallbackRulesFile = async (fileName) => {
-  await setActiveRulesFile(callback, fileName)
+const setActiveCallbackRulesFile = async (fileName, dfspId) => {
+  await setActiveRulesFile(await getLocalData(dfspId, 'callback'), fileName, dfspId)
 }
 
-const getCallbackRules = async () => {
-  const rules = await getRules(callback)
+const getCallbackRules = async (dfspId) => {
+  const rules = await getRules(await getLocalData(dfspId, 'callback'), dfspId)
   return rules
 }
 
-const getCallbackRulesEngine = async (convertedRules) => {
-  const rulesEngine = await getRulesEngine(callback, convertedRules)
+const getCallbackRulesEngine = async (convertedRules, dfspId) => {
+  const rulesEngine = await getRulesEngine(await getLocalData(dfspId, 'callback'), convertedRules, dfspId)
   return rulesEngine
 }
 
-const getCallbackRulesFiles = async () => {
-  await getCallbackRules()
-  const rulesFiles = await getRulesFiles(callback)
+const getCallbackRulesFiles = async (dfspId) => {
+  await getCallbackRules(dfspId)
+  const rulesFiles = await getRulesFiles(await getLocalData(dfspId, 'callback'), dfspId)
   return rulesFiles
 }
 
-const getCallbackRulesFileContent = async (fileName) => {
-  const rulesFileContent = await getRulesFileContent(callback.rulesFilePathPrefix, fileName)
+const getCallbackRulesFileContent = async (fileName, dfspId) => {
+  const rulesFileContent = await getRulesFileContent(await getLocalData(dfspId, 'callback'), fileName, dfspId)
   return rulesFileContent
 }
 
-const setCallbackRulesFileContent = async (fileName, fileContent) => {
-  const rulesFileContent = await setRulesFileContent(callback, fileName, fileContent)
+const setCallbackRulesFileContent = async (fileName, fileContent, dfspId) => {
+  const rulesFileContent = await setRulesFileContent(await getLocalData(dfspId, 'callback'), fileName, fileContent, dfspId)
   return rulesFileContent
 }
 
-const deleteCallbackRulesFile = async (fileName) => {
-  const deleted = await deleteRulesFile(callback, fileName)
+const deleteCallbackRulesFile = async (fileName, dfspId) => {
+  const deleted = await deleteRulesFile(await getLocalData(dfspId, 'callback'), fileName, dfspId)
   return deleted
 }
 
 // forward rules
-const reloadForwardRules = async () => {
-  await reloadRules(forward)
+const reloadForwardRules = async (dfspId) => {
+  await reloadRules(await getLocalData(dfspId, 'forward'), dfspId)
 }
 
-const setActiveForwardRulesFile = async (fileName) => {
-  await setActiveRulesFile(forward, fileName)
+const setActiveForwardRulesFile = async (fileName, dfspId) => {
+  await setActiveRulesFile(await getLocalData(dfspId, 'forward'), fileName, dfspId)
 }
 
-const getForwardRules = async () => {
-  const rules = await getRules(forward)
+const getForwardRules = async (dfspId) => {
+  const rules = await getRules(await getLocalData(dfspId, 'forward'), dfspId)
   return rules
 }
 
-const getForwardRulesEngine = async (convertedRules) => {
-  const rulesEngine = await getRulesEngine(forward, convertedRules)
+const getForwardRulesEngine = async (convertedRules, dfspId) => {
+  const rulesEngine = await getRulesEngine(await getLocalData(dfspId, 'forward'), convertedRules, dfspId)
   return rulesEngine
 }
 
-const getForwardRulesFiles = async () => {
-  await getCallbackRules()
-  const rulesFiles = await getRulesFiles(forward)
+const getForwardRulesFiles = async (dfspId) => {
+  await getForwardRules(dfspId)
+  const rulesFiles = await getRulesFiles(await getLocalData(dfspId, 'forward'), dfspId)
   return rulesFiles
 }
 
-const getForwardRulesFileContent = async (fileName) => {
-  const rulesFileContent = await getRulesFileContent(forward.rulesFilePathPrefix, fileName)
+const getForwardRulesFileContent = async (fileName, dfspId) => {
+  const rulesFileContent = await getRulesFileContent(await getLocalData(dfspId, 'forward'), fileName, dfspId)
   return rulesFileContent
 }
 
-const setForwardRulesFileContent = async (fileName, fileContent) => {
-  const rulesFileContent = await setRulesFileContent(forward, fileName, fileContent)
+const setForwardRulesFileContent = async (fileName, fileContent, dfspId) => {
+  const rulesFileContent = await setRulesFileContent(await getLocalData(dfspId, 'forward'), fileName, fileContent, dfspId)
   return rulesFileContent
 }
 
-const deleteForwardRulesFile = async (fileName) => {
-  const deleted = await deleteRulesFile(forward, fileName)
+const deleteForwardRulesFile = async (fileName, dfspId) => {
+  const deleted = await deleteRulesFile(await getLocalData(dfspId, 'forward'), fileName, dfspId)
   return deleted
 }
 
 // common functions
-const reloadRules = async (objStore) => {
-  const rulesConfigRawData = await utils.readFileAsync(objStore.rulesFilePathPrefix + CONFIG_FILE_NAME)
-  const rulesConfig = JSON.parse(rulesConfigRawData)
-  try {
-    await utils.accessFileAsync(objStore.rulesFilePathPrefix + rulesConfig.activeRulesFile, fs.constants.F_OK)
-  } catch (err) {
-    // If active rules file not found then make default rules file as active
-    await setActiveRulesFile(objStore, DEFAULT_RULES_FILE_NAME)
-  }
-  objStore.activeRulesFile = rulesConfig.activeRulesFile
-  customLogger.logMessage('info', `Reloading ${objStore.ruleType} Rules from file ` + rulesConfig.activeRulesFile, null, false)
-  const rulesRawdata = await utils.readFileAsync(objStore.rulesFilePathPrefix + rulesConfig.activeRulesFile)
+const reloadRules = async (objStore, dfspId = 'data') => {
+  const userRules = await dfspWiseDB.getDB().get(objStore.document)
+  objStore.activeRulesFile = userRules[dfspId].activeRulesFile
+  customLogger.logMessage('info', `Reloading ${objStore.ruleType} Rules from file ` + userRules.activeRulesFile, null, false)
 
-  objStore.rules = JSON.parse(rulesRawdata)
+  objStore.rules = userRules[dfspId].rules[userRules[dfspId].activeRulesFile]
   objStore.rulesEngine = new RulesEngine()
-  if (!objStore.rules.length) {
+  if (!objStore.rules || !objStore.rules.length) {
     objStore.rules = []
   }
   loadRules(objStore.rules, objStore)
 }
 
-const setActiveRulesFile = async (objStore, fileName) => {
-  const rulesConfig = {
-    activeRulesFile: fileName
-  }
-  await utils.writeFileAsync(objStore.rulesFilePathPrefix + CONFIG_FILE_NAME, JSON.stringify(rulesConfig, null, 2))
+const setActiveRulesFile = async (objStore, fileName, dfspId = 'data') => {
+  const userRules = await dfspWiseDB.getDB().get(objStore.document)
+  userRules[dfspId].activeRulesFile = fileName
+  await dfspWiseDB.update(objStore.document, userRules[dfspId], dfspId)
   objStore.activeRulesFile = fileName
-  await reloadRules(objStore)
+  await reloadRules(objStore, dfspId)
 }
 
-const getRules = async (objStore) => {
+const getRules = async (objStore, dfspId) => {
   if (!objStore.rules || objStore.rules.length === 0) {
-    await reloadRules(objStore)
+    await reloadRules(objStore, dfspId)
   }
   return objStore.rules
 }
 
-const getRulesEngine = async (objStore, convertedRules) => {
+const getRulesEngine = async (objStore, convertedRules, dfspId) => {
   if (convertedRules) {
     objStore.rulesEngine = new RulesEngine()
     loadRules(convertedRules, objStore)
   } else if (!objStore.rulesEngine) {
     objStore.rulesEngine = new RulesEngine()
-    const rules = await getRules(objStore)
+    const rules = await getRules(objStore, dfspId)
     loadRules(rules, objStore)
   }
   return objStore.rulesEngine
@@ -285,45 +287,50 @@ const loadRules = (rules, objStore) => {
   objStore.rulesEngine.loadRules(rules)
 }
 
-const getRulesFiles = async (objStore) => {
+const getRulesFiles = async (objStore, dfspId = 'data') => {
   try {
-    const files = await utils.readDirAsync(objStore.rulesFilePathPrefix)
-    const resp = {}
-    // Do not return the config file
-    resp.files = files.filter(item => {
-      return (item !== CONFIG_FILE_NAME)
-    })
-    resp.activeRulesFile = objStore.activeRulesFile
+    const userRules = await dfspWiseDB.getDB().get(objStore.document)
+    const resp = {
+      files: Object.keys(userRules[dfspId].rules),
+      activeRulesFile: objStore.activeRulesFile
+    }
     return resp
   } catch (err) {
     return null
   }
 }
 
-const deleteRulesFile = async (objStore, fileName) => {
+const deleteRulesFile = async (objStore, fileName, dfspId = 'data') => {
   try {
-    await utils.deleteFileAsync(objStore.rulesFilePathPrefix + fileName)
-    await reloadRules(objStore)
+    const userRules = await dfspWiseDB.getDB().get(objStore.document)
+    delete userRules[dfspId].rules[fileName]
+    await dfspWiseDB.update(objStore.document, userRules[dfspId], dfspId)
+    await reloadRules(objStore, dfspId)
     return true
   } catch (err) {
     return err
   }
 }
 
-const setRulesFileContent = async (objStore, fileName, fileContent) => {
+const setRulesFileContent = async (objStore, fileName, fileContent, dfspId = 'data') => {
   try {
     addTypeAndVersion(objStore.ruleType, fileContent)
-    await utils.writeFileAsync(objStore.rulesFilePathPrefix + fileName, JSON.stringify(fileContent, null, 2))
-    await reloadRules(objStore)
+    const userRules = await dfspWiseDB.getDB().get(objStore.document)
+    userRules[dfspId].rules[fileName] = fileContent
+    await dfspWiseDB.update(objStore.document, userRules[dfspId], dfspId)
+    await reloadRules(objStore, dfspId)
     return true
   } catch (err) {
     return err
   }
 }
 
-const getRulesFileContent = async (rulesFilePathPrefix, fileName) => {
-  const rulesRawdata = await utils.readFileAsync(rulesFilePathPrefix + fileName)
-  return JSON.parse(rulesRawdata)
+const getRulesFileContent = async (objStore, fileName, dfspId) => {
+  if (!dfspId) {
+    dfspId = 'data'
+  }
+  const userRules = await dfspWiseDB.getDB().get(objStore.document)
+  return userRules[dfspId].rules[fileName]
 }
 
 const addTypeAndVersion = (ruleType, fileContent) => {

@@ -23,16 +23,15 @@
  ******/
 
 const EventEmitter = require('events')
+const objectStore = require('./objectStore')
+
 class MyEmitter extends EventEmitter {}
-const emitters = {
-  testOutbound: null,
-  assertionRequest: null,
-  assertionCallback: null
-}
 
 const getEmitter = (emitter) => {
+  const emitters = objectStore.get('emitters')
   if (!emitters[emitter]) {
     emitters[emitter] = new MyEmitter()
+    objectStore.set('emitters', emitters)
   }
   return emitters[emitter]
 }

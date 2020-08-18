@@ -45,7 +45,7 @@ async (req, res, next) => {
   try {
     axios({
       method: req.body.method,
-      url: Config.getUserConfig().CALLBACK_ENDPOINT + req.body.path,
+      url: (await Config.getUserConfig()).CALLBACK_ENDPOINT + req.body.path,
       headers: req.body.headers,
       data: req.body.body,
       timeout: 3000,
@@ -76,7 +76,7 @@ router.post('/template/:traceID', [
     const traceID = req.params.traceID
     const inputJson = JSON.parse(JSON.stringify(req.body))
     // TODO: Change the following value to the dfspId based ont he login incase HOSTING_ENABLED
-    const dfspId = Config.getUserConfig().DEFAULT_USER_FSPID
+    const dfspId = (await Config.getUserConfig()).DEFAULT_USER_FSPID
     outbound.OutboundSend(inputJson, traceID, dfspId)
 
     return res.status(200).json({ status: 'OK' })

@@ -329,7 +329,8 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
   return new Promise((resolve, reject) => {
     (async () => {
       const httpsProps = {}
-      let urlGenerated = Config.getUserConfig().CALLBACK_ENDPOINT + path
+      const userConfig = await Config.getUserConfig()
+      let urlGenerated = userConfig.CALLBACK_ENDPOINT + path
       if (Config.getSystemConfig().HOSTING_ENABLED) {
         const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
         if (endpointsConfig.dfspEndpoints && dfspId && endpointsConfig.dfspEndpoints[dfspId]) {
@@ -341,7 +342,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
       if (baseUrl) {
         urlGenerated = getUrlPrefix(baseUrl) + path
       }
-      if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
+      if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED) {
         const tlsConfig = await ConnectionProvider.getTlsConfig()
         if (!tlsConfig.dfsps[dfspId]) {
           const errorMsg = 'Outbound TLS is enabled, but there is no TLS config found for DFSP ID: ' + dfspId
@@ -395,7 +396,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
             MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
             MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
             reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
-          }, Config.getUserConfig().CALLBACK_TIMEOUT)
+          }, userConfig.CALLBACK_TIMEOUT)
           // Listen for success callback
           MyEventEmitter.getEmitter('testOutbound').once(successCallbackUrl, (callbackHeaders, callbackBody) => {
             clearTimeout(timer)

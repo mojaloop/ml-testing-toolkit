@@ -53,9 +53,9 @@ var serverInstance = null
  * @param {number} port Port to register the Server against
  * @returns {Promise<Server>} Returns the Server object
  */
-const createServer = async (port) => {
+const createServer = async (port, dfspId) => {
   let server
-  if (Config.getUserConfig().INBOUND_MUTUAL_TLS_ENABLED) {
+  if (await Config.getUserConfig(dfspId).INBOUND_MUTUAL_TLS_ENABLED) {
     // Make sure hub server certificates are set in connection provider
     try {
       await ConnectionProvider.waitForTlsHubCerts()
@@ -141,16 +141,16 @@ const initialize = async () => {
     objectStore.initObjectStore()
     assertionStore.initAssertionStore()
 
-    console.log(`Toolkit Server running on port ${serverInstance.info.port}`)
+    RequestLogger.logMessage('info', `Toolkit Server running on port ${serverInstance.info.port}`)
   }
   return serverInstance
 }
 
-const restartServer = async () => {
+const restartServer = async (dfspId) => {
   if (serverInstance) {
     console.log(`Toolkit Server restarted on port ${serverInstance.info.port}`)
     serverInstance.stop()
-    serverInstance = await createServer(Config.getSystemConfig().API_PORT)
+    serverInstance = await createServer(Config.getSystemConfig().API_PORT, dfspId)
   }
 }
 

@@ -18,27 +18,68 @@
  * Gates Foundation
 
  * ModusBox
- * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
 
 'use strict'
 
-const Server = require('./server')
-const Config = require('./lib/config')
-const apiServer = require('./lib/api-server')
-const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
-const DfspWiseDB = require('./lib/db/dfspWiseDB')
+let db
+const dbInit = require('../../../spec_files/db-init.json')
+const customLogger = require('../requestLogger')
 
-const init = async () => {
-  await Config.loadSystemConfig()
-  apiServer.startServer(5050)
-  await DfspWiseDB.initDB()
-  await Config.loadUserConfig()
-
-  ConnectionProvider.initialize()
-
-  Server.initialize()
+const create = async (id, data) => {
+  try {
+    const doc = (await getDB().get(id))
+    if (doc.data) {
+      customLogger.logMessage('info', `${id} document already set`, null, false)
+      return
+    }
+    doc._id = id
+    doc.data = data
+    await getDB().put(doc)
+  } catch (err) {
+    if (err.status === 404) {
+      await getDB().put({
+        _id: id,
+        data
+      })
+    } else {
+      customLogger.logMessage('error', `${id} document was not created`, err, false)
+      return
+    }
+  }
+  customLogger.logMessage('info', `${id} document was created`, null, false)
 }
 
-init()
+const update = async (id, data, dfspId = 'data') => {
+  try {
+    const doc = (await getDB().get(id))
+    doc[dfspId] = data
+    await getDB().put(doc)
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const getDB = () => {
+  return db
+}
+
+const setDB = (newDB) => {
+  db = newDB
+}
+
+const initDB = async () => {
+  for (const index in dbInit) {
+    const document = dbInit[index]
+    await create(document._id, document.data)
+  }
+}
+
+module.exports = {
+  initDB,
+  getDB,
+  update,
+  setDB
+}

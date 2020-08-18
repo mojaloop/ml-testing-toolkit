@@ -32,7 +32,7 @@ const objectStore = require('../objectStore')
 
 const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
 
-const sendTemplate = async () => {
+const sendTemplate = async (dfspId) => {
   const config = objectStore.get('config')
   try {
     const readFileAsync = promisify(fs.readFile)

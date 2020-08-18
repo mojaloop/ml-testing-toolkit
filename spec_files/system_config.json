@@ -1,6 +1,6 @@
 {
   "API_PORT": 5000,
-  "HOSTING_ENABLED": false,
+  "HOSTING_ENABLED": true,
   "CONFIG_VERSIONS": {
     "response": 1,
     "callback": 1,
@@ -8,6 +8,7 @@
     "forward": 1,
     "userSettings": 1
   },
+  "DB": "ttk-test",
   "OAUTH": {
     "AUTH_ENABLED": false,
     "APP_OAUTH_CLIENT_KEY": "asdf",

@@ -1,0 +1,2310 @@
+[
+  {
+    "_id": "userConfig",
+    "data": {
+      "VERSION": 1,
+      "CALLBACK_ENDPOINT": "http://scheme-adapter:4000",
+      "CALLBACK_RESOURCE_ENDPOINTS": {
+        "enabled": false,
+        "endpoints": [
+          {
+            "method": "put",
+            "path": "/parties/{Type}/{ID}",
+            "endpoint": "http://localhost:4002"
+          },
+          {
+            "method": "put",
+            "path": "/quotes/{ID}",
+            "endpoint": "http://localhost:3002"
+          },
+          {
+            "method": "put",
+            "path": "/transfers/{ID}",
+            "endpoint": "http://localhost:3000"
+          }
+        ]
+      },
+      "HUB_ONLY_MODE": false,
+      "ENDPOINTS_DFSP_WISE": {
+        "dfsps": {
+          "userdfsp": {
+            "defaultEndpoint": "http://scheme-adapter:4000",
+            "endpoints": []
+          },
+          "userdfsp2": {
+            "defaultEndpoint": "http://scheme-adapter2:4000",
+            "endpoints": []
+          }
+        }
+      },
+      "SEND_CALLBACK_ENABLE": true,
+      "FSPID": "testingtoolkitdfsp",
+      "DEFAULT_USER_FSPID": "userdfsp",
+      "TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES": true,
+      "TRANSFERS_VALIDATION_ILP_PACKET": true,
+      "TRANSFERS_VALIDATION_CONDITION": true,
+      "ILP_SECRET": "secret",
+      "VERSIONING_SUPPORT_ENABLE": true,
+      "VALIDATE_INBOUND_JWS": false,
+      "VALIDATE_INBOUND_PUT_PARTIES_JWS": false,
+      "JWS_SIGN": false,
+      "JWS_SIGN_PUT_PARTIES": false,
+      "CONNECTION_MANAGER_API_URL": "http://172.17.0.1:5061",
+      "CONNECTION_MANAGER_AUTH_ENABLED": false,
+      "CONNECTION_MANAGER_HUB_USERNAME": "hub",
+      "CONNECTION_MANAGER_HUB_PASSWORD": "hub",
+      "INBOUND_MUTUAL_TLS_ENABLED": false,
+      "OUTBOUND_MUTUAL_TLS_ENABLED": false,
+      "ADVANCED_FEATURES_ENABLED": true,
+      "CALLBACK_TIMEOUT": 10000
+    }
+  },
+  {
+    "_id": "userReports",
+    "data": {}
+  },
+  {
+    "_id": "userCallbackRules",
+    "data": {
+      "activeRulesFile": "default.json",
+      "rules": {
+        "default.json": [
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 1,
+            "priority": 1,
+            "description": "post /quotes",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/quotes"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": null,
+              "path": null,
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 2,
+            "priority": 1,
+            "description": "post /transfers",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transfers"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/transfers/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "ruleId": 3,
+            "priority": 1,
+            "description": "get /parties/{Type}/{ID}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/parties/{Type}/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/parties/{Type}/{ID}",
+              "params": {
+                "scripts": {}
+              },
+              "type": "MOCK_CALLBACK"
+            },
+            "type": "callback",
+            "version": 1
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 4,
+            "priority": 1,
+            "description": "post /transactionRequests",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transactionRequests"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/transactionRequests/{ID}",
+              "params": {
+                "body": {
+                  "transactionRequestState": "RECEIVED"
+                }
+              },
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 5,
+            "priority": 1,
+            "description": "get /quotes/{ID}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/quotes/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/quotes/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 6,
+            "priority": 1,
+            "description": "get /participants/{Type}/{ID}/{SubId}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/participants/{Type}/{ID}/{SubId}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/participants/{Type}/{ID}/{SubId}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 7,
+            "priority": 1,
+            "description": "post /participants/{Type}/{ID}/{SubId}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/participants/{Type}/{ID}/{SubId}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/participants/{Type}/{ID}/{SubId}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 8,
+            "priority": 1,
+            "description": "get /participants/{Type}/{ID}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/participants/{Type}/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/participants/{Type}/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 9,
+            "priority": 1,
+            "description": "post /participants/{Type}/{ID}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/participants/{Type}/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/participants/{Type}/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 10,
+            "priority": 1,
+            "description": "post /participants",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/participants"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/participants/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 11,
+            "priority": 1,
+            "description": "get /parties/{Type}/{ID}/{SubId}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/parties/{Type}/{ID}/{SubId}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/parties/{Type}/{ID}/{SubId}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 12,
+            "priority": 1,
+            "description": "get /transactionRequests/{ID}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transactionRequests/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/transactionRequests/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 13,
+            "priority": 1,
+            "description": "get /authorizations/{ID}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/authorizations/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/authorizations/{ID}",
+              "params": {
+                "body": {
+                  "responseType": "ENTERED"
+                }
+              },
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 14,
+            "priority": 1,
+            "description": "get /transfers/{ID}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transfers/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/transfers/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 15,
+            "priority": 1,
+            "description": "get /transactions/{ID}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transactions/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/transactions/{ID}",
+              "params": {
+                "body": {
+                  "transactionState": "COMPLETED"
+                }
+              },
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 16,
+            "priority": 1,
+            "description": "get /bulkQuotes/{ID}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/bulkQuotes/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": null,
+              "path": null,
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 17,
+            "priority": 1,
+            "description": "post /bulkQuotes",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/bulkQuotes"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/bulkQuotes/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 18,
+            "priority": 1,
+            "description": "get /bulkTransfers/{ID}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/bulkTransfers/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": null,
+              "path": null,
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 19,
+            "priority": 1,
+            "description": "post /bulkTransfers",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/bulkTransfers"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/bulkTransfers/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 20,
+            "priority": 1,
+            "description": "post /quotes",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/quotes"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": null,
+              "path": null,
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 21,
+            "priority": 1,
+            "description": "post /transfers",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transfers"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/transfers/{ID}",
+              "params": {
+                "body": {
+                  "transferState": "RESERVED"
+                }
+              },
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "ruleId": 22,
+            "priority": 1,
+            "description": "get /parties/{Type}/{ID}",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/parties/{Type}/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/parties/{Type}/{ID}",
+              "params": {
+                "scripts": {}
+              },
+              "type": "MOCK_CALLBACK"
+            },
+            "type": "callback",
+            "version": 1
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 23,
+            "priority": 1,
+            "description": "post /transactionRequests",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transactionRequests"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/transactionRequests/{ID}",
+              "params": {
+                "body": {
+                  "transactionRequestState": "RECEIVED"
+                }
+              },
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 24,
+            "priority": 1,
+            "description": "get /quotes/{ID}",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/quotes/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/quotes/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 25,
+            "priority": 1,
+            "description": "get /participants/{Type}/{ID}/{SubId}",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/participants/{Type}/{ID}/{SubId}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/participants/{Type}/{ID}/{SubId}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 26,
+            "priority": 1,
+            "description": "post /participants/{Type}/{ID}/{SubId}",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/participants/{Type}/{ID}/{SubId}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/participants/{Type}/{ID}/{SubId}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 27,
+            "priority": 1,
+            "description": "get /participants/{Type}/{ID}",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/participants/{Type}/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/participants/{Type}/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 28,
+            "priority": 1,
+            "description": "post /participants/{Type}/{ID}",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/participants/{Type}/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/participants/{Type}/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 29,
+            "priority": 1,
+            "description": "post /participants",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/participants"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/participants/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 30,
+            "priority": 1,
+            "description": "get /parties/{Type}/{ID}/{SubId}",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/parties/{Type}/{ID}/{SubId}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/parties/{Type}/{ID}/{SubId}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 31,
+            "priority": 1,
+            "description": "get /transactionRequests/{ID}",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transactionRequests/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/transactionRequests/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 32,
+            "priority": 1,
+            "description": "get /authorizations/{ID}",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/authorizations/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/authorizations/{ID}",
+              "params": {
+                "body": {
+                  "responseType": "ENTERED"
+                }
+              },
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 33,
+            "priority": 1,
+            "description": "get /transfers/{ID}",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transfers/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/transfers/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 34,
+            "priority": 1,
+            "description": "get /transactions/{ID}",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transactions/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/transactions/{ID}",
+              "params": {
+                "body": {
+                  "transactionState": "COMPLETED"
+                }
+              },
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 35,
+            "priority": 1,
+            "description": "get /bulkQuotes/{ID}",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/bulkQuotes/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": null,
+              "path": null,
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 36,
+            "priority": 1,
+            "description": "post /bulkQuotes",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/bulkQuotes"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/bulkQuotes/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 37,
+            "priority": 1,
+            "description": "get /bulkTransfers/{ID}",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/bulkTransfers/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": null,
+              "path": null,
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 38,
+            "priority": 1,
+            "description": "post /bulkTransfers",
+            "apiVersion": {
+              "minorVersion": 1,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/bulkTransfers"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/bulkTransfers/{ID}",
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          }
+        
+        ],
+        "p2p-limit.json": [
+          {
+            "ruleId": 1,
+            "priority": 1,
+            "description": "get /parties/{Type}/{ID}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/parties/{Type}/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/parties/{Type}/{ID}",
+              "params": {
+                "scripts": {
+                  "exec": [
+                    "const ttkAllowedAmount = pm.environment.get('ttkAllowedAmount')",
+                    "if (ttkAllowedAmount === undefined) {",
+                    "  pm.environment.set('ttkAllowedAmount', 1000)",
+                    "}"
+                  ]
+                }
+              },
+              "type": "MOCK_CALLBACK"
+            },
+            "type": "callback",
+            "version": 1
+          },
+          {
+            "type": "callback",
+            "version": 1,
+            "ruleId": 2,
+            "priority": 1,
+            "description": "post /quotes",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/quotes"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": null,
+              "path": null,
+              "params": {},
+              "delay": 0,
+              "type": "MOCK_CALLBACK"
+            }
+          },
+          {
+            "ruleId": 3,
+            "priority": 1,
+            "description": "post /transfers",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "body",
+                  "operator": "equal",
+                  "value": "testingtoolkitdfsp",
+                  "path": "payeeFsp"
+                },
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transfers"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": "put",
+              "path": "/transfers/{ID}",
+              "params": {
+                "scripts": {
+                  "exec": [
+                    "const body = JSON.parse(pm.request.body)",
+                    "var ttkdfspTotalAmount = pm.environment.get('ttkdfspTotalAmount') || 0",
+                    "var ttkAllowedAmount = pm.environment.get('ttkAllowedAmount')",
+                    "ttkdfspTotalAmount += +body.amount.amount",
+                    "ttkAllowedAmount -= +body.amount.amount",
+                    "pm.environment.set('ttkdfspTotalAmount', ttkdfspTotalAmount)",
+                    "pm.environment.set('ttkAllowedAmount', ttkAllowedAmount)"
+                  ]
+                }
+              },
+              "type": "MOCK_CALLBACK"
+            },
+            "type": "callback",
+            "version": 1
+          }
+        ]
+      }
+    }
+  },
+  {
+    "_id": "userForwardRules",
+    "data": {
+      "activeRulesFile": "default.json",
+      "rules": {
+        "default.json": [
+          {
+            "ruleId": 1,
+            "priority": 1,
+            "description": "get /parties/{Type}/{ID}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "headers",
+                  "operator": "equal",
+                  "value": "userdfsp",
+                  "path": "fspiop-source"
+                },
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/parties/{Type}/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "params": {
+                "to": "payee",
+                "dfspId": "userdfsp2"
+              },
+              "type": "FORWARD"
+            },
+            "type": "forward",
+            "version": 1
+          },
+          {
+            "ruleId": 2,
+            "priority": 1,
+            "description": "put /parties/{Type}/{ID} to payer",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "headers",
+                  "operator": "equal",
+                  "value": "userdfsp",
+                  "path": "fspiop-destination"
+                },
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/parties/{Type}/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "put"
+                }
+              ]
+            },
+            "event": {
+              "params": {
+                "to": "payer",
+                "dfspId": "userdfsp"
+              },
+              "type": "FORWARD"
+            },
+            "type": "forward",
+            "version": 1
+          },
+          {
+            "ruleId": 3,
+            "priority": 1,
+            "description": "post /quotes",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "headers",
+                  "operator": "equal",
+                  "value": "userdfsp2",
+                  "path": "fspiop-destination"
+                },
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/quotes"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "params": {
+                "to": "payee",
+                "dfspId": "userdfsp2"
+              },
+              "type": "FORWARD"
+            },
+            "type": "forward",
+            "version": 1
+          },
+          {
+            "ruleId": 4,
+            "priority": 1,
+            "description": "put /quotes",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "headers",
+                  "operator": "equal",
+                  "value": "userdfsp",
+                  "path": "fspiop-destination"
+                },
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/quotes/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "put"
+                }
+              ]
+            },
+            "event": {
+              "params": {
+                "to": "payer",
+                "dfspId": "userdfsp"
+              },
+              "type": "FORWARD"
+            },
+            "type": "forward",
+            "version": 1
+          },
+          {
+            "type": "forward",
+            "version": 1,
+            "ruleId": 5,
+            "priority": 1,
+            "description": "post /transfers",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "body",
+                  "operator": "equal",
+                  "value": "userdfsp2",
+                  "path": "payeeFsp"
+                },
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transfers"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "params": {
+                "to": "payee",
+                "dfspId": "userdfsp2"
+              },
+              "type": "FORWARD"
+            }
+          },
+          {
+            "type": "forward",
+            "version": 1,
+            "ruleId": 6,
+            "priority": 1,
+            "description": "put /transfers",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "headers",
+                  "operator": "equal",
+                  "value": "userdfsp",
+                  "path": "fspiop-destination"
+                },
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transfers/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "put"
+                }
+              ]
+            },
+            "event": {
+              "params": {
+                "to": "payer",
+                "dfspId": "userdfsp"
+              },
+              "type": "FORWARD"
+            }
+          },
+          {
+            "ruleId": 7,
+            "priority": 1,
+            "description": "get /parties/{Type}/{ID}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "headers",
+                  "operator": "equal",
+                  "value": "userdfsp2",
+                  "path": "fspiop-source"
+                },
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/parties/{Type}/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "params": {
+                "to": "payer",
+                "dfspId": "userdfsp"
+              },
+              "type": "FORWARD"
+            },
+            "type": "forward",
+            "version": 1
+          },
+          {
+            "ruleId": 8,
+            "priority": 1,
+            "description": "put /parties/{Type}/{ID}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "headers",
+                  "operator": "equal",
+                  "value": "userdfsp2",
+                  "path": "fspiop-destination"
+                },
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/parties/{Type}/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "put"
+                }
+              ]
+            },
+            "event": {
+              "params": {
+                "to": "payee",
+                "dfspId": "userdfsp2"
+              },
+              "type": "FORWARD"
+            },
+            "type": "forward",
+            "version": 1
+          },
+          {
+            "ruleId": 9,
+            "priority": 1,
+            "description": "post /quotes",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "headers",
+                  "operator": "equal",
+                  "value": "userdfsp",
+                  "path": "fspiop-destination"
+                },
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/quotes"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "params": {
+                "to": "payer",
+                "dfspId": "userdfsp"
+              },
+              "type": "FORWARD"
+            },
+            "type": "forward",
+            "version": 1
+          },
+          {
+            "ruleId": 10,
+            "priority": 1,
+            "description": "put /quotes",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "headers",
+                  "operator": "equal",
+                  "value": "userdfsp2",
+                  "path": "fspiop-destination"
+                },
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/quotes/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "put"
+                }
+              ]
+            },
+            "event": {
+              "params": {
+                "to": "payee",
+                "dfspId": "userdfsp2"
+              },
+              "type": "FORWARD"
+            },
+            "type": "forward",
+            "version": 1
+          },
+          {
+            "type": "forward",
+            "version": 1,
+            "ruleId": 11,
+            "priority": 1,
+            "description": "post /transfers",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "body",
+                  "operator": "equal",
+                  "value": "userdfsp",
+                  "path": "payeeFsp"
+                },
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transfers"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "params": {
+                "to": "payer",
+                "dfspId": "userdfsp"
+              },
+              "type": "FORWARD"
+            }
+          },
+          {
+            "type": "forward",
+            "version": 1,
+            "ruleId": 12,
+            "priority": 1,
+            "description": "put /transfers",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "headers",
+                  "operator": "equal",
+                  "value": "userdfsp2",
+                  "path": "fspiop-destination"
+                },
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/transfers/{ID}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "put"
+                }
+              ]
+            },
+            "event": {
+              "params": {
+                "to": "payee",
+                "dfspId": "userdfsp2"
+              },
+              "type": "FORWARD"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "_id": "userResponseRules",
+    "data": {
+      "activeRulesFile": "default.json",
+      "rules": {
+        "default.json": [
+          {
+            "type": "response",
+            "version": 1.0,
+            "ruleId": 1,
+            "priority": 1,
+            "description": "post /settlementWindows/{id}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "settlements",
+              "asynchronous": false
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/settlementWindows/{id}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": null,
+              "path": null,
+              "params": {
+                "body": {
+                  "state": "OPEN"
+                },
+                "statusCode": "200"
+              },
+              "delay": 0,
+              "type": "MOCK_RESPONSE"
+            }
+          },
+          {
+            "type": "response",
+            "version": 1.0,
+            "ruleId": 3,
+            "priority": 1,
+            "description": "post /settlements",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "settlements",
+              "asynchronous": false
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/settlements"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "post"
+                }
+              ]
+            },
+            "event": {
+              "method": null,
+              "path": null,
+              "params": {
+                "body": {
+                  "id": "123",
+                  "state": "PENDING_SETTLEMENT",
+                  "settlementWindows": [
+                    [
+                      {
+                        "id": 123,
+                        "createdDate": "1954-11-03",
+                        "state": "PENDING_SETTLEMENT",
+                        "reason": "do",
+                        "changedDate": "1954-11-03"
+                      }
+                    ]
+                  ],
+                  "participants": [
+                    {
+                      "id": -91450113,
+                      "accounts": [
+                        {
+                          "id": 81795155,
+                          "reason": "veniam est proident commodo aliqua",
+                          "state": "PENDING_SETTLEMENT",
+                          "netSettlementAmount": {
+                            "amount": 100,
+                            "currency": "USD"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "statusCode": "200"
+              },
+              "delay": 0,
+              "type": "FIXED_RESPONSE"
+            }
+          },
+          {
+            "type": "response",
+            "version": 1.0,
+            "ruleId": 4,
+            "priority": 1,
+            "description": "get /settlements/{id}",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "settlements",
+              "asynchronous": false
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/settlements/{id}"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": null,
+              "path": null,
+              "params": {
+                "body": {
+                  "id": "{$request.params.id}",
+                  "state": "PS_TRANSFERS_RECORDED",
+                  "settlementWindows": [
+                    [
+                      {
+                        "createdDate": "2020-02-10",
+                        "id": "{$request.params.id}",
+                        "state": "PS_TRANSFERS_RECORDED",
+                        "reason": "amet cillum culpa v",
+                        "changedDate": "2020-02-10"
+                      }
+                    ]
+                  ],
+                  "participants": [
+                    {
+                      "id": -35933071,
+                      "accounts": [
+                        {
+                          "id": -14386227,
+                          "reason": "aliquip aliqua nulla deserunt",
+                          "state": "PS_TRANSFERS_RECORDED",
+                          "netSettlementAmount": {
+                            "amount": 100,
+                            "currency": "USD"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "statusCode": "200"
+              },
+              "delay": 0,
+              "type": "FIXED_RESPONSE"
+            }
+          },
+          {
+            "type": "response",
+            "version": 1.0,
+            "ruleId": 5,
+            "priority": 1,
+            "description": "get /settlementWindows",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "settlements",
+              "asynchronous": false
+            },
+            "conditions": {
+              "all": [
+                {
+                  "fact": "operationPath",
+                  "operator": "equal",
+                  "value": "/settlementWindows"
+                },
+                {
+                  "fact": "method",
+                  "operator": "equal",
+                  "value": "get"
+                }
+              ]
+            },
+            "event": {
+              "method": null,
+              "path": null,
+              "params": {
+                "body": [
+                  {
+                    "createdDate": "2020-02-10",
+                    "id": 123,
+                    "state": "{$request.query.state}",
+                    "reason": "string",
+                    "changedDate": "2020-02-10"
+                  }
+                ],
+                "statusCode": "200"
+              },
+              "delay": 0,
+              "type": "FIXED_RESPONSE"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "_id": "userValidationRules",
+    "data": {
+      "activeRulesFile": "default.json",
+      "rules": {
+        "default.json": [],
+        "p2p-limit.json": [
+        {
+          "ruleId": 1,
+          "priority": 1,
+          "description": "post /quotes",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "conditions": {
+            "all": [
+              {
+                "fact": "body",
+                "operator": "numericGreaterThan",
+                "value": "{$environment.ttkAllowedAmount}",
+                "path": "amount.amount"
+              },
+              {
+                "fact": "body",
+                "operator": "equal",
+                "value": "testingtoolkitdfsp",
+                "path": "payee.partyIdInfo.fspId"
+              },
+              {
+                "fact": "operationPath",
+                "operator": "equal",
+                "value": "/quotes"
+              },
+              {
+                "fact": "method",
+                "operator": "equal",
+                "value": "post"
+              }
+            ]
+          },
+          "event": {
+            "method": "put",
+            "path": "/quotes/{ID}/error",
+            "params": {
+              "body": {
+                "errorInformation": {
+                  "errorCode": "5100",
+                  "errorDescription": "The total allowed amount for the dfsp has been reached"
+                }
+              },
+              "scripts": {}
+            },
+            "type": "MOCK_ERROR_CALLBACK"
+          },
+          "type": "validation",
+          "version": 1
+        }
+        ]
+      }
+    }
+  }
+]

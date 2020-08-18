@@ -24,18 +24,17 @@
 
 'use strict'
 const Config = require('../config')
-let Constants = Config.getSystemConfig()
 const Cookies = require('cookies')
 const jwt = require('jsonwebtoken')
 const wso2Client = require('./Wso2Client')
+// const customLogger = require('../requestLogger')
 
 /**
  * Logs the user in.
  * If successful, sets the JWT token in a cookie and returns the token payload
  */
 exports.loginUser = async function (username, password, req, res) {
-  Constants = Config.getSystemConfig()
-  if (!Constants.OAUTH.AUTH_ENABLED) {
+  if (!Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
     return {
       ok: false,
       token: {
@@ -64,7 +63,7 @@ exports.loginUser = async function (username, password, req, res) {
 
     return response
   } catch (error) {
-    console.log('Error on LoginService.loginUser: ', error)
+    // customLogger.logMessage('error', `Error on LoginService.loginUser: ${error}`, null, false)
     if (error && error.statusCode === 400 && error.message.includes('Authentication failed')) {
       throw new Error(`Authentication failed for user ${username}`, error.error)
     }
@@ -86,17 +85,17 @@ const buildJWTResponse = (decodedIdToken, accessToken, expiresIn, req, res) => {
         continue
       }
       dfspId = groupMatchResult[1]
-      console.log('LoginService.loginUser found dfspId: ', dfspId)
+      // customLogger.logMessage('info', `LoginService.loginUser found dfspId: ${dfspId}`, null, false)
       break // FIXME only returns the first ( there should be only one ). May report an error if there's more than one Application/DFSP group ?
     }
   }
 
   decodedIdToken.dfspId = dfspId
-  console.log('LoginService.loginUser returning decodedIdToken: ', decodedIdToken)
 
   const cookies = new Cookies(req, res)
   const cookieOptions = { maxAge: expiresIn * 1000, httpOnly: true, sameSite: 'strict' } // secure is automatic based on HTTP or HTTPS used
-  cookies.set(Constants.OAUTH.JWT_COOKIE_NAME, accessToken, cookieOptions)
+
+  cookies.set(Config.getSystemConfig().OAUTH.JWT_COOKIE_NAME, accessToken, cookieOptions)
   return {
     ok: true,
     token: {
@@ -113,5 +112,5 @@ const buildJWTResponse = (decodedIdToken, accessToken, expiresIn, req, res) => {
  */
 exports.logoutUser = async function (req, res) {
   const cookies = new Cookies(req, res)
-  cookies.set(Constants.OAUTH.JWT_COOKIE_NAME)
+  cookies.set(Config.getSystemConfig().OAUTH.JWT_COOKIE_NAME)
 }
