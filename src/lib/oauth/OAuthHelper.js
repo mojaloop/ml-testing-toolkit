@@ -27,7 +27,7 @@ const passport = require('passport')
 let Config = {}
 const fs = require('fs')
 const path = require('path')
-const customLogger = require('../requestLogger')
+// const customLogger = require('../requestLogger')
 
 function cookieExtractor (req) {
   const cookies = new Cookies(req)
