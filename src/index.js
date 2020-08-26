@@ -28,17 +28,13 @@ const Server = require('./server')
 const Config = require('./lib/config')
 const apiServer = require('./lib/api-server')
 const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
-const DfspWiseDB = require('./lib/db/dfspWiseDB')
 
 const init = async () => {
   await Config.loadSystemConfig()
   apiServer.startServer(5050)
-  await DfspWiseDB.initDB()
   await Config.loadUserConfig()
-
-  ConnectionProvider.initialize()
-
-  Server.initialize()
+  await ConnectionProvider.initialize()
+  await Server.initialize()
 }
 
 init()

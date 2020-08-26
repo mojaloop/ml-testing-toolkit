@@ -124,7 +124,7 @@ const initDFSP = async (environmentId, dfspId, dfspName) => {
   }
 }
 
-const initJWSCertificate = async (environmentId, dfspId, jwsCertificate = null, intermediateCertificate = null) => {
+const initJWSCertificate = async (environmentId, dfspId, jwsCertificate, intermediateCertificate) => {
   const rootCertificate = null
   let certExists = false
   let certResult = null
@@ -172,7 +172,6 @@ const fetchUserDFSPJwsCerts = async (environmentId, dfspId) => {
       if (!_.isEqual(fetchedJwsCerts, currentJWSConfig.dfsps[dfspId])) {
         currentJWSConfig.dfsps[dfspId] = fetchedJwsCerts
         await setJWSConfig()
-        // console.log('User DFSP JWS Certificate updated', fetchedJwsCerts.jwsCert)
       }
     }
   } catch (err) {}
@@ -455,7 +454,7 @@ const checkConnectionManager = async () => {
       await initDFSPHelper()
       // Initialize JWS certificate for testing toolkit dfsp
       const certData = await readFileAsync('secrets/publickey.cer')
-      currentJWSConfig.testingToolkitDfspCerts = await initJWSCertificate(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, certData.toString())
+      currentJWSConfig.testingToolkitDfspCerts = await initJWSCertificate(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, certData.toString(), null)
       await setJWSConfig()
       // Fetch the user DFSP Jws certs once and then periodically check
       const dfspList = await getDFSPs()
@@ -498,12 +497,10 @@ const initDFSPHelper = async () => {
   // Initialize HUB environment
   await initEnvironment()
   // Initialize the DFSPs
-  if (currentEnvironment) {
-    await initDFSP(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, 'Testing Toolkit DFSP')
-    const dfspList = await getDFSPs()
-    for (let i = 0; i < dfspList.length; i++) {
-      await initDFSP(currentEnvironment.id, dfspList[i].id, dfspList[i].name)
-    }
+  await initDFSP(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, 'Testing Toolkit DFSP')
+  const dfspList = await getDFSPs()
+  for (let i = 0; i < dfspList.length; i++) {
+    await initDFSP(currentEnvironment.id, dfspList[i].id, dfspList[i].name)
   }
 }
 
@@ -547,11 +544,7 @@ const waitForTlsHubCerts = async (interval = 2) => {
     if (currentTlsConfig.hubCaCert && currentTlsConfig.hubServerCert && currentTlsConfig.hubServerKey) {
       return true
     }
-    await new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve(true)
-      }, interval * 1000)
-    })
+    await new Promise(resolve => setTimeout(resolve, interval * 1000))
   }
   throw new Error('Timeout Hub Init')
 }

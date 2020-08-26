@@ -67,7 +67,8 @@ describe('callbackHandler', () => {
       const req = {
         headers: {
           traceparent: 'traceparent'
-        }
+        },
+        customInfo: {}
       }
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
@@ -126,7 +127,8 @@ describe('callbackHandler', () => {
       const req = {
         headers: {
           traceparent: 'traceparent'
-        }
+        },
+        customInfo: {}
       }
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
@@ -168,7 +170,8 @@ describe('callbackHandler', () => {
         }
       }
       const req = {
-        headers: {}
+        headers: {},
+        customInfo: {}
       }
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
@@ -225,7 +228,8 @@ describe('callbackHandler', () => {
         }
       }
       const req = {
-        headers: {}
+        headers: {},
+        customInfo: {}
       }
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
@@ -328,7 +332,8 @@ describe('callbackHandler', () => {
         }
       }
       const req = {
-        headers: {}
+        headers: {},
+        customInfo: {}
       }
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
@@ -373,7 +378,8 @@ describe('callbackHandler', () => {
         }
       }
       const req = {
-        headers: {}
+        headers: {},
+        customInfo: {}
       }
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
@@ -420,7 +426,12 @@ describe('callbackHandler', () => {
         }
       }
       const req = {
-        headers: {}
+        headers: {},
+        customInfo: {
+          user: {
+            dfspId: 'test'
+          }
+        }
       }
       SpyGetUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',

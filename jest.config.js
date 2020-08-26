@@ -11,5 +11,6 @@ module.exports = {
       lines: 98
     }
   },
-  modulePathIgnorePatterns: ['spec_files']
+  modulePathIgnorePatterns: ['spec_files'],
+  testEnvironment: 'node'
 }

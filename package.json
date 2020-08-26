@@ -95,6 +95,7 @@
     "jsreport-core": "2.7.2",
     "jsreport-handlebars": "2.1.0",
     "lodash": "^4.17.15",
+    "mongoose": "^5.10.0",
     "mustache": "3.1.0",
     "node-dir": "0.1.17",
     "node-strings": "^1.0.2",

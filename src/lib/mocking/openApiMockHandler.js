@@ -121,7 +121,7 @@ module.exports.handleRequest = async (req, h) => {
     customLogger.logMessage('error', 'Resource not found', null, true, req)
     return h.response({ error: 'Not Found' }).code(404)
   }
-  if (apis[selectedVersion].type === 'fspiop' && (await Config.getUserConfig()).VERSIONING_SUPPORT_ENABLE) {
+  if (apis[selectedVersion].type === 'fspiop' && (await Config.getUserConfig(req.customInfo.user)).VERSIONING_SUPPORT_ENABLE) {
     const fspiopApis = apis.filter(item => {
       return item.type === 'fspiop'
     })
@@ -229,7 +229,7 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
     responseBody = mock
     responseStatus = +status
   }
-  // Verify that it is a success code, then generate callback and only if the method is post or get
+  // Verify that it is a success code, then generate callback
   if ((req.method === 'post' || req.method === 'get' || req.method === 'put') && responseStatus >= 200 && responseStatus <= 299) {
     // Generate callback asynchronously
     setImmediate(generateAsyncCallback, item, context, req)
@@ -242,7 +242,7 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
 }
 
 const generateAsyncCallback = async (item, context, req) => {
-  const userConfig = await Config.getUserConfig()
+  const userConfig = await Config.getUserConfig(req.customInfo.user)
   if (req.method === 'put') {
     if (!userConfig.HUB_ONLY_MODE) {
       return

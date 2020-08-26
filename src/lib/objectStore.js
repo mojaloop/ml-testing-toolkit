@@ -25,45 +25,11 @@
 const storedObject = {
   transactions: {},
   inboundEnvironment: {},
-  emitters: {},
-  rulesEngineModel: {
-    response: {
-      rulesFilePathPrefix: 'spec_files/rules_response/',
-      rules: null,
-      rulesEngine: null,
-      activeRulesFile: 'default.json',
-      ruleType: 'response'
-    },
-    validation: {
-      rulesFilePathPrefix: 'spec_files/rules_validation/',
-      rules: null,
-      rulesEngine: null,
-      activeRulesFile: 'default.json',
-      ruleType: 'validation'
-    },
-    callback: {
-      rulesFilePathPrefix: 'spec_files/rules_callback/',
-      rules: null,
-      rulesEngine: null,
-      activeRulesFile: 'default.json',
-      ruleType: 'callback'
-    },
-    forward: {
-      rulesFilePathPrefix: 'spec_files/rules_forward/',
-      rules: null,
-      rulesEngine: null,
-      activeRulesFile: 'default.json',
-      ruleType: 'forward'
-    }
-  }
+  emitters: {}
 }
 
-const set = (key, value, property) => {
-  if (property) {
-    storedObject[key][property] = { ...value }
-  } else {
-    storedObject[key] = { ...value }
-  }
+const set = (key, value) => {
+  storedObject[key] = { ...value }
 }
 
 const get = (key) => {

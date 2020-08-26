@@ -27,17 +27,37 @@ const AdmZip = require('adm-zip')
 const Config = require('./config')
 const { Engine } = require('json-rules-engine')
 const CONFIG_FILE_NAME = 'config.json'
+const storageAdapter = require('./storageAdapter')
 
-const exportSpecFiles = async (ruleTypes) => {
+const exportSpecFiles = async (ruleTypes, user) => {
   const zip = new AdmZip()
-  ruleTypes.forEach(ruleType => {
-    const filename = `spec_files/${ruleType}`
-    if (filename.endsWith('.json')) {
-      zip.addLocalFile(filename)
+
+  for (const index in ruleTypes) {
+    const ruleType = ruleTypes[index]
+    if (user) {
+      if (ruleType.endsWith('.json')) {
+        const filename = `spec_files/${ruleType}`
+        const document = await storageAdapter.read(filename, user)
+        zip.addFile(filename, Buffer.from(JSON.stringify(document.data)))
+      } else {
+        const filename = `spec_files/${ruleType}/`
+        const documents = await storageAdapter.read(filename, user)
+        for (const index in documents) {
+          const id = filename + documents[index]
+          const document = await storageAdapter.read(id, user)
+          zip.addFile(id, Buffer.from(JSON.stringify(document.data)))
+        }
+      }
     } else {
-      zip.addLocalFolder(filename, ruleType)
+      if (ruleType.endsWith('.json')) {
+        const filename = `spec_files/${ruleType}`
+        zip.addLocalFile(filename)
+      } else {
+        const filename = `spec_files/${ruleType}/`
+        zip.addLocalFolder(filename, ruleType)
+      }
     }
-  })
+  }
   return {
     namePrefix: ruleTypes.length > 1 ? 'spec_files' : ruleTypes[0],
     buffer: zip.toBuffer()
@@ -66,7 +86,10 @@ const validateInputData = (zipEntries, options) => {
   zipEntries.forEach((zipEntry) => {
     const entryName = zipEntry.entryName
     const entryData = JSON.parse(zipEntry.getData().toString('utf-8'))
-    entries.push(entryName)
+    entries.push({
+      name: entryName,
+      data: entryData
+    })
     const element = entryName.split('/')[0]
     if (options.includes(element)) {
       switch (element) {
@@ -101,31 +124,39 @@ const validateInputData = (zipEntries, options) => {
   return entries
 }
 
-const extractData = async (zip, options, entries) => {
+const extractData = async (zip, options, entries, user) => {
   for (const index in options) {
-    const option = options[index]
-    if (option === 'user_config.json') {
-      zip.extractEntryTo(option, 'spec_files', false, true)
-    } else {
-      let deleted = false
+    if (user) {
       for (const index in entries) {
-        const entry = entries[index]
-        if (entry.startsWith(option)) {
-          if (!deleted) {
-            await rmdirAsync(`spec_files/${option}`, { recursive: true })
-            deleted = true
+        const id = entries[index].name
+        const data = entries[index].data
+        await storageAdapter.upsert(id, data, user)
+      }
+    } else {
+      const option = options[index]
+      if (option === 'user_config.json') {
+        zip.extractEntryTo(option, 'spec_files', false, true)
+      } else {
+        let deleted = false
+        for (const index in entries) {
+          const entry = entries[index].name
+          if (entry.startsWith(option)) {
+            if (!deleted) {
+              await rmdirAsync(`spec_files/${option}`, { recursive: true })
+              deleted = true
+            }
+            zip.extractEntryTo(entry, `spec_files/${option}`, false)
           }
-          zip.extractEntryTo(entry, `spec_files/${option}`, false)
         }
       }
     }
   }
 }
 
-const importSpecFiles = async (data, options) => {
+const importSpecFiles = async (data, options, user) => {
   const zip = new AdmZip(Buffer.from(data))
   const entries = validateInputData(zip.getEntries(), options)
-  await extractData(zip, options, entries)
+  await extractData(zip, options, entries, user)
 }
 
 module.exports = {

@@ -100,9 +100,15 @@ const createServer = async (port, dfspId) => {
   return server
 }
 
-const onPreHandler = (request, h) => {
-  // Generate UniqueID
+const onPreHandler = async (request, h) => {
   request.customInfo = {}
+  if (Config.getSystemConfig().HOSTING_ENABLED) {
+    request.customInfo.user = {
+      dfspId: (await Config.getUserConfig(request.headers['fspiop-source'])).FSPID
+    }
+  }
+
+  // Generate UniqueID
   request.customInfo.uniqueId = UniqueIdGenerator.generateUniqueId(request)
   // Parse the traceparent header if present
   if (request.headers.traceparent) {

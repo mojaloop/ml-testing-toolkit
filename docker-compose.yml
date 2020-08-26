@@ -16,8 +16,10 @@ services:
       - sh
       - -c
       - "npm start"
+    depends_on:
+      - mongo
   mojaloop-testing-toolkit-ui:
-    image: mojaloop/ml-testing-toolkit-ui:v11.0.2
+    image: mojaloop/ml-testing-toolkit-ui:v11.0.3
     ports:
       - "6060:6060"
     environment:
@@ -26,6 +28,15 @@ services:
     command:
       - sh
       - /usr/share/nginx/start.sh
+
+  mongo:
+    image: mongo
+    # Disable logging as it is far too verbose for debugging locally
+    logging:
+      driver: none
+    ports:
+      - "27017:27017"
+
 networks:
   default:
     name: mojaloop-testing-toolkit

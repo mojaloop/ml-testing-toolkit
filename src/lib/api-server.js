@@ -30,6 +30,7 @@ const passport = require('passport')
 const cookieParser = require('cookie-parser')
 const util = require('util')
 const cors = require('cors')
+const Config = require('./config')
 
 const initServer = () => {
   // For CORS policy
@@ -42,11 +43,6 @@ const initServer = () => {
   // For oauth
   app.use(cookieParser())
   require('./oauth/OAuthHelper').handleMiddleware()
-
-  // For DB
-  const PouchDB = require('pouchdb')
-  app.use('/db', verifyUser(), require('express-pouchdb')(PouchDB))
-  require('../lib/db/dfspWiseDB').setDB(new PouchDB(require('./config').getSystemConfig().DB))
 
   // For admin API
   app.use('/api/rules', verifyUser(), require('./api-routes/rules'))
@@ -75,7 +71,6 @@ const getApp = () => {
 }
 
 const verifyUser = () => {
-  const Config = require('./config')
   if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
     return (req, res, next) => {
       req.session = {}

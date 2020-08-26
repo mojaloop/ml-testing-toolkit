@@ -24,7 +24,7 @@
 
 const Cookies = require('cookies')
 const passport = require('passport')
-let Config = {}
+const Config = require('../config')
 const fs = require('fs')
 const path = require('path')
 // const customLogger = require('../requestLogger')
@@ -141,9 +141,6 @@ function getOAuth2Middleware () {
 }
 
 const handleMiddleware = () => {
-  if (Object.keys(Config).length === 0) {
-    Config = require('../config')
-  }
   const systemConfig = Config.getSystemConfig()
   if (systemConfig.OAUTH.AUTH_ENABLED) {
     console.log(`Enabling OAUTH. systemConfig.OAUTH.AUTH_ENABLED = ${systemConfig.OAUTH.AUTH_ENABLED}`)

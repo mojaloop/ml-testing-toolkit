@@ -44,7 +44,10 @@ describe('LoginService tests', () => {
     it('should return status true if oauth enabled and groups provided', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
         OAUTH: {
-          AUTH_ENABLED: true,
+          AUTH_ENABLED: true
+        }
+      }).mockReturnValueOnce({
+        OAUTH: {
           JWT_COOKIE_NAME: 'JWT_COOKIE_NAME'
         }
       })
@@ -64,7 +67,10 @@ describe('LoginService tests', () => {
     it('should return status true if oauth enabled and dfspId provided', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
         OAUTH: {
-          AUTH_ENABLED: true,
+          AUTH_ENABLED: true
+        }
+      }).mockReturnValueOnce({
+        OAUTH: {
           JWT_COOKIE_NAME: 'JWT_COOKIE_NAME'
         }
       })
@@ -91,7 +97,10 @@ describe('LoginService tests', () => {
     it('should rethrow the error if token was not found and message not include Authentication failed', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
         OAUTH: {
-          AUTH_ENABLED: true,
+          AUTH_ENABLED: true
+        }
+      }).mockReturnValueOnce({
+        OAUTH: {
           JWT_COOKIE_NAME: 'JWT_COOKIE_NAME'
         }
       })

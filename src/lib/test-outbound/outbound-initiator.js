@@ -47,17 +47,24 @@ const utilsInternal = require('../utilsInternal')
 
 var terminateTraceIds = {}
 
+const getTracing = (traceID) => {
+  const tracing = {
+    outboundID: traceID,
+    sessionID: null
+  }
+  if (traceID && traceHeaderUtils.isCustomTraceID(traceID)) {
+    tracing.outboundID = traceHeaderUtils.getEndToEndID(traceID)
+    tracing.sessionID = traceHeaderUtils.getSessionID(traceID)
+  }
+  return tracing
+}
+
 const OutboundSend = async (inputTemplate, traceID, dfspId) => {
   const startedTimeStamp = new Date()
-  let outboundID = traceID
-  let sessionID = null
-  if (traceID && traceHeaderUtils.isCustomTraceID(traceID)) {
-    outboundID = traceHeaderUtils.getEndToEndID(traceID)
-    sessionID = traceHeaderUtils.getSessionID(traceID)
-  }
+  const tracing = getTracing(traceID)
 
   const environmentVariables = {
-    items: Object.entries(inputTemplate.inputValues).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
+    items: Object.entries(inputTemplate.inputValues || {}).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
   }
   try {
     for (const i in inputTemplate.test_cases) {
@@ -67,7 +74,7 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
     const completedTimeStamp = new Date()
     const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
     // Send the total result to client
-    if (outboundID) {
+    if (tracing.outboundID) {
       const runtimeInformation = {
         completedTimeISO: completedTimeStamp.toISOString(),
         startedTime: startedTimeStamp.toUTCString(),
@@ -78,15 +85,15 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
       const totalResult = generateFinalReport(inputTemplate, runtimeInformation)
       notificationEmitter.broadcastOutboundProgress({
         status: 'FINISHED',
-        outboundID: outboundID,
+        outboundID: tracing.outboundID,
         totalResult
-      }, sessionID)
+      }, tracing.sessionID)
     }
   } catch (err) {
     notificationEmitter.broadcastOutboundProgress({
       status: 'TERMINATED',
-      outboundID: outboundID
-    }, sessionID)
+      outboundID: tracing.outboundID
+    }, tracing.sessionID)
   }
 }
 
@@ -95,15 +102,9 @@ const terminateOutbound = (traceID) => {
 }
 
 const processTestCase = async (testCase, traceID, inputValues, environmentVariables, dfspId) => {
-  let outboundID = traceID
-  let sessionID = null
-  if (traceID && traceHeaderUtils.isCustomTraceID(traceID)) {
-    outboundID = traceHeaderUtils.getEndToEndID(traceID)
-    sessionID = traceHeaderUtils.getSessionID(traceID)
-  }
+  const tracing = getTracing(traceID)
 
   // Load the requests array into an object by the request id to access a particular object faster
-  // console.log(testCase.requests)
   const requestsObj = {}
   // Store the request ids into a new array
   const templateIDArr = []
@@ -115,8 +116,6 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
   templateIDArr.sort((a, b) => {
     return a > b
   })
-  // console.log(requestsObj)
-  // console.log(templateIDArr)
 
   const apiDefinitions = await openApiDefinitionsModel.getApiDefinitions()
   // Iterate the request ID array
@@ -136,49 +135,43 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
     })
 
     let convertedRequest = JSON.parse(JSON.stringify(request))
-    // console.log(request)
+
     // Form the actual http request headers, body, path and method by replacing configurable parameters
     // Replace the parameters
     convertedRequest = replaceVariables(request, inputValues, request, requestsObj)
     convertedRequest = replaceRequestVariables(convertedRequest)
 
-    // console.log(convertedRequest)
     // Form the path from params and operationPath
     convertedRequest.path = replacePathVariables(request.operationPath, convertedRequest.params)
 
     // Insert traceparent header if sessionID passed
-    if (sessionID) {
-      if (!convertedRequest.headers) {
-        convertedRequest.headers = {}
-      }
+    if (tracing.sessionID) {
+      convertedRequest.headers = convertedRequest.headers || {}
       convertedRequest.headers.traceparent = '00-' + traceID + '-0123456789abcdef0-00'
     }
 
     const scriptsExecution = {}
-    let environment
-    let contextObj
+    const environment = {
+      data: {}
+    }
+    const contextObj = await context.generageContextObj(environmentVariables.items)
     // Send http request
     try {
-      contextObj = await context.generageContextObj(environmentVariables.items)
-
       await executePreRequestScript(request, convertedRequest, scriptsExecution, contextObj, environmentVariables)
 
-      environment = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
-      convertedRequest = replaceEnvironmentVariables(convertedRequest, environment)
+      environment.data = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
 
-      // Form callbacks
-      // TODO: Get version from accept / content-type headers
+      convertedRequest = replaceEnvironmentVariables(convertedRequest, environment.data)
+
       let successCallbackUrl = null
       let errorCallbackUrl = null
       if (request.apiVersion.asynchronous === true) {
         const cbMapRawdata = await readFileAsync(reqApiDefinition.callbackMapFile)
         const reqCallbackMap = JSON.parse(cbMapRawdata)
-        if (reqCallbackMap[request.operationPath] && reqCallbackMap[request.operationPath][request.method]) {
-          const successCallback = reqCallbackMap[request.operationPath][request.method].successCallback
-          const errorCallback = reqCallbackMap[request.operationPath][request.method].errorCallback
-          successCallbackUrl = successCallback.method + ' ' + replaceVariables(successCallback.pathPattern, null, convertedRequest)
-          errorCallbackUrl = errorCallback.method + ' ' + replaceVariables(errorCallback.pathPattern, null, convertedRequest)
-        }
+        const successCallback = reqCallbackMap[request.operationPath][request.method].successCallback
+        const errorCallback = reqCallbackMap[request.operationPath][request.method].errorCallback
+        successCallbackUrl = successCallback.method + ' ' + replaceVariables(successCallback.pathPattern, null, convertedRequest)
+        errorCallbackUrl = errorCallback.method + ' ' + replaceVariables(errorCallback.pathPattern, null, convertedRequest)
       }
 
       if (request.delay) {
@@ -186,75 +179,15 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
       }
       const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId)
 
-      await executePostRequestScript(request, resp, scriptsExecution, contextObj, environmentVariables)
-
-      environment = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
-
-      const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environment)
-      request.appended = {
-        status: 'SUCCESS',
-        testResult,
-        response: resp.syncResponse,
-        callback: resp.callback,
-        request: convertedRequest,
-        additionalInfo: {
-          curlRequest: resp.curlRequest
-        }
-      }
-      if (outboundID) {
-        notificationEmitter.broadcastOutboundProgress({
-          outboundID: outboundID,
-          testCaseId: testCase.id,
-          status: 'SUCCESS',
-          requestId: request.id,
-          response: resp.syncResponse,
-          callback: resp.callback,
-          requestSent: convertedRequest,
-          additionalInfo: {
-            curlRequest: resp.curlRequest,
-            scriptsExecution: scriptsExecution
-          },
-          testResult
-        }, sessionID)
-      }
+      await setResponse(convertedRequest, resp, environment, environmentVariables, request, 'SUCCESS', tracing, testCase, scriptsExecution, contextObj)
     } catch (err) {
       let resp
       try {
         resp = JSON.parse(err.message)
-      } catch (err) {
+      } catch (parsingErr) {
         resp = err.message
       }
-
-      await executePostRequestScript(request, resp, scriptsExecution, contextObj, environmentVariables)
-      environment = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
-
-      const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environment)
-      request.appended = {
-        status: 'ERROR',
-        testResult,
-        response: resp.syncResponse,
-        callback: resp.callback,
-        request: convertedRequest,
-        additionalInfo: {
-          curlRequest: resp.curlRequest
-        }
-      }
-      if (outboundID) {
-        notificationEmitter.broadcastOutboundProgress({
-          outboundID: outboundID,
-          testCaseId: testCase.id,
-          status: 'ERROR',
-          requestId: request.id,
-          response: resp.syncResponse,
-          callback: resp.callback,
-          requestSent: convertedRequest,
-          additionalInfo: {
-            curlRequest: resp.curlRequest,
-            scriptsExecution: scriptsExecution
-          },
-          testResult
-        }, sessionID)
-      }
+      await setResponse(convertedRequest, resp, environment, environmentVariables, request, 'ERROR', tracing, testCase, scriptsExecution, contextObj)
     } finally {
       contextObj.ctx.dispose()
       contextObj.ctx = null
@@ -264,6 +197,38 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
   // Return status report of this test case
   return testCase
   // Set a timeout if the response callback is not received in a particular time
+}
+
+const setResponse = async (convertedRequest, resp, environment, environmentVariables, request, status, tracing, testCase, scriptsExecution, contextObj) => {
+  await executePostRequestScript(request, resp, scriptsExecution, contextObj, environmentVariables)
+  environment.data = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
+  const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environment.data)
+  request.appended = {
+    status: status,
+    testResult,
+    response: resp.syncResponse,
+    callback: resp.callback,
+    request: convertedRequest,
+    additionalInfo: {
+      curlRequest: resp.curlRequest
+    }
+  }
+  if (tracing.outboundID) {
+    notificationEmitter.broadcastOutboundProgress({
+      outboundID: tracing.outboundID,
+      testCaseId: testCase.id,
+      status: status,
+      requestId: request.id,
+      response: resp.syncResponse,
+      callback: resp.callback,
+      requestSent: convertedRequest,
+      additionalInfo: {
+        curlRequest: resp.curlRequest,
+        scriptsExecution: scriptsExecution
+      },
+      testResult
+    }, tracing.sessionID)
+  }
 }
 
 const executePreRequestScript = async (request, convertedRequest, scriptsExecution, contextObj, environmentVariables) => {
@@ -276,9 +241,7 @@ const executePreRequestScript = async (request, convertedRequest, scriptsExecuti
 const executePostRequestScript = async (request, resp, scriptsExecution, contextObj, environmentVariables) => {
   if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
     let response
-    if (_.isString(resp)) {
-      response = resp
-    } else if (resp.syncResponse) {
+    if (resp.syncResponse) {
       response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
     }
     scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, response }, id: uuid.v4() }, contextObj)
@@ -293,7 +256,6 @@ const handleTests = async (request, response = null, callback = null, environmen
     if (request.tests && request.tests.assertions.length > 0) {
       for (const k in request.tests.assertions) {
         const testCase = request.tests.assertions[k]
-        // console.log(testCase.description, response)
         try {
           eval(testCase.exec.join('\n')) // eslint-disable-line
           results[testCase.id] = {
@@ -329,7 +291,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
   return new Promise((resolve, reject) => {
     (async () => {
       const httpsProps = {}
-      const userConfig = await Config.getUserConfig()
+      const userConfig = await Config.getUserConfig(dfspId ? { dfspId } : undefined)
       let urlGenerated = userConfig.CALLBACK_ENDPOINT + path
       if (Config.getSystemConfig().HOSTING_ENABLED) {
         const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
@@ -349,13 +311,12 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           customLogger.logMessage('error', errorMsg, null, true, null)
           reject(new Error(JSON.stringify({ errorCode: 4000, errorDescription: errorMsg })))
         }
-        const httpsAgent = new https.Agent({
+        httpsProps.httpsAgent = new https.Agent({
           cert: tlsConfig.dfsps[dfspId].hubClientCert,
           key: tlsConfig.hubClientKey,
           ca: [tlsConfig.dfsps[dfspId].dfspServerCaRootCert],
           rejectUnauthorized: true
         })
-        httpsProps.httpsAgent = httpsAgent
         urlGenerated = urlGenerated.replace('http:', 'https:')
       }
 
@@ -387,7 +348,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         const curlRequest = result.request ? result.request.toCurl() : ''
 
         if (result.status > 299) {
-          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
+          reject(new Error(JSON.stringify({ curlRequest, syncResponse })))
         }
 
         customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
@@ -395,22 +356,22 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           const timer = setTimeout(() => {
             MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
             MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
-            reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
+            reject(new Error(JSON.stringify({ curlRequest, syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
           }, userConfig.CALLBACK_TIMEOUT)
           // Listen for success callback
           MyEventEmitter.getEmitter('testOutbound').once(successCallbackUrl, (callbackHeaders, callbackBody) => {
             clearTimeout(timer)
             MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
-            resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
+            resolve({ curlRequest, syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
           })
           // Listen for error callback
           MyEventEmitter.getEmitter('testOutbound').once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
             clearTimeout(timer)
             MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
-            reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
+            reject(new Error(JSON.stringify({ curlRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
           })
         } else {
-          resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
+          resolve({ curlRequest, syncResponse })
         }
       }, (err) => {
         customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, err, false)
@@ -420,14 +381,17 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
   })
 }
 
-const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
-  var resultObject
-  // Check whether inputObject is string or object. If it is object, then convert that to JSON string and parse it while return
+const setResultObject = (inputObject) => {
   if (typeof inputObject === 'string') {
-    resultObject = inputObject
+    return inputObject
   } else if (typeof inputObject === 'object') {
-    resultObject = JSON.stringify(inputObject)
-  } else {
+    return JSON.stringify(inputObject)
+  }
+}
+
+const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
+  let resultObject = setResultObject(inputObject)
+  if (!resultObject) {
     return inputObject
   }
   // Check the string for any inclusions like {$some_param}
@@ -437,14 +401,15 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
       // Check for the function type of param, if its function we need to call a function in custom-functions and replace the returned value
       const splitArr = element.split('.')
       switch (splitArr[0]) {
-        case '{$function':
+        case '{$function': {
           resultObject = resultObject.replace(element, getFunctionResult(element, inputValues, request))
           break
-        case '{$prev':
-          var temp1 = element.replace(/{\$prev.(.*)}/, '$1')
-          var temp1Arr = temp1.split('.')
+        }
+        case '{$prev': {
+          const temp = element.replace(/{\$prev.(.*)}/, '$1')
+          const tempArr = temp.split('.')
           try {
-            var replacedValue = _.get(requestsObj[temp1Arr[0]].appended, temp1.replace(temp1Arr[0] + '.', ''))
+            var replacedValue = _.get(requestsObj[tempArr[0]].appended, temp.replace(tempArr[0] + '.', ''))
             if (replacedValue) {
               resultObject = resultObject.replace(element, replacedValue)
             }
@@ -452,47 +417,41 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
             console.log(`${element} not found`)
           }
           break
-        case '{$request':
-          var temp2 = element.replace(/{\$request.(.*)}/, '$1')
-          var replacedValue2 = _.get(request, temp2)
-          if (replacedValue2 && !replacedValue2.startsWith('{$')) {
-            resultObject = resultObject.replace(element, replacedValue2)
+        }
+        case '{$request': {
+          const temp = element.replace(/{\$request.(.*)}/, '$1')
+          const replacedValue = _.get(request, temp)
+          if (replacedValue && !replacedValue.startsWith('{$')) {
+            resultObject = resultObject.replace(element, replacedValue)
           }
           break
-        case '{$inputs':
-          var temp = element.replace(/{\$inputs.(.*)}/, '$1')
+        }
+        case '{$inputs': {
+          const temp = element.replace(/{\$inputs.(.*)}/, '$1')
           if (inputValues[temp]) {
             resultObject = resultObject.replace(element, inputValues[temp])
           }
           break
+        }
         default:
           break
       }
     })
   }
 
-  if (typeof inputObject === 'object') {
-    return JSON.parse(resultObject)
-  } else {
-    return resultObject
-  }
+  return (typeof inputObject === 'object') ? JSON.parse(resultObject) : resultObject
 }
 
 const replaceRequestVariables = (inputRequest) => {
-  var resultObject
-  // Check whether inputRequest is string or object. If it is object, then convert that to JSON string and parse it while return
-  if (typeof inputRequest === 'string') {
-    resultObject = inputRequest
-  } else if (typeof inputRequest === 'object') {
-    resultObject = JSON.stringify(inputRequest)
-  } else {
+  let resultObject = setResultObject(inputRequest)
+  if (!resultObject) {
     return inputRequest
   }
 
   // Check once again for the replaced request variables
-  const matchedArray2 = resultObject.match(/{\$([^}]+)}/g)
-  if (matchedArray2) {
-    matchedArray2.forEach(element => {
+  const matchedArray = resultObject.match(/{\$([^}]+)}/g)
+  if (matchedArray) {
+    matchedArray.forEach(element => {
       // Check for the function type of param, if its function we need to call a function in custom-functions and replace the returned value
       const splitArr = element.split('.')
       switch (splitArr[0]) {
@@ -509,28 +468,19 @@ const replaceRequestVariables = (inputRequest) => {
     })
   }
 
-  if (typeof inputRequest === 'object') {
-    return JSON.parse(resultObject)
-  } else {
-    return resultObject
-  }
+  return (typeof inputRequest === 'object') ? JSON.parse(resultObject) : resultObject
 }
 
 const replaceEnvironmentVariables = (inputRequest, environment) => {
-  var resultObject
-  // Check whether inputRequest is string or object. If it is object, then convert that to JSON string and parse it while return
-  if (typeof inputRequest === 'string') {
-    resultObject = inputRequest
-  } else if (typeof inputRequest === 'object') {
-    resultObject = JSON.stringify(inputRequest)
-  } else {
+  let resultObject = setResultObject(inputRequest)
+  if (!resultObject) {
     return inputRequest
   }
 
   // Check once again for the replaced request variables
-  const matchedArray2 = resultObject.match(/{\$([^}]+)}/g)
-  if (matchedArray2) {
-    matchedArray2.forEach(element => {
+  const matchedArray = resultObject.match(/{\$([^}]+)}/g)
+  if (matchedArray) {
+    matchedArray.forEach(element => {
       // Check for the function type of param, if its function we need to call a function in custom-functions and replace the returned value
       const splitArr = element.split('.')
       switch (splitArr[0]) {
@@ -547,11 +497,7 @@ const replaceEnvironmentVariables = (inputRequest, environment) => {
     })
   }
 
-  if (typeof inputRequest === 'object') {
-    return JSON.parse(resultObject)
-  } else {
-    return resultObject
-  }
+  return (typeof inputRequest === 'object') ? JSON.parse(resultObject) : resultObject
 }
 
 const replacePathVariables = (operationPath, params) => {

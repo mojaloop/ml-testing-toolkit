@@ -71,23 +71,4 @@ router.post('/testcase/:format', async (req, res, next) => {
   }
 })
 
-// Prepare report
-router.post('/testcase/json/prepare', async (req, res, next) => {
-  try {
-    const dfspId = req.user ? req.user.dfspId : 'data'
-    const jsonReport = req.body
-    const dfspWiseDB = require('../db/dfspWiseDB')
-    const userReports = await dfspWiseDB.getDB().get('userReports')
-    if (!userReports[dfspId]) {
-      userReports[dfspId] = []
-    }
-    userReports[dfspId].push(jsonReport)
-    await dfspWiseDB.update('userReports', userReports[dfspId], dfspId)
-    res.status(200).send()
-  } catch (err) {
-    console.log(err)
-    next(err)
-  }
-})
-
 module.exports = router

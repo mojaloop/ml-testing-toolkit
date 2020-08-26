@@ -52,7 +52,6 @@ router.post('/token', async (req, res, next) => {
   try {
     const plainIdToken = {
       username: req.body.username,
-      dfspId: req.body.username,
       userguid: 'userguid'
     }
     let groupsData = [

@@ -220,7 +220,6 @@ describe('OpenApiMockHandler', () => {
       req.path = '/quotes'
       req.method = 'post'
 
-      SpyReadFileAsync.mockRejectedValueOnce()
       SpyResponseRules.mockResolvedValueOnce({
         status: '200',
         body: {}
@@ -332,7 +331,10 @@ describe('OpenApiMockHandler', () => {
           path: '/transfers'
         }
       }
-      const sampleRequest = {}
+      const sampleRequest = {
+        customInfo: {}
+      }
+      SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({}))
       SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({}))
       SpyRequestLogger.mockReturnValue()
       const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
@@ -347,7 +349,9 @@ describe('OpenApiMockHandler', () => {
           method: 'post'
         }
       }
-      const sampleRequest = {}
+      const sampleRequest = {
+        customInfo: {}
+      }
       SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
         '/transfers': {
           put: {}
@@ -359,7 +363,9 @@ describe('OpenApiMockHandler', () => {
     it('Check for the returned value - existing path', async () => {
       const item = {}
       const sampleContext = {}
-      const sampleRequest = {}
+      const sampleRequest = {
+        customInfo: {}
+      }
       SpyReadFileAsync.mockImplementationOnce(() => {throw new Error()})
       SpyRequestLogger.mockReturnValue()
       const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
@@ -735,6 +741,58 @@ describe('OpenApiMockHandler', () => {
       SpyOpenApiRulesEngine.mockResolvedValueOnce({})
       SpyForwardRules.mockResolvedValueOnce()
       const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+    })
+    it('Check for the returned value - existing path with previous quotes validation failed', async () => {
+      const item = {}
+      const sampleContext = {
+        operation: {
+          path: '/transfers'
+        },
+        request: {
+          method: 'post'
+        }
+      }
+      const sampleRequest = {
+        customInfo: {},
+        method: 'post'
+      }
+      SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
+        '/transfers': {
+          'post': {}
+        }
+      }))
+      SpyRequestLogger.mockReturnValue()
+      SpyResponseRules.mockResolvedValueOnce({
+        status: 400,
+        body: {}
+      })
+      const result = await OpenApiMockHandler.openApiBackendNotImplementedHandler(sampleContext, sampleRequest, h, item)
+    })
+    it('Check for the returned value - existing path with previous quotes validation failed', async () => {
+      const item = {}
+      const sampleContext = {
+        operation: {
+          path: '/transfers'
+        },
+        request: {
+          method: 'post'
+        }
+      }
+      const sampleRequest = {
+        customInfo: {},
+        method: 'post'
+      }
+      SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
+        '/transfers': {
+          'post': {}
+        }
+      }))
+      SpyRequestLogger.mockReturnValue()
+      SpyResponseRules.mockResolvedValueOnce({
+        status: 400,
+        body: {}
+      })
+      const result = await OpenApiMockHandler.openApiBackendNotImplementedHandler(sampleContext, sampleRequest, h, item)
     })
   })
 })

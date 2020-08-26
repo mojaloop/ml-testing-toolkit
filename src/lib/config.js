@@ -24,67 +24,65 @@
  ******/
 
 const utils = require('./utils')
-const dfspWiseDB = require('./db/dfspWiseDB')
+const storageAdapter = require('./storageAdapter')
 
 const SYSTEM_CONFIG_FILE = 'spec_files/system_config.json'
+const USER_CONFIG_FILE = 'spec_files/user_config.json'
 
 var SYSTEM_CONFIG = {}
-var USER_CONFIG = {}
+var USER_CONFIG = {
+  data: undefined
+}
 
 const getSystemConfig = () => {
   return SYSTEM_CONFIG
 }
 
-const getUserConfig = async (dfspId) => {
-  if (!USER_CONFIG[dfspId]) {
-    await loadUserConfig(dfspId)
+const getUserConfig = async (user) => {
+  const item = user ? user.dfspId : 'data'
+  if (!USER_CONFIG[item]) {
+    await loadUserConfig(user)
   }
-  return USER_CONFIG[dfspId]
+  return USER_CONFIG[item]
 }
 
-const getStoredUserConfig = async (dfspId) => {
+const getStoredUserConfig = async (user) => {
   try {
-    const storedConfig = await loadUserConfigDFSPWise(dfspId)
+    const storedConfig = await loadUserConfigDFSPWise(user)
     return storedConfig
   } catch (err) {
     return {}
   }
 }
 
-const setStoredUserConfig = async (dfspId, newConfig) => {
+const setStoredUserConfig = async (newConfig, user) => {
   try {
-    await dfspWiseDB.update('userConfig', newConfig, dfspId)
+    await storageAdapter.upsert(USER_CONFIG_FILE, newConfig, user)
     return true
   } catch (err) {
     return false
   }
 }
 
-const loadUserConfig = async (dfspId) => {
+const loadUserConfig = async (user) => {
   try {
-    USER_CONFIG[dfspId] = await loadUserConfigDFSPWise(dfspId)
-    return true
+    USER_CONFIG[user ? user.dfspId : 'data'] = await loadUserConfigDFSPWise(user)
   } catch (err) {
-    return false
+    console.log('Error: Can not read the file ' + USER_CONFIG_FILE)
   }
+  return true
 }
 
-const loadUserConfigDFSPWise = async (dfspId) => {
-  if (!dfspId) {
-    dfspId = 'data'
-  }
-  const userConfig = (await dfspWiseDB.getDB().get('userConfig'))
-  if (!userConfig[dfspId]) {
-    userConfig[dfspId] = (await dfspWiseDB.update('userConfig', userConfig.data, dfspId))
-  }
-  return userConfig[dfspId]
+const loadUserConfigDFSPWise = async (user) => {
+  const userConfig = await storageAdapter.read(USER_CONFIG_FILE, user)
+  return userConfig.data
 }
 
 // Function to load system configuration
 const loadSystemConfig = async () => {
   try {
     const contents = await utils.readFileAsync(SYSTEM_CONFIG_FILE)
-    SYSTEM_CONFIG = { ...JSON.parse(contents) }
+    SYSTEM_CONFIG = JSON.parse(contents)
   } catch (err) {
     console.log('Error: Can not read the file ' + SYSTEM_CONFIG_FILE)
   }
@@ -92,7 +90,9 @@ const loadSystemConfig = async () => {
 }
 
 const loadSystemConfigMiddleware = () => {
-  SYSTEM_CONFIG = require('../../' + SYSTEM_CONFIG_FILE)
+  if (Object.keys(SYSTEM_CONFIG).length === 0) {
+    SYSTEM_CONFIG = require('../../' + SYSTEM_CONFIG_FILE)
+  }
 }
 
 module.exports = {
