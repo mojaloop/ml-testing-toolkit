@@ -27,7 +27,6 @@ const Config = require('../config')
 const Cookies = require('cookies')
 const jwt = require('jsonwebtoken')
 const wso2Client = require('./Wso2Client')
-// const customLogger = require('../requestLogger')
 
 /**
  * Logs the user in.
@@ -94,7 +93,6 @@ const buildJWTResponse = (decodedIdToken, accessToken, expiresIn, req, res) => {
 
   const cookies = new Cookies(req, res)
   const cookieOptions = { maxAge: expiresIn * 1000, httpOnly: true, sameSite: 'strict' } // secure is automatic based on HTTP or HTTPS used
-
   cookies.set(Config.getSystemConfig().OAUTH.JWT_COOKIE_NAME, accessToken, cookieOptions)
   return {
     ok: true,

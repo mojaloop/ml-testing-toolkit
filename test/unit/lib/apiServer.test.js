@@ -25,9 +25,7 @@
 
 const Config = require('../../../src/lib/config')
 const loaded = Config.loadSystemConfigMiddleware()
-
 const apiServer = require('../../../src/lib/api-server')
-
 
 const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 

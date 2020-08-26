@@ -28,8 +28,9 @@
 var bunyan = require('bunyan')
 var Logger = bunyan.createLogger({ name: 'ml-testing-toolkit', level: 'debug' })
 const notificationEmitter = require('./notificationEmitter.js')
+const Config = require('../lib/config.js')
 const getSessionID = function (request) {
-  if (require('../lib/config.js').getSystemConfig().HOSTING_ENABLED) {
+  if (Config.getSystemConfig().HOSTING_ENABLED) {
     return request && request.headers && request.headers['fspiop-source'] ? request.headers['fspiop-source'] : null
   } else {
     return request && request.customInfo ? request.customInfo.sessionID : null
