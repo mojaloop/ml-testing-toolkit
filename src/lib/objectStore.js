@@ -22,10 +22,9 @@
  --------------
  ******/
 
-const storedObject = {
+var storedObject = {
   transactions: {},
-  inboundEnvironment: {},
-  emitters: {}
+  inboundEnvironment: {}
 }
 
 const set = (key, value) => {
