@@ -1,0 +1,117 @@
+{
+  "name": "hub-transaction-requests-tests",
+  "test_cases": [
+    {
+      "id": 4,
+      "name": "authorizations",
+      "requests": [
+        {
+          "id": 1,
+          "description": "authorizations",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/authorizations/{ID}",
+          "path": "/authorizations/{$environment.tran}",
+          "method": "get",
+          "params": {
+            "ID": "{$environment.tran}"
+          },
+          "url": "{$inputs.HOST_TRANSACTION_REQUESTS_SERVICE}",
+          "ignoreCallbacks": true,
+          "headers": {
+            "Content-Type": "application/vnd.interoperability.authorizations+json;version=1.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "payerfsp",
+            "Accept": "application/vnd.interoperability.authorizations+json;version=1",
+            "FSPIOP-Destination": "payeefsp"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "getAuthroziation Status code is 202",
+                "exec": [
+                  "expect(environment.getAuthorization.code).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "putAuthroziation Status code is 200",
+                "exec": [
+                  "expect(environment.putAuthorization.code).to.equal(200)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "",
+                "pm.environment.set('transactionRequestDate', (new Date()).toUTCString());",
+                "pm.environment.set('transactionRequestId', uuid.v4());",
+                "",
+                "{",
+                "  pm.sendRequest({",
+                "    url: pm.environment.get(\"HOST_TRANSACTION_REQUESTS_SERVICE\")+\"/authorizations/\"+pm.environment.get(\"transactionRequestId\") + \"?authenticationType=OTP&retriesLeft=2&amount=102&currency=USD\",",
+                "    method: 'GET',",
+                "    header: {",
+                "      'Accept' : 'application/vnd.interoperability.authorizations+json;version=1',",
+                "      'Content-Type': 'application/vnd.interoperability.authorizations+json;version=1.0',",
+                "      'Date': pm.environment.get(\"transactionRequestDate\"),",
+                "      'fspiop-source': 'payerfsp',",
+                "      'fspiop-destination': 'payeefsp',",
+                "      'fspiop-uri': '/transactionRequests/' + pm.environment.get(\"transactionRequestId\") + \"?authenticationType=OTP&retriesLeft=2&amount=102&currency=USD\",",
+                "      'fspiop-http-method': 'GET',",
+                "    }",
+                "  }, function (err, response) {",
+                "    console.log(\"getAuthorization: \", response)",
+                "    pm.environment.set(\"getAuthorization\", response)",
+                "  });",
+                "}",
+                "",
+                "{",
+                "  pm.sendRequest({",
+                "    url: pm.environment.get(\"HOST_TRANSACTION_REQUESTS_SERVICE\")+\"/authorizations/\"+pm.environment.get(\"transactionRequestId\"),",
+                "    method: 'PUT',",
+                "    header: {",
+                "      'Accept' : 'application/vnd.interoperability.authorizations+json;version=1',",
+                "      'Content-Type': 'application/vnd.interoperability.authorizations+json;version=1.0',",
+                "      'Date': pm.environment.get(\"transactionRequestDate\"),",
+                "      'fspiop-source': 'payeefsp',",
+                "      'fspiop-destination': 'payerfsp',",
+                "      'fspiop-uri': '/transactionRequests/' + pm.environment.get(\"transactionRequestId\"),",
+                "      'fspiop-http-method': 'PUT',",
+                "    },",
+                "    body: {",
+                "      mode: 'raw',",
+                "      raw: JSON.stringify({",
+                "        \"authenticationInfo\": {",
+                "          \"authentication\": \"OTP\",",
+                "          \"authenticationValue\": \"234567\"",
+                "        },",
+                "        \"responseType\": \"REJECTED\"",
+                "      })",
+                "    }",
+                "  }, function (err, response) {",
+                "    console.log(\"putAuthorization: \", response)",
+                "    pm.environment.set(\"putAuthorization\", response)",
+                "  });",
+                "}"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
