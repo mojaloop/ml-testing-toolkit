@@ -726,41 +726,41 @@ paths:
           $ref: "#/components/responses/501"
         503:
           $ref: "#/components/responses/503"
-    # put:
-    #   description: The callback `PUT /parties/{Type}/{ID}` (or `PUT /parties/{Type}/{ID}/{SubId}`) is used to inform the client of a successful result of the Party information lookup.
-    #   summary: Return party information
-    #   tags:
-    #     - parties
-    #   operationId: PartiesSubIdByTypeAndIDPut
-    #   parameters:
-    #     #Headers
-    #     - $ref: "#/components/parameters/Content-Length"
-    #   requestBody:
-    #     description: Party information returned.
-    #     required: true
-    #     content:
-    #       application/json:
-    #         schema:
-    #           $ref: "#/components/schemas/PartiesTypeIDPutResponse"
-    #   responses:
-    #     200:
-    #       $ref: "#/components/responses/200"
-    #     400:
-    #       $ref: "#/components/responses/400"
-    #     401:
-    #       $ref: "#/components/responses/401"
-    #     403:
-    #       $ref: "#/components/responses/403"
-    #     404:
-    #       $ref: "#/components/responses/404"
-    #     405:
-    #       $ref: "#/components/responses/405"
-    #     406:
-    #       $ref: "#/components/responses/406"
-    #     501:
-    #       $ref: "#/components/responses/501"
-    #     503:
-    #       $ref: "#/components/responses/503"
+    put:
+      description: The callback `PUT /parties/{Type}/{ID}` (or `PUT /parties/{Type}/{ID}/{SubId}`) is used to inform the client of a successful result of the Party information lookup.
+      summary: Return party information
+      tags:
+        - parties
+      operationId: PartiesSubIdByTypeAndIDPut
+      parameters:
+        #Headers
+        - $ref: "#/components/parameters/Content-Length"
+      requestBody:
+        description: Party information returned.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PartiesTypeIDPutResponse"
+      responses:
+        200:
+          $ref: "#/components/responses/200"
+        400:
+          $ref: "#/components/responses/400"
+        401:
+          $ref: "#/components/responses/401"
+        403:
+          $ref: "#/components/responses/403"
+        404:
+          $ref: "#/components/responses/404"
+        405:
+          $ref: "#/components/responses/405"
+        406:
+          $ref: "#/components/responses/406"
+        501:
+          $ref: "#/components/responses/501"
+        503:
+          $ref: "#/components/responses/503"
   /parties/{Type}/{ID}/{SubId}/error:
     put:
       description: If the server is unable to find Party information of the provided identity, or another processing error occurred, the error callback `PUT /parties/{Type}/{ID}/error` (or `PUT /parties/{Type}/{ID}/{SubId}/error`) is used.
