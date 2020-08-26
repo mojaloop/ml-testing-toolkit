@@ -61,15 +61,15 @@ function createJwtStrategy (extraExtractors) {
   jwtStrategyOpts.jsonWebTokenOptions = {}
   let certContent
   if (systemConfig.OAUTH.EMBEDDED_CERTIFICATE) {
-    // customLogger.logMessage('info', 'Setting Token Issuer certificate from Constants.OAUTH.EMBEDDED_CERTIFICATE', null, false)
+    console.log('Setting Token Issuer certificate from Constants.OAUTH.EMBEDDED_CERTIFICATE')
     certContent = systemConfig.OAUTH.EMBEDDED_CERTIFICATE
   } else if (systemConfig.OAUTH.CERTIFICATE_FILE_NAME) {
-    // customLogger.logMessage('info', `Setting Token Issuer certificate from Constants.OAUTH.CERTIFICATE_FILE_NAME: ${systemConfig.OAUTH.CERTIFICATE_FILE_NAME}`, null, false)
+    console.log(`Setting Token Issuer certificate from Constants.OAUTH.CERTIFICATE_FILE_NAME: ${systemConfig.OAUTH.CERTIFICATE_FILE_NAME}`)
     if (systemConfig.OAUTH.CERTIFICATE_FILE_NAME.startsWith('/')) {
-      // customLogger.logMessage('info', 'Token Issuer Constants.OAUTH.CERTIFICATE_FILE_NAME absolute path', null, false)
+      console.log('Token Issuer Constants.OAUTH.CERTIFICATE_FILE_NAME absolute path')
       certContent = fs.readFileSync(systemConfig.OAUTH.CERTIFICATE_FILE_NAME, 'utf8')
     } else {
-      // customLogger.logMessage('info', 'Token Issuer Constants.OAUTH.CERTIFICATE_FILE_NAME relative path', null, false)
+      console.log('Token Issuer Constants.OAUTH.CERTIFICATE_FILE_NAME relative path')
       certContent = fs.readFileSync(path.join(__dirname, '..', systemConfig.OAUTH.CERTIFICATE_FILE_NAME), 'utf8')
     }
   } else {

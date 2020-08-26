@@ -24,8 +24,7 @@
  ******/
 
 var storedObject = {
-  transactions: {},
-  userConfig: {}
+  transactions: {}
 }
 
 const set = async (key, value) => {

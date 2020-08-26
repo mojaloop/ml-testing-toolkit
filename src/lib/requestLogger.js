@@ -30,9 +30,9 @@ var Logger = bunyan.createLogger({ name: 'ml-testing-toolkit', level: 'debug' })
 const notificationEmitter = require('./notificationEmitter.js')
 const getSessionID = function (request) {
   if (require('../lib/config.js').getSystemConfig().HOSTING_ENABLED) {
-    return (request && request.headers && request.headers['fspiop-source']) ? request.headers['fspiop-source'] : null
+    return request && request.headers && request.headers['fspiop-source'] ? request.headers['fspiop-source'] : null
   } else {
-    return (request && request.customInfo) ? request.customInfo.sessionID : null
+    return request && request.customInfo ? request.customInfo.sessionID : null
   }
 }
 
@@ -85,7 +85,7 @@ const logMessage = (verbosity, message, additionalData = null, notification = tr
   }
 
   if (notification) {
-    notificationEmitter.broadcastLog({ uniqueId: request ? request.customInfo.uniqueId : null, traceID: (request && request.customInfo) ? request.customInfo.traceID : null, resource: request ? { method: request.method, path: request.path } : null, messageType: 'generic', verbosity, message: message, additionalData }, request ? getSessionID(request) : null)
+    notificationEmitter.broadcastLog({ uniqueId: request ? request.customInfo.uniqueId : null, traceID: (request && request.customInfo) ? request.customInfo.traceID : null, resource: request ? { method: request.method, path: request.path } : null, messageType: 'generic', verbosity, message: message, additionalData }, getSessionID(request))
   }
 }
 

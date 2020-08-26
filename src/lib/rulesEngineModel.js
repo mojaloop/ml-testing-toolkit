@@ -28,36 +28,37 @@ const customLogger = require('./requestLogger')
 const Config = require('./config')
 const storageAdapter = require('./storageAdapter')
 
-const CONFIG_FILE = 'config.json'
-const DEFAULT_FILE = 'default.json'
+const DEFAULT_RULES_FILE_NAME = 'default.json'
+const CONFIG_FILE_NAME = 'config.json'
+
 const model = {
   data: {
     response: {
       rulesFilePathPrefix: 'spec_files/rules_response/',
       rules: null,
       rulesEngine: null,
-      activeRulesFile: DEFAULT_FILE,
+      activeRulesFile: DEFAULT_RULES_FILE_NAME,
       ruleType: 'response'
     },
     validation: {
       rulesFilePathPrefix: 'spec_files/rules_validation/',
       rules: null,
       rulesEngine: null,
-      activeRulesFile: DEFAULT_FILE,
+      activeRulesFile: DEFAULT_RULES_FILE_NAME,
       ruleType: 'validation'
     },
     callback: {
       rulesFilePathPrefix: 'spec_files/rules_callback/',
       rules: null,
       rulesEngine: null,
-      activeRulesFile: DEFAULT_FILE,
+      activeRulesFile: DEFAULT_RULES_FILE_NAME,
       ruleType: 'callback'
     },
     forward: {
       rulesFilePathPrefix: 'spec_files/rules_forward/',
       rules: null,
       rulesEngine: null,
-      activeRulesFile: DEFAULT_FILE,
+      activeRulesFile: DEFAULT_RULES_FILE_NAME,
       ruleType: 'forward'
     }
   }
@@ -273,7 +274,7 @@ const deleteForwardRulesFile = async (fileName, user) => {
 
 // common functions
 const reloadRules = async (model, user) => {
-  // const ruleConfig = await storageAdapter.read(objStore.rulesFilePathPrefix + CONFIG_FILE, user)
+  // const ruleConfig = await storageAdapter.read(objStore.rulesFilePathPrefix + CONFIG_FILE_NAME, user)
   // objStore.activeRulesFile = ruleConfig.data.activeRulesFile
   customLogger.logMessage('info', `Reloading ${model.ruleType} Rules from file ` + model.activeRulesFile, null, false)
   const userRules = await storageAdapter.read(model.rulesFilePathPrefix + model.activeRulesFile, user)
@@ -291,7 +292,7 @@ const setActiveRulesFile = async (model, fileName, user) => {
   const rulesConfig = {
     activeRulesFile: fileName
   }
-  await storageAdapter.upsert(model.rulesFilePathPrefix + CONFIG_FILE, rulesConfig, user)
+  await storageAdapter.upsert(model.rulesFilePathPrefix + CONFIG_FILE_NAME, rulesConfig, user)
   model.activeRulesFile = fileName
   await reloadRules(model, user)
 }
@@ -330,7 +331,7 @@ const getRulesFiles = async (model, user) => {
     const resp = {}
     // Do not return the config file
     resp.files = files.data.filter(item => {
-      return (item !== CONFIG_FILE)
+      return (item !== CONFIG_FILE_NAME)
     })
     resp.activeRulesFile = model.activeRulesFile
     return resp
@@ -343,7 +344,7 @@ const getRulesFiles = async (model, user) => {
 const deleteRulesFile = async (model, fileName, user) => {
   try {
     await storageAdapter.remove(model.rulesFilePathPrefix + fileName, user)
-    await setActiveRulesFile(model, DEFAULT_FILE, user)
+    await setActiveRulesFile(model, DEFAULT_RULES_FILE_NAME, user)
     return true
   } catch (err) {
     return err

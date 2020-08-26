@@ -63,7 +63,7 @@ exports.loginUser = async function (username, password, req, res) {
 
     return response
   } catch (error) {
-    // customLogger.logMessage('error', `Error on LoginService.loginUser: ${error}`, null, false)
+    console.log('Error on LoginService.loginUser: ', error)
     if (error && error.statusCode === 400 && error.message.includes('Authentication failed')) {
       throw new Error(`Authentication failed for user ${username}`, error.error)
     }
@@ -85,7 +85,7 @@ const buildJWTResponse = (decodedIdToken, accessToken, expiresIn, req, res) => {
         continue
       }
       dfspId = groupMatchResult[1]
-      // customLogger.logMessage('info', `LoginService.loginUser found dfspId: ${dfspId}`, null, false)
+      console.log('LoginService.loginUser found dfspId: ', dfspId)
       break // FIXME only returns the first ( there should be only one ). May report an error if there's more than one Application/DFSP group ?
     }
   }

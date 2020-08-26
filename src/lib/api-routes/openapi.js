@@ -90,6 +90,7 @@ router.get('/callback_map/:type/:version', async (req, res, next) => {
 
         res.status(200).json(reqCallbackMap)
       } catch (err) {
+        console.log(err)
         res.status(404).json({ error: 'Unknown Version' })
       }
     } else {
@@ -119,6 +120,7 @@ router.get('/response_map/:type/:version', async (req, res, next) => {
         const reqResponseMap = JSON.parse(rawdata)
         res.status(200).json(reqResponseMap)
       } catch (err) {
+        console.log(err)
         res.status(404).json({ error: 'Unknown Version' })
       }
     } else {

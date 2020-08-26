@@ -88,7 +88,6 @@ const initEnvironment = async () => {
         throw new Error('Some error creating environment')
       }
     } catch (err) {
-      console.log(err)
       throw new Error('Some error creating environment')
     }
   }
