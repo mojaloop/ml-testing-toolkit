@@ -126,8 +126,6 @@ const validateRules = async (context, req) => {
         customLogger.logMessage('error', 'No Specification file provided for validateRules function', null, true, req)
       }
     }
-  } else {
-    customLogger.logMessage('error', 'No validation rules are matched', null, true, req)
   }
   return generatedErrorCallback
 }
@@ -178,6 +176,7 @@ const evaluate = async (rulesEngine, context) => {
   }
   const res = await rulesEngine.evaluate(facts)
   if (res) {
+    console.log(res.length)
     const curEvent = res[0]
     if (!curEvent.params) {
       curEvent.params = {}

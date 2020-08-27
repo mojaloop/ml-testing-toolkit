@@ -317,7 +317,9 @@ const loadRules = (model, rules) => {
       }
     })
   })
-  model.rulesEngine = new RulesEngine()
+  if (!model.rulesEngine) {
+    model.rulesEngine = new RulesEngine()
+  }
   model.rulesEngine.loadRules(rules)
 }
 

@@ -28,7 +28,10 @@ const customLogger = require('./requestLogger')
 class RulesEngine {
   constructor (config) {
     this.config = config
-    // this.logger = config.logger || console
+    this.init()
+  }
+
+  init () {
     this.engine = new Engine()
     this._addCustomOperators()
   }
@@ -52,6 +55,7 @@ class RulesEngine {
    */
   loadRules (rules) {
     try {
+      this.init()
       const rulesLength = rules.length
       rules.forEach((r, index) => {
         r.priority = rulesLength - index
