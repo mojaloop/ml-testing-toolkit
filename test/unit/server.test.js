@@ -143,7 +143,9 @@ describe('Server', () => {
     }
     const req = {
       customInfo: {},
-      headers: {}
+      headers: {
+        'fspiop-source': 'data'
+      }
     }
     it('onPreHandler should not throw an error', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({

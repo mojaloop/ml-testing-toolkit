@@ -103,8 +103,11 @@ const createServer = async (port, user) => {
 const onPreHandler = async (request, h) => {
   request.customInfo = {}
   if (Config.getSystemConfig().HOSTING_ENABLED) {
+    request.customInfo.sourceUser = {
+      dfspId: request.headers['fspiop-source']
+    }
     request.customInfo.user = {
-      dfspId: (await Config.getUserConfig(request.headers['fspiop-source'])).FSPID
+      dfspId: (await Config.getUserConfig(request.customInfo.sourceUser)).FSPID
     }
   }
 
