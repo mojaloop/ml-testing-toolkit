@@ -176,7 +176,6 @@ const evaluate = async (rulesEngine, context) => {
   }
   const res = await rulesEngine.evaluate(facts)
   if (res) {
-    console.log(res.length)
     const curEvent = res[0]
     if (!curEvent.params) {
       curEvent.params = {}
