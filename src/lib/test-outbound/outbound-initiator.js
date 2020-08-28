@@ -376,41 +376,50 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
       } catch (err) {
         console.log(err)
       }
+
+      var syncResponse = {}
+      var curlRequest = ''
+      var timer = null
+      if (successCallbackUrl && errorCallbackUrl && (ignoreCallbacks !== true)) {
+        timer = setTimeout(() => {
+          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
+          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
+          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
+        }, Config.getUserConfig().CALLBACK_TIMEOUT)
+        // Listen for success callback
+        MyEventEmitter.getEmitter('testOutbound').once(successCallbackUrl, (callbackHeaders, callbackBody) => {
+          clearTimeout(timer)
+          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
+          resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
+        })
+        // Listen for error callback
+        MyEventEmitter.getEmitter('testOutbound').once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
+          clearTimeout(timer)
+          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
+          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
+        })
+      } else {
+        resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
+      }
+
       axios(reqOpts).then((result) => {
-        const syncResponse = {
+        syncResponse = {
           status: result.status,
           statusText: result.statusText,
           body: result.data,
           headers: result.headers
         }
-        const curlRequest = result.request ? result.request.toCurl() : ''
+        curlRequest = result.request ? result.request.toCurl() : ''
 
         if (result.status > 299) {
+          if (timer) {
+            clearTimeout(timer)
+            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
+            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
+          }
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
         }
-
         customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
-        if (successCallbackUrl && errorCallbackUrl && (ignoreCallbacks !== true)) {
-          const timer = setTimeout(() => {
-            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
-            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
-            reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
-          }, Config.getUserConfig().CALLBACK_TIMEOUT)
-          // Listen for success callback
-          MyEventEmitter.getEmitter('testOutbound').once(successCallbackUrl, (callbackHeaders, callbackBody) => {
-            clearTimeout(timer)
-            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
-            resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
-          })
-          // Listen for error callback
-          MyEventEmitter.getEmitter('testOutbound').once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
-            clearTimeout(timer)
-            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
-            reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
-          })
-        } else {
-          resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
-        }
       }, (err) => {
         customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, err, false)
         reject(new Error(JSON.stringify({ errorCode: 4000 })))
