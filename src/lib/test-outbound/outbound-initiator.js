@@ -390,15 +390,18 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         MyEventEmitter.getEmitter('testOutbound').once(successCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
+          customLogger.logMessage('info', 'Received success callback ' + successCallbackUrl, { headers: callbackHeaders, body: callbackBody }, false)
           resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
         })
         // Listen for error callback
         MyEventEmitter.getEmitter('testOutbound').once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
+          customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { headers: callbackHeaders, body: callbackBody }, false)
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
         })
       } else {
+        // TODO: Make sure to take care of this case.
         resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
       }
 
