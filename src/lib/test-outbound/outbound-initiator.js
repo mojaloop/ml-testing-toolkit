@@ -400,9 +400,6 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { headers: callbackHeaders, body: callbackBody }, false)
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
         })
-      } else {
-        // TODO: Make sure to take care of this case.
-        resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
       }
 
       axios(reqOpts).then((result) => {
@@ -421,6 +418,10 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
             MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
           }
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
+        }
+
+        if (!successCallbackUrl || !errorCallbackUrl || ignoreCallbacks) {
+          resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
         }
         customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
       }, (err) => {
