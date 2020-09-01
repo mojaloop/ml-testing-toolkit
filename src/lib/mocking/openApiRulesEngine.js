@@ -108,9 +108,15 @@ const validateRules = async (context, req) => {
     await executeScripts(curEvent, req)
 
     if (curEvent.type === 'FIXED_ERROR_CALLBACK') {
-      generatedErrorCallback.method = curEvent.params.method
-      generatedErrorCallback.path = replaceVariablesFromRequest(curEvent.params.path, context, req)
-      generatedErrorCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
+      const operationCallback = req.customInfo.callbackInfo.errorCallback.path
+
+      if (req.customInfo.callbackInfo.errorCallback.pathPattern) {
+        generatedErrorCallback.path = replaceVariablesFromRequest(req.customInfo.callbackInfo.errorCallback.pathPattern, context, req)
+      } else {
+        generatedErrorCallback.path = operationCallback
+      }
+      generatedErrorCallback.callbackInfo = replaceVariablesFromRequest(req.customInfo.callbackInfo, context, req)
+      generatedErrorCallback.method = req.customInfo.callbackInfo.errorCallback.method
       generatedErrorCallback.body = replaceVariablesFromRequest(curEvent.params.body, context, req)
       generatedErrorCallback.headers = replaceVariablesFromRequest(curEvent.params.headers, context, req)
     } else if (curEvent.type === 'MOCK_ERROR_CALLBACK') {

@@ -15,7 +15,7 @@ services:
     command:
       - sh
       - -c
-      - "npm start"
+      - "npm start |bunyan"
   mojaloop-testing-toolkit-ui:
     image: mojaloop/ml-testing-toolkit-ui:v11.0.3
     ports:
