@@ -27,6 +27,7 @@ const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const outbound = require('../../test-outbound/outbound-initiator')
 const TraceHeaderUtils = require('../../traceHeaderUtils')
+const customLogger = require('../../requestLogger')
 
 const handleRequest = async (context, request, callback, triggerFolder) => {
   // Check whether the request is POST /transactionRequests
@@ -58,7 +59,7 @@ const handleRequest = async (context, request, callback, triggerFolder) => {
           outbound.OutboundSend(outboundTemplate, null, callback.fspId)
         }
       } catch (err) {
-        console.log(err)
+        customLogger.logMessage('error', err.message, err)
       }
     }
   }

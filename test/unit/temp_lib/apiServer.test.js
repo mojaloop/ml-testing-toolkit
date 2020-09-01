@@ -24,12 +24,25 @@
 
 
 const Config = require('../../../src/lib/config')
-const loaded = Config.loadSystemConfigMiddleware()
+const requestLogger = require('../../../src/lib/requestLogger')
+
+jest.mock('../../../src/lib/requestLogger')
+jest.mock('../../../src/lib/config')
+
 const apiServer = require('../../../src/lib/api-server')
 
-const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
-
 describe('api-server', () => { 
+  beforeEach(() => {
+    requestLogger.logMessage.mockReturnValue()
+    Config.getSystemConfig.mockReturnValue({
+      OAUTH: {
+        AUTH_ENABLED: false
+      }
+    })
+  })
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('when getApp is called', () => {
     it('the server should be initialized if not already', async () => {
       expect(() => apiServer.getApp()).not.toThrowError()
@@ -38,7 +51,7 @@ describe('api-server', () => {
   })
   describe('when verifyUser is called', () => {
     it('should authenticate the user if auth is enabled', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValue({
         OAUTH: {
           AUTH_ENABLED: true
         }
@@ -46,7 +59,7 @@ describe('api-server', () => {
       expect(() => apiServer.verifyUser()).not.toThrowError()
     })
     it('should return a function which can be executed with 401 status code', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValue({
         OAUTH: {
           AUTH_ENABLED: true
         }
@@ -59,7 +72,7 @@ describe('api-server', () => {
       expect(() => retFn(req, res, () => {})).not.toThrowError()
     })
     it('should return a function which can be executed with 200 status code', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValue({
         OAUTH: {
           AUTH_ENABLED: true
         }
@@ -74,7 +87,7 @@ describe('api-server', () => {
   })
   describe('when startServer is called', () => {
     it('the server should be initialized', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValue({
         OAUTH: {}
       })
       expect(() => apiServer.startServer()).not.toThrowError()

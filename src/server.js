@@ -29,7 +29,7 @@
 
 const Hapi = require('@hapi/hapi')
 // const Path = require('path')
-const Config = require('./lib/config.js')
+const Config = require('./lib/config')
 // const Plugins = require('./plugins')
 const RequestLogger = require('./lib/requestLogger')
 const OpenApiMockHandler = require('./lib/mocking/openApiMockHandler')
@@ -55,12 +55,14 @@ var serverInstance = null
  */
 const createServer = async (port, user) => {
   let server
-  if (await Config.getUserConfig(user).INBOUND_MUTUAL_TLS_ENABLED) {
+  const userConfig = await Config.getUserConfig(user)
+  console.log('userConfig - ', userConfig)
+  if (userConfig.INBOUND_MUTUAL_TLS_ENABLED) {
     // Make sure hub server certificates are set in connection provider
     try {
       await ConnectionProvider.waitForTlsHubCerts()
     } catch (err) {
-      console.log('Tls certificates initiation failed.')
+      RequestLogger.logMessage('error', 'Tls certificates initiation failed.', { user })
       return null
     }
     const tlsConfig = await ConnectionProvider.getTlsConfig()
@@ -124,14 +126,15 @@ const onPreHandler = async (request, h) => {
     }
   } else {
     request.customInfo.traceID = traceHeaderUtils.generateRandTraceId()
-    RequestLogger.logMessage('info', 'Traceparent header not found. Generated a random traceID.', { traceID: request.customInfo.traceID }, true, request)
+
+    RequestLogger.logMessage('info', 'Traceparent header not found. Generated a random traceID.', { additionalData: { traceID: request.customInfo.traceID }, request })
   }
-  RequestLogger.logRequest(request)
+  RequestLogger.logRequest(request, request.customInfo.sourceUser)
   return h.continue
 }
 
 const onPreResponse = (request, h) => {
-  RequestLogger.logResponse(request)
+  RequestLogger.logResponse(request, request.customInfo.sourceUser)
   if (request.customInfo && request.customInfo.negotiatedContentType) {
     if (request.response.isBoom) {
       request.response.output.headers['content-type'] = request.customInfo.negotiatedContentType
@@ -150,16 +153,17 @@ const initialize = async () => {
     objectStore.initObjectStore()
     assertionStore.initAssertionStore()
 
-    console.log(`Toolkit Server running on port ${serverInstance.info.port}`)
+    RequestLogger.logMessage('error', `Toolkit Server running on port ${serverInstance.info.port}`)
   }
   return serverInstance
 }
 
 const restartServer = async (user) => {
   if (serverInstance) {
-    console.log(`Toolkit Server restarted on port ${serverInstance.info.port}`)
+    RequestLogger.logMessage('error', `Toolkit Server restarted on port ${serverInstance.info.port}`, { user })
     serverInstance.stop()
     serverInstance = await createServer(Config.getSystemConfig().API_PORT, user)
+    return serverInstance
   }
 }
 

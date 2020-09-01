@@ -27,9 +27,12 @@ const MBConnectionManagerProvider = require('../../../../src/lib/configuration-p
 const Config = require('../../../../src/lib/config')
 const axios = require('axios').default
 const { readFileAsync }  = require('../../../../src/lib/utils')
+const requestLogger = require('../../../../src/lib/requestLogger')
 
 jest.mock('axios')
 jest.mock('../../../../src/lib/config')
+jest.mock('../../../../src/lib/requestLogger')
+
 const userConfig = {
   JWS_SIGN: true,
   VALIDATE_INBOUND_JWS: true,
@@ -277,6 +280,9 @@ const axiosHelper = (type, url) => {
 }
 
 describe('mb-connection-manager', () => {
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
   describe('getTestingToolkitDfspJWSCerts', () => {
     it('should return null', async () => {
       const getTestingToolkitDfspJWSCerts = await MBConnectionManagerProvider.getTestingToolkitDfspJWSCerts()

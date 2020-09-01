@@ -9,7 +9,8 @@
     "userSettings": 1
   },
   "DB": {
-    "URI": "mongodb://mongo:27017/dfsps"
+    "URI": "mongodb+srv://ttkdfsp:ttkdfsp@cluster0.l3r9o.mongodb.net/dfsps?retryWrites=true&w=majority",
+    "URI2": "mongodb://mongo:27017/dfsps"
   },
   "OAUTH": {
     "AUTH_ENABLED": false,
@@ -21,6 +22,9 @@
     "OAUTH2_ISSUER": "http://172.17.0.1:5050/api/oauth2/token",
     "JWT_COOKIE_NAME": "TTK-API_ACCESS_TOKEN",
     "EMBEDDED_CERTIFICATE": "password"
+  },
+  "DB_LOCAL": {
+    "URI": "mongodb+srv://ttkdfsp:ttkdfsp@cluster0.l3r9o.mongodb.net/dfsps?retryWrites=true&w=majority"
   },
   "API_DEFINITIONS": [
     {

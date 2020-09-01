@@ -48,7 +48,8 @@ mongoose.connect.mockReturnValueOnce({
           _id: 'undefined'
         }]
       },
-      findOneAndRemove: () => {}
+      findOneAndRemove: () => {},
+      findOneAndUpdate: () => {return {}}
     }
   }
 })
@@ -60,6 +61,13 @@ Config.getSystemConfig.mockReturnValue({
 })
 
 describe('dbAdapter', () => {
+  beforeAll(() => {
+    Config.getSystemConfig.mockReturnValue({
+      DB: {
+        URI: ''
+      }
+    })
+  })
   const user = {
     dfspId: 'test'
   }

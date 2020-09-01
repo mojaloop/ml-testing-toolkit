@@ -25,15 +25,24 @@
 
 'use strict'
 
+const Config = require('../../src/lib/config')
+const Server = require('../../src/server')
+const apiServer = require('../../src/lib/api-server')
+const ConnectionProvider = require('../../src/lib/configuration-providers/mb-connection-manager')
 
+jest.mock('../../src/lib/config')
+jest.mock('../../src/server')
+jest.mock('../../src/lib/api-server')
+jest.mock('../../src/lib/configuration-providers/mb-connection-manager')
 
 describe('Index', () => {
   describe('init', () => {
     it('Init should not throw an error', async () => {
-      expect(() => {
-        require('../../src/index')
-      }).not.toThrowError();
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      apiServer.startServer.mockReturnValue()
+      Config.loadUserConfig.mockResolvedValue()
+      ConnectionProvider.initialize.mockResolvedValue()
+      Server.initialize.mockResolvedValue()
+      expect(() => {require('../../src/index')}).not.toThrowError();
     })
   })
 })

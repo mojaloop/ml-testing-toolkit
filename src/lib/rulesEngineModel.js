@@ -71,7 +71,6 @@ const getModel = async (user, dfspType) => {
       model[dfspId] = {}
     }
     if (!model[dfspId][dfspType]) {
-      console.log(model.data[dfspType])
       model[dfspId][dfspType] = { ...model.data[dfspType] }
       await getRulesFiles(model[dfspId][dfspType], user)
     }
@@ -274,7 +273,7 @@ const deleteForwardRulesFile = async (fileName, user) => {
 
 // common functions
 const reloadRules = async (model, user) => {
-  customLogger.logMessage('info', `Reloading ${model.ruleType} Rules from file ` + model.activeRulesFile, null, false)
+  customLogger.logMessage('info', `Reloading ${model.ruleType} Rules from file ` + model.activeRulesFile, { user })
   const userRules = await storageAdapter.read(model.rulesFilePathPrefix + model.activeRulesFile, user)
   model.rules = userRules.data
   if (!model.rules || !model.rules.length) {
@@ -334,7 +333,6 @@ const getRulesFiles = async (model, user) => {
     resp.activeRulesFile = model.activeRulesFile
     return resp
   } catch (err) {
-    console.log(err)
     return null
   }
 }

@@ -29,7 +29,7 @@ const Schema = mongoose.Schema
 
 const commonModel = new Schema({
   _id: String,
-  data: { type: Object, default: {} }
+  data: { type: Schema.Types.Mixed }
 })
 
 module.exports = {

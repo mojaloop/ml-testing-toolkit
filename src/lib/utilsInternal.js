@@ -23,7 +23,7 @@
  ******/
 const customLogger = require('./requestLogger')
 
-const getFunctionResult = (param, fromObject, request) => {
+const getFunctionResult = (param, fromObject, request, user) => {
   const temp = param.replace(/{\$function\.(.*)}/, '$1').split('.')
   if (temp.length === 2) {
     const fileName = temp[0]
@@ -32,16 +32,16 @@ const getFunctionResult = (param, fromObject, request) => {
     try {
       fn = require('./mocking/custom-functions/' + fileName)[functionName]
     } catch (e) {
-      customLogger.logMessage('error', 'The specified module does not exist', param, false)
+      customLogger.logMessage('error', 'The specified module does not exist', { additionalData: param, user })
       return param
     }
     if (!fn) {
-      customLogger.logMessage('error', 'The specified custom function does not exist', param, false)
+      customLogger.logMessage('error', 'The specified custom function does not exist', { additionalData: param, user })
       return param
     }
     return fn(fromObject, request)
   } else {
-    customLogger.logMessage('error', 'The specified custom function format is not correct', param, false)
+    customLogger.logMessage('error', 'The specified custom function format is not correct', { additionalData: param, user })
     return param
   }
 }

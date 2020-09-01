@@ -26,14 +26,12 @@
 
 const mongoose = require('mongoose')
 const mongoDBModels = require('../models/mongoDBModels')
-let Config = require('../../config')
+const customLogger = require('../../requestLogger')
+const Config = require('../../config')
 let conn
 
 const getConnection = async () => {
   if (!conn) {
-    if (Object.keys(Config).length === 0) {
-      Config = require('../../config')
-    }
     conn = await mongoose.connect(Config.getSystemConfig().DB.URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -64,19 +62,11 @@ const find = async (id, user) => {
   return documents
 }
 
-const upsert = async (id, data, user) => {
+const upsert = async (id, data, user, append) => {
   const conn = await getConnection()
   const MyModel = conn.model(user.dfspId, mongoDBModels.commonModel)
-  let document = await MyModel.findById(id)
-  if (!document) {
-    document = await MyModel.create({
-      _id: id,
-      data: data
-    })
-  } else {
-    document.data = data
-    await document.save()
-  }
+  const update = append ? { $push: { data } } : { $set: { data } }
+  const document = await MyModel.findOneAndUpdate({ _id: id }, update, { new: true, upsert: true })
   return document
 }
 
@@ -88,7 +78,7 @@ const remove = async (id, user) => {
 
 process.on('SIGINT', () => {
   mongoose.connection.close(() => {
-    console.log('Mongoose default connection is disconnected due to application termination')
+    customLogger.logMessage('info', 'Mongoose default connection is disconnected due to application termination')
     process.exit(0)
   })
 })

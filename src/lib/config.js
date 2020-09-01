@@ -23,9 +23,8 @@
  --------------
  ******/
 
-const utils = require('./utils')
 const storageAdapter = require('./storageAdapter')
-
+const customLogger = require('./requestLogger')
 const SYSTEM_CONFIG_FILE = 'spec_files/system_config.json'
 const USER_CONFIG_FILE = 'spec_files/user_config.json'
 
@@ -41,8 +40,10 @@ const getSystemConfig = () => {
 const getUserConfig = async (user) => {
   const item = user ? user.dfspId : 'data'
   if (!USER_CONFIG[item]) {
+    console.log(USER_CONFIG[item])
     await loadUserConfig(user)
   }
+  console.log(USER_CONFIG[item])
   return USER_CONFIG[item]
 }
 
@@ -51,7 +52,7 @@ const getStoredUserConfig = async (user) => {
     const storedConfig = await loadUserConfigDFSPWise(user)
     return storedConfig
   } catch (err) {
-    console.log('Error: Can not read the file spec_files/user_config.json')
+    customLogger.logMessage('error', `Can not read the file ${USER_CONFIG_FILE}`, { additionalData: err })
     return {}
   }
 }
@@ -69,7 +70,8 @@ const loadUserConfig = async (user) => {
   try {
     USER_CONFIG[user ? user.dfspId : 'data'] = await loadUserConfigDFSPWise(user)
   } catch (err) {
-    console.log('Error: Can not read the file ' + USER_CONFIG_FILE)
+    console.log(err)
+    customLogger.logMessage('error', `Can not read the file ${USER_CONFIG_FILE}`, { additionalData: err })
   }
   return true
 }
@@ -79,29 +81,16 @@ const loadUserConfigDFSPWise = async (user) => {
   return userConfig.data
 }
 
-// Function to load system configuration
-const loadSystemConfig = async () => {
-  try {
-    const contents = await utils.readFileAsync(SYSTEM_CONFIG_FILE)
-    SYSTEM_CONFIG = JSON.parse(contents)
-  } catch (err) {
-    console.log('Error: Can not read the file ' + SYSTEM_CONFIG_FILE)
-  }
-  return true
+const loadSystemConfigMiddleware = () => {
+  Object.assign(SYSTEM_CONFIG, require('../../' + SYSTEM_CONFIG_FILE))
 }
 
-const loadSystemConfigMiddleware = () => {
-  if (Object.keys(SYSTEM_CONFIG).length === 0) {
-    SYSTEM_CONFIG = require('../../' + SYSTEM_CONFIG_FILE)
-  }
-}
+loadSystemConfigMiddleware()
 
 module.exports = {
   getUserConfig: getUserConfig,
   getStoredUserConfig: getStoredUserConfig,
   setStoredUserConfig: setStoredUserConfig,
   loadUserConfig: loadUserConfig,
-  getSystemConfig: getSystemConfig,
-  loadSystemConfig: loadSystemConfig,
-  loadSystemConfigMiddleware: loadSystemConfigMiddleware
+  getSystemConfig: getSystemConfig
 }

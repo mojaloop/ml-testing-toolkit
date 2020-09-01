@@ -27,6 +27,7 @@ const Config = require('../config')
 const Cookies = require('cookies')
 const jwt = require('jsonwebtoken')
 const wso2Client = require('./Wso2Client')
+const customLogger = require('../requestLogger')
 
 /**
  * Logs the user in.
@@ -62,7 +63,7 @@ exports.loginUser = async function (username, password, req, res) {
 
     return response
   } catch (error) {
-    console.log('Error on LoginService.loginUser: ', error)
+    customLogger.logMessage('error', 'login user failed', error)
     if (error && error.statusCode === 400 && error.message.includes('Authentication failed')) {
       throw new Error(`Authentication failed for user ${username}`, error.error)
     }
@@ -84,7 +85,7 @@ const buildJWTResponse = (decodedIdToken, accessToken, expiresIn, req, res) => {
         continue
       }
       dfspId = groupMatchResult[1]
-      console.log('LoginService.loginUser found dfspId: ', dfspId)
+      customLogger.logMessage('info', `${dfspId} found in ${group} group`)
       break // FIXME only returns the first ( there should be only one ). May report an error if there's more than one Application/DFSP group ?
     }
   }

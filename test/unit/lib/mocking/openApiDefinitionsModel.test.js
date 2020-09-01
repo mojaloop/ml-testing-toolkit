@@ -28,7 +28,6 @@
 const Config = require('../../../../src/lib/config')
 
 const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
-const SpyloadSystemConfig = jest.spyOn(Config, 'loadSystemConfig')
 
 const OpenApiDefinitionsModel = require('../../../../src/lib/mocking/openApiDefinitionsModel')
 
@@ -38,7 +37,6 @@ describe('OpenApiDefinitionsModel', () => {
       SpyGetSystemConfig.mockReturnValueOnce({
         API_DEFINITIONS: null
       })
-      SpyloadSystemConfig.mockResolvedValue()
       SpyGetSystemConfig.mockReturnValueOnce({
         API_DEFINITIONS: [{
           version: '1.0',

@@ -128,7 +128,6 @@ describe('JwsSigning', () => {
     it('Signed request should contain required fspiop headers', async () => {
       // Sign with JWS
       await expect(JwsSigning.sign(reqOpts)).resolves.toBeDefined();
-      // console.log('GVK',reqOpts)
       expect(reqOpts.headers).toHaveProperty('fspiop-uri')
       expect(reqOpts.headers).toHaveProperty('fspiop-http-method')
       expect(reqOpts.headers).toHaveProperty('fspiop-signature')

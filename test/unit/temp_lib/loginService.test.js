@@ -17,8 +17,8 @@
 
 const LoginService = require('../../../src/lib/oauth/LoginService')
 const wso2Client = require('../../../src/lib/oauth/Wso2Client')
-const utils = require('../../../src/lib/utils')
 const jwt = require('jsonwebtoken')
+const requestLogger = require('../../../src/lib/requestLogger')
 
 const Cookies = require('cookies')
 const Config = require('../../../src/lib/config')
@@ -27,10 +27,14 @@ const SpyWso2Client = jest.spyOn(wso2Client, 'getToken')
 const SpyJWT = jest.spyOn(jwt, 'decode')
 
 jest.mock('cookies')
+jest.mock('../../../src/lib/requestLogger')
 
 Cookies.mockImplementation()
 
 describe('LoginService tests', () => {
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
   describe('loginUser', () => {
     it('should return status false if oauth not enabled', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({

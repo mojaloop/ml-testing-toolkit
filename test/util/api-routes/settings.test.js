@@ -23,7 +23,6 @@
  ******/
 
 const Config = require('../../../../src/lib/config')
-const loaded = Config.loadSystemConfigMiddleware()
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
@@ -36,7 +35,6 @@ const SpyImportSpecFiles = jest.spyOn(ImportExport, 'importSpecFiles')
 const SpyExportSpecFiles = jest.spyOn(ImportExport, 'exportSpecFiles')
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 const SpyGetStoredUserConfig = jest.spyOn(Config, 'getStoredUserConfig')
-const SpyLoadUserConfig = jest.spyOn(Config, 'loadUserConfig')
 const SpyReloadResponseRules = jest.spyOn(RulesEngineModel, 'reloadResponseRules')
 const SpyReloadCallbackRules = jest.spyOn(RulesEngineModel, 'reloadCallbackRules')
 const SpyReloadValidationRules = jest.spyOn(RulesEngineModel, 'reloadValidationRules')
@@ -77,7 +75,6 @@ describe('API route /api/settings', () => {
         SpyReloadValidationRules.mockResolvedValueOnce()
         SpyGetUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
         SpyGetStoredUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: false})
-        SpyLoadUserConfig.mockResolvedValueOnce()
         SpyServer.mockResolvedValueOnce()
         const options = ['rules_response','rules_callback','rules_validation','user_config.json']
         SpyImportSpecFiles.mockResolvedValueOnce()
@@ -93,7 +90,6 @@ describe('API route /api/settings', () => {
         SpyReloadValidationRules.mockResolvedValueOnce()
         SpyGetUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
         SpyGetStoredUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
-        SpyLoadUserConfig.mockResolvedValueOnce()
         const options = ['rules_response','rules_callback','rules_validation','user_config.json']
         SpyImportSpecFiles.mockResolvedValueOnce()
         const res = await request(app)

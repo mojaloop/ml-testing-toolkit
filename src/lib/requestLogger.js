@@ -29,7 +29,7 @@ var bunyan = require('bunyan')
 var Logger = bunyan.createLogger({ name: 'ml-testing-toolkit', level: 'debug' })
 const notificationEmitter = require('./notificationEmitter.js')
 const Config = require('../lib/config.js')
-const getSessionID = function (request) {
+const getSessionID = (request) => {
   if (Config.getSystemConfig().HOSTING_ENABLED) {
     return request && request.headers && request.headers['fspiop-source'] ? request.headers['fspiop-source'] : null
   } else {
@@ -37,42 +37,62 @@ const getSessionID = function (request) {
   }
 }
 
-const logRequest = function (request) {
-  let logMessage = `Request: ${request.method} ${request.path}`
+const saveLog = (log, data) => {
+  if (Config.getSystemConfig().HOSTING_ENABLED) {
+    if (!data.user) {
+      data.user = data.request.customInfo.user
+    }
+  }
+}
+
+const logRequest = function (request, user) {
+  let log = `Request: ${request.method} ${request.path}`
   if (request.body) {
-    logMessage += ` Body: ${request.body}`
+    log += ` Body: ${request.body}`
   }
-  const logObject = {
-    request: {
-      uniqueId: request.customInfo ? request.customInfo.uniqueId : null,
-      headers: request.headers,
-      queryParams: request.query,
-      body: request.payload
-    }
-  }
-  Logger.info(logObject, logMessage)
-
-  notificationEmitter.broadcastLog({ uniqueId: request.customInfo ? request.customInfo.uniqueId : null, traceID: (request && request.customInfo) ? request.customInfo.traceID : null, resource: { method: request.method, path: request.path }, messageType: 'request', verbosity: 'info', message: logMessage, additionalData: logObject }, getSessionID(request))
-}
-
-const logResponse = function (request) {
-  if (request.response) {
-    const logObject = {
-      response: {
+  logMessage('info', log, {
+    additionalData: {
+      request: {
         uniqueId: request.customInfo ? request.customInfo.uniqueId : null,
-        body: request.response.source
+        headers: request.headers,
+        queryParams: request.query,
+        body: request.payload
       }
-    }
-    const logMessage = `Response: ${request.method} ${request.path} Status: ${request.response.statusCode}`
-    Logger.info(logObject, logMessage)
-    notificationEmitter.broadcastLog({ uniqueId: request.customInfo ? request.customInfo.uniqueId : null, traceID: (request && request.customInfo) ? request.customInfo.traceID : null, resource: { method: request.method, path: request.path }, messageType: 'response', verbosity: 'info', message: logMessage, additionalData: logObject }, getSessionID(request))
+    },
+    user,
+    request,
+    messageType: 'request'
+  })
+}
+
+const logResponse = function (request, user) {
+  if (request.response) {
+    const log = `Response: ${request.method} ${request.path} Status: ${request.response.statusCode}`
+    logMessage('info', log, {
+      additionalData: {
+        response: {
+          uniqueId: request.customInfo ? request.customInfo.uniqueId : null,
+          body: request.response.source
+        }
+      },
+      user,
+      request,
+      messageType: 'response'
+    })
   }
 }
 
-const logMessage = (verbosity, message, additionalData = null, notification = true, request = null) => {
+const logMessage = (verbosity, message, externalData = {}) => {
+  const data = {
+    additionalData: externalData.additionalData || null,
+    notification: typeof externalData.notification !== 'undefined' ? externalData.notification : true,
+    messageType: externalData.messageType || 'generic',
+    request: externalData.request || null,
+    user: externalData.user
+  }
   switch (verbosity) {
     case 'debug':
-      Logger.debug(additionalData, message)
+      Logger.debug(data.additionalData, message)
       break
     case 'warn':
       Logger.warn(message)
@@ -81,12 +101,25 @@ const logMessage = (verbosity, message, additionalData = null, notification = tr
       Logger.error(message)
       break
     case 'info':
-    default:
+    default: {
       Logger.info(message)
+    }
   }
 
-  if (notification) {
-    notificationEmitter.broadcastLog({ uniqueId: request ? request.customInfo.uniqueId : null, traceID: (request && request.customInfo) ? request.customInfo.traceID : null, resource: request ? { method: request.method, path: request.path } : null, messageType: 'generic', verbosity, message: message, additionalData }, getSessionID(request))
+  if (data.notification) {
+    console.log(data.notification)
+    console.log(verbosity)
+    const log = {
+      uniqueId: (data.request && data.request.customInfo) ? data.request.customInfo.uniqueId : null,
+      traceID: (data.request && data.request.customInfo) ? data.request.customInfo.traceID : null,
+      resource: data.request ? { method: data.request.method, path: data.request.path } : null,
+      messageType: data.messageType,
+      verbosity: data.verbosity,
+      message: data.message,
+      additionalData: data.additionalData
+    }
+    saveLog(log, data)
+    notificationEmitter.broadcastLog(log, getSessionID(data.request))
   }
 }
 

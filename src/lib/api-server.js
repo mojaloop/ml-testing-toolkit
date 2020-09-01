@@ -31,6 +31,7 @@ const cookieParser = require('cookie-parser')
 const util = require('util')
 const cors = require('cors')
 const Config = require('./config')
+const requestLogger = require('./requestLogger')
 
 const initServer = () => {
   // For CORS policy
@@ -60,7 +61,7 @@ const initServer = () => {
 const startServer = port => {
   initServer()
   http.listen(port)
-  console.log('API Server started on port ' + port)
+  requestLogger.logMessage('info', 'API Server started on port ' + port)
 }
 
 const getApp = () => {
@@ -77,8 +78,7 @@ const verifyUser = () => {
       passport.authenticate('jwt', { session: false, failureMessage: true })(req, res, next)
       // failWithError: true returns awful html error. , failureMessage: True to store failure message in req.session.messages, or a string to use as override message for failure.
       if (res.statusCode === 401) {
-        const customLogger = require('./requestLogger')
-        customLogger.logMessage('error', `Unable to authenticate with passport.authenticate - ${util.inspect(req.session.messages)}`, req.session.messages, false)
+        requestLogger.logMessage('error', `Unable to authenticate with passport.authenticate - ${util.inspect(req.session.messages)}`, { additionalData: req.session.messages, notification: false })
       }
     }
     // return passport.authenticate('jwt', { session: false, failWithError: true })

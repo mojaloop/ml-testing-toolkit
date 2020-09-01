@@ -92,7 +92,6 @@ describe('API route /api/oauth2', () => {
     it('logout should return 200 if successful', async () => {
       SpyLogout.mockResolvedValueOnce()
       const res = await request(app).get(`/api/oauth2/logout`)
-      console.log(res.body)
       expect(res.statusCode).toEqual(200)
     })
     it('logout should return an error if not successful', async () => {

@@ -125,7 +125,6 @@ describe('ILP Model', () => {
       }
       fulfilment = IlpModel.handleQuoteIlp(sampleContext, response)
       ilpPacket = response.body.ilpPacket
-      console.log(ilpPacket)
       condition = response.body.condition
       expect(response.body).toHaveProperty('ilpPacket')
       expect(response.body).toHaveProperty('condition')

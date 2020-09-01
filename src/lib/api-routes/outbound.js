@@ -53,9 +53,9 @@ async (req, res, next) => {
         return status < 900 // Reject only if the status code is greater than or equal to 900
       }
     }).then((result) => {
-      customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
+      customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, user: req.user })
     }, (err) => {
-      customLogger.logMessage('info', 'Failed to send request ' + req.body.method + ' ' + req.body.path, err, false)
+      customLogger.logMessage('info', 'Failed to send request ' + req.body.method + ' ' + req.body.path, { additionalData: err, user: req.user })
     })
     res.status(200).json({ status: 'OK' })
   } catch (err) {

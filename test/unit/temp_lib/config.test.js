@@ -26,19 +26,34 @@
 'use strict'
 
 const Config = require('../../../src/lib/config')
-const Utils = require('../../../src/lib/utils')
-const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
-const SpyWriteFileAsync = jest.spyOn(Utils, 'writeFileAsync')
+const requestLogger = require('../../../src/lib/requestLogger')
+const storageAdapter = require('../../../src/lib/storageAdapter')
+
+jest.mock('../../../src/lib/requestLogger')
+jest.mock('../../../src/lib/storageAdapter')
 
 describe('Config', () => {
+  beforeEach(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('when getUserConfig is called', () => {
-    it('should not throw an error ', async () => {
-      const userConfig = await Config.getUserConfig()
-      expect(userConfig).toBeDefined()
+    it('should load userConfig only once', async () => {
+      storageAdapter.read.mockResolvedValueOnce({
+        data: {}
+      })
+      const userConfig1 = await Config.getUserConfig('testConfig')
+      const userConfig2 = await Config.getUserConfig('testConfig')
+      expect(userConfig1).toStrictEqual(userConfig2)
     })
     it('should not throw an error ', async () => {
-      const userConfig = await Config.getUserConfig({dfspId: 'test'})
-      expect(userConfig).toBeUndefined()
+      storageAdapter.read.mockResolvedValueOnce({
+        data: {}
+      })
+      const userConfig = await Config.getUserConfig()
+      expect(userConfig).toBeDefined()
     })
   })
   describe('when getSystemConfig is called', () => {
@@ -52,19 +67,19 @@ describe('Config', () => {
       expect(userConfig).toBeDefined()
     })
     it('the response should be empty object', async () => {
-      SpyReadFileAsync.mockRejectedValueOnce({})
+      storageAdapter.read.mockRejectedValueOnce()
       const userConfig = await Config.getStoredUserConfig()
       expect(userConfig).toStrictEqual({})
     })
   })
   describe('when setStoredUserConfig throws an error', () => {
     it('the response should be false', async () => {
-      SpyWriteFileAsync.mockResolvedValueOnce()
+      storageAdapter.upsert.mockResolvedValueOnce()
       const storedUserConfig = await Config.setStoredUserConfig({})
       expect(storedUserConfig).toBe(true)
     })
     it('the response should be false', async () => {
-      SpyWriteFileAsync.mockRejectedValueOnce()
+      storageAdapter.upsert.mockRejectedValueOnce()
       const storedUserConfig = await Config.setStoredUserConfig()
       expect(storedUserConfig).toBe(false)
     })
@@ -79,20 +94,9 @@ describe('Config', () => {
       expect(loadUserConfig).toBe(true)
     })
     it('the response should be true', async () => {
-      SpyReadFileAsync.mockRejectedValueOnce()
+      Utils.readFileAsync.mockRejectedValueOnce()
       const loadUserConfig = await Config.loadUserConfig()
       expect(loadUserConfig).toBe(true)
-    })
-  })
-  describe('when loadSystemConfig throws an error', () => {
-    it('the response should be true', async () => {
-      const loadSystemConfig = await Config.loadSystemConfig()
-      expect(loadSystemConfig).toBe(true)
-    })
-    it('the response should be true', async () => {
-      SpyReadFileAsync.mockRejectedValueOnce()
-      const loadSystemConfig = await Config.loadSystemConfig()
-      expect(loadSystemConfig).toBe(true)
     })
   })
 })

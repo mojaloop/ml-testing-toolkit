@@ -32,9 +32,6 @@ const specFilePrefix = 'spec_files/api_definitions/'
 
 module.exports.getApiDefinitions = async () => {
   if (!apiDefinitions) {
-    if (!Config.getSystemConfig().API_DEFINITIONS) {
-      await Config.loadSystemConfig()
-    }
     apiDefinitions = Config.getSystemConfig().API_DEFINITIONS.map(item => {
       return {
         minorVersion: +item.version.split('.')[1],

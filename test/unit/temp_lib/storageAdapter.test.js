@@ -23,8 +23,6 @@
  --------------
  ******/
 
-const dbAdapter = require('../../../src/lib/db/adapters/dbAdapter')
-const fileAdapter = require('../../../src/lib/fileAdapter')
 const storageAdapter = require('../../../src/lib/storageAdapter')
 
 jest.mock('../../../src/lib/db/adapters/dbAdapter', () => {
@@ -92,8 +90,10 @@ jest.mock('../../../src/lib/fileAdapter', () => {
   }
 })
 
-
 describe('dbAdapter', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('when user defined', () => {
     const user = {
       dfspId: 'test'
