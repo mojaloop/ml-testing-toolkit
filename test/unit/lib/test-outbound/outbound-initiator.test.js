@@ -46,6 +46,9 @@ jest.mock('axios')
 
 
 describe('Outbound Initiator Functions', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
   describe('getFunctionResult', () => {
     // Positive Scenarios
     it('getFunctionResult should return uuid with length greater than 5', async () => {
@@ -438,7 +441,7 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      axios.mockClear()
+      
       try {
         await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'userdfsp')
       } catch (err) {}
@@ -492,124 +495,11 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      axios.mockClear()
+      
       try{
         await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, {}, {}, null, 'userdfsp')
 
       } catch (err) {}
-      expect(axios).toHaveBeenCalledTimes(1);
-    })
-    it('sendRequest should call axios with appropriate params', async () => {
-      axios.mockImplementation(() => Promise.resolve({
-        status: 200,
-        statusText: 'OK',
-        data: {},
-        request: {
-          toCurl: () => ''
-        }
-      }))
-      SpySign.mockReturnValueOnce(Promise.resolve())
-      SpyAgent.mockImplementationOnce(() => {
-        return {httpsAgent: {}}
-      })
-      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
-        dfsps: {
-          'userdfsp': {
-            hubClientCert: 'cert',
-            dfspServerCaRootCert: 'ca'
-          }
-        },
-        hubClientKey: 'key'
-      }))
-      SpyGetSystemConfig.mockReturnValueOnce({
-        HOSTING_ENABLED: false
-      })
-      SpyGetUserConfig.mockResolvedValueOnce({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: true,
-        CALLBACK_TIMEOUT: 5000
-      })
-      const sampleRequest = {
-        headers: {
-          'FSPIOP-Source': 'userdfsp',
-          Date: '2020-01-01 01:01:01',
-          TimeStamp: '{$request.headers.Date}'
-        },
-        body: {
-          transactionId: '123',
-          amount: {
-            amount: '100',
-            currency: 'USD'
-          },
-          transactionAmount: {
-            amount: '{$request.body.amount.amount}',
-            currency: '{$request.body.amount.currency}'
-          }
-        }
-      }
-      axios.mockClear()
-      OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, 'successCallback', 'errorCallback', null, 'userdfsp')
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      const testOutboundEmitter = MyEventEmitter.getEmitter('testOutbound')
-      testOutboundEmitter.emit('successCallback')
-      expect(axios).toHaveBeenCalledTimes(1);
-    })
-    it('sendRequest should call axios with appropriate params', async () => {
-      axios.mockImplementation(() => Promise.resolve({
-        status: 200,
-        statusText: 'OK',
-        data: {},
-        request: {
-          toCurl: () => ''
-        }
-      }))
-      SpySign.mockResolvedValueOnce()
-      SpyAgent.mockImplementationOnce(() => {
-        return {httpsAgent: {}}
-      })
-      SpyGetTlsConfig.mockResolvedValueOnce({
-        dfsps: {
-          'userdfsp': {
-            hubClientCert: 'cert',
-            dfspServerCaRootCert: 'ca'
-          }
-        },
-        hubClientKey: 'key'
-      })
-      SpyGetSystemConfig.mockReturnValueOnce({
-        HOSTING_ENABLED: false
-      })
-      SpyGetUserConfig.mockResolvedValueOnce({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: true,
-        CALLBACK_TIMEOUT: 5000
-      })
-      const sampleRequest = {
-        headers: {
-          'FSPIOP-Source': 'userdfsp',
-          Date: '2020-01-01 01:01:01',
-          TimeStamp: '{$request.headers.Date}'
-        },
-        body: {
-          transactionId: '123',
-          amount: {
-            amount: '100',
-            currency: 'USD'
-          },
-          transactionAmount: {
-            amount: '{$request.body.amount.amount}',
-            currency: '{$request.body.amount.currency}'
-          }
-        }
-      }
-      axios.mockClear()
-      try {
-        OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, 'successCallback', 'errorCallback', null, 'userdfsp')
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        const testOutboundEmitter = MyEventEmitter.getEmitter('testOutbound')
-        testOutboundEmitter.emit('errorCallback')
-      } catch (err) {}
-        
       expect(axios).toHaveBeenCalledTimes(1);
     })
     it('sendRequest should call axios with appropriate params', async () => {
@@ -659,7 +549,7 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      axios.mockClear()
+      
       try {
         await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'userdfsp')
       } catch (err) {}
@@ -712,7 +602,7 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      axios.mockClear()
+      
       try {
         await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, {}, {}, null, 'userdfsp')
       } catch (err) {}
@@ -770,13 +660,13 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      axios.mockClear()
+      
       try {
         await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, {}, {}, null, 'userdfsp')
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
     })
-    it('sendRequest should call axios with appropriate params 12', async () => {
+    it('sendRequest should call axios with appropriate params', async () => {
       SpyGetTlsConfig.mockResolvedValueOnce({
         dfsps: {
           'userdfsp': {

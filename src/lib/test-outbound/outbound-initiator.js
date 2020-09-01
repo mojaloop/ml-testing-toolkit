@@ -168,10 +168,12 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
       if (request.apiVersion.asynchronous === true) {
         const cbMapRawdata = await readFileAsync(reqApiDefinition.callbackMapFile)
         const reqCallbackMap = JSON.parse(cbMapRawdata)
-        const successCallback = reqCallbackMap[request.operationPath][request.method].successCallback
-        const errorCallback = reqCallbackMap[request.operationPath][request.method].errorCallback
-        successCallbackUrl = successCallback.method + ' ' + replaceVariables(successCallback.pathPattern, null, convertedRequest)
-        errorCallbackUrl = errorCallback.method + ' ' + replaceVariables(errorCallback.pathPattern, null, convertedRequest)
+        if (reqCallbackMap[request.operationPath] && reqCallbackMap[request.operationPath][request.method]) {
+          const successCallback = reqCallbackMap[request.operationPath][request.method].successCallback
+          const errorCallback = reqCallbackMap[request.operationPath][request.method].errorCallback
+          successCallbackUrl = successCallback.method + ' ' + replaceVariables(successCallback.pathPattern, null, convertedRequest)
+          errorCallbackUrl = errorCallback.method + ' ' + replaceVariables(errorCallback.pathPattern, null, convertedRequest)
+        }
       }
 
       if (request.delay) {
@@ -241,7 +243,9 @@ const executePreRequestScript = async (request, convertedRequest, scriptsExecuti
 const executePostRequestScript = async (request, resp, scriptsExecution, contextObj, environmentVariables) => {
   if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
     let response
-    if (resp.syncResponse) {
+    if (_.isString(resp)) {
+      response = resp
+    } else if (resp.syncResponse) {
       response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
     }
     scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, response }, id: uuid.v4() }, contextObj)

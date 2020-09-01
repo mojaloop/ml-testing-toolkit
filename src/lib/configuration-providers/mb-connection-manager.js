@@ -123,7 +123,7 @@ const initDFSP = async (environmentId, dfspId, dfspName) => {
   }
 }
 
-const initJWSCertificate = async (environmentId, dfspId, jwsCertificate, intermediateCertificate) => {
+const initJWSCertificate = async (environmentId, dfspId, jwsCertificate = null, intermediateCertificate = null) => {
   const rootCertificate = null
   let certExists = false
   let certResult = null
@@ -453,7 +453,7 @@ const checkConnectionManager = async () => {
       await initDFSPHelper()
       // Initialize JWS certificate for testing toolkit dfsp
       const certData = await readFileAsync('secrets/publickey.cer')
-      currentJWSConfig.testingToolkitDfspCerts = await initJWSCertificate(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, certData.toString(), null)
+      currentJWSConfig.testingToolkitDfspCerts = await initJWSCertificate(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, certData.toString())
       await setJWSConfig()
       // Fetch the user DFSP Jws certs once and then periodically check
       const dfspList = await getDFSPs()

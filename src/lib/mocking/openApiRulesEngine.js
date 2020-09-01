@@ -369,8 +369,7 @@ const replaceVariablesFromRequest = async (inputObject, context, req) => {
   const matchedArray = resultObject.match(/{\$([^}]+)}/g)
   if (matchedArray) {
     const userConfig = await Config.getUserConfig(req.customInfo.sourceUser)
-    for (const index in matchedArray) {
-      const element = matchedArray[index]
+    matchedArray.forEach(element => {
       const splitArr = element.split('.')
       switch (splitArr[0]) {
         case '{$function':
@@ -390,7 +389,7 @@ const replaceVariablesFromRequest = async (inputObject, context, req) => {
         default:
           resultObject = resultObject.replace(element, getVariableValue(element, context))
       }
-    }
+    })
   }
 
   if (typeof inputObject === 'object') {
