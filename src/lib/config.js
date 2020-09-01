@@ -24,49 +24,59 @@
  ******/
 
 const utils = require('./utils')
+const storageAdapter = require('./storageAdapter')
 
 const SYSTEM_CONFIG_FILE = 'spec_files/system_config.json'
 const USER_CONFIG_FILE = 'spec_files/user_config.json'
 
 var SYSTEM_CONFIG = {}
-var USER_CONFIG = {}
+var USER_CONFIG = {
+  data: undefined
+}
 
 const getSystemConfig = () => {
   return SYSTEM_CONFIG
 }
 
-const getUserConfig = () => {
-  return USER_CONFIG
+const getUserConfig = async (user) => {
+  const item = user ? user.dfspId : 'data'
+  if (!USER_CONFIG[item]) {
+    await loadUserConfig(user)
+  }
+  return USER_CONFIG[item]
 }
 
-const getStoredUserConfig = async () => {
-  let storedConfig = {}
+const getStoredUserConfig = async (user) => {
   try {
-    const contents = await utils.readFileAsync(USER_CONFIG_FILE)
-    storedConfig = JSON.parse(contents)
+    const storedConfig = await loadUserConfigDFSPWise(user)
+    return storedConfig
   } catch (err) {
     console.log('Error: Can not read the file spec_files/user_config.json')
+    return {}
   }
-  return storedConfig
 }
 
-const setStoredUserConfig = async (newConfig) => {
+const setStoredUserConfig = async (newConfig, user) => {
   try {
-    await utils.writeFileAsync(USER_CONFIG_FILE, JSON.stringify(newConfig, null, 2))
+    await storageAdapter.upsert(USER_CONFIG_FILE, newConfig, user)
     return true
   } catch (err) {
     return false
   }
 }
 
-const loadUserConfig = async () => {
+const loadUserConfig = async (user) => {
   try {
-    const contents = await utils.readFileAsync(USER_CONFIG_FILE)
-    USER_CONFIG = JSON.parse(contents)
+    USER_CONFIG[user ? user.dfspId : 'data'] = await loadUserConfigDFSPWise(user)
   } catch (err) {
     console.log('Error: Can not read the file ' + USER_CONFIG_FILE)
   }
   return true
+}
+
+const loadUserConfigDFSPWise = async (user) => {
+  const userConfig = await storageAdapter.read(USER_CONFIG_FILE, user)
+  return userConfig.data
 }
 
 // Function to load system configuration
@@ -81,7 +91,9 @@ const loadSystemConfig = async () => {
 }
 
 const loadSystemConfigMiddleware = () => {
-  SYSTEM_CONFIG = require('../../' + SYSTEM_CONFIG_FILE)
+  if (Object.keys(SYSTEM_CONFIG).length === 0) {
+    SYSTEM_CONFIG = require('../../' + SYSTEM_CONFIG_FILE)
+  }
 }
 
 module.exports = {

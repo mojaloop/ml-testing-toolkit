@@ -26,27 +26,23 @@ const express = require('express')
 const app = express()
 const http = require('http').Server(app)
 const socketIO = require('socket.io')(http)
-const OAuthHelper = require('./oauth/OAuthHelper')
 const passport = require('passport')
 const cookieParser = require('cookie-parser')
 const util = require('util')
 const cors = require('cors')
+const Config = require('./config')
 
 const initServer = () => {
-  const Config = require('./config')
-  if (Object.keys(Config.getSystemConfig()).length === 0) {
-    Config.loadSystemConfigMiddleware()
-  }
-
   // For CORS policy
   app.use(cors({ origin: true, credentials: true }))
 
   // For parsing incoming JSON requests
   app.use(express.json({ limit: '50mb' }))
   app.use(express.urlencoded({ extended: true }))
-  app.use(cookieParser())
+
   // For oauth
-  OAuthHelper.handleMiddleware()
+  app.use(cookieParser())
+  require('./oauth/OAuthHelper').handleMiddleware()
 
   // For admin API
   app.use('/api/rules', verifyUser(), require('./api-routes/rules'))
@@ -59,13 +55,6 @@ const initServer = () => {
   app.use('/api/settings', verifyUser(), require('./api-routes/settings'))
   app.use('/api/samples', verifyUser(), require('./api-routes/samples'))
   app.use('/api/objectstore', verifyUser(), require('./api-routes/objectstore'))
-
-  // // For front-end UI
-  // app.use('/ui', express.static(path.join('client/build')))
-
-  // app.get('*', (req, res) => {
-  //   res.sendFile(process.cwd() + '/client/build/index.html')
-  // })
 }
 
 const startServer = port => {
@@ -82,7 +71,6 @@ const getApp = () => {
 }
 
 const verifyUser = () => {
-  const Config = require('./config')
   if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
     return (req, res, next) => {
       req.session = {}

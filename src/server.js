@@ -53,9 +53,9 @@ var serverInstance = null
  * @param {number} port Port to register the Server against
  * @returns {Promise<Server>} Returns the Server object
  */
-const createServer = async (port) => {
+const createServer = async (port, user) => {
   let server
-  if (Config.getUserConfig().INBOUND_MUTUAL_TLS_ENABLED) {
+  if (await Config.getUserConfig(user).INBOUND_MUTUAL_TLS_ENABLED) {
     // Make sure hub server certificates are set in connection provider
     try {
       await ConnectionProvider.waitForTlsHubCerts()
@@ -100,9 +100,18 @@ const createServer = async (port) => {
   return server
 }
 
-const onPreHandler = (request, h) => {
-  // Generate UniqueID
+const onPreHandler = async (request, h) => {
   request.customInfo = {}
+  if (Config.getSystemConfig().HOSTING_ENABLED) {
+    request.customInfo.sourceUser = {
+      dfspId: request.headers['fspiop-source']
+    }
+    request.customInfo.user = {
+      dfspId: (await Config.getUserConfig(request.customInfo.sourceUser)).FSPID
+    }
+  }
+
+  // Generate UniqueID
   request.customInfo.uniqueId = UniqueIdGenerator.generateUniqueId(request)
   // Parse the traceparent header if present
   if (request.headers.traceparent) {
@@ -146,11 +155,11 @@ const initialize = async () => {
   return serverInstance
 }
 
-const restartServer = async () => {
+const restartServer = async (user) => {
   if (serverInstance) {
     console.log(`Toolkit Server restarted on port ${serverInstance.info.port}`)
     serverInstance.stop()
-    serverInstance = await createServer(Config.getSystemConfig().API_PORT)
+    serverInstance = await createServer(Config.getSystemConfig().API_PORT, user)
   }
 }
 

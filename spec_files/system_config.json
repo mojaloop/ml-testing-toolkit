@@ -8,6 +8,9 @@
     "forward": 1,
     "userSettings": 1
   },
+  "DB": {
+    "URI": "mongodb://mongo:27017/dfsps"
+  },
   "OAUTH": {
     "AUTH_ENABLED": false,
     "APP_OAUTH_CLIENT_KEY": "asdf",

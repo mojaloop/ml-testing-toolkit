@@ -30,7 +30,6 @@ const { readFileAsync }  = require('../../../../src/lib/utils')
 
 jest.mock('axios')
 jest.mock('../../../../src/lib/config')
-
 const userConfig = {
   JWS_SIGN: true,
   VALIDATE_INBOUND_JWS: true,
@@ -277,7 +276,7 @@ const axiosHelper = (type, url) => {
   return Promise.reject(new Error('not found'))
 }
 
-describe('mb-connection-manager', async () => {
+describe('mb-connection-manager', () => {
   describe('getTestingToolkitDfspJWSCerts', () => {
     it('should return null', async () => {
       const getTestingToolkitDfspJWSCerts = await MBConnectionManagerProvider.getTestingToolkitDfspJWSCerts()
@@ -285,15 +284,15 @@ describe('mb-connection-manager', async () => {
     })
   })
   describe('waitForTlsHubCerts', () => {
-    it('should wait for tls certs', async () => {
-      MBConnectionManagerProvider.waitForTlsHubCerts()
-      await new Promise(resolve => setTimeout(resolve, 500))
-    })
     it('should throw an error', async () => {
+      jest.useRealTimers()
       await expect(MBConnectionManagerProvider.waitForTlsHubCerts(0)).rejects.toThrowError()
     })
   })
   describe('initialize', () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
     it('should not throw error', async () => {
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
     })
@@ -471,6 +470,7 @@ describe('mb-connection-manager', async () => {
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
     })
+    
     it('should not throw error', async () => {
       const original = mapping.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] 
       mapping.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = {
@@ -604,6 +604,14 @@ describe('mb-connection-manager', async () => {
       mapping.get['/api/environments/1/hub/servercerts'] = original
     })
     it('should not throw error', async () => {
+      const original = mapping.get['/api/environments/1/hub/servercerts'] 
+      mapping.get['/api/environments/1/hub/servercerts'] = {
+        status: 400
+      }
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/hub/servercerts'] = original
+    })
+    it('should not throw error', async () => {
       const original = mapping.get['/api/environments/1/dfsps/userdfsp/servercerts'] 
       mapping.get['/api/environments/1/dfsps/userdfsp/servercerts'] = {
         status: 400
@@ -710,19 +718,17 @@ describe('mb-connection-manager', async () => {
       mapping.get['/api/environments/1/hub/servercerts'] = original
     })
   })
-  describe('getTlsConfig', async () => {
+  describe('getTlsConfig', () => {
     it('should have required properties', async () => {
       const tlsConfig = await MBConnectionManagerProvider.getTlsConfig()
       expect(tlsConfig).toHaveProperty('hubCaCert')
-      // expect(tlsConfig).toHaveProperty('dfspCaRootCert')
-      // expect(tlsConfig).toHaveProperty('hubClientCert')
       expect(tlsConfig).toHaveProperty('hubServerCaRootCert')
       expect(tlsConfig).toHaveProperty('hubServerCert')
       expect(tlsConfig).toHaveProperty('hubServerKey')
       expect(tlsConfig).toHaveProperty('hubClientKey')
     })
   })
-  describe('getTestingToolkitDfspJWSCerts', async () => {
+  describe('getTestingToolkitDfspJWSCerts', () => {
     it('should return certificate value', async () => {
       const dfspJwsCerts = await MBConnectionManagerProvider.getTestingToolkitDfspJWSCerts()
       expect(dfspJwsCerts).toEqual('asdf')
@@ -749,8 +755,8 @@ describe('mb-connection-manager', async () => {
   })
   describe('getEndpointsConfig', () => {
     it('get endpooints config', async () => {
-      await expect(MBConnectionManagerProvider.getEndpointsConfig()).resolves.toBeDefined()
+      const response = await MBConnectionManagerProvider.getEndpointsConfig()
+      expect(response).toBeDefined()
     })
   })
-
 })

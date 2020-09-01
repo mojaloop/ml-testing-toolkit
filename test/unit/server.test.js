@@ -137,6 +137,23 @@ describe('Server', () => {
       expect(server).toBeUndefined()
     })
   })
+  describe('onPreHandler', () => {
+    const h = {
+      continue: () => {}
+    }
+    const req = {
+      customInfo: {},
+      headers: {
+        'fspiop-source': 'data'
+      }
+    }
+    it('onPreHandler should not throw an error', async () => {
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: true
+      })
+      await Server.onPreHandler(req, h)
+    })
+  })
   describe('onPreResponse', () => {
     const h = {
       continue: () => {}

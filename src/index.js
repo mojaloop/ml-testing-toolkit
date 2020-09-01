@@ -31,12 +31,10 @@ const ConnectionProvider = require('./lib/configuration-providers/mb-connection-
 
 const init = async () => {
   await Config.loadSystemConfig()
-  await Config.loadUserConfig()
   apiServer.startServer(5050)
-
-  ConnectionProvider.initialize()
-
-  Server.initialize()
+  await Config.loadUserConfig()
+  await ConnectionProvider.initialize()
+  await Server.initialize()
 }
 
 init()

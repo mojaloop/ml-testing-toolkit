@@ -23,11 +23,12 @@
  --------------
  ******/
 
+const Config = require('../../../../src/lib/config')
+const loaded = Config.loadSystemConfigMiddleware()
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
 const axios = require('axios').default
-const Config = require('../../../../src/lib/config')
 const OutboundInitiator = require('../../../../src/lib/test-outbound/outbound-initiator')
 
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')

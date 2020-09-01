@@ -24,7 +24,6 @@
 
 'use strict'
 const Config = require('../config')
-let Constants = Config.getSystemConfig()
 const Cookies = require('cookies')
 const jwt = require('jsonwebtoken')
 const wso2Client = require('./Wso2Client')
@@ -34,8 +33,7 @@ const wso2Client = require('./Wso2Client')
  * If successful, sets the JWT token in a cookie and returns the token payload
  */
 exports.loginUser = async function (username, password, req, res) {
-  Constants = Config.getSystemConfig()
-  if (!Constants.OAUTH.AUTH_ENABLED) {
+  if (!Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
     return {
       ok: false,
       token: {
@@ -92,11 +90,10 @@ const buildJWTResponse = (decodedIdToken, accessToken, expiresIn, req, res) => {
   }
 
   decodedIdToken.dfspId = dfspId
-  console.log('LoginService.loginUser returning decodedIdToken: ', decodedIdToken)
 
   const cookies = new Cookies(req, res)
   const cookieOptions = { maxAge: expiresIn * 1000, httpOnly: true, sameSite: 'strict' } // secure is automatic based on HTTP or HTTPS used
-  cookies.set(Constants.OAUTH.JWT_COOKIE_NAME, accessToken, cookieOptions)
+  cookies.set(Config.getSystemConfig().OAUTH.JWT_COOKIE_NAME, accessToken, cookieOptions)
   return {
     ok: true,
     token: {
@@ -113,5 +110,5 @@ const buildJWTResponse = (decodedIdToken, accessToken, expiresIn, req, res) => {
  */
 exports.logoutUser = async function (req, res) {
   const cookies = new Cookies(req, res)
-  cookies.set(Constants.OAUTH.JWT_COOKIE_NAME)
+  cookies.set(Config.getSystemConfig().OAUTH.JWT_COOKIE_NAME)
 }

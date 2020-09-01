@@ -32,8 +32,13 @@ const SpyWriteFileAsync = jest.spyOn(Utils, 'writeFileAsync')
 
 describe('Config', () => {
   describe('when getUserConfig is called', () => {
-    it('should not throw an error ', () => {
-      expect(() => Config.getUserConfig()).toBeDefined()
+    it('should not throw an error ', async () => {
+      const userConfig = await Config.getUserConfig()
+      expect(userConfig).toBeDefined()
+    })
+    it('should not throw an error ', async () => {
+      const userConfig = await Config.getUserConfig({dfspId: 'test'})
+      expect(userConfig).toBeUndefined()
     })
   })
   describe('when getSystemConfig is called', () => {
@@ -67,6 +72,10 @@ describe('Config', () => {
   describe('when loadUserConfig throws an error', () => {
     it('the response should be true', async () => {
       const loadUserConfig = await Config.loadUserConfig()
+      expect(loadUserConfig).toBe(true)
+    })
+    it('the response should be true', async () => {
+      const loadUserConfig = await Config.loadUserConfig({dfspId: 'test'})
       expect(loadUserConfig).toBe(true)
     })
     it('the response should be true', async () => {

@@ -171,7 +171,6 @@ const fetchUserDFSPJwsCerts = async (environmentId, dfspId) => {
       if (!_.isEqual(fetchedJwsCerts, currentJWSConfig.dfsps[dfspId])) {
         currentJWSConfig.dfsps[dfspId] = fetchedJwsCerts
         await setJWSConfig()
-        // console.log('User DFSP JWS Certificate updated', fetchedJwsCerts.jwsCert)
       }
     }
   } catch (err) {}
@@ -439,12 +438,13 @@ const endpointChecker = async () => {
 }
 
 const checkConnectionManager = async () => {
-  if (Config.getUserConfig().CONNECTION_MANAGER_AUTH_ENABLED) {
+  const userConfig = await Config.getUserConfig()
+  if (userConfig.CONNECTION_MANAGER_AUTH_ENABLED) {
     // Get the cookies from object store
     currentCookies = await objectStore.get('CONNECTION_MANAGER_COOKIES')
   }
-  CONNECTION_MANAGER_API_URL = Config.getUserConfig().CONNECTION_MANAGER_API_URL
-  if (Config.getUserConfig().JWS_SIGN || Config.getUserConfig().VALIDATE_INBOUND_JWS) {
+  CONNECTION_MANAGER_API_URL = userConfig.CONNECTION_MANAGER_API_URL
+  if (userConfig.JWS_SIGN || userConfig.VALIDATE_INBOUND_JWS) {
     try {
       // Get private key for signing
       currentJWSConfig.testingToolkitDfspPrivateKey = await readFileAsync('secrets/privatekey.pem')
@@ -465,7 +465,7 @@ const checkConnectionManager = async () => {
     }
   }
 
-  if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED || Config.getUserConfig().INBOUND_MUTUAL_TLS_ENABLED) {
+  if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED || userConfig.INBOUND_MUTUAL_TLS_ENABLED) {
     try {
       // Do TLS related stuff
       if (!currentEnvironment) {
@@ -496,12 +496,10 @@ const initDFSPHelper = async () => {
   // Initialize HUB environment
   await initEnvironment()
   // Initialize the DFSPs
-  if (currentEnvironment) {
-    await initDFSP(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, 'Testing Toolkit DFSP')
-    const dfspList = await getDFSPs()
-    for (let i = 0; i < dfspList.length; i++) {
-      await initDFSP(currentEnvironment.id, dfspList[i].id, dfspList[i].name)
-    }
+  await initDFSP(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, 'Testing Toolkit DFSP')
+  const dfspList = await getDFSPs()
+  for (let i = 0; i < dfspList.length; i++) {
+    await initDFSP(currentEnvironment.id, dfspList[i].id, dfspList[i].name)
   }
 }
 
@@ -514,11 +512,12 @@ const initDFSPListStuff = async () => {
 }
 
 const initAuth = async () => {
-  if (Config.getUserConfig().CONNECTION_MANAGER_AUTH_ENABLED) {
-    CONNECTION_MANAGER_API_URL = Config.getUserConfig().CONNECTION_MANAGER_API_URL
+  const userConfig = await Config.getUserConfig()
+  if (userConfig.CONNECTION_MANAGER_AUTH_ENABLED) {
+    CONNECTION_MANAGER_API_URL = userConfig.CONNECTION_MANAGER_API_URL
     const loginFormData = {
-      username: Config.getUserConfig().CONNECTION_MANAGER_HUB_USERNAME,
-      password: Config.getUserConfig().CONNECTION_MANAGER_HUB_PASSWORD
+      username: userConfig.CONNECTION_MANAGER_HUB_USERNAME,
+      password: userConfig.CONNECTION_MANAGER_HUB_PASSWORD
     }
     const loginResp = await axios.post(CONNECTION_MANAGER_API_URL + '/api/login', querystring.stringify(loginFormData), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
     if (loginResp.status === 200) {
@@ -544,11 +543,7 @@ const waitForTlsHubCerts = async (interval = 2) => {
     if (currentTlsConfig.hubCaCert && currentTlsConfig.hubServerCert && currentTlsConfig.hubServerKey) {
       return true
     }
-    await new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve(true)
-      }, interval * 1000)
-    })
+    await new Promise(resolve => setTimeout(resolve, interval * 1000))
   }
   throw new Error('Timeout Hub Init')
 }

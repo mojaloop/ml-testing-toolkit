@@ -61,9 +61,8 @@ router.post('/token', async (req, res, next) => {
       'Internal/everyone'
     ]
     const systemConfig = Config.getSystemConfig()
-    const userConfig = Config.getUserConfig()
+    const userConfig = await Config.getUserConfig()
     if (req.body.username === userConfig.CONNECTION_MANAGER_HUB_USERNAME) {
-      plainIdToken.dfspId = req.body.username
       groupsData = [
         'Application/PTA',
         'Internal/everyone'
@@ -75,7 +74,6 @@ router.post('/token', async (req, res, next) => {
       if (!dfspValid) {
         throw (new Error('Invalid DFSP ID'))
       }
-      plainIdToken.dfspId = req.body.username
     }
     const expiresIn = 3600
     const iat = Date.now() / 1000

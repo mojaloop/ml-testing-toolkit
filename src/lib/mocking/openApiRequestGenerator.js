@@ -228,7 +228,6 @@ class OpenApiRequestGenerator {
   }
 
   async generateResponseBody (path, httpMethod, jsfRefs) {
-    console.log(this.schema.paths)
     const pathValue = this.schema.paths[path]
     const operation = pathValue[httpMethod]
     const id = operation.operationId || operation.summary

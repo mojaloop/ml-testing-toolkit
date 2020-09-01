@@ -23,9 +23,10 @@
  --------------
  ******/
 
+const Config = require('../../../../src/lib/config')
+const loaded = Config.loadSystemConfigMiddleware()
 const request = require('supertest')
 const app = require('../../../../src/lib/api-server').getApp()
-const Config = require('../../../../src/lib/config')
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 const SpyGetStoredUserConfig = jest.spyOn(Config, 'getStoredUserConfig')
 const SpySetStoredUserConfig = jest.spyOn(Config, 'setStoredUserConfig')
@@ -33,9 +34,8 @@ const SpyLoadUserConfig = jest.spyOn(Config, 'loadUserConfig')
 const Server = require('../../../../src/server')
 const SpyServer = jest.spyOn(Server, 'restartServer')
 
-
-
 describe('API route /config', () => {
+  Config.loadSystemConfigMiddleware()
   describe('GET /api/config/user', () => {
     it('Getting config', async () => {
       SpyGetUserConfig.mockReturnValueOnce({})
