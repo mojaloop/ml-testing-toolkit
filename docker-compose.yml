@@ -16,8 +16,6 @@ services:
       - sh
       - -c
       - "npm start |bunyan"
-    depends_on:
-      - mongo
   mojaloop-testing-toolkit-ui:
     image: mojaloop/ml-testing-toolkit-ui:v11.0.3
     ports:
