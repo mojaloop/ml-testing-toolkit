@@ -44,7 +44,7 @@ const context = require('./context')
 const openApiDefinitionsModel = require('../mocking/openApiDefinitionsModel')
 const uuid = require('uuid')
 const utilsInternal = require('../utilsInternal')
-const storageAdapter = require('../storageAdapter')
+const dbAdapter = require('../db/adapters/dbAdapter')
 
 var terminateTraceIds = {}
 
@@ -84,8 +84,10 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
         avgResponseTime: 'NA'
       }
       const totalResult = generateFinalReport(inputTemplate, runtimeInformation, dfspId)
-      if (dfspId) {
-        await storageAdapter.upsert('reports', totalResult, { dfspId }, true)
+      if (Config.getSystemConfig().HOSTING_ENABLED) {
+        const totalResultCopy = JSON.parse(JSON.stringify(totalResult))
+        totalResultCopy.runtimeInformation.completedTimeISO = completedTimeStamp
+        dbAdapter.upsert('reports', totalResultCopy, { dfspId })
       }
       notificationEmitter.broadcastOutboundProgress({
         status: 'FINISHED',

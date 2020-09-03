@@ -31,9 +31,15 @@ const assertionStore = require('../../../../src/lib/assertionStore')
 const SpyPopRequest = jest.spyOn(assertionStore, 'popRequest')
 const SpyPopCallback = jest.spyOn(assertionStore, 'popCallback')
 
+const requestLogger = require('../../../../src/lib/requestLogger')
+
+jest.mock('../../../../src/lib/requestLogger')
 jest.setTimeout(10000);
 
 describe('API route /longpolling/requests/*', () => {
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
   describe('GET /longpolling/requests/123', () => {
     it('Getting stored requests', async () => {
       SpyPopRequest.mockReturnValueOnce({

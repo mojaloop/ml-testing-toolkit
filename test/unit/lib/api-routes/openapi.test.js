@@ -34,8 +34,17 @@ const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
 const OpenApiDefinitionsModel = require('../../../../src/lib/mocking/openApiDefinitionsModel')
 const SpyGetApiDefinitions = jest.spyOn(OpenApiDefinitionsModel, 'getApiDefinitions')
 const SpyGetOpenApiObjects = jest.spyOn(OpenApiMockHandler, 'getOpenApiObjects')
+const requestLogger = require('../../../../src/lib/requestLogger')
+
+jest.mock('../../../../src/lib/requestLogger')
 
 describe('API route /api/openapi', () => {
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('GET /api/openapi/api_versions', () => {
     it('Getting all api versions', async () => {
       const mockGetApiDefinitionsResponse = [{

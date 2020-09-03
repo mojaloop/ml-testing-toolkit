@@ -18,8 +18,7 @@
  * Gates Foundation
 
  * ModusBox
- * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
- * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
 
@@ -157,36 +156,4 @@ describe('dbAdapter', () => {
       })
     })
   })
-  // describe('read', () => {
-  //   it('should create new object if not exists', async () => {
-  //     const result = await dbAdapter.read('undefined', user)
-  //     expect(result).toBeDefined()
-  //   })
-  //   it('should take existing object if exists', async () => {
-  //     const result = await dbAdapter.read('defined', user)
-  //     expect(result).toBeDefined()
-  //   })
-  // })
-  // describe('find', () => {
-  //   it('should return existing documents', async () => {
-  //     const result = await dbAdapter.find('undefined', user)
-  //     expect(result).toBeDefined()
-  //   })
-  // })
-  // describe('upsert', () => {
-  //   it('should create new object if not exists', async () => {
-  //     const result = await dbAdapter.upsert('undefined', {}, user)
-  //     expect(result).toBeDefined()
-  //   })
-  //   it('should create new object if not exists', async () => {
-  //     const result = await dbAdapter.upsert('defined', {}, user)
-  //     expect(result).toBeDefined()
-  //   })
-  // })
-  // describe('remove', () => {
-  //   it('should remove existing object', async () => {
-  //     const result = await dbAdapter.remove('undefined', user)
-  //     expect(result).toBeUndefined()
-  //   })
-  // })
 })

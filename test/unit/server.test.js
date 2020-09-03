@@ -36,12 +36,17 @@ const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
 const SpyInitObjectStore = jest.spyOn(ObjectStore, 'initObjectStore')
 const SpyInitAssertionStore = jest.spyOn(AssertionStore, 'initAssertionStore')
 const SpyInitilizeMockHandler = jest.spyOn(OpenApiMockHandler, 'initilizeMockHandler')
+const customLogger = require('../../src/lib/requestLogger')
 
+jest.mock('../../src/lib/requestLogger')
 jest.mock('../../src/lib/config')
 
 jest.setTimeout(30000)
 
 describe('Server', () => {
+  beforeAll(() => {
+    customLogger.logMessage.mockReturnValue()
+  })
   afterEach(() => {
     jest.clearAllMocks()
   })

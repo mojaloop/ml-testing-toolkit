@@ -27,30 +27,14 @@
 // const Util = require('util')
 var bunyan = require('bunyan')
 var Logger = bunyan.createLogger({ name: 'ml-testing-toolkit', level: 'debug' })
-const notificationEmitter = require('./notificationEmitter.js')
-const Config = require('../lib/config.js')
-const getSessionID = (request) => {
-  if (Config.getSystemConfig().HOSTING_ENABLED) {
-    return request && request.headers && request.headers['fspiop-source'] ? request.headers['fspiop-source'] : null
-  } else {
-    return request && request.customInfo ? request.customInfo.sessionID : null
-  }
-}
+const notificationEmitter = require('./notificationEmitter')
 
-const saveLog = (log, data) => {
-  if (Config.getSystemConfig().HOSTING_ENABLED) {
-    if (!data.user) {
-      data.user = data.request.customInfo.user
-    }
-  }
-}
-
-const logRequest = function (request, user) {
-  let log = `Request: ${request.method} ${request.path}`
+const logRequest = (request, user) => {
+  let message = `Request: ${request.method} ${request.path}`
   if (request.body) {
-    log += ` Body: ${request.body}`
+    message += ` Body: ${request.body}`
   }
-  logMessage('info', log, {
+  logMessage('info', message, {
     additionalData: {
       request: {
         uniqueId: request.customInfo ? request.customInfo.uniqueId : null,
@@ -65,13 +49,13 @@ const logRequest = function (request, user) {
   })
 }
 
-const logResponse = function (request, user) {
+const logResponse = (request, user) => {
   if (request.response) {
-    const log = `Response: ${request.method} ${request.path} Status: ${request.response.statusCode}`
-    logMessage('info', log, {
+    const message = `Response: ${request.method} ${request.path} Status: ${request.response.statusCode}`
+    logMessage('info', message, {
       additionalData: {
         response: {
-          uniqueId: request.customInfo ? request.customInfo.uniqueId : null,
+          uniqueId: request.customInfo.uniqueId || null,
           body: request.response.source
         }
       },
@@ -107,19 +91,31 @@ const logMessage = (verbosity, message, externalData = {}) => {
   }
 
   if (data.notification) {
-    console.log(data.notification)
-    console.log(verbosity)
     const log = {
       uniqueId: (data.request && data.request.customInfo) ? data.request.customInfo.uniqueId : null,
       traceID: (data.request && data.request.customInfo) ? data.request.customInfo.traceID : null,
       resource: data.request ? { method: data.request.method, path: data.request.path } : null,
       messageType: data.messageType,
-      verbosity: data.verbosity,
-      message: data.message,
+      verbosity,
+      message,
       additionalData: data.additionalData
     }
-    saveLog(log, data)
-    notificationEmitter.broadcastLog(log, getSessionID(data.request))
+
+    const hostingEnabled = require('./config').getSystemConfig().HOSTING_ENABLED
+    if (hostingEnabled) {
+      if (!data.user && data.request && data.request.customInfo) {
+        data.user = data.request.customInfo.user
+      }
+      data.sessionID = data.user.dfspId
+    } else {
+      data.sessionID = data.request && data.request.customInfo ? data.request.customInfo.sessionID : null
+    }
+
+    notificationEmitter.broadcastLog(log, data.sessionID)
+
+    if (hostingEnabled && data.user) {
+      require('./db/adapters/dbAdapter').upsert('logs', log, data.user)
+    }
   }
 }
 

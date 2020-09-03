@@ -32,8 +32,14 @@ const SpySetStoredUserConfig = jest.spyOn(Config, 'setStoredUserConfig')
 const SpyLoadUserConfig = jest.spyOn(Config, 'loadUserConfig')
 const Server = require('../../../../src/server')
 const SpyServer = jest.spyOn(Server, 'restartServer')
+const requestLogger = require('../../../../src/lib/requestLogger')
+
+jest.mock('../../../../src/lib/requestLogger')
 
 describe('API route /config', () => {
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
   describe('GET /api/config/user', () => {
     it('Getting config', async () => {
       SpyGetUserConfig.mockReturnValueOnce({})

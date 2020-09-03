@@ -26,12 +26,8 @@ const express = require('express')
 const router = new express.Router()
 // const { check, validationResult } = require('express-validator')
 const jsreportCore = require('jsreport-core')
-const fs = require('fs')
-const { promisify } = require('util')
-const readFileAsync = promisify(fs.readFile)
-
+const { readFileAsync } = require('../utils')
 const BASE_TEMPLATE_PATH = 'spec_files/reports/templates/newman'
-const storageAdapter = require('../storageAdapter')
 
 // Generate report
 router.post('/testcase/:format', async (req, res, next) => {
@@ -67,18 +63,6 @@ router.post('/testcase/:format', async (req, res, next) => {
     res.setHeader('Content-disposition', 'attachment; filename=TTK-Assertion-Report' + downloadFileSuffix)
     res.setHeader('TTK-FileName', 'TTK-Assertion-Report' + downloadFileSuffix)
     res.status(200).send(result.content)
-  } catch (err) {
-    next(err)
-  }
-})
-
-router.get('/testcase', async (req, res, next) => {
-  try {
-    let reports = (await storageAdapter.read('reports', req.user)).data
-    if (req.query && req.query.name) {
-      reports = reports.filter(report => report.name.includes(req.query.name))
-    }
-    res.status(200).send(reports)
   } catch (err) {
     next(err)
   }

@@ -22,11 +22,7 @@
  --------------
  ******/
 
-// TODO: Implement a logger and log the messages with different verbosity
-// TODO: Write unit tests
-
-const Config = require('../config.js')
-
+const Config = require('../config')
 var apiDefinitions = null
 const specFilePrefix = 'spec_files/api_definitions/'
 

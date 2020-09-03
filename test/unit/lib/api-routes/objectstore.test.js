@@ -24,14 +24,20 @@
  ******/
 
 const request = require('supertest')
-const apiServer = require('../../../src/lib/api-server')
+const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
-const objectStore = require('../../../src/lib/objectStore')
+const objectStore = require('../../../../src/lib/objectStore')
 
 const SpyGet = jest.spyOn(objectStore, 'get')
 const SpySet = jest.spyOn(objectStore, 'set')
+const requestLogger = require('../../../../src/lib/requestLogger')
+
+jest.mock('../../../../src/lib/requestLogger')
 
 describe('API route /api/objectstore', () => {
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
   describe('GET /api/objectstore/:object', () => {
     it('should not throw if the object is retrieved', async () => {
       SpyGet.mockReturnValueOnce({})

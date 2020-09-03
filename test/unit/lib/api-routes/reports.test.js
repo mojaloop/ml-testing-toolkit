@@ -25,19 +25,13 @@
 
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
-const fs = require('fs')
 const jsreportCore = require('jsreport-core')
+const requestLogger = require('../../../../src/lib/requestLogger')
 
 const app = apiServer.getApp()
-const axios = require('axios').default
 
-jest.mock('axios')
-axios.mockImplementation(() => Promise.resolve(true))
-
-jest.mock('fs')
 jest.mock('jsreport-core')
-
-fs.readFile.mockImplementation((_, callback) => callback(null, Buffer.from('Sample')))
+jest.mock('../../../../src/lib/requestLogger')
 
 const properJsonReport = {
   name: 'dfsp-p2p-tests',
@@ -219,6 +213,12 @@ const properJsonReport = {
 }
 
 describe('API route /api/reports', () => {
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('POST /api/reports/testcase/:format', () => {
     it('Send a proper html request', async () => {
       jsreportCore.mockImplementationOnce( () => {

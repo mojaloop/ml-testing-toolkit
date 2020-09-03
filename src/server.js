@@ -56,7 +56,6 @@ var serverInstance = null
 const createServer = async (port, user) => {
   let server
   const userConfig = await Config.getUserConfig(user)
-  console.log('userConfig - ', userConfig)
   if (userConfig.INBOUND_MUTUAL_TLS_ENABLED) {
     // Make sure hub server certificates are set in connection provider
     try {
@@ -152,15 +151,14 @@ const initialize = async () => {
   if (serverInstance) {
     objectStore.initObjectStore()
     assertionStore.initAssertionStore()
-
-    RequestLogger.logMessage('error', `Toolkit Server running on port ${serverInstance.info.port}`)
+    RequestLogger.logMessage('info', `Toolkit Server running on ${serverInstance.info.uri}`)
   }
   return serverInstance
 }
 
 const restartServer = async (user) => {
   if (serverInstance) {
-    RequestLogger.logMessage('error', `Toolkit Server restarted on port ${serverInstance.info.port}`, { user })
+    RequestLogger.logMessage('info', `Toolkit Server restarted on ${serverInstance.info.uri}`, { user })
     serverInstance.stop()
     serverInstance = await createServer(Config.getSystemConfig().API_PORT, user)
     return serverInstance

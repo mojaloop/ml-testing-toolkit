@@ -34,6 +34,9 @@ const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 
 const SpyLogin = jest.spyOn(LoginService, 'loginUser')
 const SpyLogout = jest.spyOn(LoginService, 'logoutUser')
+const requestLogger = require('../../../../src/lib/requestLogger')
+
+jest.mock('../../../../src/lib/requestLogger')
 
 const systemConfig = {
   "API_PORT": 5000,
@@ -42,12 +45,15 @@ const systemConfig = {
     "EMBEDDED_CERTIFICATE": "password"
   }
 }
-SpyGetSystemConfig.mockReturnValue(systemConfig)
 
 const app = apiServer.getApp()
 jest.setTimeout(30000)
 
 describe('API route /api/oauth2', () => {
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+    SpyGetSystemConfig.mockReturnValue(systemConfig)
+  })
   describe('GET /api/oauth2/token', () => {
     it('Verify oauth credentials when HOSTING_ENABLED is enabled', async () => {
       SpySign.mockReturnValueOnce('idToken')

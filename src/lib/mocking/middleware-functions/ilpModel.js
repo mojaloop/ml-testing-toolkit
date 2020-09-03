@@ -94,7 +94,7 @@ const validateTransferCondition = (context, request) => {
     let fulfilment = null
     if (request.customInfo.storedTransaction && request.customInfo.storedTransaction.fulfilment) {
       fulfilment = request.customInfo.storedTransaction.fulfilment
-      customLogger.logMessage('info', 'Validating condition with the stored fulfilment', null, true, request)
+      customLogger.logMessage('info', 'Validating condition with the stored fulfilment', { request })
     } else {
       try {
         fulfilment = ilpObj.calculateFulfil(request.payload.ilpPacket).replace('"', '')

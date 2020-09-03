@@ -58,11 +58,14 @@ describe('Config', () => {
   })
   describe('when getSystemConfig is called', () => {
     it('should not throw an error ', () => {
-      expect(() => Config.getSystemConfig()).toBeDefined()
+      expect(Config.getSystemConfig()).toBeDefined()
     })
   })
   describe('when getStoredUserConfig throws an error', () => {
     it('the response should not be empty object', async () => {
+      storageAdapter.read.mockResolvedValueOnce({
+        data: {}
+      })
       const userConfig = await Config.getStoredUserConfig()
       expect(userConfig).toBeDefined()
     })
@@ -85,16 +88,22 @@ describe('Config', () => {
     })
   })
   describe('when loadUserConfig throws an error', () => {
-    it('the response should be true', async () => {
+    it('the response should be true if user is not provided and there is no error', async () => {
+      storageAdapter.read.mockResolvedValueOnce({
+        data: {}
+      })
       const loadUserConfig = await Config.loadUserConfig()
       expect(loadUserConfig).toBe(true)
     })
-    it('the response should be true', async () => {
+    it('the response should be true if user is provided and there is no error', async () => {
+      storageAdapter.read.mockResolvedValueOnce({
+        data: {}
+      })
       const loadUserConfig = await Config.loadUserConfig({dfspId: 'test'})
       expect(loadUserConfig).toBe(true)
     })
-    it('the response should be true', async () => {
-      Utils.readFileAsync.mockRejectedValueOnce()
+    it('the response should be true if user is provided and there an error', async () => {
+      storageAdapter.read.mockRejectedValueOnce(new Error('expected error'))
       const loadUserConfig = await Config.loadUserConfig()
       expect(loadUserConfig).toBe(true)
     })

@@ -40,10 +40,8 @@ const getSystemConfig = () => {
 const getUserConfig = async (user) => {
   const item = user ? user.dfspId : 'data'
   if (!USER_CONFIG[item]) {
-    console.log(USER_CONFIG[item])
     await loadUserConfig(user)
   }
-  console.log(USER_CONFIG[item])
   return USER_CONFIG[item]
 }
 

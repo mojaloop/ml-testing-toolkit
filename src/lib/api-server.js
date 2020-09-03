@@ -30,8 +30,6 @@ const passport = require('passport')
 const cookieParser = require('cookie-parser')
 const util = require('util')
 const cors = require('cors')
-const Config = require('./config')
-const requestLogger = require('./requestLogger')
 
 const initServer = () => {
   // For CORS policy
@@ -56,12 +54,13 @@ const initServer = () => {
   app.use('/api/settings', verifyUser(), require('./api-routes/settings'))
   app.use('/api/samples', verifyUser(), require('./api-routes/samples'))
   app.use('/api/objectstore', verifyUser(), require('./api-routes/objectstore'))
+  app.use('/api/history', verifyUser(), require('./api-routes/history'))
 }
 
 const startServer = port => {
   initServer()
   http.listen(port)
-  requestLogger.logMessage('info', 'API Server started on port ' + port)
+  require('./requestLogger').logMessage('info', 'API Server started on port ' + port)
 }
 
 const getApp = () => {
@@ -72,13 +71,13 @@ const getApp = () => {
 }
 
 const verifyUser = () => {
-  if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
+  if (require('./config').getSystemConfig().OAUTH.AUTH_ENABLED) {
     return (req, res, next) => {
       req.session = {}
       passport.authenticate('jwt', { session: false, failureMessage: true })(req, res, next)
       // failWithError: true returns awful html error. , failureMessage: True to store failure message in req.session.messages, or a string to use as override message for failure.
       if (res.statusCode === 401) {
-        requestLogger.logMessage('error', `Unable to authenticate with passport.authenticate - ${util.inspect(req.session.messages)}`, { additionalData: req.session.messages, notification: false })
+        require('./requestLogger').logMessage('error', `Unable to authenticate with passport.authenticate - ${util.inspect(req.session.messages)}`, { additionalData: req.session.messages, notification: false })
       }
     }
     // return passport.authenticate('jwt', { session: false, failWithError: true })

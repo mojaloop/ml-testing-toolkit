@@ -37,7 +37,7 @@
     "test": "npm run test:unit",
     "test:unit": "jest --testMatch '**/test/unit/**/*.test.js'",
     "test:int": "jest --reporters=default --reporters=jest-junit --testMatch '**/test/integration/**/*.test.js'",
-    "test:coverage": "jest --coverage --coverageThreshold='{}' --testMatch '**/test/unit/temp_lib/config.test.js'",
+    "test:coverage": "jest --coverage --coverageThreshold='{}' --testMatch '**/test/unit/**/*.test.js'",
     "test:coverage-check": "jest --coverage --testMatch '**/test/unit/**/*.test.js'",
     "test:junit": "jest --reporters=default --reporters=jest-junit --testMatch '**/test/unit/**/*.test.js'",
     "test:integration": "./test/integration-runner.sh ",

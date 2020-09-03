@@ -49,9 +49,9 @@ const read = async (id, user) => {
   return document
 }
 
-const upsert = async (id, data, user, append) => {
+const upsert = async (id, data, user) => {
   if (user) {
-    await dbAdapter.upsert(id, data, user, append)
+    await dbAdapter.upsert(id, data, user)
   } else {
     await fileAdapter.upsert(id, data)
   }

@@ -42,13 +42,16 @@ describe('requestLogger', () => {
         body: {},
         customInfo: {
           uniqueId: '',
-          sessionID: ''
+          sessionID: '',
+          user: {
+            dfspId: 'test'
+          }
         },
         headers: {},
         query: {},
         payload: {}
       }
-      Config.getSystemConfig.mockReturnValue({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
       })
       expect(() => requestLogger.logRequest(req)).not.toThrowError()
@@ -60,7 +63,10 @@ describe('requestLogger', () => {
         body: {},
         customInfo: {
           uniqueId: '',
-          sessionID: ''
+          sessionID: '',
+          user: {
+            dfspId: 'test'
+          }
         },
         headers: {
           'fspiop-source': 'userdfsp'
@@ -68,7 +74,7 @@ describe('requestLogger', () => {
         query: {},
         payload: {}
       }
-      Config.getSystemConfig.mockReturnValue({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
       })
       expect(() => requestLogger.logRequest(req)).not.toThrowError()
@@ -85,7 +91,7 @@ describe('requestLogger', () => {
         query: {},
         payload: {}
       }
-      Config.getSystemConfig.mockReturnValue({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: false
       })
       expect(() => requestLogger.logRequest(req)).not.toThrowError()
@@ -98,11 +104,14 @@ describe('requestLogger', () => {
         query: {},
         payload: {}
       }
+      Config.getSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
       expect(() => requestLogger.logRequest(req)).not.toThrowError()
     })
   })
   describe('when logResponse is called', () => {
-    it('should not throw an error', async () => {
+    it('should not throw an error 1', async () => {
       const req = {
         response: {
           source: {},
@@ -115,6 +124,9 @@ describe('requestLogger', () => {
           sessionID: ''
         }
       }
+      Config.getSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
       expect(() => requestLogger.logResponse(req)).not.toThrowError()
     })
     it('should not throw an error if response is missing', async () => {
@@ -127,9 +139,13 @@ describe('requestLogger', () => {
           source: {},
           statusCode: 200
         },
+        customInfo: {},
         method: 'post',
         path: '/'
       }
+      Config.getSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
       expect(() => requestLogger.logResponse(req)).not.toThrowError()
     })
   })
@@ -182,7 +198,10 @@ describe('requestLogger', () => {
         request: {
           customInfo: {
             uniqueId: '',
-            sessionID: ''
+            sessionID: '',
+            user: {
+              dfspId: 'test'
+            }
           },
           method: 'put',
           path: '/'
@@ -191,7 +210,7 @@ describe('requestLogger', () => {
           dfspId: 'test'
         }
       }
-      Config.getSystemConfig.mockReturnValue({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
       })
       expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()

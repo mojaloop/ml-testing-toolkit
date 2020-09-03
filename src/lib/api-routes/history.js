@@ -22,44 +22,35 @@
  --------------
  ******/
 
-'use strict'
+const express = require('express')
+const router = new express.Router()
+const dbAdapter = require('../db/adapters/dbAdapter')
 
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-
-const commonModel = new Schema({
-  _id: String,
-  data: { type: Schema.Types.Mixed }
+router.get('/reports', async (req, res, next) => {
+  try {
+    const reports = (await dbAdapter.read('reports', req.user, { query: req.query }))
+    res.status(200).send(reports)
+  } catch (err) {
+    next(err)
+  }
 })
 
-const logsModel = new Schema({
-  _id: mongoose.Types.ObjectId,
-  uniqueId: {
-    type: String,
-    required: false
-  },
-  traceID: {
-    type: String,
-    required: false
-  },
-  resource: Object,
-  messageType: String,
-  verbosity: String,
-  message: String,
-  additionalData: Schema.Types.Mixed,
-  logTime: Date
-}, { _id: false })
-
-const reportsModel = new Schema({
-  _id: String,
-  name: String,
-  inputValues: Object,
-  test_cases: [],
-  runtimeInformation: Object
+router.post('/reports', async (req, res, next) => {
+  try {
+    await dbAdapter.upsert('reports', req.body, req.user)
+    res.status(200).send()
+  } catch (err) {
+    next(err)
+  }
 })
 
-module.exports = {
-  commonModel,
-  logsModel,
-  reportsModel
-}
+router.get('/logs', async (req, res, next) => {
+  try {
+    const logs = (await dbAdapter.read('logs', req.user, { query: req.query }))
+    res.status(200).send(logs)
+  } catch (err) {
+    next(err)
+  }
+})
+
+module.exports = router

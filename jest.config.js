@@ -5,10 +5,10 @@ module.exports = {
   ],
   coverageThreshold: {
     global: {
-      statements: 98,
-      functions: 98,
-      branches: 98,
-      lines: 98
+      statements: 95,
+      functions: 95,
+      branches: 95,
+      lines: 95
     }
   },
   modulePathIgnorePatterns: ['spec_files'],

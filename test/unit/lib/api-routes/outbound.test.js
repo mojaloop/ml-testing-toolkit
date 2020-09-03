@@ -33,15 +33,23 @@ const OutboundInitiator = require('../../../../src/lib/test-outbound/outbound-in
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 const SpyTerminateOutbound = jest.spyOn(OutboundInitiator, 'terminateOutbound')
 const SpyOutboundSend = jest.spyOn(OutboundInitiator, 'OutboundSend')
+const requestLogger = require('../../../../src/lib/requestLogger')
 
+jest.mock('../../../../src/lib/requestLogger')
 jest.mock('axios')
 
-const axiosMockedResponse = {
-  status: 200,
-  statusText: 'OK',
-  data: {}
-}
 describe('API route /api/outbound', () => {
+  const axiosMockedResponse = {
+    status: 200,
+    statusText: 'OK',
+    data: {}
+  }
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('POST /api/outbound/request', () => {
     it('Send a proper request', async () => {
       axios.mockImplementationOnce(() => Promise.resolve(true))
