@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -106,7 +107,7 @@ const logMessage = (verbosity, message, externalData = {}) => {
       if (!data.user && data.request && data.request.customInfo) {
         data.user = data.request.customInfo.user
       }
-      data.sessionID = data.user.dfspId
+      data.sessionID = data.user ? data.user.dfspId : null
     } else {
       data.sessionID = data.request && data.request.customInfo ? data.request.customInfo.sessionID : null
     }
