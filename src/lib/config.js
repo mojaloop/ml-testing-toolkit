@@ -79,16 +79,19 @@ const loadUserConfigDFSPWise = async (user) => {
   return userConfig.data
 }
 
-const loadSystemConfigMiddleware = () => {
-  Object.assign(SYSTEM_CONFIG, require('../../' + SYSTEM_CONFIG_FILE))
+const loadSystemConfig = () => {
+  if (Object.keys(SYSTEM_CONFIG).length === 0) {
+    Object.assign(SYSTEM_CONFIG, require('../../' + SYSTEM_CONFIG_FILE))
+  }
 }
 
-loadSystemConfigMiddleware()
+loadSystemConfig()
 
 module.exports = {
   getUserConfig: getUserConfig,
   getStoredUserConfig: getStoredUserConfig,
   setStoredUserConfig: setStoredUserConfig,
   loadUserConfig: loadUserConfig,
-  getSystemConfig: getSystemConfig
+  getSystemConfig: getSystemConfig,
+  loadSystemConfig: loadSystemConfig
 }

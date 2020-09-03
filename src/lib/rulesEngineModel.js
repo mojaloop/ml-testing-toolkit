@@ -333,6 +333,7 @@ const getRulesFiles = async (model, user) => {
     resp.activeRulesFile = model.activeRulesFile
     return resp
   } catch (err) {
+    console.log(err)
     return null
   }
 }

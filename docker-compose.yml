@@ -15,7 +15,7 @@ services:
     command:
       - sh
       - -c
-      - "npm start"
+      - "npm start |bunyan"
     depends_on:
       - mongo
   mojaloop-testing-toolkit-ui:

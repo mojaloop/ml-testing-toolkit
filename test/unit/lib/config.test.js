@@ -95,11 +95,13 @@ describe('Config', () => {
       const loadUserConfig = await Config.loadUserConfig()
       expect(loadUserConfig).toBe(true)
     })
-    it('the response should be true if user is provided and there is no error', async () => {
-      storageAdapter.read.mockResolvedValueOnce({
-        data: {}
-      })
+    it('the response should be true', async () => {
       const loadUserConfig = await Config.loadUserConfig({dfspId: 'test'})
+      expect(loadUserConfig).toBe(true)
+    })
+    it('the response should be true', async () => {
+      SpyReadFileAsync.mockRejectedValueOnce()
+      const loadUserConfig = await Config.loadUserConfig()
       expect(loadUserConfig).toBe(true)
     })
     it('the response should be true if user is provided and there an error', async () => {
