@@ -100,7 +100,7 @@ describe('Config', () => {
       expect(loadUserConfig).toBe(true)
     })
     it('the response should be true', async () => {
-      SpyReadFileAsync.mockRejectedValueOnce()
+      storageAdapter.read.mockRejectedValueOnce()
       const loadUserConfig = await Config.loadUserConfig()
       expect(loadUserConfig).toBe(true)
     })
@@ -108,6 +108,12 @@ describe('Config', () => {
       storageAdapter.read.mockRejectedValueOnce(new Error('expected error'))
       const loadUserConfig = await Config.loadUserConfig()
       expect(loadUserConfig).toBe(true)
+    })
+  })
+  describe('when loadSystemConfig', () => {
+    it('should not throw an error', async () => {
+      const loadUserConfig = await Config.loadSystemConfig()
+      expect(loadUserConfig).toBeUndefined()
     })
   })
 })

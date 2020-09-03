@@ -36,6 +36,7 @@ const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
 const SpyInitObjectStore = jest.spyOn(ObjectStore, 'initObjectStore')
 const SpyInitAssertionStore = jest.spyOn(AssertionStore, 'initAssertionStore')
 const SpyInitilizeMockHandler = jest.spyOn(OpenApiMockHandler, 'initilizeMockHandler')
+
 const customLogger = require('../../src/lib/requestLogger')
 
 jest.mock('../../src/lib/requestLogger')
@@ -180,7 +181,7 @@ describe('Server', () => {
       }
     }
     it('onPreHandler should not throw an error', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
       })
       await Server.onPreHandler(req, h)

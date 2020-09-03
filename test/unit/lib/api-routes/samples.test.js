@@ -22,8 +22,6 @@
  --------------
  ******/
 
-const Config = require('../../../../src/lib/config')
-const loaded = Config.loadSystemConfigMiddleware()
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()

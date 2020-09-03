@@ -102,17 +102,18 @@ const logMessage = (verbosity, message, externalData = {}) => {
       additionalData: data.additionalData
     }
 
+    let sessionID
     const hostingEnabled = require('./config').getSystemConfig().HOSTING_ENABLED
     if (hostingEnabled) {
       if (!data.user && data.request && data.request.customInfo) {
         data.user = data.request.customInfo.user
       }
-      data.sessionID = data.user ? data.user.dfspId : null
+      sessionID = data.user ? data.user.dfspId : null
     } else {
-      data.sessionID = data.request && data.request.customInfo ? data.request.customInfo.sessionID : null
+      sessionID = data.request && data.request.customInfo ? data.request.customInfo.sessionID : null
     }
 
-    notificationEmitter.broadcastLog(log, data.sessionID)
+    notificationEmitter.broadcastLog(log, sessionID)
 
     if (hostingEnabled && data.user) {
       require('./db/adapters/dbAdapter').upsert('logs', log, data.user)

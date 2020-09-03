@@ -215,5 +215,23 @@ describe('requestLogger', () => {
       })
       expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()
     })
+    it('when request is not empty should not throw an error', async () => {
+      const verbosity = 'info'
+      const message = ''
+      const externalData = {
+        request: {
+          customInfo: {
+            uniqueId: '',
+            sessionID: ''
+          },
+          method: 'put',
+          path: '/'
+        }
+      }
+      Config.getSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: true
+      })
+      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()
+    })
   })
 })
