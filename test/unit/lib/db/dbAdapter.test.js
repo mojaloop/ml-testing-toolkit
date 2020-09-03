@@ -18,8 +18,7 @@
  * Gates Foundation
 
  * ModusBox
- * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
- * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
 
@@ -35,8 +34,8 @@ mongoose.connect.mockReturnValueOnce({
     return {
       findById: (id) => {
         switch (id) {
-          case 'undefined': return undefined
-          case 'defined': return {
+          case 'id1': return undefined
+          case 'id2': return {
             data: {},
             save: async () => {}
           }
@@ -45,7 +44,7 @@ mongoose.connect.mockReturnValueOnce({
       create: (data) => data,
       find: () => {
         return [{
-          _id: 'undefined'
+          _id: 'id3'
         }]
       },
       findOneAndRemove: () => {},
@@ -73,33 +72,72 @@ describe('dbAdapter', () => {
   }
   describe('read', () => {
     it('should create new object if not exists', async () => {
-      const result = await dbAdapter.read('undefined', user)
+      const result = await dbAdapter.read('id1', user)
       expect(result).toBeDefined()
     })
     it('should take existing object if exists', async () => {
-      const result = await dbAdapter.read('defined', user)
+      const result = await dbAdapter.read('id2', user)
+      expect(result).toBeDefined()
+    })
+    it('should take existing logs', async () => {
+      const result = await dbAdapter.read('logs', user)
+      expect(result).toBeDefined()
+    })
+    it('should take existing logs in specific range', async () => {
+      const result = await dbAdapter.read('logs', user, {
+        query: {
+          gte: new Date().toISOString(),
+          lt: new Date().toISOString()
+        }
+      })
+      expect(result).toBeDefined()
+    })
+    it('should take existing reports', async () => {
+      const result = await dbAdapter.read('reports', user)
+      expect(result).toBeDefined()
+    })
+    it('should take existing reports in specific range', async () => {
+      const result = await dbAdapter.read('reports', user, {
+        query: {
+          gte: new Date().toISOString(),
+          lt: new Date().toISOString()
+        }
+      })
       expect(result).toBeDefined()
     })
   })
   describe('find', () => {
     it('should return existing documents', async () => {
-      const result = await dbAdapter.find('undefined', user)
+      const result = await dbAdapter.find('id3', user)
       expect(result).toBeDefined()
     })
   })
   describe('upsert', () => {
     it('should create new object if not exists', async () => {
-      const result = await dbAdapter.upsert('undefined', {}, user)
+      const result = await dbAdapter.upsert('id1', {}, user)
       expect(result).toBeDefined()
     })
     it('should create new object if not exists', async () => {
-      const result = await dbAdapter.upsert('defined', {}, user)
+      const result = await dbAdapter.upsert('id2', {}, user)
       expect(result).toBeDefined()
+    })
+    it('should create new object if not exists', async () => {
+      const result = await dbAdapter.upsert('logs', {}, user)
+      expect(result).toBeUndefined()
+    })
+    it('should create new object if not exists', async () => {
+      const result = await dbAdapter.upsert('reports', {
+        name: 'test',
+        runtimeInformation: {
+          completedTimeISO: new Date()
+        }
+      }, user)
+      expect(result).toBeUndefined()
     })
   })
   describe('remove', () => {
     it('should remove existing object', async () => {
-      const result = await dbAdapter.remove('undefined', user)
+      const result = await dbAdapter.remove('id1', user)
       expect(result).toBeUndefined()
     })
   })

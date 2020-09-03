@@ -48,8 +48,8 @@ const read = async (id, user, additionalData) => {
     const MyModel = conn.model(`${user.dfspId}_${id}`, mongoDBModels.logsModel)
     const query = {
       logTime: {
-        $gte: additionalData.query && additionalData.query.gte ? new Date(additionalData.query.gte) : new Date(Date.now() - (60 * 60 * 1000)),
-        $lt: additionalData.query && additionalData.query.lt ? new Date(additionalData.query.lt) : new Date()
+        $gte: additionalData && additionalData.query && additionalData.query.gte ? new Date(additionalData.query.gte) : new Date(Date.now() - (60 * 60 * 1000)),
+        $lt: additionalData && additionalData.query && additionalData.query.lt ? new Date(additionalData.query.lt) : new Date()
       }
     }
     documents = await MyModel.find(query)
@@ -57,11 +57,10 @@ const read = async (id, user, additionalData) => {
     const MyModel = conn.model(`${user.dfspId}_${id}`, mongoDBModels.reportsModel)
     const query = {
       'runtimeInformation.completedTimeISO': {
-        $gte: additionalData.query && additionalData.query.gte ? new Date(additionalData.query.gte) : new Date(Date.now() - (60 * 60 * 1000)),
-        $lt: additionalData.query && additionalData.query.lt ? new Date(additionalData.query.lt) : new Date()
+        $gte: additionalData && additionalData.query && additionalData.query.gte ? new Date(additionalData.query.gte) : new Date(Date.now() - (60 * 60 * 1000)),
+        $lt: additionalData && additionalData.query && additionalData.query.lt ? new Date(additionalData.query.lt) : new Date()
       }
     }
-    console.log(query)
     documents = await MyModel.find(query)
   } else {
     const MyModel = conn.model(user.dfspId, mongoDBModels.commonModel)
