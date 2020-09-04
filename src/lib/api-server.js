@@ -33,7 +33,13 @@ const cors = require('cors')
 
 const initServer = () => {
   // For CORS policy
-  app.use(cors({ origin: true, credentials: true }))
+  app.use(cors({
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+    exposedHeaders: ['Content-Disposition'],
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    origin: true,
+    credentials: true
+  }))
 
   // For parsing incoming JSON requests
   app.use(express.json({ limit: '50mb' }))
