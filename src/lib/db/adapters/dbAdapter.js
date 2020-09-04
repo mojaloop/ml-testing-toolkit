@@ -55,12 +55,12 @@ const read = async (id, user, additionalData) => {
     documents = await MyModel.find(query)
   } else if (id === 'reports') {
     const MyModel = conn.model(`${user.dfspId}_${id}`, mongoDBModels.reportsModel)
-    const query = {
+    const query = (additionalData && additionalData.query && (additionalData.query.gte || additionalData.query.lt)) ? {
       'runtimeInformation.completedTimeISO': {
-        $gte: additionalData && additionalData.query && additionalData.query.gte ? new Date(additionalData.query.gte) : new Date(Date.now() - (60 * 60 * 1000)),
+        $gte: additionalData && additionalData.query && additionalData.query.gte ? new Date(additionalData.query.gte) : new Date(Date.now() - (24 * 60 * 60 * 1000)),
         $lt: additionalData && additionalData.query && additionalData.query.lt ? new Date(additionalData.query.lt) : new Date()
       }
-    }
+    } : {}
     documents = await MyModel.find(query)
   } else {
     const MyModel = conn.model(user.dfspId, mongoDBModels.commonModel)
