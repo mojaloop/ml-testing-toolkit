@@ -110,7 +110,7 @@ const remove = async (id, user) => {
 
 process.on('SIGINT', () => {
   mongoose.connection.close(() => {
-    customLogger.logMessage('info', 'Mongoose default connection is disconnected due to application termination')
+    customLogger.logMessage('info', 'Mongoose default connection is disconnected due to application termination', { notification: false })
     process.exit(0)
   })
 })

@@ -347,7 +347,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
       try {
         await JwsSigning.sign(reqOpts)
       } catch (err) {
-        customLogger.logMessage('error', err.message, { additionalData: err })
+        customLogger.logMessage('error', err.message, { additionalData: err, notification: false })
       }
 
       var syncResponse = {}
@@ -396,9 +396,9 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         if (!successCallbackUrl || !errorCallbackUrl || ignoreCallbacks) {
           resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
         }
-        customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
+        customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user })
       }, (err) => {
-        customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: err, user })
+        customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: err, notification: false, user })
         reject(new Error(JSON.stringify({ errorCode: 4000 })))
       })
     })()
@@ -438,7 +438,7 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
               resultObject = resultObject.replace(element, replacedValue)
             }
           } catch (err) {
-            customLogger.logMessage('error', `${element} not found`)
+            customLogger.logMessage('error', `${element} not found`, { notification: false })
           }
           break
         }
@@ -561,6 +561,7 @@ const generateFinalReport = (inputTemplate, runtimeInformation) => {
           }
         })
         request.tests.passedAssertionsCount = testResult.passedCount
+        console.log('line 564')
       }
       return {
         request,

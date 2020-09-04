@@ -62,7 +62,7 @@ class RulesEngine {
         this.engine.addRule(r)
       })
     } catch (err) {
-      customLogger.logMessage('error', 'Error loading rules ' + err, { user })
+      customLogger.logMessage('error', 'Error loading rules ' + err, { notification: false })
       throw err
     }
   }

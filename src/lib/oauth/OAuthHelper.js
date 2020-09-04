@@ -61,21 +61,21 @@ function createJwtStrategy (extraExtractors) {
   jwtStrategyOpts.jsonWebTokenOptions = {}
   let certContent
   if (systemConfig.OAUTH.EMBEDDED_CERTIFICATE) {
-    customLogger.logMessage('info', 'Setting Token Issuer certificate from Constants.OAUTH.EMBEDDED_CERTIFICATE')
+    customLogger.logMessage('info', 'Setting Token Issuer certificate from Constants.OAUTH.EMBEDDED_CERTIFICATE', { notification: false })
     certContent = systemConfig.OAUTH.EMBEDDED_CERTIFICATE
   } else if (systemConfig.OAUTH.CERTIFICATE_FILE_NAME) {
-    customLogger.logMessage('info', `Setting Token Issuer certificate from Constants.OAUTH.CERTIFICATE_FILE_NAME: ${systemConfig.OAUTH.CERTIFICATE_FILE_NAME}`)
+    customLogger.logMessage('info', `Setting Token Issuer certificate from Constants.OAUTH.CERTIFICATE_FILE_NAME: ${systemConfig.OAUTH.CERTIFICATE_FILE_NAME}`, { notification: false })
     if (systemConfig.OAUTH.CERTIFICATE_FILE_NAME.startsWith('/')) {
-      customLogger.logMessage('info', 'Token Issuer Constants.OAUTH.CERTIFICATE_FILE_NAME absolute path')
+      customLogger.logMessage('info', 'Token Issuer Constants.OAUTH.CERTIFICATE_FILE_NAME absolute path', { notification: false })
       certContent = fs.readFileSync(systemConfig.OAUTH.CERTIFICATE_FILE_NAME, 'utf8')
     } else {
-      customLogger.logMessage('info', 'Token Issuer Constants.OAUTH.CERTIFICATE_FILE_NAME relative path')
+      customLogger.logMessage('info', 'Token Issuer Constants.OAUTH.CERTIFICATE_FILE_NAME relative path', { notification: false })
       certContent = fs.readFileSync(path.join(__dirname, '..', systemConfig.OAUTH.CERTIFICATE_FILE_NAME), 'utf8')
     }
   } else {
-    customLogger.logMessage('warn', 'No value specified for Constants.OAUTH.CERTIFICATE_FILE_NAME or Constants.OAUTH.EMBEDDED_CERTIFICATE. Auth will probably fail to validate the tokens')
+    customLogger.logMessage('warn', 'No value specified for Constants.OAUTH.CERTIFICATE_FILE_NAME or Constants.OAUTH.EMBEDDED_CERTIFICATE. Auth will probably fail to validate the tokens', { notification: false })
   }
-  customLogger.logMessage('info', `Token Issuer loaded: ${certContent}`)
+  customLogger.logMessage('info', `Token Issuer loaded: ${certContent}`, { notification: false })
 
   jwtStrategyOpts.secretOrKeyProvider = (request, rawJwtToken, done) => {
     done(null, certContent)
@@ -99,23 +99,23 @@ function createJwtStrategy (extraExtractors) {
 function verifyCallback (req, jwtPayload, done) {
   if (!jwtPayload.sub) {
     const message = 'Invalid Authentication info: no sub'
-    customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`)
+    customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`, { notification: false })
     return done(null, false, message)
   }
   if (!jwtPayload.iss) {
     const message = 'Invalid Authentication info: no iss'
-    customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`)
+    customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`, { notification: false })
     return done(null, false, message)
   }
   const systemConfig = Config.getSystemConfig()
   if (jwtPayload.iss !== systemConfig.OAUTH.OAUTH2_ISSUER && jwtPayload.iss !== systemConfig.OAUTH.OAUTH2_TOKEN_ISS) {
     const message = `Invalid Authentication: wrong issuer ${jwtPayload.iss}, expecting: ${systemConfig.OAUTH.OAUTH2_ISSUER} or ${systemConfig.OAUTH.OAUTH2_TOKEN_ISS}`
-    customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`)
+    customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`, { notification: false })
     return done(null, false, message)
   }
   if (!jwtPayload.groups) {
     const message = 'Invalid Authentication info: no groups'
-    customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`)
+    customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`, { notification: false })
     return done(null, false, message)
   }
   const foundMTA = jwtPayload.groups.includes(systemConfig.OAUTH.MTA_ROLE)
@@ -142,10 +142,10 @@ function getOAuth2Middleware () {
 
 const handleMiddleware = () => {
   if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
-    customLogger.logMessage('info', 'Enabling OAUTH')
+    customLogger.logMessage('info', 'Enabling OAUTH', { notification: false })
     getOAuth2Middleware()
   } else {
-    customLogger.logMessage('info', 'NOT enabling OAUTH')
+    customLogger.logMessage('info', 'NOT enabling OAUTH', { notification: false })
   }
 }
 

@@ -61,7 +61,7 @@ const createServer = async (port, user) => {
     try {
       await ConnectionProvider.waitForTlsHubCerts()
     } catch (err) {
-      RequestLogger.logMessage('error', 'Tls certificates initiation failed.', { user })
+      RequestLogger.logMessage('error', 'Tls certificates initiation failed.', { notification: false })
       return null
     }
     const tlsConfig = await ConnectionProvider.getTlsConfig()
@@ -151,7 +151,7 @@ const initialize = async () => {
   if (serverInstance) {
     objectStore.initObjectStore()
     assertionStore.initAssertionStore()
-    RequestLogger.logMessage('info', `Toolkit Server running on ${serverInstance.info.uri}`)
+    RequestLogger.logMessage('info', `Toolkit Server running on ${serverInstance.info.uri}`, { notification: false })
   }
   return serverInstance
 }

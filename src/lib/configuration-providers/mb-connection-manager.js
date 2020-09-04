@@ -117,10 +117,10 @@ const initDFSP = async (environmentId, dfspId, dfspName) => {
     if (dfspCreateResponse.status === 200) {
       return dfspCreateResponse.data
     } else {
-      customLogger.logMessage('error', 'Some error creating DFSP')
+      customLogger.logMessage('error', 'Some error creating DFSP', { notification: false })
     }
   } catch (err) {
-    customLogger.logMessage('error', 'Some error creating DFSP', { additionalData: err.response ? err.response.data : err })
+    customLogger.logMessage('error', 'Some error creating DFSP', { additionalData: err.response ? err.response.data : err, notification: false })
   }
 }
 
@@ -156,10 +156,10 @@ const initJWSCertificate = async (environmentId, dfspId, jwsCertificate, interme
     if (jwsCertResponse.status === 200) {
       return jwsCertResponse.data
     } else {
-      customLogger.logMessage('error', 'Some error creating / updating JWS cert for DFSP')
+      customLogger.logMessage('error', 'Some error creating / updating JWS cert for DFSP', { notification: false })
     }
   } catch (err) {
-    customLogger.logMessage('error', 'Some error creating / updating JWS cert for DFSP', { additionalData: err.response ? err.response.data : err })
+    customLogger.logMessage('error', 'Some error creating / updating JWS cert for DFSP', { additionalData: err.response ? err.response.data : err, notification: false })
   }
 }
 
@@ -227,10 +227,10 @@ const initHubCa = async (environmentId) => {
     if (hubCaCertResponse.status === 200) {
       return hubCaCertResponse.data.certificate
     } else {
-      customLogger.logMessage('error', 'Some error creating Hub CA Certificate')
+      customLogger.logMessage('error', 'Some error creating Hub CA Certificate', { notification: false })
     }
   } catch (err) {
-    customLogger.logMessage('error', 'Some error creating Hub CA Certificate', { additionalData: err.response ? err.response.data : err })
+    customLogger.logMessage('error', 'Some error creating Hub CA Certificate', { additionalData: err.response ? err.response.data : err, notification: false })
   }
 }
 
@@ -265,13 +265,13 @@ const checkDfspCsrs = async (environmentId, dfspId) => {
 
       if (signResponse.status === 200) {
         if (signResponse.data.certificate) {
-          customLogger.logMessage('info', 'CSR signed for ' + dfspId)
+          customLogger.logMessage('info', 'CSR signed for ' + dfspId, { notification: false })
         }
       } else {
-        customLogger.logMessage('error', 'Some error signing DFSP CSR')
+        customLogger.logMessage('error', 'Some error signing DFSP CSR', { notification: false })
       }
     } catch (err) {
-      customLogger.logMessage('error', 'Some error signing DFSP CSR', { additionalData: err.response ? err.response.data : err })
+      customLogger.logMessage('error', 'Some error signing DFSP CSR', { additionalData: err.response ? err.response.data : err, notification: false })
     }
   }
 }
@@ -290,7 +290,7 @@ const checkHubCsrs = async (environmentId, dfspId) => {
   if (hubCsrs.length > 0) {
     const hubSignedCsrs = hubCsrs.filter(item => (item.validationState === 'VALID' && item.state === 'CERT_SIGNED' && item.certificate !== null))
     if (hubSignedCsrs.length > 0 && currentTlsConfig.dfsps[dfspId] && currentTlsConfig.dfsps[dfspId].hubClientCert !== hubSignedCsrs[0].certificate) {
-      customLogger.logMessage('info', 'New Signed Hub client CERT Found: ' + dfspId)
+      customLogger.logMessage('info', 'New Signed Hub client CERT Found: ' + dfspId, { notification: false })
       currentTlsConfig.dfsps[dfspId].hubClientCert = hubSignedCsrs[0].certificate
       await setTLSConfig()
     }
@@ -302,9 +302,9 @@ const checkHubCsrs = async (environmentId, dfspId) => {
       }
       let hubCsrCreateResponse = null
       hubCsrCreateResponse = await axios.post(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps/' + dfspId + '/enrollments/outbound', hubCsrData, { headers: { Cookie: currentCookies[0], 'Content-Type': 'application/json' } })
-      customLogger.logMessage('info', hubCsrCreateResponse.status === 200 ? 'Hub CSR Uploaded' : 'Some error uploading Hub CSR')
+      customLogger.logMessage('info', hubCsrCreateResponse.status === 200 ? 'Hub CSR Uploaded' : 'Some error uploading Hub CSR', { notification: false })
     } catch (err) {
-      customLogger.logMessage('error', 'Some error uploading Hub CSR', { additionalData: err.response ? err.response.data : err })
+      customLogger.logMessage('error', 'Some error uploading Hub CSR', { additionalData: err.response ? err.response.data : err, notification: false })
     }
   }
 }
@@ -331,24 +331,24 @@ const uploadHubServerCerts = async (environmentId, rootCert, intermediateChain, 
       try {
         const hubServerCertsUpdateResponse = await axios.put(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/hub/servercerts', newHubServerCerts, { headers: { Cookie: currentCookies[0], 'Content-Type': 'application/json' } })
         if (hubServerCertsUpdateResponse.status === 200) {
-          customLogger.logMessage('info', 'Hub Server certs updated')
+          customLogger.logMessage('info', 'Hub Server certs updated', { notification: false })
         } else {
-          customLogger.logMessage('error', 'Some error updating Hub server certs')
+          customLogger.logMessage('error', 'Some error updating Hub server certs', { notification: false })
         }
       } catch (err) {
-        customLogger.logMessage('error', 'Some error updating Hub server certs', { additionalData: err })
+        customLogger.logMessage('error', 'Some error updating Hub server certs', { additionalData: err, notification: false })
       }
     }
   } else {
     try {
       const hubServerCertsCreateResponse = await axios.post(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/hub/servercerts', newHubServerCerts, { headers: { Cookie: currentCookies[0], 'Content-Type': 'application/json' } })
       if (hubServerCertsCreateResponse.status === 200) {
-        customLogger.logMessage('info', 'Hub Server certs created')
+        customLogger.logMessage('info', 'Hub Server certs created', { notification: false })
       } else {
-        customLogger.logMessage('error', 'Some error creating Hub server certs')
+        customLogger.logMessage('error', 'Some error creating Hub server certs', { notification: false })
       }
     } catch (err) {
-      customLogger.logMessage('error', 'Some error creating Hub server certs', { additionalData: err })
+      customLogger.logMessage('error', 'Some error creating Hub server certs', { additionalData: err, notification: false })
     }
   }
 }
@@ -469,7 +469,7 @@ const checkConnectionManager = async () => {
         await fetchUserDFSPJwsCerts(currentEnvironment.id, dfspList[i].id)
       }
     } catch (err) {
-      customLogger.logMessage('error', err.message, { additionalData: err })
+      customLogger.logMessage('error', err.message, { additionalData: err, notification: false })
     }
   }
 
@@ -482,7 +482,7 @@ const checkConnectionManager = async () => {
       }
       await tlsChecker()
     } catch (err) {
-      customLogger.logMessage('error', err.message, { additionalData: err })
+      customLogger.logMessage('error', err.message, { additionalData: err, notification: false })
     }
   }
 
@@ -495,7 +495,7 @@ const checkConnectionManager = async () => {
       }
       await endpointChecker()
     } catch (err) {
-      customLogger.logMessage('error', err.message, { additionalData: err })
+      customLogger.logMessage('error', err.message, { additionalData: err, notification: false })
     }
   }
 }

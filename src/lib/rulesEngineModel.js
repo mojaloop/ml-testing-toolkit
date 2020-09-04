@@ -273,7 +273,7 @@ const deleteForwardRulesFile = async (fileName, user) => {
 
 // common functions
 const reloadRules = async (model, user) => {
-  customLogger.logMessage('info', `Reloading ${model.ruleType} Rules from file ` + model.activeRulesFile, { user })
+  customLogger.logMessage('info', `Reloading ${model.ruleType} Rules from file ` + model.activeRulesFile, { notification: false })
   const userRules = await storageAdapter.read(model.rulesFilePathPrefix + model.activeRulesFile, user)
   model.rules = userRules.data
   if (!model.rules || !model.rules.length) {
@@ -333,7 +333,6 @@ const getRulesFiles = async (model, user) => {
     resp.activeRulesFile = model.activeRulesFile
     return resp
   } catch (err) {
-    console.log(err)
     return null
   }
 }

@@ -59,7 +59,7 @@ const handleRequest = async (context, request, callback, triggerFolder) => {
           outbound.OutboundSend(outboundTemplate, null, callback.fspId)
         }
       } catch (err) {
-        customLogger.logMessage('error', err.message, err)
+        customLogger.logMessage('error', err.message, err, { notification: false })
       }
     }
   }
