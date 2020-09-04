@@ -25,6 +25,8 @@
 const express = require('express')
 const app = express()
 const http = require('http').Server(app)
+const customLogger = require('./requestLogger')
+const Config = require('./config')
 const socketIO = require('socket.io')(http)
 const passport = require('passport')
 const cookieParser = require('cookie-parser')
@@ -49,24 +51,25 @@ const initServer = () => {
   app.use(cookieParser())
   require('./oauth/OAuthHelper').handleMiddleware()
 
+  const verifyUserMiddleware = verifyUser()
   // For admin API
-  app.use('/api/rules', verifyUser(), require('./api-routes/rules'))
-  app.use('/api/openapi', verifyUser(), require('./api-routes/openapi'))
-  app.use('/api/outbound', verifyUser(), require('./api-routes/outbound'))
-  app.use('/api/config', verifyUser(), require('./api-routes/config'))
-  app.use('/longpolling', verifyUser(), require('./api-routes/longpolling'))
+  app.use('/api/rules', verifyUserMiddleware, require('./api-routes/rules'))
+  app.use('/api/openapi', verifyUserMiddleware, require('./api-routes/openapi'))
+  app.use('/api/outbound', verifyUserMiddleware, require('./api-routes/outbound'))
+  app.use('/api/config', verifyUserMiddleware, require('./api-routes/config'))
+  app.use('/longpolling', verifyUserMiddleware, require('./api-routes/longpolling'))
   app.use('/api/oauth2', require('./api-routes/oauth2'))
-  app.use('/api/reports', verifyUser(), require('./api-routes/reports'))
-  app.use('/api/settings', verifyUser(), require('./api-routes/settings'))
-  app.use('/api/samples', verifyUser(), require('./api-routes/samples'))
-  app.use('/api/objectstore', verifyUser(), require('./api-routes/objectstore'))
-  app.use('/api/history', verifyUser(), require('./api-routes/history'))
+  app.use('/api/reports', verifyUserMiddleware, require('./api-routes/reports'))
+  app.use('/api/settings', verifyUserMiddleware, require('./api-routes/settings'))
+  app.use('/api/samples', verifyUserMiddleware, require('./api-routes/samples'))
+  app.use('/api/objectstore', verifyUserMiddleware, require('./api-routes/objectstore'))
+  app.use('/api/history', verifyUserMiddleware, require('./api-routes/history'))
 }
 
 const startServer = port => {
   initServer()
   http.listen(port)
-  require('./requestLogger').logMessage('info', 'API Server started on port ' + port)
+  customLogger.logMessage('info', 'API Server started on port ' + port, { notification: false })
 }
 
 const getApp = () => {
@@ -77,13 +80,13 @@ const getApp = () => {
 }
 
 const verifyUser = () => {
-  if (require('./config').getSystemConfig().OAUTH.AUTH_ENABLED) {
+  if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
     return (req, res, next) => {
       req.session = {}
       passport.authenticate('jwt', { session: false, failureMessage: true })(req, res, next)
       // failWithError: true returns awful html error. , failureMessage: True to store failure message in req.session.messages, or a string to use as override message for failure.
       if (res.statusCode === 401) {
-        require('./requestLogger').logMessage('error', `Unable to authenticate with passport.authenticate - ${util.inspect(req.session.messages)}`, { additionalData: req.session.messages, notification: false })
+        customLogger.logMessage('error', `Unable to authenticate with passport.authenticate - ${util.inspect(req.session.messages)}`, { additionalData: req.session.messages, notification: false })
       }
     }
     // return passport.authenticate('jwt', { session: false, failWithError: true })

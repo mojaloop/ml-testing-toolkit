@@ -23,6 +23,13 @@
  --------------
  ******/
 
+const Config = require('../../../../src/lib/config')
+jest.mock('../../../../src/lib/config')
+Config.getSystemConfig.mockReturnValue({
+  OAUTH: {
+    AUTH_ENABLED: false
+  }
+})
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const jsreportCore = require('jsreport-core')

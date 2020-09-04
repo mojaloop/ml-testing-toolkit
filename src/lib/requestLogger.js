@@ -28,7 +28,6 @@
 // const Util = require('util')
 var bunyan = require('bunyan')
 var Logger = bunyan.createLogger({ name: 'ml-testing-toolkit', level: 'debug' })
-const notificationEmitter = require('./notificationEmitter')
 
 const logRequest = (request, user) => {
   let message = `Request: ${request.method} ${request.path}`
@@ -80,14 +79,14 @@ const logMessage = (verbosity, message, externalData = {}) => {
       Logger.debug(data.additionalData, message)
       break
     case 'warn':
-      Logger.warn(message)
+      Logger.warn(data.additionalData, message)
       break
     case 'error':
-      Logger.error(message)
+      Logger.error(data.additionalData, message)
       break
     case 'info':
     default: {
-      Logger.info(message)
+      Logger.info(data.additionalData, message)
     }
   }
 
@@ -113,10 +112,12 @@ const logMessage = (verbosity, message, externalData = {}) => {
       sessionID = data.request && data.request.customInfo ? data.request.customInfo.sessionID : null
     }
 
+    const notificationEmitter = require('./notificationEmitter')
     notificationEmitter.broadcastLog(log, sessionID)
 
     if (hostingEnabled && data.user) {
-      require('./db/adapters/dbAdapter').upsert('logs', log, data.user)
+      const dbAdapter = require('./db/adapters/dbAdapter')
+      dbAdapter.upsert('logs', log, data.user)
     }
   }
 }

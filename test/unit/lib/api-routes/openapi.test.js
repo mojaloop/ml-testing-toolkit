@@ -23,6 +23,14 @@
  --------------
  ******/
 
+const Config = require('../../../../src/lib/config')
+jest.mock('../../../../src/lib/config')
+Config.getSystemConfig.mockReturnValue({
+  OAUTH: {
+    AUTH_ENABLED: false
+  }
+})
+
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const OpenApiMockHandler = require('../../../../src/lib/mocking/openApiMockHandler')
@@ -37,6 +45,7 @@ const SpyGetOpenApiObjects = jest.spyOn(OpenApiMockHandler, 'getOpenApiObjects')
 const requestLogger = require('../../../../src/lib/requestLogger')
 
 jest.mock('../../../../src/lib/requestLogger')
+jest.mock('../../../../src/lib/config')
 
 describe('API route /api/openapi', () => {
   beforeAll(() => {

@@ -26,9 +26,9 @@
 const express = require('express')
 const router = new express.Router()
 const jwt = require('jsonwebtoken')
+const { verifyUser } = require('../api-server')
 const Config = require('../config')
 const LoginService = require('../oauth/LoginService')
-const { verifyUser } = require('../api-server')
 
 router.post('/login', async (req, res, next) => {
   try {
@@ -61,7 +61,7 @@ router.post('/token', async (req, res, next) => {
       'Internal/everyone'
     ]
     const systemConfig = Config.getSystemConfig()
-    const userConfig = await Config.getUserConfig()
+    const userConfig = await Config.getUserConfig(plainIdToken)
     if (req.body.username === userConfig.CONNECTION_MANAGER_HUB_USERNAME) {
       groupsData = [
         'Application/PTA',

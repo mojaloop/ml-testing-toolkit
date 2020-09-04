@@ -24,15 +24,12 @@
 
 'use strict'
 
-const mongoose = require('mongoose')
-const mongoDBModels = require('../models/mongoDBModels')
-const customLogger = require('../../requestLogger')
-let Config
+const mongoDBWrapper = require('../models/mongoDBWrapper')
 let conn
 const getConnection = async () => {
   if (!conn) {
-    Config = require('../../config')
-    conn = await mongoose.connect(Config.getSystemConfig().DB.URI, {
+    const Config = require('../../config')
+    conn = await mongoDBWrapper.connect(Config.getSystemConfig().DB.URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false
@@ -45,25 +42,27 @@ const read = async (id, user, additionalData) => {
   const conn = await getConnection()
   let documents
   if (id === 'logs') {
-    const MyModel = conn.model(`${user.dfspId}_${id}`, mongoDBModels.logsModel)
+    const MyModel = conn.model(`${user.dfspId}_${id}`, mongoDBWrapper.models.logs)
+    // by default is taking the logs from the last hour
     const query = {
       logTime: {
         $gte: additionalData && additionalData.query && additionalData.query.gte ? new Date(additionalData.query.gte) : new Date(Date.now() - (60 * 60 * 1000)),
         $lt: additionalData && additionalData.query && additionalData.query.lt ? new Date(additionalData.query.lt) : new Date()
       }
     }
-    documents = await MyModel.find(query).sort('logTime').select('-_id -__v')
+    documents = await MyModel.find(query).select('-_id -__v').sort('logTime')
   } else if (id === 'reports') {
-    const MyModel = conn.model(`${user.dfspId}_${id}`, mongoDBModels.reportsModel)
-    const query = (additionalData && additionalData.query && (additionalData.query.gte || additionalData.query.lt)) ? {
+    const MyModel = conn.model(`${user.dfspId}_${id}`, mongoDBWrapper.models.reports)
+    // by default is taking the reports from the last 30 days
+    const query = {
       'runtimeInformation.completedTimeISO': {
-        $gte: additionalData && additionalData.query && additionalData.query.gte ? new Date(additionalData.query.gte) : new Date(Date.now() - (24 * 60 * 60 * 1000)),
+        $gte: additionalData && additionalData.query && additionalData.query.gte ? new Date(additionalData.query.gte) : new Date(Date.now() - (30 * 24 * 60 * 60 * 1000)),
         $lt: additionalData && additionalData.query && additionalData.query.lt ? new Date(additionalData.query.lt) : new Date()
       }
-    } : {}
-    documents = await MyModel.find(query).sort('-runtimeInformation.completedTimeISO').select('-_id -__v')
+    }
+    documents = await MyModel.find(query).select('-_id -__v').sort('-runtimeInformation.completedTimeISO')
   } else {
-    const MyModel = conn.model(user.dfspId, mongoDBModels.commonModel)
+    const MyModel = conn.model(user.dfspId, mongoDBWrapper.models.common)
     documents = await MyModel.findById(id)
     if (!documents) {
       documents = await MyModel.create({
@@ -77,8 +76,8 @@ const read = async (id, user, additionalData) => {
 
 const find = async (id, user) => {
   const conn = await getConnection()
-  const MyModel = conn.model(user.dfspId, mongoDBModels.commonModel)
-  const documents = await MyModel.find({ _id: { $regex: `${id}`, $options: 'i' } }, '_id')
+  const MyModel = conn.model(user.dfspId, mongoDBWrapper.models.commonModel)
+  const documents = await MyModel.find({ _id: { $regex: `${id}`, $options: 'i' } }).select('_id')
   documents.forEach((item, i) => { documents[i] = item._id })
   return documents
 }
@@ -87,16 +86,16 @@ const upsert = async (id, data, user) => {
   const conn = await getConnection()
   if (id === 'logs') {
     const collectionId = `${user.dfspId}_${id}`
-    const MyModel = conn.model(collectionId, mongoDBModels.logsModel)
-    data._id = new mongoose.Types.ObjectId()
+    const MyModel = conn.model(collectionId, mongoDBWrapper.models.logs)
+    data._id = new mongoDBWrapper.Types.ObjectId()
     await MyModel.create(data)
   } else if (id === 'reports') {
     const collectionId = `${user.dfspId}_${id}`
-    const MyModel = conn.model(collectionId, mongoDBModels.reportsModel)
+    const MyModel = conn.model(collectionId, mongoDBWrapper.models.reports)
     data._id = `${data.name}_${data.runtimeInformation.completedTimeISO.toISOString()}`
     await MyModel.create(data)
   } else {
-    const MyModel = conn.model(user.dfspId, mongoDBModels.commonModel)
+    const MyModel = conn.model(user.dfspId, mongoDBWrapper.models.common)
     const document = await MyModel.findOneAndUpdate({ _id: id }, { $set: { data } }, { new: true, upsert: true })
     return document
   }
@@ -104,16 +103,9 @@ const upsert = async (id, data, user) => {
 
 const remove = async (id, user) => {
   const conn = await getConnection()
-  const MyModel = conn.model(user.dfspId, mongoDBModels.commonModel)
+  const MyModel = conn.model(user.dfspId, mongoDBWrapper.models.common)
   await MyModel.findOneAndRemove({ _id: id })
 }
-
-process.on('SIGINT', () => {
-  mongoose.connection.close(() => {
-    customLogger.logMessage('info', 'Mongoose default connection is disconnected due to application termination', { notification: false })
-    process.exit(0)
-  })
-})
 
 module.exports = {
   read,

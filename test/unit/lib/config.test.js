@@ -113,7 +113,7 @@ describe('Config', () => {
   describe('when loadSystemConfig', () => {
     it('should not throw an error', async () => {
       const loadUserConfig = await Config.loadSystemConfig()
-      expect(loadUserConfig).toBeUndefined()
+      expect(loadUserConfig).toBeTruthy()
     })
   })
 })

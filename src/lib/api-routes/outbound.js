@@ -55,7 +55,7 @@ async (req, res, next) => {
     }).then((result) => {
       customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user: req.user })
     }, (err) => {
-      customLogger.logMessage('info', 'Failed to send request ' + req.body.method + ' ' + req.body.path, { additionalData: err, notification: false, user: req.user })
+      customLogger.logMessage('error', 'Failed to send request ' + req.body.method + ' ' + req.body.path, { additionalData: err, notification: false, user: req.user })
     })
     res.status(200).json({ status: 'OK' })
   } catch (err) {

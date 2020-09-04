@@ -23,13 +23,19 @@
  ******/
 
 const Config = require('../../../../src/lib/config')
+jest.mock('../../../../src/lib/config')
+Config.getSystemConfig.mockReturnValue({
+  OAUTH: {
+    AUTH_ENABLED: false
+  }
+})
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const Server = require('../../../../src/server')
 const ImportExport = require('../../../../src/lib/importExport')
 const RulesEngineModel = require('../../../../src/lib/rulesEngineModel')
 const requestLogger = require('../../../../src/lib/requestLogger')
-let app
+const app = apiServer.getApp()
 
 jest.mock('../../../../src/server')
 jest.mock('../../../../src/lib/requestLogger')
@@ -40,12 +46,6 @@ jest.mock('../../../../src/lib/rulesEngineModel')
 describe('API route /api/settings', () => {
   beforeAll(() => {
     requestLogger.logMessage.mockReturnValue()
-    Config.getSystemConfig.mockReturnValue({
-      OAUTH: {
-        AUTH_ENABLED: false
-      }
-    })
-    app = apiServer.getApp()
   })
   afterEach(() => {
     jest.clearAllMocks()

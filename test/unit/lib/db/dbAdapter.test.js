@@ -42,10 +42,28 @@ mongoose.connect.mockReturnValueOnce({
         }
       },
       create: (data) => data,
-      find: () => {
-        return [{
-          _id: 'id3'
-        }]
+      find: (query) => {
+        if (query._id) {
+          return {
+            select: () => {
+              return [{
+                _id: 'id3'
+              }]
+            }
+          }
+        } else {
+          return {
+            select: () => {
+              return {
+                sort: () => {
+                  return [{
+                    _id: 'id4'
+                  }]
+                }
+              }
+            }
+          }
+        }
       },
       findOneAndRemove: () => {},
       findOneAndUpdate: () => {return {}}

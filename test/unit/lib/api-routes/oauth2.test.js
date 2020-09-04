@@ -23,14 +23,18 @@
  --------------
  ******/
 
+const Config = require('../../../../src/lib/config')
+jest.mock('../../../../src/lib/config')
+Config.getSystemConfig.mockReturnValue({
+  OAUTH: {
+    OAUTH_ENABLED: false
+  }
+})
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const jwt = require('jsonwebtoken')
-const Config = require('../../../../src/lib/config')
 const LoginService = require('../../../../src/lib/oauth/LoginService')
 const SpySign = jest.spyOn(jwt, 'sign')
-const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
-const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 
 const SpyLogin = jest.spyOn(LoginService, 'loginUser')
 const SpyLogout = jest.spyOn(LoginService, 'logoutUser')
@@ -38,30 +42,46 @@ const requestLogger = require('../../../../src/lib/requestLogger')
 
 jest.mock('../../../../src/lib/requestLogger')
 
-const systemConfig = {
-  "API_PORT": 5000,
-  "HOSTING_ENABLED": true,
-  "OAUTH": {
-    "EMBEDDED_CERTIFICATE": "password"
-  }
-}
-
 const app = apiServer.getApp()
 jest.setTimeout(30000)
 
 describe('API route /api/oauth2', () => {
   beforeAll(() => {
     requestLogger.logMessage.mockReturnValue()
-    SpyGetSystemConfig.mockReturnValue(systemConfig)
+    Object.assign(Config.getSystemConfig(), {
+      API_PORT: 5000,
+      HOSTING_ENABLED: false,
+      OAUTH: {
+        EMBEDDED_CERTIFICATE: "password"
+      }
+    })
   })
   describe('GET /api/oauth2/token', () => {
     it('Verify oauth credentials when HOSTING_ENABLED is enabled', async () => {
       SpySign.mockReturnValueOnce('idToken')
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getUserConfig.mockReturnValueOnce({
+        CONNECTION_MANAGER_HUB_USERNAME: 'userdfsp'
+      })
+      Object.assign(Config.getSystemConfig(), {
+        HOSTING_ENABLED: true
+      })
+      const res = await request(app).post(`/api/oauth2/token`).send({
+        username: 'userdfsp'
+      })
+      expect(res.statusCode).toEqual(200)
+      expect(res.body).toHaveProperty('access_token')
+      expect(res.body).toHaveProperty('id_token')
+    })
+    it('Verify oauth credentials when HOSTING_ENABLED is enabled', async () => {
+      SpySign.mockReturnValueOnce('idToken')
+      Object.assign(Config.getSystemConfig(), {
+        HOSTING_ENABLED: true
+      })
+      Config.getUserConfig.mockReturnValueOnce({
         CONNECTION_MANAGER_HUB_USERNAME: 'userdfsp'
       })
       const res = await request(app).post(`/api/oauth2/token`).send({
-        username: 'userdfsp'
+        username: 'userdfsp1'
       })
       expect(res.statusCode).toEqual(200)
       expect(res.body).toHaveProperty('access_token')
@@ -69,17 +89,12 @@ describe('API route /api/oauth2', () => {
     })
     it('Verify oauth credentials when HOSTING_ENABLED is enabled', async () => {
       SpySign.mockReturnValueOnce('idToken')
-      systemConfig.HOSTING_ENABLED = true
-      const res = await request(app).post(`/api/oauth2/token`).send({
-        username: 'userdfsp'
+      Object.assign(Config.getSystemConfig(), {
+        HOSTING_ENABLED: true
       })
-      expect(res.statusCode).toEqual(200)
-      expect(res.body).toHaveProperty('access_token')
-      expect(res.body).toHaveProperty('id_token')
-    })
-    it('Verify oauth credentials when HOSTING_ENABLED is enabled', async () => {
-      SpySign.mockReturnValueOnce('idToken')
-      systemConfig.HOSTING_ENABLED = true
+      Config.getUserConfig.mockReturnValueOnce({
+        CONNECTION_MANAGER_HUB_USERNAME: 'userdfsp'
+      })
       const res = await request(app).post(`/api/oauth2/token`).send({
         username: 'username'
       })
@@ -87,7 +102,12 @@ describe('API route /api/oauth2', () => {
     })
     it('Verify oauth credentials should throw an error if sign fails', async () => {
       SpySign.mockImplementationOnce(() => {throw {}})
-      systemConfig.HOSTING_ENABLED = false
+      Object.assign(Config.getSystemConfig(), {
+        HOSTING_ENABLED: false
+      })
+      Config.getUserConfig.mockReturnValueOnce({
+        CONNECTION_MANAGER_HUB_USERNAME: 'userdfsp'
+      })
       const res = await request(app).post(`/api/oauth2/token`).send({
         username: 'username'
       })

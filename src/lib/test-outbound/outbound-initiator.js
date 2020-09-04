@@ -360,7 +360,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
           MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
-        }, Config.getUserConfig().CALLBACK_TIMEOUT)
+        }, userConfig.CALLBACK_TIMEOUT)
         // Listen for success callback
         MyEventEmitter.getEmitter('testOutbound').once(successCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)

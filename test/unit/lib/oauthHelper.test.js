@@ -186,14 +186,4 @@ describe('OAuthHelper tests', () => {
       OAuthHelper.verifyCallback(req, jwtPayload, done)
     });
   });
-  describe('getOAuth2Middleware', () => {
-    it('should not throw an error', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
-        OAUTH: {
-          EMBEDDED_CERTIFICATE: ''
-        }
-      })
-      OAuthHelper.getOAuth2Middleware()
-    });
-  });
 });

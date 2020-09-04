@@ -15,6 +15,14 @@
  *  limitations under the License.                                            *
  ******************************************************************************/
 
+const Config = require('../../../src/lib/config')
+jest.mock('../../../src/lib/config')
+Config.getSystemConfig.mockReturnValue({
+  OAUTH: {
+    OAUTH2_ISSUER: ''
+  }
+})
+
 const Wso2Client = require('../../../src/lib/oauth/Wso2Client')
 const rp = require('request-promise-native')
 const customLogger = require('../../../src/lib/requestLogger')
