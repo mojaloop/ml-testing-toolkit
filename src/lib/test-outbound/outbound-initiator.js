@@ -81,7 +81,9 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
         startedTime: startedTimeStamp.toUTCString(),
         completedTime: completedTimeStamp.toUTCString(),
         runDurationMs: runDurationMs,
-        avgResponseTime: 'NA'
+        avgResponseTime: 'NA',
+        totalAssertions: 0,
+        totalPassedAssertions: 0
       }
       const totalResult = generateFinalReport(inputTemplate, runtimeInformation, dfspId)
       if (Config.getSystemConfig().HOSTING_ENABLED) {
@@ -561,7 +563,8 @@ const generateFinalReport = (inputTemplate, runtimeInformation) => {
           }
         })
         request.tests.passedAssertionsCount = testResult.passedCount
-        console.log('line 564')
+        runtimeInformation.totalAssertions += request.tests.assertions.length
+        runtimeInformation.totalPassedAssertions += request.tests.passedAssertionsCount
       }
       return {
         request,
