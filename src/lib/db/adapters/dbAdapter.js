@@ -52,7 +52,7 @@ const read = async (id, user, additionalData) => {
         $lt: additionalData && additionalData.query && additionalData.query.lt ? new Date(additionalData.query.lt) : new Date()
       }
     }
-    documents = await MyModel.find(query)
+    documents = await MyModel.find(query).sort('logTime').select('-_id -__v')
   } else if (id === 'reports') {
     const MyModel = conn.model(`${user.dfspId}_${id}`, mongoDBModels.reportsModel)
     const query = (additionalData && additionalData.query && (additionalData.query.gte || additionalData.query.lt)) ? {
@@ -61,7 +61,7 @@ const read = async (id, user, additionalData) => {
         $lt: additionalData && additionalData.query && additionalData.query.lt ? new Date(additionalData.query.lt) : new Date()
       }
     } : {}
-    documents = await MyModel.find(query)
+    documents = await MyModel.find(query).sort('-runtimeInformation.completedTimeISO').select('-_id -__v')
   } else {
     const MyModel = conn.model(user.dfspId, mongoDBModels.commonModel)
     documents = await MyModel.findById(id)
