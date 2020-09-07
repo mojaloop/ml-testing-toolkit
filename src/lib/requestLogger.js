@@ -98,7 +98,8 @@ const logMessage = (verbosity, message, externalData = {}) => {
       messageType: data.messageType,
       verbosity,
       message,
-      additionalData: data.additionalData
+      additionalData: data.additionalData,
+      logTime: new Date()
     }
 
     let sessionID
