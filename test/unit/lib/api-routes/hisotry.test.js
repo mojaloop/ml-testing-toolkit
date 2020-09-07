@@ -33,55 +33,52 @@ Config.getSystemConfig.mockReturnValue({
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
-const loadSamples = require('../../../../src/lib/loadSamples')
+const dbAdapter = require('../../../../src/lib/db/adapters/dbAdapter')
 const requestLogger = require('../../../../src/lib/requestLogger')
 
 jest.mock('../../../../src/lib/requestLogger')
-const spyGetSample = jest.spyOn(loadSamples, 'getSample')
-const spyGetCollectionsOrEnvironments = jest.spyOn(loadSamples, 'getCollectionsOrEnvironments')
-const spyGetCollectionsOrEnvironmentsWithFileSize = jest.spyOn(loadSamples, 'getCollectionsOrEnvironmentsWithFileSize')
+jest.mock('../../../../src/lib/db/adapters/dbAdapter')
 
-
-describe('API route /api/samples', () => {
+describe('API route /api/hisotry', () => {
   beforeAll(() => {
     requestLogger.logMessage.mockReturnValue()
   })
   afterEach(() => {
     jest.clearAllMocks()
   })
-  describe('GET /api/samples/load', () => {
+  describe('GET /api/history/reports', () => {
     it('Send a proper request', async () => {
-      spyGetSample.mockResolvedValueOnce()
-      const res = await request(app).get(`/api/samples/load`).send()
+      dbAdapter.read.mockResolvedValueOnce([])
+      const res = await request(app).get(`/api/history/reports`).send()
       expect(res.statusCode).toEqual(200)
     })
     it('Send a proper request with type: hub', async () => {
-      spyGetSample.mockRejectedValueOnce({message: ''})
-      const res = await request(app).get(`/api/samples/load`).send()
+      dbAdapter.read.mockRejectedValueOnce({message: ''})
+      const res = await request(app).get(`/api/history/reports`).send()
       expect(res.statusCode).toEqual(500)
     })
   })
-  describe('GET /api/samples', () => {
+  describe('POST /api/history/reports', () => {
     it('Send a proper request with missing collections query param', async () => {
-      spyGetCollectionsOrEnvironments.mockResolvedValueOnce()
-      const res = await request(app).get(`/api/samples/load/collections`).send()
+      dbAdapter.upsert.mockResolvedValueOnce()
+      const res = await request(app).post(`/api/history/reports`).send({})
       expect(res.statusCode).toEqual(200)
     })
     it('Send a bad request with not existing environment', async () => {
-      spyGetCollectionsOrEnvironments.mockRejectedValueOnce({message: ''})
-      const res = await request(app).get(`/api/samples/load/collections`).send()
+      dbAdapter.upsert.mockRejectedValueOnce({message: ''})
+      const res = await request(app).post(`/api/history/reports`).send({})
       expect(res.statusCode).toEqual(500)
     })
   })
-  describe('GET /api/samples with file sizes', () => {
-    it('Send a proper request with missing collections query param', async () => {
-      spyGetCollectionsOrEnvironmentsWithFileSize.mockResolvedValueOnce()
-      const res = await request(app).get(`/api/samples/list/collections`).send()
+  describe('GET /api/history/logs', () => {
+    it('Send a proper request', async () => {
+      dbAdapter.read.mockResolvedValueOnce()
+      const res = await request(app).get(`/api/history/logs`).send()
       expect(res.statusCode).toEqual(200)
     })
-    it('Send a bad request with not existing environment', async () => {
-      spyGetCollectionsOrEnvironmentsWithFileSize.mockRejectedValueOnce({message: ''})
-      const res = await request(app).get(`/api/samples/list/collections`).send()
+    it('Send a bad request', async () => {
+      dbAdapter.read.mockRejectedValueOnce({message: ''})
+      const res = await request(app).get(`/api/history/logs`).send()
       expect(res.statusCode).toEqual(500)
     })
   })

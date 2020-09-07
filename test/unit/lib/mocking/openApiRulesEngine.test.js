@@ -28,7 +28,6 @@
 const OpenApiRulesEngine = require('../../../../src/lib/mocking/openApiRulesEngine')
 
 const rulesEngineModel = require('../../../../src/lib/rulesEngineModel')
-const { reject } = require('lodash')
 jest.mock('../../../../src/lib/rulesEngineModel')
 
 jest.setTimeout(30000)

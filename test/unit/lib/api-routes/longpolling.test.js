@@ -24,7 +24,13 @@
  ******/
 
 const Config = require('../../../../src/lib/config')
-const loaded = Config.loadSystemConfigMiddleware()
+jest.mock('../../../../src/lib/config')
+Config.getSystemConfig.mockReturnValue({
+  OAUTH: {
+    AUTH_ENABLED: false
+  }
+})
+
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
@@ -33,9 +39,15 @@ const assertionStore = require('../../../../src/lib/assertionStore')
 const SpyPopRequest = jest.spyOn(assertionStore, 'popRequest')
 const SpyPopCallback = jest.spyOn(assertionStore, 'popCallback')
 
+const requestLogger = require('../../../../src/lib/requestLogger')
+
+jest.mock('../../../../src/lib/requestLogger')
 jest.setTimeout(10000);
 
 describe('API route /longpolling/requests/*', () => {
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
   describe('GET /longpolling/requests/123', () => {
     it('Getting stored requests', async () => {
       SpyPopRequest.mockReturnValueOnce({

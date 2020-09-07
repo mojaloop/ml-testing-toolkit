@@ -24,38 +24,94 @@
  ******/
 
 const Config = require('../../../../src/lib/config')
-const loaded = Config.loadSystemConfigMiddleware()
+jest.mock('../../../../src/lib/config')
+Config.getSystemConfig.mockReturnValue({
+  "API_PORT": 5000,
+  "HOSTING_ENABLED": false,
+  "CONFIG_VERSIONS": {
+    "response": 1,
+    "callback": 1,
+    "validation": 1,
+    "forward": 1,
+    "userSettings": 1
+  },
+  "DB": {
+    "URI": "mongodb://mongo:27017/dfsps"
+  },
+  "OAUTH": {
+    "AUTH_ENABLED": false,
+    "APP_OAUTH_CLIENT_KEY": "asdf",
+    "APP_OAUTH_CLIENT_SECRET": "asdf",
+    "MTA_ROLE": "Application/MTA",
+    "PTA_ROLE": "Application/PTA",
+    "EVERYONE_ROLE": "Internal/everyone",
+    "OAUTH2_ISSUER": "http://172.17.0.1:5050/api/oauth2/token",
+    "JWT_COOKIE_NAME": "TTK-API_ACCESS_TOKEN",
+    "EMBEDDED_CERTIFICATE": "password"
+  },
+  "API_DEFINITIONS": [
+    {
+      "type": "fspiop",
+      "version": "1.0",
+      "folderPath": "fspiop_1.0",
+      "asynchronous": true
+    },
+    {
+      "type": "fspiop",
+      "version": "1.1",
+      "folderPath": "fspiop_1.1",
+      "asynchronous": true
+    },
+    {
+      "type": "settlements",
+      "version": "1.0",
+      "folderPath": "settlements_1.0"
+    },
+    {
+      "type": "central_admin",
+      "version": "9.3",
+      "folderPath": "central_admin_9.3"
+    }
+  ]
+})
+Config.getUserConfig.mockReturnValue({
+  CALLBACK_ENDPOINT: 'http://localhost:5000',
+  CALLBACK_TIMEOUT: 5000
+})
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
 const axios = require('axios').default
 const OutboundInitiator = require('../../../../src/lib/test-outbound/outbound-initiator')
 
-const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 const SpyTerminateOutbound = jest.spyOn(OutboundInitiator, 'terminateOutbound')
 const SpyOutboundSend = jest.spyOn(OutboundInitiator, 'OutboundSend')
+const requestLogger = require('../../../../src/lib/requestLogger')
 
+jest.mock('../../../../src/lib/requestLogger')
 jest.mock('axios')
 
-const axiosMockedResponse = {
-  status: 200,
-  statusText: 'OK',
-  data: {}
-}
 describe('API route /api/outbound', () => {
+  const axiosMockedResponse = {
+    status: 200,
+    statusText: 'OK',
+    data: {}
+  }
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('POST /api/outbound/request', () => {
     it('Send a proper request', async () => {
       axios.mockImplementationOnce(() => Promise.resolve(true))
-      SpyGetUserConfig.mockReturnValueOnce({
-        CALLBACK_ENDPOINT: 'http://localhost:5000'
-      })
       const res = await request(app).post(`/api/outbound/request`).send({
         method: 'get',
         path: '/parties/MSISDN/1234567890',
         headers: {},
         body: null
       })
-      SpyGetUserConfig.mockRestore()
       expect(res.statusCode).toEqual(200)
     })
     it('Send a request with missing method', async () => {
@@ -74,15 +130,7 @@ describe('API route /api/outbound', () => {
       })
       expect(res.statusCode).toEqual(422)
     })
-    it('when the server throws an error, statusCode is 500', async () => {
-      axios.mockImplementationOnce(() => {throw new Error()})
-      const res = await request(app).post(`/api/outbound/request`).send({
-        method: 'get',
-        path: '/parties/MSISDN/1234567890'
-      })
-      expect(res.statusCode).toEqual(500)
-    })
-    it('when the server reject the request, statusCode is 500', async () => {
+    it('when the server reject the request, statusCode is 200', async () => {
       axios.mockImplementationOnce(() => Promise.reject(true))
       const res = await request(app).post(`/api/outbound/request`).send({
         method: 'get',
@@ -91,6 +139,18 @@ describe('API route /api/outbound', () => {
         body: null
       })
       expect(res.statusCode).toEqual(200)
+    })
+    it('when there is an internal error, statusCode is 500', async () => {
+      axios.mockImplementationOnce(() => {throw new Error()})
+      try {
+        const res = await request(app).post(`/api/outbound/request`).send({
+          method: 'get',
+          path: '/parties/MSISDN/1234567890'
+        })
+        expect(res.statusCode).toEqual(500)
+      } catch (err) {
+        console.log(err)
+      }
     })
   })
   describe('POST /api/outbound/template/:outboundID', () => {
@@ -201,7 +261,7 @@ describe('API route /api/outbound', () => {
       const res = await request(app).post(`/api/outbound/template/aabb123aabb`).send(properTemplateAsync)
       expect(res.statusCode).toEqual(200)
     })
-    it('Send a proper template with id aabb123aabb', async () => {
+    it('Send a duplicate template with id aabb123aabb', async () => {
       SpyOutboundSend.mockImplementationOnce(() => {throw new Error()})
       const res = await request(app).post(`/api/outbound/template/aabb123aabb`).send(properTemplateAsync)
       expect(res.statusCode).toEqual(500)

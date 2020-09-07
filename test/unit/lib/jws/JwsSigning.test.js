@@ -24,7 +24,6 @@
 
 'use strict'
 
-const fs = require('fs')
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
 const Config = require('../../../../src/lib/config')
 const ConnectionProvider = require('../../../../src/lib/configuration-providers/mb-connection-manager')
@@ -37,6 +36,10 @@ Config.getUserConfig.mockImplementation(() => {
     VALIDATE_INBOUND_JWS: true,
     DEFAULT_USER_FSPID: 'userdfsp'
   }
+})
+
+Config.getSystemConfig.mockImplementation(() => {
+  return {}
 })
 
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -128,7 +131,6 @@ describe('JwsSigning', () => {
     it('Signed request should contain required fspiop headers', async () => {
       // Sign with JWS
       await expect(JwsSigning.sign(reqOpts)).resolves.toBeDefined();
-      // console.log('GVK',reqOpts)
       expect(reqOpts.headers).toHaveProperty('fspiop-uri')
       expect(reqOpts.headers).toHaveProperty('fspiop-http-method')
       expect(reqOpts.headers).toHaveProperty('fspiop-signature')

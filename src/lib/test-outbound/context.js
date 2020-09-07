@@ -32,6 +32,7 @@ const generageContextObj = async (environment = []) => {
   const ctx = await createContextAsync({ timeout: 30000 })
   ctx.executeAsync = util.promisify(ctx.execute)
   ctx.on('error', function (cursor, err) {
+    // log the error in postman sandbox
     console.log(cursor, err)
   })
   const contextObj = {

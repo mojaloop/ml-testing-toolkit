@@ -23,14 +23,28 @@
  ******/
 
 const Config = require('../../../../src/lib/config')
-const loaded = Config.loadSystemConfigMiddleware()
+jest.mock('../../../../src/lib/config')
+Config.getSystemConfig.mockReturnValue({
+  OAUTH: {
+    AUTH_ENABLED: false
+  }
+})
+
 const request = require('supertest')
 const app = require('../../../../src/lib/api-server').getApp()
 const RulesEngineModel = require('../../../../src/lib/rulesEngineModel')
+const requestLogger = require('../../../../src/lib/requestLogger')
 
+jest.mock('../../../../src/lib/requestLogger')
 jest.mock('../../../../src/lib/rulesEngineModel')
 
 describe('API route /api/rules', () => {
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('Validation Rules', () => {
     describe('GET /api/rules/files/validation', () => {
       it('Getting all rules files', async () => {

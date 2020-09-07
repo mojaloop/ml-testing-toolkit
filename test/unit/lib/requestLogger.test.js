@@ -22,15 +22,18 @@
  --------------
  ******/
 
-const notificationEmitter = require('../../../src/lib/notificationEmitter.js')
+const notificationEmitter = require('../../../src/lib/notificationEmitter')
 const Config = require('../../../src/lib/config')
 
-const SpyNotificationEmitter = jest.spyOn(notificationEmitter, 'broadcastLog')
-const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
+jest.mock('../../../src/lib/notificationEmitter')
+jest.mock('../../../src/lib/config')
 
 const requestLogger = require('../../../src/lib/requestLogger')
 
-describe('requestLogger', () => { 
+describe('requestLogger', () => {
+  beforeAll(() => {
+    notificationEmitter.broadcastLog.mockReturnValue()
+  })
   describe('when logRequest is called', () => {
     it('should take session id from customInfo.sessionId if HOSTING_ENABLED is true', async () => {
       const req = {
@@ -39,14 +42,16 @@ describe('requestLogger', () => {
         body: {},
         customInfo: {
           uniqueId: '',
-          sessionID: ''
+          sessionID: '',
+          user: {
+            dfspId: 'test'
+          }
         },
         headers: {},
         query: {},
         payload: {}
       }
-      SpyNotificationEmitter.mockReturnValueOnce()
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
       })
       expect(() => requestLogger.logRequest(req)).not.toThrowError()
@@ -58,7 +63,10 @@ describe('requestLogger', () => {
         body: {},
         customInfo: {
           uniqueId: '',
-          sessionID: ''
+          sessionID: '',
+          user: {
+            dfspId: 'test'
+          }
         },
         headers: {
           'fspiop-source': 'userdfsp'
@@ -66,8 +74,7 @@ describe('requestLogger', () => {
         query: {},
         payload: {}
       }
-      SpyNotificationEmitter.mockReturnValueOnce()
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
       })
       expect(() => requestLogger.logRequest(req)).not.toThrowError()
@@ -84,7 +91,9 @@ describe('requestLogger', () => {
         query: {},
         payload: {}
       }
-      SpyNotificationEmitter.mockReturnValueOnce()
+      Config.getSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
       expect(() => requestLogger.logRequest(req)).not.toThrowError()
     })
     it('should not throw an error if customInfo is missing', async () => {
@@ -95,12 +104,14 @@ describe('requestLogger', () => {
         query: {},
         payload: {}
       }
-      SpyNotificationEmitter.mockReturnValueOnce()
+      Config.getSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
       expect(() => requestLogger.logRequest(req)).not.toThrowError()
     })
   })
   describe('when logResponse is called', () => {
-    it('should not throw an error', async () => {
+    it('should not throw an error 1', async () => {
       const req = {
         response: {
           source: {},
@@ -113,12 +124,13 @@ describe('requestLogger', () => {
           sessionID: ''
         }
       }
-      SpyNotificationEmitter.mockReturnValueOnce()
+      Config.getSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
       expect(() => requestLogger.logResponse(req)).not.toThrowError()
     })
     it('should not throw an error if response is missing', async () => {
-      const req = {
-      }
+      const req = {}
       expect(() => requestLogger.logResponse(req)).not.toThrowError()
     })
     it('should not throw an error if customInfo is missing', async () => {
@@ -127,10 +139,13 @@ describe('requestLogger', () => {
           source: {},
           statusCode: 200
         },
+        customInfo: {},
         method: 'post',
         path: '/'
       }
-      SpyNotificationEmitter.mockReturnValueOnce()
+      Config.getSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
       expect(() => requestLogger.logResponse(req)).not.toThrowError()
     })
   })
@@ -138,59 +153,85 @@ describe('requestLogger', () => {
     it('with verbosity debug then should not throw an error', async () => {
       const verbosity = 'debug'
       const message = ''
-      const additionalData = {}
-      const notification = false
-      expect(() => requestLogger.logMessage(verbosity,message,additionalData,notification)).not.toThrowError()
+      const externalData = {
+        additionalData: {},
+        notification: false
+      }
+      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()
     })
     it('with verbosity warn then should not throw an error', async () => {
       const verbosity = 'warn'
       const message = ''
-      const additionalData = null
-      const notification = false
-      expect(() => requestLogger.logMessage(verbosity,message,additionalData,notification)).not.toThrowError()
+      const externalData = {
+        notification: false
+      }
+      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()
     })
     it('with verbosity error then should not throw an error', async () => {
       const verbosity = 'error'
       const message = ''
-      const additionalData = null
-      const notification = false
-      expect(() => requestLogger.logMessage(verbosity,message,additionalData,notification)).not.toThrowError()
-    })
-    it('with verbosity info then should not throw an error', async () => {
-      const verbosity = 'info'
-      const message = ''
-      const additionalData = null
-      const notification = false
-      expect(() => requestLogger.logMessage(verbosity,message,additionalData,notification)).not.toThrowError()
+      const externalData = {
+        notification: false
+      }
+      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()
     })
     it('with verbosity default then should not throw an error', async () => {
       const verbosity = 'default'
       const message = ''
-      const additionalData = null
-      const notification = false
-      expect(() => requestLogger.logMessage(verbosity,message,additionalData,notification)).not.toThrowError()
+      const externalData = {
+        notification: false
+      }
+      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()
     })
     it('when request is empty should not throw an error', async () => {
       const verbosity = 'info'
       const message = ''
-      SpyNotificationEmitter.mockReturnValueOnce()
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false
+      })
       expect(() => requestLogger.logMessage(verbosity,message)).not.toThrowError()
     })
     it('when request is not empty should not throw an error', async () => {
       const verbosity = 'info'
       const message = ''
-      const additionalData = null
-      const notification = true
-      const req = {
-        customInfo: {
-          uniqueId: '',
-          sessionID: ''
+      const externalData = {
+        request: {
+          customInfo: {
+            uniqueId: '',
+            sessionID: '',
+            user: {
+              dfspId: 'test'
+            }
+          },
+          method: 'put',
+          path: '/'
         },
-        method: 'put',
-        path: '/'
+        user: {
+          dfspId: 'test'
+        }
       }
-      SpyNotificationEmitter.mockReturnValueOnce()
-      expect(() => requestLogger.logMessage(verbosity,message,additionalData,notification,req)).not.toThrowError()
+      Config.getSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: true
+      })
+      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()
+    })
+    it('when request is not empty should not throw an error', async () => {
+      const verbosity = 'info'
+      const message = ''
+      const externalData = {
+        request: {
+          customInfo: {
+            uniqueId: '',
+            sessionID: ''
+          },
+          method: 'put',
+          path: '/'
+        }
+      }
+      Config.getSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: true
+      })
+      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()
     })
   })
 })

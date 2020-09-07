@@ -16,16 +16,22 @@
  ******************************************************************************/
 
 const OAuthHelper = require('../../../src/lib/oauth/OAuthHelper')
-const utils = require('../../../src/lib/utils')
 
 const Cookies = require('cookies')
 const Config = require('../../../src/lib/config')
 const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
+const requestLogger = require('../../../src/lib/requestLogger')
 
 jest.mock('cookies')
+jest.mock('../../../src/lib/requestLogger')
 
 Cookies.mockImplementation()
+
+
 describe('OAuthHelper tests', () => {
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
   it('handleMiddleware when AUTH is enabled should not throw an error', async () => {
     SpyGetSystemConfig.mockReturnValueOnce({
       OAUTH: {
@@ -178,16 +184,6 @@ describe('OAuthHelper tests', () => {
       }
       const done = jest.fn()
       OAuthHelper.verifyCallback(req, jwtPayload, done)
-    });
-  });
-  describe('getOAuth2Middleware', () => {
-    it('should not throw an error', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
-        OAUTH: {
-          EMBEDDED_CERTIFICATE: ''
-        }
-      })
-      OAuthHelper.getOAuth2Middleware()
     });
   });
 });

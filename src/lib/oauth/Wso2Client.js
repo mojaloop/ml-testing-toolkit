@@ -25,6 +25,7 @@
 'use strict'
 const Config = require('../config')
 const rp = require('request-promise-native')
+const customLogger = require('../requestLogger')
 
 exports.getToken = async (username, password) => {
   const form = {
@@ -38,7 +39,7 @@ exports.getToken = async (username, password) => {
     const Constants = Config.getSystemConfig()
     const url = Constants.OAUTH.OAUTH2_ISSUER
     const loginResponse = await rp.post(url).form(form).auth(Constants.OAUTH.APP_OAUTH_CLIENT_KEY, Constants.OAUTH.APP_OAUTH_CLIENT_SECRET) // MP-757
-    console.log(`Wso2Client.getToken received ${loginResponse}`)
+    customLogger.logMessage('info', `Wso2Client.getToken received ${loginResponse}`, { notification: false })
     const loginResponseObj = JSON.parse(loginResponse)
     return loginResponseObj
   } catch (error) {

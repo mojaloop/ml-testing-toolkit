@@ -368,28 +368,6 @@ describe('Outbound Initiator Functions', () => {
       expect(request.body.transactionAmount.amount).toEqual('{$request.body.amount.amount}')
       expect(request.body.transactionAmount.currency).toEqual('{$request.body.amount.currency}')
     })
-    it('replaceVariables should not replace previous response variables properly if key not matched', async () => {
-      const responsesObject = {
-        1: {
-          appended: {
-            response: {
-              body: {
-                party:{
-                  fspId: '123'
-                }
-              }
-            }
-          }
-        }
-      }
-      const sampleRequest = {
-        headers: {
-          'FSPIOP-Destination': '{$prev.2.response.body.party.fspId}'
-        }
-      }
-      const request = OutboundInitiator.replaceVariables(sampleRequest, null, null, responsesObject)
-      expect(request.headers['FSPIOP-Destination']).toEqual('{$prev.2.response.body.party.fspId}')
-    })
   })
 
   describe('sendRequest', () => {
@@ -447,7 +425,7 @@ describe('Outbound Initiator Functions', () => {
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
     })
-    it('sendRequest should call axios with appropriate params', async () => {
+    it('sendRequest should call axios with appropriate params 2', async () => {
       axios.mockImplementation(() => Promise.resolve({
         status: 200,
         statusText: 'OK',
@@ -502,17 +480,17 @@ describe('Outbound Initiator Functions', () => {
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
     })
-    it('sendRequest should call axios with appropriate params', async () => {
+    it('sendRequest should call axios with appropriate params 4', async () => {
       axios.mockImplementation(() => Promise.resolve({
-        status: 300,
+        status: 200,
         statusText: 'OK',
         data: {},
         request: {
           toCurl: () => ''
         }
       }))
-      SpySign.mockImplementationOnce(async () => {throw new Error()})
-      SpyAgent.mockImplementationOnce(async () => {
+      SpySign.mockResolvedValueOnce()
+      SpyAgent.mockImplementationOnce(() => {
         return {httpsAgent: {}}
       })
       SpyGetTlsConfig.mockResolvedValueOnce({
@@ -529,7 +507,8 @@ describe('Outbound Initiator Functions', () => {
       })
       SpyGetUserConfig.mockResolvedValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: true
+        OUTBOUND_MUTUAL_TLS_ENABLED: true,
+        CALLBACK_TIMEOUT: 5000
       })
       const sampleRequest = {
         headers: {
@@ -555,7 +534,7 @@ describe('Outbound Initiator Functions', () => {
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
     })
-    it('sendRequest should call axios with appropriate params', async () => {
+    it('sendRequest should call axios with appropriate params 5', async () => {
       axios.mockImplementation(() => Promise.reject({
         status: 300,
         statusText: 'OK',
@@ -608,7 +587,60 @@ describe('Outbound Initiator Functions', () => {
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
     })
-    it('sendRequest should call axios with appropriate params', async () => {
+    it('sendRequest should call axios with appropriate params 6', async () => {
+      axios.mockImplementation(() => Promise.reject({
+        status: 300,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpySign.mockImplementationOnce(async () => {throw new Error()})
+      SpyAgent.mockImplementationOnce(async () => {
+        return {httpsAgent: {}}
+      })
+      SpyGetTlsConfig.mockResolvedValueOnce({
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
+      })
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: true
+      })
+      SpyGetUserConfig.mockResolvedValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
+      })
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'userdfsp',
+          Date: '2020-01-01 01:01:01',
+          TimeStamp: '{$request.headers.Date}'
+        },
+        body: {
+          transactionId: '123',
+          amount: {
+            amount: '100',
+            currency: 'USD'
+          },
+          transactionAmount: {
+            amount: '{$request.body.amount.amount}',
+            currency: '{$request.body.amount.currency}'
+          }
+        }
+      }
+      
+      try {
+        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, {}, {}, null, 'userdfsp')
+      } catch (err) {}
+      expect(axios).toHaveBeenCalledTimes(1);
+    })
+    it('sendRequest should call axios with appropriate params 7', async () => {
       axios.mockImplementation(() => Promise.reject({
         status: 300,
         statusText: 'OK',
@@ -660,13 +692,13 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      
+      axios.mockClear()
       try {
         await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, {}, {}, null, 'userdfsp')
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
     })
-    it('sendRequest should call axios with appropriate params', async () => {
+    it('sendRequest should call axios with appropriate params 8', async () => {
       SpyGetTlsConfig.mockResolvedValueOnce({
         dfsps: {
           'userdfsp': {

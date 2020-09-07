@@ -98,7 +98,7 @@ const validateRules = async (context, req) => {
   let generatedErrorCallback = {}
 
   if (curEvent) {
-    customLogger.logMessage('debug', 'Validation rules matched', curEvent, true, req)
+    customLogger.logMessage('debug', 'Validation rules matched', { additionalData: curEvent, request: req })
     if (curEvent.params.delay) {
       generatedErrorCallback.delay = curEvent.params.delay
     }
@@ -123,7 +123,7 @@ const validateRules = async (context, req) => {
         _.merge(generatedErrorCallback.headers, await replaceVariablesFromRequest(curEvent.params.headers, context, req))
         removeEmpty(generatedErrorCallback.body)
       } else {
-        customLogger.logMessage('error', 'No Specification file provided for validateRules function', null, true, req)
+        customLogger.logMessage('error', 'No Specification file provided for validateRules function', { request: req })
       }
     }
   }
@@ -194,7 +194,7 @@ const callbackRules = async (context, req) => {
 
   const generatedCallback = {}
   if (curEvent) {
-    customLogger.logMessage('debug', 'Callback rules are matched', curEvent, true, req)
+    customLogger.logMessage('debug', 'Callback rules are matched', { additionalData: curEvent, request: req })
     if (curEvent.params.delay) {
       generatedCallback.delay = curEvent.params.delay
     }
@@ -252,11 +252,11 @@ const callbackRules = async (context, req) => {
         removeEmpty(generatedCallback.body)
         _.merge(generatedCallback.headers, await replaceVariablesFromRequest(curEvent.params.headers, context, req))
       } else {
-        customLogger.logMessage('error', 'No Specification file provided for validateRules function', null, true, req)
+        customLogger.logMessage('error', 'No Specification file provided for validateRules function', { request: req })
       }
     }
   } else {
-    customLogger.logMessage('error', 'No callback rules are matched', null, true, req)
+    customLogger.logMessage('error', 'No callback rules are matched', { request: req })
   }
 
   return generatedCallback
@@ -273,7 +273,7 @@ const responseRules = async (context, req) => {
   const generatedResponse = {}
 
   if (curEvent) {
-    customLogger.logMessage('debug', 'Response rules are matched', curEvent, true, req)
+    customLogger.logMessage('debug', 'Response rules are matched', { additionalData: curEvent, request: req })
     if (curEvent.params.delay) {
       generatedResponse.delay = curEvent.params.delay
     }
@@ -310,11 +310,11 @@ const responseRules = async (context, req) => {
         removeEmpty(generatedResponse.body)
         _.merge(generatedResponse.headers, await replaceVariablesFromRequest(curEvent.params.headers, context, req))
       } else {
-        customLogger.logMessage('error', 'No Specification file provided for responseRules function', null, true, req)
+        customLogger.logMessage('error', 'No Specification file provided for responseRules function', { request: req })
       }
     }
   } else {
-    customLogger.logMessage('info', 'No response rules are matched', null, true, req)
+    customLogger.logMessage('info', 'No response rules are matched', { request: req })
   }
   return generatedResponse
 }
@@ -329,7 +329,7 @@ const forwardRules = async (context, req) => {
 
   if (curEvent) {
     const forwardedRequest = {}
-    customLogger.logMessage('debug', 'Forward rules are matched', curEvent, true, req)
+    customLogger.logMessage('debug', 'Forward rules are matched', { additionalData: curEvent, request: req })
     await executeScripts(curEvent, req)
 
     if (curEvent.type === 'FORWARD') {
@@ -348,7 +348,7 @@ const forwardRules = async (context, req) => {
     }
     return forwardedRequest
   } else {
-    customLogger.logMessage('error', 'No forward rules are matched', null, true, req)
+    customLogger.logMessage('error', 'No forward rules are matched', { request: req })
     return false
   }
 }

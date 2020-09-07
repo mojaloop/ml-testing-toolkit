@@ -44,7 +44,7 @@ const handleCallback = async (callbackObject, context, req) => {
     if (endpointsConfig.dfspEndpoints && callbackObject.callbackInfo.fspid && endpointsConfig.dfspEndpoints[callbackObject.callbackInfo.fspid]) {
       callbackEndpoint = endpointsConfig.dfspEndpoints[callbackObject.callbackInfo.fspid]
     } else {
-      customLogger.logMessage('warning', 'Hosting is enabled, But there is no endpoint configuration found for DFSP ID: ' + callbackObject.callbackInfo.fspid, null, true, req)
+      customLogger.logMessage('warning', 'Hosting is enabled, But there is no endpoint configuration found for DFSP ID: ' + callbackObject.callbackInfo.fspid, { request: req })
     }
   } else {
     const endpointsDfspWise = userConfig.ENDPOINTS_DFSP_WISE
@@ -82,7 +82,7 @@ const handleCallback = async (callbackObject, context, req) => {
     const tlsConfig = await ConnectionProvider.getTlsConfig()
     if (!tlsConfig.dfsps[callbackObject.callbackInfo.fspid]) {
       const errorMsg = 'Outbound TLS is enabled, but there is no TLS config found for DFSP ID: ' + callbackObject.callbackInfo.fspid
-      customLogger.logMessage('error', errorMsg, null, true, req)
+      customLogger.logMessage('error', errorMsg, { request: req })
       throw errorMsg
     }
     const httpsAgent = new https.Agent({
@@ -119,16 +119,16 @@ const handleCallback = async (callbackObject, context, req) => {
     try {
       await JwsSigning.sign(reqOpts)
     } catch (err) {
-      console.log(err)
+      customLogger.logMessage('error', 'JWS signing failed', { additionalData: err })
     }
   }
   // Validate callback against openapi
   if (callbackObject.method !== 'put') {
     const validationResult = await context.api.validateRequest(callbackObject)
     if (validationResult.valid) {
-      customLogger.logMessage('info', 'Callback schema is valid ' + callbackObject.method + ' ' + callbackObject.path, null, true, req)
+      customLogger.logMessage('info', 'Callback schema is valid ' + callbackObject.method + ' ' + callbackObject.path, { request: req })
     } else {
-      customLogger.logMessage('error', 'Callback schema is invalid ' + callbackObject.method + ' ' + callbackObject.path, validationResult.errors, true, req)
+      customLogger.logMessage('error', 'Callback schema is invalid ' + callbackObject.method + ' ' + callbackObject.path, { additionalData: validationResult.errors, request: req })
     }
   }
   // Store callbacks for assertion
@@ -143,14 +143,14 @@ const handleCallback = async (callbackObject, context, req) => {
 
   // Send callback
   if (userConfig.SEND_CALLBACK_ENABLE) {
-    customLogger.logMessage('info', 'Sending callback ' + callbackObject.method + ' ' + reqOpts.url, callbackObject, true, req)
+    customLogger.logMessage('info', 'Sending callback ' + callbackObject.method + ' ' + reqOpts.url, { additionalData: callbackObject, request: req })
     axios(reqOpts).then((result) => {
-      customLogger.logMessage('info', 'Received callback response ' + result.status + ' ' + result.statusText, null, true, req)
+      customLogger.logMessage('info', 'Received callback response ' + result.status + ' ' + result.statusText, { request: req })
     }, (err) => {
-      customLogger.logMessage('error', 'Failed to send callback ' + callbackObject.method + ' ' + reqOpts.url, err.message, true, req)
+      customLogger.logMessage('error', 'Failed to send callback ' + callbackObject.method + ' ' + reqOpts.url, { additionalData: err.message, request: req })
     })
   } else {
-    customLogger.logMessage('info', 'Log callback ' + callbackObject.method + ' ' + callbackObject.path, callbackObject, true, req)
+    customLogger.logMessage('info', 'Log callback ' + callbackObject.method + ' ' + callbackObject.path, { additionalData: callbackObject, request: req })
   }
 }
 

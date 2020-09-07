@@ -44,6 +44,7 @@ const context = require('./context')
 const openApiDefinitionsModel = require('../mocking/openApiDefinitionsModel')
 const uuid = require('uuid')
 const utilsInternal = require('../utilsInternal')
+const dbAdapter = require('../db/adapters/dbAdapter')
 
 var terminateTraceIds = {}
 
@@ -80,9 +81,16 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
         startedTime: startedTimeStamp.toUTCString(),
         completedTime: completedTimeStamp.toUTCString(),
         runDurationMs: runDurationMs,
-        avgResponseTime: 'NA'
+        avgResponseTime: 'NA',
+        totalAssertions: 0,
+        totalPassedAssertions: 0
       }
-      const totalResult = generateFinalReport(inputTemplate, runtimeInformation)
+      const totalResult = generateFinalReport(inputTemplate, runtimeInformation, dfspId)
+      if (Config.getSystemConfig().HOSTING_ENABLED) {
+        const totalResultCopy = JSON.parse(JSON.stringify(totalResult))
+        totalResultCopy.runtimeInformation.completedTimeISO = completedTimeStamp
+        dbAdapter.upsert('reports', totalResultCopy, { dfspId })
+      }
       notificationEmitter.broadcastOutboundProgress({
         status: 'FINISHED',
         outboundID: tracing.outboundID,
@@ -295,14 +303,15 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
   return new Promise((resolve, reject) => {
     (async () => {
       const httpsProps = {}
-      const userConfig = await Config.getUserConfig(dfspId ? { dfspId } : undefined)
+      const user = dfspId ? { dfspId } : undefined
+      const userConfig = await Config.getUserConfig(user)
       let urlGenerated = userConfig.CALLBACK_ENDPOINT + path
       if (Config.getSystemConfig().HOSTING_ENABLED) {
         const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
         if (endpointsConfig.dfspEndpoints && dfspId && endpointsConfig.dfspEndpoints[dfspId]) {
           urlGenerated = endpointsConfig.dfspEndpoints[dfspId] + path
         } else {
-          customLogger.logMessage('warning', 'Hosting is enabled, But there is no endpoint configuration found for DFSP ID: ' + dfspId, null, true, null)
+          customLogger.logMessage('warning', 'Hosting is enabled, But there is no endpoint configuration found for DFSP ID: ' + dfspId, { user })
         }
       }
       if (baseUrl) {
@@ -312,7 +321,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         const tlsConfig = await ConnectionProvider.getTlsConfig()
         if (!tlsConfig.dfsps[dfspId]) {
           const errorMsg = 'Outbound TLS is enabled, but there is no TLS config found for DFSP ID: ' + dfspId
-          customLogger.logMessage('error', errorMsg, null, true, null)
+          customLogger.logMessage('error', errorMsg, { user })
           reject(new Error(JSON.stringify({ errorCode: 4000, errorDescription: errorMsg })))
         }
         httpsProps.httpsAgent = new https.Agent({
@@ -340,7 +349,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
       try {
         await JwsSigning.sign(reqOpts)
       } catch (err) {
-        console.log(err)
+        customLogger.logMessage('error', err.message, { additionalData: err, notification: false })
       }
 
       var syncResponse = {}
@@ -351,7 +360,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
           MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
-        }, Config.getUserConfig().CALLBACK_TIMEOUT)
+        }, userConfig.CALLBACK_TIMEOUT)
         // Listen for success callback
         MyEventEmitter.getEmitter('testOutbound').once(successCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)
@@ -389,9 +398,9 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         if (!successCallbackUrl || !errorCallbackUrl || ignoreCallbacks) {
           resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
         }
-        customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
+        customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user })
       }, (err) => {
-        customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, err, false)
+        customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: err, notification: false, user })
         reject(new Error(JSON.stringify({ errorCode: 4000 })))
       })
     })()
@@ -431,7 +440,7 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
               resultObject = resultObject.replace(element, replacedValue)
             }
           } catch (err) {
-            console.log(`${element} not found`)
+            customLogger.logMessage('error', `${element} not found`, { notification: false })
           }
           break
         }
@@ -554,6 +563,8 @@ const generateFinalReport = (inputTemplate, runtimeInformation) => {
           }
         })
         request.tests.passedAssertionsCount = testResult.passedCount
+        runtimeInformation.totalAssertions += request.tests.assertions.length
+        runtimeInformation.totalPassedAssertions += request.tests.passedAssertionsCount
       }
       return {
         request,

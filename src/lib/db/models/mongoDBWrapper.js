@@ -25,13 +25,48 @@
 'use strict'
 
 const mongoose = require('mongoose')
+
 const Schema = mongoose.Schema
 
-const commonModel = new Schema({
-  _id: String,
-  data: { type: Object, default: {} }
+const models = {
+  common: new Schema({
+    _id: String,
+    data: { type: Schema.Types.Mixed }
+  }),
+  logs: new Schema({
+    _id: mongoose.Types.ObjectId,
+    uniqueId: {
+      type: String,
+      required: false
+    },
+    traceID: {
+      type: String,
+      required: false
+    },
+    resource: Object,
+    messageType: String,
+    verbosity: String,
+    message: String,
+    additionalData: Schema.Types.Mixed,
+    logTime: Date
+  }, { _id: false }),
+  reports: new Schema({
+    _id: String,
+    name: String,
+    inputValues: Object,
+    test_cases: [],
+    runtimeInformation: Object
+  })
+}
+
+process.on('SIGINT', () => {
+  mongoose.connection.close(() => {
+    process.exit(0)
+  })
 })
 
 module.exports = {
-  commonModel
+  models,
+  connect: mongoose.connect,
+  Types: mongoose.Types
 }

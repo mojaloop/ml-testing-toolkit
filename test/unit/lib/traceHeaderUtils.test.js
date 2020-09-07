@@ -61,14 +61,18 @@ describe('TraceHeaderUtils', () => {
   describe('getTraceIdPrefix', () => {
     it('Should get the session ID properly', () => {
       const result = TraceHeaderUtils.getTraceIdPrefix()
-      console.log(result)
       expect(result).toBeDefined()
     })
   })
   describe('getTraceParentHeader', () => {
     it('Should get the session ID properly', () => {
       const result = TraceHeaderUtils.getTraceParentHeader('aabb')
-      console.log(result)
+      expect(result).toBeDefined()
+    })
+  })
+  describe('generateRandTraceId', () => {
+    it('Should get the random trace ID properly', () => {
+      const result = TraceHeaderUtils.generateRandTraceId(4)
       expect(result).toBeDefined()
     })
   })

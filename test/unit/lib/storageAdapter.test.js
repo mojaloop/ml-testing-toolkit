@@ -23,8 +23,6 @@
  --------------
  ******/
 
-const dbAdapter = require('../../../src/lib/db/adapters/dbAdapter')
-const fileAdapter = require('../../../src/lib/fileAdapter')
 const storageAdapter = require('../../../src/lib/storageAdapter')
 
 jest.mock('../../../src/lib/db/adapters/dbAdapter', () => {
@@ -92,8 +90,10 @@ jest.mock('../../../src/lib/fileAdapter', () => {
   }
 })
 
-
 describe('dbAdapter', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('when user defined', () => {
     const user = {
       dfspId: 'test'
@@ -157,36 +157,4 @@ describe('dbAdapter', () => {
       })
     })
   })
-  // describe('read', () => {
-  //   it('should create new object if not exists', async () => {
-  //     const result = await dbAdapter.read('undefined', user)
-  //     expect(result).toBeDefined()
-  //   })
-  //   it('should take existing object if exists', async () => {
-  //     const result = await dbAdapter.read('defined', user)
-  //     expect(result).toBeDefined()
-  //   })
-  // })
-  // describe('find', () => {
-  //   it('should return existing documents', async () => {
-  //     const result = await dbAdapter.find('undefined', user)
-  //     expect(result).toBeDefined()
-  //   })
-  // })
-  // describe('upsert', () => {
-  //   it('should create new object if not exists', async () => {
-  //     const result = await dbAdapter.upsert('undefined', {}, user)
-  //     expect(result).toBeDefined()
-  //   })
-  //   it('should create new object if not exists', async () => {
-  //     const result = await dbAdapter.upsert('defined', {}, user)
-  //     expect(result).toBeDefined()
-  //   })
-  // })
-  // describe('remove', () => {
-  //   it('should remove existing object', async () => {
-  //     const result = await dbAdapter.remove('undefined', user)
-  //     expect(result).toBeUndefined()
-  //   })
-  // })
 })

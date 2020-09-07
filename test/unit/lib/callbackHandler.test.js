@@ -31,10 +31,7 @@ const MyEventEmitter = require('../../../src/lib/MyEventEmitter')
 const axios = require('axios').default
 const https = require('https')
 const ConnectionProvider = require('../../../src/lib/configuration-providers/mb-connection-manager')
-const OpenApiMockHandler = require('../../../src/lib/mocking/openApiMockHandler')
 
-const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
-const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 const SpySign = jest.spyOn(JwsSigning, 'sign')
 const SpyPushCallback = jest.spyOn(AssertionStore, 'pushCallback')
 const SpyRequestLogger = jest.spyOn(RequestLogger, 'logMessage')
@@ -43,6 +40,7 @@ const SpyAgent = jest.spyOn(https, 'Agent')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
 const SpyEndpointsConfig = jest.spyOn(ConnectionProvider, 'getEndpointsConfig')
 jest.mock('axios')
+jest.mock('../../../src/lib/config')
 
 describe('callbackHandler', () => {
   describe('handleCallback should not throw an error', () => {
@@ -70,12 +68,12 @@ describe('callbackHandler', () => {
         },
         customInfo: {}
       }
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         OUTBOUND_MUTUAL_TLS_ENABLED: true,
         SEND_CALLBACK_ENABLE: true
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
       })
       SpySign.mockReturnValueOnce()
@@ -130,12 +128,12 @@ describe('callbackHandler', () => {
         },
         customInfo: {}
       }
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         OUTBOUND_MUTUAL_TLS_ENABLED: true,
         SEND_CALLBACK_ENABLE: true
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
       })
       SpySign.mockReturnValueOnce()
@@ -173,7 +171,7 @@ describe('callbackHandler', () => {
         headers: {},
         customInfo: {}
       }
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         CALLBACK_RESOURCE_ENDPOINTS: {
           enabled: true,
@@ -194,7 +192,7 @@ describe('callbackHandler', () => {
         OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: false
       })
       SpySign.mockImplementationOnce(() => {
@@ -231,7 +229,7 @@ describe('callbackHandler', () => {
         headers: {},
         customInfo: {}
       }
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         HUB_ONLY_MODE: true,
         ENDPOINTS_DFSP_WISE: {
@@ -249,7 +247,7 @@ describe('callbackHandler', () => {
         OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: false
       })
       SpySign.mockImplementationOnce(() => {
@@ -286,7 +284,7 @@ describe('callbackHandler', () => {
           traceID: 'traceID'
         }
       }
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         HUB_ONLY_MODE: true,
         ENDPOINTS_DFSP_WISE: {
@@ -300,7 +298,7 @@ describe('callbackHandler', () => {
         OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: false
       })
       SpySign.mockImplementationOnce(() => {
@@ -335,7 +333,7 @@ describe('callbackHandler', () => {
         headers: {},
         customInfo: {}
       }
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         HUB_ONLY_MODE: true,
         ENDPOINTS_DFSP_WISE: {
@@ -349,7 +347,7 @@ describe('callbackHandler', () => {
         OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: false
       })
       SpySign.mockImplementationOnce(() => {
@@ -381,7 +379,7 @@ describe('callbackHandler', () => {
         headers: {},
         customInfo: {}
       }
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         CALLBACK_RESOURCE_ENDPOINTS: {
           enabled: true,
@@ -397,7 +395,7 @@ describe('callbackHandler', () => {
         OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: false
       })
       SpySign.mockImplementationOnce(() => {
@@ -433,7 +431,10 @@ describe('callbackHandler', () => {
           }
         }
       }
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
+      Config.getUserConfig.mockReturnValueOnce({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: false

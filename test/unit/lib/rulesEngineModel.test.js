@@ -27,6 +27,8 @@
 
 const Utils = require('../../../src/lib/utils')
 const Config = require('../../../src/lib/config')
+const requestLogger = require('../../../src/lib/requestLogger')
+const dbAdapter = require('../../../src/lib/db/adapters/dbAdapter')
 
 const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
 const SpyReadDirAsync = jest.spyOn(Utils, 'readDirAsync')
@@ -34,22 +36,34 @@ const SpyWriteFileAsync = jest.spyOn(Utils, 'writeFileAsync')
 const SpyDeleteFileAsync = jest.spyOn(Utils, 'deleteFileAsync')
 
 const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
-
+jest.mock('../../../src/lib/requestLogger')
+jest.mock('../../../src/lib/db/adapters/dbAdapter')
 
 const RulesEngineModel = require('../../../src/lib/rulesEngineModel')
 
 describe('RulesEngineModel', () => {
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
   describe('model', () => {
     it('getModel should return the model', async () => {
       const result = await RulesEngineModel.getModel(undefined, 'response')
       expect(result).toBeDefined()      
     })
     it('getModel should return the model', async () => {
+      dbAdapter.read.mockResolvedValueOnce({
+        data: {}
+      })
       SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify([]))
       const result = await RulesEngineModel.getModel({dfspId: 'userdfsp'}, 'response')
       expect(result).toBeDefined()      
     })
     it('getModel should return the model', async () => {
+      dbAdapter.read.mockResolvedValueOnce({
+        data: {
+          key: 'value'
+        }
+      })
       const result = await RulesEngineModel.getModel({dfspId: 'userdfsp'}, 'response')
       expect(result).toBeDefined()      
     })
@@ -110,9 +124,7 @@ describe('RulesEngineModel', () => {
       }))
       try {
         await RulesEngineModel.reloadResponseRules()
-      } catch (err) {
-        console.log(err)
-      }
+      } catch (err) {}
     })
     it('setActiveResponseRulesFile should set activeRulesFile', async () => {
       SpyWriteFileAsync.mockResolvedValueOnce()

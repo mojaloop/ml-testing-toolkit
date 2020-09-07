@@ -53,7 +53,7 @@ class RulesEngine {
    * @param {object[]} rules - an array of rules to load into the engine
    * @returns {undefined}
    */
-  loadRules (rules) {
+  loadRules (rules, user) {
     try {
       this.init()
       const rulesLength = rules.length
@@ -61,9 +61,8 @@ class RulesEngine {
         r.priority = rulesLength - index
         this.engine.addRule(r)
       })
-      // customLogger.logMessage('info', `Rules loaded: ${util.inspect(rules, { depth: 20 })}`)
     } catch (err) {
-      customLogger.logMessage('error', 'Error loading rules ' + err)
+      customLogger.logMessage('error', 'Error loading rules ' + err, { notification: false })
       throw err
     }
   }
@@ -77,7 +76,6 @@ class RulesEngine {
    */
   async evaluate (facts) {
     return new Promise((resolve, reject) => {
-      // customLogger.logMessage('info', `Rule engine evaluating facts: ${util.inspect(facts)}`)
       this.engine
         .run(facts)
         .then((events) => {

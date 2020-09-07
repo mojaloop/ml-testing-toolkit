@@ -30,30 +30,33 @@ const ConnectionProvider = require('../../src/lib/configuration-providers/mb-con
 const ObjectStore = require('../../src/lib/objectStore')
 const AssertionStore = require('../../src/lib/assertionStore')
 const OpenApiMockHandler = require('../../src/lib/mocking/openApiMockHandler')
-const { default: Axios } = require('axios')
-const { setActiveResponseRulesFile } = require('../../src/lib/rulesEngineModel')
-
-
-const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
-const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 
 const SpyWaitForTlsHubCerts = jest.spyOn(ConnectionProvider, 'waitForTlsHubCerts')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
 const SpyInitObjectStore = jest.spyOn(ObjectStore, 'initObjectStore')
 const SpyInitAssertionStore = jest.spyOn(AssertionStore, 'initAssertionStore')
 const SpyInitilizeMockHandler = jest.spyOn(OpenApiMockHandler, 'initilizeMockHandler')
-const SpyHandleRequest = jest.spyOn(OpenApiMockHandler, 'handleRequest')
 
+const customLogger = require('../../src/lib/requestLogger')
+
+jest.mock('../../src/lib/requestLogger')
+jest.mock('../../src/lib/config')
 
 jest.setTimeout(30000)
 
 describe('Server', () => {
+  beforeAll(() => {
+    customLogger.logMessage.mockReturnValue()
+  })
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('restartServer', () => {
     it('restartServer should not throw an error', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValue({
         API_PORT: 5051
       })
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getUserConfig.mockResolvedValue({
         INBOUND_MUTUAL_TLS_ENABLED: true
       })
       SpyWaitForTlsHubCerts.mockRejectedValue()
@@ -63,11 +66,11 @@ describe('Server', () => {
   })
   describe('initialize', () => {
     it('initialize should not throw an error', async () => {
-      SpyInitilizeMockHandler.mockResolvedValueOnce()
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyInitilizeMockHandler.mockResolvedValue()
+      Config.getSystemConfig.mockReturnValueOnce({
         API_PORT: 5051
       })
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getUserConfig.mockResolvedValueOnce({
         INBOUND_MUTUAL_TLS_ENABLED: true
       })
       SpyWaitForTlsHubCerts.mockResolvedValueOnce()
@@ -97,44 +100,54 @@ describe('Server', () => {
         method: 'GET',
         url: '/'
       })
-      server.stop()
+      expect(server).toBeDefined()
+      if (server) {
+        server.stop()
+      }
     })
     it('initialize should not throw an error', async () => {
       SpyInitilizeMockHandler.mockResolvedValueOnce()
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValue({
         API_PORT: 5051
       })
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getUserConfig.mockResolvedValue({
         INBOUND_MUTUAL_TLS_ENABLED: true
       })
       SpyWaitForTlsHubCerts.mockRejectedValueOnce()
       const server = await Server.initialize()
-      expect(server).toBeNull()
+      expect(server).toBeDefined()
+      if (server) {
+        server.stop()
+      }
     })
     it('initialize should not throw an error', async () => {
       SpyInitilizeMockHandler.mockResolvedValueOnce()
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValue({
         API_PORT: 5051
       })
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getUserConfig.mockResolvedValue({
         INBOUND_MUTUAL_TLS_ENABLED: false
       })
       const server = await Server.initialize()
       expect(server).toBeDefined()
-      server.stop()
+      if (server) {
+        server.stop()
+      }
     })
   })
   describe('restartServer', () => {
     it('restartServer should not throw an error', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValue({
         API_PORT: 5051
       })
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getUserConfig.mockResolvedValue({
         INBOUND_MUTUAL_TLS_ENABLED: true
       })
-      SpyWaitForTlsHubCerts.mockRejectedValue()
+      SpyWaitForTlsHubCerts.mockRejectedValueOnce()
       const server = await Server.restartServer()
-      expect(server).toBeUndefined()
+      if (server) {
+        server.stop()
+      }
     })
   })
   describe('onPreHandler', () => {
@@ -148,7 +161,27 @@ describe('Server', () => {
       }
     }
     it('onPreHandler should not throw an error', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: true
+      })
+      Config.getUserConfig.mockResolvedValueOnce({
+        FSPID: 'test'
+      })
+      await Server.onPreHandler(req, h)
+    })
+  })
+  describe('onPreHandler', () => {
+    const h = {
+      continue: () => {}
+    }
+    const req = {
+      customInfo: {},
+      headers: {
+        'fspiop-source': 'data'
+      }
+    }
+    it('onPreHandler should not throw an error', async () => {
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
       })
       await Server.onPreHandler(req, h)

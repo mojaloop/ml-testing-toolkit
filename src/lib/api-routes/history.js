@@ -18,31 +18,39 @@
  * Gates Foundation
 
  * ModusBox
- * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
- * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
 
-'use strict'
+const express = require('express')
+const router = new express.Router()
+const dbAdapter = require('../db/adapters/dbAdapter')
 
-const Config = require('../../src/lib/config')
-const Server = require('../../src/server')
-const apiServer = require('../../src/lib/api-server')
-const ConnectionProvider = require('../../src/lib/configuration-providers/mb-connection-manager')
-
-jest.mock('../../src/lib/config')
-jest.mock('../../src/server')
-jest.mock('../../src/lib/api-server')
-jest.mock('../../src/lib/configuration-providers/mb-connection-manager')
-
-describe('Index', () => {
-  describe('init', () => {
-    it('Init should not throw an error', async () => {
-      apiServer.startServer.mockReturnValue()
-      Config.loadUserConfig.mockResolvedValue()
-      ConnectionProvider.initialize.mockResolvedValue()
-      Server.initialize.mockResolvedValue()
-      expect(() => {require('../../src/index')}).not.toThrowError();
-    })
-  })
+router.get('/reports', async (req, res, next) => {
+  try {
+    const reports = (await dbAdapter.read('reports', req.user, { query: req.query }))
+    res.status(200).send(reports)
+  } catch (err) {
+    next(err)
+  }
 })
+
+router.post('/reports', async (req, res, next) => {
+  try {
+    await dbAdapter.upsert('reports', req.body, req.user)
+    res.status(200).send()
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.get('/logs', async (req, res, next) => {
+  try {
+    const logs = (await dbAdapter.read('logs', req.user, { query: req.query }))
+    res.status(200).send(logs)
+  } catch (err) {
+    next(err)
+  }
+})
+
+module.exports = router

@@ -23,18 +23,18 @@
  ******/
 
 'use strict'
-
-const Server = require('./server')
-const Config = require('./lib/config')
+const RequestLogger = require('./lib/requestLogger')
 const apiServer = require('./lib/api-server')
-const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
+const Config = require('./lib/config')
 
 const init = async () => {
+  RequestLogger.logMessage('info', 'Toolkit Initialization started...', { notification: false })
   await Config.loadSystemConfig()
-  apiServer.startServer(5050)
   await Config.loadUserConfig()
-  await ConnectionProvider.initialize()
-  await Server.initialize()
+  apiServer.startServer(5050)
+  await require('./lib/configuration-providers/mb-connection-manager').initialize()
+  await require('./server').initialize()
+  RequestLogger.logMessage('info', 'Toolkit Initialization completed.', { notification: false })
 }
 
 init()
