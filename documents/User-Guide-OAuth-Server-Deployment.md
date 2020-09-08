@@ -106,7 +106,7 @@ Open the URL http://localhost:8080/auth/admin and login with username 'admin' an
 * Create the following entries in the Mappers tab:
 
   | Name | Mapper Type | Properties | Add to ID token | Add to Access token |
-  | --- | --- | --- | --- | --- | --- |
+  | --- | --- | --- | --- | --- |
   | dfspId | User Attribute | User Attribute: __dfspId__ <br /> Token Claim Name: __dfspId__ <br /> Claim JSON Type: __String__ | ON | ON |
   | aud | Audience | Included Client Audience : __ttk__ <br /> Included Custom Audience: __aud__ |
   | Groups | Group Membership | Token Claim Name: __groups__ <br /> Full group path: __OFF__ | ON | ON |
