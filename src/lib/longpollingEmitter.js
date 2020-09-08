@@ -23,14 +23,14 @@
  ******/
 
 const MyEventEmitter = require('./MyEventEmitter')
-const assertionStore = require('./assertionStore')
+const objectStore = require('./objectStore')
 
 const LONGPOLLING_TIMEOUT = 5000
 
-const setAssertionStoreEmitter = (storedObject, eventPath, res) => {
+const setAssertionStoreEmitter = (storedObject, eventPath, res, user) => {
   switch (storedObject) {
-    case 'requests': setEmitter(storedObject, MyEventEmitter.getEmitter('assertionRequest'), eventPath, res); break
-    case 'callbacks': setEmitter(storedObject, MyEventEmitter.getEmitter('assertionCallback'), eventPath, res); break
+    case 'requests': setEmitter(storedObject, MyEventEmitter.getEmitter('assertionRequest', user), eventPath, res); break
+    case 'callbacks': setEmitter(storedObject, MyEventEmitter.getEmitter('assertionCallback', user), eventPath, res); break
   }
 }
 
@@ -42,7 +42,7 @@ const setEmitter = (storedObject, emitter, eventPath, res) => {
 
   emitter.once(eventPath, (data) => {
     clearTimeout(timer)
-    assertionStore.pop(storedObject, eventPath)
+    objectStore.popObject(storedObject, eventPath)
     res.status(200).json(data)
   })
 }

@@ -30,29 +30,16 @@ describe('ObjectStore', () => {
   describe('Transaction Related Functions', () => {
     it('Save transaction should not throw error', async () => {
       expect(() => {
-        const result = ObjectStore.saveTransaction('123')
+        const result = ObjectStore.push('transactions', '123', {})
       }).not.toThrowError();
     })
-    it('Search for the transaction', async () => {
-      const result = ObjectStore.searchTransaction('123')
-      expect(result).toBe(true)
-    })
     it('Get existing transaction', async () => {
-      const result = ObjectStore.getTransaction('123')
+      const result = ObjectStore.get('transactions', '123')
       expect(result).not.toBe(null)
     })
     it('Get not existing transaction', async () => {
-      const result = ObjectStore.getTransaction('1234')
+      const result = ObjectStore.get('transactions', '1234')
       expect(result).toBe(null)
-    })
-    it('Delete the transaction', async () => {
-      expect(() => {
-        const result = ObjectStore.deleteTransaction('123')
-      }).not.toThrowError();
-    })
-    it('Search again for the transaction', async () => {
-      const result = ObjectStore.searchTransaction('123')
-      expect(result).toBe(false)
     })
   })
   describe('Generic Functions', () => {
@@ -82,16 +69,8 @@ describe('ObjectStore', () => {
   describe('inbound environment Related Functions', () => {
     it('Save inbound environment should not throw error', async () => {
       expect(() => {
-        const result = ObjectStore.push('inboundEnvironment', '123')
+        const result = ObjectStore.push('inboundEnvironment', '123', {})
       }).not.toThrowError();
-    })
-    it('Get existing inbound environment', async () => {
-      const result = ObjectStore.getObject('inboundEnvironment', '123')
-      expect(result).not.toBe(null)
-    })
-    it('Get not existing inbound environment', async () => {
-      const result = ObjectStore.getObject('inboundEnvironment', '1234')
-      expect(result).toBe(null)
     })
     it('Delete the inbound environment', async () => {
       expect(() => {

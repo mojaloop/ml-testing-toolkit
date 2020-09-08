@@ -357,21 +357,21 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
       var timer = null
       if (successCallbackUrl && errorCallbackUrl && (ignoreCallbacks !== true)) {
         timer = setTimeout(() => {
-          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
-          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
+          MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
+          MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
         }, userConfig.CALLBACK_TIMEOUT)
         // Listen for success callback
-        MyEventEmitter.getEmitter('testOutbound').once(successCallbackUrl, (callbackHeaders, callbackBody) => {
+        MyEventEmitter.getEmitter('testOutbound', user).once(successCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)
-          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
+          MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
           customLogger.logMessage('info', 'Received success callback ' + successCallbackUrl, { headers: callbackHeaders, body: callbackBody }, false)
           resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
         })
         // Listen for error callback
-        MyEventEmitter.getEmitter('testOutbound').once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
+        MyEventEmitter.getEmitter('testOutbound', user).once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)
-          MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
+          MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
           customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { headers: callbackHeaders, body: callbackBody }, false)
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
         })
@@ -389,8 +389,8 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         if (result.status > 299) {
           if (timer) {
             clearTimeout(timer)
-            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
-            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
+            MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
+            MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
           }
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
         }

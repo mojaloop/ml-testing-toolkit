@@ -368,7 +368,7 @@ const replaceVariablesFromRequest = async (inputObject, context, req) => {
   const environment = objectStore.get('inboundEnvironment')
   const matchedArray = resultObject.match(/{\$([^}]+)}/g)
   if (matchedArray) {
-    const userConfig = await Config.getUserConfig(req.customInfo.sourceUser)
+    const userConfig = await Config.getUserConfig(req.customInfo.userSource)
     matchedArray.forEach(element => {
       const splitArr = element.split('.')
       switch (splitArr[0]) {

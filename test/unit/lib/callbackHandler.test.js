@@ -25,7 +25,7 @@
 const Config = require('../../../src/lib/config')
 const callbackHandler = require('../../../src/lib/callbackHandler')
 const JwsSigning = require('../../../src/lib/jws/JwsSigning')
-const AssertionStore = require('../../../src/lib/assertionStore')
+const ObjectStore = require('../../../src/lib/objectStore')
 const RequestLogger = require('../../../src/lib/requestLogger')
 const MyEventEmitter = require('../../../src/lib/MyEventEmitter')
 const axios = require('axios').default
@@ -33,7 +33,7 @@ const https = require('https')
 const ConnectionProvider = require('../../../src/lib/configuration-providers/mb-connection-manager')
 
 const SpySign = jest.spyOn(JwsSigning, 'sign')
-const SpyPushCallback = jest.spyOn(AssertionStore, 'pushCallback')
+const SpyPushCallback = jest.spyOn(ObjectStore, 'push')
 const SpyRequestLogger = jest.spyOn(RequestLogger, 'logMessage')
 const SpyMyEventEmitter = jest.spyOn(MyEventEmitter, 'getEmitter')
 const SpyAgent = jest.spyOn(https, 'Agent')

@@ -28,13 +28,11 @@ const Server = require('../../src/server')
 const Config = require('../../src/lib/config')
 const ConnectionProvider = require('../../src/lib/configuration-providers/mb-connection-manager')
 const ObjectStore = require('../../src/lib/objectStore')
-const AssertionStore = require('../../src/lib/assertionStore')
 const OpenApiMockHandler = require('../../src/lib/mocking/openApiMockHandler')
 
 const SpyWaitForTlsHubCerts = jest.spyOn(ConnectionProvider, 'waitForTlsHubCerts')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
 const SpyInitObjectStore = jest.spyOn(ObjectStore, 'initObjectStore')
-const SpyInitAssertionStore = jest.spyOn(AssertionStore, 'initAssertionStore')
 const SpyInitilizeMockHandler = jest.spyOn(OpenApiMockHandler, 'initilizeMockHandler')
 
 const customLogger = require('../../src/lib/requestLogger')
@@ -80,7 +78,6 @@ describe('Server', () => {
         hubCaCert: ''
       })
       SpyInitObjectStore.mockReturnValueOnce()
-      SpyInitAssertionStore.mockReturnValueOnce()
       const server = await Server.initialize()
       await server.inject({
         method: 'GET',

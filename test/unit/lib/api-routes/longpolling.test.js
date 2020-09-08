@@ -34,10 +34,10 @@ Config.getSystemConfig.mockReturnValue({
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
-const assertionStore = require('../../../../src/lib/assertionStore')
+const objectStore = require('../../../../src/lib/objectStore')
 
-const SpyPopRequest = jest.spyOn(assertionStore, 'popRequest')
-const SpyPopCallback = jest.spyOn(assertionStore, 'popCallback')
+const SpyPopRequest = jest.spyOn(objectStore, 'popObject')
+const SpyPopCallback = jest.spyOn(objectStore, 'popObject')
 
 const requestLogger = require('../../../../src/lib/requestLogger')
 
