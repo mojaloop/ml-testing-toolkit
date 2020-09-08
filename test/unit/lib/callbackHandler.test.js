@@ -33,7 +33,7 @@ const https = require('https')
 const ConnectionProvider = require('../../../src/lib/configuration-providers/mb-connection-manager')
 
 const SpySign = jest.spyOn(JwsSigning, 'sign')
-const SpyPushCallback = jest.spyOn(ObjectStore, 'push')
+const SpyPush = jest.spyOn(ObjectStore, 'push')
 const SpyRequestLogger = jest.spyOn(RequestLogger, 'logMessage')
 const SpyMyEventEmitter = jest.spyOn(MyEventEmitter, 'getEmitter')
 const SpyAgent = jest.spyOn(https, 'Agent')
@@ -77,7 +77,7 @@ describe('callbackHandler', () => {
         HOSTING_ENABLED: true
       })
       SpySign.mockReturnValueOnce()
-      SpyPushCallback.mockReturnValueOnce()
+      SpyPush.mockReturnValueOnce()
       SpyMyEventEmitter.mockReturnValueOnce({
         emit: () => {}
       })
@@ -137,7 +137,7 @@ describe('callbackHandler', () => {
         HOSTING_ENABLED: true
       })
       SpySign.mockReturnValueOnce()
-      SpyPushCallback.mockReturnValueOnce()
+      SpyPush.mockReturnValueOnce()
       SpyMyEventEmitter.mockReturnValueOnce({
         emit: () => {}
       })
@@ -198,7 +198,7 @@ describe('callbackHandler', () => {
       SpySign.mockImplementationOnce(() => {
         throw new Error('log error if jws signign fails')
       })
-      SpyPushCallback.mockReturnValueOnce()
+      SpyPush.mockReturnValueOnce()
       SpyMyEventEmitter.mockReturnValueOnce({
         emit: () => {}
       })
@@ -253,7 +253,7 @@ describe('callbackHandler', () => {
       SpySign.mockImplementationOnce(() => {
         throw new Error('log error if jws signign fails')
       })
-      SpyPushCallback.mockReturnValueOnce()
+      SpyPush.mockReturnValueOnce()
       SpyMyEventEmitter.mockReturnValueOnce({
         emit: () => {}
       })
@@ -304,7 +304,7 @@ describe('callbackHandler', () => {
       SpySign.mockImplementationOnce(() => {
         throw new Error('log error if jws signign fails')
       })
-      SpyPushCallback.mockReturnValueOnce()
+      SpyPush.mockReturnValueOnce()
       SpyMyEventEmitter.mockReturnValueOnce({
         emit: () => {}
       })
@@ -353,7 +353,7 @@ describe('callbackHandler', () => {
       SpySign.mockImplementationOnce(() => {
         throw new Error('log error if jws signign fails')
       })
-      SpyPushCallback.mockReturnValueOnce()
+      SpyPush.mockReturnValueOnce()
       SpyMyEventEmitter.mockReturnValueOnce({
         emit: () => {}
       })
@@ -401,7 +401,7 @@ describe('callbackHandler', () => {
       SpySign.mockImplementationOnce(() => {
         throw new Error('log error if jws signign fails')
       })
-      SpyPushCallback.mockReturnValueOnce()
+      SpyPush.mockReturnValueOnce()
       SpyMyEventEmitter.mockReturnValueOnce({
         emit: () => {}
       })
@@ -440,7 +440,7 @@ describe('callbackHandler', () => {
         SEND_CALLBACK_ENABLE: false
       })
       SpySign.mockReturnValueOnce()
-      SpyPushCallback.mockReturnValueOnce()
+      SpyPush.mockReturnValueOnce()
       SpyMyEventEmitter.mockReturnValueOnce({
         emit: () => {}
       })
