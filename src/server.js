@@ -35,7 +35,6 @@ const RequestLogger = require('./lib/requestLogger')
 const OpenApiMockHandler = require('./lib/mocking/openApiMockHandler')
 const UniqueIdGenerator = require('./lib/uniqueIdGenerator')
 const objectStore = require('./lib/objectStore')
-const assertionStore = require('./lib/assertionStore')
 const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
 const traceHeaderUtils = require('./lib/traceHeaderUtils')
 
@@ -150,7 +149,6 @@ const initialize = async () => {
 
   if (serverInstance) {
     objectStore.initObjectStore()
-    assertionStore.initAssertionStore()
     RequestLogger.logMessage('info', `Toolkit Server running on ${serverInstance.info.uri}`, { notification: false })
   }
   return serverInstance

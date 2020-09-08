@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -42,19 +43,19 @@ const get = (key, item, user) => {
     if (storedObject[context][key][item]) {
       return { ...storedObject[context][key][item] }
     }
+    return null
   } else {
     return { ...storedObject[context][key] }
   }
-  return null
 }
 
 const push = (key, item, value, user) => {
   const context = user ? user.dfspId : 'data'
   if (!storedObject[context]) {
-    storedObject[context] = {
-      transactions: {},
-      inboundEnvironment: {}
-    }
+    storedObject[context] = {}
+  }
+  if (!storedObject[context][key]) {
+    storedObject[context][key] = {}
   }
   storedObject[context][key][item] = {
     insertedDate: Date.now(),
