@@ -30,9 +30,7 @@ const https = require('https')
 const Config = require('../config')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
-const fs = require('fs')
-const { promisify } = require('util')
-const readFileAsync = promisify(fs.readFile)
+const { readFileAsync } = require('../utils')
 const expect = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
 const traceHeaderUtils = require('../traceHeaderUtils')
@@ -48,7 +46,7 @@ const dbAdapter = require('../db/adapters/dbAdapter')
 
 var terminateTraceIds = {}
 
-const getTracing = (traceID) => {
+const getTracing = (traceID, dfspId) => {
   const tracing = {
     outboundID: traceID,
     sessionID: null
@@ -57,12 +55,15 @@ const getTracing = (traceID) => {
     tracing.outboundID = traceHeaderUtils.getEndToEndID(traceID)
     tracing.sessionID = traceHeaderUtils.getSessionID(traceID)
   }
+  if (Config.getSystemConfig().HOSTING_ENABLED) {
+    tracing.sessionID = dfspId
+  }
   return tracing
 }
 
 const OutboundSend = async (inputTemplate, traceID, dfspId) => {
   const startedTimeStamp = new Date()
-  const tracing = getTracing(traceID)
+  const tracing = getTracing(traceID, dfspId)
 
   const environmentVariables = {
     items: Object.entries(inputTemplate.inputValues || {}).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
@@ -85,7 +86,7 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
         totalAssertions: 0,
         totalPassedAssertions: 0
       }
-      const totalResult = generateFinalReport(inputTemplate, runtimeInformation, dfspId)
+      const totalResult = generateFinalReport(inputTemplate, runtimeInformation)
       if (Config.getSystemConfig().HOSTING_ENABLED) {
         const totalResultCopy = JSON.parse(JSON.stringify(totalResult))
         totalResultCopy.runtimeInformation.completedTimeISO = completedTimeStamp
@@ -110,7 +111,7 @@ const terminateOutbound = (traceID) => {
 }
 
 const processTestCase = async (testCase, traceID, inputValues, environmentVariables, dfspId) => {
-  const tracing = getTracing(traceID)
+  const tracing = getTracing(traceID, dfspId)
 
   // Load the requests array into an object by the request id to access a particular object faster
   const requestsObj = {}
