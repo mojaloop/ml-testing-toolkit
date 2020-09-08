@@ -28,13 +28,12 @@ const objectStore = require('./objectStore')
 const LONGPOLLING_TIMEOUT = 5000
 
 const setAssertionStoreEmitter = (storedObject, eventPath, res, user) => {
+  let emitterType
   switch (storedObject) {
-    case 'requests': setEmitter(storedObject, MyEventEmitter.getEmitter('assertionRequest', user), eventPath, res); break
-    case 'callbacks': setEmitter(storedObject, MyEventEmitter.getEmitter('assertionCallback', user), eventPath, res); break
+    case 'requests': emitterType = 'assertionRequest'; break
+    case 'callbacks': emitterType = 'assertionCallback'; break
   }
-}
-
-const setEmitter = (storedObject, emitter, eventPath, res) => {
+  const emitter = MyEventEmitter.getEmitter(emitterType, user)
   const timer = setTimeout(() => {
     emitter.removeAllListeners(eventPath)
     res.status(500).json({ error: 'Timed out' })
@@ -42,7 +41,7 @@ const setEmitter = (storedObject, emitter, eventPath, res) => {
 
   emitter.once(eventPath, (data) => {
     clearTimeout(timer)
-    objectStore.popObject(storedObject, eventPath)
+    objectStore.popObject(storedObject, eventPath, user)
     res.status(200).json(data)
   })
 }
