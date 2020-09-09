@@ -103,11 +103,8 @@ const createServer = async (port, user) => {
 const onPreHandler = async (request, h) => {
   request.customInfo = {}
   if (Config.getSystemConfig().HOSTING_ENABLED) {
-    request.customInfo.sourceUser = {
-      dfspId: request.headers['fspiop-source']
-    }
     request.customInfo.user = {
-      dfspId: (await Config.getUserConfig(request.customInfo.sourceUser)).FSPID
+      dfspId: request.headers['fspiop-source']
     }
   }
 
@@ -127,12 +124,12 @@ const onPreHandler = async (request, h) => {
 
     RequestLogger.logMessage('info', 'Traceparent header not found. Generated a random traceID.', { additionalData: { traceID: request.customInfo.traceID }, request })
   }
-  RequestLogger.logRequest(request, request.customInfo.sourceUser)
+  RequestLogger.logRequest(request, request.customInfo.user)
   return h.continue
 }
 
 const onPreResponse = (request, h) => {
-  RequestLogger.logResponse(request, request.customInfo.sourceUser)
+  RequestLogger.logResponse(request, request.customInfo.user)
   if (request.customInfo && request.customInfo.negotiatedContentType) {
     if (request.response.isBoom) {
       request.response.output.headers['content-type'] = request.customInfo.negotiatedContentType

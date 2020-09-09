@@ -35,7 +35,12 @@ const read = async (id, user) => {
     } else {
       document = await dbAdapter.read(id, user)
       if (Object.keys(document.data).length === 0) {
-        const content = await fileAdapter.read(id)
+        let content
+        try {
+          content = await fileAdapter.read(id)
+        } catch (err) {
+          content = {}
+        }
         document = await dbAdapter.upsert(id, content, user)
       }
     }

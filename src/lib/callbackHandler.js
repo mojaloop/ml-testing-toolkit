@@ -39,7 +39,7 @@ const handleCallback = async (callbackObject, context, req) => {
   const userConfig = await Config.getUserConfig(req.customInfo.user)
 
   let callbackEndpoint = userConfig.CALLBACK_ENDPOINT
-  if (Config.getSystemConfig().HOSTING_ENABLED) {
+  if (Config.getSystemConfig().HOSTING_ENABLED && !userConfig.HUB_ONLY_MODE) {
     const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
     if (endpointsConfig.dfspEndpoints && callbackObject.callbackInfo.fspid && endpointsConfig.dfspEndpoints[callbackObject.callbackInfo.fspid]) {
       callbackEndpoint = endpointsConfig.dfspEndpoints[callbackObject.callbackInfo.fspid]

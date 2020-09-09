@@ -32,13 +32,24 @@ var storedObject = {
   }
 }
 
-const set = (key, value, user) => {
+const init = (key, user) => {
   const context = user ? user.dfspId : 'data'
+  if (!storedObject[context]) {
+    storedObject[context] = {}
+  }
+  if (!storedObject[context][key]) {
+    storedObject[context][key] = {}
+  }
+  return context
+}
+
+const set = (key, value, user) => {
+  const context = init(key, user)
   storedObject[context][key] = { ...value }
 }
 
 const get = (key, item, user) => {
-  const context = user ? user.dfspId : 'data'
+  const context = init(key, user)
   if (item) {
     if (storedObject[context][key][item]) {
       return { ...storedObject[context][key][item] }
@@ -50,13 +61,7 @@ const get = (key, item, user) => {
 }
 
 const push = (key, item, value, user) => {
-  const context = user ? user.dfspId : 'data'
-  if (!storedObject[context]) {
-    storedObject[context] = {}
-  }
-  if (!storedObject[context][key]) {
-    storedObject[context][key] = {}
-  }
+  const context = init(key, user)
   storedObject[context][key][item] = {
     insertedDate: Date.now(),
     data: JSON.parse(JSON.stringify(value))
@@ -75,7 +80,7 @@ const clear = (object, interval) => {
 }
 
 const popObject = (key, item, user) => {
-  const context = user ? user.dfspId : 'data'
+  const context = init(key, user)
   if (Object.prototype.hasOwnProperty.call(storedObject[context][key], item)) {
     const foundData = JSON.parse(JSON.stringify(storedObject[context][key][item].data))
     delete storedObject[context][key][item]

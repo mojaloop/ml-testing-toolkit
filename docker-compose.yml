@@ -27,8 +27,8 @@ services:
       - sh
       - /usr/share/nginx/start.sh
 
-  mongo:
-    image: mongo
+  mojaloop-testing-toolkit-db:
+    image: mongo:latest
     # Disable logging as it is far too verbose for debugging locally
     logging:
       driver: none

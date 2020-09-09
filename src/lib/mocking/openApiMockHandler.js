@@ -190,7 +190,7 @@ module.exports.getOpenApiObjects = () => {
 const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
   customLogger.logMessage('debug', 'Schema Validation Passed', { request: req })
   if (req.method === 'put') {
-    MyEventEmitter.getEmitter('testOutbound', req.customInfo.userSource).emit(req.method + ' ' + req.path, req.headers, req.payload)
+    MyEventEmitter.getEmitter('testOutbound', req.customInfo.user).emit(req.method + ' ' + req.path, req.headers, req.payload)
     let assertionPath = req.path
     const assertionData = { headers: req.headers, body: req.payload }
     if (assertionPath.endsWith('/error')) {
@@ -198,7 +198,7 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
       assertionData.error = true
     }
     objectStore.push('requests', assertionPath, assertionData)
-    MyEventEmitter.getEmitter('assertionRequest', req.customInfo.userSource).emit(assertionPath, assertionData)
+    MyEventEmitter.getEmitter('assertionRequest', req.customInfo.user).emit(assertionPath, assertionData)
   }
   req.customInfo.specFile = item.specFile
   req.customInfo.jsfRefFile = item.jsfRefFile
@@ -230,6 +230,10 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
     responseStatus = +status
   }
   // Verify that it is a success code, then generate callback
+  console.log('bam 1')
+  console.log(req.url)
+  console.log(req.headers)
+  console.log(req.payload)
   if ((req.method === 'post' || req.method === 'get' || req.method === 'put') && responseStatus >= 200 && responseStatus <= 299) {
     // Generate callback asynchronously
     setImmediate(generateAsyncCallback, item, context, req)
