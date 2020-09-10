@@ -46,7 +46,7 @@ const dbAdapter = require('../db/adapters/dbAdapter')
 
 var terminateTraceIds = {}
 
-const getTracing = (traceID, dfspId) => {
+const getTracing = (traceID) => {
   const tracing = {
     outboundID: traceID,
     sessionID: null
@@ -55,15 +55,12 @@ const getTracing = (traceID, dfspId) => {
     tracing.outboundID = traceHeaderUtils.getEndToEndID(traceID)
     tracing.sessionID = traceHeaderUtils.getSessionID(traceID)
   }
-  if (Config.getSystemConfig().HOSTING_ENABLED) {
-    tracing.sessionID = dfspId
-  }
   return tracing
 }
 
 const OutboundSend = async (inputTemplate, traceID, dfspId) => {
   const startedTimeStamp = new Date()
-  const tracing = getTracing(traceID, dfspId)
+  const tracing = getTracing(traceID)
 
   const environmentVariables = {
     items: Object.entries(inputTemplate.inputValues || {}).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
@@ -111,7 +108,7 @@ const terminateOutbound = (traceID) => {
 }
 
 const processTestCase = async (testCase, traceID, inputValues, environmentVariables, dfspId) => {
-  const tracing = getTracing(traceID, dfspId)
+  const tracing = getTracing(traceID)
 
   // Load the requests array into an object by the request id to access a particular object faster
   const requestsObj = {}

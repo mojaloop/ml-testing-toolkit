@@ -27,14 +27,6 @@ services:
       - sh
       - /usr/share/nginx/start.sh
 
-  mojaloop-testing-toolkit-db:
-    image: mongo:latest
-    # Disable logging as it is far too verbose for debugging locally
-    logging:
-      driver: none
-    ports:
-      - "27017:27017"
-
 networks:
   default:
     name: mojaloop-testing-toolkit
