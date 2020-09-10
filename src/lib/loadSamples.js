@@ -21,7 +21,7 @@
  * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
-const { readFileAsync, readRecursiveAsync } = require('./utils')
+const { readFileAsync, readRecursiveAsync, fileStatAsync } = require('./utils')
 const fs = require('fs')
 
 // load collections or environments
@@ -83,8 +83,38 @@ const getSample = async (queryParams) => {
   return sample
 }
 
+// load samples content
+const getSampleWithFolderWise = async (queryParams) => {
+  const collections = []
+  if (queryParams.collections) {
+    for (const i in queryParams.collections) {
+      const fileContent = await readFileAsync(queryParams.collections[i], 'utf8')
+      const fileStat = await fileStatAsync(queryParams.collections[i])
+      // collections.push(JSON.parse(collection))
+      collections.push({
+        name: queryParams.collections[i],
+        path: queryParams.collections[i],
+        size: fileStat.size,
+        modified: fileStat.mtime,
+        content: JSON.parse(fileContent)
+      })
+    }
+  }
+
+  let environment = {}
+  if (queryParams.environment) {
+    environment = JSON.parse(await readFileAsync(queryParams.environment, 'utf8')).inputValues
+  }
+
+  return {
+    collections,
+    environment
+  }
+}
+
 module.exports = {
   getCollectionsOrEnvironments,
   getCollectionsOrEnvironmentsWithFileSize,
-  getSample
+  getSample,
+  getSampleWithFolderWise
 }
