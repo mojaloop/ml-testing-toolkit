@@ -230,10 +230,6 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
     responseStatus = +status
   }
   // Verify that it is a success code, then generate callback
-  console.log('bam 1')
-  console.log(req.url)
-  console.log(req.headers)
-  console.log(req.payload)
   if ((req.method === 'post' || req.method === 'get' || req.method === 'put') && responseStatus >= 200 && responseStatus <= 299) {
     // Generate callback asynchronously
     setImmediate(generateAsyncCallback, item, context, req)
