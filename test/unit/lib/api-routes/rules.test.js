@@ -101,10 +101,6 @@ describe('API route /api/rules', () => {
         const res = await request(app).put(`/api/rules/files/validation/test1.json`).send([])
         expect(res.statusCode).toEqual(200)
       })
-      it('Create a test file with wrong content', async () => {
-        const res = await request(app).put(`/api/rules/files/validation/test1.json`).send({})
-        expect(res.statusCode).toEqual(422)
-      })
       it('Create a test file fails if there is an error', async () => {
         RulesEngineModel.setValidationRulesFileContent.mockRejectedValueOnce({})
         const res = await request(app).put(`/api/rules/files/validation/test1.json`).send([])

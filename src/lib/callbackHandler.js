@@ -26,7 +26,7 @@ const customLogger = require('./requestLogger')
 const Config = require('../lib/config')
 const axios = require('axios').default
 const https = require('https')
-const assertionStore = require('./assertionStore')
+const objectStore = require('./objectStore')
 const MyEventEmitter = require('./MyEventEmitter')
 const JwsSigning = require('./jws/JwsSigning')
 const ConnectionProvider = require('../lib/configuration-providers/mb-connection-manager')
@@ -138,8 +138,8 @@ const handleCallback = async (callbackObject, context, req) => {
     assertionPath = assertionPath.replace('/error', '')
     assertionData.error = true
   }
-  assertionStore.pushCallback(assertionPath, assertionData)
-  MyEventEmitter.getEmitter('assertionCallback').emit(assertionPath, assertionData)
+  objectStore.push('callbacks', assertionPath, assertionData)
+  MyEventEmitter.getEmitter('assertionCallback', req.customInfo.user).emit(assertionPath, assertionData)
 
   // Send callback
   if (userConfig.SEND_CALLBACK_ENABLE) {

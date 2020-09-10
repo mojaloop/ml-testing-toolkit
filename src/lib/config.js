@@ -27,7 +27,6 @@ const storageAdapter = require('./storageAdapter')
 const customLogger = require('./requestLogger')
 const SYSTEM_CONFIG_FILE = 'spec_files/system_config.json'
 const USER_CONFIG_FILE = 'spec_files/user_config.json'
-const utils = require('./utils')
 
 var SYSTEM_CONFIG = {}
 var USER_CONFIG = {
@@ -82,8 +81,7 @@ const loadUserConfigDFSPWise = async (user) => {
 
 const loadSystemConfig = async () => {
   try {
-    const contents = await utils.readFileAsync(SYSTEM_CONFIG_FILE)
-    SYSTEM_CONFIG = JSON.parse(contents)
+    SYSTEM_CONFIG = (await storageAdapter.read(SYSTEM_CONFIG_FILE)).data
   } catch (err) {
     customLogger.logMessage('error', `Can not read the file ${SYSTEM_CONFIG_FILE}`, { additionalData: err, notification: false })
   }

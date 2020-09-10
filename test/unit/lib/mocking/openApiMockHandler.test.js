@@ -36,7 +36,7 @@ const CallbackHandler = require('../../../../src/lib/callbackHandler')
 const QuotesAssociation = require('../../../../src/lib/mocking/middleware-functions/quotesAssociation')
 const TransactionRequestsService = require('../../../../src/lib/mocking/middleware-functions/transactionRequestsService')
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
-const AssertionStore = require('../../../../src/lib/assertionStore')
+const ObjectStore = require('../../../../src/lib/objectStore')
 const OpenApiVersionTools = require('../../../../src/lib/mocking/openApiVersionTools')
 
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
@@ -69,7 +69,7 @@ const SpyValidateAcceptHeader = jest.spyOn(OpenApiVersionTools, 'validateAcceptH
 const SpyNegotiateVersion = jest.spyOn(OpenApiVersionTools, 'negotiateVersion')
 const SpyValidateContentTypeHeader = jest.spyOn(OpenApiVersionTools, 'validateContentTypeHeader')
 
-jest.mock('../../../../src/lib/assertionStore')
+jest.mock('../../../../src/lib/objectStore')
 
 jest.setTimeout(10000)
 const quoteRequestBody = {
@@ -196,7 +196,7 @@ describe('OpenApiMockHandler', () => {
           }
         } 
       }
-      AssertionStore.pushRequest.mockReturnValueOnce()
+      ObjectStore.push.mockReturnValueOnce()
       SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
         '/quotes': {
           put: {}
@@ -209,7 +209,7 @@ describe('OpenApiMockHandler', () => {
       await openApiBackendObject.handlers.notImplemented(context, req, h)
       
       req.path = '/quotes/{ID}/error'
-      AssertionStore.pushRequest.mockReturnValueOnce()
+      ObjectStore.push.mockReturnValueOnce()
       SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
         '/quotes/{ID}/error': {
           put: {}

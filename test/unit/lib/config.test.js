@@ -79,12 +79,12 @@ describe('Config', () => {
     it('the response should be false', async () => {
       storageAdapter.upsert.mockResolvedValueOnce()
       const storedUserConfig = await Config.setStoredUserConfig({})
-      expect(storedUserConfig).toBe(true)
+      expect(storedUserConfig).toBeTruthy()
     })
     it('the response should be false', async () => {
       storageAdapter.upsert.mockRejectedValueOnce()
       const storedUserConfig = await Config.setStoredUserConfig()
-      expect(storedUserConfig).toBe(false)
+      expect(storedUserConfig).toBeFalsy()
     })
   })
   describe('when loadUserConfig throws an error', () => {
@@ -93,25 +93,33 @@ describe('Config', () => {
         data: {}
       })
       const loadUserConfig = await Config.loadUserConfig()
-      expect(loadUserConfig).toBe(true)
+      expect(loadUserConfig).toBeTruthy()
     })
     it('the response should be true', async () => {
       const loadUserConfig = await Config.loadUserConfig({dfspId: 'test'})
-      expect(loadUserConfig).toBe(true)
+      expect(loadUserConfig).toBeTruthy()
     })
     it('the response should be true', async () => {
       storageAdapter.read.mockRejectedValueOnce()
       const loadUserConfig = await Config.loadUserConfig()
-      expect(loadUserConfig).toBe(true)
+      expect(loadUserConfig).toBeTruthy()
     })
     it('the response should be true if user is provided and there an error', async () => {
       storageAdapter.read.mockRejectedValueOnce(new Error('expected error'))
       const loadUserConfig = await Config.loadUserConfig()
-      expect(loadUserConfig).toBe(true)
+      expect(loadUserConfig).toBeTruthy()
     })
   })
   describe('when loadSystemConfig', () => {
     it('should not throw an error', async () => {
+      storageAdapter.read.mockResolvedValueOnce({
+        data: {}
+      })
+      const loadUserConfig = await Config.loadSystemConfig()
+      expect(loadUserConfig).toBeTruthy()
+    })
+    it('should return true if there is an error reading the file', async () => {
+      storageAdapter.read.mockRejectedValueOnce()
       const loadUserConfig = await Config.loadSystemConfig()
       expect(loadUserConfig).toBeTruthy()
     })

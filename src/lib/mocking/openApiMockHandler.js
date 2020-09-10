@@ -35,7 +35,7 @@ const _ = require('lodash')
 const MyEventEmitter = require('../MyEventEmitter')
 const utils = require('../utils')
 const Config = require('../config')
-const assertionStore = require('../assertionStore')
+const objectStore = require('../objectStore')
 const JwsSigning = require('../jws/JwsSigning')
 
 var path = require('path')
@@ -190,15 +190,15 @@ module.exports.getOpenApiObjects = () => {
 const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
   customLogger.logMessage('debug', 'Schema Validation Passed', { request: req })
   if (req.method === 'put') {
-    MyEventEmitter.getEmitter('testOutbound').emit(req.method + ' ' + req.path, req.headers, req.payload)
+    MyEventEmitter.getEmitter('testOutbound', req.customInfo.user).emit(req.method + ' ' + req.path, req.headers, req.payload)
     let assertionPath = req.path
     const assertionData = { headers: req.headers, body: req.payload }
     if (assertionPath.endsWith('/error')) {
       assertionPath = assertionPath.replace('/error', '')
       assertionData.error = true
     }
-    assertionStore.pushRequest(assertionPath, assertionData)
-    MyEventEmitter.getEmitter('assertionRequest').emit(assertionPath, assertionData)
+    objectStore.push('requests', assertionPath, assertionData)
+    MyEventEmitter.getEmitter('assertionRequest', req.customInfo.user).emit(assertionPath, assertionData)
   }
   req.customInfo.specFile = item.specFile
   req.customInfo.jsfRefFile = item.jsfRefFile
