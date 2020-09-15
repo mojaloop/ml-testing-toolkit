@@ -31,33 +31,30 @@ const generateSlackBlocks = (progress) => {
   let totalAssertionsCount = 0
   let totalPassedAssertionsCount = 0
   let totalRequestsCount = 0
-  let testCasesText = ''
   progress.test_cases.forEach(testCase => {
     // console.log(fStr.yellow(testCase.name))
-    testCasesText += '>• ' + testCase.name + '\n'
     totalRequestsCount += testCase.requests.length
+    // let testCaseAssertionsCount = 0
+    // let testCasePassedAssertionsCount = 0
     testCase.requests.forEach(req => {
-      const passedAssertionsCount = req.request.tests && req.request.tests.passedAssertionsCount
-      const assertionsCount = req.request.tests && req.request.tests.assertions.length
+      const passedAssertionsCount = req.request.tests && req.request.tests.passedAssertionsCount ? req.request.tests.passedAssertionsCount : 0
+      const assertionsCount = req.request.tests && req.request.tests.assertions && req.request.tests.assertions.length ? req.request.tests.assertions.length : 0
       totalAssertionsCount += assertionsCount
       totalPassedAssertionsCount += passedAssertionsCount
-      const logMessage = `\t\t${
-        req.request.description} - ${
-        req.request.method.toUpperCase()} - ${
-        req.request.operationPath} - [ *${
-        passedAssertionsCount}/${
-        assertionsCount}* ]`
-      const passed = passedAssertionsCount === assertionsCount
-      testCasesText += '>' + logMessage + (passed ? '' : ' `FAILED` ') + '\n'
-      // console.log(passed ? fStr.green(logMessage) : fStr.red(logMessage))
+      // testCaseAssertionsCount += assertionsCount
+      // testCasePassedAssertionsCount += passedAssertionsCount
     })
-  })
-  slackBlocks.push({
-    type: 'section',
-    text: {
-      type: 'mrkdwn',
-      text: '*Test Cases:*\n' + testCasesText
-    }
+    // const passed = testCasePassedAssertionsCount === testCaseAssertionsCount
+    // // TODO: make sure this list should not be more than 40 because we can add only max 50 blocks in a slack message
+    // if(!passed) {
+    //   slackBlocks.push({
+    //     type: 'section',
+    //     text: {
+    //       type: 'mrkdwn',
+    //       text: `${testCase.name} - [ *${testCasePassedAssertionsCount}/${testCaseAssertionsCount}* ]` + ' `FAILED`'
+    //     }
+    //   })
+    // }
   })
   let summaryText = ''
 
@@ -93,7 +90,7 @@ const generateSlackBlocks = (progress) => {
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: '*Summary:*\n' + summaryText
+      text: '*Test Result:*' + ((totalAssertionsCount === totalPassedAssertionsCount) ? ' `PASSED` ' : ' `FAILED` ') + '\n' + summaryText
     },
     ...additionalParams
   })
@@ -127,6 +124,7 @@ const sendSlackNotification = async (progress, reportURL = null) => {
       type: 'divider'
     })
     try {
+      // console.log(JSON.stringify(slackBlocks, null, 2))
       await webhook.send({
         text: 'Test Report',
         blocks: slackBlocks
