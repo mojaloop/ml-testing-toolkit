@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+ * Vijay Kumar Guthi <vijaya.guthi@modusbox.com>
  * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
@@ -25,35 +26,32 @@ const axios = require('axios').default
 const fs = require('fs')
 const { promisify } = require('util')
 const objectStore = require('../objectStore')
+const s3Upload = require('../extras/s3-upload')
 
 const outbound = async (data) => {
+  const returnInfo = {}
   const config = objectStore.get('config')
-  const writeFileAsync = promisify(fs.writeFile)
   let reportData
   let reportFilename
   switch (config.reportFormat) {
     case 'json':
       reportData = JSON.stringify(data, null, 2)
-      reportFilename = config.reportFilename || `${data.name}-${data.runtimeInformation.completedTimeISO}.json`
+      reportFilename = `${data.name}-${data.runtimeInformation.completedTimeISO}.json`
       break
     case 'html':
     case 'printhtml': {
       const response = await axios.post(`${config.baseURL}/api/reports/testcase/${config.reportFormat}`, data, { headers: { 'Content-Type': 'application/json' } })
       reportData = response.data
-      if (config.reportFilename) {
-        reportFilename = config.reportFilename
-      } else {
-        const disposition = response.headers['content-disposition']
-        if (disposition && disposition.indexOf('attachment') !== -1) {
-          var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
-          var matches = filenameRegex.exec(disposition)
-          if (matches != null && matches[1]) {
-            reportFilename = matches[1].replace(/['"]/g, '')
-          }
+      const disposition = response.headers['content-disposition']
+      if (disposition && disposition.indexOf('attachment') !== -1) {
+        var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+        var matches = filenameRegex.exec(disposition)
+        if (matches != null && matches[1]) {
+          reportFilename = matches[1].replace(/['"]/g, '')
         }
-        if (!reportFilename) {
-          reportFilename = 'report.html'
-        }
+      }
+      if (!reportFilename) {
+        reportFilename = 'report.html'
       }
       break
     }
@@ -61,8 +59,46 @@ const outbound = async (data) => {
       console.log('reportFormat is not supported')
       return
   }
-  await writeFileAsync(reportFilename, reportData)
-  console.log(`${reportFilename} was generated`)
+  if (config.reportTarget) {
+    const reportTargetRe = /(.*):\/\/(.*)/g
+    const reportTargetArr = reportTargetRe.exec(config.reportTarget)
+    let writeFileName = reportTargetArr[2]
+    if (config.reportAutoFilenameEnable) {
+      // Replace the last part with auto generated file name
+      writeFileName = replaceFileName(writeFileName, reportFilename)
+    }
+    switch (reportTargetArr[1]) {
+      case 'file': {
+        const writeFileAsync = promisify(fs.writeFile)
+        await writeFileAsync(writeFileName, reportData)
+        console.log(`${writeFileName} was generated`)
+        break
+      }
+      case 's3': {
+        const uploadedReportURL = await s3Upload.uploadFileDataToS3('s3://' + writeFileName, reportData)
+        returnInfo.uploadedReportURL = uploadedReportURL
+        break
+      }
+      default:
+        console.log('reportTarget is not supported')
+        return
+    }
+  } else {
+    // Store the file
+    const writeFileAsync = promisify(fs.writeFile)
+    await writeFileAsync(reportFilename, reportData)
+    console.log(`${reportFilename} was generated`)
+  }
+  return returnInfo
+}
+
+const replaceFileName = (fullPath, fileName) => {
+  const fullPathArr = fullPath.split('/')
+  if (fullPathArr.length > 1) {
+    return fullPath.split('/').slice(0, -1).join('/') + '/' + fileName
+  } else {
+    return fileName
+  }
 }
 
 module.exports = {
