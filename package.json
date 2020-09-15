@@ -50,7 +50,8 @@
     "audit:check": "SHELL=sh check-audit",
     "dep:check": "npx ncu -e 2",
     "dep:update": "npx ncu -u",
-    "genexec": "pkg -t node8-win ."
+    "genexec": "pkg -t node8-win .",
+    "cli": "node src/cli_client/client.js"
   },
   "dependencies": {
     "@hapi/basic": "5.1.1",
