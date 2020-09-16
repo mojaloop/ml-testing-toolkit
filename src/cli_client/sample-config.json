@@ -2,9 +2,9 @@
   "mode": "outbound",
   "reportFormat": "html",
   "baseURL": "http://localhost:5050",
-  "reportTarget": "s3://mojaloop-oss-qa-results/ttk-tests/reports/asdf.html",
+  "reportTarget": "s3://qa-results/ttk-tests/reports/asdf.html",
   "reportAutoFilenameEnable": true,
-  "slackWebhookUrl": "https://hooks.slack.com/services/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",
-  "slackPassedImage": "https://mojaloop-oss-qa-results.s3-us-west-2.amazonaws.com/ttk-tests/assets/accept-47587_640.png",
-  "slackFailedImage": "https://mojaloop-oss-qa-results.s3-us-west-2.amazonaws.com/ttk-tests/assets/cancel-47588_640.png"
+  "slackWebhookUrl": "https://hooks.slack.com/services/some-ids-here",
+  "slackPassedImage": "https://passed-image-url/file.png",
+  "slackFailedImage": "https://failed-image-url/file.png"
 }
