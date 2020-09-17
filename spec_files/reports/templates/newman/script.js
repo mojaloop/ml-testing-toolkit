@@ -76,7 +76,7 @@ function ifAllTestsPassedInRequest(request) {
 
 function ifFailedTestCase(testCase) {
   const failedRequest = testCase.requests.find((item) => {
-    if (item.request.tests.assertions) {
+    if (item.request.tests && item.request.tests.assertions) {
       return item.request.tests.passedAssertionsCount!=item.request.tests.assertions.length
     } else {
       return false

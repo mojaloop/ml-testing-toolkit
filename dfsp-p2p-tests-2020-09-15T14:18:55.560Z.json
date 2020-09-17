@@ -1,0 +1,566 @@
+{
+  "inputValues": {
+    "fromIdType": "MSISDN",
+    "fromIdValue": "44123456789",
+    "fromFirstName": "Firstname-Test",
+    "fromLastName": "Lastname-Test",
+    "fromDOB": "1984-01-01",
+    "note": "test",
+    "currency": "USD",
+    "amount": "100",
+    "homeTransactionId": "123ABC",
+    "fromFspId": "testingtoolkitdfsp",
+    "accept": "application/vnd.interoperability.parties+json;version=1.0",
+    "contentType": "application/vnd.interoperability.parties+json;version=1.0",
+    "toIdValue": "27713803912",
+    "toIdType": "MSISDN",
+    "toFspId": "payeefsp",
+    "acceptQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
+    "contentTypeQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
+    "acceptTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
+    "contentTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
+    "hub_operator": "NOT_APPLICABLE",
+    "payerfsp": "testingtoolkitdfsp",
+    "accountId": "6",
+    "payeefsp": "payeefsp",
+    "ilpPacket": "AQAAAAAAAADIEHByaXZhdGUucGF5ZWVmc3CCAiB7InRyYW5zYWN0aW9uSWQiOiIyZGY3NzRlMi1mMWRiLTRmZjctYTQ5NS0yZGRkMzdhZjdjMmMiLCJxdW90ZUlkIjoiMDNhNjA1NTAtNmYyZi00NTU2LThlMDQtMDcwM2UzOWI4N2ZmIiwicGF5ZWUiOnsicGFydHlJZEluZm8iOnsicGFydHlJZFR5cGUiOiJNU0lTRE4iLCJwYXJ0eUlkZW50aWZpZXIiOiIyNzcxMzgwMzkxMyIsImZzcElkIjoicGF5ZWVmc3AifSwicGVyc29uYWxJbmZvIjp7ImNvbXBsZXhOYW1lIjp7fX19LCJwYXllciI6eyJwYXJ0eUlkSW5mbyI6eyJwYXJ0eUlkVHlwZSI6Ik1TSVNETiIsInBhcnR5SWRlbnRpZmllciI6IjI3NzEzODAzOTExIiwiZnNwSWQiOiJwYXllcmZzcCJ9LCJwZXJzb25hbEluZm8iOnsiY29tcGxleE5hbWUiOnt9fX0sImFtb3VudCI6eyJjdXJyZW5jeSI6IlVTRCIsImFtb3VudCI6IjIwMCJ9LCJ0cmFuc2FjdGlvblR5cGUiOnsic2NlbmFyaW8iOiJERVBPU0lUIiwic3ViU2NlbmFyaW8iOiJERVBPU0lUIiwiaW5pdGlhdG9yIjoiUEFZRVIiLCJpbml0aWF0b3JUeXBlIjoiQ09OU1VNRVIiLCJyZWZ1bmRJbmZvIjp7fX19",
+    "condition": "HOr22-H3AfTDHrSkPjJtVPRdKouuMkDXTR4ejlQa8Ks",
+    "validFulfillment": "UNlJ98hZTY_dsw0cAqw4i_UN3v4utt7CZFB4yfLbVFA",
+    "validCondition": "GRzLaTP7DJ9t4P-a_BA0WA9wzzlsugf00-Tn6kESAfM",
+    "invalidFulfillment": "_3cco-YN5OGpRKVWV3n6x6uNpBTH9tYUdOYmHA",
+    "fspiopSignature": "{\"signature\":\"iU4GBXSfY8twZMj1zXX1CTe3LDO8Zvgui53icrriBxCUF_wltQmnjgWLWI4ZUEueVeOeTbDPBZazpBWYvBYpl5WJSUoXi14nVlangcsmu2vYkQUPmHtjOW-yb2ng6_aPfwd7oHLWrWzcsjTF-S4dW7GZRPHEbY_qCOhEwmmMOnE1FWF1OLvP0dM0r4y7FlnrZNhmuVIFhk_pMbEC44rtQmMFv4pm4EVGqmIm3eyXz0GkX8q_O1kGBoyIeV_P6RRcZ0nL6YUVMhPFSLJo6CIhL2zPm54Qdl2nVzDFWn_shVyV0Cl5vpcMJxJ--O_Zcbmpv6lxqDdygTC782Ob3CNMvg\\\",\\\"protectedHeader\\\":\\\"eyJhbGciOiJSUzI1NiIsIkZTUElPUC1VUkkiOiIvdHJhbnNmZXJzIiwiRlNQSU9QLUhUVFAtTWV0aG9kIjoiUE9TVCIsIkZTUElPUC1Tb3VyY2UiOiJPTUwiLCJGU1BJT1AtRGVzdGluYXRpb24iOiJNVE5Nb2JpbGVNb25leSIsIkRhdGUiOiIifQ\"}",
+    "HUB_OPERATOR_BEARER_TOKEN": "NOT_APPLICABLE",
+    "BASE_CENTRAL_LEDGER_ADMIN": "",
+    "HOST_ML_API_ADAPTER": "http://ml-api-adapter.local",
+    "HOST_CENTRAL_LEDGER": "http://central-ledger.local",
+    "HOST_QUOTING_SERVICE": "http://quoting-service.local",
+    "HOST_ACCOUNT_LOOKUP_SERVICE": "http://account-lookup-service.local",
+    "HOST_SIMULATOR": "http://moja-simulator.local",
+    "HOST_CENTRAL_SETTLEMENT": "http://central-settlement.local/v1",
+    "HOST_TRANSACTION_REQUESTS_SERVICE": "http://transaction-request-service.local",
+    "payerIdType": "MSISDN",
+    "payerIdentifier": "22507008181",
+    "payeeIdType": "MSISDN",
+    "payeeIdentifier": "22556999125"
+  },
+  "name": "dfsp-p2p-tests",
+  "test_cases": [
+    {
+      "id": 1,
+      "name": "P2P Transfer Happy Path",
+      "requests": [
+        {
+          "request": {
+            "id": 1,
+            "description": "Get party information",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "operationPath": "/parties/{Type}/{ID}",
+            "method": "get",
+            "headers": {
+              "Accept": "application/vnd.interoperability.parties+json;version=1.0",
+              "Content-Type": "application/vnd.interoperability.parties+json;version=1.0",
+              "Date": "Tue, 15 Sep 2020 14:18:55 GMT",
+              "FSPIOP-Source": "testingtoolkitdfsp"
+            },
+            "params": {
+              "Type": "MSISDN",
+              "ID": "27713803912"
+            },
+            "tests": {
+              "assertions": [
+                {
+                  "id": 1,
+                  "description": "Response status to be 202",
+                  "exec": [
+                    "expect(response.status).to.equal(202)"
+                  ],
+                  "resultStatus": {
+                    "status": "SUCCESS"
+                  }
+                },
+                {
+                  "id": 2,
+                  "description": "Response statusText be Accepted",
+                  "exec": [
+                    "expect(response.statusText).to.equal('Accepted')"
+                  ],
+                  "resultStatus": {
+                    "status": "SUCCESS"
+                  }
+                },
+                {
+                  "id": 3,
+                  "description": "Callback Content Length not 0",
+                  "exec": [
+                    "expect(callback.headers['Content-Length']).to.not.equal('0')"
+                  ],
+                  "resultStatus": {
+                    "status": "SUCCESS"
+                  }
+                },
+                {
+                  "id": 4,
+                  "description": "Callback body should contain party",
+                  "exec": [
+                    "expect(callback.body).to.have.property('party')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "expected { Object (errorInformation) } to have property 'party'"
+                  }
+                },
+                {
+                  "id": 5,
+                  "description": "Request FSPIOP-Source same as inputs fromFspId",
+                  "exec": [
+                    "expect('testingtoolkitdfsp').to.equal('testingtoolkitdfsp')"
+                  ],
+                  "resultStatus": {
+                    "status": "SUCCESS"
+                  }
+                },
+                {
+                  "id": 6,
+                  "description": "Callback FSPIOP-Destination same as request FSPIOP-Source",
+                  "exec": [
+                    "expect(callback.headers['fspiop-destination']).to.equal('testingtoolkitdfsp')"
+                  ],
+                  "resultStatus": {
+                    "status": "SUCCESS"
+                  }
+                },
+                {
+                  "id": 7,
+                  "description": "Callback content-type to be parties",
+                  "exec": [
+                    "expect(callback.headers['content-type']).to.equal('application/vnd.interoperability.parties+json;version=1.0')"
+                  ],
+                  "resultStatus": {
+                    "status": "SUCCESS"
+                  }
+                },
+                {
+                  "id": 8,
+                  "description": "Callback partyIdInfo (partyIdType, partyIdentifier)",
+                  "exec": [
+                    "expect(callback.body.party.partyIdInfo.partyIdType).to.equal('MSISDN')",
+                    "expect(callback.body.party.partyIdInfo.partyIdentifier).to.equal('27713803912')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "Cannot read property 'partyIdInfo' of undefined"
+                  }
+                }
+              ],
+              "passedAssertionsCount": 6
+            },
+            "path": "/parties/MSISDN/27713803912"
+          },
+          "status": "ERROR",
+          "response": {
+            "status": 202,
+            "statusText": "Accepted",
+            "body": "",
+            "headers": {
+              "content-type": "text/plain; charset=utf-8",
+              "content-length": "0",
+              "date": "Tue, 15 Sep 2020 14:18:55 GMT",
+              "connection": "close"
+            }
+          },
+          "callback": {
+            "url": "put /parties/MSISDN/27713803912/error",
+            "headers": {
+              "content-type": "application/vnd.interoperability.parties+json;version=1.0",
+              "date": "Tue, 15 Sep 2020 14:18:55 GMT",
+              "fspiop-source": "userdfsp",
+              "fspiop-destination": "testingtoolkitdfsp",
+              "authorization": "Bearer 7718fa9b-be13-3fe7-87f0-a12cf1628168",
+              "host": "mojaloop-testing-toolkit:5000",
+              "content-length": "83",
+              "connection": "close"
+            },
+            "body": {
+              "errorInformation": {
+                "errorCode": "3200",
+                "errorDescription": "Generic ID not found"
+              }
+            }
+          },
+          "additionalInfo": {
+            "curlRequest": "curl 'http://scheme-adapter:4000/parties/MSISDN/27713803912' -H 'accept: application/vnd.interoperability.parties+json;version=1.0' -H 'content-type: application/vnd.interoperability.parties+json;version=1.0' -H 'date: Tue, 15 Sep 2020 14:18:55 GMT' -H 'fspiop-source: testingtoolkitdfsp' -H 'user-agent: axios/0.19.2' --compressed"
+          }
+        },
+        {
+          "request": {
+            "id": 2,
+            "description": "Send quote",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "operationPath": "/quotes",
+            "method": "post",
+            "headers": {
+              "Accept": "application/vnd.interoperability.quotes+json;version=1.0",
+              "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0",
+              "Date": "Tue, 15 Sep 2020 14:18:55 GMT",
+              "FSPIOP-Source": "testingtoolkitdfsp"
+            },
+            "body": {
+              "quoteId": "7e1c33ac-f246-44ff-b3d1-d27524c8247b",
+              "transactionId": "940f2e72-9fec-4501-b8aa-487e643b552a",
+              "payer": {
+                "partyIdInfo": {
+                  "partyIdType": "MSISDN",
+                  "partyIdentifier": "44123456789",
+                  "fspId": "testingtoolkitdfsp"
+                },
+                "personalInfo": {
+                  "complexName": {
+                    "firstName": "Firstname-Test",
+                    "lastName": "Lastname-Test"
+                  },
+                  "dateOfBirth": "1984-01-01"
+                }
+              },
+              "payee": {
+                "partyIdInfo": {
+                  "partyIdType": "{$prev.1.callback.body.party.partyIdInfo.partyIdType}",
+                  "partyIdentifier": "{$prev.1.callback.body.party.partyIdInfo.partyIdentifier}",
+                  "fspId": "{$prev.1.callback.body.party.partyIdInfo.fspId}"
+                }
+              },
+              "amountType": "SEND",
+              "amount": {
+                "amount": "100",
+                "currency": "USD"
+              },
+              "transactionType": {
+                "scenario": "TRANSFER",
+                "initiator": "PAYER",
+                "initiatorType": "CONSUMER"
+              },
+              "note": "test"
+            },
+            "tests": {
+              "assertions": [
+                {
+                  "id": 1,
+                  "description": "Response status to be 202",
+                  "exec": [
+                    "expect(response.status).to.equal(202)"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "expected 400 to equal 202"
+                  }
+                },
+                {
+                  "id": 2,
+                  "description": "Response statusText be Accepted",
+                  "exec": [
+                    "expect(response.statusText).to.equal('Accepted')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "expected 'Bad Request' to equal 'Accepted'"
+                  }
+                },
+                {
+                  "id": 3,
+                  "description": "Callback Content Length not 0",
+                  "exec": [
+                    "expect(callback.headers['Content-Length']).to.not.equal('0')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "Cannot read property 'headers' of null"
+                  }
+                },
+                {
+                  "id": 4,
+                  "description": "Callback FSP Destination equal to request FSP Source",
+                  "exec": [
+                    "expect(callback.headers['fspiop-destination']).to.equal('testingtoolkitdfsp')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "Cannot read property 'headers' of null"
+                  }
+                },
+                {
+                  "id": 5,
+                  "description": "Callback body should contain transferAmount",
+                  "exec": [
+                    "expect(callback.body).to.have.property('transferAmount')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "Cannot read property 'body' of null"
+                  }
+                },
+                {
+                  "id": 6,
+                  "description": "Callback transferAmount (amount & currency)to match the request",
+                  "exec": [
+                    "expect(callback.body.transferAmount.amount).to.equal('100')",
+                    "expect(callback.body.transferAmount.currency).to.equal('USD')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "Cannot read property 'body' of null"
+                  }
+                },
+                {
+                  "id": 7,
+                  "description": "Callback content-type to be quotes",
+                  "exec": [
+                    "expect(callback.headers['content-type']).to.equal('application/vnd.interoperability.quotes+json;version=1.0')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "Cannot read property 'headers' of null"
+                  }
+                },
+                {
+                  "id": 8,
+                  "description": "Request amountType to be SEND",
+                  "exec": [
+                    "expect('SEND').to.equal('SEND')"
+                  ],
+                  "resultStatus": {
+                    "status": "SUCCESS"
+                  }
+                },
+                {
+                  "id": 9,
+                  "description": "Request transactionType scenario to be TRANSFER",
+                  "exec": [
+                    "expect('TRANSFER').to.equal('TRANSFER')"
+                  ],
+                  "resultStatus": {
+                    "status": "SUCCESS"
+                  }
+                },
+                {
+                  "id": 10,
+                  "description": "Request transactionType initiator to be PAYER",
+                  "exec": [
+                    "expect('PAYER').to.equal('PAYER')"
+                  ],
+                  "resultStatus": {
+                    "status": "SUCCESS"
+                  }
+                },
+                {
+                  "id": 11,
+                  "description": "Request transactionType initiatorType to be CONSUMER",
+                  "exec": [
+                    "expect('CONSUMER').to.equal('CONSUMER')"
+                  ],
+                  "resultStatus": {
+                    "status": "SUCCESS"
+                  }
+                }
+              ],
+              "passedAssertionsCount": 4
+            },
+            "path": "/quotes"
+          },
+          "status": "ERROR",
+          "response": {
+            "status": 400,
+            "statusText": "Bad Request",
+            "body": {
+              "errorInformation": {
+                "errorCode": "3100",
+                "errorDescription": ".body.payee.partyIdInfo.partyIdType should be equal to one of the allowed values"
+              }
+            },
+            "headers": {
+              "content-type": "application/json; charset=utf-8",
+              "content-length": "143",
+              "date": "Tue, 15 Sep 2020 14:18:55 GMT",
+              "connection": "close"
+            }
+          },
+          "additionalInfo": {
+            "curlRequest": "curl 'http://scheme-adapter:4000/quotes' -H 'content-type: application/vnd.interoperability.quotes+json;version=1.0' -H 'accept: application/vnd.interoperability.quotes+json;version=1.0' -H 'date: Tue, 15 Sep 2020 14:18:55 GMT' -H 'fspiop-source: testingtoolkitdfsp' -H 'user-agent: axios/0.19.2' --data-binary '{\"quoteId\":\"7e1c33ac-f246-44ff-b3d1-d27524c8247b\",\"transactionId\":\"940f2e72-9fec-4501-b8aa-487e643b552a\",\"payer\":{\"partyIdInfo\":{\"partyIdType\":\"MSISDN\",\"partyIdentifier\":\"44123456789\",\"fspId\":\"testingtoolkitdfsp\"},\"personalInfo\":{\"complexName\":{\"firstName\":\"Firstname-Test\",\"lastName\":\"Lastname-Test\"},\"dateOfBirth\":\"1984-01-01\"}},\"payee\":{\"partyIdInfo\":{\"partyIdType\":\"{$prev.1.callback.body.party.partyIdInfo.partyIdType}\",\"partyIdentifier\":\"{$prev.1.callback.body.party.partyIdInfo.partyIdentifier}\",\"fspId\":\"{$prev.1.callback.body.party.partyIdInfo.fspId}\"}},\"amountType\":\"SEND\",\"amount\":{\"amount\":\"100\",\"currency\":\"USD\"},\"transactionType\":{\"scenario\":\"TRANSFER\",\"initiator\":\"PAYER\",\"initiatorType\":\"CONSUMER\"},\"note\":\"test\"}' --compressed"
+          }
+        },
+        {
+          "request": {
+            "id": 3,
+            "description": "Send transfer",
+            "apiVersion": {
+              "minorVersion": 0,
+              "majorVersion": 1,
+              "type": "fspiop",
+              "asynchronous": true
+            },
+            "operationPath": "/transfers",
+            "method": "post",
+            "headers": {
+              "Accept": "application/vnd.interoperability.transfers+json;version=1.0",
+              "Content-Type": "application/vnd.interoperability.transfers+json;version=1.0",
+              "Date": "Tue, 15 Sep 2020 14:18:55 GMT",
+              "FSPIOP-Source": "testingtoolkitdfsp"
+            },
+            "body": {
+              "transferId": "940f2e72-9fec-4501-b8aa-487e643b552a",
+              "payerFsp": "testingtoolkitdfsp",
+              "payeeFsp": "{$prev.1.callback.body.party.partyIdInfo.fspId}",
+              "amount": {
+                "amount": "100",
+                "currency": "USD"
+              },
+              "expiration": "{$prev.2.callback.body.expiration}",
+              "ilpPacket": "{$prev.2.callback.body.ilpPacket}",
+              "condition": "{$prev.2.callback.body.condition}"
+            },
+            "tests": {
+              "assertions": [
+                {
+                  "id": 1,
+                  "description": "Response status to be 202",
+                  "exec": [
+                    "expect(response.status).to.equal(202)"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "expected 400 to equal 202"
+                  }
+                },
+                {
+                  "id": 2,
+                  "description": "Response statusText be Accepted",
+                  "exec": [
+                    "expect(response.statusText).to.equal('Accepted')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "expected 'Bad Request' to equal 'Accepted'"
+                  }
+                },
+                {
+                  "id": 3,
+                  "description": "Callback Content Length not 0",
+                  "exec": [
+                    "expect(callback.headers['Content-Length']).to.not.equal('0')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "Cannot read property 'headers' of null"
+                  }
+                },
+                {
+                  "id": 4,
+                  "description": "Callback FSP Destination equal to request FSP Source",
+                  "exec": [
+                    "expect(callback.headers['fspiop-destination']).to.equal('testingtoolkitdfsp')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "Cannot read property 'headers' of null"
+                  }
+                },
+                {
+                  "id": 5,
+                  "description": "Callback transferState to be COMMITTED",
+                  "exec": [
+                    "expect(callback.body.transferState).to.equal('COMMITTED')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "Cannot read property 'body' of null"
+                  }
+                },
+                {
+                  "id": 6,
+                  "description": "Callback content-type to be transfers",
+                  "exec": [
+                    "expect(callback.headers['content-type']).to.equal('application/vnd.interoperability.transfers+json;version=1.0')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "Cannot read property 'headers' of null"
+                  }
+                },
+                {
+                  "id": 7,
+                  "description": "Request transferId same as quote request transferId",
+                  "exec": [
+                    "expect('940f2e72-9fec-4501-b8aa-487e643b552a').to.equal('940f2e72-9fec-4501-b8aa-487e643b552a')"
+                  ],
+                  "resultStatus": {
+                    "status": "SUCCESS"
+                  }
+                },
+                {
+                  "id": 8,
+                  "description": "Request transferAmount (amount & currency) to match quote request",
+                  "exec": [
+                    "expect('{$prev.2.callback.body.transferAmount.amount}').to.equal('100')",
+                    "expect('{$prev.2.callback.body.transferAmount.currency}').to.equal('USD')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "expected '{$prev.2.callback.body.transferAmount.amount}' to equal '100'"
+                  }
+                },
+                {
+                  "id": 9,
+                  "description": "Request FSP source the same as quote callback FSP destination",
+                  "exec": [
+                    "expect('testingtoolkitdfsp').to.equal('{$prev.2.callback.headers.fspiop-destination}')"
+                  ],
+                  "resultStatus": {
+                    "status": "FAILED",
+                    "message": "expected 'testingtoolkitdfsp' to equal '{$prev.2.callback.headers.fspiop-destination}'"
+                  }
+                }
+              ],
+              "passedAssertionsCount": 1
+            },
+            "path": "/transfers"
+          },
+          "status": "ERROR",
+          "response": {
+            "status": 400,
+            "statusText": "Bad Request",
+            "body": {
+              "errorInformation": {
+                "errorCode": "3100",
+                "errorDescription": ".body.payeeFsp should NOT be longer than 32 characters"
+              }
+            },
+            "headers": {
+              "content-type": "application/json; charset=utf-8",
+              "content-length": "117",
+              "date": "Tue, 15 Sep 2020 14:18:55 GMT",
+              "connection": "close"
+            }
+          },
+          "additionalInfo": {
+            "curlRequest": "curl 'http://scheme-adapter:4000/transfers' -H 'content-type: application/vnd.interoperability.transfers+json;version=1.0' -H 'accept: application/vnd.interoperability.transfers+json;version=1.0' -H 'date: Tue, 15 Sep 2020 14:18:55 GMT' -H 'fspiop-source: testingtoolkitdfsp' -H 'user-agent: axios/0.19.2' --data-binary '{\"transferId\":\"940f2e72-9fec-4501-b8aa-487e643b552a\",\"payerFsp\":\"testingtoolkitdfsp\",\"payeeFsp\":\"{$prev.1.callback.body.party.partyIdInfo.fspId}\",\"amount\":{\"amount\":\"100\",\"currency\":\"USD\"},\"expiration\":\"{$prev.2.callback.body.expiration}\",\"ilpPacket\":\"{$prev.2.callback.body.ilpPacket}\",\"condition\":\"{$prev.2.callback.body.condition}\"}' --compressed"
+          }
+        }
+      ]
+    }
+  ],
+  "runtimeInformation": {
+    "completedTimeISO": "2020-09-15T14:18:55.560Z",
+    "startedTime": "Tue, 15 Sep 2020 14:18:55 GMT",
+    "completedTime": "Tue, 15 Sep 2020 14:18:55 GMT",
+    "runDurationMs": 531,
+    "avgResponseTime": "NA"
+  }
+}

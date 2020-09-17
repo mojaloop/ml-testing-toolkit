@@ -1,5 +1,0 @@
-{
-  "mode": "outbound",
-  "reportFormat": "json",
-  "baseURL": "http://localhost:5050"
-}

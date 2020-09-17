@@ -29,6 +29,7 @@ const fStr = require('node-strings')
 const fs = require('fs')
 const { promisify } = require('util')
 const objectStore = require('../objectStore')
+const slackBroadcast = require('../extras/slack-broadcast')
 
 const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
 
@@ -93,7 +94,8 @@ const handleIncomingProgress = async (progress) => {
     let passed
     try {
       passed = logger.outbound(progress.totalResult)
-      await report.outbound(progress.totalResult)
+      const resultReport = await report.outbound(progress.totalResult)
+      await slackBroadcast.sendSlackNotification(progress.totalResult, resultReport.uploadedReportURL)
     } catch (err) {
       console.log(err)
       passed = false
