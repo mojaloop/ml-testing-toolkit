@@ -76,6 +76,7 @@
               "initiator": "{$inputs.TrsInitiator}",
               "initiatorType": "{$inputs.TrsInitiatorType}"
             },
+            "transactionRequestId": "{$inputs.TrsTransactionRequestId}",
             "note": "{$inputs.TrsNote}"
           },
           "tests": {

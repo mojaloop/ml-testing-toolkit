@@ -50,6 +50,7 @@ const handleRequest = async (context, request, callback, triggerFolder) => {
         outboundTemplate.inputValues.TrsScenario = transactionRequest.transactionType.scenario
         outboundTemplate.inputValues.TrsInitiator = transactionRequest.transactionType.initiator
         outboundTemplate.inputValues.TrsInitiatorType = transactionRequest.transactionType.initiatorType
+        outboundTemplate.inputValues.TrsTransactionRequestId = transactionRequest.transactionRequestId
 
         // Replace the transaction ID from the generated callback
         outboundTemplate.inputValues.transactionId = callback.body.transactionId
