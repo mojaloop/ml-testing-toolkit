@@ -93,6 +93,12 @@ const handleCallback = async (callbackObject, context, req) => {
     })
     httpsProps.httpsAgent = httpsAgent
     urlGenerated = urlGenerated.replace('http:', 'https:')
+  } else {
+    if (urlGenerated.startsWith('https:')) {
+      httpsProps.httpsAgent = new https.Agent({
+        rejectUnauthorized: false
+      })
+    }
   }
 
   // Pass on the traceparent header if exists
@@ -140,6 +146,9 @@ const handleCallback = async (callbackObject, context, req) => {
   }
   objectStore.push('callbacks', assertionPath, assertionData)
   MyEventEmitter.getEmitter('assertionCallback', req.customInfo.user).emit(assertionPath, assertionData)
+
+  // Store all the callbacks in callbacksHistory
+  objectStore.push('callbacksHistory', callbackObject.method + ' ' + callbackObject.path, { headers: callbackObject.headers, body: callbackObject.body })
 
   // Send callback
   if (userConfig.SEND_CALLBACK_ENABLE) {

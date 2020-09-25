@@ -43,6 +43,7 @@ const openApiDefinitionsModel = require('../mocking/openApiDefinitionsModel')
 const uuid = require('uuid')
 const utilsInternal = require('../utilsInternal')
 const dbAdapter = require('../db/adapters/dbAdapter')
+const objectStore = require('../objectStore')
 
 var terminateTraceIds = {}
 
@@ -208,9 +209,17 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
 }
 
 const setResponse = async (convertedRequest, resp, environment, environmentVariables, request, status, tracing, testCase, scriptsExecution, contextObj) => {
-  await executePostRequestScript(request, resp, scriptsExecution, contextObj, environmentVariables)
+  // Get the requestsHistory and callbacksHistory from the objectStore
+  const requestsHistoryObj = objectStore.get('requestsHistory')
+  const callbacksHistoryObj = objectStore.get('callbacksHistory')
+  const backgroundData = {
+    requestsHistory: requestsHistoryObj,
+    callbacksHistory: callbacksHistoryObj
+  }
+
+  await executePostRequestScript(request, resp, scriptsExecution, contextObj, environmentVariables, backgroundData)
   environment.data = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
-  const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environment.data)
+  const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environment.data, backgroundData)
   request.appended = {
     status: status,
     testResult,
@@ -246,7 +255,7 @@ const executePreRequestScript = async (request, convertedRequest, scriptsExecuti
   }
 }
 
-const executePostRequestScript = async (request, resp, scriptsExecution, contextObj, environmentVariables) => {
+const executePostRequestScript = async (request, resp, scriptsExecution, contextObj, environmentVariables, backgroundData) => {
   if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
     let response
     if (_.isString(resp)) {
@@ -254,12 +263,28 @@ const executePostRequestScript = async (request, resp, scriptsExecution, context
     } else if (resp.syncResponse) {
       response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
     }
-    scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, response }, id: uuid.v4() }, contextObj)
+
+    // Pass the requestsHistory and callbacksHistory to postman sandbox
+    const collectionVariables = []
+    collectionVariables.push(
+      {
+        type: 'any',
+        key: 'requestsHistory',
+        value: JSON.stringify(backgroundData.requestsHistory)
+      },
+      {
+        type: 'any',
+        key: 'callbacksHistory',
+        value: JSON.stringify(backgroundData.callbacksHistory)
+      }
+    )
+
+    scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, response, collectionVariables }, id: uuid.v4() }, contextObj)
     environmentVariables.items = scriptsExecution.postRequest.environment
   }
 }
 
-const handleTests = async (request, response = null, callback = null, environment = []) => {
+const handleTests = async (request, response = null, callback = null, environment = {}, backgroundData = {}) => {
   try {
     const results = {}
     let passedCount = 0
@@ -329,6 +354,12 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           rejectUnauthorized: true
         })
         urlGenerated = urlGenerated.replace('http:', 'https:')
+      } else {
+        if (urlGenerated.startsWith('https:')) {
+          httpsProps.httpsAgent = new https.Agent({
+            rejectUnauthorized: false
+          })
+        }
       }
 
       const reqOpts = {
@@ -399,7 +430,11 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user })
       }, (err) => {
         customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: err, notification: false, user })
-        reject(new Error(JSON.stringify({ errorCode: 4000 })))
+        syncResponse = {
+          status: 500,
+          statusText: err.message
+        }
+        reject(new Error(JSON.stringify({ errorCode: 4000, syncResponse })))
       })
     })()
   })

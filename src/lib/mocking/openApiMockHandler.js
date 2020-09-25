@@ -200,6 +200,9 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
     objectStore.push('requests', assertionPath, assertionData)
     MyEventEmitter.getEmitter('assertionRequest', req.customInfo.user).emit(assertionPath, assertionData)
   }
+  // Store all the inbound requests
+  objectStore.push('requestsHistory', req.method + ' ' + req.path, { headers: req.headers, body: req.payload })
+
   req.customInfo.specFile = item.specFile
   req.customInfo.jsfRefFile = item.jsfRefFile
   let responseBody, responseStatus
