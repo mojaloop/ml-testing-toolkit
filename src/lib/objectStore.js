@@ -94,6 +94,8 @@ const clearOldObjects = () => {
   clear('transactions', interval)
   clear('requests', interval)
   clear('callbacks', interval)
+  clear('requestsHistory', interval)
+  clear('callbacksHistory', interval)
 }
 
 const initObjectStore = () => {

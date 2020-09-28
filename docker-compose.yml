@@ -17,7 +17,7 @@ services:
       - -c
       - "npm start |bunyan"
   mojaloop-testing-toolkit-ui:
-    image: mojaloop/ml-testing-toolkit-ui:v11.0.9
+    image: mojaloop/ml-testing-toolkit-ui:v11.1.0
     ports:
       - "6060:6060"
     environment:

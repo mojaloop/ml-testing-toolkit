@@ -34,15 +34,17 @@ const outbound = (progress) => {
     console.log(fStr.yellow(testCase.name))
     totalRequestsCount += testCase.requests.length
     testCase.requests.forEach(req => {
-      totalAssertionsCount += req.request.tests.assertions.length
-      totalPassedAssertionsCount += req.request.tests.passedAssertionsCount
+      const passedAssertionsCount = req.request.tests && req.request.tests.passedAssertionsCount
+      const assertionsCount = req.request.tests && req.request.tests.assertions.length
+      totalAssertionsCount += assertionsCount
+      totalPassedAssertionsCount += passedAssertionsCount
       const logMessage = `\t${
         req.request.description} - ${
         req.request.method.toUpperCase()} - ${
         req.request.operationPath} - [${
-        req.request.tests.passedAssertionsCount}/${
-        req.request.tests.assertions.length}]`
-      const passed = req.request.tests.passedAssertionsCount === req.request.tests.assertions.length
+        passedAssertionsCount}/${
+          assertionsCount}]`
+      const passed = passedAssertionsCount === assertionsCount
       console.log(passed ? fStr.green(logMessage) : fStr.red(logMessage))
     })
   })
@@ -58,8 +60,7 @@ const outbound = (progress) => {
     { 'Passed percentage': `${(100 * (totalPassedAssertionsCount / totalAssertionsCount)).toFixed(2)}%` },
     { 'Started time': progress.runtimeInformation.startedTime },
     { 'Completed time': progress.runtimeInformation.completedTime },
-    { 'Runtime duration': `${progress.runtimeInformation.runDurationMs} ms` },
-    { 'Average response time': progress.runtimeInformation.avgResponseTime }
+    { 'Runtime duration': `${progress.runtimeInformation.runDurationMs} ms` }
   )
   console.log(summary.toString())
 

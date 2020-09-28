@@ -38,6 +38,7 @@ const requestLogger = require('../../../../src/lib/requestLogger')
 
 jest.mock('../../../../src/lib/requestLogger')
 const spyGetSample = jest.spyOn(loadSamples, 'getSample')
+const spyGetSampleWithFolderWise = jest.spyOn(loadSamples, 'getSampleWithFolderWise')
 const spyGetCollectionsOrEnvironments = jest.spyOn(loadSamples, 'getCollectionsOrEnvironments')
 const spyGetCollectionsOrEnvironmentsWithFileSize = jest.spyOn(loadSamples, 'getCollectionsOrEnvironmentsWithFileSize')
 
@@ -58,6 +59,18 @@ describe('API route /api/samples', () => {
     it('Send a proper request with type: hub', async () => {
       spyGetSample.mockRejectedValueOnce({message: ''})
       const res = await request(app).get(`/api/samples/load`).send()
+      expect(res.statusCode).toEqual(500)
+    })
+  })
+  describe('GET /api/samples/loadFolderWise', () => {
+    it('Send a proper request', async () => {
+      spyGetSampleWithFolderWise.mockResolvedValueOnce()
+      const res = await request(app).get(`/api/samples/loadFolderWise`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Send a proper request with type: hub', async () => {
+      spyGetSampleWithFolderWise.mockRejectedValueOnce({message: ''})
+      const res = await request(app).get(`/api/samples/loadFolderWise`).send()
       expect(res.statusCode).toEqual(500)
     })
   })

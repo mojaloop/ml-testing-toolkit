@@ -1,7 +1,7 @@
 {
   "name": "ml-testing-toolkit",
   "description": "Testing Toolkit for Mojaloop implementations",
-  "version": "11.1.1",
+  "version": "11.2.1",
   "license": "Apache-2.0",
   "author": "Vijaya Kumar Guthi, ModusBox Inc.",
   "contributors": [
@@ -50,7 +50,8 @@
     "audit:check": "SHELL=sh check-audit",
     "dep:check": "npx ncu -e 2",
     "dep:update": "npx ncu -u",
-    "genexec": "pkg -t node8-win ."
+    "genexec": "pkg -t node8-win .",
+    "cli": "node src/cli_client/client.js"
   },
   "dependencies": {
     "@hapi/basic": "5.1.1",
@@ -61,9 +62,11 @@
     "@hapi/vision": "5.5.4",
     "@mojaloop/sdk-standard-components": "10.2.0",
     "@now-ims/hapi-now-auth": "2.0.0",
+    "@slack/webhook": "^5.0.3",
     "@types/socket.io": "^2.1.4",
     "adm-zip": "^0.4.14",
     "atob": "2.1.2",
+    "aws-sdk": "^2.751.0",
     "axios": "^0.19.2",
     "blipp": "4.0.1",
     "bunyan": "^1.8.12",

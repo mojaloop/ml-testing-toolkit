@@ -58,7 +58,17 @@ const executeScripts = async (curEvent, req) => {
       method: req.method,
       headers: req.headers
     }
-    const postmanSandbox = await postmanContext.executeAsync(curEvent.params.scripts.exec, { context: { ...contextObj, request: postmanRequest }, id: uuid.v4() }, contextObj)
+    // Set global variables userConfig
+    const globals = []
+    const userConfig = await Config.getUserConfig(req.customInfo.user)
+    globals.push(
+      {
+        type: 'any',
+        key: 'userConfig',
+        value: JSON.stringify(userConfig)
+      }
+    )
+    const postmanSandbox = await postmanContext.executeAsync(curEvent.params.scripts.exec, { context: { ...contextObj, request: postmanRequest, globals }, id: uuid.v4() }, contextObj)
 
     // replace inbound environment with the sandbox environment
     const mergedInboundEnvironment = postmanSandbox.environment.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})

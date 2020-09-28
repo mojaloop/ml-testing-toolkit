@@ -9,7 +9,8 @@
     "userSettings": 1
   },
   "DB": {
-    "URI": "mongodb://mojaloop-testing-toolkit-db:27017/dfsps"
+    "URI": "mongodb+srv://ttkdfsp:ttkdfsp@cluster0.l3r9o.mongodb.net/dfsps?retryWrites=true&w=majority",
+    "URI2": "mongodb://172.17.0.1:27017/dfsps"
   },
   "OAUTH": {
     "AUTH_ENABLED": false,
@@ -44,6 +45,11 @@
       "type": "central_admin",
       "version": "9.3",
       "folderPath": "central_admin_9.3"
+    },
+    {
+      "type": "als_oracle",
+      "version": "1.2",
+      "folderPath": "als_oracle_1.2"
     }
   ]
 }

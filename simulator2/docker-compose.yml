@@ -8,8 +8,8 @@ services:
     ports:
       - "23003:3003"
     depends_on:
-      - scheme-adapter2
-  scheme-adapter2:
+      - scheme-adapter2.local
+  scheme-adapter2.local:
     image: "mojaloop/sdk-scheme-adapter:v8.6.0"
     # image: "sdk-scheme-adapter:local"
     env_file: ./scheme-adapter.env

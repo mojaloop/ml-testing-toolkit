@@ -1,0 +1,10 @@
+{
+  "mode": "outbound",
+  "reportFormat": "html",
+  "baseURL": "http://localhost:5050",
+  "reportTarget": "s3://qa-results/ttk-tests/reports/asdf.html",
+  "reportAutoFilenameEnable": true,
+  "slackWebhookUrl": "https://hooks.slack.com/services/some-ids-here",
+  "slackPassedImage": "https://passed-image-url/file.png",
+  "slackFailedImage": "https://failed-image-url/file.png"
+}

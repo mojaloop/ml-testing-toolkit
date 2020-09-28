@@ -1,6 +1,6 @@
 {
   "VERSION": 1,
-  "CALLBACK_ENDPOINT": "http://scheme-adapter:4000",
+  "CALLBACK_ENDPOINT": "http://scheme-adapter.local:4000",
   "CALLBACK_RESOURCE_ENDPOINTS": {
     "enabled": false,
     "endpoints": [
@@ -25,11 +25,11 @@
   "ENDPOINTS_DFSP_WISE": {
     "dfsps": {
       "userdfsp": {
-        "defaultEndpoint": "http://scheme-adapter:4000",
+        "defaultEndpoint": "http://scheme-adapter.local:4000",
         "endpoints": []
       },
       "userdfsp2": {
-        "defaultEndpoint": "http://scheme-adapter2:4000",
+        "defaultEndpoint": "http://scheme-adapter2.local:4000",
         "endpoints": []
       }
     }
