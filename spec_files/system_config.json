@@ -9,8 +9,7 @@
     "userSettings": 1
   },
   "DB": {
-    "URI": "mongodb+srv://ttkdfsp:ttkdfsp@cluster0.l3r9o.mongodb.net/dfsps?retryWrites=true&w=majority",
-    "URI2": "mongodb://172.17.0.1:27017/dfsps"
+    "URI": "mongodb://172.17.0.1:27017/dfsps"
   },
   "OAUTH": {
     "AUTH_ENABLED": false,
@@ -47,9 +46,9 @@
       "folderPath": "central_admin_9.3"
     },
     {
-      "type": "als_oracle",
-      "version": "1.2",
-      "folderPath": "als_oracle_1.2"
+      "type": "als_admin",
+      "version": "1.1",
+      "folderPath": "als_admin_1.1"
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "VERSION": 1,
-  "CALLBACK_ENDPOINT": "http://scheme-adapter.local:4000",
+  "CALLBACK_ENDPOINT": "http://172.17.0.1:5000",
   "CALLBACK_RESOURCE_ENDPOINTS": {
     "enabled": false,
     "endpoints": [
