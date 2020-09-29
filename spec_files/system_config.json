@@ -9,7 +9,7 @@
     "userSettings": 1
   },
   "DB": {
-    "URI": "mongodb://172.17.0.1:27017/dfsps"
+    "URI": "mongodb://mojaloop-testing-toolkit-db:27017/dfsps"
   },
   "OAUTH": {
     "AUTH_ENABLED": false,
