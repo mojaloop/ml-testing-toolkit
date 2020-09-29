@@ -56,7 +56,11 @@ const executeScripts = async (curEvent, req) => {
     const postmanRequest = {
       body: JSON.stringify(req.payload),
       method: req.method,
-      headers: req.headers
+      headers: req.headers,
+      url: {
+        path: req.path,
+        query: Object.keys(req.query || {}).length === 0 ? [] : req.query
+      }
     }
     // Set global variables userConfig
     const globals = []
