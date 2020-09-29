@@ -261,7 +261,7 @@ const executePostRequestScript = async (request, resp, scriptsExecution, context
     if (_.isString(resp)) {
       response = resp
     } else if (resp.syncResponse) {
-      response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
+      response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.body || resp.syncResponse.data }
     }
 
     // Pass the requestsHistory and callbacksHistory to postman sandbox
