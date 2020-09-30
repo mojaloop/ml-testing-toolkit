@@ -23,6 +23,7 @@
  ******/
 const fStr = require('node-strings')
 const Table = require('cli-table3')
+const objectStore = require('../objectStore')
 
 const outbound = (progress) => {
   let totalAssertionsCount = 0
@@ -49,6 +50,14 @@ const outbound = (progress) => {
     })
   })
   console.log(fStr.yellow(testCasesTag))
+  const config = objectStore.get('config')
+  if (config.extraSummaryInformation) {
+    const extraSummaryInformationArr = config.extraSummaryInformation.split(',')
+    extraSummaryInformationArr.forEach(info => {
+      const infoArr = info.split(':')
+      console.log(infoArr[0] + ':' + fStr.yellow(infoArr[1]))
+    })
+  }
   const summary = new Table()
   summary.push(
     [{ colSpan: 2, content: 'SUMMARY', hAlign: 'center' }],

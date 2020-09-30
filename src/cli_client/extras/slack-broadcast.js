@@ -86,11 +86,19 @@ const generateSlackBlocks = (progress) => {
       }
     }
   }
+  let extramSummaryText = ''
+  if (config.extraSummaryInformation) {
+    const extraSummaryInformationArr = config.extraSummaryInformation.split(',')
+    extraSummaryInformationArr.forEach(info => {
+      const infoArr = info.split(':')
+      extramSummaryText += infoArr[0] + ': `' + infoArr[1] + '`\n'
+    })
+  }
   slackBlocks.push({
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: '*Test Result:*' + ((totalAssertionsCount === totalPassedAssertionsCount) ? ' `PASSED` ' : ' `FAILED` ') + '\n' + summaryText
+      text: '*Test Result:*' + ((totalAssertionsCount === totalPassedAssertionsCount) ? ' `PASSED` ' : ' `FAILED` ') + '\n' + extramSummaryText + summaryText
     },
     ...additionalParams
   })

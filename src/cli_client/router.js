@@ -44,7 +44,8 @@ const cli = (commander) => {
     slackWebhookUrl: commander.slackWebhookUrl || configFile.slackWebhookUrl,
     slackPassedImage: configFile.slackPassedImage,
     slackFailedImage: configFile.slackFailedImage,
-    baseURL: commander.baseUrl || configFile.baseURL
+    baseURL: commander.baseUrl || configFile.baseURL,
+    extraSummaryInformation: commander.extraSummaryInformation || configFile.extraSummaryInformation
   }
 
   objectStore.set('config', config)
