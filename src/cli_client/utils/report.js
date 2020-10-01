@@ -40,6 +40,16 @@ const outbound = async (data) => {
       break
     case 'html':
     case 'printhtml': {
+      if (config.extraSummaryInformation) {
+        const extraSummaryInformationArr = config.extraSummaryInformation.split(',')
+        data.extraRuntimeInformation = extraSummaryInformationArr.map(info => {
+          const infoArr = info.split(':')
+          return {
+            key: infoArr[0],
+            value: infoArr[1]
+          }
+        })
+      }
       const response = await axios.post(`${config.baseURL}/api/reports/testcase/${config.reportFormat}`, data, { headers: { 'Content-Type': 'application/json' } })
       reportData = response.data
       const disposition = response.headers['content-disposition']

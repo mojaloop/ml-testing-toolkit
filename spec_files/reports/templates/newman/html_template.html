@@ -479,6 +479,12 @@ input:checked + .slider:before {
                 <span><i class="fas fa-stopwatch"></i></span><strong> Total run duration:</strong> {{runtimeInformation.runDurationMs}} ms<br>
                 <span><i class="fas fa-stopwatch"></i></span><strong> Average response time:</strong> {{runtimeInformation.avgResponseTime}}<br>
                 {{/if}}
+                {{#if extraRuntimeInformation}}
+                {{#each extraRuntimeInformation}}
+                <span><i class="fas fa-arrow-right"></i></span><strong> {{key}}:</strong> {{value}}<br>
+                {{/each}}
+
+                {{/if}}
                 </div>
             </div>
         </div>
