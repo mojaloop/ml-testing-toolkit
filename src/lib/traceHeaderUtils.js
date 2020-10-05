@@ -23,6 +23,18 @@
  ******/
 const customTracePrefix = 'aabb'
 
+const randHex = (len) => {
+  const maxlen = 8
+  const min = Math.pow(16, Math.min(len, maxlen) - 1)
+  const max = Math.pow(16, Math.min(len, maxlen)) - 1
+  const n = Math.floor(Math.random() * (max - min + 1)) + min
+  let r = n.toString(16)
+  while (r.length < len) {
+    r = r + randHex(len - maxlen)
+  }
+  return r
+}
+
 const isCustomTraceID = (traceID) => {
   return traceID.startsWith(customTracePrefix)
 }
@@ -39,9 +51,19 @@ const getTraceIdPrefix = () => {
   return customTracePrefix
 }
 
+const generateRandTraceId = () => {
+  return 'ccdd' + randHex(26)
+}
+
+const getTraceParentHeader = (traceID) => {
+  return '00-' + traceID + '-0123456789abcdef0-00'
+}
+
 module.exports = {
   isCustomTraceID,
   getEndToEndID,
   getSessionID,
-  getTraceIdPrefix
+  getTraceIdPrefix,
+  generateRandTraceId,
+  getTraceParentHeader
 }

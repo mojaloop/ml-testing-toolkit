@@ -52,6 +52,8 @@ docker-compose build
 docker-compose up
 ```
 
+You should get the web interface on http://localhost:6060
+
 If you want to test the tool for the whole functionality like schema validation, additional validation and callback generation ..etc, you can initiate a transfer cycle from mojaloop simulator UI.
 
 Please follow the below steps from the ml-testing-toolkit folder

@@ -15,9 +15,9 @@ services:
     command:
       - sh
       - -c
-      - "npm start"
+      - "npm start |bunyan"
   mojaloop-testing-toolkit-ui:
-    image: mojaloop/ml-testing-toolkit-ui:v10.6.0
+    image: mojaloop/ml-testing-toolkit-ui:v11.1.0
     ports:
       - "6060:6060"
     environment:
@@ -26,6 +26,7 @@ services:
     command:
       - sh
       - /usr/share/nginx/start.sh
+
 networks:
   default:
     name: mojaloop-testing-toolkit

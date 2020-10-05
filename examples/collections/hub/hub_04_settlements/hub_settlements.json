@@ -222,8 +222,8 @@
                 "id": 1,
                 "description": "Status to be 200 or error code 3001",
                 "exec": [
-                  "if (response.data.errorInformation) {",
-                  "  expect(response.data.errorInformation.errorCode).to.equal(\"3100\")",
+                  "if (response.body.errorInformation) {",
+                  "  expect(response.body.errorInformation.errorCode).to.equal(\"3100\")",
                   "} else {",
                   "  expect(response.status).to.equal(200)  ",
                   "}",
@@ -234,10 +234,10 @@
                 "id": 2,
                 "description": "State to be OPEN or Window is empty",
                 "exec": [
-                  "if (response.data.errorInformation) {",
-                  "  expect(response.data.errorInformation.errorDescription).to.equal(`Generic validation error - Window ${environment.openWindowID} is empty`)",
+                  "if (response.body.errorInformation) {",
+                  "  expect(response.body.errorInformation.errorDescription).to.equal(`Generic validation error - Window ${environment.openWindowID} is empty`)",
                   "} else {",
-                  "  expect(response.data.state).to.equal('OPEN') ",
+                  "  expect(response.body.state).to.equal('OPEN') ",
                   "}"
                 ]
               }
@@ -1237,7 +1237,7 @@
                 "id": 2,
                 "description": "State should be OPEN",
                 "exec": [
-                  "expect(response.data.state).to.equal('OPEN')"
+                  "expect(response.body.state).to.equal('OPEN')"
                 ]
               }
             ]
@@ -1299,63 +1299,63 @@
                 "id": 2,
                 "description": "Settlement State should be PENDING_SETTLEMENT",
                 "exec": [
-                  "expect(response.data.state).to.equal('PENDING_SETTLEMENT')"
+                  "expect(response.body.state).to.equal('PENDING_SETTLEMENT')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Number of associated windows should be 1",
                 "exec": [
-                  "expect(response.data.settlementWindows.length).to.equal(1)"
+                  "expect(response.body.settlementWindows.length).to.equal(1)"
                 ]
               },
               {
                 "id": 4,
                 "description": "Associated Settlement Window ID should be as closedWindowId",
                 "exec": [
-                  "expect(response.data.settlementWindows[0].id).to.eql(environment.closedWindowID)"
+                  "expect(response.body.settlementWindows[0].id).to.eql(environment.closedWindowID)"
                 ]
               },
               {
                 "id": 5,
                 "description": "Associated Settlement Window state should be PENDING_SETTLEMENT ",
                 "exec": [
-                  "expect(response.data.state).to.equal('PENDING_SETTLEMENT')"
+                  "expect(response.body.state).to.equal('PENDING_SETTLEMENT')"
                 ]
               },
               {
                 "id": 6,
                 "description": "Associated number of participants should be 4",
                 "exec": [
-                  "expect(response.data.participants.length).to.equal(4)"
+                  "expect(response.body.participants.length).to.equal(4)"
                 ]
               },
               {
                 "id": 7,
                 "description": "DEFERREDNET calculation for testfsp1 should be 80.09",
                 "exec": [
-                  "expect(response.data.participants[0].accounts[0].netSettlementAmount.amount).to.equal(80.09)"
+                  "expect(response.body.participants[0].accounts[0].netSettlementAmount.amount).to.equal(80.09)"
                 ]
               },
               {
                 "id": 8,
                 "description": "DEFERREDNET calculation for testfsp2 should be -75.667",
                 "exec": [
-                  "expect(response.data.participants[1].accounts[0].netSettlementAmount.amount).to.equal(-75.667)"
+                  "expect(response.body.participants[1].accounts[0].netSettlementAmount.amount).to.equal(-75.667)"
                 ]
               },
               {
                 "id": 9,
                 "description": "DEFERREDNET calculation for testfsp3 should be -10.1857",
                 "exec": [
-                  "expect(response.data.participants[2].accounts[0].netSettlementAmount.amount).to.equal(-10.1857)"
+                  "expect(response.body.participants[2].accounts[0].netSettlementAmount.amount).to.equal(-10.1857)"
                 ]
               },
               {
                 "id": 10,
                 "description": "DEFERREDNET calculation for testfsp4 should be 5.7627",
                 "exec": [
-                  "expect(response.data.participants[3].accounts[0].netSettlementAmount.amount).to.equal(5.7627)"
+                  "expect(response.body.participants[3].accounts[0].netSettlementAmount.amount).to.equal(5.7627)"
                 ]
               }
             ]
@@ -1682,35 +1682,35 @@
                 "id": 2,
                 "description": "Settlement Id should be as expected",
                 "exec": [
-                  "expect(response.data.id).to.equal(environment.settlementId)"
+                  "expect(response.body.id).to.equal(environment.settlementId)"
                 ]
               },
               {
                 "id": 3,
                 "description": "Settlement state should be PS_TRANSFERS_RECORDED",
                 "exec": [
-                  "expect(response.data.state).to.equal(\"PS_TRANSFERS_RECORDED\")"
+                  "expect(response.body.state).to.equal(\"PS_TRANSFERS_RECORDED\")"
                 ]
               },
               {
                 "id": 4,
                 "description": "Settlement Window ID should be closed",
                 "exec": [
-                  "expect(response.data.settlementWindows[0].id).to.equal(environment.closedWindowID)"
+                  "expect(response.body.settlementWindows[0].id).to.equal(environment.closedWindowID)"
                 ]
               },
               {
                 "id": 5,
                 "description": "Settlement Window State should be PENDING_SETTLEMENT",
                 "exec": [
-                  "expect(response.data.settlementWindows[0].state).to.equal(\"PENDING_SETTLEMENT\")"
+                  "expect(response.body.settlementWindows[0].state).to.equal(\"PENDING_SETTLEMENT\")"
                 ]
               },
               {
                 "id": 6,
                 "description": "Participant Accounts state is PS_TRANSFERS_RECORDED",
                 "exec": [
-                  "response.data.participants.forEach(participant => {",
+                  "response.body.participants.forEach(participant => {",
                   "\tparticipant.accounts.forEach(account => {",
                   "      expect(account.state).to.equal(\"PS_TRANSFERS_RECORDED\")",
                   "    })",
@@ -2069,35 +2069,35 @@
                 "id": 2,
                 "description": "Settlement Id should be as expected",
                 "exec": [
-                  "expect(response.data.id).to.equal(environment.settlementId)"
+                  "expect(response.body.id).to.equal(environment.settlementId)"
                 ]
               },
               {
                 "id": 3,
                 "description": "Settlement state should be PS_TRANSFERS_RESERVED",
                 "exec": [
-                  "expect(response.data.state).to.equal(\"PS_TRANSFERS_RESERVED\")"
+                  "expect(response.body.state).to.equal(\"PS_TRANSFERS_RESERVED\")"
                 ]
               },
               {
                 "id": 4,
                 "description": "Settlement Window ID should be closed",
                 "exec": [
-                  "expect(response.data.settlementWindows[0].id).to.equal(environment.closedWindowID)"
+                  "expect(response.body.settlementWindows[0].id).to.equal(environment.closedWindowID)"
                 ]
               },
               {
                 "id": 5,
                 "description": "Settlement Window State should be PENDING_SETTLEMENT",
                 "exec": [
-                  "expect(response.data.settlementWindows[0].state).to.equal(\"PENDING_SETTLEMENT\")"
+                  "expect(response.body.settlementWindows[0].state).to.equal(\"PENDING_SETTLEMENT\")"
                 ]
               },
               {
                 "id": 6,
                 "description": "Participant Accounts state is PS_TRANSFERS_RESERVED",
                 "exec": [
-                  "response.data.participants.forEach(participant => {",
+                  "response.body.participants.forEach(participant => {",
                   "\tparticipant.accounts.forEach(account => {",
                   "      expect(account.state).to.equal(\"PS_TRANSFERS_RESERVED\")",
                   "    })",
@@ -2450,35 +2450,35 @@
                 "id": 2,
                 "description": "Settlement Id should be as expected",
                 "exec": [
-                  "expect(response.data.id).to.equal(environment.settlementId)"
+                  "expect(response.body.id).to.equal(environment.settlementId)"
                 ]
               },
               {
                 "id": 3,
                 "description": "Settlement state should be PS_TRANSFERS_COMMITTED",
                 "exec": [
-                  "expect(response.data.state).to.equal(\"PS_TRANSFERS_COMMITTED\")"
+                  "expect(response.body.state).to.equal(\"PS_TRANSFERS_COMMITTED\")"
                 ]
               },
               {
                 "id": 4,
                 "description": "Settlement Window ID should be closed",
                 "exec": [
-                  "expect(response.data.settlementWindows[0].id).to.equal(environment.closedWindowID)"
+                  "expect(response.body.settlementWindows[0].id).to.equal(environment.closedWindowID)"
                 ]
               },
               {
                 "id": 5,
                 "description": "Settlement Window State should be PENDING_SETTLEMENT",
                 "exec": [
-                  "expect(response.data.settlementWindows[0].state).to.equal(\"PENDING_SETTLEMENT\")"
+                  "expect(response.body.settlementWindows[0].state).to.equal(\"PENDING_SETTLEMENT\")"
                 ]
               },
               {
                 "id": 6,
                 "description": "Participant Accounts state is PS_TRANSFERS_COMMITTED",
                 "exec": [
-                  "response.data.participants.forEach(participant => {",
+                  "response.body.participants.forEach(participant => {",
                   "\tparticipant.accounts.forEach(account => {",
                   "      expect(account.state).to.equal(\"PS_TRANSFERS_COMMITTED\")",
                   "    })",
@@ -2829,35 +2829,35 @@
                 "id": 2,
                 "description": "Settlement Id should be as expected",
                 "exec": [
-                  "expect(response.data.id).to.equal(environment.settlementId)"
+                  "expect(response.body.id).to.equal(environment.settlementId)"
                 ]
               },
               {
                 "id": 3,
                 "description": "Settlement state should be SETTLED",
                 "exec": [
-                  "expect(response.data.state).to.equal(\"SETTLED\")"
+                  "expect(response.body.state).to.equal(\"SETTLED\")"
                 ]
               },
               {
                 "id": 4,
                 "description": "Settlement Window ID should be closed",
                 "exec": [
-                  "expect(response.data.settlementWindows[0].id).to.equal(environment.closedWindowID)"
+                  "expect(response.body.settlementWindows[0].id).to.equal(environment.closedWindowID)"
                 ]
               },
               {
                 "id": 5,
                 "description": "Settlement Window State should be SETTLED",
                 "exec": [
-                  "expect(response.data.settlementWindows[0].state).to.equal(\"SETTLED\")"
+                  "expect(response.body.settlementWindows[0].state).to.equal(\"SETTLED\")"
                 ]
               },
               {
                 "id": 6,
                 "description": "Participant Accounts state is SETTLED",
                 "exec": [
-                  "response.data.participants.forEach(participant => {",
+                  "response.body.participants.forEach(participant => {",
                   "\tparticipant.accounts.forEach(account => {",
                   "      expect(account.state).to.equal(\"SETTLED\")",
                   "    })",

@@ -36,7 +36,7 @@ router.get('/export', async (req, res, next) => {
     if (!req.query || !req.query.options) {
       res.status(400).send('options query param is required')
     }
-    const resp = await importExport.exportSpecFiles(req.query.options)
+    const resp = await importExport.exportSpecFiles(req.query.options, req.user)
     res.status(200).json({ status: 'OK', body: resp })
   } catch (err) {
     next(err)
@@ -46,22 +46,22 @@ router.get('/export', async (req, res, next) => {
 router.post('/import', async (req, res, next) => {
   try {
     const options = req.query.options
-    await importExport.importSpecFiles(req.body.buffer, options)
+    await importExport.importSpecFiles(req.body.buffer, options, req.user)
     for (const index in options) {
       switch (options[index]) {
-        case 'rules_response': await RulesEngineModel.reloadResponseRules(); break
-        case 'rules_callback': await RulesEngineModel.reloadCallbackRules(); break
-        case 'rules_validation': await RulesEngineModel.reloadValidationRules(); break
+        case 'rules_response': await RulesEngineModel.reloadResponseRules(req.user); break
+        case 'rules_callback': await RulesEngineModel.reloadCallbackRules(req.user); break
+        case 'rules_validation': await RulesEngineModel.reloadValidationRules(req.user); break
         case 'user_config.json': {
-          const runtime = await Config.getUserConfig()
-          const stored = await Config.getStoredUserConfig()
+          const runtime = await Config.getUserConfig(req.user)
+          const stored = await Config.getStoredUserConfig(req.user)
           let reloadServer = false
           if (runtime.INBOUND_MUTUAL_TLS_ENABLED !== stored.INBOUND_MUTUAL_TLS_ENABLED) {
             reloadServer = true
           }
-          await Config.loadUserConfig()
+          await Config.loadUserConfig(req.user)
           if (reloadServer) {
-            Server.restartServer()
+            Server.restartServer(req.user)
           }
         }
       }

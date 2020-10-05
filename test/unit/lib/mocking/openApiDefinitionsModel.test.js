@@ -27,19 +27,14 @@
 
 const Config = require('../../../../src/lib/config')
 
-const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
-const SpyloadSystemConfig = jest.spyOn(Config, 'loadSystemConfig')
+jest.mock('../../../../src/lib/config')
 
 const OpenApiDefinitionsModel = require('../../../../src/lib/mocking/openApiDefinitionsModel')
 
 describe('OpenApiDefinitionsModel', () => {
   describe('getApiDefinitions', () => {
     it('Result must contain the required properties', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
-        API_DEFINITIONS: null
-      })
-      SpyloadSystemConfig.mockResolvedValue()
-      SpyGetSystemConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValueOnce({
         API_DEFINITIONS: [{
           version: '1.0',
           type: 'response',
@@ -62,6 +57,14 @@ describe('OpenApiDefinitionsModel', () => {
       expect(result[0]).toHaveProperty('jsfRefFile')
     })
     it('Result must contain the required properties', async () => {
+      Config.getSystemConfig.mockReturnValueOnce({
+        API_DEFINITIONS: [{
+          version: '1.0',
+          type: 'response',
+          asynchronous: false,
+          folderPath: 'central_admin_9.3'
+        }]
+      })
       const result = await OpenApiDefinitionsModel.getApiDefinitions()
       expect(Array.isArray(result)).toBe(true)
       expect(result.length).toBeGreaterThan(0)

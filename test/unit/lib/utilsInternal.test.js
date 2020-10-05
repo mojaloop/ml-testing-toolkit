@@ -23,8 +23,14 @@
  ******/
 
 const utilsInternal = require('../../../src/lib/utilsInternal')
+const customLogger = require('../../../src/lib/requestLogger')
 
-describe('api-server', () => { 
+jest.mock('../../../src/lib/requestLogger')
+
+describe('api-server', () => {
+  beforeAll(() => {
+    customLogger.logMessage.mockReturnValue()
+  })
   describe('when getApp is called', () => {
     it('the server should be initialized if not already', async () => {
       const functionResult = utilsInternal.getFunctionResult('{$function.generic.generateUUID}')
@@ -37,6 +43,10 @@ describe('api-server', () => {
     it('the server should be initialized if not already', async () => {
       const functionResult = utilsInternal.getFunctionResult('{$function.generic.}')
       expect(functionResult).toBe('{$function.generic.}')
+    })
+    it('the server should be initialized if not already', async () => {
+      const functionResult = utilsInternal.getFunctionResult('{$function.}')
+      expect(functionResult).toBe('{$function.}')
     })
   })
 })

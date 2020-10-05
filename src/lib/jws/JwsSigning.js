@@ -29,11 +29,12 @@ const { Jws } = require('@mojaloop/sdk-standard-components')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
 
 const validate = async (req) => {
-  if (Config.getUserConfig().VALIDATE_INBOUND_JWS) {
+  const userConfig = await Config.getUserConfig()
+  if (userConfig.VALIDATE_INBOUND_JWS) {
     if (req.method === 'get') {
       return false
     }
-    if (req.method === 'put' && req.path.startsWith('/parties/') && !Config.getUserConfig().VALIDATE_INBOUND_PUT_PARTIES_JWS) {
+    if (req.method === 'put' && req.path.startsWith('/parties/') && !userConfig.VALIDATE_INBOUND_PUT_PARTIES_JWS) {
       return false
     }
     const reqOpts = {
@@ -59,12 +60,13 @@ const validate = async (req) => {
 }
 
 const sign = async (req) => {
-  if (Config.getUserConfig().JWS_SIGN) {
+  const userConfig = await Config.getUserConfig()
+  if (userConfig.JWS_SIGN) {
     if (req.method === 'get') {
       return false
     }
 
-    if (req.method === 'put' && req.path.startsWith('/parties/') && !Config.getUserConfig().JWS_SIGN_PUT_PARTIES) {
+    if (req.method === 'put' && req.path.startsWith('/parties/') && !userConfig.JWS_SIGN_PUT_PARTIES) {
       return false
     }
     const jwsSigningKey = await ConnectionProvider.getTestingToolkitDfspJWSPrivateKey()
@@ -80,12 +82,14 @@ const sign = async (req) => {
       resolveWithFullResponse: true,
       simple: false
     }
-    reqOpts.headers['fspiop-source'] = reqOpts.headers['FSPIOP-Source']
+    if (reqOpts.headers['FSPIOP-Source']) {
+      reqOpts.headers['fspiop-source'] = reqOpts.headers['FSPIOP-Source']
+      delete reqOpts.headers['FSPIOP-Source']
+    }
     if (reqOpts.headers['FSPIOP-Destination']) {
       reqOpts.headers['fspiop-destination'] = reqOpts.headers['FSPIOP-Destination']
       delete reqOpts.headers['FSPIOP-Destination']
     }
-    delete reqOpts.headers['FSPIOP-Source']
     delete reqOpts.headers['FSPIOP-Signature']
     delete reqOpts.headers['FSPIOP-URI']
     delete reqOpts.headers['FSPIOP-HTTP-Method']
@@ -94,7 +98,6 @@ const sign = async (req) => {
       jwsSigner.sign(reqOpts)
       return true
     } catch (err) {
-      // console.log(err.message)
       throw new Error(err.toString())
     }
   }

@@ -39,6 +39,17 @@ router.get('/load', async (req, res, next) => {
   }
 })
 
+// Route to load a sample in folder structure format
+// query param 'collections': list of filenames
+router.get('/loadFolderWise', async (req, res, next) => {
+  try {
+    const files = await loadSamples.getSampleWithFolderWise(req.query)
+    return res.status(200).json({ status: 'OK', body: files })
+  } catch (err) {
+    next(err)
+  }
+})
+
 // Route to get root filenames
 // uri param 'exampleType': supported values: 'collections', 'environments'
 // query param 'type': examples: 'hub', 'dfsp'
@@ -46,6 +57,18 @@ router.get('/load/:exampleType', async (req, res, next) => {
   try {
     const filenames = await loadSamples.getCollectionsOrEnvironments(req.params.exampleType, req.query.type)
     return res.status(200).json({ status: 'OK', body: filenames })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Route to get root filenames with file size
+// uri param 'exampleType': supported values: 'collections', 'environments'
+// query param 'type': examples: 'hub', 'dfsp'
+router.get('/list/:exampleType', async (req, res, next) => {
+  try {
+    const fileList = await loadSamples.getCollectionsOrEnvironmentsWithFileSize(req.params.exampleType, req.query.type)
+    return res.status(200).json({ status: 'OK', body: fileList })
   } catch (err) {
     next(err)
   }

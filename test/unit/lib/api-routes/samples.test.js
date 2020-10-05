@@ -18,21 +18,38 @@
  * Gates Foundation
 
  * ModusBox
- * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
- * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
+
+const Config = require('../../../../src/lib/config')
+jest.mock('../../../../src/lib/config')
+Config.getSystemConfig.mockReturnValue({
+  OAUTH: {
+    AUTH_ENABLED: false
+  }
+})
 
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
 const loadSamples = require('../../../../src/lib/loadSamples')
+const requestLogger = require('../../../../src/lib/requestLogger')
 
+jest.mock('../../../../src/lib/requestLogger')
 const spyGetSample = jest.spyOn(loadSamples, 'getSample')
+const spyGetSampleWithFolderWise = jest.spyOn(loadSamples, 'getSampleWithFolderWise')
 const spyGetCollectionsOrEnvironments = jest.spyOn(loadSamples, 'getCollectionsOrEnvironments')
+const spyGetCollectionsOrEnvironmentsWithFileSize = jest.spyOn(loadSamples, 'getCollectionsOrEnvironmentsWithFileSize')
 
 
 describe('API route /api/samples', () => {
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('GET /api/samples/load', () => {
     it('Send a proper request', async () => {
       spyGetSample.mockResolvedValueOnce()
@@ -45,6 +62,18 @@ describe('API route /api/samples', () => {
       expect(res.statusCode).toEqual(500)
     })
   })
+  describe('GET /api/samples/loadFolderWise', () => {
+    it('Send a proper request', async () => {
+      spyGetSampleWithFolderWise.mockResolvedValueOnce()
+      const res = await request(app).get(`/api/samples/loadFolderWise`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Send a proper request with type: hub', async () => {
+      spyGetSampleWithFolderWise.mockRejectedValueOnce({message: ''})
+      const res = await request(app).get(`/api/samples/loadFolderWise`).send()
+      expect(res.statusCode).toEqual(500)
+    })
+  })
   describe('GET /api/samples', () => {
     it('Send a proper request with missing collections query param', async () => {
       spyGetCollectionsOrEnvironments.mockResolvedValueOnce()
@@ -54,6 +83,18 @@ describe('API route /api/samples', () => {
     it('Send a bad request with not existing environment', async () => {
       spyGetCollectionsOrEnvironments.mockRejectedValueOnce({message: ''})
       const res = await request(app).get(`/api/samples/load/collections`).send()
+      expect(res.statusCode).toEqual(500)
+    })
+  })
+  describe('GET /api/samples with file sizes', () => {
+    it('Send a proper request with missing collections query param', async () => {
+      spyGetCollectionsOrEnvironmentsWithFileSize.mockResolvedValueOnce()
+      const res = await request(app).get(`/api/samples/list/collections`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Send a bad request with not existing environment', async () => {
+      spyGetCollectionsOrEnvironmentsWithFileSize.mockRejectedValueOnce({message: ''})
+      const res = await request(app).get(`/api/samples/list/collections`).send()
       expect(res.statusCode).toEqual(500)
     })
   })

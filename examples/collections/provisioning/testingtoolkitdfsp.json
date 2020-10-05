@@ -30,7 +30,7 @@
                 "id": 1,
                 "description": "status to be 201 if not exists or 400 if exists",
                 "exec": [
-                  "if (response.data.errorInformation) {",
+                  "if (response.body.errorInformation) {",
                   "  expect(response.status).to.equal(400)",
                   "} else {",
                   "  expect(response.status).to.equal(201)",
@@ -72,7 +72,7 @@
                 "id": 1,
                 "description": "status to be 201 if not exists or 500 if exists",
                 "exec": [
-                  "if (response.data.errorInformation) {",
+                  "if (response.body.errorInformation) {",
                   "  expect(response.status).to.equal(500)",
                   "} else {",
                   "  expect(response.status).to.equal(201)",
@@ -851,6 +851,40 @@
           "body": {
             "type": "FSPIOP_CALLBACK_URL_PARTICIPANT_BATCH_PUT_ERROR",
             "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/participants/{{requestId}}/error"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 201",
+                "exec": [
+                  "expect(response.status).to.equal(201)"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 26,
+          "description": "Add callback - PARTIES PUT ERROR",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/endpoints",
+          "path": "/participants/{$inputs.fromFspId}/endpoints",
+          "method": "post",
+          "params": {
+            "name": "{$inputs.fromFspId}"
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "type": "FSPIOP_CALLBACK_URL_PARTIES_PUT_ERROR",
+            "value": "{$inputs.CALLBACK_ENDPOINT_BASE_URL}/parties/{{partyIdType}}/{{partyIdentifier}}/error"
           },
           "tests": {
             "assertions": [

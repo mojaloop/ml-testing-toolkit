@@ -22,13 +22,75 @@
  --------------
  ******/
 
+
+const Config = require('../../../src/lib/config')
+const requestLogger = require('../../../src/lib/requestLogger')
+
+jest.mock('../../../src/lib/requestLogger')
+jest.mock('../../../src/lib/config')
+
 const apiServer = require('../../../src/lib/api-server')
 
 describe('api-server', () => { 
+  beforeEach(() => {
+    requestLogger.logMessage.mockReturnValue()
+    Config.getSystemConfig.mockReturnValue({
+      OAUTH: {
+        AUTH_ENABLED: false
+      }
+    })
+  })
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('when getApp is called', () => {
     it('the server should be initialized if not already', async () => {
       expect(() => apiServer.getApp()).not.toThrowError()
       expect(() => apiServer.getApp()).not.toThrowError()
+    })
+  })
+  describe('when verifyUser is called', () => {
+    it('should authenticate the user if auth is enabled', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        OAUTH: {
+          AUTH_ENABLED: true
+        }
+      })
+      expect(() => apiServer.verifyUser()).not.toThrowError()
+    })
+    it('should return a function which can be executed with 401 status code', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        OAUTH: {
+          AUTH_ENABLED: true
+        }
+      })
+      const req = {}
+      const res = {
+        statusCode: 401
+      }
+      const retFn = apiServer.verifyUser()
+      expect(() => retFn(req, res, () => {})).not.toThrowError()
+    })
+    it('should return a function which can be executed with 200 status code', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        OAUTH: {
+          AUTH_ENABLED: true
+        }
+      })
+      const req = {}
+      const res = {
+        statusCode: 200
+      }
+      const retFn = apiServer.verifyUser()
+      expect(() => retFn(req, res, () => {})).not.toThrowError()
+    })
+  })
+  describe('when startServer is called', () => {
+    it('the server should be initialized', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        OAUTH: {}
+      })
+      expect(() => apiServer.startServer()).not.toThrowError()
     })
   })
 })

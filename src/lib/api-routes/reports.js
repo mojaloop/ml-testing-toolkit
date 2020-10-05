@@ -26,10 +26,7 @@ const express = require('express')
 const router = new express.Router()
 // const { check, validationResult } = require('express-validator')
 const jsreportCore = require('jsreport-core')
-const fs = require('fs')
-const { promisify } = require('util')
-const readFileAsync = promisify(fs.readFile)
-
+const { readFileAsync } = require('../utils')
 const BASE_TEMPLATE_PATH = 'spec_files/reports/templates/newman'
 
 // Generate report

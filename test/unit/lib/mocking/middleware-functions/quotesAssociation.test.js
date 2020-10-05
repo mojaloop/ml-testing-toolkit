@@ -35,6 +35,9 @@ const sampleIlpPacket = 'AYIDMgAAAAAAACcQImcudGVzdGluZ3Rvb2xraXRkZnNwLm1zaXNkbi4
 
 describe('QuotesAssociation', () => {
   const fulfilment = 'asdf'
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
 
   describe('handleQuotes', () => {
     it('It should call object store save transaction method', () => {
@@ -46,9 +49,9 @@ describe('QuotesAssociation', () => {
           transactionId: sampleTransactionId
         }
       }
-      ObjectStore.saveTransaction.mockClear()
+      ObjectStore.push.mockReturnValueOnce()
       QuotesAssociation.handleQuotes(sampleContext, request, fulfilment)
-      expect(ObjectStore.saveTransaction).toHaveBeenCalledWith(sampleTransactionId, fulfilment)
+      expect(ObjectStore.push).toHaveBeenCalledWith('transactions', sampleTransactionId, { fulfilment })
     })
     it('It should not call saveTransaction if its not post quotes', () => {
       const sampleContext = {}
@@ -59,9 +62,8 @@ describe('QuotesAssociation', () => {
           transactionId: sampleTransactionId
         }
       }
-      ObjectStore.saveTransaction.mockClear()
       QuotesAssociation.handleQuotes(sampleContext, request)
-      expect(ObjectStore.saveTransaction).not.toHaveBeenCalledWith(sampleTransactionId)
+      expect(ObjectStore.push).not.toHaveBeenCalledWith(sampleTransactionId)
     })
   })
   describe('handleTransfers', () => {
@@ -76,17 +78,14 @@ describe('QuotesAssociation', () => {
         },
         customInfo: {}
       }
-      ObjectStore.searchTransaction.mockClear()
-      ObjectStore.getTransaction.mockClear()
-      ObjectStore.deleteTransaction.mockClear()
-      IlpModel.getIlpTransactionObject.mockClear()
-      ObjectStore.searchTransaction.mockImplementation(() => true)
-      ObjectStore.getTransaction.mockImplementation(() => { return { fulfilment: 'asdf' }})
-      IlpModel.getIlpTransactionObject.mockImplementation(() => { return {transactionId: sampleTransactionId} })
+      IlpModel.getIlpTransactionObject.mockReturnValueOnce({
+        transactionId: sampleTransactionId
+      })
+      ObjectStore.popObject.mockReturnValueOnce({
+        fulfilment: ''
+      })
       QuotesAssociation.handleTransfers(sampleContext, request)
-      expect(ObjectStore.searchTransaction).toHaveBeenCalledWith(sampleTransactionId)
-      expect(ObjectStore.getTransaction).toHaveBeenCalledWith(sampleTransactionId)
-      expect(ObjectStore.deleteTransaction).toHaveBeenCalledWith(sampleTransactionId)
+      expect(ObjectStore.popObject).toHaveBeenCalledWith('transactions', sampleTransactionId)
       expect(request.customInfo).toHaveProperty('storedTransaction')
       expect(request.customInfo.storedTransaction).toHaveProperty('fulfilment')
     })
@@ -99,11 +98,12 @@ describe('QuotesAssociation', () => {
           transferId: sampleTransactionId
         }
       }
-      ObjectStore.searchTransaction.mockClear()
-      ObjectStore.deleteTransaction.mockClear()
-      ObjectStore.searchTransaction.mockImplementation(() => false)
-      QuotesAssociation.handleTransfers(sampleContext, request)
-      expect(ObjectStore.deleteTransaction).not.toHaveBeenCalledWith(sampleTransactionId)
+      IlpModel.getIlpTransactionObject.mockReturnValueOnce({
+        transactionId: sampleTransactionId
+      })
+      ObjectStore.popObject.mockReturnValueOnce()
+      const handleTransfers = QuotesAssociation.handleTransfers(sampleContext, request)
+      expect(handleTransfers).toBeFalsy()
     })
     it('It should not call searchTransaction if its not post transfers', () => {
       const sampleContext = {}
@@ -114,10 +114,8 @@ describe('QuotesAssociation', () => {
           transferId: sampleTransactionId
         }
       }
-      ObjectStore.searchTransaction.mockClear()
-      ObjectStore.searchTransaction.mockImplementation(() => true)
-      QuotesAssociation.handleTransfers(sampleContext, request)
-      expect(ObjectStore.searchTransaction).not.toHaveBeenCalledWith('123')
+      const handleTransfers = QuotesAssociation.handleTransfers(sampleContext, request)
+      expect(handleTransfers).toBeTruthy()
     })
     it('It should not call searchTransaction if there is no payload', () => {
       const sampleContext = {}
@@ -125,8 +123,9 @@ describe('QuotesAssociation', () => {
         method: 'post',
         path: '/transfers'
       }
-      QuotesAssociation.handleTransfers(sampleContext, request)
-      expect(ObjectStore.searchTransaction).not.toHaveBeenCalledWith('123')
+      IlpModel.getIlpTransactionObject.mockRejectedValueOnce()
+      const handleTransfers = QuotesAssociation.handleTransfers(sampleContext, request)
+      expect(handleTransfers).toBeFalsy()
     })
   })
 })

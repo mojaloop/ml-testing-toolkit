@@ -22,19 +22,12 @@
  --------------
  ******/
 
-// TODO: Implement a logger and log the messages with different verbosity
-// TODO: Write unit tests
-
-const Config = require('../config.js')
-
+const Config = require('../config')
 var apiDefinitions = null
 const specFilePrefix = 'spec_files/api_definitions/'
 
 module.exports.getApiDefinitions = async () => {
   if (!apiDefinitions) {
-    if (!Config.getSystemConfig().API_DEFINITIONS) {
-      await Config.loadSystemConfig()
-    }
     apiDefinitions = Config.getSystemConfig().API_DEFINITIONS.map(item => {
       return {
         minorVersion: +item.version.split('.')[1],

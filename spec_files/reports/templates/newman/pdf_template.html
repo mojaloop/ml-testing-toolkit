@@ -626,7 +626,23 @@ input:checked + .slider:before {
                             </div>
                         </div>
                         {{/if}}
-                        {{#if response.data}}
+                        {{#if response.headers}}
+                        <div class="row">
+                        <div class="col-sm-12 mb-3">
+                            <div class="card-deck">
+                            <div class="card border-info" style="width: 50rem;">
+                                <div class="card-body">
+                                    <h5 class="card-title text-uppercase text-white text-center bg-info">Response Headers</h5>
+                                        <div class="dyn-height">
+                                                <pre><code id="copyText-responseHeaders-{{../id}}-{{request.id}}" class="prettyPrint">{{jsonStringify response.headers}}</code></pre>
+                                        </div>
+                                </div>
+                            </div>
+                            </div>
+                            </div>
+                        </div>
+                        {{/if}}
+                        {{#if response.body}}
                         <div class="row">
                         <div class="col-sm-12 mb-3">
                             <div class="card-deck">
@@ -634,7 +650,7 @@ input:checked + .slider:before {
                                 <div class="card-body">
                                     <h5 class="card-title text-uppercase text-white text-center bg-info">Response Body</h5>
                                         <div class="dyn-height">
-                                                <pre><code id="copyText-responseBody-{{../id}}-{{request.id}}" class="prettyPrint">{{jsonStringify response.data}}</code></pre>
+                                                <pre><code id="copyText-responseBody-{{../id}}-{{request.id}}" class="prettyPrint">{{jsonStringify response.body}}</code></pre>
                                         </div>
                                 </div>
                             </div>

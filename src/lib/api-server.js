@@ -25,74 +25,51 @@
 const express = require('express')
 const app = express()
 const http = require('http').Server(app)
+const customLogger = require('./requestLogger')
+const Config = require('./config')
 const socketIO = require('socket.io')(http)
-const OAuthHelper = require('./oauth/OAuthHelper')
 const passport = require('passport')
 const cookieParser = require('cookie-parser')
+const util = require('util')
+const cors = require('cors')
 
 const initServer = () => {
-  const Config = require('./config')
-  if (Object.keys(Config.getSystemConfig()).length === 0) {
-    Config.loadSystemConfigMiddleware()
-  }
-
   // For CORS policy
-  app.use((req, res, next) => {
-    res.setHeader(
-      'Access-Control-Allow-Headers',
-      'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-    )
-    res.setHeader(
-      'Access-Control-Expose-Headers',
-      'Content-Disposition'
-    )
-    res.setHeader(
-      'Access-Control-Allow-Methods',
-      'GET, POST, PATCH, PUT, DELETE, OPTIONS'
-    )
-    if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
-      res.setHeader('Access-Control-Allow-Credentials', 'true')
-      res.setHeader('Access-Control-Allow-Origin', Config.getSystemConfig().OAUTH.ORIGIN)
-      if (req.method === 'OPTIONS') {
-        res.send(200)
-      }
-    } else {
-      res.setHeader('Access-Control-Allow-Origin', '*')
-    }
-    next()
-  })
+  app.use(cors({
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+    exposedHeaders: ['Content-Disposition'],
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    origin: true,
+    credentials: true
+  }))
 
   // For parsing incoming JSON requests
   app.use(express.json({ limit: '50mb' }))
   app.use(express.urlencoded({ extended: true }))
-  app.use(cookieParser())
+
   // For oauth
-  OAuthHelper.handleMiddleware()
+  app.use(cookieParser())
+  require('./oauth/OAuthHelper').handleMiddleware()
 
+  const verifyUserMiddleware = verifyUser()
   // For admin API
-  app.use('/api/rules', verifyUser(), require('./api-routes/rules'))
-  app.use('/api/openapi', verifyUser(), require('./api-routes/openapi'))
-  app.use('/api/outbound', verifyUser(), require('./api-routes/outbound'))
-  app.use('/api/config', verifyUser(), require('./api-routes/config'))
-  app.use('/longpolling', require('./api-routes/longpolling'))
+  app.use('/api/rules', verifyUserMiddleware, require('./api-routes/rules'))
+  app.use('/api/openapi', verifyUserMiddleware, require('./api-routes/openapi'))
+  app.use('/api/outbound', verifyUserMiddleware, require('./api-routes/outbound'))
+  app.use('/api/config', verifyUserMiddleware, require('./api-routes/config'))
+  app.use('/longpolling', verifyUserMiddleware, require('./api-routes/longpolling'))
   app.use('/api/oauth2', require('./api-routes/oauth2'))
-  app.use('/api/reports', verifyUser(), require('./api-routes/reports'))
-  app.use('/api/settings', verifyUser(), require('./api-routes/settings'))
-  app.use('/api/samples', verifyUser(), require('./api-routes/samples'))
-  app.use('/api/objectstore', verifyUser(), require('./api-routes/objectstore'))
-
-  // // For front-end UI
-  // app.use('/ui', express.static(path.join('client/build')))
-
-  // app.get('*', (req, res) => {
-  //   res.sendFile(process.cwd() + '/client/build/index.html')
-  // })
+  app.use('/api/reports', verifyUserMiddleware, require('./api-routes/reports'))
+  app.use('/api/settings', verifyUserMiddleware, require('./api-routes/settings'))
+  app.use('/api/samples', verifyUserMiddleware, require('./api-routes/samples'))
+  app.use('/api/objectstore', verifyUserMiddleware, require('./api-routes/objectstore'))
+  app.use('/api/history', verifyUserMiddleware, require('./api-routes/history'))
 }
 
 const startServer = port => {
   initServer()
   http.listen(port)
-  console.log('API Server started on port ' + port)
+  customLogger.logMessage('info', 'API Server started on port ' + port, { notification: false })
 }
 
 const getApp = () => {
@@ -103,9 +80,16 @@ const getApp = () => {
 }
 
 const verifyUser = () => {
-  const Config = require('./config')
   if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
-    return passport.authenticate('jwt', { session: false })
+    return (req, res, next) => {
+      req.session = {}
+      passport.authenticate('jwt', { session: false, failureMessage: true })(req, res, next)
+      // failWithError: true returns awful html error. , failureMessage: True to store failure message in req.session.messages, or a string to use as override message for failure.
+      if (res.statusCode === 401) {
+        customLogger.logMessage('error', `Unable to authenticate with passport.authenticate - ${util.inspect(req.session.messages)}`, { additionalData: req.session.messages, notification: false })
+      }
+    }
+    // return passport.authenticate('jwt', { session: false, failWithError: true })
   }
   return (req, res, next) => { next() }
 }

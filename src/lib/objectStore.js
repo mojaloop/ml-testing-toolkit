@@ -18,65 +18,84 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
 
 var storedObject = {
-  transactions: {},
-  inboundEnvironment: {}
-}
-
-const set = (key, value) => {
-  storedObject[key] = { ...value }
-}
-
-const get = (key) => {
-  return { ...storedObject[key] }
-}
-
-const push = (object, objectId, data) => {
-  const curDateMillis = Date.now()
-  storedObject[object][objectId] = {
-    insertedDate: curDateMillis,
-    ...data
+  data: {
+    transactions: {},
+    inboundEnvironment: {},
+    requests: {},
+    callbacks: {}
   }
 }
 
-const getObject = (object, objectId) => {
-  return storedObject[object][objectId] || null
+const init = (key, user) => {
+  const context = user ? user.dfspId : 'data'
+  if (!storedObject[context]) {
+    storedObject[context] = {}
+  }
+  if (!storedObject[context][key]) {
+    storedObject[context][key] = {}
+  }
+  return context
+}
+
+const set = (key, value, user) => {
+  const context = init(key, user)
+  storedObject[context][key] = { ...value }
+}
+
+const get = (key, item, user) => {
+  const context = init(key, user)
+  if (item) {
+    if (storedObject[context][key][item]) {
+      return { ...storedObject[context][key][item] }
+    }
+    return null
+  } else {
+    return { ...storedObject[context][key] }
+  }
+}
+
+const push = (key, item, value, user) => {
+  const context = init(key, user)
+  storedObject[context][key][item] = {
+    insertedDate: Date.now(),
+    data: JSON.parse(JSON.stringify(value))
+  }
 }
 
 const clear = (object, interval) => {
-  for (const objectId in storedObject[object]) {
-    const timeDiff = Date.now() - storedObject[object][objectId].insertedDate
-    if (timeDiff > interval) { // Remove the old transactions greater than 10min
-      delete storedObject[object][objectId]
+  for (const context in storedObject) {
+    for (const item in storedObject[context][object]) {
+      const timeDiff = Date.now() - storedObject[context][object][item].insertedDate
+      if (timeDiff > interval) {
+        delete storedObject[context][object][item]
+      }
     }
   }
 }
 
-const saveTransaction = (transactionId, fulfilment) => {
-  // Append the current transaction to transactions
-  push('transactions', transactionId, { fulfilment })
-}
-
-const searchTransaction = (transactionId) => {
-  // Search for the transactionId
-  return Object.prototype.hasOwnProperty.call(storedObject.transactions, transactionId)
-}
-
-const getTransaction = (transactionId) => {
-  // get the transaction for the transactionId
-  return getObject('transactions', transactionId)
-}
-
-const deleteTransaction = (transactionId) => {
-  delete storedObject.transactions[transactionId]
+const popObject = (key, item, user) => {
+  const context = init(key, user)
+  if (Object.prototype.hasOwnProperty.call(storedObject[context][key], item)) {
+    const foundData = JSON.parse(JSON.stringify(storedObject[context][key][item].data))
+    delete storedObject[context][key][item]
+    return foundData
+  }
+  return null
 }
 
 const clearOldObjects = () => {
-  clear('transactions', 10 * 60 * 1000)
+  const interval = 10 * 60 * 1000
+  clear('transactions', interval)
+  clear('requests', interval)
+  clear('callbacks', interval)
+  clear('requestsHistory', interval)
+  clear('callbacksHistory', interval)
 }
 
 const initObjectStore = () => {
@@ -86,12 +105,8 @@ const initObjectStore = () => {
 module.exports = {
   set,
   get,
-  saveTransaction,
-  searchTransaction,
-  getTransaction,
-  deleteTransaction,
   initObjectStore,
   push,
-  getObject,
-  clear
+  clear,
+  popObject
 }

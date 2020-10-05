@@ -24,18 +24,17 @@
 
 'use strict'
 const Config = require('../config')
-const Constants = Config.getSystemConfig()
 const Cookies = require('cookies')
 const jwt = require('jsonwebtoken')
 const wso2Client = require('./Wso2Client')
+const customLogger = require('../requestLogger')
 
 /**
  * Logs the user in.
  * If successful, sets the JWT token in a cookie and returns the token payload
  */
 exports.loginUser = async function (username, password, req, res) {
-  const Constants = Config.getSystemConfig()
-  if (!Constants.OAUTH.AUTH_ENABLED) {
+  if (!Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
     return {
       ok: false,
       token: {
@@ -60,11 +59,11 @@ exports.loginUser = async function (username, password, req, res) {
 
     const decodedIdToken = jwt.decode(loginResponseObj.id_token)
 
-    const response = buildJWTResponse(decodedIdToken, loginResponseObj.access_token, req, res)
+    const response = buildJWTResponse(decodedIdToken, loginResponseObj.access_token, loginResponseObj.expires_in, req, res)
 
     return response
   } catch (error) {
-    console.log('Error on LoginService.loginUser: ', error)
+    customLogger.logMessage('error', 'login user failed', error, { notification: false })
     if (error && error.statusCode === 400 && error.message.includes('Authentication failed')) {
       throw new Error(`Authentication failed for user ${username}`, error.error)
     }
@@ -72,7 +71,7 @@ exports.loginUser = async function (username, password, req, res) {
   }
 }
 
-const buildJWTResponse = (decodedIdToken, accessToken, req, res) => {
+const buildJWTResponse = (decodedIdToken, accessToken, expiresIn, req, res) => {
   // If the user is a DFSP admin, set the dfspId so the UI can send it
   let dfspId = null
   if (decodedIdToken.dfspId != null) {
@@ -86,23 +85,23 @@ const buildJWTResponse = (decodedIdToken, accessToken, req, res) => {
         continue
       }
       dfspId = groupMatchResult[1]
-      console.log('LoginService.loginUser found dfspId: ', dfspId)
+      customLogger.logMessage('info', `${dfspId} found in ${group} group`, { notification: false })
       break // FIXME only returns the first ( there should be only one ). May report an error if there's more than one Application/DFSP group ?
     }
   }
 
   decodedIdToken.dfspId = dfspId
-  console.log('LoginService.loginUser returning decodedIdToken: ', decodedIdToken)
 
   const cookies = new Cookies(req, res)
-  const maxAge = 3600 // seconds
-  const cookieOptions = { maxAge: maxAge * 1000, httpOnly: true, sameSite: 'strict' } // secure is automatic based on HTTP or HTTPS used
-  cookies.set(Constants.OAUTH.JWT_COOKIE_NAME, accessToken, cookieOptions)
-  decodedIdToken.maxAge = maxAge
+  const cookieOptions = { maxAge: expiresIn * 1000, httpOnly: true, sameSite: 'strict' } // secure is automatic based on HTTP or HTTPS used
+  cookies.set(Config.getSystemConfig().OAUTH.JWT_COOKIE_NAME, accessToken, cookieOptions)
   return {
     ok: true,
     token: {
-      payload: decodedIdToken
+      payload: {
+        maxAge: expiresIn,
+        ...decodedIdToken
+      }
     }
   }
 }
@@ -112,5 +111,5 @@ const buildJWTResponse = (decodedIdToken, accessToken, req, res) => {
  */
 exports.logoutUser = async function (req, res) {
   const cookies = new Cookies(req, res)
-  cookies.set(Constants.OAUTH.JWT_COOKIE_NAME)
+  cookies.set(Config.getSystemConfig().OAUTH.JWT_COOKIE_NAME)
 }

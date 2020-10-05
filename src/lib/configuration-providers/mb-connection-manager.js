@@ -31,6 +31,7 @@ const querystring = require('querystring')
 const readFileAsync = promisify(fs.readFile)
 const objectStore = require('../objectStore/objectStoreInterface')
 const dfspDB = require('../db/dfspMockUsers')
+const customLogger = require('../requestLogger')
 
 const DEFAULT_ENVIRONMENT_NAME = 'TESTING-TOOLKIT'
 const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
@@ -38,18 +39,11 @@ const CM_CHECK_INTERVAL = 10000
 var CONNECTION_MANAGER_API_URL = null
 
 const getDFSPs = async () => {
-  const tempDfspList = await dfspDB.getDFSPList()
-  if (Config.getSystemConfig().HOSTING_ENABLED) {
-    return tempDfspList
-  } else {
-    return {
-      id: Config.getUserConfig().DEFAULT_USER_FSPID,
-      name: 'User DFSP'
-    }
-  }
+  const dfspsFound = await dfspDB.getDFSPList()
+  return dfspsFound
 }
 
-var currentCookies = []
+var currentCookies = [null]
 var currentEnvironment = null
 // var currentTestingToolkitDFSP = null
 // var currentUserDFSP = null
@@ -123,14 +117,14 @@ const initDFSP = async (environmentId, dfspId, dfspName) => {
     if (dfspCreateResponse.status === 200) {
       return dfspCreateResponse.data
     } else {
-      console.log('Some error creating DFSP')
+      customLogger.logMessage('error', 'Some error creating DFSP', { notification: false })
     }
   } catch (err) {
-    console.log('Some error creating DFSP', err.response ? err.response.data : err)
+    customLogger.logMessage('error', 'Some error creating DFSP', { additionalData: err.response ? err.response.data : err, notification: false })
   }
 }
 
-const initJWSCertificate = async (environmentId, dfspId, jwsCertificate = null, intermediateCertificate = null) => {
+const initJWSCertificate = async (environmentId, dfspId, jwsCertificate, intermediateCertificate) => {
   const rootCertificate = null
   let certExists = false
   let certResult = null
@@ -162,11 +156,10 @@ const initJWSCertificate = async (environmentId, dfspId, jwsCertificate = null, 
     if (jwsCertResponse.status === 200) {
       return jwsCertResponse.data
     } else {
-      console.log('---------------------------here')
-      console.log('Some error creating / updating JWS cert for DFSP')
+      customLogger.logMessage('error', 'Some error creating / updating JWS cert for DFSP', { notification: false })
     }
   } catch (err) {
-    console.log('Some error creating / updating JWS cert for DFSP', err.response ? err.response.data : err)
+    customLogger.logMessage('error', 'Some error creating / updating JWS cert for DFSP', { additionalData: err.response ? err.response.data : err, notification: false })
   }
 }
 
@@ -179,7 +172,6 @@ const fetchUserDFSPJwsCerts = async (environmentId, dfspId) => {
       if (!_.isEqual(fetchedJwsCerts, currentJWSConfig.dfsps[dfspId])) {
         currentJWSConfig.dfsps[dfspId] = fetchedJwsCerts
         await setJWSConfig()
-        // console.log('User DFSP JWS Certificate updated', fetchedJwsCerts.jwsCert)
       }
     }
   } catch (err) {}
@@ -235,10 +227,10 @@ const initHubCa = async (environmentId) => {
     if (hubCaCertResponse.status === 200) {
       return hubCaCertResponse.data.certificate
     } else {
-      console.log('Some error creating Hub CA Certificate')
+      customLogger.logMessage('error', 'Some error creating Hub CA Certificate', { notification: false })
     }
   } catch (err) {
-    console.log('Some error creating Hub CA Certificate', err.response ? err.response.data : err)
+    customLogger.logMessage('error', 'Some error creating Hub CA Certificate', { additionalData: err.response ? err.response.data : err, notification: false })
   }
 }
 
@@ -248,7 +240,6 @@ const checkDfspCa = async (environmentId, dfspId) => {
     const dfspCaResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps/' + dfspId + '/ca', { headers: { Cookie: currentCookies[0], 'Content-Type': 'application/json' } })
     if (dfspCaResult.status === 200 && dfspCaResult.data.rootCertificate && dfspCaResult.data.validationState === 'VALID') {
       if (currentTlsConfig.dfsps[dfspId].dfspCaRootCert !== dfspCaResult.data.rootCertificate) {
-        console.log('New DFSP CA Root CERT Found')
         currentTlsConfig.dfsps[dfspId].dfspCaRootCert = dfspCaResult.data.rootCertificate
         await setTLSConfig()
       }
@@ -274,13 +265,13 @@ const checkDfspCsrs = async (environmentId, dfspId) => {
 
       if (signResponse.status === 200) {
         if (signResponse.data.certificate) {
-          console.log('CSR signed for ' + dfspId)
+          customLogger.logMessage('info', 'CSR signed for ' + dfspId, { notification: false })
         }
       } else {
-        console.log('Some error signing DFSP CSR')
+        customLogger.logMessage('error', 'Some error signing DFSP CSR', { notification: false })
       }
     } catch (err) {
-      console.log('Some error signing DFSP CSR', err.response ? err.response.data : err)
+      customLogger.logMessage('error', 'Some error signing DFSP CSR', { additionalData: err.response ? err.response.data : err, notification: false })
     }
   }
 }
@@ -298,8 +289,8 @@ const checkHubCsrs = async (environmentId, dfspId) => {
   // Store if any signed CSRs found or create a CSR if no CSR found
   if (hubCsrs.length > 0) {
     const hubSignedCsrs = hubCsrs.filter(item => (item.validationState === 'VALID' && item.state === 'CERT_SIGNED' && item.certificate !== null))
-    if (hubSignedCsrs.length > 0 && currentTlsConfig.dfsps[dfspId].hubClientCert !== hubSignedCsrs[0].certificate) {
-      console.log('New Signed Hub client CERT Found')
+    if (hubSignedCsrs.length > 0 && currentTlsConfig.dfsps[dfspId] && currentTlsConfig.dfsps[dfspId].hubClientCert !== hubSignedCsrs[0].certificate) {
+      customLogger.logMessage('info', 'New Signed Hub client CERT Found: ' + dfspId, { notification: false })
       currentTlsConfig.dfsps[dfspId].hubClientCert = hubSignedCsrs[0].certificate
       await setTLSConfig()
     }
@@ -311,9 +302,9 @@ const checkHubCsrs = async (environmentId, dfspId) => {
       }
       let hubCsrCreateResponse = null
       hubCsrCreateResponse = await axios.post(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps/' + dfspId + '/enrollments/outbound', hubCsrData, { headers: { Cookie: currentCookies[0], 'Content-Type': 'application/json' } })
-      console.log(hubCsrCreateResponse.status === 200 ? 'Hub CSR Uploaded' : 'Some error uploading Hub CSR')
+      customLogger.logMessage('info', hubCsrCreateResponse.status === 200 ? 'Hub CSR Uploaded' : 'Some error uploading Hub CSR', { notification: false })
     } catch (err) {
-      console.log('Some error uploading Hub CSR', err.response ? err.response.data : err)
+      customLogger.logMessage('error', 'Some error uploading Hub CSR', { additionalData: err.response ? err.response.data : err, notification: false })
     }
   }
 }
@@ -339,17 +330,25 @@ const uploadHubServerCerts = async (environmentId, rootCert, intermediateChain, 
     if (hubServerCerts.rootCertificate !== rootCert || hubServerCerts.intermediateChain !== intermediateChain || hubServerCerts.serverCertificate !== serverCert) {
       try {
         const hubServerCertsUpdateResponse = await axios.put(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/hub/servercerts', newHubServerCerts, { headers: { Cookie: currentCookies[0], 'Content-Type': 'application/json' } })
-        console.log(hubServerCertsUpdateResponse.status === 200 ? 'Hub Server certs updated' : 'Some error updating Hub server certs')
+        if (hubServerCertsUpdateResponse.status === 200) {
+          customLogger.logMessage('info', 'Hub Server certs updated', { notification: false })
+        } else {
+          customLogger.logMessage('error', 'Some error updating Hub server certs', { notification: false })
+        }
       } catch (err) {
-        console.log('Some error updating Hub server certs')
+        customLogger.logMessage('error', 'Some error updating Hub server certs', { additionalData: err, notification: false })
       }
     }
   } else {
     try {
       const hubServerCertsCreateResponse = await axios.post(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/hub/servercerts', newHubServerCerts, { headers: { Cookie: currentCookies[0], 'Content-Type': 'application/json' } })
-      console.log(hubServerCertsCreateResponse.status === 200 ? 'Hub Server certs created' : 'Some error creating Hub server certs')
+      if (hubServerCertsCreateResponse.status === 200) {
+        customLogger.logMessage('info', 'Hub Server certs created', { notification: false })
+      } else {
+        customLogger.logMessage('error', 'Some error creating Hub server certs', { notification: false })
+      }
     } catch (err) {
-      console.log('Some error creating Hub server certs', err)
+      customLogger.logMessage('error', 'Some error creating Hub server certs', { additionalData: err, notification: false })
     }
   }
 }
@@ -447,12 +446,13 @@ const endpointChecker = async () => {
 }
 
 const checkConnectionManager = async () => {
-  if (Config.getUserConfig().CONNECTION_MANAGER_AUTH_ENABLED) {
+  const userConfig = await Config.getUserConfig()
+  if (userConfig.CONNECTION_MANAGER_AUTH_ENABLED) {
     // Get the cookies from object store
     currentCookies = await objectStore.get('CONNECTION_MANAGER_COOKIES')
   }
-  CONNECTION_MANAGER_API_URL = Config.getUserConfig().CONNECTION_MANAGER_API_URL
-  if (Config.getUserConfig().JWS_SIGN || Config.getUserConfig().VALIDATE_INBOUND_JWS) {
+  CONNECTION_MANAGER_API_URL = userConfig.CONNECTION_MANAGER_API_URL
+  if (userConfig.JWS_SIGN || userConfig.VALIDATE_INBOUND_JWS) {
     try {
       // Get private key for signing
       currentJWSConfig.testingToolkitDfspPrivateKey = await readFileAsync('secrets/privatekey.pem')
@@ -461,7 +461,7 @@ const checkConnectionManager = async () => {
       await initDFSPHelper()
       // Initialize JWS certificate for testing toolkit dfsp
       const certData = await readFileAsync('secrets/publickey.cer')
-      currentJWSConfig.testingToolkitDfspCerts = await initJWSCertificate(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, certData.toString())
+      currentJWSConfig.testingToolkitDfspCerts = await initJWSCertificate(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, certData.toString(), null)
       await setJWSConfig()
       // Fetch the user DFSP Jws certs once and then periodically check
       const dfspList = await getDFSPs()
@@ -469,11 +469,11 @@ const checkConnectionManager = async () => {
         await fetchUserDFSPJwsCerts(currentEnvironment.id, dfspList[i].id)
       }
     } catch (err) {
-      console.log(err)
+      customLogger.logMessage('error', err.message, { additionalData: err, notification: false })
     }
   }
 
-  if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED || Config.getUserConfig().INBOUND_MUTUAL_TLS_ENABLED) {
+  if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED || userConfig.INBOUND_MUTUAL_TLS_ENABLED) {
     try {
       // Do TLS related stuff
       if (!currentEnvironment) {
@@ -482,7 +482,7 @@ const checkConnectionManager = async () => {
       }
       await tlsChecker()
     } catch (err) {
-      console.log(err)
+      customLogger.logMessage('error', err.message, { additionalData: err, notification: false })
     }
   }
 
@@ -495,7 +495,7 @@ const checkConnectionManager = async () => {
       }
       await endpointChecker()
     } catch (err) {
-      console.log(err)
+      customLogger.logMessage('error', err.message, { additionalData: err, notification: false })
     }
   }
 }
@@ -504,12 +504,10 @@ const initDFSPHelper = async () => {
   // Initialize HUB environment
   await initEnvironment()
   // Initialize the DFSPs
-  if (currentEnvironment) {
-    await initDFSP(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, 'Testing Toolkit DFSP')
-    const dfspList = await getDFSPs()
-    for (let i = 0; i < dfspList.length; i++) {
-      await initDFSP(currentEnvironment.id, dfspList[i].id, dfspList[i].name)
-    }
+  await initDFSP(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, 'Testing Toolkit DFSP')
+  const dfspList = await getDFSPs()
+  for (let i = 0; i < dfspList.length; i++) {
+    await initDFSP(currentEnvironment.id, dfspList[i].id, dfspList[i].name)
   }
 }
 
@@ -522,11 +520,12 @@ const initDFSPListStuff = async () => {
 }
 
 const initAuth = async () => {
-  if (Config.getUserConfig().CONNECTION_MANAGER_AUTH_ENABLED) {
-    CONNECTION_MANAGER_API_URL = Config.getUserConfig().CONNECTION_MANAGER_API_URL
+  const userConfig = await Config.getUserConfig()
+  if (userConfig.CONNECTION_MANAGER_AUTH_ENABLED) {
+    CONNECTION_MANAGER_API_URL = userConfig.CONNECTION_MANAGER_API_URL
     const loginFormData = {
-      username: Config.getUserConfig().CONNECTION_MANAGER_HUB_USERNAME,
-      password: Config.getUserConfig().CONNECTION_MANAGER_HUB_PASSWORD
+      username: userConfig.CONNECTION_MANAGER_HUB_USERNAME,
+      password: userConfig.CONNECTION_MANAGER_HUB_PASSWORD
     }
     const loginResp = await axios.post(CONNECTION_MANAGER_API_URL + '/api/login', querystring.stringify(loginFormData), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
     if (loginResp.status === 200) {
@@ -552,11 +551,7 @@ const waitForTlsHubCerts = async (interval = 2) => {
     if (currentTlsConfig.hubCaCert && currentTlsConfig.hubServerCert && currentTlsConfig.hubServerKey) {
       return true
     }
-    await new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve(true)
-      }, interval * 1000)
-    })
+    await new Promise(resolve => setTimeout(resolve, interval * 1000))
   }
   throw new Error('Timeout Hub Init')
 }

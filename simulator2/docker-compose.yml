@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+  redis2:
+    image: "redis:5.0.4-alpine"
+  sim2:
+    image: "mojaloop/mojaloop-simulator:v8.2.0"
+    env_file: ./sim-backend.env
+    ports:
+      - "23003:3003"
+    depends_on:
+      - scheme-adapter2
+  scheme-adapter2:
+    image: "mojaloop/sdk-scheme-adapter:v8.6.0"
+    # image: "sdk-scheme-adapter:local"
+    env_file: ./scheme-adapter.env
+    volumes:
+      - "./secrets:/src/secrets"
+    ports:
+      - "24000:4000"
+    depends_on:
+      - redis2
+networks:
+  default:
+    name: mojaloop-testing-toolkit

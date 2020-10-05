@@ -15,19 +15,30 @@
  *  limitations under the License.                                            *
  ******************************************************************************/
 
-const Wso2Client = require('../../../src/lib/oauth/Wso2Client')
-const utils = require('../../../src/lib/utils')
 const Config = require('../../../src/lib/config')
+jest.mock('../../../src/lib/config')
+Config.getSystemConfig.mockReturnValue({
+  OAUTH: {
+    OAUTH2_ISSUER: ''
+  }
+})
+
+const Wso2Client = require('../../../src/lib/oauth/Wso2Client')
 const rp = require('request-promise-native')
+const customLogger = require('../../../src/lib/requestLogger')
 
 jest.mock('request-promise-native')
+jest.mock('../../../src/lib/requestLogger')
 
 describe('Wso2Client tests', () => {
+  beforeAll(() => {
+    customLogger.logMessage.mockReturnValue()
+  })
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('get token', () => {
     it('should not throw an error', async () => {
-      if (Object.keys(Config.getSystemConfig()).length === 0) {
-        await Config.loadSystemConfig()
-      }
       rp.post.mockReturnValueOnce({
         form: () => {
           return {
@@ -38,13 +49,10 @@ describe('Wso2Client tests', () => {
       await Wso2Client.getToken()
     });
     it('should throw an error', async () => {
-      if (Object.keys(Config.getSystemConfig()).length === 0) {
-        await Config.loadSystemConfig()
-      }
       rp.post.mockReturnValueOnce({
         form: () => {
           return {
-            auth: () => {throw new Error()}
+            auth: () => {throw {}}
           }
         }
       })
@@ -55,13 +63,13 @@ describe('Wso2Client tests', () => {
       }
     });
     it('should throw an error', async () => {
-      if (Object.keys(Config.getSystemConfig()).length === 0) {
-        await Config.loadSystemConfig()
-      }
       rp.post.mockReturnValueOnce({
         form: () => {
           return {
-            auth: () => {throw new Error('Authentication failed')}
+            auth: () => {throw {
+              statusCode: 400,
+              message: 'Authentication failed'
+            }}
           }
         }
       })

@@ -26,9 +26,12 @@ const AdmZip = require('adm-zip')
 const Utils = require('../../../src/lib/utils')
 
 const Config = require('../../../src/lib/config')
-
+const StorageAdapter = require('../../../src/lib/storageAdapter')
 const SpyRmdirAsync = jest.spyOn(Utils, 'rmdirAsync')
 const spyConfig = jest.spyOn(Config, 'getSystemConfig')
+const spyRead = jest.spyOn(StorageAdapter, 'read')
+const spyUpsert = jest.spyOn(StorageAdapter, 'upsert')
+
 
 jest.mock('adm-zip')
 
@@ -36,7 +39,7 @@ const importExport = require('../../../src/lib/importExport')
 
 
 describe('importExport', () => {
-  describe('exportSpecFiles should not throw an error when', () => {
+  describe('exportSpecFiles when user is undefined', () => {
     it('export 1 file', async () => {
       AdmZip.mockImplementationOnce(() => {
         return ({
@@ -62,7 +65,7 @@ describe('importExport', () => {
     })
   })
 
-  describe('importSpecFiles', () => {
+  describe('importSpecFiles when user is undefined', () => {
     it('should not throw an error when import all files', async () => {
       spyConfig.mockReturnValue({CONFIG_VERSIONS: {response: 1.0, validation: 1.0, callback: 1.0, userSettings: 1.0}})
       AdmZip.mockImplementationOnce(() => {
@@ -297,6 +300,71 @@ describe('importExport', () => {
         })
       })
       await expect(importExport.importSpecFiles([],['user_config.json'])).rejects.toThrow('validation error: user_config.json version 2 not supproted be at most 1')
+    })
+  })
+
+  const user = {
+    dfspId: 'test'
+  }
+  describe('exportSpecFiles when user is defined', () => {
+    it('export more than 1 files', async () => {
+      AdmZip.mockImplementationOnce(() => {
+        return ({
+          addFile: () => {},
+          addLocalFile: () => {},
+          addLocalFolder: () => {},
+          toBuffer: () => {return []}
+        })
+      })
+      spyRead.mockResolvedValueOnce({
+        data: ['default.json']
+      }).mockResolvedValueOnce({
+        data: []
+      }).mockResolvedValueOnce({
+        data: []
+      })
+      const exportSpecFiles = await importExport.exportSpecFiles(['rules_response','user_config.json'], user)
+      expect(exportSpecFiles.namePrefix).toBe('spec_files');
+      expect(exportSpecFiles.buffer).toHaveLength(0);
+    })
+  })
+  describe('importSpecFiles when user is defined', () => {
+    it('should not throw an error when import all files', async () => {
+      spyConfig.mockReturnValue({CONFIG_VERSIONS: {response: 1.0, validation: 1.0, callback: 1.0, userSettings: 1.0}})
+      AdmZip.mockImplementationOnce(() => {
+        return ({
+          getEntries: () => {
+            return [
+              {
+                entryName: 'rules_response/example-1.json',
+                getData: () => {return {
+                  toString: () => { return JSON.stringify([{
+                    "type": "response",
+                    "version": 1.0,
+                    "conditions": {
+                      "all": [
+                        {
+                          "fact": "operationPath",
+                          "operator": "equal",
+                          "value": "/settlementWindows/{id}"
+                        }
+                      ]
+                    },
+                    "event": {
+                      "type": "MOCK_RESPONSE"
+                    }
+                  }])}
+                }}
+              }
+            ]
+          },
+          addLocalFile: () => {},
+          addLocalFolder: () => {},
+          toBuffer: () => {return []}
+        })
+      })
+      spyUpsert.mockResolvedValueOnce({})
+      await expect(importExport.importSpecFiles([],['rules_response'], user)).resolves.toBe(undefined)
     })
   })
 })

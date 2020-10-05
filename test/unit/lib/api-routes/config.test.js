@@ -23,31 +23,39 @@
  --------------
  ******/
 
+const Config = require('../../../../src/lib/config')
+jest.mock('../../../../src/lib/config')
+Config.getSystemConfig.mockReturnValue({
+  OAUTH: {
+    AUTH_ENABLED: false
+  }
+})
+
 const request = require('supertest')
 const app = require('../../../../src/lib/api-server').getApp()
-const Config = require('../../../../src/lib/config')
-const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
-const SpyGetStoredUserConfig = jest.spyOn(Config, 'getStoredUserConfig')
-const SpySetStoredUserConfig = jest.spyOn(Config, 'setStoredUserConfig')
-const SpyLoadUserConfig = jest.spyOn(Config, 'loadUserConfig')
 const Server = require('../../../../src/server')
 const SpyServer = jest.spyOn(Server, 'restartServer')
+const requestLogger = require('../../../../src/lib/requestLogger')
 
-
+jest.mock('../../../../src/lib/requestLogger')
+jest.mock('../../../../src/lib/config')
 
 describe('API route /config', () => {
+  beforeAll(() => {
+    requestLogger.logMessage.mockReturnValue()
+  })
   describe('GET /api/config/user', () => {
     it('Getting config', async () => {
-      SpyGetUserConfig.mockReturnValueOnce({})
-      SpyGetStoredUserConfig.mockResolvedValueOnce({})
+      Config.getUserConfig.mockReturnValueOnce({})
+      Config.getStoredUserConfig.mockResolvedValueOnce({})
       const res = await request(app).get(`/api/config/user`)
       expect(res.statusCode).toEqual(200)
       expect(res.body).toHaveProperty('runtime')
       expect(res.body).toHaveProperty('stored')
     })
     it('Getting config throws an error', async () => {
-      SpyGetUserConfig.mockReturnValueOnce({})
-      SpyGetStoredUserConfig.mockRejectedValueOnce()
+      Config.getUserConfig.mockReturnValueOnce({})
+      Config.getStoredUserConfig.mockRejectedValueOnce()
       const res = await request(app).get(`/api/config/user`)
       expect(res.statusCode).toEqual(404)
     })
@@ -57,10 +65,10 @@ describe('API route /config', () => {
       const newConfig = {
         CALLBACK_ENDPOINT: 'http://localhost:5000/'
       }
-      SpySetStoredUserConfig.mockResolvedValueOnce()
-      SpyGetUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
-      SpyGetStoredUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
-      SpyLoadUserConfig.mockResolvedValueOnce()
+      Config.setStoredUserConfig.mockResolvedValueOnce()
+      Config.getUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
+      Config.getStoredUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
+      Config.loadUserConfig.mockResolvedValueOnce()
 
       const res = await request(app).put(`/api/config/user`).send(newConfig)
       expect(res.statusCode).toEqual(200)
@@ -70,10 +78,10 @@ describe('API route /config', () => {
       const newConfig = {
         CALLBACK_ENDPOINT: 'http://localhost:5000/'
       }
-      SpySetStoredUserConfig.mockResolvedValueOnce()
-      SpyGetUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
-      SpyGetStoredUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: false})
-      SpyLoadUserConfig.mockResolvedValueOnce()
+      Config.setStoredUserConfig.mockResolvedValueOnce()
+      Config.getUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
+      Config.getStoredUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: false})
+      Config.loadUserConfig.mockResolvedValueOnce()
       SpyServer.mockResolvedValueOnce()
 
       const res = await request(app).put(`/api/config/user`).send(newConfig)
@@ -92,7 +100,7 @@ describe('API route /config', () => {
       const newConfig = {
         CALLBACK_ENDPOINT: 'http://localhost:5000/'
       }
-      SpySetStoredUserConfig.mockRejectedValueOnce()
+      Config.setStoredUserConfig.mockRejectedValueOnce()
       const res = await request(app).put(`/api/config/user`).send(newConfig)
       expect(res.statusCode).toEqual(404)
     })

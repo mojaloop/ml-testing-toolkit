@@ -275,14 +275,14 @@
                 "id": 2,
                 "description": "Check Missing mandatory element - Date",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('Missing mandatory element - \"date')"
+                  "expect(response.body.errorInformation.errorDescription).to.include(\"Missing mandatory element - .header should have required property 'date'\")"
                 ]
               },
               {
                 "id": 3,
                 "description": "Check Error code 3102",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3102')"
                 ]
               }
             ]
@@ -375,14 +375,14 @@
                 "id": 2,
                 "description": "Check Missing mandatory element - Invalid accept header",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.equal('Missing mandatory element - \\\"accept\\\" is required')"
+                  "expect(response.body.errorInformation.errorDescription).to.equal(\"Missing mandatory element - .header should have required property 'accept'\")"
                 ]
               },
               {
                 "id": 3,
                 "description": "Check Error code 3101",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3102')"
                 ]
               }
             ]
@@ -442,14 +442,14 @@
                 "id": 2,
                 "description": "Check Missing mandatory element",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('Missing mandatory element')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('Missing mandatory element')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Check Error code 3102",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3102')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3102')"
                 ]
               }
             ]
@@ -499,14 +499,14 @@
                 "id": 2,
                 "description": "Check Malformed syntax",
                 "exec": [
-                  "expect(response.data.errorInformation.errorDescription).to.include('Malformed syntax')"
+                  "expect(response.body.errorInformation.errorDescription).to.include('Malformed syntax')"
                 ]
               },
               {
                 "id": 3,
                 "description": "Check Error code 3101",
                 "exec": [
-                  "expect(response.data.errorInformation.errorCode).to.equal('3101')"
+                  "expect(response.body.errorInformation.errorCode).to.equal('3101')"
                 ]
               }
             ]

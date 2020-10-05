@@ -77,11 +77,11 @@ const handleTransferIlp = (context, response) => {
 // Check the contents of ILP Packet against the values from body
 const validateTransferIlpPacket = (context, request) => {
   if (request.method === 'post' && request.path === '/transfers') {
-    customLogger.logMessage('info', 'Validating Ilp packet against the transfer request', null, true, request)
+    customLogger.logMessage('info', 'Validating Ilp packet against the transfer request', { request })
     try {
       return ilpObj.validateIlpAgainstTransferRequest(request.payload)
     } catch (err) {
-      customLogger.logMessage('error', 'Failed to validate the Ilp packet. Error: ' + err.message, null, true, request)
+      customLogger.logMessage('error', 'Failed to validate the Ilp packet. Error: ' + err.message, { request })
       return false
     }
   }
@@ -94,20 +94,20 @@ const validateTransferCondition = (context, request) => {
     let fulfilment = null
     if (request.customInfo.storedTransaction && request.customInfo.storedTransaction.fulfilment) {
       fulfilment = request.customInfo.storedTransaction.fulfilment
-      customLogger.logMessage('info', 'Validating condition with the stored fulfilment', null, true, request)
+      customLogger.logMessage('info', 'Validating condition with the stored fulfilment', { request })
     } else {
       try {
         fulfilment = ilpObj.calculateFulfil(request.payload.ilpPacket).replace('"', '')
-        customLogger.logMessage('info', 'Validating condition with the generated fulfilment', null, true, request)
+        customLogger.logMessage('info', 'Validating condition with the generated fulfilment', { request })
       } catch (err) {
-        customLogger.logMessage('error', 'Failed to calculate the fulfilment. Error: ' + err.message, null, true, request)
+        customLogger.logMessage('error', 'Failed to calculate the fulfilment. Error: ' + err.message, { request })
         return false
       }
     }
     try {
       return ilpObj.validateFulfil(fulfilment, request.payload.condition)
     } catch (err) {
-      customLogger.logMessage('error', 'Failed to validate the fulfilment. Error: ' + err.message, null, true, request)
+      customLogger.logMessage('error', 'Failed to validate the fulfilment. Error: ' + err.message, { request })
       return false
     }
   }
