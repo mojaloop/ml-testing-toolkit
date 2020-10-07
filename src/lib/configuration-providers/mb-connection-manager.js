@@ -38,14 +38,6 @@ const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
 const CM_CHECK_INTERVAL = 10000
 var CONNECTION_MANAGER_API_URL = null
 
-const getDFSPs = async () => {
-  const user = {
-    dfspId: DEFAULT_TESTING_TOOLKIT_FSPID
-  }
-  const dfspsFound = await dfspDB.getDFSPList(user)
-  return dfspsFound
-}
-
 var currentCookies = [null]
 var currentEnvironment = null
 // var currentTestingToolkitDFSP = null
@@ -393,7 +385,7 @@ const tlsChecker = async () => {
   // Initialize HUB CA
   currentTlsConfig.hubCaCert = await initHubCa(currentEnvironment.id)
 
-  const dfspList = await getDFSPs()
+  const dfspList = await dfspDB.getDFSPList()
   for (let i = 0; i < dfspList.length; i++) {
     // TODO: Download DFSP CA and place it in trusted store
     await checkDfspCa(currentEnvironment.id, dfspList[i].id)
@@ -476,7 +468,7 @@ const checkConnectionManager = async () => {
       currentJWSConfig.testingToolkitDfspCerts = await initJWSCertificate(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, certData.toString(), null)
       await setJWSConfig()
       // Fetch the user DFSP Jws certs once and then periodically check
-      const dfspList = await getDFSPs()
+      const dfspList = await dfspDB.getDFSPList()
       for (let i = 0; i < dfspList.length; i++) {
         await fetchUserDFSPJwsCerts(currentEnvironment.id, dfspList[i].id)
       }
@@ -509,7 +501,7 @@ const initDFSPHelper = async () => {
   await initEnvironment()
   // Initialize the DFSPs
   await initDFSP(currentEnvironment.id, DEFAULT_TESTING_TOOLKIT_FSPID, 'Testing Toolkit DFSP')
-  const dfspList = await getDFSPs()
+  const dfspList = await dfspDB.getDFSPList()
   for (let i = 0; i < dfspList.length; i++) {
     await initDFSP(currentEnvironment.id, dfspList[i].id, dfspList[i].name)
   }

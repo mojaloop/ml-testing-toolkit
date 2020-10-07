@@ -2,6 +2,7 @@ const Config = require('../config')
 const querystring = require('querystring')
 const axios = require('axios').default
 const objectStore = require('../objectStore/objectStoreInterface')
+const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
 
 const tempDfspList = [
   {
@@ -18,8 +19,10 @@ const tempDfspList = [
   }
 ]
 
-const getDFSPList = async (user) => {
-  const userConfig = await Config.getUserConfig(user)
+const getDFSPList = async () => {
+  const userConfig = await Config.getUserConfig({
+    dfspId: DEFAULT_TESTING_TOOLKIT_FSPID
+  })
   const systemConfig = Config.getSystemConfig()
   let users = []
   if (systemConfig.HOSTING_ENABLED) {
