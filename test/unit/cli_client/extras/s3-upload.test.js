@@ -26,7 +26,7 @@
 const AWS = require('aws-sdk')
 jest.mock('aws-sdk')
 AWS.config.update.mockReturnValueOnce()
-AWS.S3.mockReturnValue({
+const s3UploadMockResolve = {
   upload: () => {
     return {
       promise: async () => {
@@ -36,7 +36,12 @@ AWS.S3.mockReturnValue({
       }
     }
   }
-})
+}
+const s3UploadMockReject = {
+  upload: () => {
+    throw new Error()
+  }
+}
 
 const s3Upload = require('../../../../src/cli_client/extras/s3-upload')
 
@@ -64,12 +69,31 @@ describe('Cli client', () => {
       AWS.config.region = 'asdf'
       await expect(s3Upload.uploadFileDataToS3('wrong://asdf/', sampleFileData)).resolves.toBe(undefined)
     })
-    it('when there are some AWS credentials, and AWS region it should return undefined', async () => {
+    it('when there are some AWS credentials, and AWS region it should return some_url', async () => {
       AWS.config.credentials = {
         asdf: 'asdf'
       }
       AWS.config.region = 'asdf'
+      AWS.S3.mockReturnValueOnce(s3UploadMockResolve)
       await expect(s3Upload.uploadFileDataToS3(s3SampleURL, sampleFileData)).resolves.toBe('some_url')
     })
+    it('when there are some AWS credentials, and AWS region, and sample url not ends with html or htm it should return some_url', async () => {
+      AWS.config.credentials = {
+        asdf: 'asdf'
+      }
+      AWS.config.region = 'asdf'
+      AWS.S3.mockReturnValueOnce(s3UploadMockResolve)
+      const s3SampleURL = 's3://some_bucket/file_key.ht'
+      await expect(s3Upload.uploadFileDataToS3(s3SampleURL, sampleFileData)).resolves.toBe('some_url')
+    })
+    it('when there are some AWS credentials, and AWS region, and s3 upload fails, it should return null', async () => {
+      AWS.config.credentials = {
+        asdf: 'asdf'
+      }
+      AWS.config.region = 'asdf'
+      AWS.S3.mockReturnValueOnce(s3UploadMockReject)
+      await expect(s3Upload.uploadFileDataToS3(s3SampleURL, sampleFileData)).resolves.toBe(null)
+    })
+    
   })
 })
