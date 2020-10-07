@@ -44,13 +44,18 @@ const userConfig = {
   CONNECTION_MANAGER_HUB_USERNAME: 'hub',
   CONNECTION_MANAGER_HUB_PASSWORD: 'hub'
 }
+
+const systemConfig = {
+  HOSTING_ENABLED: true,
+  KEYCLOAK: {
+    ENABLED: false
+  }
+}
 Config.getUserConfig.mockImplementation(() => {
   return userConfig
 })
 Config.getSystemConfig.mockImplementation(() => {
-  return {
-    HOSTING_ENABLED: true
-  }
+  return systemConfig
 })
 const reject = {
   post: {},
@@ -303,16 +308,14 @@ describe('mb-connection-manager', () => {
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
     })
     it('should not throw error', async () => {
+      const newSystemConfig = {...systemConfig}
+      newSystemConfig.HOSTING_ENABLED = false
       Config.getSystemConfig.mockImplementation(() => {
-        return {
-          HOSTING_ENABLED: false
-        }
+        return newSystemConfig
       })
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       Config.getSystemConfig.mockImplementation(() => {
-        return {
-          HOSTING_ENABLED: true
-        }
+        return systemConfig
       })
     })
     it('should not throw error', async () => {

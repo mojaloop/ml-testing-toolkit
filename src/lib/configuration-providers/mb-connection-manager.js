@@ -39,7 +39,10 @@ const CM_CHECK_INTERVAL = 10000
 var CONNECTION_MANAGER_API_URL = null
 
 const getDFSPs = async () => {
-  const dfspsFound = await dfspDB.getDFSPList()
+  const user = {
+    dfspId: DEFAULT_TESTING_TOOLKIT_FSPID
+  }
+  const dfspsFound = await dfspDB.getDFSPList(user)
   return dfspsFound
 }
 
@@ -86,16 +89,22 @@ const initEnvironment = async () => {
       if (createEnvResponse.status === 200) {
         currentEnvironment = createEnvResponse.data
       } else {
-        throw new Error('Some error creating environment')
+        throw new Error('Some error creating environment - ', createEnvResponse)
       }
     } catch (err) {
-      throw new Error('Some error creating environment')
+      throw new Error('Some error creating environment - ', err)
     }
   }
 }
 
 const initDFSP = async (environmentId, dfspId, dfspName) => {
-  // Check whether a dfspId exists with the name testing-toolkit
+  if (!currentJWSConfig.dfsps[dfspId]) {
+    currentJWSConfig.dfsps[dfspId] = {}
+  }
+  if (!currentTlsConfig.dfsps[dfspId]) {
+    currentTlsConfig.dfsps[dfspId] = {}
+  }
+  // Check whether a dfspId exists
   try {
     const dfspResult = await axios.get(CONNECTION_MANAGER_API_URL + '/api/environments/' + environmentId + '/dfsps', { headers: { Cookie: currentCookies[0], 'Content-Type': 'application/json' } })
     if (dfspResult.status === 200 && dfspResult.data.length > 0) {
@@ -446,12 +455,15 @@ const endpointChecker = async () => {
 }
 
 const checkConnectionManager = async () => {
-  const userConfig = await Config.getUserConfig()
+  const user = {
+    dfspId: DEFAULT_TESTING_TOOLKIT_FSPID
+  }
+  const userConfig = await Config.getUserConfig(user)
+  CONNECTION_MANAGER_API_URL = userConfig.CONNECTION_MANAGER_API_URL
   if (userConfig.CONNECTION_MANAGER_AUTH_ENABLED) {
     // Get the cookies from object store
-    currentCookies = await objectStore.get('CONNECTION_MANAGER_COOKIES')
+    currentCookies = await auth(user)
   }
-  CONNECTION_MANAGER_API_URL = userConfig.CONNECTION_MANAGER_API_URL
   if (userConfig.JWS_SIGN || userConfig.VALIDATE_INBOUND_JWS) {
     try {
       // Get private key for signing
@@ -475,11 +487,7 @@ const checkConnectionManager = async () => {
 
   if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED || userConfig.INBOUND_MUTUAL_TLS_ENABLED) {
     try {
-      // Do TLS related stuff
-      if (!currentEnvironment) {
-        // Initialize HUB environment
-        await initDFSPHelper()
-      }
+      await initDFSPHelper()
       await tlsChecker()
     } catch (err) {
       customLogger.logMessage('error', err.message, { additionalData: err, notification: false })
@@ -488,11 +496,7 @@ const checkConnectionManager = async () => {
 
   if (Config.getSystemConfig().HOSTING_ENABLED) {
     try {
-      // Do TLS related stuff
-      if (!currentEnvironment) {
-        // Initialize HUB environment
-        await initDFSPHelper()
-      }
+      await initDFSPHelper()
       await endpointChecker()
     } catch (err) {
       customLogger.logMessage('error', err.message, { additionalData: err, notification: false })
@@ -511,37 +515,49 @@ const initDFSPHelper = async () => {
   }
 }
 
-const initDFSPListStuff = async () => {
-  const dfspList = await getDFSPs()
-  for (let i = 0; i < dfspList.length; i++) {
-    currentJWSConfig.dfsps[dfspList[i].id] = {}
-    currentTlsConfig.dfsps[dfspList[i].id] = {}
+const auth = async (user) => {
+  const userConfig = Config.getUserConfig(user)
+  const loginFormData = {
+    username: userConfig.CONNECTION_MANAGER_HUB_USERNAME,
+    password: userConfig.CONNECTION_MANAGER_HUB_PASSWORD
   }
-}
-
-const initAuth = async () => {
-  const userConfig = await Config.getUserConfig()
-  if (userConfig.CONNECTION_MANAGER_AUTH_ENABLED) {
-    CONNECTION_MANAGER_API_URL = userConfig.CONNECTION_MANAGER_API_URL
-    const loginFormData = {
-      username: userConfig.CONNECTION_MANAGER_HUB_USERNAME,
-      password: userConfig.CONNECTION_MANAGER_HUB_PASSWORD
-    }
-    const loginResp = await axios.post(CONNECTION_MANAGER_API_URL + '/api/login', querystring.stringify(loginFormData), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
-    if (loginResp.status === 200) {
-      if (loginResp.headers['set-cookie']) {
-        await objectStore.set('CONNECTION_MANAGER_COOKIES', loginResp.headers['set-cookie'])
+  let cookies = await objectStore.get('CONNECTION_MANAGER_COOKIES')
+  if (Object.keys(cookies).length !== 0) {
+    const cookieIsValid = Object.values(cookies).some(cookie => {
+      const token = {}
+      const cookieItems = cookie.split(';').map(item => item.trim())
+      cookieItems.forEach(cookieItem => {
+        const cookieElements = cookieItem.split('=').map(item => item.trim())
+        if (cookieElements[0] === 'MCM-API_ACCESS_TOKEN') {
+          token.accessToken = cookieElements[1]
+        } else if (cookieElements[0] === 'expires') {
+          token.expires = Date.parse(cookieElements[1])
+        }
+      })
+      if (token.accessToken && token.expires) {
+        return (Date.now() < token.expires - (60 * 1000))
       }
-    } else {
-      throw new Error('Some error while login to the MCM as hub')
+      return false
+    })
+    if (cookieIsValid) {
+      return cookies
     }
   }
+  const loginResp = await axios.post(CONNECTION_MANAGER_API_URL + '/api/login', querystring.stringify(loginFormData), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
+  if (loginResp.status === 200) {
+    if (loginResp.headers['set-cookie']) {
+      await objectStore.set('CONNECTION_MANAGER_COOKIES', loginResp.headers['set-cookie'])
+      cookies = await objectStore.get('CONNECTION_MANAGER_COOKIES')
+      return cookies
+    }
+  } else {
+    throw new Error('Some error while login to the MCM as hub')
+  }
+  return cookies
 }
 
 const initialize = async () => {
   await objectStore.init()
-  await initAuth()
-  await initDFSPListStuff()
   await checkConnectionManager()
   setInterval(checkConnectionManager, CM_CHECK_INTERVAL)
 }
