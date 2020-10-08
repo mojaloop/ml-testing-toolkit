@@ -164,7 +164,7 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
     const contextObj = await context.generageContextObj(environmentVariables.items)
     // Send http request
     try {
-      await executePreRequestScript(request, convertedRequest, scriptsExecution, contextObj, environmentVariables)
+      await executePreRequestScript(convertedRequest, scriptsExecution, contextObj, environmentVariables)
 
       environment.data = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
 
@@ -217,7 +217,7 @@ const setResponse = async (convertedRequest, resp, environment, environmentVaria
     callbacksHistory: callbacksHistoryObj
   }
 
-  await executePostRequestScript(request, resp, scriptsExecution, contextObj, environmentVariables, backgroundData)
+  await executePostRequestScript(convertedRequest, resp, scriptsExecution, contextObj, environmentVariables, backgroundData)
   environment.data = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
   const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environment.data, backgroundData)
   request.appended = {
@@ -248,15 +248,15 @@ const setResponse = async (convertedRequest, resp, environment, environmentVaria
   }
 }
 
-const executePreRequestScript = async (request, convertedRequest, scriptsExecution, contextObj, environmentVariables) => {
-  if (request.scripts && request.scripts.preRequest && request.scripts.preRequest.exec.length > 0 && request.scripts.preRequest.exec !== ['']) {
-    scriptsExecution.preRequest = await context.executeAsync(request.scripts.preRequest.exec, { context: { ...contextObj, request: convertedRequest }, id: uuid.v4() }, contextObj)
+const executePreRequestScript = async (convertedRequest, scriptsExecution, contextObj, environmentVariables) => {
+  if (convertedRequest.scripts && convertedRequest.scripts.preRequest && convertedRequest.scripts.preRequest.exec.length > 0 && convertedRequest.scripts.preRequest.exec !== ['']) {
+    scriptsExecution.preRequest = await context.executeAsync(convertedRequest.scripts.preRequest.exec, { context: { ...contextObj, request: convertedRequest }, id: uuid.v4() }, contextObj)
     environmentVariables.items = scriptsExecution.preRequest.environment
   }
 }
 
-const executePostRequestScript = async (request, resp, scriptsExecution, contextObj, environmentVariables, backgroundData) => {
-  if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
+const executePostRequestScript = async (convertedRequest, resp, scriptsExecution, contextObj, environmentVariables, backgroundData) => {
+  if (convertedRequest.scripts && convertedRequest.scripts.postRequest && convertedRequest.scripts.postRequest.exec.length > 0 && convertedRequest.scripts.postRequest.exec !== ['']) {
     let response
     if (_.isString(resp)) {
       response = resp
@@ -279,7 +279,7 @@ const executePostRequestScript = async (request, resp, scriptsExecution, context
       }
     )
 
-    scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, response, collectionVariables }, id: uuid.v4() }, contextObj)
+    scriptsExecution.postRequest = await context.executeAsync(convertedRequest.scripts.postRequest.exec, { context: { ...contextObj, response, collectionVariables }, id: uuid.v4() }, contextObj)
     environmentVariables.items = scriptsExecution.postRequest.environment
   }
 }
