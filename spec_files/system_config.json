@@ -23,7 +23,7 @@
     "EMBEDDED_CERTIFICATE": "password"
   },
   "KEYCLOAK": {
-    "ENABLED": true,
+    "ENABLED": false,
     "API_URL": "http://172.17.0.1:9080",
     "REALM": "testingtoolkit",
     "USERNAME": "hub",
