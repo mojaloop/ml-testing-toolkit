@@ -1,0 +1,361 @@
+{
+  "name": "hub-transaction-requests-tests",
+  "test_cases": [
+    {
+      "id": 2,
+      "name": "reject State",
+      "requests": [
+        {
+          "id": 1,
+          "description": "Payee initiate and send Received request",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transactionRequests",
+          "path": "/transactionRequests",
+          "method": "post",
+          "body": {
+            "transactionRequestId": "{$environment.transactionRequestId}",
+            "payee": {
+              "partyIdInfo": {
+                "partyIdType": "PERSONAL_ID",
+                "partyIdentifier": "16135551212",
+                "partySubIdOrType": "DRIVING_LICENSE",
+                "fspId": "1234"
+              },
+              "merchantClassificationCode": "4321",
+              "name": "Justin Trudeau",
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "Justin",
+                  "middleName": "Pierre",
+                  "lastName": "Trudeau"
+                },
+                "dateOfBirth": "1971-12-25"
+              }
+            },
+            "payer": {
+              "partyIdType": "PERSONAL_ID",
+              "partyIdentifier": "16135551212",
+              "partySubIdOrType": "DRIVING_LICENSE",
+              "fspId": "1234"
+            },
+            "amount": {
+              "currency": "USD",
+              "amount": "123.45"
+            },
+            "transactionType": {
+              "scenario": "DEPOSIT",
+              "subScenario": "CUSTOM_SUBSCENARIO",
+              "initiator": "PAYEE",
+              "initiatorType": "CONSUMER",
+              "refundInfo": {
+                "originalTransactionId": "{$environment.transactionRequestId}",
+                "refundReason": "free text indicating reason for the refund"
+              },
+              "balanceOfPayments": "123"
+            },
+            "note": "Free-text memo",
+            "geoCode": {
+              "latitude": "+45.4215",
+              "longitude": "+75.6972"
+            },
+            "authenticationType": "OTP",
+            "expiration": "{$environment.transferExpiration}"
+          },
+          "url": "{$inputs.HOST_TRANSACTION_REQUESTS_SERVICE}",
+          "headers": {
+            "Accept": "application/vnd.interoperability.transactionRequests+json;version=1",
+            "Content-Type": "application/vnd.interoperability.transactionRequests+json;version=1.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "payeefsp",
+            "FSPIOP-Destination": "payerfsp"
+          },
+          "ignoreCallbacks": true,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Callback received in the Simulator",
+                "exec": [
+                  "expect(environment.transactionRequestResponse.data).to.not.equal(undefined)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "transactionId matches",
+                "exec": [
+                  "expect(environment.transactionRequestResponse.data['transactionId']).to.equal(environment.transactionRequestId);"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "fspiop-source is payerfsp",
+                "exec": [
+                  "expect(environment.transactionRequestResponse.headers['fspiop-source']).to.equal('payerfsp');"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "fspiop-destination is payeefsp",
+                "exec": [
+                  "expect(environment.transactionRequestResponse.headers['fspiop-destination']).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "fspiop-http-method is PUT",
+                "exec": [
+                  "expect(environment.transactionRequestResponse.headers['fspiop-http-method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "content-type is same as sent in the request",
+                "exec": [
+                  "expect(environment.transactionRequestResponse.headers['content-type']).to.equal('application/vnd.interoperability.transactionRequests+json;version=1.0')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "transactionRequestState is RECEIVED",
+                "exec": [
+                  "expect(environment.transactionRequestResponse.data['transactionRequestState']).to.eql('RECEIVED')"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "",
+                "pm.environment.set('transactionRequestDate', (new Date()).toUTCString());",
+                "pm.environment.set('transactionRequestId', uuid.v4());",
+                "pm.environment.set('transferExpiration', new Date(new Date().getTime() + 600000));"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"HOST_SIMULATOR\")+\"/transactionRequests/callbacks/\"+pm.environment.get(\"transactionRequestId\"), function (err, response) {",
+                "    console.log(\"transactionRequestResponse: \", response)",
+                "    pm.environment.set(\"transactionRequestResponseObject\", response)",
+                "    pm.environment.set(\"transactionRequestResponse\", response.json())",
+                "  });",
+                "}, 500)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 2,
+          "description": "Check transactionRequest state",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transactionRequests/{ID}",
+          "path": "/transactionRequests/{$environment.transactionRequestId}",
+          "method": "get",
+          "params": {
+            "ID": "{$environment.transactionRequestId}"
+          },
+          "url": "{$inputs.HOST_TRANSACTION_REQUESTS_SERVICE}",
+          "headers": {
+            "Accept": "application/vnd.interoperability.transactionRequests+json;version=1",
+            "Content-Type": "application/vnd.interoperability.transactionRequests+json;version=1.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "payeefsp"
+          },
+          "ignoreCallbacks": true,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Callback received in the Simulator",
+                "exec": [
+                  "expect(environment.checkTransactionRequestStateCallback.data).to.not.equal(undefined)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "transactionId matches",
+                "exec": [
+                  "expect(environment.checkTransactionRequestStateCallback.data['transactionId']).to.equal(environment.transactionRequestId);"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "fspiop-source is payeefsp",
+                "exec": [
+                  "expect(environment.checkTransactionRequestStateCallback.headers['fspiop-source']).to.equal('payeefsp');"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "fspiop-destination is payerfsp",
+                "exec": [
+                  "expect(environment.checkTransactionRequestStateCallback.headers['fspiop-destination']).to.equal('payerfsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "fspiop-http-method is PUT",
+                "exec": [
+                  "expect(environment.checkTransactionRequestStateCallback.headers['fspiop-http-method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "content-type is same as sent in the request",
+                "exec": [
+                  "expect(environment.checkTransactionRequestStateCallback.headers['content-type']).to.equal('application/vnd.interoperability.transactionRequests+json;version=1.0')"
+                ]
+              },
+              {
+                "id": 7,
+                "description": "transactionRequestState is RECEIVED",
+                "exec": [
+                  "expect(environment.checkTransactionRequestStateCallback.data['transactionRequestState']).to.eql('RECEIVED')"
+                ]
+              },
+              {
+                "id": 8,
+                "description": "send RECEIVED state status is 200",
+                "exec": [
+                  "expect(environment.transactionRequestSendStateResponseObject.code).to.eql(200)"
+                ]
+              },
+              {
+                "id": 9,
+                "description": "Callback received in the Simulator",
+                "exec": [
+                  "expect(environment.transactionRequestSendStateCallback.data).to.not.equal(undefined)"
+                ]
+              },
+              {
+                "id": 10,
+                "description": "put transactionId matches",
+                "exec": [
+                  "expect(environment.transactionRequestSendStateCallback.data['transactionId']).to.equal(environment.transactionRequestId);"
+                ]
+              },
+              {
+                "id": 11,
+                "description": "put fspiop-source is payerfsp",
+                "exec": [
+                  "expect(environment.transactionRequestSendStateCallback.headers['fspiop-source']).to.equal('payerfsp');"
+                ]
+              },
+              {
+                "id": 12,
+                "description": "put fspiop-destination is payeefsp",
+                "exec": [
+                  "expect(environment.transactionRequestSendStateCallback.headers['fspiop-destination']).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 13,
+                "description": "put fspiop-http-method is PUT",
+                "exec": [
+                  "expect(environment.transactionRequestSendStateCallback.headers['fspiop-http-method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 14,
+                "description": "put content-type is same as sent in the request",
+                "exec": [
+                  "expect(environment.transactionRequestResponse.headers['content-type']).to.equal('application/vnd.interoperability.transactionRequests+json;version=1.0')"
+                ]
+              },
+              {
+                "id": 15,
+                "description": "put transactionRequestState is RECEIVED",
+                "exec": [
+                  "expect(environment.transactionRequestSendStateCallback.data['transactionRequestState']).to.eql('REJECTED')"
+                ]
+              },
+              {
+                "id": 16,
+                "description": "send REJECT state status is 200",
+                "exec": [
+                  "expect(environment.transactionRequestSendStateCallbackObject.code).to.eql(200)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "pm.environment.set('transactionRequestDate', (new Date()).toUTCString());"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"HOST_SIMULATOR\")+\"/transactionRequests/callbacks/\"+pm.environment.get(\"transactionRequestId\"), function (err, response) {",
+                "    const responseJson = response.json()",
+                "    console.log(\"checkTransactionRequestStateCallbackObject: \", response)",
+                "    pm.environment.set(\"checkTransactionRequestStateCallback\", responseJson)",
+                "    pm.environment.set(\"checkTransactionRequestStateCallbackObject\", response)",
+                "  });",
+                "}, 500)",
+                "",
+                "setTimeout(function () {",
+                "  pm.sendRequest({",
+                "    url: pm.environment.get(\"HOST_TRANSACTION_REQUESTS_SERVICE\")+\"/transactionRequests/\"+pm.environment.get(\"transactionRequestId\"),",
+                "    method: 'PUT',",
+                "    header: {",
+                "      'Accept' : 'application/vnd.interoperability.transactionRequests+json;version=1',",
+                "      'Content-Type': 'application/vnd.interoperability.transactionRequests+json;version=1.0',",
+                "      'Date': pm.environment.get(\"transactionRequestDate\"),",
+                "      'fspiop-source': 'payerfsp',",
+                "      'fspiop-destination': 'payeefsp',",
+                "      'fspiop-uri': '/transactionRequests/' + pm.environment.get(\"transactionRequestId\"),",
+                "      'fspiop-http-method': 'PUT',",
+                "    },",
+                "    body: {",
+                "      mode: 'raw',",
+                "      raw: JSON.stringify({",
+                "        \"transactionId\": pm.environment.get(\"transactionRequestId\"),",
+                "        \"transactionRequestState\": \"REJECTED\"",
+                "      })",
+                "    }",
+                "  }, function (err, response) {",
+                "    const responseJson = response.json()",
+                "    console.log(\"transactionRequestSendStateResponseObject: \", response)",
+                "    pm.environment.set(\"transactionRequestSendStateResponse\", responseJson)",
+                "    pm.environment.set(\"transactionRequestSendStateResponseObject\", response)",
+                "  });",
+                "}, 1000)",
+                "",
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"HOST_SIMULATOR\")+\"/transactionRequests/callbacks/\"+pm.environment.get(\"transactionRequestId\"), function (err, response) {",
+                "    const responseJson = response.json()",
+                "    console.log(\"transactionRequestSendStateCallbackObject: \", response)",
+                "    pm.environment.set(\"transactionRequestSendStateCallback\", responseJson)",
+                "    pm.environment.set(\"transactionRequestSendStateCallbackObject\", response)",
+                "  });",
+                "}, 1500)"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

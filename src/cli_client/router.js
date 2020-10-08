@@ -25,15 +25,27 @@ const fs = require('fs')
 const objectStore = require('./objectStore')
 
 const cli = (commander) => {
-  const configFile = JSON.parse(fs.readFileSync(commander.config || 'cli-default-config.json', 'utf8'))
+  let configFile = {
+    mode: 'outbound',
+    reportFormat: 'json',
+    baseURL: 'http://localhost:5050'
+  }
+  if (fs.existsSync(commander.config)) {
+    configFile = JSON.parse(fs.readFileSync(commander.config, 'utf8'))
+  }
 
   const config = {
     mode: commander.mode || configFile.mode,
     inputFiles: commander.inputFiles,
     environmentFile: commander.environmentFile,
     reportFormat: commander.reportFormat || configFile.reportFormat,
-    reportFilename: commander.reportFilename,
-    baseURL: commander.baseURL || configFile.baseURL
+    reportAutoFilenameEnable: commander.reportAutoFilenameEnable === 'true' || configFile.reportAutoFilenameEnable === true,
+    reportTarget: commander.reportTarget || configFile.reportTarget,
+    slackWebhookUrl: commander.slackWebhookUrl || configFile.slackWebhookUrl,
+    slackPassedImage: configFile.slackPassedImage,
+    slackFailedImage: configFile.slackFailedImage,
+    baseURL: commander.baseUrl || configFile.baseURL,
+    extraSummaryInformation: commander.extraSummaryInformation || configFile.extraSummaryInformation
   }
 
   objectStore.set('config', config)

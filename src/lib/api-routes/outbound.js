@@ -45,7 +45,7 @@ async (req, res, next) => {
   try {
     axios({
       method: req.body.method,
-      url: Config.getUserConfig().CALLBACK_ENDPOINT + req.body.path,
+      url: req.body.url ? req.body.url : (await Config.getUserConfig(req.user)).CALLBACK_ENDPOINT + req.body.path,
       headers: req.body.headers,
       data: req.body.body,
       timeout: 3000,
@@ -53,9 +53,9 @@ async (req, res, next) => {
         return status < 900 // Reject only if the status code is greater than or equal to 900
       }
     }).then((result) => {
-      customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
+      customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user: req.user })
     }, (err) => {
-      customLogger.logMessage('info', 'Failed to send request ' + req.body.method + ' ' + req.body.path, err, false)
+      customLogger.logMessage('info', 'Failed to send request ' + req.body.method + ' ' + req.body.path, { additionalData: err, notification: false, user: req.user })
     })
     res.status(200).json({ status: 'OK' })
   } catch (err) {
@@ -76,7 +76,7 @@ router.post('/template/:traceID', [
     const traceID = req.params.traceID
     const inputJson = JSON.parse(JSON.stringify(req.body))
     // TODO: Change the following value to the dfspId based ont he login incase HOSTING_ENABLED
-    const dfspId = Config.getUserConfig().DEFAULT_USER_FSPID
+    const dfspId = req.user ? req.user.dfspId : Config.getUserConfig().DEFAULT_USER_FSPID
     outbound.OutboundSend(inputJson, traceID, dfspId)
 
     return res.status(200).json({ status: 'OK' })

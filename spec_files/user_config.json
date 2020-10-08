@@ -1,6 +1,6 @@
 {
   "VERSION": 1,
-  "CALLBACK_ENDPOINT": "http://localhost:4000",
+  "CALLBACK_ENDPOINT": "http://scheme-adapter:4000",
   "CALLBACK_RESOURCE_ENDPOINTS": {
     "enabled": false,
     "endpoints": [
@@ -20,6 +20,19 @@
         "endpoint": "http://localhost:3000"
       }
     ]
+  },
+  "HUB_ONLY_MODE": false,
+  "ENDPOINTS_DFSP_WISE": {
+    "dfsps": {
+      "userdfsp": {
+        "defaultEndpoint": "http://scheme-adapter:4000",
+        "endpoints": []
+      },
+      "userdfsp2": {
+        "defaultEndpoint": "http://scheme-adapter2:4000",
+        "endpoints": []
+      }
+    }
   },
   "SEND_CALLBACK_ENABLE": true,
   "FSPID": "testingtoolkitdfsp",

@@ -26,13 +26,12 @@ const express = require('express')
 const rulesEngineModel = require('../rulesEngineModel')
 
 const router = new express.Router()
-const { body, validationResult } = require('express-validator')
 
 // Validation Rules
 // Get all validation rules files
 router.get('/files/validation', async (req, res, next) => {
   try {
-    const result = await rulesEngineModel.getValidationRulesFiles()
+    const result = await rulesEngineModel.getValidationRulesFiles(req.user)
     res.status(200).json(result)
   } catch (err) {
     next(err)
@@ -42,9 +41,8 @@ router.get('/files/validation', async (req, res, next) => {
 // Route to get content of a validation rule file
 router.get('/files/validation/:fileName', async (req, res, next) => {
   const fileName = req.params.fileName
-
   try {
-    const result = await rulesEngineModel.getValidationRulesFileContent(fileName)
+    const result = await rulesEngineModel.getValidationRulesFileContent(fileName, req.user)
     res.status(200).json(result)
   } catch (err) {
     next(err)
@@ -52,18 +50,11 @@ router.get('/files/validation/:fileName', async (req, res, next) => {
 })
 
 // Route to edit a validation rule file
-router.put('/files/validation/:fileName', [
-  body().isArray()
-], async (req, res, next) => {
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    return res.status(422).json({ errors: errors.array() })
-  }
-
+router.put('/files/validation/:fileName', async (req, res, next) => {
   const fileName = req.params.fileName
 
   try {
-    await rulesEngineModel.setValidationRulesFileContent(fileName, req.body)
+    await rulesEngineModel.setValidationRulesFileContent(fileName, req.body, req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
@@ -75,7 +66,7 @@ router.delete('/files/validation/:fileName', async (req, res, next) => {
   const fileName = req.params.fileName
 
   try {
-    await rulesEngineModel.deleteValidationRulesFile(fileName)
+    await rulesEngineModel.deleteValidationRulesFile(fileName, req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
@@ -88,7 +79,7 @@ router.put('/files/validation', async (req, res, next) => {
   try {
     switch (reqType) {
       case 'activeRulesFile':
-        await rulesEngineModel.setActiveValidationRulesFile(req.body.fileName)
+        await rulesEngineModel.setActiveValidationRulesFile(req.body.fileName, req.user)
         res.status(200).json({ status: 'OK' })
         break
       default:
@@ -103,7 +94,7 @@ router.put('/files/validation', async (req, res, next) => {
 // Get all callback rules files
 router.get('/files/callback', async (req, res, next) => {
   try {
-    const result = await rulesEngineModel.getCallbackRulesFiles()
+    const result = await rulesEngineModel.getCallbackRulesFiles(req.user)
     res.status(200).json(result)
   } catch (err) {
     next(err)
@@ -115,7 +106,7 @@ router.get('/files/callback/:fileName', async (req, res, next) => {
   const fileName = req.params.fileName
 
   try {
-    const result = await rulesEngineModel.getCallbackRulesFileContent(fileName)
+    const result = await rulesEngineModel.getCallbackRulesFileContent(fileName, req.user)
     res.status(200).json(result)
   } catch (err) {
     next(err)
@@ -127,7 +118,7 @@ router.put('/files/callback/:fileName', async (req, res, next) => {
   const fileName = req.params.fileName
 
   try {
-    await rulesEngineModel.setCallbackRulesFileContent(fileName, req.body)
+    await rulesEngineModel.setCallbackRulesFileContent(fileName, req.body, req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
@@ -139,7 +130,7 @@ router.delete('/files/callback/:fileName', async (req, res, next) => {
   const fileName = req.params.fileName
 
   try {
-    await rulesEngineModel.deleteCallbackRulesFile(fileName)
+    await rulesEngineModel.deleteCallbackRulesFile(fileName, req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
@@ -152,7 +143,7 @@ router.put('/files/callback', async (req, res, next) => {
   try {
     switch (reqType) {
       case 'activeRulesFile':
-        await rulesEngineModel.setActiveCallbackRulesFile(req.body.fileName)
+        await rulesEngineModel.setActiveCallbackRulesFile(req.body.fileName, req.user)
         res.status(200).json({ status: 'OK' })
         break
       default:
@@ -167,7 +158,7 @@ router.put('/files/callback', async (req, res, next) => {
 // Get all response rules files
 router.get('/files/response', async (req, res, next) => {
   try {
-    const result = await rulesEngineModel.getResponseRulesFiles()
+    const result = await rulesEngineModel.getResponseRulesFiles(req.user)
     res.status(200).json(result)
   } catch (err) {
     next(err)
@@ -179,7 +170,7 @@ router.get('/files/response/:fileName', async (req, res, next) => {
   const fileName = req.params.fileName
 
   try {
-    const result = await rulesEngineModel.getResponseRulesFileContent(fileName)
+    const result = await rulesEngineModel.getResponseRulesFileContent(fileName, req.user)
     res.status(200).json(result)
   } catch (err) {
     next(err)
@@ -191,7 +182,7 @@ router.put('/files/response/:fileName', async (req, res, next) => {
   const fileName = req.params.fileName
 
   try {
-    await rulesEngineModel.setResponseRulesFileContent(fileName, req.body)
+    await rulesEngineModel.setResponseRulesFileContent(fileName, req.body, req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
@@ -203,7 +194,7 @@ router.delete('/files/response/:fileName', async (req, res, next) => {
   const fileName = req.params.fileName
 
   try {
-    await rulesEngineModel.deleteResponseRulesFile(fileName)
+    await rulesEngineModel.deleteResponseRulesFile(fileName, req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
     next(err)
@@ -216,7 +207,7 @@ router.put('/files/response', async (req, res, next) => {
   try {
     switch (reqType) {
       case 'activeRulesFile':
-        await rulesEngineModel.setActiveResponseRulesFile(req.body.fileName)
+        await rulesEngineModel.setActiveResponseRulesFile(req.body.fileName, req.user)
         res.status(200).json({ status: 'OK' })
         break
       default:
@@ -227,41 +218,67 @@ router.put('/files/response', async (req, res, next) => {
   }
 })
 
-// Old methods
-// router.get('/validation', async (req, res, next) => {
-//   try {
-//     const result = await rulesEngineModel.getValidationRules()
-//     res.status(200).json(result)
-//   } catch (err) {
-//     next(err)
-//   }
-// })
+// Forward Rules
+// Get all forward rules files
+router.get('/files/forward', async (req, res, next) => {
+  try {
+    const result = await rulesEngineModel.getForwardRulesFiles(req.user)
+    res.status(200).json(result)
+  } catch (err) {
+    next(err)
+  }
+})
 
-// router.put('/validation', async (req, res, next) => {
-//   try {
-//     await rulesEngineModel.setValidationRules(req.body)
-//     res.status(200).json({ status: 'OK' })
-//   } catch (err) {
-//     next(err)
-//   }
-// })
+// Route to get content of a forward rule file
+router.get('/files/forward/:fileName', async (req, res, next) => {
+  const fileName = req.params.fileName
+  try {
+    const result = await rulesEngineModel.getForwardRulesFileContent(fileName, req.user)
+    res.status(200).json(result)
+  } catch (err) {
+    next(err)
+  }
+})
 
-// router.get('/callback', async (req, res, next) => {
-//   try {
-//     const result = await rulesEngineModel.getCallbackRules()
-//     res.status(200).json(result)
-//   } catch (err) {
-//     next(err)
-//   }
-// })
+// Route to edit a forward rule file
+router.put('/files/forward/:fileName', async (req, res, next) => {
+  const fileName = req.params.fileName
 
-// router.put('/callback', async (req, res, next) => {
-//   try {
-//     await rulesEngineModel.setCallbackRules(req.body)
-//     res.status(200).json({ status: 'OK'})
-//   } catch (err) {
-//     next(err)
-//   }
-// })
+  try {
+    await rulesEngineModel.setForwardRulesFileContent(fileName, req.body, req.user)
+    res.status(200).json({ status: 'OK' })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Route to delete a callback rule file
+router.delete('/files/forward/:fileName', async (req, res, next) => {
+  const fileName = req.params.fileName
+
+  try {
+    await rulesEngineModel.deleteForwardRulesFile(fileName, req.user)
+    res.status(200).json({ status: 'OK' })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Route to modify configuration in forward rules
+router.put('/files/forward', async (req, res, next) => {
+  const reqType = req.body.type
+  try {
+    switch (reqType) {
+      case 'activeRulesFile':
+        await rulesEngineModel.setActiveForwardRulesFile(req.body.fileName, req.user)
+        res.status(200).json({ status: 'OK' })
+        break
+      default:
+        throw (new Error('Unknown update type'))
+    }
+  } catch (err) {
+    next(err)
+  }
+})
 
 module.exports = router

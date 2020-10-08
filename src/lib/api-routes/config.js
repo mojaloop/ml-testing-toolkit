@@ -31,8 +31,8 @@ const { check, validationResult } = require('express-validator')
 // Get runtime and stored user config
 router.get('/user', async (req, res, next) => {
   try {
-    const runtime = Config.getUserConfig()
-    const stored = await Config.getStoredUserConfig()
+    const runtime = await Config.getUserConfig(req.user)
+    const stored = await Config.getStoredUserConfig(req.user)
     res.status(200).json({ runtime, stored })
   } catch (err) {
     next(err)
@@ -48,16 +48,16 @@ router.put('/user', [
     return res.status(422).json({ errors: errors.array() })
   }
   try {
-    await Config.setStoredUserConfig(req.body)
-    const runtime = await Config.getUserConfig()
-    const stored = await Config.getStoredUserConfig()
+    await Config.setStoredUserConfig(req.body, req.user)
+    const runtime = await Config.getUserConfig(req.user)
+    const stored = await Config.getStoredUserConfig(req.user)
     let reloadServer = false
     if (runtime.INBOUND_MUTUAL_TLS_ENABLED !== stored.INBOUND_MUTUAL_TLS_ENABLED) {
       reloadServer = true
     }
-    await Config.loadUserConfig()
+    await Config.loadUserConfig(req.user)
     if (reloadServer) {
-      Server.restartServer()
+      Server.restartServer(req.user)
     }
     res.status(200).json({ status: 'OK' })
   } catch (err) {

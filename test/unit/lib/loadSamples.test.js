@@ -23,9 +23,12 @@
  ******/
 
 const Utils = require('../../../src/lib/utils')
+const fs = require('fs')
 
 const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
+const SpyFileStatAsync = jest.spyOn(Utils, 'fileStatAsync')
 const SpyReadRecursiveAsync = jest.spyOn(Utils, 'readRecursiveAsync')
+const SpyFsStatSync = jest.spyOn(fs, 'statSync')
 
 
 const loadSamples = require('../../../src/lib/loadSamples')
@@ -93,6 +96,70 @@ describe('loadSamples', () => {
       })
     })
   })
+  describe('getSampleWithFolderWise should not throw an error when', () => {
+    it('sample should be loaded with required data', async () => {
+      const queryParams = {
+        collections: ['collection-1.json', 'collection-2.json'],
+        environment: 'environment.json'
+      }
+      SpyReadFileAsync
+        .mockResolvedValueOnce(JSON.stringify({
+            name: queryParams.collections[0],
+            test_cases: [{id: 1}]
+        }))
+        .mockResolvedValueOnce(JSON.stringify({
+            name: queryParams.collections[1],
+            test_cases: [{id: 1}]
+        }))
+        .mockResolvedValueOnce(JSON.stringify({inputValues: {}}))
+
+      SpyFileStatAsync
+        .mockResolvedValueOnce({
+          size: 123,
+          mtime: 'asdf'
+        })
+        .mockResolvedValueOnce({
+          size: 123,
+          mtime: 'asdf'
+        })
+        .mockResolvedValueOnce({
+          size: 123,
+          mtime: 'asdf'
+        })
+      const sample = await loadSamples.getSampleWithFolderWise(queryParams)  
+      expect(sample).toHaveProperty('collections')
+      expect(sample).toHaveProperty('environment')
+      expect(sample.collections.length).toEqual(2)
+      expect(sample.collections[0]).toHaveProperty('name')
+      expect(sample.collections[0]).toHaveProperty('path')
+      expect(sample.collections[0]).toHaveProperty('size')
+      expect(sample.collections[0]).toHaveProperty('content')
+      expect(sample.collections[0].content).toStrictEqual({
+        name: queryParams.collections[0],
+        test_cases: [{id: 1}]
+      })
+      expect(sample.collections[0].size).toEqual(123)
+
+    })
+    it('sample name should be null if there is are no collections', async () => {
+      const queryParams = {
+        collections: []
+      }
+      const sample = await loadSamples.getSampleWithFolderWise(queryParams)
+      expect(sample).toHaveProperty('collections')
+      expect(sample).toHaveProperty('environment')
+      expect(sample.collections.length).toEqual(0)
+    })
+    it('sample name should be null if collections is null', async () => {
+      const queryParams = {
+        collections: null
+      }
+      const sample = await loadSamples.getSampleWithFolderWise(queryParams)
+      expect(sample).toHaveProperty('collections')
+      expect(sample).toHaveProperty('environment')
+      expect(sample.collections.length).toEqual(0)
+    })
+  })
   describe('getCollectionsOrEnvironments should not throw an error when', () => {
     it('sample name should be \'multi\' if there is more than one collection', async () => {
       SpyReadRecursiveAsync
@@ -109,6 +176,32 @@ describe('loadSamples', () => {
         ])
       const collectionsOrEnvironments = await loadSamples.getCollectionsOrEnvironments('exampleType')
       expect(collectionsOrEnvironments).toStrictEqual([ 'sample.json' ]);
+    })
+  })
+  describe('getCollectionsOrEnvironmentsWithFileSize should not throw an error when', () => {
+    it('sample name should be \'multi\' if there is more than one collection', async () => {
+      SpyReadRecursiveAsync
+        .mockResolvedValueOnce([
+          "sample.json", "sampleFolder"
+        ])
+      SpyFsStatSync.mockReturnValueOnce({ size: 100 })
+      const collectionsOrEnvironments = await loadSamples.getCollectionsOrEnvironmentsWithFileSize('exampleType', 'type')
+      expect(collectionsOrEnvironments[0]).toHaveProperty('name')
+      expect(collectionsOrEnvironments[0]).toHaveProperty('size')
+      expect(collectionsOrEnvironments[0].name).toBe('sample.json')
+      expect(collectionsOrEnvironments[0].size).toBe(100)
+    })
+    it('should not throw an error when type is not provided', async () => {
+      SpyReadRecursiveAsync
+        .mockResolvedValueOnce([
+          "sample.json", "sampleFolder"
+        ])
+      SpyFsStatSync.mockReturnValueOnce({ size: 100 })
+      const collectionsOrEnvironments = await loadSamples.getCollectionsOrEnvironmentsWithFileSize('exampleType')
+      expect(collectionsOrEnvironments[0]).toHaveProperty('name')
+      expect(collectionsOrEnvironments[0]).toHaveProperty('size')
+      expect(collectionsOrEnvironments[0].name).toBe('sample.json')
+      expect(collectionsOrEnvironments[0].size).toBe(100)
     })
   })
 })

@@ -1,11 +1,15 @@
 {
   "API_PORT": 5000,
-  "HOSTING_ENABLED": true,
+  "HOSTING_ENABLED": false,
   "CONFIG_VERSIONS": {
     "response": 1,
     "callback": 1,
     "validation": 1,
+    "forward": 1,
     "userSettings": 1
+  },
+  "DB": {
+    "URI": "mongodb://mojaloop-testing-toolkit-db:27017/dfsps"
   },
   "OAUTH": {
     "AUTH_ENABLED": false,
@@ -14,11 +18,9 @@
     "MTA_ROLE": "Application/MTA",
     "PTA_ROLE": "Application/PTA",
     "EVERYONE_ROLE": "Internal/everyone",
-    "OAUTH2_ISSUER": "http://172.17.0.1:5050/api/oauth2/token",
-    "CERTIFICATE_FILE_NAME": "resources/wso2carbon-publickey.cert",
+    "OAUTH2_ISSUER": "http://mojaloop-testing-toolkit:5050/api/oauth2/token",
     "JWT_COOKIE_NAME": "TTK-API_ACCESS_TOKEN",
-    "EMBEDDED_CERTIFICATE": "password",
-    "ORIGIN": "http://localhost:3000"
+    "EMBEDDED_CERTIFICATE": "password"
   },
   "API_DEFINITIONS": [
     {
@@ -42,6 +44,11 @@
       "type": "central_admin",
       "version": "9.3",
       "folderPath": "central_admin_9.3"
+    },
+    {
+      "type": "als_admin",
+      "version": "1.1",
+      "folderPath": "als_admin_1.1"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "name": "ml-testing-toolkit",
   "description": "Testing Toolkit for Mojaloop implementations",
-  "version": "10.6.2",
+  "version": "11.2.3",
   "license": "Apache-2.0",
   "author": "Vijaya Kumar Guthi, ModusBox Inc.",
   "contributors": [
@@ -50,7 +50,8 @@
     "audit:check": "SHELL=sh check-audit",
     "dep:check": "npx ncu -e 2",
     "dep:update": "npx ncu -u",
-    "genexec": "pkg -t node8-win ."
+    "genexec": "pkg -t node8-win .",
+    "cli": "node src/cli_client/client.js"
   },
   "dependencies": {
     "@hapi/basic": "5.1.1",
@@ -61,9 +62,11 @@
     "@hapi/vision": "5.5.4",
     "@mojaloop/sdk-standard-components": "10.2.0",
     "@now-ims/hapi-now-auth": "2.0.0",
+    "@slack/webhook": "^5.0.3",
     "@types/socket.io": "^2.1.4",
     "adm-zip": "^0.4.14",
     "atob": "2.1.2",
+    "aws-sdk": "^2.751.0",
     "axios": "^0.19.2",
     "blipp": "4.0.1",
     "bunyan": "^1.8.12",
@@ -73,6 +76,7 @@
     "commander": "4.0.0",
     "cookie-parser": "^1.4.5",
     "cookies": "0.8.0",
+    "cors": "^2.8.5",
     "docdash": "1.1.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -92,11 +96,12 @@
     "jsreport-core": "2.7.2",
     "jsreport-handlebars": "2.1.0",
     "lodash": "^4.17.15",
+    "mongoose": "5.10.0",
     "mustache": "3.1.0",
     "node-dir": "0.1.17",
     "node-strings": "^1.0.2",
     "npm-run-all": "4.1.5",
-    "openapi-backend": "3.5.1",
+    "openapi-backend": "3.5.2",
     "parse-strings-in-object": "1.2.0",
     "passport": "0.4.1",
     "passport-jwt": "4.0.0",
@@ -104,13 +109,15 @@
     "postman-collection": "3.6.1",
     "postman-sandbox": "3.5.3",
     "rc": "1.2.8",
+    "request": "^2.88.2",
     "request-promise-native": "1.0.8",
     "request-to-curl": "^0.1.6",
     "selectn": "^1.1.2",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
     "uuid": "8.1.0",
-    "uuid4": "1.1.4"
+    "uuid4": "1.1.4",
+    "ml-testing-toolkit-shared-lib": "11.0.0"
   },
   "devDependencies": {
     "@types/jest": "24.0.22",

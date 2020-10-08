@@ -18,6 +18,7 @@
  * Gates Foundation
 
  * ModusBox
+ * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
@@ -34,7 +35,7 @@ const _ = require('lodash')
 const MyEventEmitter = require('../MyEventEmitter')
 const utils = require('../utils')
 const Config = require('../config')
-const assertionStore = require('../assertionStore')
+const objectStore = require('../objectStore')
 const JwsSigning = require('../jws/JwsSigning')
 
 var path = require('path')
@@ -51,7 +52,7 @@ var apis = []
  */
 module.exports.initilizeMockHandler = async () => {
   // Initialize ILP
-  IlpModel.init(Config.getUserConfig().ILP_SECRET)
+  IlpModel.init((await Config.getUserConfig()).ILP_SECRET)
   // Get API Definitions from configuration
   const apiDefinitions = await OpenApiDefinitionsModel.getApiDefinitions()
   // Create create openApiBackend objects for all the api definitions
@@ -80,7 +81,7 @@ module.exports.initilizeMockHandler = async () => {
           return h.response(errorResponseBuilder('3100', context.validation.errors[0].message, { extensionList })).code(400)
         },
         notFound: async (context, req, h) => {
-          customLogger.logMessage('error', 'Resource not found', null, true, req)
+          customLogger.logMessage('error', 'Resource not found', { request: req })
           return h.response({ error: 'Not Found' }).code(404)
         }
       }
@@ -93,7 +94,7 @@ module.exports.initilizeMockHandler = async () => {
   })
 
   for (const api of apis) {
-    customLogger.logMessage('info', 'Initializing the api spec file: ' + api.specFile, null, false)
+    customLogger.logMessage('info', 'Initializing the api spec file: ' + api.specFile, { notification: false })
     await api.openApiBackendObject.init()
   }
 }
@@ -103,11 +104,11 @@ module.exports.handleRequest = async (req, h) => {
   try {
     const jwsValidated = await JwsSigning.validate(req)
     if (jwsValidated) {
-      customLogger.logMessage('debug', 'JWS Signature Validated', null, true, req)
+      customLogger.logMessage('debug', 'JWS Signature Validated', { request: req })
     }
   } catch (err) {
     // TODO: The errorCode should be checked with the api specification
-    customLogger.logMessage('error', 'JWS validation failed', err.message, true, req)
+    customLogger.logMessage('error', 'JWS validation failed', { additionalData: err.message, request: req })
     return h.response(errorResponseBuilder('3105', 'Invalid signature')).code(400)
   }
 
@@ -117,10 +118,10 @@ module.exports.handleRequest = async (req, h) => {
 
   selectedVersion = pickApiByMethodAndPath(req)
   if (selectedVersion === -1) {
-    customLogger.logMessage('error', 'Resource not found', null, true, req)
+    customLogger.logMessage('error', 'Resource not found', { request: req })
     return h.response({ error: 'Not Found' }).code(404)
   }
-  if (apis[selectedVersion].type === 'fspiop' && Config.getUserConfig().VERSIONING_SUPPORT_ENABLE) {
+  if (apis[selectedVersion].type === 'fspiop' && (await Config.getUserConfig(req.customInfo.user)).VERSIONING_SUPPORT_ENABLE) {
     const fspiopApis = apis.filter(item => {
       return item.type === 'fspiop'
     })
@@ -187,18 +188,21 @@ module.exports.getOpenApiObjects = () => {
 }
 
 const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
-  customLogger.logMessage('debug', 'Schema Validation Passed', null, true, req)
+  customLogger.logMessage('debug', 'Schema Validation Passed', { request: req })
   if (req.method === 'put') {
-    MyEventEmitter.getEmitter('testOutbound').emit(req.method + ' ' + req.path, req.headers, req.payload)
+    MyEventEmitter.getEmitter('testOutbound', req.customInfo.user).emit(req.method + ' ' + req.path, req.headers, req.payload)
     let assertionPath = req.path
     const assertionData = { headers: req.headers, body: req.payload }
     if (assertionPath.endsWith('/error')) {
       assertionPath = assertionPath.replace('/error', '')
       assertionData.error = true
     }
-    assertionStore.pushRequest(assertionPath, assertionData)
-    MyEventEmitter.getEmitter('assertionRequest').emit(assertionPath, assertionData)
+    objectStore.push('requests', assertionPath, assertionData)
+    MyEventEmitter.getEmitter('assertionRequest', req.customInfo.user).emit(assertionPath, assertionData)
   }
+  // Store all the inbound requests
+  objectStore.push('requestsHistory', req.method + ' ' + req.path, { headers: req.headers, body: req.payload })
+
   req.customInfo.specFile = item.specFile
   req.customInfo.jsfRefFile = item.jsfRefFile
   let responseBody, responseStatus
@@ -210,7 +214,7 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
       const responseInfo = responseMap[context.operation.path][context.request.method]
       req.customInfo.responseInfo = responseInfo
     } else {
-      customLogger.logMessage('error', 'Response info not found for method in response map file for ' + context.operation.path + context.request.method, null, true, req)
+      customLogger.logMessage('error', 'Response info not found for method in response map file for ' + context.operation.path + context.request.method, { request: req })
       return
     }
   } catch (err) { }
@@ -218,7 +222,7 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
   const generatedResponse = await OpenApiRulesEngine.responseRules(context, req)
   responseStatus = +generatedResponse.status
   responseBody = generatedResponse.body
-  customLogger.logMessage('info', 'Generated response', generatedResponse, true, req)
+  customLogger.logMessage('info', 'Generated response', { additionalData: generatedResponse, request: req })
   if (generatedResponse.delay) {
     await new Promise(resolve => setTimeout(resolve, generatedResponse.delay))
   }
@@ -228,8 +232,8 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
     responseBody = mock
     responseStatus = +status
   }
-  // Verify that it is a success code, then generate callback and only if the method is post or get
-  if ((req.method === 'post' || req.method === 'get') && responseStatus >= 200 && responseStatus <= 299) {
+  // Verify that it is a success code, then generate callback
+  if ((req.method === 'post' || req.method === 'get' || req.method === 'put') && responseStatus >= 200 && responseStatus <= 299) {
     // Generate callback asynchronously
     setImmediate(generateAsyncCallback, item, context, req)
   }
@@ -241,40 +245,53 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
 }
 
 const generateAsyncCallback = async (item, context, req) => {
-  // Getting callback info from callback map file
-  try {
-    const cbMapRawdata = await utils.readFileAsync(item.callbackMapFile)
-    const callbackMap = JSON.parse(cbMapRawdata)
-    if (!callbackMap[context.operation.path]) {
-      customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, null, true, req)
+  const userConfig = await Config.getUserConfig(req.customInfo.user)
+  if (req.method === 'put') {
+    if (!userConfig.HUB_ONLY_MODE) {
       return
     }
-    const callbackInfo = callbackMap[context.operation.path][context.request.method]
-    if (!callbackInfo) {
-      customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method, null, true, req)
+  } else {
+    // Getting callback info from callback map file
+    try {
+      const cbMapRawdata = await utils.readFileAsync(item.callbackMapFile)
+      const callbackMap = JSON.parse(cbMapRawdata)
+      if (!callbackMap[context.operation.path]) {
+        customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, req.customInfo.user, { request: req })
+        return
+      }
+      const callbackInfo = callbackMap[context.operation.path][context.request.method]
+      if (!callbackInfo) {
+        customLogger.logMessage('error', 'Callback info not found for method in callback map file for ' + context.operation.path + context.request.method, { request: req })
+        return
+      }
+      req.customInfo.callbackInfo = callbackInfo
+    } catch (err) {
+      customLogger.logMessage('error', 'Callback file not found.', { request: req })
       return
     }
-    req.customInfo.callbackInfo = callbackInfo
-  } catch (err) {
-    customLogger.logMessage('error', 'Callback file not found.', null, true, req)
-    return
-  }
-  // Additional validation based on the Json Rules Engine, send error callback on failure
-  const generatedErrorCallback = await OpenApiRulesEngine.validateRules(context, req)
-  if (generatedErrorCallback.body) {
-    // TODO: Handle method and path verifications against the generated ones
-    customLogger.logMessage('error', 'Sending error callback', null, true, req)
-    CallbackHandler.handleCallback(generatedErrorCallback, context, req)
-    return
+    // Additional validation based on the Json Rules Engine, send error callback on failure
+    const generatedErrorCallback = await OpenApiRulesEngine.validateRules(context, req)
+    if (generatedErrorCallback.body) {
+      // TODO: Handle method and path verifications against the generated ones
+      customLogger.logMessage('error', 'Sending error callback', { request: req })
+      CallbackHandler.handleCallback(generatedErrorCallback, context, req)
+      return
+    }
   }
 
-  const userConfig = Config.getUserConfig()
-
+  // forward request after validation
+  if (userConfig.HUB_ONLY_MODE) {
+    const forwardRequest = await OpenApiRulesEngine.forwardRules(context, req)
+    if (forwardRequest) {
+      CallbackHandler.handleCallback(forwardRequest, context, req)
+    }
+    return
+  }
   // Handle quotes and transfer association - should do this first to get the associated quote
   if (userConfig.TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
     const matchFound = require('./middleware-functions/quotesAssociation').handleTransfers(context, req)
     if (!matchFound) {
-      customLogger.logMessage('error', 'Matching Quote Not Found', null, true, req)
+      customLogger.logMessage('error', 'Matching Quote Not Found', { request: req })
       const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
       generatedErrorCallback.body = {
         errorInformation: {
@@ -291,7 +308,7 @@ const generateAsyncCallback = async (item, context, req) => {
   if (userConfig.TRANSFERS_VALIDATION_ILP_PACKET) {
     const validated = IlpModel.validateTransferIlpPacket(context, req)
     if (!validated) {
-      customLogger.logMessage('error', 'ILP Packet is not matching with the content', null, true, req)
+      customLogger.logMessage('error', 'ILP Packet is not matching with the content', { request: req })
       const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
       generatedErrorCallback.body = {
         errorInformation: {
@@ -308,7 +325,7 @@ const generateAsyncCallback = async (item, context, req) => {
   if (userConfig.TRANSFERS_VALIDATION_CONDITION) {
     const validated = IlpModel.validateTransferCondition(context, req)
     if (!validated) {
-      customLogger.logMessage('error', 'Condition can not be validated', null, true, req)
+      customLogger.logMessage('error', 'Condition can not be validated', { request: req })
       const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
       generatedErrorCallback.body = {
         errorInformation: {

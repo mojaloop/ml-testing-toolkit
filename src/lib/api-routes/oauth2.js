@@ -26,6 +26,7 @@
 const express = require('express')
 const router = new express.Router()
 const jwt = require('jsonwebtoken')
+const { verifyUser } = require('../api-server')
 const Config = require('../config')
 const LoginService = require('../oauth/LoginService')
 
@@ -38,7 +39,7 @@ router.post('/login', async (req, res, next) => {
   }
 })
 
-router.get('/logout', async (req, res, next) => {
+router.get('/logout', verifyUser(), async (req, res, next) => {
   try {
     await LoginService.logoutUser(req, res)
     res.status(200).json({ message: 'logout successful' })
@@ -60,9 +61,8 @@ router.post('/token', async (req, res, next) => {
       'Internal/everyone'
     ]
     const systemConfig = Config.getSystemConfig()
-    const userConfig = Config.getUserConfig()
+    const userConfig = await Config.getUserConfig(plainIdToken)
     if (req.body.username === userConfig.CONNECTION_MANAGER_HUB_USERNAME) {
-      plainIdToken.dfspId = req.body.username
       groupsData = [
         'Application/PTA',
         'Internal/everyone'
@@ -74,11 +74,12 @@ router.post('/token', async (req, res, next) => {
       if (!dfspValid) {
         throw (new Error('Invalid DFSP ID'))
       }
-      plainIdToken.dfspId = req.body.username
     }
+    const expiresIn = 3600
+    const iat = Date.now() / 1000
     const plainAccessToken = {
-      expires_in: 3600,
-      iat: Date.now() / 1000,
+      exp: iat + expiresIn,
+      iat: iat,
       aud: systemConfig.OAUTH.APP_OAUTH_CLIENT_KEY,
       sub: plainIdToken.username,
       iss: systemConfig.OAUTH.OAUTH2_ISSUER,
@@ -87,6 +88,7 @@ router.post('/token', async (req, res, next) => {
       userguid: plainIdToken.userguid
     }
     res.status(200).json({
+      expires_in: expiresIn,
       access_token: jwt.sign(plainAccessToken, systemConfig.OAUTH.EMBEDDED_CERTIFICATE),
       id_token: jwt.sign(plainIdToken, systemConfig.OAUTH.EMBEDDED_CERTIFICATE)
     })

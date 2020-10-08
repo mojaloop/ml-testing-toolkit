@@ -53,6 +53,8 @@ docker-compose build
 docker-compose up
 ```
 
+You should get the web interface on http://localhost:6060
+
 ## 2 Settings
 
 Setup database

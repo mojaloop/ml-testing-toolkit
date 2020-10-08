@@ -29,7 +29,7 @@ const handleQuotes = (context, request, fulfilment = null) => {
   // Check whether the request is POST /quotes
   if (request.method === 'post' && request.path === '/quotes') {
     // Save the Transaction ID in object store
-    ObjectStore.saveTransaction(request.payload.transactionId, fulfilment)
+    ObjectStore.push('transactions', request.payload.transactionId, { fulfilment })
   }
 }
 
@@ -42,12 +42,10 @@ const handleTransfers = (context, request) => {
     } catch (err) {
       return false
     }
-    // Search for the Transaction ID in object store
-    if (ObjectStore.searchTransaction(ilpTransactionObject.transactionId)) {
-      const storedTransaction = ObjectStore.getTransaction(ilpTransactionObject.transactionId)
+    // Search for the Transaction ID in object store - delete it if found
+    const storedTransaction = ObjectStore.popObject('transactions', ilpTransactionObject.transactionId)
+    if (storedTransaction) {
       request.customInfo.storedTransaction = storedTransaction
-      // Transaction Found, delete it in objectStore
-      ObjectStore.deleteTransaction(ilpTransactionObject.transactionId)
     } else {
       // Transaction not found, throw error callback
       return false
