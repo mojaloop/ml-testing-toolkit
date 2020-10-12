@@ -53,6 +53,9 @@ describe('API route /api/oauth2', () => {
       HOSTING_ENABLED: false,
       OAUTH: {
         EMBEDDED_CERTIFICATE: "password"
+      },
+      KEYCLOAK: {
+        ENABLED: false
       }
     })
   })

@@ -1,4 +1,8 @@
 const Config = require('../config')
+const querystring = require('querystring')
+const axios = require('axios').default
+const objectStore = require('../objectStore/objectStoreInterface')
+const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
 
 const tempDfspList = [
   {
@@ -16,26 +20,81 @@ const tempDfspList = [
 ]
 
 const getDFSPList = async () => {
-  const userConfig = await Config.getUserConfig()
-  if (Config.getSystemConfig().HOSTING_ENABLED) {
-    return tempDfspList
+  const userConfig = await Config.getUserConfig({
+    dfspId: DEFAULT_TESTING_TOOLKIT_FSPID
+  })
+  const systemConfig = Config.getSystemConfig()
+  let users = []
+  if (systemConfig.HOSTING_ENABLED) {
+    if (systemConfig.KEYCLOAK.ENABLED) {
+      const keycloakToken = await keycloakAuth()
+      users = await getKeyCloakUsers(keycloakToken)
+    } else {
+      users = tempDfspList
+    }
   } else if (userConfig.HUB_ONLY_MODE) {
     const dfsps = Object.keys(userConfig.ENDPOINTS_DFSP_WISE.dfsps || {})
     if (dfsps.length > 0) {
-      const dfspsList = []
       dfsps.forEach(dfspId => {
-        dfspsList.push({
+        users.push({
           id: dfspId,
           name: dfspId
         })
       })
-      return dfspsList
     }
   }
-  return [{
-    id: userConfig.DEFAULT_USER_FSPID,
-    name: 'User DFSP'
-  }]
+  if (users.length === 0) {
+    users.push({
+      id: userConfig.DEFAULT_USER_FSPID,
+      name: 'User DFSP'
+    })
+  }
+  return users
+}
+
+const getKeyCloakUsers = async (keycloakToken) => {
+  const systemConfig = Config.getSystemConfig()
+  const getUsersResp = await axios.get(systemConfig.KEYCLOAK.API_URL + `/auth/admin/realms/${systemConfig.KEYCLOAK.REALM}/users`, { headers: { Authorization: `Bearer ${keycloakToken.accessToken}` } })
+  if (getUsersResp.status === 200) {
+    const users = []
+    getUsersResp.data.map(user => {
+      if (user.username !== systemConfig.KEYCLOAK.USERNAME) {
+        users.push({
+          id: user.username,
+          name: `${user.firstName} ${user.lastName}`
+        })
+      }
+    })
+    return users
+  } else {
+    throw new Error(`Some error while getting users from as ${systemConfig.KEYCLOAK.USERNAME}`)
+  }
+}
+
+const keycloakAuth = async () => {
+  let keycloakToken = await objectStore.get('KEYCLOAK_TOKEN')
+  // if token not set or expires in 1 min, then generate a new one
+  if (Object.keys(keycloakToken).length === 0 || Date.now() >= (keycloakToken.expiresAt - (60 * 1000))) {
+    const systemConfig = Config.getSystemConfig()
+    const loginFormData = {
+      grant_type: 'password',
+      client_id: systemConfig.OAUTH.APP_OAUTH_CLIENT_KEY,
+      client_secret: systemConfig.OAUTH.APP_OAUTH_CLIENT_SECRET,
+      username: systemConfig.KEYCLOAK.USERNAME,
+      password: systemConfig.KEYCLOAK.PASSWORD
+    }
+    const loginResp = await axios.post(systemConfig.OAUTH.OAUTH2_ISSUER, querystring.stringify(loginFormData), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
+    if (loginResp.status === 200) {
+      await objectStore.set('KEYCLOAK_TOKEN', {
+        accessToken: loginResp.data.access_token,
+        expiresAt: Date.now() + (loginResp.data.expires_in * 1000)
+      })
+      keycloakToken = await objectStore.get('KEYCLOAK_TOKEN')
+    } else {
+      throw new Error(`Some error while login to the Keycloak as ${systemConfig.KEYCLOAK.USERNAME}`)
+    }
+  }
+  return keycloakToken
 }
 
 const checkDFSP = async (dfspId) => {
@@ -49,5 +108,7 @@ const checkDFSP = async (dfspId) => {
 
 module.exports = {
   getDFSPList,
-  checkDFSP
+  checkDFSP,
+  getKeyCloakUsers,
+  keycloakAuth
 }

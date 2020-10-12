@@ -29,7 +29,8 @@ const fileAdapter = require('./fileAdapter')
 
 const read = async (id, user) => {
   let document
-  if (user) {
+  const Config = require('./config')
+  if (user && Config.getSystemConfig().HOSTING_ENABLED) {
     if (id.endsWith('/')) {
       document = { data: await find(id, user) }
     } else {
@@ -55,7 +56,8 @@ const read = async (id, user) => {
 }
 
 const upsert = async (id, data, user) => {
-  if (user) {
+  const Config = require('./config')
+  if (user && Config.getSystemConfig().HOSTING_ENABLED) {
     await dbAdapter.upsert(id, data, user)
   } else {
     await fileAdapter.upsert(id, data)
@@ -63,7 +65,8 @@ const upsert = async (id, data, user) => {
 }
 
 const remove = async (id, user) => {
-  if (user) {
+  const Config = require('./config')
+  if (user && Config.getSystemConfig().HOSTING_ENABLED) {
     await dbAdapter.remove(id, user)
   } else {
     await fileAdapter.remove(id)
@@ -72,7 +75,8 @@ const remove = async (id, user) => {
 
 const find = async (id, user) => {
   let files
-  if (user) {
+  const Config = require('./config')
+  if (user && Config.getSystemConfig().HOSTING_ENABLED) {
     files = await dbAdapter.find(id, user)
     if (files.length === 0) {
       files = await fileAdapter.readDir(id)
