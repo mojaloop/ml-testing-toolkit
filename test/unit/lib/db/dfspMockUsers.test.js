@@ -25,18 +25,19 @@
 
 const dfspMockUsers = require('../../../../src/lib/db/dfspMockUsers')
 const Config = require('../../../../src/lib/config')
+const axios = require('axios').default
+
 jest.mock('../../../../src/lib/config')
+jest.mock('axios')
 
 describe('dfspMockUsers', () => {
   describe('getDFSPList', () => {
     it('should return temp dfsp list if hosting enabled', async () => {
       Config.getSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: true
-      })
-      Config.getUserConfig.mockReturnValue({
-        JWS_SIGN: true,
-        VALIDATE_INBOUND_JWS: true,
-        DEFAULT_USER_FSPID: 'userdfsp'
+        HOSTING_ENABLED: true,
+        KEYCLOAK: {
+          ENABLED: false
+        }
       })
       const dfspList = await dfspMockUsers.getDFSPList()
       expect(Array.isArray(dfspList)).toBeTruthy()
@@ -70,7 +71,10 @@ describe('dfspMockUsers', () => {
     })
     it('should return userdfsp if hosting disabled and hub only mode disabled', async () => {
       Config.getSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: false
+        HOSTING_ENABLED: false,
+        KEYCLOAK: {
+          ENABLED: false
+        }
       })
       Config.getUserConfig.mockReturnValue({
         HUB_ONLY_MODE: false,
@@ -83,7 +87,10 @@ describe('dfspMockUsers', () => {
   describe('checkDFSP', () => {
     it('should return true if dfsp exists', async () => {
       Config.getSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: true
+        HOSTING_ENABLED: true,
+        KEYCLOAK: {
+          ENABLED: false
+        }
       })
       const dfspList = await dfspMockUsers.getDFSPList()
       const check = await dfspMockUsers.checkDFSP(dfspList[0].id)

@@ -24,7 +24,11 @@
  ******/
 
 const storageAdapter = require('../../../src/lib/storageAdapter')
-
+const Config = require('../../../src/lib/config')
+jest.mock('../../../src/lib/config')
+Config.getSystemConfig.mockReturnValue({
+  HOSTING_ENABLED: true
+})
 jest.mock('../../../src/lib/db/adapters/dbAdapter', () => {
   return {
     read: (id) => {

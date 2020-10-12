@@ -31,12 +31,14 @@ const webhook = {
 IncomingWebhook.mockImplementationOnce(() => {
   return webhook
 })
+const SpySlackSend = jest.spyOn(webhook, 'send')
 
 const objectStore = require('../../../../src/cli_client/objectStore')
 jest.mock('../../../../src/cli_client/objectStore')
 const config = {
   slackPassedImage: 'asdf',
-  slackFailedImage: 'asdf'
+  slackFailedImage: 'asdf',
+  extraSummaryInformation: "info1:value1,info2:value2"
 }
 objectStore.get.mockReturnValue(config)
 
@@ -52,14 +54,12 @@ describe('Cli client', () => {
   describe('sendSlackNotification', () => {
     it('When slackWebhookUrl config is null, it should do nothing', async () => {
       config.slackWebhookUrl = null
-      const SpySlackSend = jest.spyOn(webhook, 'send')
-      SpySlackSend.mockImplementationOnce(async () => null)
+      SpySlackSend.mockResolvedValueOnce(null)
       await expect(slackBroadCast.sendSlackNotification(sampleProgress)).resolves.toBe(undefined)
     })
     it('When slackWebhookUrl config is set, it should call slack send function', async () => {
       config.slackWebhookUrl = 'http://some_url'
-      const SpySlackSend = jest.spyOn(webhook, 'send')
-      SpySlackSend.mockImplementationOnce(async () => null)
+      SpySlackSend.mockResolvedValueOnce(null)
       await expect(slackBroadCast.sendSlackNotification(sampleProgress)).resolves.toBe(undefined)
       expect(SpySlackSend).toHaveBeenCalledWith(expect.objectContaining({
         text: expect.any(String),
@@ -68,8 +68,7 @@ describe('Cli client', () => {
     })
     it('When reportURL is set, it should call slack send function', async () => {
       config.slackWebhookUrl = 'http://some_url'
-      const SpySlackSend = jest.spyOn(webhook, 'send')
-      SpySlackSend.mockImplementationOnce(async () => null)
+      SpySlackSend.mockResolvedValueOnce(null)
       await expect(slackBroadCast.sendSlackNotification(sampleProgress, sampleReportURL)).resolves.toBe(undefined)
       expect(SpySlackSend).toHaveBeenCalledWith(expect.objectContaining({
         text: expect.any(String),
@@ -92,8 +91,7 @@ describe('Cli client', () => {
           ]
         }
       ]
-      const SpySlackSend = jest.spyOn(webhook, 'send')
-      SpySlackSend.mockImplementationOnce(async () => null)
+      SpySlackSend.mockResolvedValueOnce(null)
       await expect(slackBroadCast.sendSlackNotification(sampleProgress)).resolves.toBe(undefined)
       expect(SpySlackSend).toHaveBeenCalledWith(expect.objectContaining({
         text: expect.any(String),
@@ -116,8 +114,7 @@ describe('Cli client', () => {
           ]
         }
       ]
-      const SpySlackSend = jest.spyOn(webhook, 'send')
-      SpySlackSend.mockImplementationOnce(async () => null)
+      SpySlackSend.mockResolvedValueOnce(null)
       await expect(slackBroadCast.sendSlackNotification(sampleProgress)).resolves.toBe(undefined)
       expect(SpySlackSend).toHaveBeenCalledWith(expect.objectContaining({
         text: expect.any(String),
