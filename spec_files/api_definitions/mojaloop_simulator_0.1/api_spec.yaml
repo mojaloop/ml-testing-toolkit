@@ -1,0 +1,225 @@
+openapi: 3.0.0
+info:
+  version: '0.1'
+  title: Mojaloop simulator Test API
+  description: Control the simulator
+  license:
+    name: UNLICENSED
+paths:
+  /scenarios:
+    post:
+      description: Send test scenarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Scenario'
+      responses:
+        '200':
+          description: The test was successful
+        '400':
+          description: Test file is has errors
+        '500':
+          description: An error occured processing the request
+  /repository/parties:
+    post:
+      description: Create a party
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Party'
+      responses:
+        '204':
+          description: The party was created
+        '400':
+          description: The request was malformed
+        '500':
+          description: An error occured processing the request
+    get:
+      description: Get an existing party
+      responses:
+        '200':
+          description: Party data is returned
+  /repository/parties/{idType}/{idValue}:
+    put:
+      description: Modifies a party
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Party'
+      responses:
+        '204':
+          description: Party was created
+        '400':
+          description: The request was malformed
+        '500':
+          description: An error occured processing the request
+      parameters:
+        - name: idType
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idType'
+        - name: idValue
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idValue'
+    get:
+      description: Get an existing party
+      responses:
+        '200':
+          description: Party data is returned
+    delete:
+      description: Deletes a party
+      responses:
+        '204':
+          description: The party was created
+        '500':
+          description: An error occured processing the request
+      parameters:
+        - name: idType
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idType'
+        - name: idValue
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idValue'
+
+components:
+  schemas:
+    Scenario:
+      title: Scenario
+      type: object
+      description: An outbound transfer, bulk transfer or bulk quote scenario
+      required:
+        - name
+        - operation
+        - body
+      properties:
+        name:
+          type: string
+        operation:
+          $ref: '#/components/schemas/ScenarioOperation'
+        body:
+          type: object
+          description: >-
+            This object should be either a POST /transfers, PUT /transfers, POST /bulkTransfers or POST /bulkQuotes
+            request body as per the SDK outbound API specification
+        params:
+          $ref: '#/components/schemas/ScenarioOperationParameters'
+    ScenarioOperation:
+      title: Scenario Operation
+      type: string
+      description: The operation to perform as part of a scenario
+      enum:
+        - postTransfers
+        - putTransfers
+        - postBulkTransfers
+        - postBulkQuotes
+    ScenarioOperationParameters:
+      description: Parameters to pass into the scenario operation
+      type: object
+      oneOf:
+        - properties:
+            transferId:
+              type: string
+              description: >-
+                Transfer ID e.g. in the case of putTransfers operation this is the
+                ID of the transfer to complete
+          required:
+            - transferId
+        - properties:
+            bulkTransferId:
+              type: string
+              description: Bulk transfer ID
+          required:
+            - bulkTransferId
+        - properties:
+            bulkQuoteId:
+              type: string
+              description: Bulk quote ID
+          required:
+            - bulkQuoteId
+    Party:
+      title: Party
+      type: object
+      description: A party
+      required:
+        - displayName
+        - firstName
+        - middleName
+        - lastName
+        - dateOfBirth
+        - idType
+        - idValue
+      properties:
+        displayName:
+          type: string
+        firstName:
+          type: string
+        middleName:
+          type: string
+        lastName:
+          type: string
+        dateOfBirth:
+          type: string
+        idType:
+          type: string
+          enum:
+            - MSISDN
+            - EMAIL
+            - PERSONAL_ID
+            - BUSINESS
+            - DEVICE
+            - ACCOUNT_ID
+            - IBAN
+            - ALIAS
+        idValue:
+          type: string
+          minLength: 1
+          maxLength: 128
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
+    Extension:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+          description: Extension key.
+        value:
+          type: string
+          description: Extension value.
+      title: Extension
+      description: Data model for the complex type Extension
+    ExtensionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Extension'
+      title: ExtensionList
+      description: Data model for the complex type ExtensionList
+    idType:
+      type: string
+      enum:
+        - MSISDN
+        - EMAIL
+        - PERSONAL_ID
+        - BUSINESS
+        - DEVICE
+        - ACCOUNT_ID
+        - IBAN
+        - ALIAS
+    idValue:
+      type: string
+      minLength: 1
+      maxLength: 128
