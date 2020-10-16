@@ -81,10 +81,10 @@ const initEnvironment = async () => {
       if (createEnvResponse.status === 200) {
         currentEnvironment = createEnvResponse.data
       } else {
-        throw new Error('Some error creating environment - ', createEnvResponse)
+        throw new Error('Some error creating environment - ' + JSON.stringify(createEnvResponse))
       }
     } catch (err) {
-      throw new Error('Some error creating environment - ', err)
+      throw new Error('Some error creating environment - ' + err.message)
     }
   }
 }
@@ -508,7 +508,7 @@ const initDFSPHelper = async () => {
 }
 
 const auth = async (user) => {
-  const userConfig = Config.getUserConfig(user)
+  const userConfig = await Config.getUserConfig(user)
   const loginFormData = {
     username: userConfig.CONNECTION_MANAGER_HUB_USERNAME,
     password: userConfig.CONNECTION_MANAGER_HUB_PASSWORD
