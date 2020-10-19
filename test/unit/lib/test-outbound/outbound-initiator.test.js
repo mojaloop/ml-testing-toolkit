@@ -31,7 +31,6 @@ const https = require('https')
 const ConnectionProvider = require('../../../../src/lib/configuration-providers/mb-connection-manager')
 const Config = require('../../../../src/lib/config')
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
-const MyEventEmitter = require('../../../../src/lib/MyEventEmitter')
 
 const SpyAgent = jest.spyOn(https, 'Agent')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')

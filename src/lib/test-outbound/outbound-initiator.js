@@ -44,6 +44,7 @@ const uuid = require('uuid')
 const utilsInternal = require('../utilsInternal')
 const dbAdapter = require('../db/adapters/dbAdapter')
 const objectStore = require('../objectStore')
+const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 
 var terminateTraceIds = {}
 
@@ -328,6 +329,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
       const httpsProps = {}
       const user = dfspId ? { dfspId } : undefined
       const userConfig = await Config.getUserConfig(user)
+      const uniqueId = UniqueIdGenerator.generateUniqueId()
       let urlGenerated = userConfig.CALLBACK_ENDPOINT + path
       if (Config.getSystemConfig().HOSTING_ENABLED) {
         const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
@@ -377,8 +379,9 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
       }
       try {
         await JwsSigning.sign(reqOpts)
+        customLogger.logOutboundRequest('info', 'JWS signed', { uniqueId, request: reqOpts })
       } catch (err) {
-        customLogger.logMessage('error', err.message, { additionalData: err, notification: false })
+        customLogger.logMessage('error', err.message, { additionalData: err })
       }
 
       var syncResponse = {}
@@ -394,17 +397,19 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         MyEventEmitter.getEmitter('testOutbound', user).once(successCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
-          customLogger.logMessage('info', 'Received success callback ' + successCallbackUrl, { headers: callbackHeaders, body: callbackBody }, false)
+          customLogger.logMessage('info', 'Received success callback ' + successCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
           resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
         })
         // Listen for error callback
         MyEventEmitter.getEmitter('testOutbound', user).once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
-          customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { headers: callbackHeaders, body: callbackBody }, false)
+          customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
         })
       }
+
+      customLogger.logOutboundRequest('info', 'Sending request ' + reqOpts.method + ' ' + reqOpts.url, { additionalData: { request: reqOpts }, user, uniqueId, request: reqOpts })
 
       axios(reqOpts).then((result) => {
         syncResponse = {
@@ -416,12 +421,15 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         curlRequest = result.request ? result.request.toCurl() : ''
 
         if (result.status > 299) {
+          customLogger.logOutboundRequest('error', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: { response: result }, user, uniqueId, request: reqOpts })
           if (timer) {
             clearTimeout(timer)
             MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
             MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
           }
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
+        } else {
+          customLogger.logOutboundRequest('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: { response: result }, user, uniqueId, request: reqOpts })
         }
 
         if (!successCallbackUrl || !errorCallbackUrl || ignoreCallbacks) {
@@ -429,11 +437,12 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         }
         customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user })
       }, (err) => {
-        customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: err, notification: false, user })
         syncResponse = {
           status: 500,
           statusText: err.message
         }
+        customLogger.logOutboundRequest('error', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: err, user, uniqueId, request: reqOpts })
+        customLogger.logMessage('error', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: err, notification: false, user })
         reject(new Error(JSON.stringify({ errorCode: 4000, syncResponse })))
       })
     })()

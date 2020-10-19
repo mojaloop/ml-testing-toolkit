@@ -43,6 +43,12 @@ jest.mock('axios')
 jest.mock('../../../src/lib/config')
 
 describe('callbackHandler', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  afterAll(() => {
+    jest.clearAllMocks()
+  })
   describe('handleCallback should not throw an error', () => {
     it('when CALLBACK_RESOURCE_ENDPOINTS, OUTBOUND_MUTUAL_TLS_ENABLED and SEND_CALLBACK_ENABLE is enabled', async () => {
       const callbackObject = {
@@ -73,8 +79,10 @@ describe('callbackHandler', () => {
         OUTBOUND_MUTUAL_TLS_ENABLED: true,
         SEND_CALLBACK_ENABLE: true
       })
-      Config.getSystemConfig.mockReturnValueOnce({
-        HOSTING_ENABLED: true
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          HOSTING_ENABLED: true
+        }
       })
       SpySign.mockReturnValueOnce()
       SpyPush.mockReturnValueOnce()
@@ -133,8 +141,10 @@ describe('callbackHandler', () => {
         OUTBOUND_MUTUAL_TLS_ENABLED: true,
         SEND_CALLBACK_ENABLE: true
       })
-      Config.getSystemConfig.mockReturnValueOnce({
-        HOSTING_ENABLED: true
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          HOSTING_ENABLED: true
+        }
       })
       SpySign.mockReturnValueOnce()
       SpyPush.mockReturnValueOnce()
@@ -192,8 +202,10 @@ describe('callbackHandler', () => {
         OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
-      Config.getSystemConfig.mockReturnValueOnce({
-        HOSTING_ENABLED: false
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          HOSTING_ENABLED: false
+        }
       })
       SpySign.mockImplementationOnce(() => {
         throw new Error('log error if jws signign fails')
@@ -247,8 +259,10 @@ describe('callbackHandler', () => {
         OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
-      Config.getSystemConfig.mockReturnValueOnce({
-        HOSTING_ENABLED: false
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          HOSTING_ENABLED: false
+        }
       })
       SpySign.mockImplementationOnce(() => {
         throw new Error('log error if jws signign fails')

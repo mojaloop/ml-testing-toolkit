@@ -35,6 +35,14 @@ describe('NotificationEmitter', () => {
       expect(() => NotificationEmitter.broadcastLog({}, 'sessionID')).not.toThrowError()
     })
   })
+  describe('broadcastOutboundLog', () => {
+    it('should not throw an error when sessionID is missing', () => {
+      expect(() => NotificationEmitter.broadcastOutboundLog({})).not.toThrowError()
+    })
+    it('should not throw an error', () => {
+      expect(() => NotificationEmitter.broadcastOutboundLog({}, 'sessionID')).not.toThrowError()
+    })
+  })
   describe('broadcastOutboundProgress', () => {
     it('should not throw an error when sessionID is missing', () => {
       expect(() => NotificationEmitter.broadcastOutboundProgress({})).not.toThrowError()

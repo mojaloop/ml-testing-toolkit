@@ -46,7 +46,7 @@ router.post('/reports', async (req, res, next) => {
 
 router.get('/logs', async (req, res, next) => {
   try {
-    const logs = (await dbAdapter.read('logs', req.user, { query: req.query }))
+    const logs = (await dbAdapter.read('newLog', req.user, { query: req.query }))
     res.status(200).send(logs)
   } catch (err) {
     next(err)
