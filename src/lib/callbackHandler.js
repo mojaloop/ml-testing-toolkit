@@ -23,21 +23,22 @@
  ******/
 
 const customLogger = require('./requestLogger')
-const Config = require('../lib/config')
+const Config = require('./config')
 const axios = require('axios').default
 const https = require('https')
 const objectStore = require('./objectStore')
 const MyEventEmitter = require('./MyEventEmitter')
 const JwsSigning = require('./jws/JwsSigning')
-const ConnectionProvider = require('../lib/configuration-providers/mb-connection-manager')
+const ConnectionProvider = require('./configuration-providers/mb-connection-manager')
 const traceHeaderUtils = require('./traceHeaderUtils')
+const UniqueIdGenerator = require('./uniqueIdGenerator')
 
 const handleCallback = async (callbackObject, context, req) => {
   if (callbackObject.delay) {
     await new Promise(resolve => setTimeout(resolve, callbackObject.delay))
   }
   const userConfig = await Config.getUserConfig(req.customInfo.user)
-
+  const uniqueId = UniqueIdGenerator.generateUniqueId(req)
   let callbackEndpoint = userConfig.CALLBACK_ENDPOINT
   if (Config.getSystemConfig().HOSTING_ENABLED) {
     const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
@@ -152,10 +153,13 @@ const handleCallback = async (callbackObject, context, req) => {
 
   // Send callback
   if (userConfig.SEND_CALLBACK_ENABLE) {
+    customLogger.logOutboundRequest('info', 'Request: ' + reqOpts.method + ' ' + reqOpts.path, { additionalData: { request: reqOpts }, request: reqOpts, uniqueId })
     customLogger.logMessage('info', 'Sending callback ' + callbackObject.method + ' ' + reqOpts.url, { additionalData: callbackObject, request: req })
     axios(reqOpts).then((result) => {
+      customLogger.logOutboundRequest('info', 'Response: ' + reqOpts.method + ' ' + reqOpts.path, { additionalData: { response: result }, request: reqOpts, uniqueId })
       customLogger.logMessage('info', 'Received callback response ' + result.status + ' ' + result.statusText, { request: req })
     }, (err) => {
+      customLogger.logOutboundRequest('error', 'Response: ' + reqOpts.method + ' ' + reqOpts.path, { additionalData: err, request: reqOpts, uniqueId })
       customLogger.logMessage('error', 'Failed to send callback ' + callbackObject.method + ' ' + reqOpts.url, { additionalData: err.message, request: req })
     })
   } else {

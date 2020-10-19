@@ -32,7 +32,11 @@ const requestLogger = require('../../../src/lib/requestLogger')
 
 describe('requestLogger', () => {
   beforeAll(() => {
+    jest.clearAllMocks()
     notificationEmitter.broadcastLog.mockReturnValue()
+  })
+  afterAll(() => {
+    jest.clearAllMocks()
   })
   describe('when logRequest is called', () => {
     it('should take session id from customInfo.sessionId if HOSTING_ENABLED is true', async () => {

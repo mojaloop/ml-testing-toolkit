@@ -45,6 +45,7 @@ const models = {
     },
     resource: Object,
     messageType: String,
+    notificationType: String,
     verbosity: String,
     message: String,
     additionalData: Schema.Types.Mixed,
