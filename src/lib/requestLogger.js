@@ -54,6 +54,7 @@ const logOutboundRequest = (verbosity, message, externalData = {}) => {
   if (externalData.additionalData) {
     if (externalData.additionalData.request) {
       externalData.additionalData.request = {
+        url: externalData.additionalData.request.url,
         uniqueId: externalData.uniqueId,
         headers: externalData.additionalData.request.headers,
         queryParams: externalData.additionalData.request.query,
