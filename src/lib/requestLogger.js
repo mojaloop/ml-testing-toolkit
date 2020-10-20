@@ -80,7 +80,8 @@ const logResponse = (request, user) => {
       additionalData: {
         response: {
           uniqueId: request.customInfo.uniqueId || null,
-          body: request.response.source
+          body: request.response.source,
+          status: request.response.statusCode
         }
       },
       user,
