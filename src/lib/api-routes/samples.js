@@ -24,8 +24,16 @@
 
 const express = require('express')
 const loadSamples = require('../loadSamples')
+const Config = require('../config')
 
 const router = new express.Router()
+
+const filterDFSPSamples = (files) => {
+  if (Config.getSystemConfig().HOSTING_ENABLED) {
+    return files.filter(file => file.name.startsWith('examples/collections/dfsp') || file.name.startsWith('examples/environments/dfsp'))
+  }
+  return files
+}
 
 // Route to load a sample
 // query param 'collections': list of filenames
@@ -44,6 +52,7 @@ router.get('/load', async (req, res, next) => {
 router.get('/loadFolderWise', async (req, res, next) => {
   try {
     const files = await loadSamples.getSampleWithFolderWise(req.query)
+    console.log('/loadFolderWise', files)
     return res.status(200).json({ status: 'OK', body: files })
   } catch (err) {
     next(err)
@@ -56,6 +65,7 @@ router.get('/loadFolderWise', async (req, res, next) => {
 router.get('/load/:exampleType', async (req, res, next) => {
   try {
     const filenames = await loadSamples.getCollectionsOrEnvironments(req.params.exampleType, req.query.type)
+    console.log('/load/:exampleType', filenames)
     return res.status(200).json({ status: 'OK', body: filenames })
   } catch (err) {
     next(err)
@@ -67,7 +77,8 @@ router.get('/load/:exampleType', async (req, res, next) => {
 // query param 'type': examples: 'hub', 'dfsp'
 router.get('/list/:exampleType', async (req, res, next) => {
   try {
-    const fileList = await loadSamples.getCollectionsOrEnvironmentsWithFileSize(req.params.exampleType, req.query.type)
+    const fileList = filterDFSPSamples(await loadSamples.getCollectionsOrEnvironmentsWithFileSize(req.params.exampleType, req.query.type))
+    console.log('/list/:exampleType', fileList)
     return res.status(200).json({ status: 'OK', body: fileList })
   } catch (err) {
     next(err)

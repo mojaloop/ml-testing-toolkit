@@ -57,7 +57,7 @@ const getStoredUserConfig = async (user) => {
 
 const setStoredUserConfig = async (newConfig, user) => {
   try {
-    await storageAdapter.upsert(USER_CONFIG_FILE, newConfig, user)
+    await storageAdapter.upsert(USER_CONFIG_FILE, { ...getUserConfig(), ...newConfig }, user)
     return true
   } catch (err) {
     return false

@@ -38,15 +38,17 @@ const userConfig = {
   VALIDATE_INBOUND_JWS: true,
   OUTBOUND_MUTUAL_TLS_ENABLED: true,
   INBOUND_MUTUAL_TLS_ENABLED: true,
-  CONNECTION_MANAGER_API_URL: '',
-  DEFAULT_USER_FSPID: 'userdfsp',
-  CONNECTION_MANAGER_AUTH_ENABLED: true,
-  CONNECTION_MANAGER_HUB_USERNAME: 'hub',
-  CONNECTION_MANAGER_HUB_PASSWORD: 'hub'
+  DEFAULT_USER_FSPID: 'userdfsp'
 }
 
 const systemConfig = {
   HOSTING_ENABLED: true,
+  CONNECTION_MANAGER: {
+    API_URL: '',
+    AUTH_ENABLED: true,
+    HUB_USERNAME: 'userdfsp',
+    HUB_PASSWORD: 'hub'
+  },
   KEYCLOAK: {
     ENABLED: false
   }
@@ -319,14 +321,14 @@ describe('mb-connection-manager', () => {
       })
     })
     it('should not throw error', async () => {
-      const newUserConfig = {...userConfig}
-      newUserConfig.CONNECTION_MANAGER_AUTH_ENABLED = false
-      Config.getUserConfig.mockImplementation(() => {
-        return newUserConfig
+      const newSystemConfig = {...systemConfig}
+      newSystemConfig.CONNECTION_MANAGER.AUTH_ENABLED = false
+      Config.getSystemConfig.mockImplementation(() => {
+        return newSystemConfig
       })
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       Config.getUserConfig.mockImplementation(() => {
-        return userConfig
+        return systemConfig
       })
     })
     it('should not throw error', async () => {
@@ -357,7 +359,7 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/login'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).rejects.toBeDefined()
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       mapping.post['/api/login'] = original
     })
     it('should not throw error', async () => {

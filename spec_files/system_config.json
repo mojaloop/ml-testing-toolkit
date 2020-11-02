@@ -22,6 +22,12 @@
     "JWT_COOKIE_NAME": "TTK-API_ACCESS_TOKEN",
     "EMBEDDED_CERTIFICATE": "password"
   },
+  "CONNECTION_MANAGER": {
+    "API_URL": "http://connection-manager-api:5061",
+    "AUTH_ENABLED": false,
+    "HUB_USERNAME": "hub",
+    "HUB_PASSWORD": "hub"
+  },
   "KEYCLOAK": {
     "ENABLED": false,
     "API_URL": "http://172.17.0.1:9080",

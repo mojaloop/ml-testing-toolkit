@@ -62,11 +62,11 @@ describe('API route /api/oauth2', () => {
   describe('GET /api/oauth2/token', () => {
     it('Verify oauth credentials when HOSTING_ENABLED is enabled', async () => {
       SpySign.mockReturnValueOnce('idToken')
-      Config.getUserConfig.mockReturnValueOnce({
-        CONNECTION_MANAGER_HUB_USERNAME: 'userdfsp'
-      })
       Object.assign(Config.getSystemConfig(), {
-        HOSTING_ENABLED: true
+        HOSTING_ENABLED: true,
+        CONNECTION_MANAGER: {
+          HUB_USERNAME: 'userdfsp'
+        }
       })
       const res = await request(app).post(`/api/oauth2/token`).send({
         username: 'userdfsp'
@@ -78,10 +78,10 @@ describe('API route /api/oauth2', () => {
     it('Verify oauth credentials when HOSTING_ENABLED is enabled', async () => {
       SpySign.mockReturnValueOnce('idToken')
       Object.assign(Config.getSystemConfig(), {
-        HOSTING_ENABLED: true
-      })
-      Config.getUserConfig.mockReturnValueOnce({
-        CONNECTION_MANAGER_HUB_USERNAME: 'userdfsp'
+        HOSTING_ENABLED: true,
+        CONNECTION_MANAGER: {
+          HUB_USERNAME: 'userdfsp'
+        }
       })
       const res = await request(app).post(`/api/oauth2/token`).send({
         username: 'userdfsp1'
@@ -93,10 +93,10 @@ describe('API route /api/oauth2', () => {
     it('Verify oauth credentials when HOSTING_ENABLED is enabled', async () => {
       SpySign.mockReturnValueOnce('idToken')
       Object.assign(Config.getSystemConfig(), {
-        HOSTING_ENABLED: true
-      })
-      Config.getUserConfig.mockReturnValueOnce({
-        CONNECTION_MANAGER_HUB_USERNAME: 'userdfsp'
+        HOSTING_ENABLED: true,
+        CONNECTION_MANAGER: {
+          HUB_USERNAME: 'userdfsp'
+        }
       })
       const res = await request(app).post(`/api/oauth2/token`).send({
         username: 'username'
@@ -106,10 +106,10 @@ describe('API route /api/oauth2', () => {
     it('Verify oauth credentials should throw an error if sign fails', async () => {
       SpySign.mockImplementationOnce(() => {throw {}})
       Object.assign(Config.getSystemConfig(), {
-        HOSTING_ENABLED: false
-      })
-      Config.getUserConfig.mockReturnValueOnce({
-        CONNECTION_MANAGER_HUB_USERNAME: 'userdfsp'
+        HOSTING_ENABLED: false,
+        CONNECTION_MANAGER: {
+          HUB_USERNAME: 'userdfsp'
+        }
       })
       const res = await request(app).post(`/api/oauth2/token`).send({
         username: 'username'
