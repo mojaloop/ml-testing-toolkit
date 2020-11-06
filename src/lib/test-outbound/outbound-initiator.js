@@ -48,7 +48,7 @@ const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 
 var terminateTraceIds = {}
 
-const getTracing = (traceID) => {
+const getTracing = (traceID, dfspId) => {
   const tracing = {
     outboundID: traceID,
     sessionID: null
@@ -57,12 +57,15 @@ const getTracing = (traceID) => {
     tracing.outboundID = traceHeaderUtils.getEndToEndID(traceID)
     tracing.sessionID = traceHeaderUtils.getSessionID(traceID)
   }
+  if (Config.getSystemConfig().HOSTING_ENABLED) {
+    tracing.sessionID = dfspId
+  }
   return tracing
 }
 
 const OutboundSend = async (inputTemplate, traceID, dfspId) => {
   const startedTimeStamp = new Date()
-  const tracing = getTracing(traceID)
+  const tracing = getTracing(traceID, dfspId)
 
   const environmentVariables = {
     items: Object.entries(inputTemplate.inputValues || {}).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
