@@ -25,44 +25,23 @@
 const express = require('express')
 const router = new express.Router()
 // const { check, validationResult } = require('express-validator')
-const jsreportCore = require('jsreport-core')
-const { readFileAsync } = require('../utils')
-const BASE_TEMPLATE_PATH = 'spec_files/reports/templates/newman'
+const reportGenerator = require('../report-generator/generator')
 
 // Generate report
 router.post('/testcase/:format', async (req, res, next) => {
   const jsonReport = req.body
   const format = req.params.format
-  const recipe = 'html'
-  let templateFile = 'html_template.html'
   let downloadFileSuffix = '.html'
-  if (format === 'pdf' || format === 'printhtml') {
-    // recipe = 'chrome-pdf'
-    templateFile = 'pdf_template.html'
-    // downloadFileSuffix = '.pdf'
-  }
 
   if (jsonReport.runtimeInformation) {
     downloadFileSuffix = '-' + jsonReport.runtimeInformation.completedTimeISO + downloadFileSuffix
   }
   downloadFileSuffix = '-' + jsonReport.name + downloadFileSuffix
   try {
-    const templateContent = await readFileAsync(BASE_TEMPLATE_PATH + '/' + templateFile)
-    const scriptContent = await readFileAsync(BASE_TEMPLATE_PATH + '/script.js')
-    const jsreport = jsreportCore()
-    await jsreport.init()
-    const result = await jsreport.render({
-      template: {
-        content: templateContent.toString(),
-        engine: 'handlebars',
-        recipe: recipe,
-        helpers: scriptContent.toString()
-      },
-      data: jsonReport
-    })
+    const result = await reportGenerator.generateReport(jsonReport, format)
     res.setHeader('Content-disposition', 'attachment; filename=TTK-Assertion-Report' + downloadFileSuffix)
     res.setHeader('TTK-FileName', 'TTK-Assertion-Report' + downloadFileSuffix)
-    res.status(200).send(result.content)
+    res.status(200).send(result)
   } catch (err) {
     next(err)
   }
