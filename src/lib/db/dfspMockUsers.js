@@ -2,7 +2,6 @@ const Config = require('../config')
 const querystring = require('querystring')
 const axios = require('axios').default
 const objectStore = require('../objectStore/objectStoreInterface')
-const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
 
 const tempDfspList = [
   {
@@ -19,9 +18,9 @@ const tempDfspList = [
   }
 ]
 
-const getDFSPList = async () => {
+const getDFSPList = async (defaultTestingToolkitFspId) => {
   const userConfig = await Config.getUserConfig({
-    dfspId: DEFAULT_TESTING_TOOLKIT_FSPID
+    dfspId: defaultTestingToolkitFspId
   })
   const systemConfig = Config.getSystemConfig()
   let users = []
@@ -60,7 +59,7 @@ const getKeyCloakUsers = async (keycloakToken) => {
     getUsersResp.data.map(user => {
       if (user.username !== systemConfig.KEYCLOAK.USERNAME) {
         users.push({
-          id: user.username,
+          id: user.attributes.dfspId,
           name: `${user.firstName} ${user.lastName}`
         })
       }

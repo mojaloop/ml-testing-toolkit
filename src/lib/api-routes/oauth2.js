@@ -61,8 +61,7 @@ router.post('/token', async (req, res, next) => {
       'Internal/everyone'
     ]
     const systemConfig = Config.getSystemConfig()
-    const userConfig = await Config.getUserConfig(plainIdToken)
-    if (req.body.username === userConfig.CONNECTION_MANAGER_HUB_USERNAME) {
+    if (req.body.username === systemConfig.CONNECTION_MANAGER.HUB_USERNAME) {
       groupsData = [
         'Application/PTA',
         'Internal/everyone'

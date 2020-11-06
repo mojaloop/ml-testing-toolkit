@@ -83,7 +83,7 @@ const handleCallback = async (callbackObject, context, req) => {
     const tlsConfig = await ConnectionProvider.getTlsConfig()
     if (!tlsConfig.dfsps[callbackObject.callbackInfo.fspid]) {
       const errorMsg = 'Outbound TLS is enabled, but there is no TLS config found for DFSP ID: ' + callbackObject.callbackInfo.fspid
-      customLogger.logMessage('error', errorMsg, { request: req })
+      customLogger.logMessage('error', errorMsg, { request: req, notification: false })
       throw errorMsg
     }
     const httpsAgent = new https.Agent({
