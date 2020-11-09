@@ -1,7 +1,7 @@
 {
   "name": "ml-testing-toolkit",
   "description": "Testing Toolkit for Mojaloop implementations",
-  "version": "11.2.7",
+  "version": "11.3.0",
   "license": "Apache-2.0",
   "author": "Vijaya Kumar Guthi, ModusBox Inc.",
   "contributors": [
@@ -83,6 +83,7 @@
     "express-validator": "^6.4.0",
     "faker": "^4.1.0",
     "fs": "0.0.1-security",
+    "handlebars": "4.7.6",
     "hapi-auth-bearer-token": "^6.1.4",
     "hapi-openapi": "1.2.4",
     "hapi-swagger": "10.3.0",
@@ -93,9 +94,8 @@
     "json-rules-engine": "5.0.3",
     "json-schema-faker": "^0.5.0-rc23",
     "json-schema-ref-parser": "^7.1.3",
-    "jsreport-core": "2.7.2",
-    "jsreport-handlebars": "2.1.0",
     "lodash": "^4.17.15",
+    "ml-testing-toolkit-shared-lib": "11.0.0",
     "mongoose": "5.10.0",
     "mustache": "3.1.0",
     "node-dir": "0.1.17",
@@ -116,8 +116,7 @@
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
     "uuid": "8.1.0",
-    "uuid4": "1.1.4",
-    "ml-testing-toolkit-shared-lib": "11.0.0"
+    "uuid4": "1.1.4"
   },
   "devDependencies": {
     "@types/jest": "24.0.22",

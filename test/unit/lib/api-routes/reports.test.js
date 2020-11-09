@@ -32,12 +32,12 @@ Config.getSystemConfig.mockReturnValue({
 })
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
-const jsreportCore = require('jsreport-core')
+const reportGenerator = require('../../../../src/lib/report-generator/generator')
 const requestLogger = require('../../../../src/lib/requestLogger')
 
 const app = apiServer.getApp()
 
-jest.mock('jsreport-core')
+jest.mock('../../../../src/lib/report-generator/generator')
 jest.mock('../../../../src/lib/requestLogger')
 
 const properJsonReport = {
@@ -228,44 +228,32 @@ describe('API route /api/reports', () => {
   })
   describe('POST /api/reports/testcase/:format', () => {
     it('Send a proper html request', async () => {
-      jsreportCore.mockImplementationOnce( () => {
-        return {
-          init: jest.fn(),
-          render: () => Promise.resolve({ content: 'asdf'})
-        }
+      reportGenerator.generateReport.mockImplementationOnce( () => {
+        return Promise.resolve('asdf')
       })
       const res = await request(app).post(`/api/reports/testcase/html`).send(properJsonReport)
       expect(res.statusCode).toEqual(200)
       expect(res.text).toEqual('asdf')
     })
     it('Send a proper pdf request', async () => {
-      jsreportCore.mockImplementationOnce( () => {
-        return {
-          init: jest.fn(),
-          render: () => Promise.resolve({ content: 'asdf'})
-        }
+      reportGenerator.generateReport.mockImplementationOnce( () => {
+        return Promise.resolve('asdf')
       })
       const res = await request(app).post(`/api/reports/testcase/pdf`).send(properJsonReport)
       expect(res.statusCode).toEqual(200)
       expect(res.text).toEqual('asdf')
     })
     it('Send a proper printhtml request', async () => {
-      jsreportCore.mockImplementationOnce( () => {
-        return {
-          init: jest.fn(),
-          render: () => Promise.resolve({ content: 'asdf'})
-        }
+      reportGenerator.generateReport.mockImplementationOnce( () => {
+        return Promise.resolve('asdf')
       })
       const res = await request(app).post(`/api/reports/testcase/printhtml`).send(properJsonReport)
       expect(res.statusCode).toEqual(200)
       expect(res.text).toEqual('asdf')
     })
     it('Send a bad request html request', async () => {
-      jsreportCore.mockImplementationOnce( () => {
-        return {
-          init: jest.fn(),
-          render: () => Promise.reject({ content: 'asdf'})
-        }
+      reportGenerator.generateReport.mockImplementationOnce( () => {
+        return Promise.reject('asdf')
       })
       const {runtimeInformation, ...data} = properJsonReport
       const res = await request(app).post(`/api/reports/testcase/printhtml`).send(data)
