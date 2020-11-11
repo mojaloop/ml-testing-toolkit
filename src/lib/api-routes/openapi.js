@@ -25,6 +25,9 @@
 const express = require('express')
 const router = new express.Router()
 const utils = require('../utils')
+const multer = require('multer')
+const upload = multer({ dest: 'uploads/' })
+const APIManagement = require('../api-management')
 
 router.get('/api_versions', async (req, res, next) => {
   try {
@@ -36,7 +39,8 @@ router.get('/api_versions', async (req, res, next) => {
           minorVersion: item.minorVersion,
           majorVersion: item.majorVersion,
           type: item.type,
-          asynchronous: item.asynchronous
+          asynchronous: item.asynchronous,
+          additionalApi: item.additionalApi
         }
       }))
     } else {
@@ -67,6 +71,50 @@ router.get('/definition/:type/:version', async (req, res, next) => {
     }
   } catch (err) {
     next(err)
+  }
+})
+
+router.post('/definition', upload.single('file'), async (req, res, next) => {
+  if (req.file) {
+    try {
+      await APIManagement.addDefinition(req.file.path, req.body.name, req.body.version, req.body.asynchronous)
+      // Remove temporary file
+      try { await utils.deleteFileAsync(req.file.path) } catch (err2) {}
+      res.status(200).json({ message: 'API has been added successfully', fileName: req.file })
+    } catch (err) {
+      try { await utils.deleteFileAsync(req.file.path) } catch (err2) {}
+      res.status(404).json({ error: 'Unknown format', message: err.message })
+    }
+  } else {
+    res.status(404).json({ error: 'File not found' })
+  }
+})
+
+router.delete('/definition/:type/:version', async (req, res, next) => {
+  const apiType = req.params.type
+  const apiVersion = req.params.version
+  try {
+    await APIManagement.deleteDefinition(apiType, apiVersion)
+    res.status(200).json({ message: 'API has been removed successfully' })
+  } catch (err) {
+    console.log(err)
+    res.status(404).json({ error: 'Unknown format', message: err.message })
+  }
+})
+
+router.post('/validate_definition', upload.single('file'), async (req, res, next) => {
+  if (req.file) {
+    try {
+      const document = await APIManagement.validateDefinition(req.file.path)
+      // Remove temporary file
+      try { await utils.deleteFileAsync(req.file.path) } catch (err2) {}
+      res.status(200).json({ apiDefinition: document, fileName: req.file })
+    } catch (err) {
+      try { await utils.deleteFileAsync(req.file.path) } catch (err2) {}
+      res.status(404).json({ error: 'Unknown format', message: err.message })
+    }
+  } else {
+    res.status(404).json({ error: 'File not found' })
   }
 })
 

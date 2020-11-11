@@ -26,22 +26,31 @@ const Config = require('../config')
 var apiDefinitions = null
 const specFilePrefix = 'spec_files/api_definitions/'
 
-module.exports.getApiDefinitions = async () => {
+const getApiDefinitions = async () => {
   if (!apiDefinitions) {
-    apiDefinitions = Config.getSystemConfig().API_DEFINITIONS.map(item => {
-      return {
-        minorVersion: +item.version.split('.')[1],
-        majorVersion: +item.version.split('.')[0],
-        type: item.type,
-        asynchronous: item.asynchronous,
-        specFile: specFilePrefix + item.folderPath + '/api_spec.yaml',
-        callbackMapFile: specFilePrefix + item.folderPath + '/callback_map.json',
-        responseMapFile: specFilePrefix + item.folderPath + '/response_map.json',
-        jsfRefFile: specFilePrefix + item.folderPath + '/mockRef.json',
-        triggerTemplatesFolder: specFilePrefix + item.folderPath + '/trigger_templates'
-      }
-    })
+    refreshApiDefinitions()
   }
-
   return apiDefinitions
+}
+
+const refreshApiDefinitions = async () => {
+  apiDefinitions = Config.getSystemConfig().API_DEFINITIONS.map(item => {
+    return {
+      minorVersion: +item.version.split('.')[1],
+      majorVersion: +item.version.split('.')[0],
+      type: item.type,
+      asynchronous: item.asynchronous,
+      additionalApi: item.additionalApi,
+      specFile: specFilePrefix + item.folderPath + '/api_spec.yaml',
+      callbackMapFile: specFilePrefix + item.folderPath + '/callback_map.json',
+      responseMapFile: specFilePrefix + item.folderPath + '/response_map.json',
+      jsfRefFile: specFilePrefix + item.folderPath + '/mockRef.json',
+      triggerTemplatesFolder: specFilePrefix + item.folderPath + '/trigger_templates'
+    }
+  })
+}
+
+module.exports = {
+  getApiDefinitions,
+  refreshApiDefinitions
 }
