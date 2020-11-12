@@ -78,7 +78,6 @@ router.get('/load/:exampleType', async (req, res, next) => {
 router.get('/list/:exampleType', async (req, res, next) => {
   try {
     const fileList = filterDFSPSamples(await loadSamples.getCollectionsOrEnvironmentsWithFileSize(req.params.exampleType, req.query.type))
-    console.log('/list/:exampleType', fileList)
     return res.status(200).json({ status: 'OK', body: fileList })
   } catch (err) {
     next(err)

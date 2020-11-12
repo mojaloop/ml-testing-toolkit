@@ -30,6 +30,8 @@ const writeFileAsync = promisify(fs.writeFile)
 const accessFileAsync = promisify(fs.access)
 const readDirAsync = promisify(fs.readdir)
 const deleteFileAsync = promisify(fs.unlink)
+const renameFileAsync = promisify(fs.rename)
+const makeDirectoryAsync = promisify(fs.mkdir)
 const fileStatAsync = promisify(fs.stat)
 const readRecursiveAsync = promisify(files)
 const rmdirAsync = promisify(fs.rmdir)
@@ -40,6 +42,8 @@ module.exports = {
   accessFileAsync,
   readDirAsync,
   deleteFileAsync,
+  renameFileAsync,
+  makeDirectoryAsync,
   fileStatAsync,
   readRecursiveAsync,
   rmdirAsync

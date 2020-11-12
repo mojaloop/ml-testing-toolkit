@@ -1,7 +1,7 @@
 {
   "name": "ml-testing-toolkit",
   "description": "Testing Toolkit for Mojaloop implementations",
-  "version": "11.3.0",
+  "version": "11.4.0",
   "license": "Apache-2.0",
   "author": "Vijaya Kumar Guthi, ModusBox Inc.",
   "contributors": [
@@ -97,6 +97,7 @@
     "lodash": "^4.17.15",
     "ml-testing-toolkit-shared-lib": "11.0.0",
     "mongoose": "5.10.0",
+    "multer": "^1.4.2",
     "mustache": "3.1.0",
     "node-dir": "0.1.17",
     "node-strings": "^1.0.2",
