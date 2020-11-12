@@ -45,7 +45,7 @@ And also you can go ahead to create your own response rules to get customized re
 
 ## 3. Asynchronous API
 
-You should follow the same procedure as Synchronous API and some additional steps to provision an Asynchronous API.
+You should follow the same procedure as Synchronous API and some additional steps are there to provision an Asynchronous API.
 
 - Please copy the specification file in yaml format into the following file
   ```
@@ -62,19 +62,19 @@ You should follow the same procedure as Synchronous API and some additional step
   ```
 - Additionally you should provide some information about callback mappings to associate the asynchronous callbacks to the respective requests. You can add that information into the following file. You can refer the sample files provided for FSPIOP api in the repository.
   ```
-  spec_files/<your-api-folder-name>/api_spec.yaml
+  spec_files/<your-api-folder-name>/callback_map.json
   ```
 - Restart the testing toolkit service and that's it. You are all set.
 
 You should be able to send your API requests to TTK and the TTK will validate them against the specification. You can monitor them in the TTK UI.
 
-And also you can go ahead to create your own validation rules, callback rules and response rules to get customized callbacks and responses from TTK through TTK UI.
+And also you can go ahead to create your own validation rules, callback rules and response rules to get customized / mock callbacks and responses from TTK through TTK UI.
 
 ## 4. Provisioning through UI
 
-![Opening API Management](/assets/images/api-provisioning-menu-item.png.png)
+![Opening API Management](/assets/images/api-provisioning-menu-item.png)
 
-- You can go to _**API Management**_ navigation tab will open to the API Management window. Below is the default view of this page.
+- You can go to _**API Management**_ navigation tab. Below is the default view of this API Management page.
 
   ![API Management Default View](/assets/images/api-provisioning-list-apis-view.png)
 
