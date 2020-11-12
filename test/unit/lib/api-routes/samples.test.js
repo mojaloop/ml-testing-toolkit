@@ -97,5 +97,27 @@ describe('API route /api/samples', () => {
       const res = await request(app).get(`/api/samples/list/collections`).send()
       expect(res.statusCode).toEqual(500)
     })
+    it('Send a proper request with Hosting mode enabled', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        OAUTH: {
+          AUTH_ENABLED: false
+        },
+        HOSTING_ENABLED: true
+      })
+      spyGetCollectionsOrEnvironmentsWithFileSize.mockResolvedValueOnce([{name: 'examples/collections/dfsp'}])
+      const res = await request(app).get(`/api/samples/list/collections`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Send a proper request with Hosting mode enabled', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        OAUTH: {
+          AUTH_ENABLED: false
+        },
+        HOSTING_ENABLED: true
+      })
+      spyGetCollectionsOrEnvironmentsWithFileSize.mockResolvedValueOnce([{name: 'examples/environments/dfsp'}])
+      const res = await request(app).get(`/api/samples/list/environments`).send()
+      expect(res.statusCode).toEqual(200)
+    })
   })
 })

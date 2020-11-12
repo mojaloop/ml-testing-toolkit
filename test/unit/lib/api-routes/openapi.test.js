@@ -40,9 +40,14 @@ const app = apiServer.getApp()
 const Utils = require('../../../../src/lib/utils')
 const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
 const OpenApiDefinitionsModel = require('../../../../src/lib/mocking/openApiDefinitionsModel')
+const APIManagement = require('../../../../src/lib/api-management')
 const SpyGetApiDefinitions = jest.spyOn(OpenApiDefinitionsModel, 'getApiDefinitions')
 const SpyGetOpenApiObjects = jest.spyOn(OpenApiMockHandler, 'getOpenApiObjects')
+const SpyValidateApiDefinition = jest.spyOn(APIManagement, 'validateDefinition')
+const SpyAddApiDefinition = jest.spyOn(APIManagement, 'addDefinition')
+const SpyDeleteApiDefinition = jest.spyOn(APIManagement, 'deleteDefinition')
 const requestLogger = require('../../../../src/lib/requestLogger')
+const specFilePrefix = 'test/'
 
 jest.mock('../../../../src/lib/requestLogger')
 jest.mock('../../../../src/lib/config')
@@ -123,6 +128,68 @@ describe('API route /api/openapi', () => {
       const reqItem = mockGetApiDefinitionsResponse[0]
       const res = await request(app).get(`/api/openapi/definition/${reqItem.type}/${reqItem.majorVersion}.${reqItem.minorVersion}`)
       expect(res.statusCode).toEqual(500)
+    })
+  })
+  describe('POST /api/openapi/definition', () => {
+    it('Happy Path', async () => {
+      SpyAddApiDefinition.mockResolvedValue({})
+      const res = await request(app)
+        .post(`/api/openapi/definition`)
+        .attach('file', specFilePrefix + 'api_spec_sync.yaml')
+        .field('name', 'name')
+        .field('version', '1.0')
+        .field('asynchronous', 'false')
+      expect(res.statusCode).toEqual(200)
+      expect(res.body).toHaveProperty('message')
+    })
+    it('Without passing API file', async () => {
+      SpyAddApiDefinition.mockResolvedValue({})
+      const res = await request(app).post(`/api/openapi/definition`)
+      expect(res.statusCode).toEqual(404)
+    })
+    it('When validation failed', async () => {
+      SpyAddApiDefinition.mockRejectedValue(new Error('some error'))
+      const res = await request(app)
+        .post(`/api/openapi/definition`)
+        .attach('file', specFilePrefix + 'api_spec_sync.yaml')
+      expect(res.statusCode).toEqual(404)
+    })
+  })
+  describe('DELETE /api/openapi/definition/:type/:version', () => {
+    it('Happy Path', async () => {
+      SpyDeleteApiDefinition.mockResolvedValue({})
+      const res = await request(app)
+        .delete(`/api/openapi/definition/name/1.0`)
+      expect(res.statusCode).toEqual(200)
+      expect(res.body).toHaveProperty('message')
+    })
+    it('When deletion failed', async () => {
+      SpyDeleteApiDefinition.mockRejectedValue(new Error('some error'))
+      const res = await request(app)
+        .delete(`/api/openapi/definition/name/1.0`)
+      expect(res.statusCode).toEqual(404)
+    })
+  })
+  describe('POST /api/openapi/validate_definition', () => {
+    it('Happy Path', async () => {
+      SpyValidateApiDefinition.mockResolvedValue({})
+      const res = await request(app)
+        .post(`/api/openapi/validate_definition`)
+        .attach('file', specFilePrefix + 'api_spec_sync.yaml')
+      expect(res.statusCode).toEqual(200)
+      expect(res.body).toHaveProperty('apiDefinition')
+    })
+    it('Without passing API file', async () => {
+      SpyValidateApiDefinition.mockResolvedValue({})
+      const res = await request(app).post(`/api/openapi/validate_definition`)
+      expect(res.statusCode).toEqual(404)
+    })
+    it('When validation failed', async () => {
+      SpyValidateApiDefinition.mockRejectedValue(new Error('some error'))
+      const res = await request(app)
+        .post(`/api/openapi/validate_definition`)
+        .attach('file', specFilePrefix + 'api_spec_sync.yaml')
+      expect(res.statusCode).toEqual(404)
     })
   })
   describe('GET /api/openapi/callback_map/:type/:version', () => {
