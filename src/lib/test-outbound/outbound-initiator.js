@@ -64,6 +64,11 @@ const getTracing = (traceID, dfspId) => {
 }
 
 const OutboundSend = async (inputTemplate, traceID, dfspId) => {
+  const globalConfig = {
+    broadcastOutboundProgressEnabled: true,
+    scriptExecution: true,
+    testsExecution: true
+  }
   const startedTimeStamp = new Date()
   const tracing = getTracing(traceID, dfspId)
 
@@ -72,7 +77,7 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
   }
   try {
     for (const i in inputTemplate.test_cases) {
-      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, environmentVariables, dfspId)
+      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, environmentVariables, dfspId, globalConfig)
     }
 
     const completedTimeStamp = new Date()
@@ -108,11 +113,89 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
   }
 }
 
+const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
+  const globalConfig = {
+    broadcastOutboundProgressEnabled: false,
+    scriptExecution: false,
+    testsExecution: true
+  }
+  const tracing = getTracing(traceID, dfspId)
+
+  const environmentVariables = {
+    items: Object.entries(inputTemplate.inputValues || {}).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
+  }
+  try {
+    for (let itn = 0; itn < iterations; itn++) {
+      const startedTimeStamp = new Date()
+      // Deep copy the template
+      const tmpTemplate = JSON.parse(JSON.stringify(inputTemplate))
+      // Execute all the test cases in the template
+      for (const i in tmpTemplate.test_cases) {
+        await processTestCase(tmpTemplate.test_cases[i], traceID, tmpTemplate.inputValues, environmentVariables, dfspId, globalConfig)
+      }
+      const completedTimeStamp = new Date()
+      const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
+      const runtimeInformation = {
+        completedTimeISO: completedTimeStamp.toISOString(),
+        startedTime: startedTimeStamp.toUTCString(),
+        completedTime: completedTimeStamp.toUTCString(),
+        runDurationMs: runDurationMs,
+        avgResponseTime: 'NA',
+        totalAssertions: 0,
+        totalPassedAssertions: 0
+      }
+      generateFinalReport(tmpTemplate, runtimeInformation)
+
+      const iterationStatus = {
+        iterationNumber: itn + 1,
+        runDurationMs,
+        totalAssertions: runtimeInformation.totalAssertions,
+        totalPassedAssertions: runtimeInformation.totalPassedAssertions
+      }
+      notificationEmitter.broadcastOutboundProgress({
+        status: 'ITERATION_PROGRESS',
+        outboundID: tracing.outboundID,
+        iterationStatus
+      }, tracing.sessionID)
+    }
+
+    // Send the total result to client
+    if (tracing.outboundID) {
+      // const runtimeInformation = {
+      //   completedTimeISO: completedTimeStamp.toISOString(),
+      //   startedTime: startedTimeStamp.toUTCString(),
+      //   completedTime: completedTimeStamp.toUTCString(),
+      //   avgResponseTime: 'NA',
+      //   totalAssertions: 0,
+      //   totalPassedAssertions: 0
+      // }
+      const totalResult = {}
+      // const totalResult = generateFinalReport(inputTemplate, runtimeInformation)
+      // if (Config.getSystemConfig().HOSTING_ENABLED) {
+      //   const totalResultCopy = JSON.parse(JSON.stringify(totalResult))
+      //   totalResultCopy.runtimeInformation.completedTimeISO = completedTimeStamp
+      //   dbAdapter.upsert('reports', totalResultCopy, { dfspId })
+      // }
+      notificationEmitter.broadcastOutboundProgress({
+        status: 'ITERATIONS_FINISHED',
+        outboundID: tracing.outboundID,
+        totalResult
+      }, tracing.sessionID)
+    }
+  } catch (err) {
+    notificationEmitter.broadcastOutboundProgress({
+      status: 'ITERATIONS_TERMINATED',
+      outboundID: tracing.outboundID,
+      errorMessage: err.message
+    }, tracing.sessionID)
+  }
+}
+
 const terminateOutbound = (traceID) => {
   terminateTraceIds[traceID] = true
 }
 
-const processTestCase = async (testCase, traceID, inputValues, environmentVariables, dfspId) => {
+const processTestCase = async (testCase, traceID, inputValues, environmentVariables, dfspId, globalConfig) => {
   const tracing = getTracing(traceID)
 
   // Load the requests array into an object by the request id to access a particular object faster
@@ -165,10 +248,15 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
     const environment = {
       data: {}
     }
-    const contextObj = await context.generageContextObj(environmentVariables.items)
+    let contextObj = null
+    if (globalConfig.scriptExecution) {
+      contextObj = await context.generageContextObj(environmentVariables.items)
+    }
     // Send http request
     try {
-      await executePreRequestScript(convertedRequest, scriptsExecution, contextObj, environmentVariables)
+      if (globalConfig.scriptExecution) {
+        await executePreRequestScript(convertedRequest, scriptsExecution, contextObj, environmentVariables)
+      }
 
       environment.data = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
 
@@ -191,8 +279,7 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
         await new Promise(resolve => setTimeout(resolve, request.delay))
       }
       const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId)
-
-      await setResponse(convertedRequest, resp, environment, environmentVariables, request, 'SUCCESS', tracing, testCase, scriptsExecution, contextObj)
+      await setResponse(convertedRequest, resp, environment, environmentVariables, request, 'SUCCESS', tracing, testCase, scriptsExecution, contextObj, globalConfig)
     } catch (err) {
       let resp
       try {
@@ -200,10 +287,12 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
       } catch (parsingErr) {
         resp = err.message
       }
-      await setResponse(convertedRequest, resp, environment, environmentVariables, request, 'ERROR', tracing, testCase, scriptsExecution, contextObj)
+      await setResponse(convertedRequest, resp, environment, environmentVariables, request, 'ERROR', tracing, testCase, scriptsExecution, contextObj, globalConfig)
     } finally {
-      contextObj.ctx.dispose()
-      contextObj.ctx = null
+      if (contextObj) {
+        contextObj.ctx.dispose()
+        contextObj.ctx = null
+      }
     }
   }
 
@@ -212,7 +301,7 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
   // Set a timeout if the response callback is not received in a particular time
 }
 
-const setResponse = async (convertedRequest, resp, environment, environmentVariables, request, status, tracing, testCase, scriptsExecution, contextObj) => {
+const setResponse = async (convertedRequest, resp, environment, environmentVariables, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig) => {
   // Get the requestsHistory and callbacksHistory from the objectStore
   const requestsHistoryObj = objectStore.get('requestsHistory')
   const callbacksHistoryObj = objectStore.get('callbacksHistory')
@@ -221,9 +310,15 @@ const setResponse = async (convertedRequest, resp, environment, environmentVaria
     callbacksHistory: callbacksHistoryObj
   }
 
-  await executePostRequestScript(convertedRequest, resp, scriptsExecution, contextObj, environmentVariables, backgroundData)
+  if (globalConfig.scriptExecution) {
+    await executePostRequestScript(convertedRequest, resp, scriptsExecution, contextObj, environmentVariables, backgroundData)
+  }
   environment.data = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
-  const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environment.data, backgroundData)
+
+  let testResult = null
+  if (globalConfig.testsExecution) {
+    testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environment.data, backgroundData)
+  }
   request.appended = {
     status: status,
     testResult,
@@ -234,7 +329,7 @@ const setResponse = async (convertedRequest, resp, environment, environmentVaria
       curlRequest: resp.curlRequest
     }
   }
-  if (tracing.outboundID) {
+  if (tracing.outboundID && globalConfig.broadcastOutboundProgressEnabled) {
     notificationEmitter.broadcastOutboundProgress({
       outboundID: tracing.outboundID,
       testCaseId: testCase.id,
@@ -630,6 +725,7 @@ const generateFinalReport = (inputTemplate, runtimeInformation) => {
 
 module.exports = {
   OutboundSend,
+  OutboundSendLoop,
   terminateOutbound,
   handleTests,
   sendRequest,
