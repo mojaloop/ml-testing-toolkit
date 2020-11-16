@@ -125,6 +125,9 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
     items: Object.entries(inputTemplate.inputValues || {}).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
   }
   try {
+    const totalReport = {
+      iterations: []
+    }
     for (let itn = 0; itn < iterations; itn++) {
       const startedTimeStamp = new Date()
       // Deep copy the template
@@ -136,50 +139,29 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
       const completedTimeStamp = new Date()
       const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
       const runtimeInformation = {
+        iterationNumber: itn,
         completedTimeISO: completedTimeStamp.toISOString(),
         startedTime: startedTimeStamp.toUTCString(),
         completedTime: completedTimeStamp.toUTCString(),
         runDurationMs: runDurationMs,
-        avgResponseTime: 'NA',
         totalAssertions: 0,
         totalPassedAssertions: 0
       }
-      generateFinalReport(tmpTemplate, runtimeInformation)
-
-      const iterationStatus = {
-        iterationNumber: itn + 1,
-        runDurationMs,
-        totalAssertions: runtimeInformation.totalAssertions,
-        totalPassedAssertions: runtimeInformation.totalPassedAssertions
-      }
+      // TODO: This can be optimized by storing only results into the iterations array
+      totalReport.iterations.push(generateFinalReport(tmpTemplate, runtimeInformation))
       notificationEmitter.broadcastOutboundProgress({
         status: 'ITERATION_PROGRESS',
         outboundID: tracing.outboundID,
-        iterationStatus
+        iterationStatus: runtimeInformation
       }, tracing.sessionID)
     }
 
     // Send the total result to client
     if (tracing.outboundID) {
-      // const runtimeInformation = {
-      //   completedTimeISO: completedTimeStamp.toISOString(),
-      //   startedTime: startedTimeStamp.toUTCString(),
-      //   completedTime: completedTimeStamp.toUTCString(),
-      //   avgResponseTime: 'NA',
-      //   totalAssertions: 0,
-      //   totalPassedAssertions: 0
-      // }
-      const totalResult = {}
-      // const totalResult = generateFinalReport(inputTemplate, runtimeInformation)
-      // if (Config.getSystemConfig().HOSTING_ENABLED) {
-      //   const totalResultCopy = JSON.parse(JSON.stringify(totalResult))
-      //   totalResultCopy.runtimeInformation.completedTimeISO = completedTimeStamp
-      //   dbAdapter.upsert('reports', totalResultCopy, { dfspId })
-      // }
       notificationEmitter.broadcastOutboundProgress({
         status: 'ITERATIONS_FINISHED',
         outboundID: tracing.outboundID,
-        totalResult
+        totalReport
       }, tracing.sessionID)
     }
   } catch (err) {
