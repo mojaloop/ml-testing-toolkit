@@ -88,6 +88,7 @@ router.post('/template/:traceID', [
 // TODO: Refactor the following. Decision to be taken whether to mix it up with actual template endpoint using query params for iternations
 router.post('/template_iterations/:traceID', [
   check('name').notEmpty(),
+  check('iterationCount').notEmpty(),
   check('test_cases').notEmpty()
 ], async (req, res, next) => {
   try {
@@ -99,7 +100,7 @@ router.post('/template_iterations/:traceID', [
     const inputJson = JSON.parse(JSON.stringify(req.body))
     // TODO: Change the following value to the dfspId based ont he login incase HOSTING_ENABLED
     const dfspId = req.user ? req.user.dfspId : Config.getUserConfig().DEFAULT_USER_FSPID
-    outbound.OutboundSendLoop(inputJson, traceID, dfspId, 100)
+    outbound.OutboundSendLoop(inputJson, traceID, dfspId, req.query.iterationCount)
 
     return res.status(200).json({ status: 'OK' })
   } catch (err) {
