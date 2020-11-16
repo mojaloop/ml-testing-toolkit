@@ -2,10 +2,11 @@ version: "3.7"
 
 services:
   mojaloop-testing-toolkit:
-    image: mojaloop-testing-toolkit:local
-    build:
-      context: .
-      target: builder
+    image: mojaloop/ml-testing-toolkit:v11.4.0
+    #image: mojaloop-testing-toolkit:local
+    #build:
+    #  context: .
+    #  target: builder
     volumes:
       - "./spec_files:/opt/mojaloop-testing-toolkit/spec_files"
       - "./secrets:/opt/mojaloop-testing-toolkit/secrets"
