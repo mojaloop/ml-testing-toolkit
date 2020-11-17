@@ -85,6 +85,31 @@ router.post('/template/:traceID', [
   }
 })
 
+router.post('/template_iterations/:traceID', [
+  check('name').notEmpty(),
+  check('iterationCount').notEmpty(),
+  check('test_cases').notEmpty()
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() })
+    }
+    if (+req.query.iterationCount === 0) {
+      throw new Error('Iteration count is zero')
+    }
+    const traceID = req.params.traceID
+    const inputJson = JSON.parse(JSON.stringify(req.body))
+    // TODO: Change the following value to the dfspId based ont he login incase HOSTING_ENABLED
+    const dfspId = req.user ? req.user.dfspId : Config.getUserConfig().DEFAULT_USER_FSPID
+    outbound.OutboundSendLoop(inputJson, traceID, dfspId, req.query.iterationCount)
+
+    return res.status(200).json({ status: 'OK' })
+  } catch (err) {
+    next(err)
+  }
+})
+
 // Route to terminate the given execution
 router.delete('/template/:traceID', async (req, res, next) => {
   try {

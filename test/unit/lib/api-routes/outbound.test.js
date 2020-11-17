@@ -281,6 +281,23 @@ describe('API route /api/outbound', () => {
       const postResponse = await request(app).post(`/api/outbound/template/123`).send(properTemplateAsync)
       expect(postResponse.statusCode).toEqual(200)
     })
+    it('Send a proper template in loop without iteration count', async () => {
+      const res = await request(app).post(`/api/outbound/template_iterations/12`).send(properTemplateAsync)
+      expect(res.statusCode).toEqual(422)
+    })
+    it('Send a proper template in loop with iteration count zero', async () => {
+      const res = await request(app).post(`/api/outbound/template_iterations/12`).query({iterationCount: 0}).send(properTemplateAsync)
+      expect(res.statusCode).toEqual(500)
+    })
+    it('Send a proper template in loop with wrong template', async () => {
+      const {test_cases, ...wrongTemplate} = properTemplateAsync
+      const res = await request(app).post(`/api/outbound/template_iterations/12`).query({iterationCount: 1}).send(wrongTemplate)
+      expect(res.statusCode).toEqual(422)
+    })
+    it('Send a proper template in loop', async () => {
+      const res = await request(app).post(`/api/outbound/template_iterations/12`).query({iterationCount: 1}).send(properTemplateAsync)
+      expect(res.statusCode).toEqual(200)
+    })
   })
   describe('DELETE /api/outbound/template/:outboundID', () => {
     it('Send request to delete template with outboundID 12', async () => {
