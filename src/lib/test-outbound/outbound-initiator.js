@@ -125,6 +125,7 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
     items: Object.entries(inputTemplate.inputValues || {}).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
   }
   try {
+    const totalStartedTimeStamp = new Date()
     const totalReport = {
       iterations: []
     }
@@ -156,11 +157,14 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
       }, tracing.sessionID)
     }
 
+    const totalCompletedTimeStamp = new Date()
+    const totalRunDurationMs = totalCompletedTimeStamp.getTime() - totalStartedTimeStamp.getTime()
     // Send the total result to client
     if (tracing.outboundID) {
       notificationEmitter.broadcastOutboundProgress({
         status: 'ITERATIONS_FINISHED',
         outboundID: tracing.outboundID,
+        totalRunDurationMs,
         totalReport
       }, tracing.sessionID)
     }
