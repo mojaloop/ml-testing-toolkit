@@ -85,7 +85,6 @@ router.post('/template/:traceID', [
   }
 })
 
-// TODO: Refactor the following. Decision to be taken whether to mix it up with actual template endpoint using query params for iternations
 router.post('/template_iterations/:traceID', [
   check('name').notEmpty(),
   check('iterationCount').notEmpty(),
