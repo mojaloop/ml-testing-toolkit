@@ -96,6 +96,9 @@ router.post('/template_iterations/:traceID', [
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() })
     }
+    if (+req.query.iterationCount === 0) {
+      throw new Error('Iteration count is zero')
+    }
     const traceID = req.params.traceID
     const inputJson = JSON.parse(JSON.stringify(req.body))
     // TODO: Change the following value to the dfspId based ont he login incase HOSTING_ENABLED
