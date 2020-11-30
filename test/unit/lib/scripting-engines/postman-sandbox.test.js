@@ -24,25 +24,23 @@
 
 'use strict'
 
-const Context = require('../../../../src/lib/test-outbound/context')
+const Context = require('../../../../src/lib/scripting-engines/postman-sandbox')
 const uuid = require('uuid')
 const axios = require('axios').default
 jest.mock('axios')
 
 
 describe('Test Outbound Context', () => {
-  describe('generageContextObj', () => {
+  describe('generateContextObj', () => {
     // Positive Scenarios
-    it('generageContextObj should return contextObj with the given environment if present', async () => {
-      const environment = [
-        {type: 'any', key: 'amount', value: '100'}
-      ]
-      const contextObj = (await Context.generageContextObj(environment))
+    it('generateContextObj should return contextObj with the given environment if present', async () => {
+      const environment = { amount: 100 }
+      const contextObj = (await Context.generateContextObj(environment))
       expect(contextObj.environment).toEqual(environment)
     })
-    it('generageContextObj should return contextObj with empty environment if not present', async () => {
-      const contextObj = (await Context.generageContextObj())
-      expect(contextObj.environment).toEqual([])
+    it('generateContextObj should return contextObj with empty environment if not present', async () => {
+      const contextObj = (await Context.generateContextObj())
+      expect(contextObj.environment).toEqual({})
     })
   })
   describe('executeAsync', () => {
@@ -52,7 +50,7 @@ describe('Test Outbound Context', () => {
       axios.mockImplementation(() => Promise.resolve(true))
       const amountBefore = 100
       const expectedAmount = 200
-      const contextObj = await Context.generageContextObj([{type: 'any', key: 'amountBefore', value: amountBefore}])
+      const contextObj = await Context.generateContextObj({amountBefore})
 
       const args = {
         script: [
@@ -72,13 +70,14 @@ describe('Test Outbound Context', () => {
         contextObj.ctx.dispose()
         contextObj.ctx = null
       }
-
       expect(scriptResult.consoleLog[0][1]).toEqual('log')
       expect(scriptResult.consoleLog[0][2]).toEqual('amountAfter: ')
       expect(scriptResult.consoleLog[0][3]).toEqual(expectedAmount)
 
-      expect(scriptResult.environment[0]).toEqual({type: 'any', key: 'amountBefore', value: amountBefore})
-      expect(scriptResult.environment[1]).toEqual({type: 'any', key: 'amountAfter', value: expectedAmount})
+      expect(scriptResult.environment).toHaveProperty('amountBefore')
+      expect(scriptResult.environment).toHaveProperty('amountAfter')
+      expect(scriptResult.environment.amountBefore).toEqual(amountBefore)
+      expect(scriptResult.environment.amountAfter).toEqual(expectedAmount)
 
     })
 
@@ -87,7 +86,7 @@ describe('Test Outbound Context', () => {
       axios.mockImplementation(() => Promise.resolve(true))
       const amountBefore = 100
       const expectedAmount = 200
-      const contextObj = await Context.generageContextObj([{type: 'any', key: 'amountBefore', value: amountBefore}])
+      const contextObj = await Context.generateContextObj({amountBefore})
 
       const args = {
         script: [
@@ -112,8 +111,10 @@ describe('Test Outbound Context', () => {
       expect(scriptResult.consoleLog[0][2]).toEqual('amountAfter: ')
       expect(scriptResult.consoleLog[0][3]).toEqual(expectedAmount)
 
-      expect(scriptResult.environment[0]).toEqual({type: 'any', key: 'amountBefore', value: amountBefore})
-      expect(scriptResult.environment[1]).toEqual({type: 'any', key: 'amountAfter', value: expectedAmount})
+      expect(scriptResult.environment).toHaveProperty('amountBefore')
+      expect(scriptResult.environment).toHaveProperty('amountAfter')
+      expect(scriptResult.environment.amountBefore).toEqual(amountBefore)
+      expect(scriptResult.environment.amountAfter).toEqual(expectedAmount)
 
     })
 
@@ -122,7 +123,7 @@ describe('Test Outbound Context', () => {
       axios.mockImplementation(() => Promise.reject(true))
       const amountBefore = 100
       const expectedAmount = 200
-      const contextObj = await Context.generageContextObj([{type: 'any', key: 'amountBefore', value: amountBefore}])
+      const contextObj = await Context.generateContextObj({amountBefore})
 
       const args = {
         script: [
@@ -147,8 +148,10 @@ describe('Test Outbound Context', () => {
       expect(scriptResult.consoleLog[0][2]).toEqual('amountAfter: ')
       expect(scriptResult.consoleLog[0][3]).toEqual(expectedAmount)
 
-      expect(scriptResult.environment[0]).toEqual({type: 'any', key: 'amountBefore', value: amountBefore})
-      expect(scriptResult.environment[1]).toEqual({type: 'any', key: 'amountAfter', value: expectedAmount})
+      expect(scriptResult.environment).toHaveProperty('amountBefore')
+      expect(scriptResult.environment).toHaveProperty('amountAfter')
+      expect(scriptResult.environment.amountBefore).toEqual(amountBefore)
+      expect(scriptResult.environment.amountAfter).toEqual(expectedAmount)
 
     })
 
@@ -159,7 +162,7 @@ describe('Test Outbound Context', () => {
       }))
       const amountBefore = 100
       const expectedAmount = 200
-      const contextObj = await Context.generageContextObj([{type: 'any', key: 'amountBefore', value: amountBefore}])
+      const contextObj = await Context.generateContextObj({amountBefore})
 
       const args = {
         script: [
@@ -184,9 +187,39 @@ describe('Test Outbound Context', () => {
       expect(scriptResult.consoleLog[0][2]).toEqual('amountAfter: ')
       expect(scriptResult.consoleLog[0][3]).toEqual(expectedAmount)
 
-      expect(scriptResult.environment[0]).toEqual({type: 'any', key: 'amountBefore', value: amountBefore})
-      expect(scriptResult.environment[1]).toEqual({type: 'any', key: 'amountAfter', value: expectedAmount})
+      expect(scriptResult.environment).toHaveProperty('amountBefore')
+      expect(scriptResult.environment).toHaveProperty('amountAfter')
+      expect(scriptResult.environment.amountBefore).toEqual(amountBefore)
+      expect(scriptResult.environment.amountAfter).toEqual(expectedAmount)
 
+    })
+    // Error scenarios
+    it('executeAsync should return consoleLog with error messages', async () => {
+
+      const contextObj = await Context.generateContextObj({})
+      const args = {
+        script: [
+          "asdf()"
+        ],
+        data: { context: {...contextObj}, id: uuid.v4()},
+        contextObj: contextObj
+      }
+
+      let scriptResult
+      try {
+        scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
+      } finally {
+        contextObj.ctx.dispose()
+        contextObj.ctx = null
+      }
+      console.log(scriptResult.consoleLog)
+      expect(scriptResult.consoleLog[0][1]).toEqual('executionError')
+      expect(scriptResult.consoleLog[0][2]).toHaveProperty('type')
+      expect(scriptResult.consoleLog[0][2]).toHaveProperty('name')
+      expect(scriptResult.consoleLog[0][2]).toHaveProperty('message')
+      expect(scriptResult.consoleLog[0][2].type).toEqual('Error')
+      expect(scriptResult.consoleLog[0][2].name).toEqual('ReferenceError')
+      expect(scriptResult.consoleLog[0][2].message).toEqual('asdf is not defined')
     })
   })
 })

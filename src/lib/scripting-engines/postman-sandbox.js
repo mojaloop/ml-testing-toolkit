@@ -28,7 +28,7 @@ const axios = require('axios').default
 
 const createContextAsync = util.promisify(Sandbox.createContext)
 
-const generageContextObj = async (environment = []) => {
+const generateContextObj = async (environment = {}) => {
   const ctx = await createContextAsync({ timeout: 30000 })
   ctx.executeAsync = util.promisify(ctx.execute)
   ctx.on('error', function (cursor, err) {
@@ -44,6 +44,13 @@ const generageContextObj = async (environment = []) => {
 
 const executeAsync = async (script, data, contextObj) => {
   let consoleLog = []
+
+  // Append ctx and environment to data.context
+  if (!data.context) {
+    data.context = {}
+  }
+  data.context.ctx = contextObj.ctx
+  data.context.environment = Object.entries(contextObj.environment || {}).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
 
   contextObj.ctx.on('console', function () {
     consoleLog.push(Array.from(arguments))
@@ -81,18 +88,21 @@ const executeAsync = async (script, data, contextObj) => {
     consoleLog.push([cur, 'executionError', err])
   })
 
-  const resp = await contextObj.ctx.executeAsync(script, data)
-  contextObj.environment = resp.environment
-
+  try {
+    const resp = await contextObj.ctx.executeAsync(script, data)
+    contextObj.environment = resp.environment.values.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
+  } catch (err) {
+    // consoleLog.push([{execution: 0}, 'executionError', err.message])
+  }
   const result = {
     consoleLog: consoleLog,
-    environment: contextObj.environment.values
+    environment: contextObj.environment
   }
   consoleLog = []
   return result
 }
 
 module.exports = {
-  generageContextObj,
+  generateContextObj,
   executeAsync
 }
