@@ -31,6 +31,8 @@ const https = require('https')
 const ConnectionProvider = require('../../../../src/lib/configuration-providers/mb-connection-manager')
 const Config = require('../../../../src/lib/config')
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
+const notificationEmitter = require('../../../../src/lib/notificationEmitter.js')
+const OpenApiDefinitionsModel = require('../../../../src/lib/mocking/openApiDefinitionsModel')
 
 const SpyAgent = jest.spyOn(https, 'Agent')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
@@ -38,9 +40,10 @@ const SpyGetEndpointsConfig= jest.spyOn(ConnectionProvider, 'getEndpointsConfig'
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 const SpySign = jest.spyOn(JwsSigning, 'sign')
+const SpyGetApiDefinitions = jest.spyOn(OpenApiDefinitionsModel, 'getApiDefinitions')
 
 
-
+jest.mock('../../../../src/lib/notificationEmitter.js')
 jest.mock('axios')
 
 
@@ -955,6 +958,137 @@ describe('Outbound Initiator Functions', () => {
       expect(testResult.results['3'].status).toEqual('FAILED')
       expect(testResult.passedCount).toEqual(1)
     })
+  })
+  describe('OutboundSend & OutboundSendLoop', () => {
+    const sampleTemplate = {
+      "inputValues": {
+        "fromIdType": "MSISDN",
+        "fromIdValue": "44123456789",
+        "fromFirstName": "Firstname-Test",
+        "fromLastName": "Lastname-Test",
+        "fromDOB": "1984-01-01",
+        "note": "test",
+        "currency": "USD",
+        "amount": "100",
+        "homeTransactionId": "123ABC",
+        "fromFspId": "testingtoolkitdfsp",
+        "accept": "application/vnd.interoperability.parties+json;version=1.0",
+        "contentType": "application/vnd.interoperability.parties+json;version=1.0",
+        "toIdValue": "27713803912",
+        "toIdType": "MSISDN",
+        "toFspId": "payeefsp",
+        "acceptQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
+        "contentTypeQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
+        "acceptTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
+        "contentTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
+        "hub_operator": "NOT_APPLICABLE",
+        "payerfsp": "testingtoolkitdfsp",
+        "accountId": "6",
+        "payeefsp": "payeefsp",
+        "HUB_OPERATOR_BEARER_TOKEN": "NOT_APPLICABLE",
+        "BASE_CENTRAL_LEDGER_ADMIN": "",
+        "payerIdType": "MSISDN",
+        "payerIdentifier": "22507008181",
+        "payeeIdType": "MSISDN",
+        "payeeIdentifier": "22556999125"
+      },
+      "name": "multi",
+      "test_cases": [
+        {
+          "id": 1,
+          "name": "P2P Transfer Happy Path",
+          "requests": [
+            {
+              "id": 1,
+              "description": "Get party information",
+              "apiVersion": {
+                "minorVersion": 0,
+                "majorVersion": 1,
+                "type": "fspiop",
+                "asynchronous": false
+              },
+              "operationPath": "/parties/{Type}/{ID}",
+              "method": "get",
+              "headers": {
+                "Accept": "{$inputs.accept}",
+                "Content-Type": "{$inputs.contentType}",
+                "Date": "{$function.generic.curDate}",
+                "FSPIOP-Source": "{$inputs.fromFspId}"
+              },
+              "params": {
+                "Type": "{$inputs.toIdType}",
+                "ID": "{$inputs.toIdValue}"
+              },
+              "tests": {
+                "assertions": []
+              },
+              "scriptingEngine": "javascript",
+              "ignoreCallbacks": true,
+              "scripts": {
+                "preRequest": {
+                  "exec": [
+                    "console.log('sample')"
+                  ]
+                },
+                "postRequest": {
+                  "exec": [
+                    "console.log('sample')"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+
+    it('OutboundSend with javascript should not throw any error', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpyGetApiDefinitions.mockResolvedValueOnce([{
+        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+        type: 'fspiop'
+      }])
+      await expect(OutboundInitiator.OutboundSend(sampleTemplate)).resolves.not.toBeNull
+    })
+    it('OutboundSend with postman script should not throw any error', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpyGetApiDefinitions.mockResolvedValueOnce([{
+        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+        type: 'fspiop'
+      }])
+      sampleTemplate.test_cases[0].requests[0].scriptingEngine = 'postmanscript'
+      await expect(OutboundInitiator.OutboundSend(sampleTemplate, '123')).resolves.not.toBeNull
+    })
+    it('OutboundSendLoop should not throw any error', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpyGetApiDefinitions.mockResolvedValueOnce([{
+        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+        type: 'fspiop'
+      }])
+      await expect(OutboundInitiator.OutboundSendLoop(sampleTemplate, '123', null, 2)).resolves.not.toBeNull
+    })
+
   })
   
   describe('terminateOutbound', () => {

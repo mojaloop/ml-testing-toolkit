@@ -8,7 +8,7 @@
 
 1. [At first glance](#1-at-first-glance)
 
-2. [Dashboard](#2-dashboard)
+2. [Welcome Page](#2-welcome-page)
 
 3. [Monitoring](#3-monitoring)
 
@@ -22,7 +22,7 @@
 
 7. [Outbound Request](#7-outbound-request)
 
-    7.1 [Import Collection](#71-import-collection)
+    7.1 [Collection Manager](#71-collection-manager)
 
     7.2 [Import Environment](#72-import-environment)
 
@@ -56,7 +56,7 @@ When you open the **Mojaloop Testing Toolkit** in your browser, you will be welc
 
 Take note of the navigation bar on the left. The navigational items are;
 
-- **Dashboard**
+- **Welcome Page**
 - **Monitoring**
 - **Sync Response Rules**
 - **Validation Rules (Error Callbacks)**
@@ -66,17 +66,15 @@ Take note of the navigation bar on the left. The navigational items are;
 
 We will work through each one of the items and provide you with a fair understanding of the current functionality.
 
-### 2 Dashboard
+### 2 Welcome Page
 
-The _Dashboard_ is the default opening window. It will provide the user with valuable statistical data pertaining to request and response activities (Request and Responses statistics, including Rules Engine "Hits" statistics).
-
-The static data will be replaced with accurate information once the development of this functionality is at a more advanced stage.
+The _Welcome page_ is the default opening window.
 
 ![Opening view](/assets/images/opening-view.png)
 
 ### 3 Monitoring
 
-The _Monitoring_ navigation tab allows you to monitor _incoming_ requests from the **Mojaloop Simulator**.
+The _Monitoring_ navigation tab allows you to monitor _incoming_ and _outgoing_ requests to / from the **Testing Toolkit**.
 
 ![Monitoring Initial State](/assets/images/monitoring-initial-state.png) 
 
@@ -240,7 +238,7 @@ The same applies for this section, the functionality is similar to [4 Sync Respo
 
 ### 7 Outbound Request
 
-This sections will enable you to intiate requests from the testing toolkit to your DFSP implementation.
+This sections will enable you to intiate requests from the testing toolkit to your DFSP / HUB implementations.
 
 The user can create a collection of operations and add a number of assertions to these operations. The assertions can be setup and customized to support your testing requirements and verify both positive and negative requests and responses. 
 
@@ -250,22 +248,21 @@ Selecting the _**Outbound Request**_ navigation tab on the left side, the follow
 
 At the top of the screen, you will notice the following buttons on the main window, starting from the left.
 
-- _**Import Collection**_
-- _**Import Environment**_
-- _**New Template**_
-- _**Show Template**_
-- _**Save**_
+- _**Collections Manager**_
+- _**Load Sample**_
+- _**Show Current Template**_
+- _**Iteration Runner**_
 - _**Send**_
 
-The window on the left contains the _**Template**_ with the _Test Cases_ and operations. 
+You can see two tabs _'Test Cases'_ and _'Input Values'_. 
 
 ![Template Window](/assets/images/template-window.png)
 
-#### 7.1 Import Collection
+#### 7.1 Collection Manager
 
-By selecting the _**Import Collection**_ button, it will allow you to import a collection. For your exploration, sample collections are available under the project root directory under [/examples/collections](/examples/collections) sub directory. To select one of the sample files, on the file explorer window that poped up when you selected the _**Import Collection**_ button, navigate to [/examples/collections/dfsp](/examples/collections/dfsp) under the project root directory. Select the ```p2p_happy_path.json``` file to import into the **Mojaloop Testing Toolkit** application. This sample file consist of a couple of test samples. You could add more test cases by clicking on _Add Test Case_ button
+By selecting the _**Collection Manager**_ button, it will open a drawer on left which contains a number of file operations. That will allow you to import, export and modify a collection. For your exploration, sample collections are available under the project root directory under [/examples/collections](/examples/collections) sub directory. To select one of the sample files, on the file explorer window that poped up when you selected the _**Import File**_ button, navigate to [/examples/collections/dfsp](/examples/collections/dfsp) under the project root directory. Select the ```p2p_happy_path.json``` file to import into the **Mojaloop Testing Toolkit** application. You should select the file in the collection manager, and observe the test cases should be loaded in the main screen. You could add more test cases by clicking on _Add Test Case_ button
 
-![Import Collection](/assets/images/import-template.png)
+![Collection Manager](/assets/images/import-template.png)
 
 _**P2P Transfer Happy Path**_
 
@@ -278,9 +275,7 @@ _**P2P Transfer Happy Path**_
 ![Opened Imported Template](/assets/images/opened-imported-template.png)
 
 #### 7.2 Import Environment
-By selecting the _**Import Environment**_ button, it will allow you to import input values. For your exploration, sample environments are available under the project root directory under [/examples/environments](/examples/environments) sub directory. To select one of the sample files, on the file explorer window that poped up when you selected the _**Import Environment**_ button, navigate to [/examples/environments](/examples/environments) under the project root directory. Select the ```dfsp_local_environment.json``` file to import into the **Mojaloop Testing Toolkit** application. This sample file consist of a couple of input values.
-
-![Import Environment](/assets/images/import-template.png)
+By selecting the _**Import Environment**_ button in _Input Values_ tab, it will allow you to import input values. For your exploration, sample environments are available under the project root directory under [/examples/environments](/examples/environments) sub directory. To select one of the sample files, on the file explorer window that poped up when you selected the _**Import Environment**_ button, navigate to [/examples/environments](/examples/environments) under the project root directory. Select the ```dfsp_local_environment.json``` file to import into the **Mojaloop Testing Toolkit** application. This sample file consist of a couple of input values.
 
 It is possible to update the **Input Values** on the right hand side window. Additional input values can be added, by selecting the _**Add Input Value**_ button on the top right of this right hand side window. These values relates to the specified variable that you can select and use in any **Request** that you create.
 
@@ -314,10 +309,25 @@ The **Editor** tab displays request content and it can be updated manually on th
 
 ##### 7.3.3 Scripts
 
-The **Scripts** tab allows you to use postman like pre request and test scripts. Make sure that advanced features options is enabled. 
-- pm.test - not supported - Use Testing Toolkit Tests for this purpose. In **Tests** You could use values stored in the environment. To access thoes values use environment.'key'
-- pm.response - to get the response object outside pm.sendRequest use pm.response.body not pm.response.json()
-- everything else should work the same way is in postman
+The **Scripts** tab allows you to use postman like pre request and test scripts. Make sure that advanced features options is enabled.
+
+You can write scripts in two formats.
+
+- **Postman Script:**
+
+  If you select postman script option, you can use the same functions like pm.sendRequest as in postman. This option is usefull when you want to convert your existing postman tests to testing toolkit format.
+  - pm.test - not supported - Use Testing Toolkit Tests for this purpose. In **Tests** You could use values stored in the environment. To access thoes values use environment.'key'
+  - pm.response - to get the response object outside pm.sendRequest use pm.response.body not pm.response.json()
+  - everything else should work the same way is in postman
+
+- **Java Script:**
+
+  If you want advanced features and flexibility, you can select javascript option. This option enables you to write the scripts in javascript format and you can use the following functions.
+  - **console.log** - function
+  - **axios** - functions (async)
+  - **response** - variable
+  - **environment** - variable
+
 
 ![Sample Pre Request and Post Request Scripts](/assets/images/test-case-editor-scripts.png)
 

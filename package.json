@@ -1,7 +1,7 @@
 {
   "name": "ml-testing-toolkit",
   "description": "Testing Toolkit for Mojaloop implementations",
-  "version": "11.5.0",
+  "version": "11.6.0",
   "license": "Apache-2.0",
   "author": "Vijaya Kumar Guthi, ModusBox Inc.",
   "contributors": [
@@ -117,7 +117,8 @@
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
     "uuid": "8.1.0",
-    "uuid4": "1.1.4"
+    "uuid4": "1.1.4",
+    "vm": "0.1.0"
   },
   "devDependencies": {
     "@types/jest": "24.0.22",

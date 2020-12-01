@@ -42,6 +42,81 @@ describe('dfspMockUsers', () => {
       const dfspList = await dfspMockUsers.getDFSPList()
       expect(Array.isArray(dfspList)).toBeTruthy()
     })
+    it('should return temp dfsp list if hosting and keycloak enabled', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: true,
+        KEYCLOAK: {
+          ENABLED: true
+        },
+        OAUTH: {
+          OAUTH2_ISSUER: "http://mojaloop-testing-toolkit:5050/api/oauth2/token"
+        }
+      })
+      axios.post.mockReturnValueOnce({
+        status: 200,
+        data: {
+          access_token: 'asdf',
+          expires_in: 10
+        }
+      })
+      axios.get.mockReturnValueOnce({
+        status: 200,
+        data: [
+          {
+            username: 'sadf',
+            firstName: '',
+            lastName: '',
+            attributes: {
+              dfspId: 'asdf'
+            }
+          }
+        ]
+      })
+      const dfspList = await dfspMockUsers.getDFSPList()
+      expect(Array.isArray(dfspList)).toBeTruthy()
+    })
+    it('should throw an error if hosting and keycloak enabled and oauth requests fail', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: true,
+        KEYCLOAK: {
+          ENABLED: true,
+          USERNAME: 'asf'
+        },
+        OAUTH: {
+          OAUTH2_ISSUER: "http://mojaloop-testing-toolkit:5050/api/oauth2/token"
+        }
+      })
+      axios.post.mockReturnValueOnce({
+        status: 500
+      })
+      axios.get.mockReturnValueOnce({
+        status: 500
+      })
+      await expect(dfspMockUsers.getDFSPList()).rejects.toThrowError()
+    })
+    it('should throw an error if hosting and keycloak enabled and oauth requests fail', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: true,
+        KEYCLOAK: {
+          ENABLED: true,
+          USERNAME: 'asf'
+        },
+        OAUTH: {
+          OAUTH2_ISSUER: "http://mojaloop-testing-toolkit:5050/api/oauth2/token"
+        }
+      })
+      axios.post.mockReturnValueOnce({
+        status: 200,
+        data: {
+          access_token: 'asdf',
+          expires_in: 10
+        }
+      })
+      axios.get.mockReturnValueOnce({
+        status: 500
+      })
+      await expect(dfspMockUsers.getDFSPList()).rejects.toThrowError()
+    })
     it('should return dfsp wise list if hosting disabled and hub only mode enabled', async () => {
       Config.getSystemConfig.mockReturnValue({
         HOSTING_ENABLED: false
