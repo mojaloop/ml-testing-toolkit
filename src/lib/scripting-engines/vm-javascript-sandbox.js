@@ -69,6 +69,10 @@ const executeAsync = async (script, data, contextObj) => {
   const fullScript = preScript + script.join('\n') + postScript
   let consoleLog = []
 
+  if (data.response) {
+    contextObj.response = data.response
+  }
+
   try {
     await Sandbox.runInNewContext(fullScript, contextObj, { timeout: 30000, microtaskMode: 'afterEvaluate' })
     for (let i = 0; i < contextObj.consoleOutObj.stdOut.length; i++) {
