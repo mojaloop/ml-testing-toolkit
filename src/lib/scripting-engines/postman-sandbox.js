@@ -96,7 +96,7 @@ const executeAsync = async (script, data, contextObj) => {
   }
   const result = {
     consoleLog: consoleLog,
-    environment: contextObj.environment
+    environment: { ...contextObj.environment }
   }
   consoleLog = []
   return result
