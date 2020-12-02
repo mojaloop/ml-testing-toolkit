@@ -118,7 +118,7 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
 const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
   const globalConfig = {
     broadcastOutboundProgressEnabled: false,
-    scriptExecution: false,
+    scriptExecution: true,
     testsExecution: true
   }
   const tracing = getTracing(traceID, dfspId)
