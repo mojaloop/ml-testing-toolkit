@@ -24,6 +24,7 @@
 
 const Sandbox = require('vm')
 const axios = require('axios').default
+const WebSocketClientManager = require('../webSocketClient/WebSocketClientManager').WebSocketClientManager
 
 const consoleWrapperFn = (consoleOutObj) => {
   return {
@@ -33,12 +34,12 @@ const consoleWrapperFn = (consoleOutObj) => {
   }
 }
 
+const clearConsole = (consoleOutObj) => {
+  consoleOutObj.stdOut = []
+}
+
 const preScript = `
 (async () => {
-  consoleOutObj = {
-    stdOut: []
-  }
-  console = consoleWrapperFn(consoleOutObj)
 `
 
 const postScript = `
@@ -47,12 +48,12 @@ const postScript = `
 `
 
 const generateContextObj = async (environmentObj = {}) => {
-  // const ctx = await createContextAsync({ timeout: 30000 })
-  // ctx.executeAsync = util.promisify(ctx.execute)
-  // ctx.on('error', function (cursor, err) {
-  //   // log the error in postman sandbox
-  //   console.log(cursor, err)
-  // })
+  const consoleOutObj = {
+    stdOut: []
+  }
+  const consoleFn = consoleWrapperFn(consoleOutObj)
+  const websocket = new WebSocketClientManager(consoleFn)
+
   const contextObj = {
     ctx: {
       dispose: () => {}
@@ -60,7 +61,10 @@ const generateContextObj = async (environmentObj = {}) => {
     environment: { ...environmentObj },
     axios,
     consoleWrapperFn,
-    executeAsync
+    executeAsync,
+    websocket,
+    console: consoleFn,
+    consoleOutObj
   }
   return contextObj
 }
@@ -88,8 +92,9 @@ const executeAsync = async (script, data, contextObj) => {
 
   const result = {
     consoleLog: consoleLog,
-    environment: contextObj.environment
+    environment: { ...contextObj.environment }
   }
+  clearConsole(contextObj.consoleOutObj)
   consoleLog = []
   return result
 }

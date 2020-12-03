@@ -73,10 +73,12 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
   const startedTimeStamp = new Date()
   const tracing = getTracing(traceID, dfspId)
 
-  const environmentVariables = { ...inputTemplate.inputValues }
+  const variableData = {
+    environment: { ...inputTemplate.inputValues }
+  }
   try {
     for (const i in inputTemplate.test_cases) {
-      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, environmentVariables, dfspId, globalConfig)
+      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, variableData, dfspId, globalConfig)
     }
 
     const completedTimeStamp = new Date()
@@ -116,7 +118,7 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
 const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
   const globalConfig = {
     broadcastOutboundProgressEnabled: false,
-    scriptExecution: false,
+    scriptExecution: true,
     testsExecution: true
   }
   const tracing = getTracing(traceID, dfspId)
@@ -179,7 +181,7 @@ const terminateOutbound = (traceID) => {
   terminateTraceIds[traceID] = true
 }
 
-const processTestCase = async (testCase, traceID, inputValues, environmentVariables, dfspId, globalConfig) => {
+const processTestCase = async (testCase, traceID, inputValues, variableData, dfspId, globalConfig) => {
   const tracing = getTracing(traceID)
 
   // Load the requests array into an object by the request id to access a particular object faster
@@ -235,16 +237,16 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
       if (convertedRequest.scriptingEngine && convertedRequest.scriptingEngine === 'javascript') {
         context = javascriptContext
       }
-      contextObj = await context.generateContextObj(environmentVariables)
+      contextObj = await context.generateContextObj(variableData.environment)
     }
 
     // Send http request
     try {
       if (globalConfig.scriptExecution) {
-        await executePreRequestScript(convertedRequest, scriptsExecution, contextObj, environmentVariables)
+        await executePreRequestScript(convertedRequest, scriptsExecution, contextObj, variableData)
       }
 
-      convertedRequest = replaceEnvironmentVariables(convertedRequest, environmentVariables)
+      convertedRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
 
       let successCallbackUrl = null
       let errorCallbackUrl = null
@@ -263,7 +265,7 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
         await new Promise(resolve => setTimeout(resolve, request.delay))
       }
       const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId)
-      await setResponse(convertedRequest, resp, environmentVariables, request, 'SUCCESS', tracing, testCase, scriptsExecution, contextObj, globalConfig)
+      await setResponse(convertedRequest, resp, variableData, request, 'SUCCESS', tracing, testCase, scriptsExecution, contextObj, globalConfig)
     } catch (err) {
       let resp
       try {
@@ -271,7 +273,7 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
       } catch (parsingErr) {
         resp = err.message
       }
-      await setResponse(convertedRequest, resp, environmentVariables, request, 'ERROR', tracing, testCase, scriptsExecution, contextObj, globalConfig)
+      await setResponse(convertedRequest, resp, variableData, request, 'ERROR', tracing, testCase, scriptsExecution, contextObj, globalConfig)
     } finally {
       if (contextObj) {
         contextObj.ctx.dispose()
@@ -285,7 +287,7 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
   // Set a timeout if the response callback is not received in a particular time
 }
 
-const setResponse = async (convertedRequest, resp, environmentVariables, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig) => {
+const setResponse = async (convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig) => {
   // Get the requestsHistory and callbacksHistory from the objectStore
   const requestsHistoryObj = objectStore.get('requestsHistory')
   const callbacksHistoryObj = objectStore.get('callbacksHistory')
@@ -295,12 +297,12 @@ const setResponse = async (convertedRequest, resp, environmentVariables, request
   }
 
   if (globalConfig.scriptExecution) {
-    await executePostRequestScript(convertedRequest, resp, scriptsExecution, contextObj, environmentVariables, backgroundData)
+    await executePostRequestScript(convertedRequest, resp, scriptsExecution, contextObj, variableData, backgroundData)
   }
 
   let testResult = null
   if (globalConfig.testsExecution) {
-    testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environmentVariables, backgroundData)
+    testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, variableData.environment, backgroundData)
   }
   request.appended = {
     status: status,
@@ -330,18 +332,18 @@ const setResponse = async (convertedRequest, resp, environmentVariables, request
   }
 }
 
-const executePreRequestScript = async (convertedRequest, scriptsExecution, contextObj, environmentVariables) => {
+const executePreRequestScript = async (convertedRequest, scriptsExecution, contextObj, variableData) => {
   if (convertedRequest.scripts && convertedRequest.scripts.preRequest && convertedRequest.scripts.preRequest.exec.length > 0 && convertedRequest.scripts.preRequest.exec !== ['']) {
     let context = postmanContext
     if (convertedRequest.scriptingEngine && convertedRequest.scriptingEngine === 'javascript') {
       context = javascriptContext
     }
     scriptsExecution.preRequest = await context.executeAsync(convertedRequest.scripts.preRequest.exec, { context: { request: convertedRequest }, id: uuid.v4() }, contextObj)
-    environmentVariables = scriptsExecution.preRequest.environment
+    variableData.environment = scriptsExecution.preRequest.environment
   }
 }
 
-const executePostRequestScript = async (convertedRequest, resp, scriptsExecution, contextObj, environmentVariables, backgroundData) => {
+const executePostRequestScript = async (convertedRequest, resp, scriptsExecution, contextObj, variableData, backgroundData) => {
   if (convertedRequest.scripts && convertedRequest.scripts.postRequest && convertedRequest.scripts.postRequest.exec.length > 0 && convertedRequest.scripts.postRequest.exec !== ['']) {
     let response
     if (_.isString(resp)) {
@@ -369,7 +371,7 @@ const executePostRequestScript = async (convertedRequest, resp, scriptsExecution
       context = javascriptContext
     }
     scriptsExecution.postRequest = await context.executeAsync(convertedRequest.scripts.postRequest.exec, { context: { response, collectionVariables }, id: uuid.v4() }, contextObj)
-    environmentVariables = scriptsExecution.postRequest.environment
+    variableData.environment = scriptsExecution.postRequest.environment
   }
 }
 
