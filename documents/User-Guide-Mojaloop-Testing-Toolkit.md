@@ -337,7 +337,7 @@ You can write scripts in two formats.
 
     With websocket library, you can connect to a websocket server and get the first message from the server.
 
-    Functions are supported:
+    Functions supported:
     
     - _websocket.connect_ - To connect to a websocket URL and listen for messsages
     - _websocket.getMessage_ - To get the message arrived. This function can also wait for the message some time. The session will be disconnected automatically after returning the message
