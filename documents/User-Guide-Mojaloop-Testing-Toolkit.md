@@ -324,10 +324,42 @@ You can write scripts in two formats.
 
   If you want advanced features and flexibility, you can select javascript option. This option enables you to write the scripts in javascript format and you can use the following functions.
   - **console.log** - function
-  - **axios** - functions (async)
   - **response** - variable
   - **environment** - variable
+  - **axios** - library
+    
+    With axios library, you can use various functions like axios.get, axios.post...etc. Please note these functions are async functions and you may need to use `await` before the function.
+    ```
+    const resp = await axios.get('http://someurl')
+    ```
+    You can find the documentation about axios at this link https://github.com/axios/axios#axios-api
+  - **websocket** - library
 
+    With websocket library, you can connect to a websocket server and get the first message from the server.
+
+    Functions are supported:
+    
+    - _websocket.connect_ - To connect to a websocket URL and listen for messsages
+    - _websocket.getMessage_ - To get the message arrived. This function can also wait for the message some time. The session will be disconnected automatically after returning the message
+    - _websocket.disconnect_ - To disconnect a particular session
+    - _websocket.disconnectAll_ - To disconnect all the sessions
+    
+    This will be used to assert on the payee side data from the sdk-scheme-adapter in tests cases. You may need to enable websocket capabilities in the sdk-scheme-adapter.
+    
+    **Examaple:**
+
+    In Pre-request
+    ```
+    await websocket.connect('ws://localhost:4002/requests/{$inputs.toIdValue}', 'payeeRequest')
+    ```
+    In Post-request
+    ```
+    environment.payeeRequest = await websocket.getMessage('payeeRequest')
+    ```
+    Then you can use the above environment variable in assertions.
+    ```
+    environment.payeeRequest.headers['content-type']
+    ```
 
 ![Sample Pre Request and Post Request Scripts](/assets/images/test-case-editor-scripts.png)
 
