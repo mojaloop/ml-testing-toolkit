@@ -128,14 +128,16 @@ class WebSocketClientManager {
       this.ws[clientName].client.close()
       delete this.ws[clientName]
     }
+    return true
   }
 
-  disconnectAllClients () {
+  disconnectAll () {
     for (const clientName in this.ws) {
       this.ws[clientName].client.close()
       delete this.ws[clientName]
       this.customLog(`${clientName}: Deleted`)
     }
+    return true
   }
 }
 
