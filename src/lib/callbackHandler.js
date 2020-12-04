@@ -30,7 +30,7 @@ const objectStore = require('./objectStore')
 const MyEventEmitter = require('./MyEventEmitter')
 const JwsSigning = require('./jws/JwsSigning')
 const ConnectionProvider = require('./configuration-providers/mb-connection-manager')
-const traceHeaderUtils = require('./traceHeaderUtils')
+const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 const UniqueIdGenerator = require('./uniqueIdGenerator')
 
 const handleCallback = async (callbackObject, context, req) => {
@@ -107,7 +107,7 @@ const handleCallback = async (callbackObject, context, req) => {
     callbackObject.headers.traceparent = req.headers.traceparent
   } else {
     if (req.customInfo && req.customInfo.traceID) {
-      callbackObject.headers.traceparent = traceHeaderUtils.getTraceParentHeader(req.customInfo.traceID)
+      callbackObject.headers.traceparent = TraceHeaderUtils.getTraceParentHeader(req.customInfo.traceID)
     }
   }
 

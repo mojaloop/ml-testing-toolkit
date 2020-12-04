@@ -33,7 +33,7 @@ const notificationEmitter = require('../notificationEmitter.js')
 const { readFileAsync } = require('../utils')
 const expect = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
-const traceHeaderUtils = require('../traceHeaderUtils')
+const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
 require('request-to-curl')
 require('atob') // eslint-disable-line
@@ -54,9 +54,9 @@ const getTracing = (traceID, dfspId) => {
     outboundID: traceID,
     sessionID: null
   }
-  if (traceID && traceHeaderUtils.isCustomTraceID(traceID)) {
-    tracing.outboundID = traceHeaderUtils.getEndToEndID(traceID)
-    tracing.sessionID = traceHeaderUtils.getSessionID(traceID)
+  if (traceID && TraceHeaderUtils.isCustomTraceID(traceID)) {
+    tracing.outboundID = TraceHeaderUtils.getEndToEndID(traceID)
+    tracing.sessionID = TraceHeaderUtils.getSessionID(traceID)
   }
   if (Config.getSystemConfig().HOSTING_ENABLED) {
     tracing.sessionID = dfspId
