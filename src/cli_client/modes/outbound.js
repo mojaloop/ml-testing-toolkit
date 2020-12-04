@@ -57,6 +57,7 @@ const sendTemplate = async (sessionId) => {
     await axios.post(`${config.baseURL}/api/outbound/template/` + outboundRequestID, template, { headers: { 'Content-Type': 'application/json' } })
   } catch (err) {
     console.log(err)
+    process.exit(1)
   }
 }
 
