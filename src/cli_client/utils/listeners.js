@@ -26,10 +26,10 @@ const outboundMode = require('../modes/outbound')
 const monitoringMode = require('../modes/monitoring')
 const objectStore = require('../objectStore')
 
-const outbound = () => {
+const outbound = (sessionId) => {
   const config = objectStore.get('config')
   const socket = socketIOClient(config.baseURL)
-  socket.on('outboundProgress', outboundMode.handleIncomingProgress)
+  socket.on('outboundProgress/' + sessionId, outboundMode.handleIncomingProgress)
   console.log(`Listening on ${config.baseURL} outboundProgress events...`)
 }
 

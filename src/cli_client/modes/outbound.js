@@ -31,14 +31,20 @@ const { promisify } = require('util')
 const objectStore = require('../objectStore')
 const slackBroadcast = require('../extras/slack-broadcast')
 const TemplateGenerator = require('../utils/templateGenerator')
+const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 
 const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
 
-const sendTemplate = async () => {
+const sendTemplate = async (sessionId) => {
   const config = objectStore.get('config')
   try {
     const readFileAsync = promisify(fs.readFile)
-    const outboundRequestID = Math.random().toString(36).substring(7)
+
+    // Calculate the outbound request ID based on sessionId for catching progress notifications
+    const traceIdPrefix = TraceHeaderUtils.getTraceIdPrefix()
+    const currentEndToEndId = TraceHeaderUtils.generateEndToEndId()
+    const outboundRequestID = traceIdPrefix + sessionId + currentEndToEndId
+
     const inputFiles = config.inputFiles.split(',')
     const template = await TemplateGenerator.generateTemplate(inputFiles)
     template.inputValues = JSON.parse(await readFileAsync(config.environmentFile, 'utf8')).inputValues

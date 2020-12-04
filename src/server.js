@@ -36,7 +36,7 @@ const OpenApiMockHandler = require('./lib/mocking/openApiMockHandler')
 const UniqueIdGenerator = require('./lib/uniqueIdGenerator')
 const objectStore = require('./lib/objectStore')
 const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
-const traceHeaderUtils = require('./lib/traceHeaderUtils')
+const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 
 var serverInstance = null
 // const openAPIOptions = {
@@ -115,12 +115,12 @@ const onPreHandler = async (request, h) => {
     const traceparentHeaderArr = request.headers.traceparent.split('-')
     const traceID = traceparentHeaderArr[1]
     request.customInfo.traceID = traceID
-    if (traceHeaderUtils.isCustomTraceID(traceID)) {
-      request.customInfo.endToEndID = traceHeaderUtils.getEndToEndID(traceID)
-      request.customInfo.sessionID = traceHeaderUtils.getSessionID(traceID)
+    if (TraceHeaderUtils.isCustomTraceID(traceID)) {
+      request.customInfo.endToEndID = TraceHeaderUtils.getEndToEndID(traceID)
+      request.customInfo.sessionID = TraceHeaderUtils.getSessionID(traceID)
     }
   } else {
-    request.customInfo.traceID = traceHeaderUtils.generateRandTraceId()
+    request.customInfo.traceID = TraceHeaderUtils.generateRandTraceId()
 
     RequestLogger.logMessage('info', 'Traceparent header not found. Generated a random traceID.', { additionalData: { traceID: request.customInfo.traceID }, request })
   }

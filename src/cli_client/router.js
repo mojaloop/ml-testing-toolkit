@@ -23,6 +23,7 @@
  ******/
 const fs = require('fs')
 const objectStore = require('./objectStore')
+const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 
 const cli = (commander) => {
   let configFile = {
@@ -57,8 +58,10 @@ const cli = (commander) => {
     case 'outbound':
       if (config.inputFiles) {
         if (config.environmentFile) {
-          require('./utils/listeners').outbound()
-          require('./modes/outbound').sendTemplate()
+          // Generate a session ID
+          const sessionId = TraceHeaderUtils.generateSessionId()
+          require('./utils/listeners').outbound(sessionId)
+          require('./modes/outbound').sendTemplate(sessionId)
         } else {
           console.log('error: required option \'-e, --environment-file <environmentFile>\' not specified')
           process.exit(1)
