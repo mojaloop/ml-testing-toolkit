@@ -34,6 +34,7 @@ const objectStore = require('../objectStore')
 const utilsInternal = require('../utilsInternal')
 const uuid = require('uuid')
 const postmanContext = require('../scripting-engines/postman-sandbox')
+const { OpenApiMockGenerator } = require('ml-testing-toolkit-shared-lib')
 
 // const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
 
@@ -146,7 +147,7 @@ const validateRules = async (context, req) => {
 
 const generateMockErrorCallback = async (context, req) => {
   const generatedErrorCallback = {}
-  const callbackGenerator = new (require('./openApiRequestGenerator'))()
+  const callbackGenerator = new OpenApiMockGenerator()
   await callbackGenerator.load(path.join(req.customInfo.specFile))
   let jsfRefs1 = []
   if (req.customInfo.jsfRefFile) {
@@ -230,7 +231,7 @@ const callbackRules = async (context, req) => {
       generatedCallback.headers = await replaceVariablesFromRequest(curEvent.params.headers, context, req)
     } else if (curEvent.type === 'MOCK_CALLBACK') {
       if (req.customInfo.specFile) {
-        const callbackGenerator = new (require('./openApiRequestGenerator'))()
+        const callbackGenerator = new OpenApiMockGenerator()
         await callbackGenerator.load(path.join(req.customInfo.specFile))
         let jsfRefs1 = []
         if (req.customInfo.jsfRefFile) {
@@ -299,7 +300,7 @@ const responseRules = async (context, req) => {
       generatedResponse.status = +curEvent.params.statusCode
     } else if (curEvent.type === 'MOCK_RESPONSE') {
       if (req.customInfo.specFile) {
-        const responseGenerator = new (require('./openApiRequestGenerator'))()
+        const responseGenerator = new OpenApiMockGenerator()
         await responseGenerator.load(path.join(req.customInfo.specFile))
         let jsfRefs1 = []
         if (req.customInfo.jsfRefFile) {
