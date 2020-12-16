@@ -352,6 +352,11 @@ const executePostRequestScript = async (convertedRequest, resp, scriptsExecution
       response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.body || resp.syncResponse.data }
     }
 
+    let callback
+    if (resp.callback) {
+      callback = resp.callback
+    }
+
     // Pass the requestsHistory and callbacksHistory to postman sandbox
     const collectionVariables = []
     collectionVariables.push(
@@ -370,7 +375,7 @@ const executePostRequestScript = async (convertedRequest, resp, scriptsExecution
     if (convertedRequest.scriptingEngine && convertedRequest.scriptingEngine === 'javascript') {
       context = javascriptContext
     }
-    scriptsExecution.postRequest = await context.executeAsync(convertedRequest.scripts.postRequest.exec, { context: { response, collectionVariables }, id: uuid.v4() }, contextObj)
+    scriptsExecution.postRequest = await context.executeAsync(convertedRequest.scripts.postRequest.exec, { context: { response, callback, collectionVariables }, id: uuid.v4() }, contextObj)
     variableData.environment = scriptsExecution.postRequest.environment
   }
 }
