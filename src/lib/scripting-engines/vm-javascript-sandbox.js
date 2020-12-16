@@ -73,8 +73,16 @@ const executeAsync = async (script, data, contextObj) => {
   const fullScript = preScript + script.join('\n') + postScript
   let consoleLog = []
 
-  if (data.response) {
-    contextObj.response = data.response
+  if (data.context.response) {
+    contextObj.response = data.context.response
+  }
+
+  if (data.context.callback) {
+    contextObj.callback = data.context.callback
+  }
+
+  if (data.context.collectionVariables) {
+    contextObj.collectionVariables = data.context.collectionVariables.reduce((rObj, item) => { rObj[item.key] = item.value; return rObj }, {})
   }
 
   try {

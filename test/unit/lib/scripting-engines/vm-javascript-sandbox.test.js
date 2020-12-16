@@ -79,6 +79,53 @@ describe('Test Outbound Context', () => {
 
     })
 
+    it('executeAsync should return consoleLog with response, callback and collectionVariables', async () => {
+
+      const amountBefore = 100
+      const expectedAmount = 200
+      const contextObj = await Context.generateContextObj({amountBefore})
+
+      const collectionVariables = []
+      collectionVariables.push(
+        {
+          type: 'any',
+          key: 'data',
+          value: 'sampleCollectionVariableData'
+        }
+      )
+
+      const args = {
+        script: [
+          "console.log('response', response.data)",
+          "console.log('callback', callback.data)",
+          "console.log('collectionVariables', collectionVariables.data)",
+        ],
+        data: { context: {...contextObj, collectionVariables, response: { data: 'sampleResponseData' }, callback: { data: 'sampleCallbackData' }}, id: uuid.v4()},
+        contextObj: contextObj
+      }
+
+      let scriptResult
+      try {
+        scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
+      } finally {
+        contextObj.ctx.dispose()
+        contextObj.ctx = null
+      }
+      expect(scriptResult.consoleLog[0][1]).toEqual('log')
+      expect(scriptResult.consoleLog[0][2]).toEqual('response')
+      expect(scriptResult.consoleLog[0][3]).toEqual('sampleResponseData')
+
+      expect(scriptResult.consoleLog[1][1]).toEqual('log')
+      expect(scriptResult.consoleLog[1][2]).toEqual('callback')
+      expect(scriptResult.consoleLog[1][3]).toEqual('sampleCallbackData')
+
+      expect(scriptResult.consoleLog[2][1]).toEqual('log')
+      expect(scriptResult.consoleLog[2][2]).toEqual('collectionVariables')
+      expect(scriptResult.consoleLog[2][3]).toEqual('sampleCollectionVariableData')
+
+
+    })
+
     it('executeAsync should run axios commands', async () => {
 
       axios.mockImplementation(() => Promise.resolve(true))
