@@ -33,7 +33,7 @@ const notificationEmitter = require('../notificationEmitter.js')
 const { readFileAsync } = require('../utils')
 const expect = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
-const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
+const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
 require('request-to-curl')
 require('atob') // eslint-disable-line
@@ -183,36 +183,20 @@ const terminateOutbound = (traceID) => {
 
 const processTestCase = async (testCase, traceID, inputValues, variableData, dfspId, globalConfig) => {
   const tracing = getTracing(traceID)
+  const apiDefinitions = openApiDefinitionsModel.getApiDefinitions()
 
-  // Load the requests array into an object by the request id to access a particular object faster
-  const requestsObj = {}
-  // Store the request ids into a new array
-  const templateIDArr = []
-  for (const i in testCase.requests) {
-    requestsObj[testCase.requests[i].id] = testCase.requests[i]
-    templateIDArr.push(testCase.requests[i].id)
-  }
-  // Sort the request ids array
-  templateIDArr.sort((a, b) => {
-    return a > b
-  })
-
-  const apiDefinitions = await openApiDefinitionsModel.getApiDefinitions()
-  // Iterate the request ID array
-  for (const i in templateIDArr) {
+  const sortedRequests = [ ...testCase.requests ].sort((a, b) => a.id - b.id)
+  for (const request of sortedRequests) {
     if (terminateTraceIds[traceID]) {
       delete terminateTraceIds[traceID]
       throw new Error('Terminated')
     }
-    const request = requestsObj[templateIDArr[i]]
 
-    const reqApiDefinition = apiDefinitions.find((item) => {
-      return (
-        item.majorVersion === +request.apiVersion.majorVersion &&
-        item.minorVersion === +request.apiVersion.minorVersion &&
-        item.type === request.apiVersion.type
-      )
-    })
+    const reqApiDefinition = apiDefinitions.find((item) =>
+      item.majorVersion === +request.apiVersion.majorVersion &&
+      item.minorVersion === +request.apiVersion.minorVersion &&
+      item.type === request.apiVersion.type
+    )
 
     let convertedRequest = JSON.parse(JSON.stringify(request))
 
