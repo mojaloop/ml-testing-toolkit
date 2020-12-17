@@ -33,7 +33,7 @@ const notificationEmitter = require('../notificationEmitter.js')
 const { readFileAsync } = require('../utils')
 const expect = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
-const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
+const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
 require('request-to-curl')
 require('atob') // eslint-disable-line
