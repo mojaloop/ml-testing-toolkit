@@ -24,6 +24,7 @@
 
 const Sandbox = require('vm')
 const axios = require('axios').default
+const atob = require('atob')
 const WebSocketClientManager = require('../webSocketClient/WebSocketClientManager').WebSocketClientManager
 
 const consoleWrapperFn = (consoleOutObj) => {
@@ -60,6 +61,7 @@ const generateContextObj = async (environmentObj = {}) => {
     },
     environment: { ...environmentObj },
     axios,
+    atob,
     consoleWrapperFn,
     executeAsync,
     websocket,
