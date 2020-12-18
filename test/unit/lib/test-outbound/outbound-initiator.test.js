@@ -40,8 +40,8 @@ const SpyGetEndpointsConfig= jest.spyOn(ConnectionProvider, 'getEndpointsConfig'
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 const SpySign = jest.spyOn(JwsSigning, 'sign')
+const SpyJwsSignWithKey = jest.spyOn(JwsSigning, 'signWithKey')
 const SpyGetApiDefinitions = jest.spyOn(OpenApiDefinitionsModel, 'getApiDefinitions')
-
 
 jest.mock('../../../../src/lib/notificationEmitter.js')
 jest.mock('axios')
@@ -741,6 +741,116 @@ describe('Outbound Initiator Functions', () => {
       try {
         await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'notExistingDfsp')
       } catch (err) {}
+    })
+    it('sendRequest should call JwsSigning.signWithKey', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpySign.mockReturnValueOnce( Promise.resolve() )
+      SpyJwsSignWithKey.mockReturnValueOnce( Promise.resolve() )
+      SpyAgent.mockImplementationOnce(() => {
+        return {httpsAgent: {}}
+      })
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
+      }))
+      SpyGetUserConfig.mockResolvedValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
+      })
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'userdfsp',
+          Date: '2020-01-01 01:01:01',
+          TimeStamp: '{$request.headers.Date}'
+        },
+        body: {
+          transactionId: '123',
+          amount: {
+            amount: '100',
+            currency: 'USD'
+          },
+          transactionAmount: {
+            amount: '{$request.body.amount.amount}',
+            currency: '{$request.body.amount.currency}'
+          }
+        }
+      }
+      
+      try {
+        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'userdfsp', {requestVariables: {TTK_JWS_SIGN_KEY: 'SOME_KEY'}})
+      } catch (err) {}
+      expect(axios).toHaveBeenCalledTimes(1);
+      expect(SpyJwsSignWithKey).toHaveBeenCalledTimes(1);
+    })
+    it('sendRequest should call JwsSigning.signWithKey and throw an error', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpySign.mockReturnValueOnce( Promise.resolve() )
+      SpyJwsSignWithKey.mockReturnValueOnce( Promise.reject('SOME_ERROR') )
+      SpyAgent.mockImplementationOnce(() => {
+        return {httpsAgent: {}}
+      })
+      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
+        dfsps: {
+          'userdfsp': {
+            hubClientCert: 'cert',
+            dfspServerCaRootCert: 'ca'
+          }
+        },
+        hubClientKey: 'key'
+      }))
+      SpyGetUserConfig.mockResolvedValueOnce({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
+      })
+      SpyGetSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: false
+      })
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'userdfsp',
+          Date: '2020-01-01 01:01:01',
+          TimeStamp: '{$request.headers.Date}'
+        },
+        body: {
+          transactionId: '123',
+          amount: {
+            amount: '100',
+            currency: 'USD'
+          },
+          transactionAmount: {
+            amount: '{$request.body.amount.amount}',
+            currency: '{$request.body.amount.currency}'
+          }
+        }
+      }
+      
+      try {
+        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'userdfsp', {requestVariables: {TTK_JWS_SIGN_KEY: 'SOME_KEY'}})
+      } catch (err) {}
+      expect(axios).toHaveBeenCalledTimes(1);
+      expect(SpyJwsSignWithKey).toHaveBeenCalledTimes(1);
     })
   })
 
