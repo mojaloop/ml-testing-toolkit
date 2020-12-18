@@ -37,25 +37,31 @@ const validate = async (req) => {
     if (req.method === 'put' && req.path.startsWith('/parties/') && !userConfig.VALIDATE_INBOUND_PUT_PARTIES_JWS) {
       return false
     }
-    const reqOpts = {
-      method: req.method,
-      headers: req.headers,
-      body: req.payload,
-      resolveWithFullResponse: true,
-      simple: false
-    }
-    const keys = {}
-    keys[req.headers['fspiop-source']] = await ConnectionProvider.getUserDfspJWSCerts(req.headers['fspiop-source'])
-    const jwsValidator = new Jws.validator({ // eslint-disable-line
-      validationKeys: keys
-    })
 
-    try {
-      jwsValidator.validate(reqOpts)
-      return true
-    } catch (err) {
-      throw new Error(err.toString())
-    }
+    const certificate = await ConnectionProvider.getUserDfspJWSCerts(req.headers['fspiop-source'])
+    return validateWithCert(req.headers, req.payload, certificate)
+  }
+}
+
+const validateWithCert = (headers, body, certificate) => {
+  const reqOpts = {
+    headers,
+    body,
+    resolveWithFullResponse: true,
+    simple: false
+  }
+  const keys = {}
+  keys[headers['fspiop-source']] = certificate
+
+  const jwsValidator = new Jws.validator({ // eslint-disable-line
+    validationKeys: keys
+  })
+
+  try {
+    jwsValidator.validate(reqOpts)
+    return true
+  } catch (err) {
+    throw new Error(err.toString())
   }
 }
 
@@ -70,40 +76,46 @@ const sign = async (req) => {
       return false
     }
     const jwsSigningKey = await ConnectionProvider.getTestingToolkitDfspJWSPrivateKey()
-    const jwsSigner = new Jws.signer({ // eslint-disable-line
-      signingKey: jwsSigningKey
-    })
-    const reqOpts = {
-      method: req.method,
-      uri: req.url,
-      headers: req.headers,
-      body: JSON.stringify(req.data),
-      agent: 'testingtoolkit',
-      resolveWithFullResponse: true,
-      simple: false
-    }
-    if (reqOpts.headers['FSPIOP-Source']) {
-      reqOpts.headers['fspiop-source'] = reqOpts.headers['FSPIOP-Source']
-      delete reqOpts.headers['FSPIOP-Source']
-    }
-    if (reqOpts.headers['FSPIOP-Destination']) {
-      reqOpts.headers['fspiop-destination'] = reqOpts.headers['FSPIOP-Destination']
-      delete reqOpts.headers['FSPIOP-Destination']
-    }
-    delete reqOpts.headers['FSPIOP-Signature']
-    delete reqOpts.headers['FSPIOP-URI']
-    delete reqOpts.headers['FSPIOP-HTTP-Method']
+    return signWithKey(jwsSigningKey)
+  }
+}
 
-    try {
-      jwsSigner.sign(reqOpts)
-      return true
-    } catch (err) {
-      throw new Error(err.toString())
-    }
+const signWithKey = (req, jwsSigningKey) => {
+  const jwsSigner = new Jws.signer({ // eslint-disable-line
+    signingKey: jwsSigningKey
+  })
+  const reqOpts = {
+    method: req.method,
+    uri: req.url,
+    headers: req.headers,
+    body: JSON.stringify(req.data),
+    agent: 'testingtoolkit',
+    resolveWithFullResponse: true,
+    simple: false
+  }
+  if (reqOpts.headers['FSPIOP-Source']) {
+    reqOpts.headers['fspiop-source'] = reqOpts.headers['FSPIOP-Source']
+    delete reqOpts.headers['FSPIOP-Source']
+  }
+  if (reqOpts.headers['FSPIOP-Destination']) {
+    reqOpts.headers['fspiop-destination'] = reqOpts.headers['FSPIOP-Destination']
+    delete reqOpts.headers['FSPIOP-Destination']
+  }
+  delete reqOpts.headers['FSPIOP-Signature']
+  delete reqOpts.headers['FSPIOP-URI']
+  delete reqOpts.headers['FSPIOP-HTTP-Method']
+
+  try {
+    jwsSigner.sign(reqOpts)
+    return true
+  } catch (err) {
+    throw new Error(err.toString())
   }
 }
 
 module.exports = {
   validate,
-  sign
+  validateWithCert,
+  sign,
+  signWithKey
 }

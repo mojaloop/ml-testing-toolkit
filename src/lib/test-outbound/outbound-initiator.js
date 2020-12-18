@@ -264,7 +264,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       if (request.delay) {
         await new Promise(resolve => setTimeout(resolve, request.delay))
       }
-      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId)
+      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId, contextObj)
       await setResponse(convertedRequest, resp, variableData, request, 'SUCCESS', tracing, testCase, scriptsExecution, contextObj, globalConfig)
     } catch (err) {
       let resp
@@ -302,7 +302,7 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
 
   let testResult = null
   if (globalConfig.testsExecution) {
-    testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, variableData.environment, backgroundData)
+    testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
   }
   request.appended = {
     status: status,
@@ -338,7 +338,15 @@ const executePreRequestScript = async (convertedRequest, scriptsExecution, conte
     if (convertedRequest.scriptingEngine && convertedRequest.scriptingEngine === 'javascript') {
       context = javascriptContext
     }
-    scriptsExecution.preRequest = await context.executeAsync(convertedRequest.scripts.preRequest.exec, { context: { request: convertedRequest }, id: uuid.v4() }, contextObj)
+    const requestToPass = {
+      url: convertedRequest.url,
+      method: convertedRequest.method,
+      path: convertedRequest.path,
+      queryParams: convertedRequest.queryParams,
+      headers: convertedRequest.headers,
+      body: convertedRequest.body
+    }
+    scriptsExecution.preRequest = await context.executeAsync(convertedRequest.scripts.preRequest.exec, { context: { request: requestToPass }, id: uuid.v4() }, contextObj)
     variableData.environment = scriptsExecution.preRequest.environment
   }
 }
@@ -380,7 +388,7 @@ const executePostRequestScript = async (convertedRequest, resp, scriptsExecution
   }
 }
 
-const handleTests = async (request, response = null, callback = null, environment = {}, backgroundData = {}) => {
+const handleTests = async (request, response = null, callback = null, environment = {}, backgroundData = {}, requestVariables = {}) => {
   try {
     const results = {}
     let passedCount = 0
@@ -420,7 +428,7 @@ const getUrlPrefix = (baseUrl) => {
   return returnUrl
 }
 
-const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId) => {
+const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId, contextObj) => {
   return new Promise((resolve, reject) => {
     (async () => {
       const httpsProps = {}
@@ -474,11 +482,20 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         },
         ...httpsProps
       }
-      try {
-        await JwsSigning.sign(reqOpts)
-        customLogger.logOutboundRequest('info', 'JWS signed', { uniqueId, request: reqOpts })
-      } catch (err) {
-        customLogger.logMessage('error', err.message, { additionalData: err })
+
+      if (contextObj.requestVariables && contextObj.requestVariables.TTK_JWS_SIGN_KEY) {
+        try {
+          await JwsSigning.signWithKey(reqOpts, contextObj.requestVariables.TTK_JWS_SIGN_KEY)
+        } catch (err) {
+          customLogger.logMessage('error', err.message, { additionalData: err })
+        }
+      } else {
+        try {
+          await JwsSigning.sign(reqOpts)
+          customLogger.logOutboundRequest('info', 'JWS signed', { uniqueId, request: reqOpts })
+        } catch (err) {
+          customLogger.logMessage('error', err.message, { additionalData: err })
+        }
       }
 
       var syncResponse = {}
