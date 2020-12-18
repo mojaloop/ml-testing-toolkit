@@ -76,7 +76,7 @@ const sign = async (req) => {
       return false
     }
     const jwsSigningKey = await ConnectionProvider.getTestingToolkitDfspJWSPrivateKey()
-    return signWithKey(jwsSigningKey)
+    return signWithKey(req, jwsSigningKey)
   }
 }
 
