@@ -49,6 +49,14 @@ const customWrapperFn = (requestVariables) => {
         } catch (err) {
           return err.message
         }
+      },
+      validateCallbackProtectedHeaders: function (headers) {
+        try {
+          JwsSigning.validateProtectedHeaders(headers)
+          return 'VALID'
+        } catch (err) {
+          return err.message
+        }
       }
     }
   }

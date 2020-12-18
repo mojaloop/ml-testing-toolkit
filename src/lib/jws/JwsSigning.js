@@ -27,6 +27,7 @@
 const Config = require('../config')
 const { Jws } = require('@mojaloop/sdk-standard-components')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
+const atob = require('atob')
 
 const validate = async (req) => {
   const userConfig = await Config.getUserConfig()
@@ -63,6 +64,19 @@ const validateWithCert = (headers, body, certificate) => {
   } catch (err) {
     throw new Error(err.toString())
   }
+}
+
+const validateProtectedHeaders = (headers) => {
+  if (!headers['fspiop-signature']) {
+    throw new Error('fspiop-signature is missing in the headers')
+  }
+  const { protectedHeader } = JSON.parse(headers['fspiop-signature'])
+  const decodedProtectedHeader = JSON.parse(atob(protectedHeader))
+  const jwsValidator = new Jws.validator({ // eslint-disable-line
+    validationKeys: []
+  })
+  jwsValidator._validateProtectedHeader(headers, decodedProtectedHeader)
+  return true
 }
 
 const sign = async (req) => {
@@ -116,6 +130,7 @@ const signWithKey = (req, jwsSigningKey) => {
 module.exports = {
   validate,
   validateWithCert,
+  validateProtectedHeaders,
   sign,
   signWithKey
 }

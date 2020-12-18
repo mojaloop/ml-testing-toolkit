@@ -144,6 +144,20 @@ describe('JwsSigning', () => {
       // Validate with JWS
       await expect(JwsSigning.validate(reqOpts)).resolves.toBeDefined();
     })
+    it('Validate only protected headers', () => {
+      // Validate with JWS
+      expect(JwsSigning.validateProtectedHeaders(reqOpts.headers)).toEqual(true)
+    })
+    it('Validate only protected headers negative', () => {
+      // Validate with JWS
+      let result
+      try {
+        result = JwsSigning.validateProtectedHeaders({ ...reqOpts.headers, 'fspiop-signature': null })
+      } catch(err) {
+        result = false
+      }
+      expect(result).toEqual(false)
+    })
   })
 
   describe('Validation request should fail when', () => {

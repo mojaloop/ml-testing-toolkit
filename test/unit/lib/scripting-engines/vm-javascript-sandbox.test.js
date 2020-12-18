@@ -204,6 +204,32 @@ describe('Test Outbound Context', () => {
 
     })
 
+    it('executeAsync should call JWS validateProtectedHeaders function', async () => {
+
+      JwsSigning.validateProtectedHeaders.mockImplementation(() => { return "VALID" })
+      const contextObj = await Context.generateContextObj({})
+
+      const args = {
+        script: [
+          "const result = custom.jws.validateCallbackProtectedHeaders(null)",
+          "console.log(result)",
+        ],
+        data: { context: {...contextObj}, id: uuid.v4()},
+        contextObj: contextObj
+      }
+
+      let scriptResult
+      try {
+        scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
+      } finally {
+        contextObj.ctx.dispose()
+        contextObj.ctx = null
+      }
+      expect(scriptResult.consoleLog[0][1]).toEqual('log')
+      expect(scriptResult.consoleLog[0][2]).toEqual('VALID')
+
+    })
+
     // Error scenarios
     it('executeAsync should return consoleLog with error messages', async () => {
 
@@ -230,13 +256,36 @@ describe('Test Outbound Context', () => {
       expect(scriptResult.consoleLog[1][2]).toEqual('ReferenceError: asdf is not defined')
     })
     it('executeAsync JWS validation should fail', async () => {
-
       JwsSigning.validateWithCert.mockImplementation(() => { throw new Error('SAMPLE_ERROR') })
       const contextObj = await Context.generateContextObj({})
 
       const args = {
         script: [
           "const result = custom.jws.validateCallback(null, null, null)",
+          "console.log(result)",
+        ],
+        data: { context: {...contextObj}, id: uuid.v4()},
+        contextObj: contextObj
+      }
+
+      let scriptResult
+      try {
+        scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
+      } finally {
+        contextObj.ctx.dispose()
+        contextObj.ctx = null
+      }
+      expect(scriptResult.consoleLog[0][1]).toEqual('log')
+      expect(scriptResult.consoleLog[0][2]).toEqual('SAMPLE_ERROR')
+
+    })
+    it('executeAsync JWS validateProtectedHeaders should fail', async () => {
+      JwsSigning.validateProtectedHeaders.mockImplementation(() => { throw new Error('SAMPLE_ERROR') })
+      const contextObj = await Context.generateContextObj({})
+
+      const args = {
+        script: [
+          "const result = custom.jws.validateCallbackProtectedHeaders(null)",
           "console.log(result)",
         ],
         data: { context: {...contextObj}, id: uuid.v4()},
