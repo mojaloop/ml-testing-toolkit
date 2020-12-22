@@ -214,6 +214,10 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       )
     })
 
+    if (request.delay) {
+      await new Promise(resolve => setTimeout(resolve, request.delay))
+    }
+
     let convertedRequest = JSON.parse(JSON.stringify(request))
 
     // Form the actual http request headers, body, path and method by replacing configurable parameters
@@ -247,6 +251,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       }
 
       convertedRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
+      convertedRequest = replaceRequestLevelEnvironmentVariables(convertedRequest, contextObj.requestVariables)
 
       let successCallbackUrl = null
       let errorCallbackUrl = null
@@ -261,9 +266,6 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         }
       }
 
-      if (request.delay) {
-        await new Promise(resolve => setTimeout(resolve, request.delay))
-      }
       const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId, contextObj)
       await setResponse(convertedRequest, resp, variableData, request, 'SUCCESS', tracing, testCase, scriptsExecution, contextObj, globalConfig)
     } catch (err) {
@@ -476,7 +478,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         params: queryParams,
         headers: headers,
         data: body,
-        timeout: 3000,
+        timeout: (contextObj.requestVariables && contextObj.requestVariables.REQUEST_TIMEOUT) || 3000,
         validateStatus: function (status) {
           return status < 900 // Reject only if the status code is greater than or equal to 900
         },
@@ -625,35 +627,18 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
 }
 
 const replaceRequestVariables = (inputRequest) => {
-  let resultObject = setResultObject(inputRequest)
-  if (!resultObject) {
-    return inputRequest
-  }
-
-  // Check once again for the replaced request variables
-  const matchedArray = resultObject.match(/{\$([^}]+)}/g)
-  if (matchedArray) {
-    matchedArray.forEach(element => {
-      // Check for the function type of param, if its function we need to call a function in custom-functions and replace the returned value
-      const splitArr = element.split('.')
-      switch (splitArr[0]) {
-        case '{$request':
-          var temp2 = element.replace(/{\$request.(.*)}/, '$1')
-          var replacedValue2 = _.get(inputRequest, temp2)
-          if (replacedValue2) {
-            resultObject = resultObject.replace(element, replacedValue2)
-          }
-          break
-        default:
-          break
-      }
-    })
-  }
-
-  return (typeof inputRequest === 'object') ? JSON.parse(resultObject) : resultObject
+  return _replaceGenericVariables(inputRequest, inputRequest, 'request')
 }
 
 const replaceEnvironmentVariables = (inputRequest, environment) => {
+  return _replaceGenericVariables(inputRequest, environment, 'environment')
+}
+
+const replaceRequestLevelEnvironmentVariables = (inputRequest, requestVariables) => {
+  return _replaceGenericVariables(inputRequest, requestVariables, 'requestVariables')
+}
+
+const _replaceGenericVariables = (inputRequest, replaceObject, variablePrefix) => {
   let resultObject = setResultObject(inputRequest)
   if (!resultObject) {
     return inputRequest
@@ -665,16 +650,13 @@ const replaceEnvironmentVariables = (inputRequest, environment) => {
     matchedArray.forEach(element => {
       // Check for the function type of param, if its function we need to call a function in custom-functions and replace the returned value
       const splitArr = element.split('.')
-      switch (splitArr[0]) {
-        case '{$environment':
-          var temp2 = element.replace(/{\$environment.(.*)}/, '$1')
-          var replacedValue2 = _.get(environment, temp2)
-          if (replacedValue2) {
-            resultObject = resultObject.replace(element, replacedValue2)
-          }
-          break
-        default:
-          break
+      if (splitArr[0] === '{$' + variablePrefix) {
+        const regExp1 = new RegExp('{\\$' + variablePrefix + '.(.*)}')
+        var temp2 = element.replace(regExp1, '$1')
+        var replacedValue2 = _.get(replaceObject, temp2)
+        if (replacedValue2) {
+          resultObject = resultObject.replace(element, replacedValue2)
+        }
       }
     })
   }
@@ -748,6 +730,7 @@ module.exports = {
   replaceVariables,
   replaceRequestVariables,
   replaceEnvironmentVariables,
+  replaceRequestLevelEnvironmentVariables,
   replacePathVariables,
   getFunctionResult,
   generateFinalReport
