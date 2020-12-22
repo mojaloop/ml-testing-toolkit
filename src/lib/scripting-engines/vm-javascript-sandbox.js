@@ -61,6 +61,9 @@ const customWrapperFn = (requestVariables) => {
     },
     sleep: function (delay) {
       return new Promise(resolve => setTimeout(resolve, delay))
+    },
+    setRequestTimeout: function (timeout) {
+      requestVariables.REQUEST_TIMEOUT = timeout
     }
   }
 }

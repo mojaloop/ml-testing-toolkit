@@ -478,7 +478,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         params: queryParams,
         headers: headers,
         data: body,
-        timeout: 3000,
+        timeout: (contextObj.requestVariables && contextObj.requestVariables.REQUEST_TIMEOUT) || 3000,
         validateStatus: function (status) {
           return status < 900 // Reject only if the status code is greater than or equal to 900
         },

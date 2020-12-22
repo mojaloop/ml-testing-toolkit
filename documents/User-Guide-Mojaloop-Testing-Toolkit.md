@@ -360,6 +360,7 @@ You can write scripts in two formats.
     ```
     environment.payeeRequest.headers['content-type']
     ```
+  - **custom.setRequestTimeout** - To set a specific timeout value for the request in milli seconds (Default: 3000ms)
   - **custom.sleep** - To wait for particular amount of milli seconds
   - **custom.jws** - library
 
