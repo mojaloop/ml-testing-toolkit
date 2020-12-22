@@ -360,6 +360,7 @@ You can write scripts in two formats.
     ```
     environment.payeeRequest.headers['content-type']
     ```
+  - **custom.sleep** - To wait for particular amount of milli seconds
   - **custom.jws** - library
 
     With custom.jws library, you can sign and validate an FSPIOP request using JWS

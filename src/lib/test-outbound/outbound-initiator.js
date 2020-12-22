@@ -214,6 +214,10 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       )
     })
 
+    if (request.delay) {
+      await new Promise(resolve => setTimeout(resolve, request.delay))
+    }
+
     let convertedRequest = JSON.parse(JSON.stringify(request))
 
     // Form the actual http request headers, body, path and method by replacing configurable parameters
@@ -261,9 +265,6 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         }
       }
 
-      if (request.delay) {
-        await new Promise(resolve => setTimeout(resolve, request.delay))
-      }
       const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId, contextObj)
       await setResponse(convertedRequest, resp, variableData, request, 'SUCCESS', tracing, testCase, scriptsExecution, contextObj, globalConfig)
     } catch (err) {
