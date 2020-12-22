@@ -230,6 +230,56 @@ describe('Test Outbound Context', () => {
 
     })
 
+    it('executeAsync should call custom.sleep function', async () => {
+
+      const contextObj = await Context.generateContextObj({})
+
+      const args = {
+        script: [
+          "await custom.sleep(20)",
+          "console.log('SAMPLE_OUTPUT_AFTER_SLEEP')",
+        ],
+        data: { context: {...contextObj}, id: uuid.v4()},
+        contextObj: contextObj
+      }
+
+      let scriptResult
+      try {
+        scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
+      } finally {
+        contextObj.ctx.dispose()
+        contextObj.ctx = null
+      }
+      expect(scriptResult.consoleLog[0][1]).toEqual('log')
+      expect(scriptResult.consoleLog[0][2]).toEqual('SAMPLE_OUTPUT_AFTER_SLEEP')
+
+    })
+
+    it('executeAsync should call custom.setRequestTimeout function', async () => {
+
+      const contextObj = await Context.generateContextObj({})
+
+      const args = {
+        script: [
+          "custom.setRequestTimeout(2000)",
+          "console.log(requestVariables.REQUEST_TIMEOUT)",
+        ],
+        data: { context: {...contextObj}, id: uuid.v4()},
+        contextObj: contextObj
+      }
+
+      let scriptResult
+      try {
+        scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
+      } finally {
+        contextObj.ctx.dispose()
+        contextObj.ctx = null
+      }
+      expect(scriptResult.consoleLog[0][1]).toEqual('log')
+      expect(scriptResult.consoleLog[0][2]).toEqual(2000)
+
+    })
+
     // Error scenarios
     it('executeAsync should return consoleLog with error messages', async () => {
 
