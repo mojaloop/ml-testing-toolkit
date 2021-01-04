@@ -654,7 +654,7 @@ const _replaceGenericVariables = (inputRequest, replaceObject, variablePrefix) =
         const regExp1 = new RegExp('{\\$' + variablePrefix + '.(.*)}')
         var temp2 = element.replace(regExp1, '$1')
         var replacedValue2 = _.get(replaceObject, temp2)
-        if (replacedValue2) {
+        if (replacedValue2 !== undefined) {
           resultObject = resultObject.replace(element, replacedValue2)
         }
       }
