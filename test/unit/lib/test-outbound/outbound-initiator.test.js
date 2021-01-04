@@ -238,6 +238,92 @@ describe('Outbound Initiator Functions', () => {
     })
   })
 
+  describe('replaceRequestLevelEnvironmentVariables', () => {
+    // Positive Scenarios
+    it('replaceRequestLevelEnvironmentVariables should replace request level environment variables properly', async () => {
+      const requestVariables = {
+        transactionId: '123'
+      }
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'payerfsp',
+          Date: '2020-01-01 01:01:01'
+        },
+        body: {
+          transactionId: '{$requestVariables.transactionId}'
+        }
+      }
+      const request = OutboundInitiator.replaceRequestLevelEnvironmentVariables(sampleRequest,requestVariables)
+      expect(request.body.transactionId).toEqual('123')
+    })
+    it('replaceRequestLevelEnvironmentVariables should replace request level variables with zero value', async () => {
+      const requestVariables = {
+        transactionId: 0
+      }
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'payerfsp',
+          Date: '2020-01-01 01:01:01'
+        },
+        body: {
+          transactionId: '{$requestVariables.transactionId}'
+        }
+      }
+      const request = OutboundInitiator.replaceRequestLevelEnvironmentVariables(sampleRequest,requestVariables)
+      expect(request.body.transactionId).toEqual('0')
+    })
+    it('replaceRequestLevelEnvironmentVariables should replace request level variables with empty string', async () => {
+      const requestVariables = {
+        transactionId: ''
+      }
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'payerfsp',
+          Date: '2020-01-01 01:01:01'
+        },
+        body: {
+          transactionId: '{$requestVariables.transactionId}'
+        }
+      }
+      const request = OutboundInitiator.replaceRequestLevelEnvironmentVariables(sampleRequest,requestVariables)
+      expect(request.body.transactionId).toEqual('')
+    })
+    it('replaceRequestLevelEnvironmentVariables should replace request level variables with false value', async () => {
+      const requestVariables = {
+        isActive: false
+      }
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'payerfsp',
+          Date: '2020-01-01 01:01:01'
+        },
+        body: {
+          isActive: '{$requestVariables.isActive}'
+        }
+      }
+      const request = OutboundInitiator.replaceRequestLevelEnvironmentVariables(sampleRequest,requestVariables)
+      expect(request.body.isActive).toEqual('false')
+    })
+    // Negative Scenarios
+    it('replaceRequestLevelEnvironmentVariables should not replace request level variables which does not exist', async () => {
+      const requestVariables = {
+        quoteId: '123'
+      }
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'payerfsp',
+          Date: '2020-01-01 01:01:01'
+        },
+        body: {
+          transactionId: '{$requestVariables.transactionId}'
+        }
+      }
+      const request = OutboundInitiator.replaceRequestLevelEnvironmentVariables(sampleRequest,requestVariables)
+      expect(request.body.transactionId).toEqual('{$requestVariables.transactionId}')
+    })
+
+  })
+
   describe('replaceVariables', () => {
     // Positive Scenarios
     it('replaceVariables should replace input variables properly', async () => {
