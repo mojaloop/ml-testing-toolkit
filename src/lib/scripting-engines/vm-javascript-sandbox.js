@@ -24,12 +24,46 @@
 
 const Sandbox = require('vm')
 const axios = require('axios').default
+const atob = require('atob')
 const WebSocketClientManager = require('../webSocketClient/WebSocketClientManager').WebSocketClientManager
+const JwsSigning = require('../jws/JwsSigning')
 
 const consoleWrapperFn = (consoleOutObj) => {
   return {
     log: function () {
       consoleOutObj.stdOut.push(arguments)
+    }
+  }
+}
+
+const customWrapperFn = (requestVariables) => {
+  return {
+    jws: {
+      signRequest: function (key) {
+        requestVariables.TTK_JWS_SIGN_KEY = key
+      },
+      validateCallback: function (headers, body, certificate) {
+        try {
+          JwsSigning.validateWithCert(headers, body, certificate)
+          return 'VALID'
+        } catch (err) {
+          return err.message
+        }
+      },
+      validateCallbackProtectedHeaders: function (headers) {
+        try {
+          JwsSigning.validateProtectedHeaders(headers)
+          return 'VALID'
+        } catch (err) {
+          return err.message
+        }
+      }
+    },
+    sleep: function (delay) {
+      return new Promise(resolve => setTimeout(resolve, delay))
+    },
+    setRequestTimeout: function (timeout) {
+      requestVariables.REQUEST_TIMEOUT = timeout
     }
   }
 }
@@ -51,7 +85,9 @@ const generateContextObj = async (environmentObj = {}) => {
   const consoleOutObj = {
     stdOut: []
   }
+  const requestVariables = {}
   const consoleFn = consoleWrapperFn(consoleOutObj)
+  const customFn = customWrapperFn(requestVariables)
   const websocket = new WebSocketClientManager(consoleFn)
 
   const contextObj = {
@@ -59,11 +95,15 @@ const generateContextObj = async (environmentObj = {}) => {
       dispose: () => {}
     },
     environment: { ...environmentObj },
+    requestVariables,
     axios,
+    atob,
     consoleWrapperFn,
+    customWrapperFn,
     executeAsync,
     websocket,
     console: consoleFn,
+    custom: customFn,
     consoleOutObj
   }
   return contextObj
@@ -72,6 +112,10 @@ const generateContextObj = async (environmentObj = {}) => {
 const executeAsync = async (script, data, contextObj) => {
   const fullScript = preScript + script.join('\n') + postScript
   let consoleLog = []
+
+  if (data.context.request) {
+    contextObj.request = data.context.request
+  }
 
   if (data.context.response) {
     contextObj.response = data.context.response

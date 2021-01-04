@@ -198,6 +198,10 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       item.type === request.apiVersion.type
     )
 
+    if (request.delay) {
+      await new Promise(resolve => setTimeout(resolve, request.delay))
+    }
+
     let convertedRequest = JSON.parse(JSON.stringify(request))
 
     // Form the actual http request headers, body, path and method by replacing configurable parameters
@@ -231,6 +235,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       }
 
       convertedRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
+      convertedRequest = replaceRequestLevelEnvironmentVariables(convertedRequest, contextObj.requestVariables)
 
       let successCallbackUrl = null
       let errorCallbackUrl = null
@@ -245,10 +250,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         }
       }
 
-      if (request.delay) {
-        await new Promise(resolve => setTimeout(resolve, request.delay))
-      }
-      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId)
+      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId, contextObj)
       await setResponse(convertedRequest, resp, variableData, request, 'SUCCESS', tracing, testCase, scriptsExecution, contextObj, globalConfig)
     } catch (err) {
       let resp
@@ -286,7 +288,7 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
 
   let testResult = null
   if (globalConfig.testsExecution) {
-    testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, variableData.environment, backgroundData)
+    testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
   }
   request.appended = {
     status: status,
@@ -322,7 +324,15 @@ const executePreRequestScript = async (convertedRequest, scriptsExecution, conte
     if (convertedRequest.scriptingEngine && convertedRequest.scriptingEngine === 'javascript') {
       context = javascriptContext
     }
-    scriptsExecution.preRequest = await context.executeAsync(convertedRequest.scripts.preRequest.exec, { context: { request: convertedRequest }, id: uuid.v4() }, contextObj)
+    const requestToPass = {
+      url: convertedRequest.url,
+      method: convertedRequest.method,
+      path: convertedRequest.path,
+      queryParams: convertedRequest.queryParams,
+      headers: convertedRequest.headers,
+      body: convertedRequest.body
+    }
+    scriptsExecution.preRequest = await context.executeAsync(convertedRequest.scripts.preRequest.exec, { context: { request: requestToPass }, id: uuid.v4() }, contextObj)
     variableData.environment = scriptsExecution.preRequest.environment
   }
 }
@@ -364,7 +374,7 @@ const executePostRequestScript = async (convertedRequest, resp, scriptsExecution
   }
 }
 
-const handleTests = async (request, response = null, callback = null, environment = {}, backgroundData = {}) => {
+const handleTests = async (request, response = null, callback = null, environment = {}, backgroundData = {}, requestVariables = {}) => {
   try {
     const results = {}
     let passedCount = 0
@@ -404,7 +414,7 @@ const getUrlPrefix = (baseUrl) => {
   return returnUrl
 }
 
-const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId) => {
+const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId, contextObj = {}) => {
   return new Promise((resolve, reject) => {
     (async () => {
       const httpsProps = {}
@@ -452,17 +462,26 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         params: queryParams,
         headers: headers,
         data: body,
-        timeout: 3000,
+        timeout: (contextObj.requestVariables && contextObj.requestVariables.REQUEST_TIMEOUT) || 3000,
         validateStatus: function (status) {
           return status < 900 // Reject only if the status code is greater than or equal to 900
         },
         ...httpsProps
       }
-      try {
-        await JwsSigning.sign(reqOpts)
-        customLogger.logOutboundRequest('info', 'JWS signed', { uniqueId, request: reqOpts })
-      } catch (err) {
-        customLogger.logMessage('error', err.message, { additionalData: err })
+
+      if (contextObj.requestVariables && contextObj.requestVariables.TTK_JWS_SIGN_KEY) {
+        try {
+          await JwsSigning.signWithKey(reqOpts, contextObj.requestVariables.TTK_JWS_SIGN_KEY)
+        } catch (err) {
+          customLogger.logMessage('error', err.message, { additionalData: err })
+        }
+      } else {
+        try {
+          await JwsSigning.sign(reqOpts)
+          customLogger.logOutboundRequest('info', 'JWS signed', { uniqueId, request: reqOpts })
+        } catch (err) {
+          customLogger.logMessage('error', err.message, { additionalData: err })
+        }
       }
 
       var syncResponse = {}
@@ -592,35 +611,18 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
 }
 
 const replaceRequestVariables = (inputRequest) => {
-  let resultObject = setResultObject(inputRequest)
-  if (!resultObject) {
-    return inputRequest
-  }
-
-  // Check once again for the replaced request variables
-  const matchedArray = resultObject.match(/{\$([^}]+)}/g)
-  if (matchedArray) {
-    matchedArray.forEach(element => {
-      // Check for the function type of param, if its function we need to call a function in custom-functions and replace the returned value
-      const splitArr = element.split('.')
-      switch (splitArr[0]) {
-        case '{$request':
-          var temp2 = element.replace(/{\$request.(.*)}/, '$1')
-          var replacedValue2 = _.get(inputRequest, temp2)
-          if (replacedValue2) {
-            resultObject = resultObject.replace(element, replacedValue2)
-          }
-          break
-        default:
-          break
-      }
-    })
-  }
-
-  return (typeof inputRequest === 'object') ? JSON.parse(resultObject) : resultObject
+  return _replaceGenericVariables(inputRequest, inputRequest, 'request')
 }
 
 const replaceEnvironmentVariables = (inputRequest, environment) => {
+  return _replaceGenericVariables(inputRequest, environment, 'environment')
+}
+
+const replaceRequestLevelEnvironmentVariables = (inputRequest, requestVariables) => {
+  return _replaceGenericVariables(inputRequest, requestVariables, 'requestVariables')
+}
+
+const _replaceGenericVariables = (inputRequest, replaceObject, variablePrefix) => {
   let resultObject = setResultObject(inputRequest)
   if (!resultObject) {
     return inputRequest
@@ -632,16 +634,13 @@ const replaceEnvironmentVariables = (inputRequest, environment) => {
     matchedArray.forEach(element => {
       // Check for the function type of param, if its function we need to call a function in custom-functions and replace the returned value
       const splitArr = element.split('.')
-      switch (splitArr[0]) {
-        case '{$environment':
-          var temp2 = element.replace(/{\$environment.(.*)}/, '$1')
-          var replacedValue2 = _.get(environment, temp2)
-          if (replacedValue2) {
-            resultObject = resultObject.replace(element, replacedValue2)
-          }
-          break
-        default:
-          break
+      if (splitArr[0] === '{$' + variablePrefix) {
+        const regExp1 = new RegExp('{\\$' + variablePrefix + '.(.*)}')
+        var temp2 = element.replace(regExp1, '$1')
+        var replacedValue2 = _.get(replaceObject, temp2)
+        if (replacedValue2) {
+          resultObject = resultObject.replace(element, replacedValue2)
+        }
       }
     })
   }
@@ -715,6 +714,7 @@ module.exports = {
   replaceVariables,
   replaceRequestVariables,
   replaceEnvironmentVariables,
+  replaceRequestLevelEnvironmentVariables,
   replacePathVariables,
   getFunctionResult,
   generateFinalReport

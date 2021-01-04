@@ -339,10 +339,10 @@ You can write scripts in two formats.
 
     Functions supported:
     
-    - _websocket.connect_ - To connect to a websocket URL and listen for messsages
-    - _websocket.getMessage_ - To get the message arrived. This function can also wait for the message some time. The session will be disconnected automatically after returning the message
-    - _websocket.disconnect_ - To disconnect a particular session
-    - _websocket.disconnectAll_ - To disconnect all the sessions
+    - _**websocket.connect**_ - To connect to a websocket URL and listen for messsages
+    - _**websocket.getMessage**_ - To get the message arrived. This function can also wait for the message some time. The session will be disconnected automatically after returning the message
+    - _**websocket.disconnect**_ - To disconnect a particular session
+    - _**websocket.disconnectAll**_ - To disconnect all the sessions
     
     This will be used to assert on the payee side data from the sdk-scheme-adapter in tests cases. You may need to enable websocket capabilities in the sdk-scheme-adapter.
     
@@ -360,6 +360,18 @@ You can write scripts in two formats.
     ```
     environment.payeeRequest.headers['content-type']
     ```
+  - **custom.setRequestTimeout** - To set a specific timeout value for the request in milli seconds (Default: 3000ms)
+  - **custom.sleep** - To wait for particular amount of milli seconds
+  - **custom.jws** - library
+
+    With custom.jws library, you can sign and validate an FSPIOP request using JWS
+
+    Functions supported:
+    
+    - _**custom.jws.signRequest**(<PRIVATE_KEY>)_ - To sign the outgoing request using the private key
+    - _**custom.jws.validateCallback**(<callback.headers>, <callback.body>, <PUBLIC_CERTIFICATE>)_ - To validate the incoming callback using public certificate. This will validate protected headers too.
+    - _**custom.jws.validateCallbackProtectedHeaders**(<callback.headers>)_ - To validate only protected headers in the FSPIOP-Signature header
+
 
 ![Sample Pre Request and Post Request Scripts](/assets/images/test-case-editor-scripts.png)
 
