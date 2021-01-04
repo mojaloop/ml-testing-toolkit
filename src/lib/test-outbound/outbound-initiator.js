@@ -185,8 +185,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
   const tracing = getTracing(traceID)
   const apiDefinitions = openApiDefinitionsModel.getApiDefinitions()
 
-  const sortedRequests = [ ...testCase.requests ].sort((a, b) => a.id - b.id)
-  for (const request of sortedRequests) {
+  for (const request of testCase.requests) {
     if (terminateTraceIds[traceID]) {
       delete terminateTraceIds[traceID]
       throw new Error('Terminated')
@@ -206,7 +205,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
 
     // Form the actual http request headers, body, path and method by replacing configurable parameters
     // Replace the parameters
-    convertedRequest = replaceVariables(request, inputValues, request, requestsObj)
+    convertedRequest = replaceVariables(request, inputValues, request, testCase.requests)
     convertedRequest = replaceRequestVariables(convertedRequest)
 
     // Form the path from params and operationPath
@@ -557,7 +556,7 @@ const setResultObject = (inputObject) => {
   }
 }
 
-const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
+const replaceVariables = (inputObject, inputValues, request, requests) => {
   let resultObject = setResultObject(inputObject)
   if (!resultObject) {
     return inputObject
@@ -574,10 +573,11 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
           break
         }
         case '{$prev': {
-          const temp = element.replace(/{\$prev.(.*)}/, '$1')
-          const tempArr = temp.split('.')
+          const earlierRequestPath = element.replace(/{\$prev\.[^.]+\.(.*)}/, '$1')
+          const earlierRequestId = element.replace(/{\$prev\.([^.]+)\..*}/, '$1')
           try {
-            var replacedValue = _.get(requestsObj[tempArr[0]].appended, temp.replace(tempArr[0] + '.', ''))
+            const earlierRequest = requests.find((req) => String(req.id) === earlierRequestId).appended
+            const replacedValue = _.get(earlierRequest, earlierRequestPath)
             if (replacedValue) {
               resultObject = resultObject.replace(element, replacedValue)
             }
