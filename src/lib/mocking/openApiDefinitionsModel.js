@@ -26,14 +26,14 @@ const Config = require('../config')
 var apiDefinitions = null
 const specFilePrefix = 'spec_files/api_definitions/'
 
-const getApiDefinitions = async () => {
+const getApiDefinitions = () => {
   if (!apiDefinitions) {
     refreshApiDefinitions()
   }
   return apiDefinitions
 }
 
-const refreshApiDefinitions = async () => {
+const refreshApiDefinitions = () => {
   apiDefinitions = Config.getSystemConfig().API_DEFINITIONS.map(item => {
     return {
       minorVersion: +item.version.split('.')[1],

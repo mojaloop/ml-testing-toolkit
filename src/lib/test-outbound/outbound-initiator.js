@@ -183,36 +183,19 @@ const terminateOutbound = (traceID) => {
 
 const processTestCase = async (testCase, traceID, inputValues, variableData, dfspId, globalConfig) => {
   const tracing = getTracing(traceID)
+  const apiDefinitions = openApiDefinitionsModel.getApiDefinitions()
 
-  // Load the requests array into an object by the request id to access a particular object faster
-  const requestsObj = {}
-  // Store the request ids into a new array
-  const templateIDArr = []
-  for (const i in testCase.requests) {
-    requestsObj[testCase.requests[i].id] = testCase.requests[i]
-    templateIDArr.push(testCase.requests[i].id)
-  }
-  // Sort the request ids array
-  templateIDArr.sort((a, b) => {
-    return a > b
-  })
-
-  const apiDefinitions = await openApiDefinitionsModel.getApiDefinitions()
-  // Iterate the request ID array
-  for (const i in templateIDArr) {
+  for (const request of testCase.requests) {
     if (terminateTraceIds[traceID]) {
       delete terminateTraceIds[traceID]
       throw new Error('Terminated')
     }
-    const request = requestsObj[templateIDArr[i]]
 
-    const reqApiDefinition = apiDefinitions.find((item) => {
-      return (
-        item.majorVersion === +request.apiVersion.majorVersion &&
-        item.minorVersion === +request.apiVersion.minorVersion &&
-        item.type === request.apiVersion.type
-      )
-    })
+    const reqApiDefinition = apiDefinitions.find((item) =>
+      item.majorVersion === +request.apiVersion.majorVersion &&
+      item.minorVersion === +request.apiVersion.minorVersion &&
+      item.type === request.apiVersion.type
+    )
 
     if (request.delay) {
       await new Promise(resolve => setTimeout(resolve, request.delay))
@@ -222,7 +205,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
 
     // Form the actual http request headers, body, path and method by replacing configurable parameters
     // Replace the parameters
-    convertedRequest = replaceVariables(request, inputValues, request, requestsObj)
+    convertedRequest = replaceVariables(request, inputValues, request, testCase.requests)
     convertedRequest = replaceRequestVariables(convertedRequest)
 
     // Form the path from params and operationPath
@@ -573,7 +556,7 @@ const setResultObject = (inputObject) => {
   }
 }
 
-const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
+const replaceVariables = (inputObject, inputValues, request, requests) => {
   let resultObject = setResultObject(inputObject)
   if (!resultObject) {
     return inputObject
@@ -590,10 +573,11 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
           break
         }
         case '{$prev': {
-          const temp = element.replace(/{\$prev.(.*)}/, '$1')
-          const tempArr = temp.split('.')
+          const earlierRequestPath = element.replace(/{\$prev\.[^.]+\.(.*)}/, '$1')
+          const earlierRequestId = element.replace(/{\$prev\.([^.]+)\..*}/, '$1')
           try {
-            var replacedValue = _.get(requestsObj[tempArr[0]].appended, temp.replace(tempArr[0] + '.', ''))
+            const earlierRequest = requests.find((req) => String(req.id) === earlierRequestId).appended
+            const replacedValue = _.get(earlierRequest, earlierRequestPath)
             if (replacedValue) {
               resultObject = resultObject.replace(element, replacedValue)
             }

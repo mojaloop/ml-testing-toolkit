@@ -382,8 +382,9 @@ describe('Outbound Initiator Functions', () => {
       expect(request.body.transactionAmount.currency).toEqual('USD')
     })
     it('replaceVariables should replace previous request variables properly', async () => {
-      const responsesObject = {
-        1: {
+      const responses = [
+        {
+          id: 1,
           appended: {
             request: {
               body: {
@@ -392,18 +393,19 @@ describe('Outbound Initiator Functions', () => {
             }
           }
         }
-      }
+      ]
       const sampleRequest = {
         body: {
           transferId: '{$prev.1.request.body.transactionId}'
         }
       }
-      const request = OutboundInitiator.replaceVariables(sampleRequest, null, null, responsesObject)
+      const request = OutboundInitiator.replaceVariables(sampleRequest, null, null, responses)
       expect(request.body.transferId).toEqual('123')
     })
     it('replaceVariables should replace previous response variables properly', async () => {
-      const responsesObject = {
-        1: {
+      const responses = [
+        {
+          id: 1,
           appended: {
             response: {
               body: {
@@ -414,13 +416,13 @@ describe('Outbound Initiator Functions', () => {
             }
           }
         }
-      }
+      ]
       const sampleRequest = {
         headers: {
           'FSPIOP-Destination': '{$prev.1.response.body.party.fspId}'
         }
       }
-      const request = OutboundInitiator.replaceVariables(sampleRequest, null, null, responsesObject)
+      const request = OutboundInitiator.replaceVariables(sampleRequest, null, null, responses)
       expect(request.headers['FSPIOP-Destination']).toEqual('123')
     })
     // Negative Scenarios
