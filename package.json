@@ -62,7 +62,7 @@
     "@hapi/vision": "5.5.4",
     "@mojaloop/sdk-standard-components": "10.2.0",
     "@now-ims/hapi-now-auth": "2.0.0",
-    "@slack/webhook": "^5.0.3",
+    "@slack/webhook": "^5.0.4",
     "@types/socket.io": "^2.1.4",
     "adm-zip": "^0.4.14",
     "atob": "2.1.2",
