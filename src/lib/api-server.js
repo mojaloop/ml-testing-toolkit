@@ -64,6 +64,7 @@ const initServer = () => {
   app.use('/api/samples', verifyUserMiddleware, require('./api-routes/samples'))
   app.use('/api/objectstore', verifyUserMiddleware, require('./api-routes/objectstore'))
   app.use('/api/history', verifyUserMiddleware, require('./api-routes/history'))
+  app.use('/api/logs', verifyUserMiddleware, require('./api-routes/logs'))
 }
 
 const startServer = port => {

@@ -35,6 +35,15 @@
     "USERNAME": "hub",
     "PASSWORD": "hub"
   },
+  "SERVER_LOGS": {
+    "ENABLED": true,
+    "RESULTS_PAGE_SIZE": 20,
+    "ADAPTER": {
+      "TYPE": "ELASTICSEARCH",
+      "INDEX": "kibana_sample_data_logs",
+      "URL": "http://localhost:9200"
+    }
+  },
   "API_DEFINITIONS": [
     {
       "type": "fspiop",
