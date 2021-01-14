@@ -41,7 +41,7 @@
     "ADAPTER": {
       "TYPE": "ELASTICSEARCH",
       "INDEX": "kibana_sample_data_logs",
-      "URL": "http://localhost:9200"
+      "URL": "https://mojaloop.free.beeceptor.com"
     }
   },
   "API_DEFINITIONS": [

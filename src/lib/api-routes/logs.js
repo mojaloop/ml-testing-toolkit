@@ -29,7 +29,7 @@ const logs = require('../logs/logs')
 router.get('/search', async (req, res, next) => {
   try {
     let results = []
-    if (Object.keys(req.query).length > 0) results = await logs.search({ query: req.query })
+    if (Object.keys(req.query).length) results = await logs.search({ query: req.query })
     res.status(200).send(results)
   } catch (err) {
     next(err)
