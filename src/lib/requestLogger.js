@@ -28,6 +28,7 @@
 // const Util = require('util')
 var bunyan = require('bunyan')
 var Logger = bunyan.createLogger({ name: 'ml-testing-toolkit', level: 'debug' })
+const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 
 const logRequest = (request, user) => {
   let message = `Request: ${request.method} ${request.path}`
@@ -51,6 +52,22 @@ const logRequest = (request, user) => {
 
 const logOutboundRequest = (verbosity, message, externalData = {}) => {
   externalData.notificationType = 'newOutboundLog'
+
+  if (externalData.request.headers.traceparent) {
+    const traceparentHeaderArr = externalData.request.headers.traceparent.split('-')
+    if (traceparentHeaderArr.length > 1) {
+      const traceID = traceparentHeaderArr[1]
+      if (!externalData.request.customInfo) {
+        externalData.request.customInfo = {}
+      }
+      externalData.request.customInfo.traceID = traceID
+      if (TraceHeaderUtils.isCustomTraceID(traceID)) {
+        externalData.request.customInfo.endToEndID = TraceHeaderUtils.getEndToEndID(traceID)
+        externalData.request.customInfo.sessionID = TraceHeaderUtils.getSessionID(traceID)
+      }
+    }
+  }
+
   if (externalData.additionalData) {
     if (externalData.additionalData.request) {
       externalData.additionalData.request = {
