@@ -55,11 +55,16 @@ const logOutboundRequest = (verbosity, message, externalData = {}) => {
 
   if (externalData.request.headers.traceparent) {
     const traceparentHeaderArr = externalData.request.headers.traceparent.split('-')
-    const traceID = traceparentHeaderArr[1]
-    externalData.request.customInfo.traceID = traceID
-    if (TraceHeaderUtils.isCustomTraceID(traceID)) {
-      externalData.request.customInfo.endToEndID = TraceHeaderUtils.getEndToEndID(traceID)
-      externalData.request.customInfo.sessionID = TraceHeaderUtils.getSessionID(traceID)
+    if (traceparentHeaderArr.length > 1) {
+      const traceID = traceparentHeaderArr[1]
+      if (!externalData.request.customInfo) {
+        externalData.request.customInfo = {}
+      }
+      externalData.request.customInfo.traceID = traceID
+      if (TraceHeaderUtils.isCustomTraceID(traceID)) {
+        externalData.request.customInfo.endToEndID = TraceHeaderUtils.getEndToEndID(traceID)
+        externalData.request.customInfo.sessionID = TraceHeaderUtils.getSessionID(traceID)
+      }
     }
   }
 
