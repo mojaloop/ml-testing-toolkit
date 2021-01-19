@@ -41,7 +41,7 @@
     "ADAPTER": {
       "TYPE": "ELASTICSEARCH",
       "INDEX": "kibana_sample_data_logs",
-      "URL": "https://mojaloop.free.beeceptor.com"
+      "URL": "https://run.mocky.io/v3/8da1276b-703b-47b6-951d-a728775cb654"
     }
   },
   "API_DEFINITIONS": [
