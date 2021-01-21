@@ -49,8 +49,7 @@ const removeEmpty = obj => {
 
 const executeScripts = async (curEvent, req) => {
   if (curEvent.params.scripts && curEvent.params.scripts.exec && curEvent.params.scripts.exec.length > 0 && curEvent.params.scripts.exec !== ['']) {
-    // convert inboundEnvironment from JSON to sandbox environment format
-    const sandboxEnvironment = Object.entries(objectStore.get('inboundEnvironment')).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
+    const sandboxEnvironment = objectStore.get('inboundEnvironment')
 
     const contextObj = await postmanContext.generateContextObj(sandboxEnvironment)
 
