@@ -3,15 +3,14 @@ services:
   redis:
     image: "redis:5.0.4-alpine"
   sim:
-    image: "mojaloop/mojaloop-simulator:v11.2.1"
+    image: "mojaloop/mojaloop-simulator:v11.3.0"
     env_file: ./sim-backend.env
     ports:
       - "3003:3003"
     depends_on:
       - scheme-adapter
   scheme-adapter:
-    image: "mojaloop/sdk-scheme-adapter:v11.9.0"
-    # image: "sdk-scheme-adapter:local"
+    image: "mojaloop/sdk-scheme-adapter:v11.10.1"
     env_file: ./scheme-adapter.env
     volumes:
       - "./secrets:/src/secrets"
