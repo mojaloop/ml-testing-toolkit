@@ -40,9 +40,9 @@
     "RESULTS_PAGE_SIZE": 20,
     "ADAPTER": {
       "TYPE": "ELASTICSEARCH",
-      "INDEX": "kibana_sample_data_logs",
-      "API_URL": "https://run.mocky.io/v3/63fafc2a-9609-4a37-8d21-1514e11beebb",
-      "SERVER_UI_URL": "https://google.com"
+      "INDEX": "",
+      "API_URL": "",
+      "SERVER_UI_URL": ""
     }
   },
   "API_DEFINITIONS": [
