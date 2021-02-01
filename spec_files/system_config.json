@@ -41,7 +41,7 @@
     "ADAPTER": {
       "TYPE": "ELASTICSEARCH",
       "INDEX": "kibana_sample_data_logs",
-      "URL": "https://run.mocky.io/v3/8da1276b-703b-47b6-951d-a728775cb654"
+      "URL": "https://run.mocky.io/v3/63fafc2a-9609-4a37-8d21-1514e11beebb"
     }
   },
   "API_DEFINITIONS": [
