@@ -22,18 +22,44 @@
  --------------
  ******/
 
-const express = require('express')
-const router = new express.Router()
-const logs = require('../server-logs/logs')
+'use strict'
 
-router.get('/search', async (req, res, next) => {
-  try {
-    let results = []
-    if (Object.keys(req.query).length) results = await logs.search({ query: req.query })
-    res.status(200).send(results)
-  } catch (err) {
-    next(err)
-  }
+const Logs = require('../../../../src/lib/server-logs/logs')
+
+jest.mock('../../../../src/lib/config', () => {
+    return {
+        getSystemConfig: jest.fn().mockReturnValueOnce(
+            {
+                SERVER_LOGS: {
+                    ENABLED: true,
+                    ADAPTER: {
+                        TYPE: 'ELASTICSEARCH',
+                        API_URL: 'http://mockurl.com',
+                        INDEX: 'mock-index',
+                        RESULTS_PER_PAGE: 10
+                    }
+                }
+            }
+        )
+    }
 })
 
-module.exports = router
+jest.mock('../../../../src/lib/server-logs/adapters/elastic-search', () => {
+    return {
+        init: () => { },
+        search: () => [
+            {
+                data: {}
+            }
+        ]
+    }
+})
+
+
+describe('Logs', () => {
+    describe('search', () => {
+        it('should return search result from enabled adapter', async () => {
+            expect(await Logs.search({ query: { traceId: 'mockTraceId' } })).toHaveLength(1)
+        })
+    })
+})

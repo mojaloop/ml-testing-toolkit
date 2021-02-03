@@ -36,8 +36,8 @@ const app = require('../../../../src/lib/api-server').getApp()
 const requestLogger = require('../../../../src/lib/requestLogger')
 jest.mock('../../../../src/lib/requestLogger')
 
-const Logs = require('../../../../src/lib/logs/logs')
-jest.mock('../../../../src/lib/logs/logs')
+const Logs = require('../../../../src/lib/server-logs/logs')
+jest.mock('../../../../src/lib/server-logs/logs')
 
 
 describe('API route /logs', () => {
