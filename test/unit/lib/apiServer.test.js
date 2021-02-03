@@ -90,7 +90,17 @@ describe('api-server', () => {
       Config.getSystemConfig.mockReturnValue({
         OAUTH: {}
       })
-      expect(() => apiServer.startServer()).not.toThrowError()
+      expect(async () => {
+        await wait(); 
+        apiServer.startServer()
+      }).not.toThrowError()
     })
   })
+  const wait = async (ms = 0) => {
+    await act(async () => {
+      return new Promise(resolve => {
+        setTimeout(resolve, ms);
+      });
+    });
+  }
 })

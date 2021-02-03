@@ -40,9 +40,8 @@
     "RESULTS_PAGE_SIZE": 20,
     "ADAPTER": {
       "TYPE": "ELASTICSEARCH",
-      "INDEX": "",
-      "API_URL": "",
-      "SERVER_UI_URL": ""
+      "INDEX": "moja*",
+      "API_URL": "http://dev1-elasticsearch.mojaloop.live/"
     }
   },
   "API_DEFINITIONS": [
