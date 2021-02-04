@@ -23,8 +23,10 @@
  ******/
 
 'use strict'
-
+const Config = require('../../../../src/lib/config')
 const Logs = require('../../../../src/lib/server-logs/logs')
+
+const spyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 
 jest.mock('../../../../src/lib/server-logs/adapters/elastic-search', () => {
     return {
@@ -41,7 +43,7 @@ jest.mock('../../../../src/lib/server-logs/adapters/elastic-search', () => {
 describe('Logs', () => {
     describe('search', () => {
         it('should return search result from enabled adapter', async () => {
-            const systemConfig = {
+            spyGetSystemConfig.mockReturnValueOnce({
                 SERVER_LOGS: {
                     ENABLED: true,
                     ADAPTER: {
@@ -51,11 +53,11 @@ describe('Logs', () => {
                         RESULTS_PER_PAGE: 10
                     }
                 }
-            };
-            expect(await Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' }, systemConfig })).toHaveLength(1)
+            })
+            expect(await Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })).toHaveLength(1)
         })
         it('should throw error if API_URL is missing', async () => {
-            const systemConfig = {
+            spyGetSystemConfig.mockReturnValueOnce({
                 SERVER_LOGS: {
                     ENABLED: true,
                     ADAPTER: {
@@ -65,25 +67,14 @@ describe('Logs', () => {
                         RESULTS_PER_PAGE: 10
                     }
                 }
-            };
+            })
             Logs.setAdapter(undefined)
             expect(() => {
-                Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' }, systemConfig })
-            }).toThrowError()
-        })
-        it('should throw error if ADAPTER config is missing', async () => {
-            const systemConfig = {
-                SERVER_LOGS: {
-                    ENABLED: true
-                }
-            };
-            Logs.setAdapter(undefined)
-            expect(() => {
-                Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' }, systemConfig })
+                Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
             }).toThrowError()
         })
         it('should throw error if GRAFANA adapter is used', async () => {
-            const systemConfig = {
+            spyGetSystemConfig.mockReturnValueOnce({
                 SERVER_LOGS: {
                     ENABLED: true,
                     ADAPTER: {
@@ -93,19 +84,19 @@ describe('Logs', () => {
                         RESULTS_PER_PAGE: 10
                     }
                 }
-            };
+            })
             Logs.setAdapter(undefined)
             expect(() => {
-                Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' }, systemConfig })
+                Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
             }).toThrowError()
         })
         it('should return falsy value if SERVER LOGS ADAPTER config is missing', async () => {
-            const systemConfig = {};
+            spyGetSystemConfig.mockReturnValueOnce({})
             Logs.setAdapter(undefined)
-            expect(Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' }, systemConfig })).toBeFalsy()
+            expect(Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })).toBeFalsy()
         })
         it('should throw error if SERVER LOGS ADAPTER TYPE config is unsupported', async () => {
-            const systemConfig = {
+            spyGetSystemConfig.mockReturnValueOnce({
                 SERVER_LOGS: {
                     ENABLED: true,
                     ADAPTER: {
@@ -115,10 +106,10 @@ describe('Logs', () => {
                         RESULTS_PER_PAGE: 10
                     }
                 }
-            };
+            })
             Logs.setAdapter(undefined)
             expect(() => {
-                Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' }, systemConfig })
+                Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
             }).toThrowError()
         })
     })

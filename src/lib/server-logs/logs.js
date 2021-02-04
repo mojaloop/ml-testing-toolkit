@@ -22,11 +22,13 @@
  --------------
  ******/
 
+const config = require('../config')
 const elasticSearch = require('./adapters/elastic-search')
 const ADAPTER_TYPES = { ELASTICSEARCH: 'ELASTICSEARCH', GRAFANA: 'GRAFANA' }
-let _adapter
+let _adapter, systemConfig
 
-const search = ({ query, systemConfig }) => {
+const search = ({ query }) => {
+  systemConfig = config.getSystemConfig()
   if (!systemConfig.SERVER_LOGS || !systemConfig.SERVER_LOGS.ENABLED) return
   const adapter = _getAdapter(systemConfig)
   return adapter.search({ query })
