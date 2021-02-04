@@ -41,7 +41,7 @@ jest.mock('../../../../src/lib/server-logs/logs')
 
 
 describe('API route /logs', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     requestLogger.logMessage.mockReturnValue()
     Logs.search.mockReturnValue({})
   })

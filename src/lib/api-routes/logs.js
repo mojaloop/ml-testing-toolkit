@@ -25,11 +25,12 @@
 const express = require('express')
 const router = new express.Router()
 const logs = require('../server-logs/logs')
+const systemConfig = require('../config').getSystemConfig()
 
 router.get('/search', async (req, res, next) => {
   try {
     let results = []
-    if (Object.keys(req.query).length) results = await logs.search({ query: req.query })
+    if (Object.keys(req.query).length) results = await logs.search({ query: req.query, systemConfig })
     res.status(200).send(results)
   } catch (err) {
     next(err)

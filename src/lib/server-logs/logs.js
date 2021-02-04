@@ -23,15 +23,17 @@
  ******/
 
 const elasticSearch = require('./adapters/elastic-search')
-const config = require('../config')
 const ADAPTER_TYPES = { ELASTICSEARCH: 'ELASTICSEARCH', GRAFANA: 'GRAFANA' }
-const sysConf = config.getSystemConfig()
 let _adapter
 
-const search = ({ query }) => {
-  if (!sysConf.SERVER_LOGS || !sysConf.SERVER_LOGS.ENABLED) return
-  const adapter = _getAdapter(sysConf)
-  if (adapter) return adapter.search({ query })
+const search = ({ query, systemConfig }) => {
+  if (!systemConfig.SERVER_LOGS || !systemConfig.SERVER_LOGS.ENABLED) return
+  const adapter = _getAdapter(systemConfig)
+  return adapter.search({ query })
+}
+
+const setAdapter = (adapter) => {
+  _adapter = adapter
 }
 
 const _getAdapter = (systemConfig) => {
@@ -55,15 +57,15 @@ const _getAdapter = (systemConfig) => {
 }
 
 const _validateAdapterConfig = (systemConfig) => {
-  if (!systemConfig.SERVER_LOGS) {
-    throw new Error('[SERVER LOGS] Server logs configuration is missing in system configuration.')
-  }
   if (!systemConfig.SERVER_LOGS.ADAPTER) {
     throw new Error('[SERVER LOGS] Adapter configuration is missing.')
   }
-  if (!Object.values(ADAPTER_TYPES).includes(systemConfig.SERVER_LOGS.ADAPTER.TYPE)) { throw new Error(`[SERVER LOGS] Adapter type "${systemConfig.SERVER_LOGS.ADAPTER.TYPE}" not supported.`) }
+  if (!Object.values(ADAPTER_TYPES).includes(systemConfig.SERVER_LOGS.ADAPTER.TYPE)) {
+    throw new Error(`[SERVER LOGS] Adapter type "${systemConfig.SERVER_LOGS.ADAPTER.TYPE}" not supported.`)
+  }
 }
 
 module.exports = {
-  search
+  search,
+  setAdapter // exported for tests only
 }

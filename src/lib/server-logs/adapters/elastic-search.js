@@ -31,10 +31,14 @@ const init = ({ url, index, pageSize }) => {
   config.url = url
   config.index = index
   config.pageSize = pageSize
-  client = new Client({ node: url })
+  client = !client ? new Client({ node: url }) : client
 }
 
 const search = async ({ query }) => _marshalResponse(await client.search(_toQueryObject(query)))
+
+const setClient = (_client) => {
+  client = _client
+}
 
 const _marshalResponse = (clientResponse) => {
   if (clientResponse.statusCode === 200) {
@@ -82,5 +86,6 @@ const _toQueryObject = (query) => {
 
 module.exports = {
   init,
-  search
+  search,
+  setClient // exported for test only
 }

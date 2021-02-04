@@ -176,4 +176,62 @@ describe('dfspMockUsers', () => {
       expect(check).toBeFalsy()
     })
   })
+  describe('getKeyCloakUsers', () => {
+    it('should throw an error if response code is not 200', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: true,
+        KEYCLOAK: {
+          ENABLED: true
+        }
+      })
+      axios.get.mockReturnValue({
+        status: 500
+      })
+      await expect(dfspMockUsers.getKeyCloakUsers({ accessToken: 'mock-token' })).rejects.toThrowError()
+    })
+    it('should not throw an error if response code is 200', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: true,
+        KEYCLOAK: {
+          ENABLED: true
+        }
+      })
+      axios.get.mockReturnValue({
+        status: 200,
+        data: [
+          {
+            username: 'mock-username',
+            firstName: 'mock-firstname',
+            lastName: 'mock-lastname',
+            attributes: {
+              dfspId: 'mock-dfspId'
+            }
+          }
+        ]
+      })
+      expect(await dfspMockUsers.getKeyCloakUsers({ accessToken: 'mock-token' })).toBeTruthy()
+    })
+    it('should not throw an error if username matches KEYCLOAK.USERNAME', async () => {
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: true,
+        KEYCLOAK: {
+          ENABLED: true
+        }
+      })
+      axios.get.mockReturnValue({
+        status: 200,
+        data: [
+          {
+            username: undefined,
+            firstName: 'mock-firstname',
+            lastName: 'mock-lastname',
+            attributes: {
+              dfspId: 'mock-dfspId'
+            }
+          }
+        ]
+      })
+      expect(await dfspMockUsers.getKeyCloakUsers({ accessToken: 'mock-token' })).toBeTruthy()
+    })
+  })
 })

@@ -124,4 +124,16 @@ describe('Config', () => {
       expect(loadUserConfig).toBeTruthy()
     })
   })
+  describe('setSystemConfig', () => {
+    it('should not throw error', async () => {
+      storageAdapter.upsert.mockResolvedValueOnce()
+      const res = await Config.setSystemConfig({})
+      expect(res).toBe(true)
+    })
+    it('the response should be false', async () => {
+      storageAdapter.upsert.mockRejectedValueOnce()
+      const res = await Config.setSystemConfig()
+      expect(res).toBe(false)
+    })
+  })
 })

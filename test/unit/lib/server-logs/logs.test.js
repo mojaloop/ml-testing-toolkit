@@ -26,24 +26,6 @@
 
 const Logs = require('../../../../src/lib/server-logs/logs')
 
-jest.mock('../../../../src/lib/config', () => {
-    return {
-        getSystemConfig: jest.fn().mockReturnValueOnce(
-            {
-                SERVER_LOGS: {
-                    ENABLED: true,
-                    ADAPTER: {
-                        TYPE: 'ELASTICSEARCH',
-                        API_URL: 'http://mockurl.com',
-                        INDEX: 'mock-index',
-                        RESULTS_PER_PAGE: 10
-                    }
-                }
-            }
-        )
-    }
-})
-
 jest.mock('../../../../src/lib/server-logs/adapters/elastic-search', () => {
     return {
         init: () => { },
@@ -59,7 +41,85 @@ jest.mock('../../../../src/lib/server-logs/adapters/elastic-search', () => {
 describe('Logs', () => {
     describe('search', () => {
         it('should return search result from enabled adapter', async () => {
-            expect(await Logs.search({ query: { traceId: 'mockTraceId' } })).toHaveLength(1)
+            const systemConfig = {
+                SERVER_LOGS: {
+                    ENABLED: true,
+                    ADAPTER: {
+                        TYPE: 'ELASTICSEARCH',
+                        API_URL: 'http://mockurl.com',
+                        INDEX: 'mock-index',
+                        RESULTS_PER_PAGE: 10
+                    }
+                }
+            };
+            expect(await Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' }, systemConfig })).toHaveLength(1)
+        })
+        it('should throw error if API_URL is missing', async () => {
+            const systemConfig = {
+                SERVER_LOGS: {
+                    ENABLED: true,
+                    ADAPTER: {
+                        TYPE: 'ELASTICSEARCH',
+                        API_URL: undefined,
+                        INDEX: 'mock-index',
+                        RESULTS_PER_PAGE: 10
+                    }
+                }
+            };
+            Logs.setAdapter(undefined)
+            expect(() => {
+                Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' }, systemConfig })
+            }).toThrowError()
+        })
+        it('should throw error if ADAPTER config is missing', async () => {
+            const systemConfig = {
+                SERVER_LOGS: {
+                    ENABLED: true
+                }
+            };
+            Logs.setAdapter(undefined)
+            expect(() => {
+                Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' }, systemConfig })
+            }).toThrowError()
+        })
+        it('should throw error if GRAFANA adapter is used', async () => {
+            const systemConfig = {
+                SERVER_LOGS: {
+                    ENABLED: true,
+                    ADAPTER: {
+                        TYPE: 'GRAFANA',
+                        API_URL: 'http://mockurl.com',
+                        INDEX: 'mock-index',
+                        RESULTS_PER_PAGE: 10
+                    }
+                }
+            };
+            Logs.setAdapter(undefined)
+            expect(() => {
+                Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' }, systemConfig })
+            }).toThrowError()
+        })
+        it('should return falsy value if SERVER LOGS ADAPTER config is missing', async () => {
+            const systemConfig = {};
+            Logs.setAdapter(undefined)
+            expect(Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' }, systemConfig })).toBeFalsy()
+        })
+        it('should throw error if SERVER LOGS ADAPTER TYPE config is unsupported', async () => {
+            const systemConfig = {
+                SERVER_LOGS: {
+                    ENABLED: true,
+                    ADAPTER: {
+                        TYPE: 'UNSUPPORTED',
+                        API_URL: 'http://mockurl.com',
+                        INDEX: 'mock-index',
+                        RESULTS_PER_PAGE: 10
+                    }
+                }
+            };
+            Logs.setAdapter(undefined)
+            expect(() => {
+                Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' }, systemConfig })
+            }).toThrowError()
         })
     })
 })

@@ -31,7 +31,7 @@ jest.mock('@elastic/elasticsearch', () => {
   return {
     Client: jest.fn().mockImplementation(() => {
       return {
-        search: async () => {
+        search: jest.fn().mockImplementation(async () => {
           return {
             statusCode: 200,
             body: {
@@ -58,7 +58,7 @@ jest.mock('@elastic/elasticsearch', () => {
               }
             }
           }
-        }
+        })
       }
     })
   }
@@ -85,6 +85,15 @@ describe('Elastic Search adapter', () => {
     it('should not throw exception when URL is specified', async () => {
       ESAdapter.init({ url: 'http://mockurl.com' })
       expect(await ESAdapter.search({ query: { traceId: 'mockTraceId' } })).toHaveLength(1)
+    })
+    it('should return empty result if response code is not 200', async () => {
+      ESAdapter.init({ url: 'http://mockurl.com' })
+
+      ESAdapter.setClient({
+        search: () => ({ statusCode: 500 })
+      })
+      expect(await ESAdapter.search({ query: { traceId: 'mockTraceId' } })).toBeFalsy()
+      ESAdapter.setClient(null)
     })
   })
 })
