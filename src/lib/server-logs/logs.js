@@ -25,10 +25,10 @@
 const config = require('../config')
 const elasticSearch = require('./adapters/elastic-search')
 const ADAPTER_TYPES = { ELASTICSEARCH: 'ELASTICSEARCH', GRAFANA: 'GRAFANA' }
-let _adapter, systemConfig
+let _adapter
 
 const search = ({ query }) => {
-  systemConfig = config.getSystemConfig()
+  const systemConfig = config.getSystemConfig()
   if (!systemConfig.SERVER_LOGS || !systemConfig.SERVER_LOGS.ENABLED) return
   const adapter = _getAdapter(systemConfig)
   return adapter.search({ query })
