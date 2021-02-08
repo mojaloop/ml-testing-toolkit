@@ -24,7 +24,7 @@
 
 'use strict'
 const Config = require('../../../../src/lib/config')
-const Logs = require('../../../../src/lib/server-logs/logs')
+const ServerLogs = require('../../../../src/lib/server-logs')
 
 const spyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 
@@ -40,7 +40,7 @@ jest.mock('../../../../src/lib/server-logs/adapters/elastic-search', () => {
 })
 
 
-describe('Logs', () => {
+describe('Server Logs', () => {
     describe('search', () => {
         it('should return search result from enabled adapter', async () => {
             spyGetSystemConfig.mockReturnValueOnce({
@@ -54,7 +54,7 @@ describe('Logs', () => {
                     }
                 }
             })
-            expect(await Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })).toHaveLength(1)
+            expect(await ServerLogs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })).toHaveLength(1)
         })
         it('should throw error if API_URL is missing', async () => {
             spyGetSystemConfig.mockReturnValueOnce({
@@ -68,9 +68,9 @@ describe('Logs', () => {
                     }
                 }
             })
-            Logs.setAdapter(undefined)
+            ServerLogs.setAdapter(undefined)
             expect(() => {
-                Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
+                ServerLogs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
             }).toThrowError()
         })
         it('should throw error if GRAFANA adapter is used', async () => {
@@ -85,15 +85,15 @@ describe('Logs', () => {
                     }
                 }
             })
-            Logs.setAdapter(undefined)
+            ServerLogs.setAdapter(undefined)
             expect(() => {
-                Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
+                ServerLogs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
             }).toThrowError()
         })
         it('should return falsy value if SERVER LOGS ADAPTER config is missing', async () => {
             spyGetSystemConfig.mockReturnValueOnce({})
-            Logs.setAdapter(undefined)
-            expect(Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })).toBeFalsy()
+            ServerLogs.setAdapter(undefined)
+            expect(ServerLogs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })).toBeFalsy()
         })
         it('should throw error if SERVER LOGS ADAPTER TYPE config is unsupported', async () => {
             spyGetSystemConfig.mockReturnValueOnce({
@@ -107,9 +107,9 @@ describe('Logs', () => {
                     }
                 }
             })
-            Logs.setAdapter(undefined)
+            ServerLogs.setAdapter(undefined)
             expect(() => {
-                Logs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
+                ServerLogs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
             }).toThrowError()
         })
     })

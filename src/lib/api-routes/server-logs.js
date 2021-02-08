@@ -22,41 +22,18 @@
  --------------
  ******/
 
-const Config = require('../../../../src/lib/config')
-jest.mock('../../../../src/lib/config')
-Config.getSystemConfig.mockReturnValue({
-  OAUTH: {
-    AUTH_ENABLED: false
+const express = require('express')
+const router = new express.Router()
+const serverLogs = require('../server-logs')
+
+router.get('/search', async (req, res, next) => {
+  try {
+    let results = []
+    if (Object.keys(req.query).length) results = await serverLogs.search({ query: req.query })
+    res.status(200).send(results)
+  } catch (err) {
+    next(err)
   }
 })
 
-const request = require('supertest')
-const app = require('../../../../src/lib/api-server').getApp()
-
-const requestLogger = require('../../../../src/lib/requestLogger')
-jest.mock('../../../../src/lib/requestLogger')
-
-const Logs = require('../../../../src/lib/server-logs/logs')
-jest.mock('../../../../src/lib/server-logs/logs')
-
-
-describe('API route /logs', () => {
-  beforeEach(() => {
-    requestLogger.logMessage.mockReturnValue()
-    Logs.search.mockReturnValue({})
-  })
-  describe('GET /api/logs/search', () => {
-    it('Search logs by traceId', async () => {
-      Logs.search.mockReturnValueOnce({ hits: { total: 1 }})
-      const res = await request(app).get(`/api/logs/search`).query({ traceId: 'mockTraceId' }).send() 
-      expect(res.statusCode).toEqual(200)
-      expect(res.body).toHaveProperty('hits')
-    })
-    it('Search logs by traceId, empty queryString', async () => {
-        Logs.search.mockReturnValueOnce({ hits: { total: 1 }})
-        const res = await request(app).get(`/api/logs/search`).send() 
-        expect(res.statusCode).toEqual(200)
-        expect(res.body).not.toHaveProperty('hits')
-      })
-  })
-})
+module.exports = router
