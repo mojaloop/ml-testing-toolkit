@@ -35,6 +35,15 @@
     "USERNAME": "hub",
     "PASSWORD": "hub"
   },
+  "SERVER_LOGS": {
+    "ENABLED": true,
+    "RESULTS_PAGE_SIZE": 20,
+    "ADAPTER": {
+      "TYPE": "ELASTICSEARCH",
+      "INDEX": "moja*",
+      "API_URL": "http://dev1-elasticsearch.mojaloop.live/"
+    }
+  },
   "API_DEFINITIONS": [
     {
       "type": "fspiop",

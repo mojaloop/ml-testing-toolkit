@@ -1,11 +1,12 @@
 {
   "name": "ml-testing-toolkit",
   "description": "Testing Toolkit for Mojaloop implementations",
-  "version": "11.7.10",
+  "version": "11.7.11",
   "license": "Apache-2.0",
   "author": "Vijaya Kumar Guthi, ModusBox Inc.",
   "contributors": [
     "Georgi Logodazhki <georgi.logodazhki@modusbox.com>",
+    "Steven Oderayi <steven.oderayi@modusbox.com>",
     "Vijay Kumar <vijaya.guthi@modusbox.com>"
   ],
   "repository": {
@@ -54,6 +55,7 @@
     "cli": "node src/cli_client/client.js"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "^7.10.0",
     "@hapi/basic": "5.1.1",
     "@hapi/boom": "8.0.1",
     "@hapi/good": "8.2.4",
@@ -62,7 +64,7 @@
     "@hapi/vision": "5.5.4",
     "@mojaloop/sdk-standard-components": "10.2.0",
     "@now-ims/hapi-now-auth": "2.0.0",
-    "@slack/webhook": "^5.0.3",
+    "@slack/webhook": "^6.0.0",
     "@types/socket.io": "^2.1.4",
     "adm-zip": "^0.4.14",
     "atob": "2.1.2",
@@ -104,8 +106,8 @@
     "passport": "0.4.1",
     "passport-jwt": "4.0.0",
     "path": "^0.12.7",
-    "postman-collection": "3.6.1",
-    "postman-sandbox": "3.5.3",
+    "postman-collection": "^3.6.9",
+    "postman-sandbox": "^4.0.1",
     "rc": "1.2.8",
     "request": "^2.88.2",
     "request-promise-native": "1.0.8",
@@ -126,7 +128,7 @@
     "jest-junit": "9.0.0",
     "jsdoc": "3.6.3",
     "nodemon": "^2.0.2",
-    "npm-audit-resolver": "2.1.0",
+    "npm-audit-resolver": "^2.2.1",
     "npm-check-updates": "^4.0.4",
     "nyc": "^15.0.0",
     "parse-strings-in-object": "1.2.0",

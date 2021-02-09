@@ -28,11 +28,13 @@ const spyPromisify = jest.spyOn(util, 'promisify')
 const axios = require('axios')
 jest.mock('axios')
 const objectStore = require('../../../src/cli_client/objectStore')
+const spyObjectStoreGet = jest.spyOn(objectStore, 'get')
 const s3Upload = require('../../../src/cli_client/extras/s3-upload')
 jest.mock('../../../src/cli_client/extras/s3-upload')
 const report = require('../../../src/cli_client/utils/report')
 const Utils = require('../../../src/lib/utils')
 const SpyWriteFileAsync = jest.spyOn(Utils, 'writeFileAsync')
+
 
 
 const data = { 
@@ -134,6 +136,25 @@ describe('Cli client', () => {
       objectStore.set('config', config)
       await expect(report.outbound(data)).resolves.not.toBeNull
     })
+
+
+    it('when the report format is printhtml and extraSummaryInformation is supplied', async () => {
+      const response = {
+        'headers': {
+          'content-disposition': 'attachment; filename=TTK-Assertion-Report-Test1-2020-05-08T13:53:51.887Z.html'
+        }
+      }
+      axios.post.mockReturnValueOnce(response)
+      spyPromisify.mockReturnValueOnce(jest.fn())
+      const config = {
+        reportFormat: 'printhtml',
+        extraSummaryInformation:  'Title:Mocktitle,Summary:MockSummary'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.not.toBeNull
+    })
+
+
     it('when the report format is not supported should not throw an error', async () => {
       const config = {
         reportFormat: 'default'

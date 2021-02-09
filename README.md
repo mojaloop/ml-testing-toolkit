@@ -10,7 +10,7 @@ It should be simple to use for both technical and non-technical users; although 
 
 For getting started with **Mojaloop Testing Toolkit** quickly please follow the below steps.
 
-The following softwares should be installed on your system to run the toolkit.
+The following software should be installed on your system to run the toolkit.
 
 * Git
 * Docker

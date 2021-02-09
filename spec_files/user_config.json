@@ -49,5 +49,6 @@
   "INBOUND_MUTUAL_TLS_ENABLED": false,
   "OUTBOUND_MUTUAL_TLS_ENABLED": false,
   "ADVANCED_FEATURES_ENABLED": true,
-  "CALLBACK_TIMEOUT": 10000
+  "CALLBACK_TIMEOUT": 10000,
+  "LOG_SERVER_UI_URL": "http://dev1-efk.mojaloop.live/app/kibana"
 }
