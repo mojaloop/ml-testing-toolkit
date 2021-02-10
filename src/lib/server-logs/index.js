@@ -24,7 +24,7 @@
 
 const config = require('../config')
 const elasticSearch = require('./adapters/elastic-search')
-const ADAPTER_TYPES = { ELASTICSEARCH: 'ELASTICSEARCH', GRAFANA: 'GRAFANA' }
+const ADAPTER_TYPES = { ELASTICSEARCH: 'ELASTICSEARCH' }
 let _adapter
 
 const search = ({ query }) => {
@@ -52,9 +52,6 @@ const _getAdapter = (systemConfig) => {
     })
     _adapter = elasticSearch
     return _adapter
-  }
-  if (systemConfig.SERVER_LOGS.ADAPTER.TYPE === ADAPTER_TYPES.GRAFANA) {
-    throw new Error('[SERVER LOGS] Grafana adapter not implemented.')
   }
 }
 

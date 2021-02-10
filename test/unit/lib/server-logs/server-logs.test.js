@@ -73,23 +73,6 @@ describe('Server Logs', () => {
                 ServerLogs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
             }).toThrowError()
         })
-        it('should throw error if GRAFANA adapter is used', async () => {
-            spyGetSystemConfig.mockReturnValueOnce({
-                SERVER_LOGS: {
-                    ENABLED: true,
-                    ADAPTER: {
-                        TYPE: 'GRAFANA',
-                        API_URL: 'http://mockurl.com',
-                        INDEX: 'mock-index',
-                        RESULTS_PER_PAGE: 10
-                    }
-                }
-            })
-            ServerLogs.setAdapter(undefined)
-            expect(() => {
-                ServerLogs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
-            }).toThrowError()
-        })
         it('should return falsy value if SERVER LOGS ADAPTER config is missing', async () => {
             spyGetSystemConfig.mockReturnValueOnce({})
             ServerLogs.setAdapter(undefined)
