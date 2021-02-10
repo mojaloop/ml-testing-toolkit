@@ -35,8 +35,8 @@ const outbound = (progress) => {
     console.log(fStr.yellow(testCase.name))
     totalRequestsCount += testCase.requests.length
     testCase.requests.forEach(req => {
-      const passedAssertionsCount = req.request.tests && req.request.tests.passedAssertionsCount
-      const assertionsCount = req.request.tests && req.request.tests.assertions.length
+      const passedAssertionsCount = (req.request.tests && req.request.tests.passedAssertionsCount) ? req.request.tests.passedAssertionsCount : 0
+      const assertionsCount = (req.request.tests && req.request.tests.assertions) ? req.request.tests.assertions.length : 0
       totalAssertionsCount += assertionsCount
       totalPassedAssertionsCount += passedAssertionsCount
       const logMessage = `\t${
