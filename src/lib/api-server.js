@@ -31,6 +31,8 @@ const socketIO = require('socket.io')(http)
 const passport = require('passport')
 const cookieParser = require('cookie-parser')
 const util = require('util')
+const path = require('path')
+const fs = require('fs')
 const cors = require('cors')
 
 const initServer = () => {
@@ -65,6 +67,18 @@ const initServer = () => {
   app.use('/api/objectstore', verifyUserMiddleware, require('./api-routes/objectstore'))
   app.use('/api/history', verifyUserMiddleware, require('./api-routes/history'))
   app.use('/api/serverlogs', verifyUserMiddleware, require('./api-routes/server-logs'))
+
+  // For front-end UI
+  if (fs.existsSync(path.join('public_html'))) {
+    customLogger.logMessage('info', 'Folder public_html found: Serving Static Web UI', { notification: false })
+    // app.use('*.(jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc|css|js)', express.static(path.join('public_html')))
+    app.use(express.static(path.join('public_html')))
+    app.get('*', (req, res) => {
+      res.sendFile(process.cwd() + '/public_html/index.html')
+    })
+  } else {
+    customLogger.logMessage('warn', 'Folder public_html not found', { notification: false })
+  }
 }
 
 const startServer = port => {
