@@ -25,7 +25,7 @@ const fs = require('fs')
 const objectStore = require('./objectStore')
 const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 
-const TESTS_EXECUTION_TIMEOUT = 1000 * 60 * 15 // 15min timout
+const TESTS_EXECUTION_TIMEOUT = 1000 * 60 * 15 // 15min timeout
 
 const cli = (commander) => {
   let configFile = {
