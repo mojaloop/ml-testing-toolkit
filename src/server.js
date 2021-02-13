@@ -72,11 +72,27 @@ const createServer = async (port, user) => {
         ca: [tlsConfig.hubCaCert],
         rejectUnauthorized: true,
         requestCert: false
+      },
+      routes: {
+        cors: {
+          origin: ['*'],
+          credentials: true,
+          headers: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+          exposedHeaders: ['Content-Disposition']
+        }
       }
     })
   } else {
     server = new Hapi.Server({
-      port
+      port,
+      routes: {
+        cors: {
+          origin: ['*'],
+          credentials: true,
+          headers: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+          exposedHeaders: ['Content-Disposition']
+        }
+      }
     })
   }
 
