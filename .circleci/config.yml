@@ -306,9 +306,9 @@ jobs:
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
-      - run:
-          name: Prune non-production packages before building native app
-          command: npm prune --production
+      # - run:
+      #     name: Prune non-production packages before building native app
+      #     command: npm prune --production
       - run:
           <<: *defaults_build-native-app
       - github/release:
