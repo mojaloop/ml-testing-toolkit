@@ -1,4 +1,4 @@
-npm install
+# npm install
 sed '/\"type\": \"module\"/d' node_modules/uvm/node_modules/flatted/package.json > node_modules/uvm/node_modules/flatted/package2.json
 rm node_modules/uvm/node_modules/flatted/package.json
 mv node_modules/uvm/node_modules/flatted/package2.json node_modules/uvm/node_modules/flatted/package.json

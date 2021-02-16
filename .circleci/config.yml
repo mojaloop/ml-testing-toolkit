@@ -40,6 +40,12 @@ defaults_license_scanner: &defaults_license_scanner
   command: |
     git clone https://github.com/mojaloop/license-scanner /tmp/license-scanner
     cd /tmp/license-scanner && make build default-files set-up
+defaults_build-native-app: &defaults_build-native-app
+  name: Build Native App
+  command: |
+    sh ./native-app-generation/build-native-app.sh
+    ls -l out_native_bin/macos64
+    
 defaults_build_docker_login: &defaults_build_docker_login
   name: Login to Docker Hub
   command: |
@@ -277,6 +283,21 @@ jobs:
       - store_artifacts:
           path: /tmp/license-scanner/results
           prefix: licenses
+  build-native-app:
+    <<: *defaults_working_directory
+    <<: *defaults_docker_node
+    steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Prune non-production packages before building native app
+          command: npm prune --production
+      - run:
+          <<: *defaults_build-native-app
 
   build-snapshot:
     machine: true
@@ -403,6 +424,17 @@ workflows:
                 - /feature*/
                 - /bugfix*/
       - audit-licenses:
+          context: org-global
+          requires:
+            - setup
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
+      - build-native-app:
           context: org-global
           requires:
             - setup
