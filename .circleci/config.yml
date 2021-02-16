@@ -308,8 +308,6 @@ jobs:
       - run:
           <<: *defaults_build-native-app
       - github/release:
-          attach-workspace: true
-          # source-env-file: ./build/project.env
           before-release:
             - run:
                 name: Prepare environment for release
