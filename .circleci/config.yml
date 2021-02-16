@@ -43,6 +43,7 @@ defaults_license_scanner: &defaults_license_scanner
 defaults_build-native-app: &defaults_build-native-app
   name: Build Native App
   command: |
+    npm install -g pkg
     sh ./native-app-generation/build-native-app.sh
     ls -l out_native_bin/macos64
     
