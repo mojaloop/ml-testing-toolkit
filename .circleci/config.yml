@@ -300,10 +300,11 @@ jobs:
     <<: *defaults_buildpack_node
     steps:
       - run:
-          name: Install general dependencies
+          name: Install dependencies
           command: |
             curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh
             sudo bash nodesource_setup.sh
+            sudo rm nodesource_setup.sh
             sudo apt install nodejs
             sudo npm install -g pkg
       - checkout
