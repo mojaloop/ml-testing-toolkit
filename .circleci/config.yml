@@ -1,5 +1,5 @@
 # CircleCI v2 Config
-version: 2
+version: 2.1
 
 ##
 # orbs
