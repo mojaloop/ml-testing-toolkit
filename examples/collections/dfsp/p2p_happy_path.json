@@ -124,7 +124,8 @@
             "Accept": "application/vnd.interoperability.quotes+json;version=1.0",
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0",
             "Date": "{$function.generic.curDate}",
-            "FSPIOP-Source": "{$inputs.fromFspId}"
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$prev.1.callback.body.party.partyIdInfo.fspId}"
           },
           "body": {
             "quoteId": "{$function.generic.generateUUID}",
