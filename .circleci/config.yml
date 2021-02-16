@@ -16,6 +16,10 @@ defaults_docker_node: &defaults_docker_node
   docker:
     - image: node:12.16.0-alpine
 
+defaults_buildpack_node: &defaults_buildpack_node
+  docker:
+    - image: 'circleci/buildpack-deps:latest'
+
 defaults_docker_helm_kube: &defaults_docker_helm_kube
   docker:
     - image: hypnoglow/kubernetes-helm
@@ -294,7 +298,7 @@ jobs:
           prefix: licenses
   build-native-app:
     <<: *defaults_working_directory
-    <<: *defaults_docker_node
+    <<: *defaults_buildpack_node
     steps:
       - run:
           name: Install general dependencies
