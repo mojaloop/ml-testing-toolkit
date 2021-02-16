@@ -320,7 +320,9 @@ jobs:
             - run:
                 name: Prepare environment for release
                 command: |
-                  tar zcvf ./tmp/artefacts/${CIRCLE_PROJECT_REPONAME}_${BUILD_ARCH}_${BUILD_OS_NAME}.tar.gz ./out_native_bin/macos64
+                  rm ./tmp/artefacts/changelog.txt
+                  cd out_native_bin/macos64
+                  zip -r ../../tmp/artefacts/${CIRCLE_PROJECT_REPONAME}_${RELEASE_TAG_PROD}_macos_x64.zip *
           artefacts-folder: ./tmp/artefacts
           tag: v11.2.0
           title: Release v11.2.0
