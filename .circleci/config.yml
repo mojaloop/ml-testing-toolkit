@@ -1,6 +1,14 @@
 # CircleCI v2 Config
 version: 2
 
+##
+# orbs
+#
+# Orbs used in this pipeline
+###
+orbs:
+  github: haskell-works/github-release@1.3.3
+
 defaults_working_directory: &defaults_working_directory
   working_directory: /home/circleci/project
 
@@ -299,6 +307,17 @@ jobs:
           command: npm prune --production
       - run:
           <<: *defaults_build-native-app
+      - github/release:
+          attach-workspace: true
+          # source-env-file: ./build/project.env
+          before-release:
+            - run:
+                name: Prepare environment for release
+                command: |
+                  tar zcvf ./tmp/artefacts/${CIRCLE_PROJECT_REPONAME}_${BUILD_ARCH}_${BUILD_OS_NAME}.tar.gz ./out_native_bin/macos64
+          artefacts-folder: ./tmp/artefacts
+          tag: v11.2.0
+          title: Release v11.2.0
 
   build-snapshot:
     machine: true
