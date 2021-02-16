@@ -324,6 +324,7 @@ jobs:
           artefacts-folder: ./tmp/artefacts
           tag: v11.2.0
           title: Release v11.2.0
+          soft: false
 
   build-snapshot:
     machine: true
