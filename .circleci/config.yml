@@ -323,6 +323,7 @@ jobs:
               --repository ${CIRCLE_PROJECT_REPONAME} \
               --commitish ${CIRCLE_SHA1} \
               --name "Release v11.2.0" \
+              --replace \
               --body "Automatic Release" \
                 v11.2.0 out_native_bin
       # - save_cache:
