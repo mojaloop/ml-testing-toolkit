@@ -322,12 +322,11 @@ jobs:
       - restore_cache:
           key: native-apps-${CIRCLE_PROJECT_REPONAME}_${RELEASE_TAG_PROD}
       - github/release:
-          before-release:
-            - run:
-                name: Prepare environment for release
-                command: |
-                  rm ./tmp/artefacts/changelog.txt
-
+          # before-release:
+          #   - run:
+          #       name: Prepare environment for release
+          #       command: |
+          #         rm ./tmp/artefacts/changelog.txt
           artefacts-folder: ./tmp/artefacts
           tag: v11.2.0
           title: Release v11.2.0
