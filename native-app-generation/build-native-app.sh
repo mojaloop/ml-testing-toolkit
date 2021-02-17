@@ -1,3 +1,5 @@
+TTK_UI_TAG="v11.8.4"
+
 HelpMessage () {
   echo "Usage: $0 -platform [macos|linux|win] -arch [x64|x86|armv6|armv7]"
 }
@@ -40,8 +42,10 @@ rm -rf out_native_bin/$PLATFORM-$ARCH
 mkdir -p out_native_bin/$PLATFORM-$ARCH
 pkg -t node12-$PLATFORM-$ARCH . -o out_native_bin/$PLATFORM-$ARCH/ml-ttk
 cp -R spec_files out_native_bin/$PLATFORM-$ARCH
-cp -R public_html out_native_bin/$PLATFORM-$ARCH
 cp -R examples out_native_bin/$PLATFORM-$ARCH
+### Get the UI files from docker image
+docker cp $(docker create --rm mojaloop/ml-testing-toolkit-ui:$TTK_UI_TAG):/usr/share/nginx/html ./public_html
+cp -R public_html out_native_bin/$PLATFORM-$ARCH
 
 ### Copy files specific to platform
 if [ "$PLATFORM" == "macos" ]; then
