@@ -302,9 +302,8 @@ jobs:
       - run:
           name: Check if release exists
           command: |
-            if [[ $(git ls-remote origin "refs/tags/v11.2.20") ]]; then
-              exit 0
-            else
+            if [![ $(git ls-remote origin "refs/tags/v11.2.20") ]]; then
+              echo "Release doesn't exist"
               exit 1
             fi
       - restore_cache:
