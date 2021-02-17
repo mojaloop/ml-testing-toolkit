@@ -294,6 +294,7 @@ jobs:
           name: Install dependencies
           command: |
             apk --no-cache add openssh
+            apk --no-cache add docker
             apk --no-cache add git
             npm install -g pkg
             apk --no-cache add zip
