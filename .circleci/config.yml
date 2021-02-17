@@ -477,17 +477,7 @@ workflows:
               ignore:
                 - /feature*/
                 - /bugfix*/
-      - upload-native-app:
-          context: org-global
-          requires:
-            - build-native-app
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore:
-                - /feature*/
-                - /bugfix*/
+
       - build-snapshot:
           context: org-global
           requires:
