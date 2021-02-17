@@ -16,10 +16,6 @@ defaults_docker_node: &defaults_docker_node
   docker:
     - image: node:12.16.0-alpine
 
-defaults_buildpack_node: &defaults_buildpack_node
-  docker:
-    - image: 'circleci/buildpack-deps:latest'
-
 defaults_docker_helm_kube: &defaults_docker_helm_kube
   docker:
     - image: hypnoglow/kubernetes-helm
@@ -289,6 +285,7 @@ jobs:
       - store_artifacts:
           path: /tmp/license-scanner/results
           prefix: licenses
+
   build-native-app:
     <<: *defaults_working_directory
     <<: *defaults_docker_node
@@ -298,6 +295,7 @@ jobs:
           command: |
             npm install -g pkg
             apk --no-cache add zip
+            apk --no-cache add curl
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
@@ -311,26 +309,27 @@ jobs:
             cd out_native_bin
             zip -r ${CIRCLE_PROJECT_REPONAME}_${RELEASE_TAG_PROD}_macos_x64.zip macos64/*
             rm -rf macos64
-      - save_cache:
-          key: native-apps-${CIRCLE_PROJECT_REPONAME}_${RELEASE_TAG_PROD}
-          paths:
-            - out_native_bin
-  upload-native-app:
-    <<: *defaults_working_directory
-    <<: *defaults_buildpack_node
-    steps:
-      - restore_cache:
-          key: native-apps-${CIRCLE_PROJECT_REPONAME}_${RELEASE_TAG_PROD}
-      - github/release:
-          # before-release:
-          #   - run:
-          #       name: Prepare environment for release
-          #       command: |
-          #         rm ./tmp/artefacts/changelog.txt
-          artefacts-folder: ./tmp/artefacts
-          tag: v11.2.0
-          title: Release v11.2.0
-          soft: false
+      - run:
+          name: Download GitHub Releases tool
+          command: |
+            curl -Ls https://github.com/tcnksm/ghr/releases/download/v0.12.0/ghr_v0.12.0_linux_amd64.tar.gz | tar -xvz -C /tmp/
+            cp /tmp/ghr_v0.12.0_linux_amd64/ghr /usr/local/bin/
+      - run:
+          name: Updating release with artefacts
+          command: |
+            ghr \
+              --token ${GITHUB_TOKEN} \
+              --username ${CIRCLE_PROJECT_USERNAME} \
+              --repository ${CIRCLE_PROJECT_REPONAME} \
+              --commitish ${CIRCLE_SHA1} \
+              --name "Release v11.2.0" \
+              --body "Automatic Release" \
+                v11.2.0 out_native_bin
+      # - save_cache:
+      #     key: native-apps-${CIRCLE_PROJECT_REPONAME}_${RELEASE_TAG_PROD}
+      #     paths:
+      #       - out_native_bin
+
 
   build-snapshot:
     machine: true
