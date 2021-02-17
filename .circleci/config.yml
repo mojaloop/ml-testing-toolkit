@@ -494,9 +494,12 @@ workflows:
           context: org-global
           requires:
             - setup
+            - test-unit
+            - test-coverage
+            - vulnerability-check
           filters:
             tags:
-              only: /v[0-9]+(\.[0-9]+)*\-test/
+              only: /v[0-9]+(\.[0-9]+)*/
             branches:
               ignore:
                 - /.*/
