@@ -1,13 +1,5 @@
 # CircleCI v2 Config
-version: 2.1
-
-##
-# orbs
-#
-# Orbs used in this pipeline
-###
-orbs:
-  github: haskell-works/github-release@1.3.3
+version: 2
 
 defaults_working_directory: &defaults_working_directory
   working_directory: /home/circleci/project
