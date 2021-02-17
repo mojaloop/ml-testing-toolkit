@@ -312,7 +312,7 @@ jobs:
             zip -r ${CIRCLE_PROJECT_REPONAME}_${RELEASE_TAG_PROD}_macos_x64.zip macos64/*
             rm -rf macos64
       - save_cache:
-          key: native-apps-{{ checksum "package.json" }}
+          key: native-apps-${CIRCLE_PROJECT_REPONAME}_${RELEASE_TAG_PROD}
           paths:
             - out_native_bin
   upload-native-app:
@@ -320,7 +320,7 @@ jobs:
     <<: *defaults_buildpack_node
     steps:
       - restore_cache:
-          key: native-apps-{{ checksum "package.json" }}
+          key: native-apps-${CIRCLE_PROJECT_REPONAME}_${RELEASE_TAG_PROD}
       - github/release:
           before-release:
             - run:
