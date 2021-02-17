@@ -297,6 +297,7 @@ jobs:
           name: Install dependencies
           command: |
             npm install -g pkg
+            apk --no-cache add zip
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
