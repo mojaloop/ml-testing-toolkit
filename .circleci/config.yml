@@ -52,12 +52,6 @@ defaults_license_scanner: &defaults_license_scanner
   command: |
     git clone https://github.com/mojaloop/license-scanner /tmp/license-scanner
     cd /tmp/license-scanner && make build default-files set-up
-defaults_build-native-app: &defaults_build-native-app
-  name: Build Native App
-  command: |
-    sh ./native-app-generation/build-native-app.sh
-    ls -l out_native_bin/macos64
-    
 defaults_build_docker_login: &defaults_build_docker_login
   name: Login to Docker Hub
   command: |
@@ -297,7 +291,7 @@ jobs:
           prefix: licenses
   build-native-app:
     <<: *defaults_working_directory
-    <<: *defaults_buildpack_node
+    <<: *defaults_docker_node
     steps:
       - run:
           name: Install dependencies
@@ -314,15 +308,29 @@ jobs:
       #     name: Prune non-production packages before building native app
       #     command: npm prune --production
       - run:
-          <<: *defaults_build-native-app
+          name: Preparing Native App for MacOS
+          command: |
+            sh ./native-app-generation/build-native-app.sh
+            cd out_native_bin
+            zip -r ${CIRCLE_PROJECT_REPONAME}_${RELEASE_TAG_PROD}_macos_x64.zip macos64/*
+            rm -rf macos64
+      - save_cache:
+          key: native-apps-{{ checksum "package.json" }}
+          paths:
+            - out_native_bin
+  upload-native-app:
+    <<: *defaults_working_directory
+    <<: *defaults_buildpack_node
+    steps:
+      - restore_cache:
+          key: native-apps-{{ checksum "package.json" }}
       - github/release:
           before-release:
             - run:
                 name: Prepare environment for release
                 command: |
                   rm ./tmp/artefacts/changelog.txt
-                  cd out_native_bin/macos64
-                  zip -r ../../tmp/artefacts/${CIRCLE_PROJECT_REPONAME}_${RELEASE_TAG_PROD}_macos_x64.zip *
+
           artefacts-folder: ./tmp/artefacts
           tag: v11.2.0
           title: Release v11.2.0
@@ -467,6 +475,17 @@ workflows:
           context: org-global
           requires:
             - setup
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
+      - upload-native-app:
+          context: org-global
+          requires:
+            - build-native-app
           filters:
             tags:
               only: /.*/
