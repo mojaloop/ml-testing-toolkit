@@ -303,7 +303,7 @@ jobs:
       - run:
           name: Check if release exists
           command: |
-            if [[ ! $(git ls-remote origin "refs/tags/v11.2.0") ]]; then
+            if [[ ! $(git ls-remote origin "refs/tags/${RELEASE_TAG_PROD}") ]]; then
               echo "Release doesn't exist"
               exit 1
             fi
@@ -350,10 +350,10 @@ jobs:
               --username ${CIRCLE_PROJECT_USERNAME} \
               --repository ${CIRCLE_PROJECT_REPONAME} \
               --commitish ${CIRCLE_SHA1} \
-              --name "Release v11.2.0" \
+              --name "Release ${RELEASE_TAG_PROD}" \
               --replace \
               --body "Automatic Release" \
-                v11.2.0 out_native_bin
+                ${RELEASE_TAG_PROD} out_native_bin
 
   build-snapshot:
     machine: true
@@ -496,11 +496,10 @@ workflows:
             - setup
           filters:
             tags:
-              only: /.*/
+              only: /v[0-9]+(\.[0-9]+)*\-test/
             branches:
               ignore:
-                - /feature*/
-                - /bugfix*/
+                - /.*/
 
       - build-snapshot:
           context: org-global
