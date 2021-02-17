@@ -45,6 +45,10 @@ cp -R spec_files out_native_bin/$PLATFORM-$ARCH
 cp -R examples out_native_bin/$PLATFORM-$ARCH
 ### Get the UI files from docker image
 docker cp $(docker create --rm mojaloop/ml-testing-toolkit-ui:$TTK_UI_TAG):/usr/share/nginx/html ./public_html
+if [ ! -d "public_html" ]; then
+  echo "Couldn't get the TTK UI from docker"
+  exit 1
+fi
 cp -R public_html out_native_bin/$PLATFORM-$ARCH
 
 ### Copy files specific to platform
