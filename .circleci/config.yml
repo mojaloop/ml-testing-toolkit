@@ -324,6 +324,11 @@ jobs:
       - run:
           name: Preparing Native App for Linux
           command: |
+            export NVM_DIR="/opt/circleci/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install v12.16.3
+            nvm use v12.16.3
+            npm install -g pkg
             sh ./native-app-generation/build-native-app.sh -arch x64 -platform linux
             cd out_native_bin/linux-x64
             tar czf ../${CIRCLE_PROJECT_REPONAME}_${CIRCLE_TAG}_linux_x64.tar.gz *
