@@ -9,7 +9,7 @@ defaults_docker_node: &defaults_docker_node
     - image: node:12.16.0-alpine
 defaults_docker_ubuntu: &defaults_docker_ubuntu
   docker:
-    - image: buildpack-deps:trusty
+    - image: cimg/node:12.16.3
 
 defaults_docker_helm_kube: &defaults_docker_helm_kube
   docker:
@@ -288,16 +288,12 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # apk --no-cache add openssh
-            # apk --no-cache add docker-cli
-            # apk --no-cache add git
-            # export NVM_DIR="/opt/circleci/.nvm"
-            # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            # nvm install v12.16.3
-            # nvm use v12.16.3
+            # curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+            # sudo apt-get install -y nodejs
+            # sudo apt install zip
+            # sudo apt install git
+            # Installing Docker CLI
             npm install -g pkg
-            # apk --no-cache add zip
-            # apk --no-cache add curl
       - checkout
       - run:
           name: Check if release exists
@@ -306,23 +302,15 @@ jobs:
               echo "Release doesn't exist"
               exit 1
             fi
-      # - setup_remote_docker:
-      #     version: 19.03.13
-      #     docker_layer_caching: true
-      # - restore_cache:
-      #     key: dependency-cache-{{ checksum "package.json" }}
-      # - run:
-      #     name: Prune non-production packages before building native app
-      #     command: npm prune --production
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_caching: true
       - run:
           name: Installing NPM Dependencies
           command: npm install
       - run:
           name: Preparing Native App for MacOS
           command: |
-            export NVM_DIR="/opt/circleci/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm use v12.16.3
             sh ./native-app-generation/build-native-app.sh -arch x64 -platform macos
             cd out_native_bin
             zip -r ${CIRCLE_PROJECT_REPONAME}_${CIRCLE_TAG}_macos_x64.zip macos-x64/*
@@ -330,10 +318,6 @@ jobs:
       - run:
           name: Preparing Native App for Linux
           command: |
-            export NVM_DIR="/opt/circleci/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm use v12.16.3
-            npm install -g pkg
             sh ./native-app-generation/build-native-app.sh -arch x64 -platform linux
             cd out_native_bin/linux-x64
             tar czf ../${CIRCLE_PROJECT_REPONAME}_${CIRCLE_TAG}_linux_x64.tar.gz *
@@ -342,9 +326,6 @@ jobs:
       - run:
           name: Preparing Native App for Windows
           command: |
-            export NVM_DIR="/opt/circleci/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm use v12.16.3
             sh ./native-app-generation/build-native-app.sh -arch x64 -platform win
             cd out_native_bin
             zip -r ${CIRCLE_PROJECT_REPONAME}_${CIRCLE_TAG}_win_x64.zip win-x64/*
