@@ -293,7 +293,7 @@ jobs:
             # sudo apt install zip
             # sudo apt install git
             # Installing Docker CLI
-            npm install -g pkg
+            sudo npm install -g pkg
       - checkout
       - run:
           name: Check if release exists
