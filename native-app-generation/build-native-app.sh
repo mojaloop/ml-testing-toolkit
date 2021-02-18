@@ -52,6 +52,6 @@ fi
 cp -R public_html out_native_bin/$PLATFORM-$ARCH
 
 ### Copy files specific to platform
-if [ "$PLATFORM" == "macos" ]; then
+if [ "$PLATFORM" = "macos" ]; then
   cp native-app-generation/assets/$PLATFORM/start.sh out_native_bin/$PLATFORM-$ARCH
 fi
