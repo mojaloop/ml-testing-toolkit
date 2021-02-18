@@ -288,6 +288,8 @@ jobs:
             # apk --no-cache add openssh
             # apk --no-cache add docker-cli
             # apk --no-cache add git
+            export NVM_DIR="/opt/circleci/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm install v12.16.3
             nvm use v12.16.3
             npm install -g pkg
