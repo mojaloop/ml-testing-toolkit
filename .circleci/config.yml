@@ -317,6 +317,10 @@ jobs:
       - run:
           name: Preparing Native App for MacOS
           command: |
+            export NVM_DIR="/opt/circleci/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install v12.16.3
+            nvm use v12.16.3
             sh ./native-app-generation/build-native-app.sh -arch x64 -platform macos
             cd out_native_bin
             zip -r ${CIRCLE_PROJECT_REPONAME}_${CIRCLE_TAG}_macos_x64.zip macos-x64/*
@@ -337,6 +341,10 @@ jobs:
       - run:
           name: Preparing Native App for Windows
           command: |
+            export NVM_DIR="/opt/circleci/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install v12.16.3
+            nvm use v12.16.3
             sh ./native-app-generation/build-native-app.sh -arch x64 -platform win
             cd out_native_bin
             zip -r ${CIRCLE_PROJECT_REPONAME}_${CIRCLE_TAG}_win_x64.zip win-x64/*
