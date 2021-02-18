@@ -319,7 +319,6 @@ jobs:
           command: |
             export NVM_DIR="/opt/circleci/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm install v12.16.3
             nvm use v12.16.3
             sh ./native-app-generation/build-native-app.sh -arch x64 -platform macos
             cd out_native_bin
@@ -330,7 +329,6 @@ jobs:
           command: |
             export NVM_DIR="/opt/circleci/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm install v12.16.3
             nvm use v12.16.3
             npm install -g pkg
             sh ./native-app-generation/build-native-app.sh -arch x64 -platform linux
@@ -343,7 +341,6 @@ jobs:
           command: |
             export NVM_DIR="/opt/circleci/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm install v12.16.3
             nvm use v12.16.3
             sh ./native-app-generation/build-native-app.sh -arch x64 -platform win
             cd out_native_bin
