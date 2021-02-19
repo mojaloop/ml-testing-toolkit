@@ -7,7 +7,7 @@ defaults_working_directory: &defaults_working_directory
 defaults_docker_node: &defaults_docker_node
   docker:
     - image: node:12.16.0-alpine
-  resource_class: large
+
 defaults_docker_ubuntu: &defaults_docker_ubuntu
   docker:
     - image: cimg/node:12.16.3
@@ -104,6 +104,7 @@ jobs:
   test-unit:
     <<: *defaults_working_directory
     <<: *defaults_docker_node
+    resource_class: large
     steps:
       - run:
           name: Install general dependencies
