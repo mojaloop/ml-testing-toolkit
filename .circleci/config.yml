@@ -347,91 +347,6 @@ jobs:
               --replace \
               --body "Automatic Release" \
                 ${CIRCLE_TAG} out_native_bin
-  # build-native-app:
-  #   machine: true
-  #   <<: *defaults_working_directory
-  #   steps:
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # apk --no-cache add openssh
-  #           # apk --no-cache add docker-cli
-  #           # apk --no-cache add git
-  #           export NVM_DIR="/opt/circleci/.nvm"
-  #           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  #           nvm install v12.16.3
-  #           nvm use v12.16.3
-  #           npm install -g pkg
-  #           # apk --no-cache add zip
-  #           # apk --no-cache add curl
-  #     - checkout
-  #     - run:
-  #         name: Check if release exists
-  #         command: |
-  #           if [[ ! $(git ls-remote origin "refs/tags/${CIRCLE_TAG}") ]]; then
-  #             echo "Release doesn't exist"
-  #             exit 1
-  #           fi
-  #     # - setup_remote_docker:
-  #     #     version: 19.03.13
-  #     #     docker_layer_caching: true
-  #     # - restore_cache:
-  #     #     key: dependency-cache-{{ checksum "package.json" }}
-  #     # - run:
-  #     #     name: Prune non-production packages before building native app
-  #     #     command: npm prune --production
-  #     - run:
-  #         name: Installing NPM Dependencies
-  #         command: npm install
-  #     - run:
-  #         name: Preparing Native App for MacOS
-  #         command: |
-  #           export NVM_DIR="/opt/circleci/.nvm"
-  #           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  #           nvm use v12.16.3
-  #           sh ./native-app-generation/build-native-app.sh -arch x64 -platform macos
-  #           cd out_native_bin
-  #           zip -r ${CIRCLE_PROJECT_REPONAME}_${CIRCLE_TAG}_macos_x64.zip macos-x64/*
-  #           rm -rf macos-x64
-  #     - run:
-  #         name: Preparing Native App for Linux
-  #         command: |
-  #           export NVM_DIR="/opt/circleci/.nvm"
-  #           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  #           nvm use v12.16.3
-  #           npm install -g pkg
-  #           sh ./native-app-generation/build-native-app.sh -arch x64 -platform linux
-  #           cd out_native_bin/linux-x64
-  #           tar czf ../${CIRCLE_PROJECT_REPONAME}_${CIRCLE_TAG}_linux_x64.tar.gz *
-  #           cd ..
-  #           rm -rf linux-x64
-  #     - run:
-  #         name: Preparing Native App for Windows
-  #         command: |
-  #           export NVM_DIR="/opt/circleci/.nvm"
-  #           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  #           nvm use v12.16.3
-  #           sh ./native-app-generation/build-native-app.sh -arch x64 -platform win
-  #           cd out_native_bin
-  #           zip -r ${CIRCLE_PROJECT_REPONAME}_${CIRCLE_TAG}_win_x64.zip win-x64/*
-  #           rm -rf win-x64
-  #     - run:
-  #         name: Download GitHub Releases tool
-  #         command: |
-  #           curl -Ls https://github.com/tcnksm/ghr/releases/download/v0.12.0/ghr_v0.12.0_linux_amd64.tar.gz | tar -xvz -C /tmp/
-  #           sudo cp /tmp/ghr_v0.12.0_linux_amd64/ghr /usr/local/bin/
-  #     - run:
-  #         name: Updating release with artefacts
-  #         command: |
-  #           ghr \
-  #             --token ${GITHUB_TOKEN} \
-  #             --username ${CIRCLE_PROJECT_USERNAME} \
-  #             --repository ${CIRCLE_PROJECT_REPONAME} \
-  #             --commitish ${CIRCLE_SHA1} \
-  #             --name "Release ${CIRCLE_TAG}" \
-  #             --replace \
-  #             --body "Automatic Release" \
-  #               ${CIRCLE_TAG} out_native_bin
 
   build-snapshot:
     machine: true
@@ -572,13 +487,12 @@ workflows:
           context: org-global
           requires:
             - setup
-            # - test-unit
-            # - test-coverage
-            # - vulnerability-check
+            - test-unit
+            - test-coverage
+            - vulnerability-check
           filters:
             tags:
-              # only: /v[0-9]+(\.[0-9]+)*/
-              only: /v[0-9]+(\.[0-9]+)*\-test/
+              only: /v[0-9]+(\.[0-9]+)*/
             branches:
               ignore:
                 - /.*/
