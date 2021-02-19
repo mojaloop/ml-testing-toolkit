@@ -180,7 +180,9 @@ jobs:
             - dependency-cache-
       - run:
           name: Execute code coverage check
-          command: npm -s run test:coverage-check
+          command: |
+            export NODE_OPTIONS=--max_old_space_size=4096
+            npm -s run test:coverage-check
       - store_artifacts:
           path: coverage
           prefix: test
