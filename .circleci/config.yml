@@ -120,7 +120,9 @@ jobs:
           command: npm install -g jest
       - run:
           name: Execute unit tests
-          command: NODE_OPTIONS=--max_old_space_size=4096;npm run test:unit --silent -- --json --outputFile ./test/results/unit.json
+          command: |
+            export NODE_OPTIONS=--max_old_space_size=4096
+            npm run test:unit --silent -- --json --outputFile ./test/results/unit.json
       - store_artifacts:
           path: ./test/results
           prefix: test
