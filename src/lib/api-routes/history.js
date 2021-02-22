@@ -31,7 +31,7 @@ router.get('/reports', async (req, res, next) => {
     const reports = (await dbAdapter.read('reports', req.user, { query: req.query }))
     res.status(200).send(reports)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -40,7 +40,7 @@ router.post('/reports', async (req, res, next) => {
     await dbAdapter.upsert('reports', req.body, req.user)
     res.status(200).send()
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -49,7 +49,7 @@ router.get('/logs', async (req, res, next) => {
     const logs = (await dbAdapter.read('logs', req.user, { query: req.query }))
     res.status(200).send(logs)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 

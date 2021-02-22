@@ -26,8 +26,7 @@
 'use strict'
 
 // const Util = require('util')
-var bunyan = require('bunyan')
-var Logger = bunyan.createLogger({ name: 'ml-testing-toolkit', level: 'debug' })
+const Logger = require('@mojaloop/central-services-logger')
 const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 
 const logRequest = (request, user) => {
@@ -109,6 +108,12 @@ const logResponse = (request, user) => {
   }
 }
 
+const printAdditionalData = (additionalData) => {
+  if (additionalData !== undefined) {
+    console.log(additionalData)
+  }
+}
+
 const logMessage = (verbosity, message, externalData = {}) => {
   const data = {
     additionalData: externalData.additionalData,
@@ -119,17 +124,21 @@ const logMessage = (verbosity, message, externalData = {}) => {
   }
   switch (verbosity) {
     case 'debug':
-      Logger.debug(data.additionalData, message)
+      Logger.debug(message)
+      printAdditionalData(data.additionalData)
       break
     case 'warn':
-      Logger.warn(data.additionalData, message)
+      Logger.warn(message)
+      printAdditionalData(data.additionalData)
       break
     case 'error':
-      Logger.error(data.additionalData, message)
+      Logger.error(message)
+      printAdditionalData(data.additionalData)
       break
     case 'info':
     default: {
-      Logger.info(data.additionalData, message)
+      Logger.info(message)
+      printAdditionalData(data.additionalData)
     }
   }
 

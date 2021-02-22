@@ -34,7 +34,7 @@ router.get('/files/validation', async (req, res, next) => {
     const result = await rulesEngineModel.getValidationRulesFiles(req.user)
     res.status(200).json(result)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -45,7 +45,7 @@ router.get('/files/validation/:fileName', async (req, res, next) => {
     const result = await rulesEngineModel.getValidationRulesFileContent(fileName, req.user)
     res.status(200).json(result)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -57,7 +57,7 @@ router.put('/files/validation/:fileName', async (req, res, next) => {
     await rulesEngineModel.setValidationRulesFileContent(fileName, req.body, req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -69,7 +69,7 @@ router.delete('/files/validation/:fileName', async (req, res, next) => {
     await rulesEngineModel.deleteValidationRulesFile(fileName, req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -86,7 +86,7 @@ router.put('/files/validation', async (req, res, next) => {
         throw (new Error('Unknown update type'))
     }
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -97,7 +97,7 @@ router.get('/files/callback', async (req, res, next) => {
     const result = await rulesEngineModel.getCallbackRulesFiles(req.user)
     res.status(200).json(result)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -109,7 +109,7 @@ router.get('/files/callback/:fileName', async (req, res, next) => {
     const result = await rulesEngineModel.getCallbackRulesFileContent(fileName, req.user)
     res.status(200).json(result)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -121,7 +121,7 @@ router.put('/files/callback/:fileName', async (req, res, next) => {
     await rulesEngineModel.setCallbackRulesFileContent(fileName, req.body, req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -133,7 +133,7 @@ router.delete('/files/callback/:fileName', async (req, res, next) => {
     await rulesEngineModel.deleteCallbackRulesFile(fileName, req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -150,7 +150,7 @@ router.put('/files/callback', async (req, res, next) => {
         throw (new Error('Unknown update type'))
     }
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -161,7 +161,7 @@ router.get('/files/response', async (req, res, next) => {
     const result = await rulesEngineModel.getResponseRulesFiles(req.user)
     res.status(200).json(result)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -173,7 +173,7 @@ router.get('/files/response/:fileName', async (req, res, next) => {
     const result = await rulesEngineModel.getResponseRulesFileContent(fileName, req.user)
     res.status(200).json(result)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -185,7 +185,7 @@ router.put('/files/response/:fileName', async (req, res, next) => {
     await rulesEngineModel.setResponseRulesFileContent(fileName, req.body, req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -197,7 +197,7 @@ router.delete('/files/response/:fileName', async (req, res, next) => {
     await rulesEngineModel.deleteResponseRulesFile(fileName, req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -214,7 +214,7 @@ router.put('/files/response', async (req, res, next) => {
         throw (new Error('Unknown update type'))
     }
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -225,7 +225,7 @@ router.get('/files/forward', async (req, res, next) => {
     const result = await rulesEngineModel.getForwardRulesFiles(req.user)
     res.status(200).json(result)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -236,7 +236,7 @@ router.get('/files/forward/:fileName', async (req, res, next) => {
     const result = await rulesEngineModel.getForwardRulesFileContent(fileName, req.user)
     res.status(200).json(result)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -248,7 +248,7 @@ router.put('/files/forward/:fileName', async (req, res, next) => {
     await rulesEngineModel.setForwardRulesFileContent(fileName, req.body, req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -260,7 +260,7 @@ router.delete('/files/forward/:fileName', async (req, res, next) => {
     await rulesEngineModel.deleteForwardRulesFile(fileName, req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -277,7 +277,7 @@ router.put('/files/forward', async (req, res, next) => {
         throw (new Error('Unknown update type'))
     }
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 

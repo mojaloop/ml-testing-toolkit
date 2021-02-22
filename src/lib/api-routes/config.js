@@ -55,7 +55,8 @@ router.get('/user', async (req, res, next) => {
     const stored = userConfigView(await Config.getStoredUserConfig(req.user))
     res.status(200).json({ runtime, stored })
   } catch (err) {
-    next(err)
+    // next(err)
+    res.status(404).json({ error: err && err.message })
   }
 })
 
@@ -81,7 +82,8 @@ router.put('/user', [
     }
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    next(err)
+    // next(err)
+    res.status(404).json({ error: err && err.message })
   }
 })
 

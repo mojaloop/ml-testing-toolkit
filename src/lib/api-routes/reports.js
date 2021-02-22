@@ -43,7 +43,7 @@ router.post('/testcase/:format', async (req, res, next) => {
     res.setHeader('TTK-FileName', 'TTK-Assertion-Report' + downloadFileSuffix)
     res.status(200).send(result)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 

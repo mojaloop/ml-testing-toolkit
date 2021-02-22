@@ -47,7 +47,8 @@ router.get('/api_versions', async (req, res, next) => {
       res.status(404).json({ error: 'Can not read API versions' })
     }
   } catch (err) {
-    next(err)
+    // next(err)
+    res.status(404).json({ error: err && err.message })
   }
 })
 
@@ -70,7 +71,8 @@ router.get('/definition/:type/:version', async (req, res, next) => {
       res.status(404).json({ error: 'Unknown Version' })
     }
   } catch (err) {
-    next(err)
+    // next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -144,7 +146,8 @@ router.get('/callback_map/:type/:version', async (req, res, next) => {
       res.status(404).json({ error: 'Unknown Version' })
     }
   } catch (err) {
-    next(err)
+    // next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -173,7 +176,8 @@ router.get('/response_map/:type/:version', async (req, res, next) => {
       res.status(404).json({ error: 'Unknown Version' })
     }
   } catch (err) {
-    next(err)
+    // next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 

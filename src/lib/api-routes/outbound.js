@@ -59,7 +59,7 @@ async (req, res, next) => {
     })
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -81,7 +81,7 @@ router.post('/template/:traceID', [
 
     return res.status(200).json({ status: 'OK' })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -106,7 +106,7 @@ router.post('/template_iterations/:traceID', [
 
     return res.status(200).json({ status: 'OK' })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -118,7 +118,7 @@ router.delete('/template/:traceID', async (req, res, next) => {
 
     return res.status(200).json({ status: 'OK' })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 

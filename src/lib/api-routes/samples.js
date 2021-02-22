@@ -43,7 +43,7 @@ router.get('/load', async (req, res, next) => {
     const files = await loadSamples.getSample(req.query)
     return res.status(200).json({ status: 'OK', body: files })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -55,7 +55,7 @@ router.get('/loadFolderWise', async (req, res, next) => {
     console.log('/loadFolderWise', files)
     return res.status(200).json({ status: 'OK', body: files })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -68,7 +68,7 @@ router.get('/load/:exampleType', async (req, res, next) => {
     console.log('/load/:exampleType', filenames)
     return res.status(200).json({ status: 'OK', body: filenames })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -80,7 +80,7 @@ router.get('/list/:exampleType', async (req, res, next) => {
     const fileList = filterDFSPSamples(await loadSamples.getCollectionsOrEnvironmentsWithFileSize(req.params.exampleType, req.query.type))
     return res.status(200).json({ status: 'OK', body: fileList })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 

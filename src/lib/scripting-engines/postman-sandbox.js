@@ -26,7 +26,18 @@ const Sandbox = require('postman-sandbox')
 const util = require('util')
 const axios = require('axios').default
 
-const createContextAsync = util.promisify(Sandbox.createContext)
+// const createContextAsync = util.promisify(Sandbox.createContext)
+const createContextAsync = () => {
+  return new Promise((resolve, reject) => {
+    Sandbox.createContext(function (err, ctx) {
+      if (err) {
+        reject(err)
+        return console.error(err)
+      }
+      resolve(ctx)
+    })
+  })
+}
 
 const generateContextObj = async (environment = {}) => {
   const ctx = await createContextAsync({ timeout: 30000 })

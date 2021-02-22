@@ -32,7 +32,7 @@ router.get('/search', async (req, res, next) => {
     if (Object.keys(req.query).length) results = await serverLogs.search({ query: req.query })
     res.status(200).send(results)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
