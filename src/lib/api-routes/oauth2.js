@@ -35,7 +35,7 @@ router.post('/login', async (req, res, next) => {
     const response = await LoginService.loginUser(req.body.username, req.body.password, req, res)
     res.status(200).json(response)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -44,7 +44,7 @@ router.get('/logout', verifyUser(), async (req, res, next) => {
     await LoginService.logoutUser(req, res)
     res.status(200).json({ message: 'logout successful' })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -92,7 +92,7 @@ router.post('/token', async (req, res, next) => {
       id_token: jwt.sign(plainIdToken, systemConfig.OAUTH.EMBEDDED_CERTIFICATE)
     })
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -137,7 +137,7 @@ router.post('/token', async (req, res, next) => {
 //       }
 //     )
 //   } catch (err) {
-//     next(err)
+//     res.status(500).json({ error: err && err.message })
 //   }
 // })
 

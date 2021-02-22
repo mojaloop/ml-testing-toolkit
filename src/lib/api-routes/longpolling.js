@@ -42,7 +42,7 @@ router.get('/requests/*', async (req, res, next) => {
       longpollingEmitter.setAssertionStoreEmitter('requests', eventPath, res, req.user)
     }
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -58,7 +58,7 @@ router.get('/callbacks/*', async (req, res, next) => {
       longpollingEmitter.setAssertionStoreEmitter('callbacks', eventPath, res, req.user)
     }
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 

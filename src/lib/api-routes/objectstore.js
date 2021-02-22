@@ -32,7 +32,7 @@ router.get('/:object', async (req, res, next) => {
     const object = objectStore.get(req.params.object, undefined, req.user)
     res.status(200).json(object)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -41,7 +41,7 @@ router.delete('/:object', async (req, res, next) => {
     objectStore.set(req.params.object, {}, req.user)
     res.status(200).json({})
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
