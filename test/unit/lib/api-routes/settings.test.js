@@ -62,7 +62,6 @@ describe('API route /api/settings', () => {
         expect(exportResponse.statusCode).toEqual(200)
       })
       it('Send a bad request - no options', async () => {
-        ImportExport.exportSpecFiles.mockResolvedValueOnce()
         const exportResponse = await request(app)
           .get(`/api/settings/export`)
           .send()

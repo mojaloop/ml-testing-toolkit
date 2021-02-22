@@ -35,11 +35,13 @@ router.get('/export', async (req, res, next) => {
   try {
     if (!req.query || !req.query.options) {
       res.status(400).send('options query param is required')
+    } else {
+      const resp = await importExport.exportSpecFiles(req.query.options, req.user)
+      res.status(200).json({ status: 'OK', body: resp })
     }
-    const resp = await importExport.exportSpecFiles(req.query.options, req.user)
-    res.status(200).json({ status: 'OK', body: resp })
   } catch (err) {
-    next(err)
+    // next(err)
+    res.status(404).json({ error: err && err.message })
   }
 })
 
@@ -69,7 +71,7 @@ router.post('/import', async (req, res, next) => {
     res.status(200).json({ status: 'OK' })
   } catch (err) {
     res.status(400).send(err.message)
-    next(err)
+    // next(err)
   }
 })
 
