@@ -33,7 +33,10 @@ const slackBroadcast = require('../extras/slack-broadcast')
 const TemplateGenerator = require('../utils/templateGenerator')
 const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 
-const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
+const bar = new cliProgress.SingleBar({
+  noTTYOutput: true,
+  stream: process.stdout
+}, cliProgress.Presets.legacy)
 
 const sendTemplate = async (sessionId) => {
   const config = objectStore.get('config')
