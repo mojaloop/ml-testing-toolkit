@@ -29,8 +29,8 @@ const outbound = (progress) => {
   let totalAssertionsCount = 0
   let totalPassedAssertionsCount = 0
   let totalRequestsCount = 0
-  const testCasesTag = '--------------------TEST CASES--------------------'
-  console.log(fStr.yellow(testCasesTag))
+  const testCasesTag = '--------------------FINAL REPORT--------------------'
+  console.log('\n' + fStr.yellow(testCasesTag))
   progress.test_cases.forEach(testCase => {
     console.log(fStr.yellow(testCase.name))
     totalRequestsCount += testCase.requests.length
@@ -49,7 +49,7 @@ const outbound = (progress) => {
       console.log(passed ? fStr.green(logMessage) : fStr.red(logMessage))
     })
   })
-  console.log(fStr.yellow(testCasesTag))
+  console.log(fStr.yellow(testCasesTag) + '\n')
   const config = objectStore.get('config')
   if (config.extraSummaryInformation) {
     const extraSummaryInformationArr = config.extraSummaryInformation.split(',')

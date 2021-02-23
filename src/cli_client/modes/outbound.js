@@ -22,7 +22,6 @@
  --------------
  ******/
 const axios = require('axios').default
-const cliProgress = require('cli-progress')
 const report = require('../utils/report')
 const logger = require('../utils/logger')
 const fStr = require('node-strings')
@@ -33,10 +32,72 @@ const slackBroadcast = require('../extras/slack-broadcast')
 const TemplateGenerator = require('../utils/templateGenerator')
 const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 
-const bar = new cliProgress.SingleBar({
-  noTTYOutput: true,
-  stream: process.stdout
-}, cliProgress.Presets.legacy)
+const totalProgress = {
+  totalTestCases: 0,
+  totalRequests: 0,
+  totalAssertions: 0,
+  passedAssertions: 0,
+  failedAssertions: 0
+}
+
+const updateTotalProgressCounts = (progress) => {
+  // console.log(progress.requestSent.tests.assertions)
+  progress.requestSent.tests.assertions.forEach(assertion => {
+    if (progress.testResult.results[assertion.id].status === 'SUCCESS') {
+      totalProgress.passedAssertions++
+    } else {
+      totalProgress.failedAssertions++
+    }
+  })
+}
+
+const printTotalProgressCounts = () => {
+  const progressStr = '[ ' + fStr.green(totalProgress.passedAssertions + ' passed, ') + fStr.red(totalProgress.failedAssertions + ' failed') + ' of ' + totalProgress.totalAssertions + ' ]'
+  process.stdout.write(progressStr)
+}
+
+const printProgress = (progress) => {
+  const config = objectStore.get('config')
+  switch (config.verbosity) {
+    // Only Errors
+    case '1':
+    {
+      printTotalProgressCounts()
+      let failedAssertions = ''
+      progress.requestSent.tests.assertions.forEach(assertion => {
+        if (progress.testResult.results[assertion.id].status !== 'SUCCESS') {
+          failedAssertions += '\t' + fStr.red('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.red(assertion.description) + '\n'
+        }
+      })
+      if (failedAssertions) {
+        console.log('\n  ' + fStr.blue(progress.testCaseName + ' -> ' + progress.requestSent.description))
+        console.log(failedAssertions)
+      } else {
+        console.log()
+      }
+      break
+    }
+    // All assertions
+    case '2':
+    {
+      printTotalProgressCounts()
+      console.log('\n  ' + fStr.blue(progress.testCaseName + ' -> ' + progress.requestSent.description))
+      progress.requestSent.tests.assertions.forEach(assertion => {
+        if (progress.testResult.results[assertion.id].status === 'SUCCESS') {
+          console.log('\t' + fStr.green('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.cyan(assertion.description))
+        } else {
+          console.log('\t' + fStr.red('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.red(assertion.description))
+        }
+      })
+      break
+    }
+    // Only Requests and test counts
+    default:
+      printTotalProgressCounts()
+      console.log('\t' + fStr.blue(progress.testCaseName + ' -> ' + progress.requestSent.description))
+      break
+  }
+}
 
 const sendTemplate = async (sessionId) => {
   const config = objectStore.get('config')
@@ -52,11 +113,13 @@ const sendTemplate = async (sessionId) => {
     const template = await TemplateGenerator.generateTemplate(inputFiles)
     template.inputValues = JSON.parse(await readFileAsync(config.environmentFile, 'utf8')).inputValues
 
-    let totalRequests = 0
     template.test_cases.forEach(testCase => {
-      totalRequests += testCase.requests.length
+      totalProgress.totalTestCases++
+      totalProgress.totalRequests += testCase.requests.length
+      testCase.requests.forEach(request => {
+        totalProgress.totalAssertions += request.tests.assertions.length
+      })
     })
-    bar.start(totalRequests, 0)
     await axios.post(`${config.baseURL}/api/outbound/template/` + outboundRequestID, template, { headers: { 'Content-Type': 'application/json' } })
   } catch (err) {
     console.log(err)
@@ -66,7 +129,6 @@ const sendTemplate = async (sessionId) => {
 
 const handleIncomingProgress = async (progress) => {
   if (progress.status === 'FINISHED') {
-    bar.stop()
     let passed
     try {
       passed = logger.outbound(progress.totalResult)
@@ -84,7 +146,8 @@ const handleIncomingProgress = async (progress) => {
       process.exit(1)
     }
   } else {
-    bar.increment()
+    updateTotalProgressCounts(progress)
+    printProgress(progress)
   }
 }
 

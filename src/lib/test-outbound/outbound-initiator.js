@@ -322,6 +322,7 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
     notificationEmitter.broadcastOutboundProgress({
       outboundID: tracing.outboundID,
       testCaseId: testCase.id,
+      testCaseName: testCase.name,
       status: status,
       requestId: request.id,
       response: resp.syncResponse,
