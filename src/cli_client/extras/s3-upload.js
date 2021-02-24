@@ -56,7 +56,7 @@ const uploadFileDataToS3 = async (s3URL, fileData) => {
   try {
     // call S3 to retrieve upload file to specified bucket
     const result = await s3.upload(uploadParams).promise()
-    console.log('Successfully uploaded the file to S3.')
+    console.log('Successfully uploaded the file to S3. URL is ' + s3URL)
     return result.Location
   } catch (err) {
     console.log('ERROR: Upload to S3 failed. ', err.message)
