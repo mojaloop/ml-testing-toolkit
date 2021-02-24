@@ -41,7 +41,6 @@ const totalProgress = {
 }
 
 const updateTotalProgressCounts = (progress) => {
-  // console.log(progress.requestSent.tests.assertions)
   progress.requestSent.tests.assertions.forEach(assertion => {
     if (progress.testResult.results[assertion.id].status === 'SUCCESS') {
       totalProgress.passedAssertions++
