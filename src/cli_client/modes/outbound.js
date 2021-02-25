@@ -114,9 +114,13 @@ const sendTemplate = async (sessionId) => {
 
     template.test_cases.forEach(testCase => {
       totalProgress.totalTestCases++
-      totalProgress.totalRequests += testCase.requests.length
+      if (testCase.requests) {
+        totalProgress.totalRequests += testCase.requests.length
+      }
       testCase.requests.forEach(request => {
-        totalProgress.totalAssertions += request.tests.assertions.length
+        if (request.tests && request.tests.assertions) {
+          totalProgress.totalAssertions += request.tests.assertions.length
+        }
       })
     })
     await axios.post(`${config.baseURL}/api/outbound/template/` + outboundRequestID, template, { headers: { 'Content-Type': 'application/json' } })
