@@ -48,7 +48,7 @@ const _getAdapter = (systemConfig) => {
     elasticSearch.init({
       url: systemConfig.SERVER_LOGS.ADAPTER.API_URL,
       index: systemConfig.SERVER_LOGS.ADAPTER.INDEX,
-      resultsPageSize: systemConfig.SERVER_LOGS.ADAPTER.RESULTS_PAGE_SIZE
+      pageSize: systemConfig.SERVER_LOGS.RESULTS_PAGE_SIZE
     })
     _adapter = elasticSearch
     return _adapter
