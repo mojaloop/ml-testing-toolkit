@@ -41,13 +41,15 @@ const totalProgress = {
 }
 
 const updateTotalProgressCounts = (progress) => {
-  progress.requestSent.tests.assertions.forEach(assertion => {
-    if (progress.testResult.results[assertion.id].status === 'SUCCESS') {
-      totalProgress.passedAssertions++
-    } else {
-      totalProgress.failedAssertions++
-    }
-  })
+  if (progress.requestSent && progress.requestSent.tests && progress.requestSent.tests.assertions) {
+    progress.requestSent.tests.assertions.forEach(assertion => {
+      if (progress.testResult.results[assertion.id].status === 'SUCCESS') {
+        totalProgress.passedAssertions++
+      } else {
+        totalProgress.failedAssertions++
+      }
+    })
+  }
 }
 
 const printTotalProgressCounts = () => {
