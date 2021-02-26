@@ -1,5 +1,6 @@
 {
   "mode": "outbound",
+  "logLevel": "2",
   "reportFormat": "html",
   "baseURL": "http://localhost:5050",
   "reportTarget": "s3://qa-results/ttk-tests/reports/asdf.html",
