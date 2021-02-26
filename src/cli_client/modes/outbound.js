@@ -59,7 +59,7 @@ const printTotalProgressCounts = () => {
 
 const printProgress = (progress) => {
   const config = objectStore.get('config')
-  switch (config.verbosity) {
+  switch (config.logLevel) {
     // Only Errors
     case '1':
     {

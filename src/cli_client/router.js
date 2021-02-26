@@ -22,19 +22,24 @@
  --------------
  ******/
 const fs = require('fs')
+const _ = require('lodash')
 const objectStore = require('./objectStore')
 const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 
 const TESTS_EXECUTION_TIMEOUT = 1000 * 60 * 15 // 15min timout
 
 const cli = (commander) => {
-  let configFile = {
+  const configFile = {
     mode: 'outbound',
     reportFormat: 'json',
-    baseURL: 'http://localhost:5050'
+    baseURL: 'http://localhost:5050',
+    logLevel: '0',
+    reportAutoFilenameEnable: false
   }
+
   if (fs.existsSync(commander.config)) {
-    configFile = JSON.parse(fs.readFileSync(commander.config, 'utf8'))
+    const newConfig = JSON.parse(fs.readFileSync(commander.config, 'utf8'))
+    _.merge(configFile, newConfig)
   }
 
   const config = {
