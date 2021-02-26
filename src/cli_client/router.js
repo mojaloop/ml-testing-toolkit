@@ -40,7 +40,7 @@ const cli = (commander) => {
   const config = {
     mode: commander.mode || configFile.mode,
     inputFiles: commander.inputFiles,
-    verbosity: commander.verbosity,
+    logLevel: commander.logLevel || configFile.logLevel,
     environmentFile: commander.environmentFile,
     reportFormat: commander.reportFormat || configFile.reportFormat,
     reportAutoFilenameEnable: commander.reportAutoFilenameEnable === 'true' || configFile.reportAutoFilenameEnable === true,

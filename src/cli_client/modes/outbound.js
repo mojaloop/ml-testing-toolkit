@@ -65,13 +65,15 @@ const printProgress = (progress) => {
     {
       printTotalProgressCounts()
       let failedAssertions = ''
-      progress.requestSent.tests.assertions.forEach(assertion => {
-        if (progress.testResult.results[assertion.id].status !== 'SUCCESS') {
-          failedAssertions += '\t' + fStr.red('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.red(assertion.description) + '\n'
-        }
-      })
+      if (progress.requestSent && progress.requestSent.tests && progress.requestSent.tests.assertions) {
+        progress.requestSent.tests.assertions.forEach(assertion => {
+          if (progress.testResult.results[assertion.id].status !== 'SUCCESS') {
+            failedAssertions += '\t' + fStr.red('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.red(assertion.description) + '\n'
+          }
+        })
+      }
+      console.log('\n  ' + fStr.blue(progress.testCaseName + ' -> ' + progress.requestSent.description))
       if (failedAssertions) {
-        console.log('\n  ' + fStr.blue(progress.testCaseName + ' -> ' + progress.requestSent.description))
         console.log(failedAssertions)
       } else {
         console.log()
@@ -83,13 +85,15 @@ const printProgress = (progress) => {
     {
       printTotalProgressCounts()
       console.log('\n  ' + fStr.blue(progress.testCaseName + ' -> ' + progress.requestSent.description))
-      progress.requestSent.tests.assertions.forEach(assertion => {
-        if (progress.testResult.results[assertion.id].status === 'SUCCESS') {
-          console.log('\t' + fStr.green('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.cyan(assertion.description))
-        } else {
-          console.log('\t' + fStr.red('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.red(assertion.description))
-        }
-      })
+      if (progress.requestSent && progress.requestSent.tests && progress.requestSent.tests.assertions) {
+        progress.requestSent.tests.assertions.forEach(assertion => {
+          if (progress.testResult.results[assertion.id].status === 'SUCCESS') {
+            console.log('\t' + fStr.green('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.cyan(assertion.description))
+          } else {
+            console.log('\t' + fStr.red('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.red(assertion.description))
+          }
+        })
+      }
       break
     }
     // Only Requests and test counts
