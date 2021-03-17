@@ -19,6 +19,7 @@
 
  * ModusBox
  * Vijaya Kumar <vijaya.guthi@modusbox.com> (Original Author)
+ * Shashikant Hirugade <shashikant.hirugade@modusbox.com>
  --------------
  ******/
 
