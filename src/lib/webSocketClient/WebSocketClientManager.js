@@ -25,7 +25,12 @@
 const WebSocket = require('ws')
 const EventEmitter = require('events')
 class MyEmitter extends EventEmitter {}
-
+const Config = require('../config')
+let userConfig
+(async function () {
+  userConfig = await Config.getStoredUserConfig()
+  console.log(userConfig)
+})()
 class WebSocketClientManager {
   constructor (consoleFn) {
     this.ws = {}
@@ -41,6 +46,17 @@ class WebSocketClientManager {
   }
 
   connect (url, clientName, timeout = 15000) {
+    const tlsOptions = {}
+    const urlObject = new URL(url)
+    if (userConfig.CLIENT_MUTUAL_TLS_ENABLED) {
+      const cred = userConfig.TLS_CREDS.filter(item => item.HOST === urlObject.host)
+      if (Array.isArray(cred) && cred.length === 1) {
+        tlsOptions.cert = cred[0].CERT
+        tlsOptions.key = cred[0].KEY
+        tlsOptions.rejectUnauthorized = true
+      }
+    }
+
     return new Promise(resolve => {
       if (this.ws[clientName]) {
         this.customLog('WebSocket Client Already exists with that name')
@@ -51,7 +67,7 @@ class WebSocketClientManager {
           message: null,
           eventEmitter: null
         }
-        this.ws[clientName].client = new WebSocket(url)
+        this.ws[clientName].client = new WebSocket(url, tlsOptions)
         this.ws[clientName].client.on('open', () => {
           this.customLog('WebSocket Client Connected')
           this.ws[clientName].eventEmitter = new MyEmitter()
