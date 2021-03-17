@@ -26,19 +26,19 @@ const WebSocket = require('ws')
 const EventEmitter = require('events')
 class MyEmitter extends EventEmitter {}
 const Config = require('../config')
-let userConfig
-(async function () {
-  userConfig = await Config.getStoredUserConfig()
-  console.log(userConfig)
-})()
 class WebSocketClientManager {
   constructor (consoleFn) {
     this.ws = {}
+    this.userConfig = {}
     if (consoleFn) {
       this.consoleFn = consoleFn
     } else {
       this.consoleFn = console
     }
+  }
+
+  async init () {
+    this.userConfig = await Config.getStoredUserConfig()
   }
 
   customLog (logMessage) {
@@ -48,12 +48,15 @@ class WebSocketClientManager {
   connect (url, clientName, timeout = 15000) {
     const tlsOptions = {}
     const urlObject = new URL(url)
-    if (userConfig.CLIENT_MUTUAL_TLS_ENABLED) {
-      const cred = userConfig.TLS_CREDS.filter(item => item.HOST === urlObject.host)
+    if (this.userConfig.CLIENT_MUTUAL_TLS_ENABLED) {
+      const cred = this.userConfig.TLS_CREDS.filter(item => item.HOST === urlObject.host)
       if (Array.isArray(cred) && cred.length === 1) {
+        this.customLog(`Found the Client certificate for ${urlObject.host}`)
         tlsOptions.cert = cred[0].CERT
         tlsOptions.key = cred[0].KEY
-        tlsOptions.rejectUnauthorized = true
+        tlsOptions.rejectUnauthorized = false
+      } else {
+        this.customLog(`Client certificate not found for ${urlObject.host}`)
       }
     }
 
@@ -81,8 +84,9 @@ class WebSocketClientManager {
           this.customLog('WebSocket Client Disconnected')
           resolve(false)
         })
-        this.ws[clientName].client.on('error', () => {
+        this.ws[clientName].client.on('error', (err) => {
           this.customLog('WebSocket Client Error Connection')
+          this.customLog(JSON.stringify(err))
           delete this.ws[clientName]
           resolve(false)
         })

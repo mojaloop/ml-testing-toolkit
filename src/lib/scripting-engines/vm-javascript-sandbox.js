@@ -89,6 +89,7 @@ const generateContextObj = async (environmentObj = {}) => {
   const consoleFn = consoleWrapperFn(consoleOutObj)
   const customFn = customWrapperFn(requestVariables)
   const websocket = new WebSocketClientManager(consoleFn)
+  await websocket.init()
 
   const contextObj = {
     ctx: {
