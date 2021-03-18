@@ -20,7 +20,8 @@
 
  * ModusBox
  * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
- --------------
+ * Shashikant Hirugade <shashikant.hirugade@modusbox.com>
+--------------
  ******/
 
 'use strict'
@@ -87,66 +88,67 @@ const webSocketNegativeMock2 = () => {
 describe('WebSocketClientManager', () => {
   describe('websocket connect', () => {
     let websocket = null
-    beforeAll(() => {
+    beforeAll(async () => {
       websocket = new WebSocketClientManager()
+      await websocket.init()
     })
     it('websocket connect should return true', async () => {
       WebSocket.mockImplementationOnce(webSocketPositiveMock)
-      await expect(websocket.connect('url', 'test1')).resolves.toBe(true)
+      await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
       expect(websocket.disconnect('test1')).toBe(true)
     })
     it('websocket connect should return false on websocket failure', async () => {
       WebSocket.mockImplementationOnce(webSocketNegativeMock1)
-      await expect(websocket.connect('url', 'test1')).resolves.toBe(false)
+      await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(false)
       expect(websocket.disconnect('test1')).toBe(true)
     })
     it('websocket connect should return false on websocket failure', async () => {
       WebSocket.mockImplementationOnce(webSocketNegativeMock2)
-      await expect(websocket.connect('url', 'test1')).resolves.toBe(false)
+      await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(false)
       expect(websocket.disconnect('test1')).toBe(true)
     })
     it('websocket connect should return false on dupliceate name', async () => {
       WebSocket.mockImplementationOnce(webSocketPositiveMock)
-      await expect(websocket.connect('url', 'test1')).resolves.toBe(true)
-      await expect(websocket.connect('url', 'test1')).resolves.toBe(false)
+      await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
+      await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(false)
       expect(websocket.disconnect('test1')).toBe(true)
     })
     it('websocket getMessage', async () => {
       WebSocket.mockImplementationOnce(webSocketPositiveMock)
-      await expect(websocket.connect('url', 'test1')).resolves.toBe(true)
+      await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
       await expect(websocket.getMessage('test1')).resolves.toEqual({data: 'some data'})
       expect(websocket.disconnect('test1')).toBe(true)
     })
     it('websocket getMessage with delayed message', async () => {
       WebSocket.mockImplementationOnce(webSocketPositiveMockDelayedMessage)
-      await expect(websocket.connect('url', 'test1')).resolves.toBe(true)
+      await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
       await expect(websocket.getMessage('test1')).resolves.toEqual({data: 'some data'})
       expect(websocket.disconnect('test1')).toBe(true)
     })
     it('websocket getMessage with no message', async () => {
       WebSocket.mockImplementationOnce(webSocketPositiveMockNoMessage)
-      await expect(websocket.connect('url', 'test1')).resolves.toBe(true)
+      await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
       await expect(websocket.getMessage('test1', 100)).resolves.toBe(null)
       expect(websocket.disconnect('test1')).toBe(true)
     })
     it('websocket getMessage should fail with wrong websocket name', async () => {
       WebSocket.mockImplementationOnce(webSocketPositiveMock)
-      await expect(websocket.connect('url', 'test1')).resolves.toBe(true)
+      await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
       await expect(websocket.getMessage('test2')).resolves.toBe(null)
       expect(websocket.disconnect('test1')).toBe(true)
     })
     it('websocket getMessage should fail after connect timeout', async () => {
       WebSocket.mockImplementationOnce(webSocketPositiveMock)
-      await expect(websocket.connect('url', 'test1', 100)).resolves.toBe(true)
+      await expect(websocket.connect('wss://www.host.com', 'test1', 100)).resolves.toBe(true)
       await new Promise((r) => setTimeout(r, 150));
       await expect(websocket.getMessage('test1')).resolves.toBe(null)
       expect(websocket.disconnect('test1')).toBe(true)
     })
     it('websocket disconnectAll should not throw error', async () => {
       WebSocket.mockImplementationOnce(webSocketPositiveMock)
-      await expect(websocket.connect('url', 'test1')).resolves.toBe(true)
+      await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
       WebSocket.mockImplementationOnce(webSocketPositiveMock)
-      await expect(websocket.connect('url', 'test2')).resolves.toBe(true)
+      await expect(websocket.connect('wss://www.host.com', 'test2')).resolves.toBe(true)
       expect(websocket.disconnectAll()).toBe(true)
     })
   })

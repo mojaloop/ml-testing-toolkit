@@ -27,7 +27,6 @@ const app = express()
 const http = require('http').Server(app)
 const customLogger = require('./requestLogger')
 const Config = require('./config')
-const socketIO = require('socket.io')(http)
 const passport = require('passport')
 const cookieParser = require('cookie-parser')
 const util = require('util')
@@ -93,6 +92,9 @@ const getApp = () => {
   }
   return app
 }
+const getHttp = () => {
+  return http
+}
 
 const verifyUser = () => {
   if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
@@ -111,7 +113,7 @@ const verifyUser = () => {
 
 module.exports = {
   startServer,
-  socketIO,
+  getHttp,
   getApp,
   verifyUser
 }

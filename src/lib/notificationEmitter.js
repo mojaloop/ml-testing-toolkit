@@ -22,12 +22,15 @@
  --------------
  ******/
 
-const io = require('./api-server').socketIO
+const SocketServer = require('./socket-server')
 
 const broadcast = (log, sessionID = null, type) => {
-  io.emit(type, log)
-  if (sessionID) {
-    io.emit(`${type}/` + sessionID, log)
+  const io = SocketServer.getIO()
+  if (io) {
+    io.emit(type, log)
+    if (sessionID) {
+      io.emit(`${type}/` + sessionID, log)
+    }
   }
 }
 

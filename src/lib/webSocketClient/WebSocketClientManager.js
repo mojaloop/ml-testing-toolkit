@@ -19,16 +19,18 @@
 
  * ModusBox
  * Vijaya Kumar <vijaya.guthi@modusbox.com> (Original Author)
+ * Shashikant Hirugade <shashikant.hirugade@modusbox.com>
  --------------
  ******/
 
 const WebSocket = require('ws')
 const EventEmitter = require('events')
 class MyEmitter extends EventEmitter {}
-
+const Config = require('../config')
 class WebSocketClientManager {
   constructor (consoleFn) {
     this.ws = {}
+    this.userConfig = {}
     if (consoleFn) {
       this.consoleFn = consoleFn
     } else {
@@ -36,11 +38,28 @@ class WebSocketClientManager {
     }
   }
 
+  async init () {
+    this.userConfig = await Config.getStoredUserConfig()
+  }
+
   customLog (logMessage) {
     this.consoleFn.log(logMessage)
   }
 
   connect (url, clientName, timeout = 15000) {
+    const tlsOptions = { rejectUnauthorized: false }
+    const urlObject = new URL(url)
+    if (this.userConfig.CLIENT_MUTUAL_TLS_ENABLED) {
+      const cred = this.userConfig.CLIENT_TLS_CREDS.filter(item => item.HOST === urlObject.host)
+      if (Array.isArray(cred) && cred.length === 1) {
+        this.customLog(`Found the Client certificate for ${urlObject.host}`)
+        tlsOptions.cert = cred[0].CERT
+        tlsOptions.key = cred[0].KEY
+      } else {
+        this.customLog(`Client certificate not found for ${urlObject.host}`)
+      }
+    }
+
     return new Promise(resolve => {
       if (this.ws[clientName]) {
         this.customLog('WebSocket Client Already exists with that name')
@@ -51,7 +70,7 @@ class WebSocketClientManager {
           message: null,
           eventEmitter: null
         }
-        this.ws[clientName].client = new WebSocket(url)
+        this.ws[clientName].client = new WebSocket(url, tlsOptions)
         this.ws[clientName].client.on('open', () => {
           this.customLog('WebSocket Client Connected')
           this.ws[clientName].eventEmitter = new MyEmitter()
@@ -65,8 +84,9 @@ class WebSocketClientManager {
           this.customLog('WebSocket Client Disconnected')
           resolve(false)
         })
-        this.ws[clientName].client.on('error', () => {
+        this.ws[clientName].client.on('error', (err) => {
           this.customLog('WebSocket Client Error Connection')
+          this.customLog(JSON.stringify(err))
           delete this.ws[clientName]
           resolve(false)
         })
