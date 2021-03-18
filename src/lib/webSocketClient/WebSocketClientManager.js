@@ -47,7 +47,7 @@ class WebSocketClientManager {
   }
 
   connect (url, clientName, timeout = 15000) {
-    const tlsOptions = {}
+    const tlsOptions = { rejectUnauthorized: false }
     const urlObject = new URL(url)
     if (this.userConfig.CLIENT_MUTUAL_TLS_ENABLED) {
       const cred = this.userConfig.TLS_CREDS.filter(item => item.HOST === urlObject.host)
@@ -55,7 +55,6 @@ class WebSocketClientManager {
         this.customLog(`Found the Client certificate for ${urlObject.host}`)
         tlsOptions.cert = cred[0].CERT
         tlsOptions.key = cred[0].KEY
-        tlsOptions.rejectUnauthorized = false
       } else {
         this.customLog(`Client certificate not found for ${urlObject.host}`)
       }
