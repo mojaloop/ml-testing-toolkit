@@ -119,7 +119,7 @@ jobs:
           name: Execute unit tests
           command: |
             export NODE_OPTIONS=--max_old_space_size=4096
-            npm run test:unit --silent -- --json --outputFile ./test/results/unit.json
+            npm run test:unit --silent -- --json --maxWorkers=2 --outputFile ./test/results/unit.json
       - store_artifacts:
           path: ./test/results
           prefix: test
@@ -179,7 +179,7 @@ jobs:
           name: Execute code coverage check
           command: |
             export NODE_OPTIONS=--max_old_space_size=4096
-            npm -s run test:coverage-check
+            npm -s run test:coverage-check -- --maxWorkers=2
       - store_artifacts:
           path: coverage
           prefix: test
