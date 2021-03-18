@@ -28,6 +28,8 @@
 // const Util = require('util')
 const Logger = require('@mojaloop/central-services-logger')
 const Config = require('./config')
+const NotificationEmitter = require('./notificationEmitter')
+const DBAdapter = require('./db/adapters/dbAdapter')
 const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 
 const logRequest = (request, user) => {
@@ -167,16 +169,14 @@ const logMessage = (verbosity, message, externalData = {}) => {
       sessionID = data.request && data.request.customInfo ? data.request.customInfo.sessionID : null
     }
 
-    const notificationEmitter = require('./notificationEmitter')
     if (log.notificationType === 'newOutboundLog') {
-      notificationEmitter.broadcastOutboundLog(log, sessionID)
+      NotificationEmitter.broadcastOutboundLog(log, sessionID)
     } else {
-      notificationEmitter.broadcastLog(log, sessionID)
+      NotificationEmitter.broadcastLog(log, sessionID)
     }
 
     if (hostingEnabled && data.user) {
-      const dbAdapter = require('./db/adapters/dbAdapter')
-      dbAdapter.upsert('logs', log, data.user)
+      DBAdapter.upsert('logs', log, data.user)
     }
   }
 }
