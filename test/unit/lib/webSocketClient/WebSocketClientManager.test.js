@@ -20,7 +20,8 @@
 
  * ModusBox
  * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
- --------------
+ * Shashikant Hirugade <shashikant.hirugade@modusbox.com>
+--------------
  ******/
 
 'use strict'
