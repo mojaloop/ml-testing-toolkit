@@ -27,6 +27,7 @@
 
 // const Util = require('util')
 const Logger = require('@mojaloop/central-services-logger')
+const Config = require('./config')
 const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 
 const logRequest = (request, user) => {
@@ -156,7 +157,7 @@ const logMessage = (verbosity, message, externalData = {}) => {
     }
 
     let sessionID
-    const hostingEnabled = require('./config').getSystemConfig().HOSTING_ENABLED
+    const hostingEnabled = Config.getSystemConfig().HOSTING_ENABLED
     if (hostingEnabled) {
       if (!data.user && data.request && data.request.customInfo) {
         data.user = data.request.customInfo.user
