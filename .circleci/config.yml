@@ -6,7 +6,7 @@ defaults_working_directory: &defaults_working_directory
 
 defaults_docker_node: &defaults_docker_node
   docker:
-    - image: node:12.16.0-alpine
+    - image: node:12.16.3-alpine
 
 defaults_docker_ubuntu: &defaults_docker_ubuntu
   docker:
@@ -409,18 +409,17 @@ workflows:
               ignore:
                 - /feature*/
                 - /bugfix*/
-      # TODO - fix and enable this check
-      # - test-unit:
-      #     context: org-global
-      #     requires:
-      #       - setup
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore:
-      #           - /feature*/
-      #           - /bugfix*/
+      - test-unit:
+          context: org-global
+          requires:
+            - setup
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
       - test-postman:
           context: org-global
           requires:
@@ -432,18 +431,18 @@ workflows:
               ignore:
                 - /feature*/
                 - /bugfix*/
-      # - test-coverage:
-      #     context: org-global
-      #     requires:
-      #       - setup
-      #       - test-unit
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore:
-      #           - /feature*/
-      #           - /bugfix*/
+      - test-coverage:
+          context: org-global
+          requires:
+            - setup
+            - test-unit
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
       # - test-integration:
       #     context: org-global
       #     requires:
@@ -492,8 +491,8 @@ workflows:
           context: org-global
           requires:
             - setup
-            # - test-unit
-            # - test-coverage
+            - test-unit
+            - test-coverage
             - vulnerability-check
           filters:
             tags:
@@ -506,8 +505,8 @@ workflows:
           context: org-global
           requires:
             - setup
-            # - test-unit
-            # - test-coverage
+            - test-unit
+            - test-coverage
             # - test-integration
             # - test-functional
             - vulnerability-check
@@ -522,8 +521,8 @@ workflows:
           context: org-global
           requires:
             - setup
-            # - test-unit
-            # - test-coverage
+            - test-unit
+            - test-coverage
             # - test-integration
             # - test-functional
             - vulnerability-check
