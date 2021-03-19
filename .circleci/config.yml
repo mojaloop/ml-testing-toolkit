@@ -492,8 +492,8 @@ workflows:
           context: org-global
           requires:
             - setup
-            - test-unit
-            - test-coverage
+            # - test-unit
+            # - test-coverage
             - vulnerability-check
           filters:
             tags:
@@ -506,8 +506,8 @@ workflows:
           context: org-global
           requires:
             - setup
-            - test-unit
-            - test-coverage
+            # - test-unit
+            # - test-coverage
             # - test-integration
             # - test-functional
             - vulnerability-check
@@ -522,8 +522,8 @@ workflows:
           context: org-global
           requires:
             - setup
-            - test-unit
-            - test-coverage
+            # - test-unit
+            # - test-coverage
             # - test-integration
             # - test-functional
             - vulnerability-check
