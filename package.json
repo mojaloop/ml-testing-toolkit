@@ -1,7 +1,7 @@
 {
   "name": "ml-testing-toolkit",
   "description": "Testing Toolkit for Mojaloop implementations",
-  "version": "11.10.0",
+  "version": "11.11.0",
   "license": "Apache-2.0",
   "author": "Vijaya Kumar Guthi, ModusBox Inc. ",
   "contributors": [
@@ -34,6 +34,7 @@
   "scripts": {
     "start": "node src/index.js",
     "standard": "standard",
+    "standard:fix": "standard --fix",
     "dev": "nodemon src/index.js",
     "test": "npm run test:unit",
     "test:unit": "jest --testMatch '**/test/unit/**/*.test.js'",
