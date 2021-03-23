@@ -49,7 +49,7 @@ jest.mock('axios')
 
 describe('Outbound Initiator Functions', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
   describe('getFunctionResult', () => {
     // Positive Scenarios
@@ -469,11 +469,11 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
-      SpySign.mockReturnValueOnce( Promise.resolve() )
+      SpySign.mockReturnValue( Promise.resolve() )
       SpyAgent.mockImplementationOnce(() => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
+      SpyGetTlsConfig.mockReturnValue(Promise.resolve({
         dfsps: {
           'userdfsp': {
             hubClientCert: 'cert',
@@ -482,11 +482,11 @@ describe('Outbound Initiator Functions', () => {
         },
         hubClientKey: 'key'
       }))
-      SpyGetUserConfig.mockResolvedValueOnce({
+      SpyGetUserConfig.mockResolvedValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         HOSTING_ENABLED: false
       })
       const sampleRequest = {
@@ -522,11 +522,11 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
-      SpySign.mockReturnValueOnce(Promise.resolve())
+      SpySign.mockReturnValue(Promise.resolve())
       SpyAgent.mockImplementationOnce(() => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
+      SpyGetTlsConfig.mockReturnValue(Promise.resolve({
         dfsps: {
           'userdfsp': {
             hubClientCert: 'cert',
@@ -535,10 +535,10 @@ describe('Outbound Initiator Functions', () => {
         },
         hubClientKey: 'key'
       }))
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         HOSTING_ENABLED: false
       })
-      SpyGetUserConfig.mockResolvedValueOnce({
+      SpyGetUserConfig.mockResolvedValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         OUTBOUND_MUTUAL_TLS_ENABLED: true,
         CALLBACK_TIMEOUT: 5
@@ -577,11 +577,11 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
-      SpySign.mockResolvedValueOnce()
+      SpySign.mockResolvedValue()
       SpyAgent.mockImplementationOnce(() => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockResolvedValueOnce({
+      SpyGetTlsConfig.mockResolvedValue({
         dfsps: {
           'userdfsp': {
             hubClientCert: 'cert',
@@ -590,10 +590,10 @@ describe('Outbound Initiator Functions', () => {
         },
         hubClientKey: 'key'
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         HOSTING_ENABLED: false
       })
-      SpyGetUserConfig.mockResolvedValueOnce({
+      SpyGetUserConfig.mockResolvedValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         OUTBOUND_MUTUAL_TLS_ENABLED: true,
         CALLBACK_TIMEOUT: 5000
@@ -635,7 +635,7 @@ describe('Outbound Initiator Functions', () => {
       SpyAgent.mockImplementationOnce(async () => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockResolvedValueOnce({
+      SpyGetTlsConfig.mockResolvedValue({
         dfsps: {
           'userdfsp': {
             hubClientCert: 'cert',
@@ -644,10 +644,10 @@ describe('Outbound Initiator Functions', () => {
         },
         hubClientKey: 'key'
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         HOSTING_ENABLED: false
       })
-      SpyGetUserConfig.mockResolvedValueOnce({
+      SpyGetUserConfig.mockResolvedValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
@@ -688,7 +688,7 @@ describe('Outbound Initiator Functions', () => {
       SpyAgent.mockImplementationOnce(async () => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockResolvedValueOnce({
+      SpyGetTlsConfig.mockResolvedValue({
         dfsps: {
           'userdfsp': {
             hubClientCert: 'cert',
@@ -697,12 +697,17 @@ describe('Outbound Initiator Functions', () => {
         },
         hubClientKey: 'key'
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         HOSTING_ENABLED: true
       })
-      SpyGetUserConfig.mockResolvedValueOnce({
+      SpyGetUserConfig.mockResolvedValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         OUTBOUND_MUTUAL_TLS_ENABLED: true
+      })
+      SpyGetEndpointsConfig.mockResolvedValue({
+        dfspEndpoints: {
+          'userdfsp': 'http://localhost:5000'
+        }
       })
       const sampleRequest = {
         headers: {
@@ -741,7 +746,7 @@ describe('Outbound Initiator Functions', () => {
       SpyAgent.mockImplementationOnce(async () => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockResolvedValueOnce({
+      SpyGetTlsConfig.mockResolvedValue({
         dfsps: {
           'userdfsp': {
             hubClientCert: 'cert',
@@ -750,15 +755,15 @@ describe('Outbound Initiator Functions', () => {
         },
         hubClientKey: 'key'
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         HOSTING_ENABLED: true
       })
-      SpyGetEndpointsConfig.mockResolvedValueOnce({
+      SpyGetEndpointsConfig.mockResolvedValue({
         dfspEndpoints: {
           'userdfsp': 'http://localhost:5000'
         }
       })
-      SpyGetUserConfig.mockResolvedValueOnce({
+      SpyGetUserConfig.mockResolvedValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
@@ -787,7 +792,7 @@ describe('Outbound Initiator Functions', () => {
       expect(axios).toHaveBeenCalledTimes(1);
     })
     it('sendRequest should call axios with appropriate params 8', async () => {
-      SpyGetTlsConfig.mockResolvedValueOnce({
+      SpyGetTlsConfig.mockResolvedValue({
         dfsps: {
           'userdfsp': {
             hubClientCert: 'cert',
@@ -796,14 +801,14 @@ describe('Outbound Initiator Functions', () => {
         },
         hubClientKey: 'key'
       })
-      SpyGetUserConfig.mockResolvedValueOnce({
+      SpyGetUserConfig.mockResolvedValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         HOSTING_ENABLED: true
       })
-      SpyGetEndpointsConfig.mockResolvedValueOnce({
+      SpyGetEndpointsConfig.mockResolvedValue({
         dfspEndpoints: {}
       })
       const sampleRequest = {
@@ -837,12 +842,12 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
-      SpySign.mockReturnValueOnce( Promise.resolve() )
-      SpyJwsSignWithKey.mockReturnValueOnce( Promise.resolve() )
+      SpySign.mockReturnValue( Promise.resolve() )
+      SpyJwsSignWithKey.mockReturnValue( Promise.resolve() )
       SpyAgent.mockImplementationOnce(() => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
+      SpyGetTlsConfig.mockReturnValue(Promise.resolve({
         dfsps: {
           'userdfsp': {
             hubClientCert: 'cert',
@@ -851,11 +856,11 @@ describe('Outbound Initiator Functions', () => {
         },
         hubClientKey: 'key'
       }))
-      SpyGetUserConfig.mockResolvedValueOnce({
+      SpyGetUserConfig.mockResolvedValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         HOSTING_ENABLED: false
       })
       const sampleRequest = {
@@ -892,12 +897,12 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
-      SpySign.mockReturnValueOnce( Promise.resolve() )
-      SpyJwsSignWithKey.mockReturnValueOnce( Promise.reject('SOME_ERROR') )
+      SpySign.mockReturnValue( Promise.resolve() )
+      SpyJwsSignWithKey.mockReturnValue( Promise.reject('SOME_ERROR') )
       SpyAgent.mockImplementationOnce(() => {
         return {httpsAgent: {}}
       })
-      SpyGetTlsConfig.mockReturnValueOnce(Promise.resolve({
+      SpyGetTlsConfig.mockReturnValue(Promise.resolve({
         dfsps: {
           'userdfsp': {
             hubClientCert: 'cert',
@@ -906,11 +911,11 @@ describe('Outbound Initiator Functions', () => {
         },
         hubClientKey: 'key'
       }))
-      SpyGetUserConfig.mockResolvedValueOnce({
+      SpyGetUserConfig.mockResolvedValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         HOSTING_ENABLED: false
       })
       const sampleRequest = {
@@ -1247,7 +1252,7 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
-      SpyGetApiDefinitions.mockResolvedValueOnce([{
+      SpyGetApiDefinitions.mockResolvedValue([{
         specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
         type: 'fspiop'
       }])
@@ -1262,7 +1267,7 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
-      SpyGetApiDefinitions.mockResolvedValueOnce([{
+      SpyGetApiDefinitions.mockResolvedValue([{
         specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
         type: 'fspiop'
       }])
@@ -1278,7 +1283,7 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
-      SpyGetApiDefinitions.mockResolvedValueOnce([{
+      SpyGetApiDefinitions.mockResolvedValue([{
         specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
         type: 'fspiop'
       }])

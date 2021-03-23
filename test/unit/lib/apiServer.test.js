@@ -33,6 +33,7 @@ const apiServer = require('../../../src/lib/api-server')
 
 describe('api-server', () => { 
   beforeEach(() => {
+    jest.resetAllMocks()
     requestLogger.logMessage.mockReturnValue()
     Config.getSystemConfig.mockReturnValue({
       OAUTH: {
@@ -41,7 +42,7 @@ describe('api-server', () => {
     })
   })
   afterEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
   describe('when getApp is called', () => {
     it('the server should be initialized if not already', async () => {

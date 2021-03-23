@@ -74,10 +74,11 @@ Config.getSystemConfig.mockReturnValue({
     }
   ]
 })
-Config.getUserConfig.mockReturnValue({
+Config.getUserConfig.mockResolvedValue({
   CALLBACK_ENDPOINT: 'http://localhost:5000',
   CALLBACK_TIMEOUT: 5000
 })
+
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
@@ -86,6 +87,7 @@ const OutboundInitiator = require('../../../../src/lib/test-outbound/outbound-in
 
 const SpyTerminateOutbound = jest.spyOn(OutboundInitiator, 'terminateOutbound')
 const SpyOutboundSend = jest.spyOn(OutboundInitiator, 'OutboundSend')
+const SpyOutboundSendLoop = jest.spyOn(OutboundInitiator, 'OutboundSendLoop')
 const requestLogger = require('../../../../src/lib/requestLogger')
 
 jest.mock('../../../../src/lib/requestLogger')
@@ -100,12 +102,9 @@ describe('API route /api/outbound', () => {
   beforeAll(() => {
     requestLogger.logMessage.mockReturnValue()
   })
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
   describe('POST /api/outbound/request', () => {
     it('Send a proper request', async () => {
-      axios.mockImplementationOnce(() => Promise.resolve(true))
+      axios.mockImplementation(() => Promise.resolve(true))
       const res = await request(app).post(`/api/outbound/request`).send({
         method: 'get',
         path: '/parties/MSISDN/1234567890',
@@ -131,7 +130,7 @@ describe('API route /api/outbound', () => {
       expect(res.statusCode).toEqual(422)
     })
     it('when the server reject the request, statusCode is 200', async () => {
-      axios.mockImplementationOnce(() => Promise.reject(true))
+      axios.mockImplementation(() => Promise.reject(true))
       const res = await request(app).post(`/api/outbound/request`).send({
         method: 'get',
         path: '/parties/MSISDN/1234567890',
@@ -141,7 +140,7 @@ describe('API route /api/outbound', () => {
       expect(res.statusCode).toEqual(200)
     })
     it('when there is an internal error, statusCode is 500', async () => {
-      axios.mockImplementationOnce(() => {throw new Error()})
+      axios.mockImplementation(() => {throw new Error()})
       try {
         const res = await request(app).post(`/api/outbound/request`).send({
           method: 'get',
@@ -250,76 +249,86 @@ describe('API route /api/outbound', () => {
       ]
     }
     it('Send a proper template with id 12', async () => {
+      SpyOutboundSend.mockImplementation(() => {})
       const res = await request(app).post(`/api/outbound/template/12`).send(properTemplateSync)
       expect(res.statusCode).toEqual(200)
     })
     it('Send a proper template with id 123', async () => {
+      SpyOutboundSend.mockImplementation(() => {})
       const res = await request(app).post(`/api/outbound/template/123`).send(properTemplateAsync)
       expect(res.statusCode).toEqual(200)
     })
     it('Send a proper template with id aabb123aabb', async () => {
+      SpyOutboundSend.mockImplementation(() => {})
       const res = await request(app).post(`/api/outbound/template/aabb123aabb`).send(properTemplateAsync)
       expect(res.statusCode).toEqual(200)
     })
     it('Send a duplicate template with id aabb123aabb', async () => {
-      SpyOutboundSend.mockImplementationOnce(() => {throw new Error()})
+      SpyOutboundSend.mockImplementation(() => {throw new Error()})
       const res = await request(app).post(`/api/outbound/template/aabb123aabb`).send(properTemplateAsync)
       expect(res.statusCode).toEqual(500)
     })
     it('Send a template without name', async () => {
+      SpyOutboundSend.mockImplementation(() => {})
       const {name, ...wrongTemplate} = properTemplateAsync
       const res = await request(app).post(`/api/outbound/template/123`).send(wrongTemplate)
       expect(res.statusCode).toEqual(422)
     })
     it('Send a template without test_cases', async () => {
+      SpyOutboundSend.mockImplementation(() => {})
       const {test_cases, ...wrongTemplate} = properTemplateAsync
       const res = await request(app).post(`/api/outbound/template/123`).send(wrongTemplate)
       expect(res.statusCode).toEqual(422)
     })
     it('Send a proper template with id 123', async () => {
+      SpyOutboundSend.mockImplementation(() => {})
       const deleteResponse = await request(app).delete(`/api/outbound/template/123`).send()
       const postResponse = await request(app).post(`/api/outbound/template/123`).send(properTemplateAsync)
       expect(postResponse.statusCode).toEqual(200)
     })
     it('Send a proper template in loop without iteration count', async () => {
+      SpyOutboundSendLoop.mockImplementation(() => {})
       const res = await request(app).post(`/api/outbound/template_iterations/12`).send(properTemplateAsync)
       expect(res.statusCode).toEqual(422)
     })
     it('Send a proper template in loop with iteration count zero', async () => {
+      SpyOutboundSendLoop.mockImplementation(() => {})
       const res = await request(app).post(`/api/outbound/template_iterations/12`).query({iterationCount: 0}).send(properTemplateAsync)
       expect(res.statusCode).toEqual(500)
     })
     it('Send a proper template in loop with wrong template', async () => {
+      SpyOutboundSendLoop.mockImplementation(() => {})
       const {test_cases, ...wrongTemplate} = properTemplateAsync
       const res = await request(app).post(`/api/outbound/template_iterations/12`).query({iterationCount: 1}).send(wrongTemplate)
       expect(res.statusCode).toEqual(422)
     })
     it('Send a proper template in loop', async () => {
+      SpyOutboundSendLoop.mockImplementation(() => {})
       const res = await request(app).post(`/api/outbound/template_iterations/12`).query({iterationCount: 1}).send(properTemplateAsync)
       expect(res.statusCode).toEqual(200)
     })
   })
   describe('DELETE /api/outbound/template/:outboundID', () => {
     it('Send request to delete template with outboundID 12', async () => {
-      SpyTerminateOutbound.mockReturnValueOnce()
+      SpyTerminateOutbound.mockReturnValue()
       await new Promise(resolve => setTimeout(resolve, 2000))
       const res = await request(app).delete(`/api/outbound/template/123`).send()
       expect(res.statusCode).toEqual(200)
     })
     it('Send request to delete template with outboundID 123', async () => {
-      SpyTerminateOutbound.mockReturnValueOnce()
+      SpyTerminateOutbound.mockReturnValue()
       await new Promise(resolve => setTimeout(resolve, 2000))
       const res = await request(app).delete(`/api/outbound/template/123`).send()
       expect(res.statusCode).toEqual(200)
     })
     it('Send request to delete template with outboundID aabb123aabb', async () => {
-      SpyTerminateOutbound.mockReturnValueOnce()
+      SpyTerminateOutbound.mockReturnValue()
       await new Promise(resolve => setTimeout(resolve, 2000))
       const res = await request(app).delete(`/api/outbound/template/aabb123aabb`).send()
       expect(res.statusCode).toEqual(200)
     })
     it('Send request to delete template with outboundID 123', async () => {
-      SpyTerminateOutbound.mockImplementationOnce(() => {throw new Error()})
+      SpyTerminateOutbound.mockImplementation(() => {throw new Error()})
       await new Promise(resolve => setTimeout(resolve, 2000))
       const res = await request(app).delete(`/api/outbound/template/123`).send()
       expect(res.statusCode).toEqual(500)

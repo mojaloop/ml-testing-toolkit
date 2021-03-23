@@ -65,10 +65,6 @@ jest.mock('@elastic/elasticsearch', () => {
 })
 
 describe('Elastic Search adapter', () => {
-  beforeEach(() => { })
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
   describe('init', () => {
     it('should throw exception when URL is not specified', () => {
       expect(() => {

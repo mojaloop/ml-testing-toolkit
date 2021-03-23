@@ -95,9 +95,6 @@ jest.mock('../../../src/lib/fileAdapter', () => {
 })
 
 describe('dbAdapter', () => {
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
   describe('when user defined', () => {
     const user = {
       dfspId: 'test'

@@ -221,10 +221,11 @@ const properJsonReport = {
 
 describe('API route /api/reports', () => {
   beforeAll(() => {
+    jest.resetAllMocks()
     requestLogger.logMessage.mockReturnValue()
   })
   afterEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
   describe('POST /api/reports/testcase/:format', () => {
     it('Send a proper html request', async () => {

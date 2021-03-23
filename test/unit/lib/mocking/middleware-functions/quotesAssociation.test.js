@@ -36,7 +36,7 @@ const sampleIlpPacket = 'AYIDMgAAAAAAACcQImcudGVzdGluZ3Rvb2xraXRkZnNwLm1zaXNkbi4
 describe('QuotesAssociation', () => {
   const fulfilment = 'asdf'
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
 
   describe('handleQuotes', () => {

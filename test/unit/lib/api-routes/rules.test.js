@@ -40,10 +40,11 @@ jest.mock('../../../../src/lib/rulesEngineModel')
 
 describe('API route /api/rules', () => {
   beforeAll(() => {
+    jest.resetAllMocks()
     requestLogger.logMessage.mockReturnValue()
   })
   afterEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
   describe('Validation Rules', () => {
     describe('GET /api/rules/files/validation', () => {
