@@ -24,12 +24,13 @@
 
 'use strict'
 
-const Context = require('../../../../src/lib/scripting-engines/vm-javascript-sandbox')
 const uuid = require('uuid')
 const axios = require('axios').default
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
 jest.mock('axios')
+axios.create.mockImplementation((config) => axios)
 jest.mock('../../../../src/lib/jws/JwsSigning')
+const Context = require('../../../../src/lib/scripting-engines/vm-javascript-sandbox')
 
 
 describe('Test Outbound Context', () => {
