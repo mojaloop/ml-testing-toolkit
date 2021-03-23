@@ -389,7 +389,6 @@ workflows:
           context: org-global
           requires:
             - setup
-            - test-unit
           filters:
             tags:
               only: /.*/
