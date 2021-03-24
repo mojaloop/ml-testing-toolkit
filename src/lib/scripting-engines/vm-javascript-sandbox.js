@@ -23,10 +23,36 @@
  ******/
 
 const Sandbox = require('vm')
-const axios = require('axios').default
+const axiosModule = require('axios').default
+const https = require('https')
 const atob = require('atob')
 const WebSocketClientManager = require('../webSocketClient/WebSocketClientManager').WebSocketClientManager
 const JwsSigning = require('../jws/JwsSigning')
+const Config = require('../config')
+
+const axios = axiosModule.create()
+
+const registerAxiosRequestInterceptor = (userConfig) => {
+  axios.interceptors.request.use(config => {
+    // get the httpsAgent before the request is sent
+    const options = { rejectUnauthorized: false }
+
+    const urlObject = new URL(config.url)
+    if (userConfig.CLIENT_MUTUAL_TLS_ENABLED) {
+      const cred = userConfig.CLIENT_TLS_CREDS.filter(item => item.HOST === urlObject.host)
+      if (Array.isArray(cred) && cred.length === 1) {
+        console.log(`Found the Client certificate for ${urlObject.host}`)
+        options.cert = cred[0].CERT
+        options.key = cred[0].KEY
+      } else {
+        console.log(`Client certificate not found for ${urlObject.host}`)
+      }
+    }
+    const httpsAgent = new https.Agent(options)
+    config.httpsAgent = httpsAgent
+    return config
+  })
+}
 
 const consoleWrapperFn = (consoleOutObj) => {
   return {
@@ -90,6 +116,9 @@ const generateContextObj = async (environmentObj = {}) => {
   const customFn = customWrapperFn(requestVariables)
   const websocket = new WebSocketClientManager(consoleFn)
   await websocket.init()
+
+  const userConfig = await Config.getStoredUserConfig()
+  registerAxiosRequestInterceptor(userConfig)
 
   const contextObj = {
     ctx: {
