@@ -47,53 +47,50 @@ describe('API route /api/samples', () => {
   beforeAll(() => {
     requestLogger.logMessage.mockReturnValue()
   })
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
   describe('GET /api/samples/load', () => {
     it('Send a proper request', async () => {
-      spyGetSample.mockResolvedValueOnce()
+      spyGetSample.mockResolvedValue()
       const res = await request(app).get(`/api/samples/load`).send()
       expect(res.statusCode).toEqual(200)
     })
     it('Send a proper request with type: hub', async () => {
-      spyGetSample.mockRejectedValueOnce({message: ''})
+      spyGetSample.mockRejectedValue({message: ''})
       const res = await request(app).get(`/api/samples/load`).send()
       expect(res.statusCode).toEqual(500)
     })
   })
   describe('GET /api/samples/loadFolderWise', () => {
     it('Send a proper request', async () => {
-      spyGetSampleWithFolderWise.mockResolvedValueOnce()
+      spyGetSampleWithFolderWise.mockResolvedValue()
       const res = await request(app).get(`/api/samples/loadFolderWise`).send()
       expect(res.statusCode).toEqual(200)
     })
     it('Send a proper request with type: hub', async () => {
-      spyGetSampleWithFolderWise.mockRejectedValueOnce({message: ''})
+      spyGetSampleWithFolderWise.mockRejectedValue({message: ''})
       const res = await request(app).get(`/api/samples/loadFolderWise`).send()
       expect(res.statusCode).toEqual(500)
     })
   })
   describe('GET /api/samples', () => {
     it('Send a proper request with missing collections query param', async () => {
-      spyGetCollectionsOrEnvironments.mockResolvedValueOnce()
+      spyGetCollectionsOrEnvironments.mockResolvedValue()
       const res = await request(app).get(`/api/samples/load/collections`).send()
       expect(res.statusCode).toEqual(200)
     })
     it('Send a bad request with not existing environment', async () => {
-      spyGetCollectionsOrEnvironments.mockRejectedValueOnce({message: ''})
+      spyGetCollectionsOrEnvironments.mockRejectedValue({message: ''})
       const res = await request(app).get(`/api/samples/load/collections`).send()
       expect(res.statusCode).toEqual(500)
     })
   })
   describe('GET /api/samples with file sizes', () => {
     it('Send a proper request with missing collections query param', async () => {
-      spyGetCollectionsOrEnvironmentsWithFileSize.mockResolvedValueOnce()
+      spyGetCollectionsOrEnvironmentsWithFileSize.mockResolvedValue()
       const res = await request(app).get(`/api/samples/list/collections`).send()
       expect(res.statusCode).toEqual(200)
     })
     it('Send a bad request with not existing environment', async () => {
-      spyGetCollectionsOrEnvironmentsWithFileSize.mockRejectedValueOnce({message: ''})
+      spyGetCollectionsOrEnvironmentsWithFileSize.mockRejectedValue({message: ''})
       const res = await request(app).get(`/api/samples/list/collections`).send()
       expect(res.statusCode).toEqual(500)
     })
@@ -104,7 +101,7 @@ describe('API route /api/samples', () => {
         },
         HOSTING_ENABLED: true
       })
-      spyGetCollectionsOrEnvironmentsWithFileSize.mockResolvedValueOnce([{name: 'examples/collections/dfsp'}])
+      spyGetCollectionsOrEnvironmentsWithFileSize.mockResolvedValue([{name: 'examples/collections/dfsp'}])
       const res = await request(app).get(`/api/samples/list/collections`).send()
       expect(res.statusCode).toEqual(200)
     })
@@ -115,7 +112,7 @@ describe('API route /api/samples', () => {
         },
         HOSTING_ENABLED: true
       })
-      spyGetCollectionsOrEnvironmentsWithFileSize.mockResolvedValueOnce([{name: 'examples/environments/dfsp'}])
+      spyGetCollectionsOrEnvironmentsWithFileSize.mockResolvedValue([{name: 'examples/environments/dfsp'}])
       const res = await request(app).get(`/api/samples/list/environments`).send()
       expect(res.statusCode).toEqual(200)
     })

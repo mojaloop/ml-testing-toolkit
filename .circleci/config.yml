@@ -119,7 +119,7 @@ jobs:
           name: Execute unit tests
           command: |
             export NODE_OPTIONS=--max_old_space_size=4096
-            npm run test:unit --silent -- --json --outputFile ./test/results/unit.json
+            npm run test:unit --silent -- --json --maxWorkers=2 --outputFile ./test/results/unit.json
       - store_artifacts:
           path: ./test/results
           prefix: test
@@ -179,7 +179,7 @@ jobs:
           name: Execute code coverage check
           command: |
             export NODE_OPTIONS=--max_old_space_size=4096
-            npm -s run test:coverage-check
+            npm -s run test:coverage-check -- --maxWorkers=2
       - store_artifacts:
           path: coverage
           prefix: test
@@ -195,52 +195,6 @@ jobs:
             else
                 echo "Not a release (env CIRCLE_BRANCH != 'master'), skipping sending lcov.info to SonarQube."
             fi
-  # test-integration:
-  #   machine: true
-  #   <<: *defaults_working_directory
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         key: dependency-cache-{{ checksum "package.json" }}
-  #     - run:
-  #         name: Create dir for test results
-  #         command: mkdir -p ./test/results
-  #     - run:
-  #         name: Execute integration tests
-  #         command: npm -s run test:integration
-  #     - store_artifacts:
-  #         path: ./test/results
-  #         prefix: test
-  #     - store_test_results:
-  #         path: ./test/results
-
-  # test-functional:
-  #   machine: true
-  #   <<: *defaults_working_directory
-  #   steps:
-  #     - run:
-  #         name: Add the Postgres 9.6 binaries to the path.
-  #         command: echo ‘/usr/lib/postgresql/9.6/bin/:$PATH’ >> $BASH_ENV
-  #     - run:
-  #         name: Install Docker Compose
-  #         command: |
-  #           curl -L https://github.com/docker/compose/releases/download/1.11.2/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-  #           chmod +x ~/docker-compose
-  #           mv ~/docker-compose /usr/local/bin/docker-compose
-  #     - checkout
-  #     - restore_cache:
-  #         key: dependency-cache-{{ checksum "package.json" }}
-  #     - run:
-  #         name: Create dir for test results
-  #         command: mkdir -p ./test/results
-  #     - run:
-  #         name: Execute functional tests
-  #         command: npm -s run test:functional
-  #     - store_artifacts:
-  #         path: ./test/results
-  #         prefix: test
-  #     - store_test_results:
-  #         path: ./test/results
 
   vulnerability-check:
     <<: *defaults_working_directory
@@ -409,18 +363,17 @@ workflows:
               ignore:
                 - /feature*/
                 - /bugfix*/
-      # TODO - fix and enable this check
-      # - test-unit:
-      #     context: org-global
-      #     requires:
-      #       - setup
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore:
-      #           - /feature*/
-      #           - /bugfix*/
+      - test-unit:
+          context: org-global
+          requires:
+            - setup
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
       - test-postman:
           context: org-global
           requires:
@@ -432,40 +385,17 @@ workflows:
               ignore:
                 - /feature*/
                 - /bugfix*/
-      # - test-coverage:
-      #     context: org-global
-      #     requires:
-      #       - setup
-      #       - test-unit
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore:
-      #           - /feature*/
-      #           - /bugfix*/
-      # - test-integration:
-      #     context: org-global
-      #     requires:
-      #       - setup
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore:
-      #           - /feature*/
-      #           - /bugfix*/
-      # - test-functional:
-      #     context: org-global
-      #     requires:
-      #       - setup
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore:
-      #           - /feature*/
-      #           - /bugfix*/
+      - test-coverage:
+          context: org-global
+          requires:
+            - setup
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
       - vulnerability-check:
           context: org-global
           requires:
@@ -492,8 +422,8 @@ workflows:
           context: org-global
           requires:
             - setup
-            # - test-unit
-            # - test-coverage
+            - test-unit
+            - test-coverage
             - vulnerability-check
           filters:
             tags:
@@ -506,12 +436,10 @@ workflows:
           context: org-global
           requires:
             - setup
-            # - test-unit
-            # - test-coverage
-            # - test-integration
-            # - test-functional
+            - test-unit
+            - test-coverage
             - vulnerability-check
-            # - audit-licenses
+            - audit-licenses
           filters:
             tags:
               only: /v[0-9]+(\.[0-9]+)*\-snapshot/
@@ -522,12 +450,10 @@ workflows:
           context: org-global
           requires:
             - setup
-            # - test-unit
-            # - test-coverage
-            # - test-integration
-            # - test-functional
+            - test-unit
+            - test-coverage
             - vulnerability-check
-            # - audit-licenses
+            - audit-licenses
           filters:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/

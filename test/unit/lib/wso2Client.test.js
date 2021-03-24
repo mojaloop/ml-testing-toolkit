@@ -34,12 +34,10 @@ describe('Wso2Client tests', () => {
   beforeAll(() => {
     customLogger.logMessage.mockReturnValue()
   })
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
+
   describe('get token', () => {
     it('should not throw an error', async () => {
-      rp.post.mockReturnValueOnce({
+      rp.post.mockReturnValue({
         form: () => {
           return {
             auth: () => JSON.stringify({})
@@ -49,7 +47,7 @@ describe('Wso2Client tests', () => {
       await Wso2Client.getToken()
     });
     it('should throw an error', async () => {
-      rp.post.mockReturnValueOnce({
+      rp.post.mockReturnValue({
         form: () => {
           return {
             auth: () => {throw {}}
@@ -63,7 +61,7 @@ describe('Wso2Client tests', () => {
       }
     });
     it('should throw an error', async () => {
-      rp.post.mockReturnValueOnce({
+      rp.post.mockReturnValue({
         form: () => {
           return {
             auth: () => {throw {

@@ -47,7 +47,7 @@ describe('Server', () => {
     customLogger.logMessage.mockReturnValue()
   })
   afterEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
   describe('restartServer', () => {
     it('restartServer should not throw an error', async () => {

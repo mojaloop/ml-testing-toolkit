@@ -54,10 +54,11 @@ jest.mock('../../../../src/lib/config')
 
 describe('API route /api/openapi', () => {
   beforeAll(() => {
+    jest.resetAllMocks()
     requestLogger.logMessage.mockReturnValue()
   })
   afterEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
   describe('GET /api/openapi/api_versions', () => {
     it('Getting all api versions', async () => {

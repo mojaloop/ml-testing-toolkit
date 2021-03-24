@@ -41,10 +41,11 @@ jest.mock('../../../../src/lib/db/adapters/dbAdapter')
 
 describe('API route /api/hisotry', () => {
   beforeAll(() => {
+    jest.resetAllMocks()
     requestLogger.logMessage.mockReturnValue()
   })
   afterEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
   describe('GET /api/history/reports', () => {
     it('Send a proper request', async () => {

@@ -34,10 +34,11 @@ jest.mock('../../../src/lib/storageAdapter')
 
 describe('Config', () => {
   beforeEach(() => {
+    jest.resetAllMocks()
     requestLogger.logMessage.mockReturnValue()
   })
   afterEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
   describe('when getUserConfig is called', () => {
     it('should load userConfig only once', async () => {

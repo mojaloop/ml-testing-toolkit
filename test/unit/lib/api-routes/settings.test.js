@@ -45,10 +45,11 @@ jest.mock('../../../../src/lib/rulesEngineModel')
 
 describe('API route /api/settings', () => {
   beforeAll(() => {
+    jest.resetAllMocks()
     requestLogger.logMessage.mockReturnValue()
   })
   afterEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
   describe('import', () => {
     describe('GET /api/settings/export', () => {
