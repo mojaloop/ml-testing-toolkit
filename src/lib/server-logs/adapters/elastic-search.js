@@ -65,7 +65,14 @@ const _toQueryObject = (query) => {
     body: {
       query: {
         bool: {
-          must: []
+          must: [],
+          must_not: [
+            {
+              match: {
+                'metadata.event.type': 'trace'
+              }
+            }
+          ]
         }
       }
     }
