@@ -149,8 +149,8 @@ describe('Handlebar Helper Functions', () => {
     it('should return correct pass percentage', async () => {
       expect(HandlebarHelpers.testPassPercentage(sampleTestCases[0].requests[2].request.tests)).toEqual(0)
     })
-    it('should return zero pass percentage for empty tests', async () => {
-      expect(HandlebarHelpers.testPassPercentage(null)).toEqual(0)
+    it('should return 100 pass percentage for empty tests', async () => {
+      expect(HandlebarHelpers.testPassPercentage(null)).toEqual(100)
     })
   })
 
@@ -164,11 +164,11 @@ describe('Handlebar Helper Functions', () => {
     it('should return correct value', async () => {
       expect(HandlebarHelpers.ifAllTestsPassedInRequest(sampleTestCases[0].requests[2].request)).toEqual(false)
     })
-    it('should return false if tests are null', async () => {
-      expect(HandlebarHelpers.ifAllTestsPassedInRequest({})).toEqual(false)
+    it('should return true if tests are null', async () => {
+      expect(HandlebarHelpers.ifAllTestsPassedInRequest({})).toEqual(true)
     })
-    it('should return false if assertions are null', async () => {
-      expect(HandlebarHelpers.ifAllTestsPassedInRequest({tests:{}})).toEqual(false)
+    it('should return true if assertions are null', async () => {
+      expect(HandlebarHelpers.ifAllTestsPassedInRequest({tests:{}})).toEqual(true)
     })
   })
 
