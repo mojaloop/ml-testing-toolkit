@@ -85,19 +85,12 @@ const executeAsync = async (script, data, contextObj) => {
         headers: req.header ? req.header.reduce((rObj, item) => { rObj[item.key] = item.value; return rObj }, {}) : null,
         data: req.body && req.body.mode === 'raw' ? JSON.parse(req.body.raw) : null,
         path: '/' + req.url.path.join('/'),
-        timeout: 3000,
-        validateStatus: function (status) {
-          return status < 900 // Reject only if the status code is greater than or equal to 900
-        }
+        timeout: 3000
       }
       customLogger.logOutboundRequest('info', 'Request: ' + reqObject.method + ' ' + reqObject.path, { additionalData: { request: reqObject }, request: reqObject })
       try {
         response = await axios(reqObject)
-        if (response.status > 299) {
-          customLogger.logOutboundRequest('error', 'Error Response: ' + response.status + ' ' + response.statusText, { additionalData: { response: response }, request: reqObject })
-        } else {
-          customLogger.logOutboundRequest('info', 'Response: ' + response.status + ' ' + response.statusText, { additionalData: { response: response }, request: reqObject })
-        }
+        customLogger.logOutboundRequest('info', 'Response: ' + response.status + ' ' + response.statusText, { additionalData: { response: response }, request: reqObject })
       } catch (err) {
         customLogger.logOutboundRequest('error', 'Error Response: ' + err.message, { additionalData: err, request: reqObject })
         throw (err)
