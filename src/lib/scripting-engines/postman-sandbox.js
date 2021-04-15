@@ -25,6 +25,7 @@
 const Sandbox = require('postman-sandbox')
 const util = require('util')
 const axios = require('axios').default
+const customLogger = require('../requestLogger')
 
 // const createContextAsync = util.promisify(Sandbox.createContext)
 const createContextAsync = () => {
@@ -82,9 +83,25 @@ const executeAsync = async (script, data, contextObj) => {
         method: req.method,
         url: host + req.url.path.join('/') + queryParams,
         headers: req.header ? req.header.reduce((rObj, item) => { rObj[item.key] = item.value; return rObj }, {}) : null,
-        data: req.body && req.body.mode === 'raw' ? JSON.parse(req.body.raw) : null
+        data: req.body && req.body.mode === 'raw' ? JSON.parse(req.body.raw) : null,
+        path: '/' + req.url.path.join('/'),
+        timeout: 3000,
+        validateStatus: function (status) {
+          return status < 900 // Reject only if the status code is greater than or equal to 900
+        }
       }
-      response = await axios(reqObject)
+      customLogger.logOutboundRequest('info', 'Request: ' + reqObject.method + ' ' + reqObject.path, { additionalData: { request: reqObject }, request: reqObject })
+      try {
+        response = await axios(reqObject)
+        if (response.status > 299) {
+          customLogger.logOutboundRequest('error', 'Error Response: ' + response.status + ' ' + response.statusText, { additionalData: { response: response }, request: reqObject })
+        } else {
+          customLogger.logOutboundRequest('info', 'Response: ' + response.status + ' ' + response.statusText, { additionalData: { response: response }, request: reqObject })
+        }
+      } catch (err) {
+        customLogger.logOutboundRequest('error', 'Error Response: ' + err.message, { additionalData: err, request: reqObject })
+        throw (err)
+      }
     } catch (err) {
       consoleLog.push([cursor, 'executionError', err])
       response = err.response ? err.response : { status: 4001, data: err.message }
@@ -96,6 +113,7 @@ const executeAsync = async (script, data, contextObj) => {
   })
 
   contextObj.ctx.on(`execution.error.${data.id}`, function (cur, err) {
+    customLogger.logMessage('error', 'Script Execution Error' + err.message, { notification: false })
     consoleLog.push([cur, 'executionError', err])
   })
 
