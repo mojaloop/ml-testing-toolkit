@@ -401,10 +401,8 @@ const handleTests = async (request, response = null, callback = null, environmen
       for (const k in request.tests.assertions) {
         const testCase = request.tests.assertions[k]
         try {
-          let skipped = true
           let status = 'SKIPPED'
           const expect = (args) => { // eslint-disable-line
-            skipped = false
             status = 'SUCCESS'
             return expectOriginal(args)
           }
@@ -412,8 +410,7 @@ const handleTests = async (request, response = null, callback = null, environmen
 
           eval(testsString) // eslint-disable-line
           results[testCase.id] = {
-            status,
-            skipped
+            status
           }
           passedCount++
         } catch (err) {
