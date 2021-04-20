@@ -118,6 +118,10 @@ const isAssertionPassed = (status) => {
   return status === 'SUCCESS'
 }
 
+const isAssertionSkipped = (input) => {
+  return input.status === 'SKIPPED'
+}
+
 module.exports = {
   now,
   totalAssertions,
@@ -131,5 +135,6 @@ module.exports = {
   ifAllTestsPassedInRequest,
   ifFailedTestCase,
   jsonStringify,
-  isAssertionPassed
+  isAssertionPassed,
+  isAssertionSkipped
 }
