@@ -193,4 +193,10 @@ describe('Handlebar Helper Functions', () => {
     })
   })
 
+  describe('isAssertionSkipped', () => {
+    it('should return strigified value of json', async () => {
+      expect(HandlebarHelpers.isAssertionSkipped('SKIPPED')).toEqual(true)
+    })
+  })
+
 })
