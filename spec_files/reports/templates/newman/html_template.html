@@ -769,7 +769,7 @@ input:checked + .slider:before {
                                                 {{#each request.tests.assertions}}
                                                 <tr>
                                                     <td>{{description}}</td>
-                                                    {{#if (isAssertionSkipped resultStatus)}}
+                                                    {{#if (isAssertionSkipped resultStatus.status)}}
                                                     <td class="text-center bg-warning">
                                                         SKIPPED
                                                     </td>

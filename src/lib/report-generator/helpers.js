@@ -118,8 +118,8 @@ const isAssertionPassed = (status) => {
   return status === 'SUCCESS'
 }
 
-const isAssertionSkipped = (input) => {
-  return input.status === 'SKIPPED'
+const isAssertionSkipped = (status) => {
+  return status === 'SKIPPED'
 }
 
 module.exports = {
