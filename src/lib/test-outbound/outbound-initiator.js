@@ -31,7 +31,7 @@ const Config = require('../config')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
 const { readFileAsync } = require('../utils')
-const expect = require('chai').expect // eslint-disable-line
+const expectOriginal = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
 const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
@@ -401,9 +401,16 @@ const handleTests = async (request, response = null, callback = null, environmen
       for (const k in request.tests.assertions) {
         const testCase = request.tests.assertions[k]
         try {
-          eval(testCase.exec.join('\n')) // eslint-disable-line
+          let status = 'SKIPPED'
+          const expect = (args) => { // eslint-disable-line
+            status = 'SUCCESS'
+            return expectOriginal(args)
+          }
+          const testsString = testCase.exec.join('\n')
+
+          eval(testsString) // eslint-disable-line
           results[testCase.id] = {
-            status: 'SUCCESS'
+            status
           }
           passedCount++
         } catch (err) {

@@ -37,6 +37,7 @@ const totalProgress = {
   totalRequests: 0,
   totalAssertions: 0,
   passedAssertions: 0,
+  skippedAssertions: 0,
   failedAssertions: 0
 }
 
@@ -45,6 +46,8 @@ const updateTotalProgressCounts = (progress) => {
     progress.requestSent.tests.assertions.forEach(assertion => {
       if (progress.testResult.results[assertion.id].status === 'SUCCESS') {
         totalProgress.passedAssertions++
+      } else if (progress.testResult.results[assertion.id].status === 'SKIPPED') {
+        totalProgress.skippedAssertions++
       } else {
         totalProgress.failedAssertions++
       }
@@ -53,7 +56,7 @@ const updateTotalProgressCounts = (progress) => {
 }
 
 const printTotalProgressCounts = () => {
-  const progressStr = '[ ' + fStr.green(totalProgress.passedAssertions + ' passed, ') + fStr.red(totalProgress.failedAssertions + ' failed') + ' of ' + totalProgress.totalAssertions + ' ]'
+  const progressStr = '[ ' + fStr.green(totalProgress.passedAssertions + ' passed, ') + fStr.yellow(totalProgress.skippedAssertions + ' skipped, ') + fStr.red(totalProgress.failedAssertions + ' failed') + ' of ' + totalProgress.totalAssertions + ' ]'
   process.stdout.write(progressStr)
 }
 
@@ -89,6 +92,8 @@ const printProgress = (progress) => {
         progress.requestSent.tests.assertions.forEach(assertion => {
           if (progress.testResult.results[assertion.id].status === 'SUCCESS') {
             console.log('\t' + fStr.green('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.cyan(assertion.description))
+          } else if (progress.testResult.results[assertion.id].status === 'SKIPPED') {
+            console.log('\t' + fStr.yellow('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.cyan(assertion.description))
           } else {
             console.log('\t' + fStr.red('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.red(assertion.description))
           }
