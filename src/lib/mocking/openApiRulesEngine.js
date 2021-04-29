@@ -50,6 +50,7 @@ const removeEmpty = obj => {
 const executeScripts = async (curEvent, req) => {
   if (curEvent.params.scripts && curEvent.params.scripts.exec && curEvent.params.scripts.exec.length > 0 && curEvent.params.scripts.exec !== ['']) {
     const sandboxEnvironment = objectStore.get('inboundEnvironment')
+    customLogger.logMessage('debug', 'Inbound Script: Starting...', { additionalData: curEvent.params.scripts.exec, request: req })
 
     const contextObj = await postmanContext.generateContextObj(sandboxEnvironment)
 
@@ -74,6 +75,10 @@ const executeScripts = async (curEvent, req) => {
     )
     const postmanSandbox = await postmanContext.executeAsync(curEvent.params.scripts.exec, { context: { ...contextObj, request: postmanRequest, globals }, id: uuid.v4() }, contextObj)
 
+    const additionalData = {
+      consoleLogArray: postmanSandbox.consoleLog && postmanSandbox.consoleLog.map(log => log[2])
+    }
+    customLogger.logMessage('debug', 'Inbound Script: Executed', { additionalData, request: req })
     // replace inbound environment with the sandbox environment
     const mergedInboundEnvironment = postmanSandbox.environment
     objectStore.set('inboundEnvironment', mergedInboundEnvironment)

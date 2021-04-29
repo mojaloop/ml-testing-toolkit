@@ -134,7 +134,8 @@ const generateContextObj = async (environmentObj = {}) => {
     websocket,
     console: consoleFn,
     custom: customFn,
-    consoleOutObj
+    consoleOutObj,
+    userConfig
   }
   return contextObj
 }
@@ -160,12 +161,13 @@ const executeAsync = async (script, data, contextObj) => {
   }
 
   try {
-    await Sandbox.runInNewContext(fullScript, contextObj, { timeout: 30000, microtaskMode: 'afterEvaluate' })
+    const options = { timeout: (contextObj.userConfig && contextObj.userConfig.SCRIPT_TIMEOUT) || 30000, microtaskMode: 'afterEvaluate' }
+    await Sandbox.runInNewContext(fullScript, contextObj, options)
     for (let i = 0; i < contextObj.consoleOutObj.stdOut.length; i++) {
       consoleLog.push([{ execution: 0 }, 'log', ...contextObj.consoleOutObj.stdOut[i]])
     }
   } catch (err) {
-    // console.log(err)
+    console.log(err)
     for (let i = 0; i < contextObj.consoleOutObj.stdOut.length; i++) {
       consoleLog.push([{ execution: 0 }, 'log', ...contextObj.consoleOutObj.stdOut[i]])
     }
