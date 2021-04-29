@@ -162,7 +162,6 @@ const executeAsync = async (script, data, contextObj) => {
 
   try {
     const options = { timeout: (contextObj.userConfig && contextObj.userConfig.SCRIPT_TIMEOUT) || 30000, microtaskMode: 'afterEvaluate' }
-    console.log(options)
     await Sandbox.runInNewContext(fullScript, contextObj, options)
     for (let i = 0; i < contextObj.consoleOutObj.stdOut.length; i++) {
       consoleLog.push([{ execution: 0 }, 'log', ...contextObj.consoleOutObj.stdOut[i]])
