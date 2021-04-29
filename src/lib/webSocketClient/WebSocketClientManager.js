@@ -100,7 +100,7 @@ class WebSocketClientManager {
   }
 
   getMessage (clientName, timeout = 5000) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       if (!this.ws[clientName]) {
         resolve(null)
       } else {
@@ -118,10 +118,14 @@ class WebSocketClientManager {
           var timer = null
           // Set the timer
           timer = setTimeout(() => {
-            this.ws[clientName].eventEmitter.removeAllListeners('newMessage')
-            // Disconnect the websocket connection
-            this.disconnect(clientName)
-            resolve(null)
+            try {
+              this.ws[clientName].eventEmitter.removeAllListeners('newMessage')
+              // Disconnect the websocket connection
+              this.disconnect(clientName)
+              resolve(null)
+            } catch (err) {
+              reject(err)
+            }
           }, timeout)
           // Listen for message
           this.ws[clientName].eventEmitter.once('newMessage', (message) => {

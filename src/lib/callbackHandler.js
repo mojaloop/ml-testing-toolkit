@@ -133,7 +133,7 @@ const handleCallback = async (callbackObject, context, req) => {
     path: callbackObject.path,
     headers: callbackObject.headers,
     data: callbackObject.body,
-    timeout: 3000,
+    timeout: userConfig.DEFAULT_REQUEST_TIMEOUT || 3000,
     ...httpsProps
   }
 
