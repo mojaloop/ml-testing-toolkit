@@ -24,51 +24,77 @@
 
 const http = require('http')
 const https = require('https')
+const _ = require('lodash')
+const customLogger = require('./requestLogger')
 
 const httpAgentStore = {}
 const httpsAgentStore = {}
 
+const _createAgent = (agentModule, options) => {
+  customLogger.logMessage('info', 'Creating new http/https agent', { notification: false })
+  const httpAgent = new agentModule.Agent({
+    ...options,
+    keepAlive: true,
+    maxSockets: 50
+  })
+  return httpAgent
+}
+
+const _addAgentStoreItem = (agentStore, key, passedOptions, agent) => {
+  // Create a new entry in the store
+  agentStore[key] = {
+    createdDate: Date.now(),
+    lastAccessDate: Date.now(),
+    lastModifiedDate: Date.now(),
+    passedOptions,
+    agent
+  }
+}
+
+const _replaceAgentStoreItem = (agentStore, key, passedOptions, agent) => {
+  agentStore[key].agent = agent
+  agentStore[key].passedOptions = passedOptions
+  agentStore[key].lastModifiedDate = Date.now()
+}
+
+const _compareAgentStoreItemOptions = (agentStore, key, options) => {
+  return _.isEqual(options, agentStore[key].passedOptions)
+}
+
+const _pickAgentStoreItem = (agentStore, key) => {
+  customLogger.logMessage('info', 'Using existing http/https agent for ' + key, { notification: false })
+  agentStore[key].lastAccessDate = Date.now()
+}
+
 const getHttpAgent = (key, options) => {
   if (!httpAgentStore[key]) {
-    const httpAgent = new http.Agent({
-      ...options,
-      keepAlive: true,
-      maxSockets: 50
-    })
-    httpAgentStore[key] = {
-      createdDate: Date.now(),
-      lastAccessDate: Date.now(),
-      lastModifiedDate: Date.now(),
-      agent: httpAgent
-    }
+    const httpAgent = _createAgent(http, options)
+    _addAgentStoreItem(httpAgentStore, key, options, httpAgent)
   } else {
-    httpAgentStore[key].lastAccessDate = Date.now()
-    // TODO: Check for the keys and values in the options, if there are any changes then we need to re-create the agent and update the modified date
+    if (!_compareAgentStoreItemOptions(httpAgentStore, key, options)) {
+      const httpAgent = _createAgent(http, options)
+      _replaceAgentStoreItem(httpAgentStore, key, options, httpAgent)
+    }
+    _pickAgentStoreItem(httpAgentStore, key)
   }
   return httpAgentStore[key].agent
 }
 
 const getHttpsAgent = (key, options) => {
   if (!httpsAgentStore[key]) {
-    const httpsAgent = new https.Agent({
-      ...options,
-      keepAlive: true,
-      maxSockets: 50
-    })
-    httpsAgentStore[key] = {
-      createdDate: Date.now(),
-      lastAccessDate: Date.now(),
-      lastModifiedDate: Date.now(),
-      agent: httpsAgent
-    }
+    const httpsAgent = _createAgent(https, options)
+    _addAgentStoreItem(httpsAgentStore, key, options, httpsAgent)
   } else {
-    httpsAgentStore[key].lastAccessDate = Date.now()
-    // TODO: Check for the keys and values in the options, if there are any changes then we need to re-create the agent and update the modified date
+    if (!_compareAgentStoreItemOptions(httpsAgentStore, key, options)) {
+      const httpsAgent = _createAgent(http, options)
+      _replaceAgentStoreItem(httpsAgentStore, key, options, httpsAgent)
+    }
+    _pickAgentStoreItem(httpsAgentStore, key)
   }
   return httpsAgentStore[key].agent
 }
 
-const clear = (agentStoreObj, interval) => {
+const _clear = (agentStoreObj, interval) => {
   for (const item in agentStoreObj) {
     const timeDiff = Date.now() - agentStoreObj[item].lastAccessDate
     if (timeDiff > interval) {
@@ -85,8 +111,8 @@ const clear = (agentStoreObj, interval) => {
 
 const clearAgents = () => {
   const interval = 30 * 60 * 1000 // Clear http agents not being used for more than 30min
-  clear(httpsAgentStore, interval)
-  clear(httpAgentStore, interval)
+  _clear(httpsAgentStore, interval)
+  _clear(httpAgentStore, interval)
 }
 
 const init = () => {
