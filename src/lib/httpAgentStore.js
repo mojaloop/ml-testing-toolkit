@@ -30,6 +30,8 @@ const customLogger = require('./requestLogger')
 const httpAgentStore = {}
 const httpsAgentStore = {}
 
+var UNUSED_AGENTS_CLEAR_TIMER_MS = 30 * 60 * 1000
+
 const _createAgent = (agentModule, options) => {
   customLogger.logMessage('info', 'Creating new http/https agent', { notification: false })
   const httpAgent = new agentModule.Agent({
@@ -109,18 +111,23 @@ const _clear = (agentStoreObj, interval) => {
   }
 }
 
-const clearAgents = () => {
-  const interval = 30 * 60 * 1000 // Clear http agents not being used for more than 30min
-  _clear(httpsAgentStore, interval)
-  _clear(httpAgentStore, interval)
+const _clearAgents = () => {
+  _clear(httpsAgentStore, UNUSED_AGENTS_CLEAR_TIMER_MS)
+  _clear(httpAgentStore, UNUSED_AGENTS_CLEAR_TIMER_MS)
+}
+
+// Clear http agents not being used for more this time
+const setUnusedAgentsClearTimerMs = (timerMs) => {
+  UNUSED_AGENTS_CLEAR_TIMER_MS = timerMs
 }
 
 const init = () => {
-  setInterval(clearAgents, 5 * 60 * 1000) // Check for the cleanup every 5min
+  setInterval(_clearAgents, 5 * 60 * 1000) // Check for the cleanup every 5min
 }
 
 module.exports = {
   getHttpAgent,
   getHttpsAgent,
+  setUnusedAgentsClearTimerMs,
   init
 }
