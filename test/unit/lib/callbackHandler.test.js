@@ -530,6 +530,44 @@ describe('callbackHandler', () => {
       SpyRequestLogger.mockReturnValue()
       await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
     })
+    it('when CALLBACK_RESOURCE_ENDPOINTS, SEND_CALLBACK_ENABLE and OUTBOUND_MUTUAL_TLS_ENABLED disabled and the url is https', async () => {
+      const callbackObject = {
+        method: 'post',
+        path: '/transfers/{ID}',
+        headers: {},
+        body: {}
+      }
+      const context = {
+        api: {
+          validateRequest:  async () => {
+            return {valid: true}
+          }
+        }
+      }
+      const req = {
+        headers: {},
+        customInfo: {
+          user: {
+            dfspId: 'test'
+          }
+        }
+      }
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false
+      })
+      Config.getUserConfig.mockReturnValue({
+        CALLBACK_ENDPOINT: 'https://localhost:5000',
+        OUTBOUND_MUTUAL_TLS_ENABLED: false,
+        SEND_CALLBACK_ENABLE: false
+      })
+      SpySign.mockReturnValue()
+      SpyPush.mockReturnValue()
+      SpyMyEventEmitter.mockReturnValue({
+        emit: () => {}
+      })
+      SpyRequestLogger.mockReturnValue()
+      await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
+    })
     it('when CALLBACK_RESOURCE_ENDPOINTS, CLIENT_MUTUAL_TLS_ENABLED and SEND_CALLBACK_ENABLE is enabled, CLIENT_TLS_CREDS is missing', async () => {
       const callbackObject = {
         delay: 100,
