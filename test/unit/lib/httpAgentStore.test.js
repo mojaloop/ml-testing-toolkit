@@ -84,7 +84,7 @@ describe('httpAgentStore', () => {
     let httpsAgent1
     it('Start the timer', async () => {
       httpAgentStore.init()
-      httpAgentStore.setUnusedAgentsClearTimerMs(1)
+      httpAgentStore.setUnusedAgentsClearTimerMs(0)
     })
     it('Create a https agent', async () => {
       httpsAgent1 = httpAgentStore.getHttpsAgent('agent1', { option1: 'value1' })
