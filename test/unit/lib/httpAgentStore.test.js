@@ -25,7 +25,6 @@
 'use strict'
 
 const httpAgentStore = require('../../../src/lib/httpAgentStore')
-jest.useFakeTimers();
 
 describe('httpAgentStore', () => {
   describe('getHttpAgent', () => {
@@ -83,6 +82,7 @@ describe('httpAgentStore', () => {
   describe('getHttpsAgent timer', () => {
     let httpsAgent1
     it('Start the timer', async () => {
+      jest.useFakeTimers()
       httpAgentStore.init()
       httpAgentStore.setUnusedAgentsClearTimerMs(0)
     })
@@ -99,6 +99,8 @@ describe('httpAgentStore', () => {
       jest.runOnlyPendingTimers()
     })
     it('Request for another https agent with same key and options after clear timer', async () => {
+      jest.useRealTimers()
+      await new Promise((r) => setTimeout(r, 100))
       const httpsAgent2 = httpAgentStore.getHttpsAgent('agent1', { option1: 'value1' })
       expect(httpsAgent2).not.toBeNull()
       expect(httpsAgent1).not.toStrictEqual(httpsAgent2)
