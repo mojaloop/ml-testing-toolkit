@@ -26,18 +26,17 @@ const http = require('http')
 const https = require('https')
 const _ = require('lodash')
 const customLogger = require('./requestLogger')
+const Config = require('./config')
 
 const httpAgentStore = {}
 const httpsAgentStore = {}
-
-var UNUSED_AGENTS_CLEAR_TIMER_MS = 30 * 60 * 1000
 
 const _createAgent = (agentModule, options) => {
   customLogger.logMessage('info', 'Creating new http/https agent', { notification: false })
   const httpAgent = new agentModule.Agent({
     ...options,
-    keepAlive: true,
-    maxSockets: 50
+    keepAlive: (Config.getSystemConfig().HTTP_CLIENT && Config.getSystemConfig().HTTP_CLIENT.KEEP_ALIVE) || true,
+    maxSockets: (Config.getSystemConfig().HTTP_CLIENT && Config.getSystemConfig().HTTP_CLIENT.MAX_SOCKETS) || 50
   })
   return httpAgent
 }
@@ -112,22 +111,18 @@ const _clear = (agentStoreObj, interval) => {
 }
 
 const _clearAgents = () => {
-  _clear(httpsAgentStore, UNUSED_AGENTS_CLEAR_TIMER_MS)
-  _clear(httpAgentStore, UNUSED_AGENTS_CLEAR_TIMER_MS)
-}
-
-// Clear http agents not being used for more this time
-const setUnusedAgentsClearTimerMs = (timerMs) => {
-  UNUSED_AGENTS_CLEAR_TIMER_MS = timerMs
+  const unUsedAgentsExpiryMs = (Config.getSystemConfig().HTTP_CLIENT && Config.getSystemConfig().HTTP_CLIENT.UNUSED_AGENTS_EXPIRY_MS) || 30 * 60 * 1000 // Clear http agents not being used for more this time
+  _clear(httpsAgentStore, unUsedAgentsExpiryMs)
+  _clear(httpAgentStore, unUsedAgentsExpiryMs)
 }
 
 const init = () => {
-  setInterval(_clearAgents, 5 * 60 * 1000) // Check for the cleanup every 5min
+  const timerInterval = (Config.getSystemConfig().HTTP_CLIENT && Config.getSystemConfig().HTTP_CLIENT.UNUSED_AGENTS_CHECK_TIMER_MS) || 5 * 60 * 1000 // Check for the cleanup every 5min
+  setInterval(_clearAgents, timerInterval)
 }
 
 module.exports = {
   getHttpAgent,
   getHttpsAgent,
-  setUnusedAgentsClearTimerMs,
   init
 }
