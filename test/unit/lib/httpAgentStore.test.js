@@ -42,17 +42,17 @@ describe('httpAgentStore', () => {
     it('getHttpAgent second call should retrun the same object for same key and options', async () => {
       const httpAgent1 = httpAgentStore.getHttpAgent('someclient', { option1: 'value1' })
       const httpAgent2 = httpAgentStore.getHttpAgent('someclient', { option1: 'value1' })
-      expect(httpAgent1).toStrictEqual(httpAgent2)
+      expect(Object.is(httpAgent1, httpAgent2)).toBe(true)
     })
     it('getHttpAgent second call should retrun a new object for a different key', async () => {
       const httpAgent1 = httpAgentStore.getHttpAgent('someclient1', {})
       const httpAgent2 = httpAgentStore.getHttpAgent('someclient2', {})
-      expect(httpAgent1).not.toStrictEqual(httpAgent2)
+      expect(Object.is(httpAgent1, httpAgent2)).toBe(false)
     })
     it('getHttpAgent second call should retrun a new object for different options', async () => {
       const httpAgent1 = httpAgentStore.getHttpAgent('someclient3', { option1: 'value1' })
       const httpAgent2 = httpAgentStore.getHttpAgent('someclient3', { option2: 'value2' })
-      expect(httpAgent1).not.toStrictEqual(httpAgent2)
+      expect(Object.is(httpAgent1, httpAgent2)).toBe(false)
     })
   })
   describe('getHttpsAgent', () => {
@@ -68,17 +68,17 @@ describe('httpAgentStore', () => {
     it('getHttpsAgent second call should retrun the same object for same key and options', async () => {
       const httpsAgent1 = httpAgentStore.getHttpsAgent('someclient', { option1: 'value1' })
       const httpsAgent2 = httpAgentStore.getHttpsAgent('someclient', { option1: 'value1' })
-      expect(httpsAgent1).toStrictEqual(httpsAgent2)
+      expect(Object.is(httpsAgent1, httpsAgent2)).toBe(true)
     })
     it('getHttpsAgent second call should retrun a new object for a different key', async () => {
       const httpsAgent1 = httpAgentStore.getHttpsAgent('someclient1', {})
       const httpsAgent2 = httpAgentStore.getHttpsAgent('someclient2', {})
-      expect(httpsAgent1).not.toStrictEqual(httpsAgent2)
+      expect(Object.is(httpsAgent1, httpsAgent2)).toBe(false)
     })
     it('getHttpsAgent second call should retrun a new object for different options', async () => {
       const httpsAgent1 = httpAgentStore.getHttpsAgent('someclient3', { option1: 'value1' })
       const httpsAgent2 = httpAgentStore.getHttpsAgent('someclient3', { option2: 'value2' })
-      expect(httpsAgent1).not.toStrictEqual(httpsAgent2)
+      expect(Object.is(httpsAgent1, httpsAgent2)).toBe(false)
     })
   })
   describe('getHttpsAgent timer', () => {
@@ -91,7 +91,7 @@ describe('httpAgentStore', () => {
           KEEP_ALIVE: true,
           MAX_SOCKETS: 50,
           UNUSED_AGENTS_EXPIRY_MS: 0,
-          UNUSED_AGENTS_CHECK_TIMER_MS: 1
+          UNUSED_AGENTS_CHECK_TIMER_MS: 10000
         }
       })
       httpAgentStore.init()
@@ -104,17 +104,17 @@ describe('httpAgentStore', () => {
     it('Request for another https agent with same key and options', async () => {
       const httpsAgent2 = httpAgentStore.getHttpsAgent('agent1', { option1: 'value1' })
       expect(httpsAgent2).not.toBeNull()
-      expect(httpsAgent1).toStrictEqual(httpsAgent2)
+      expect(Object.is(httpsAgent1, httpsAgent2)).toBe(true)
     })
     it('Fast forward the timer', async () => {
-      jest.runOnlyPendingTimers()
+      jest.advanceTimersByTime(15000)
     })
     it('Request for another https agent with same key and options after clear timer', async () => {
       jest.useRealTimers()
       await new Promise((r) => setTimeout(r, 100))
       const httpsAgent2 = httpAgentStore.getHttpsAgent('agent1', { option1: 'value1' })
       expect(httpsAgent2).not.toBeNull()
-      expect(httpsAgent1).not.toStrictEqual(httpsAgent2)
+      expect(Object.is(httpsAgent1, httpsAgent2)).toBe(false)
     })
   })
 })
