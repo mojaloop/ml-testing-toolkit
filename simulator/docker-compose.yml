@@ -10,7 +10,7 @@ services:
     depends_on:
       - scheme-adapter
   scheme-adapter:
-    image: "mojaloop/sdk-scheme-adapter:v11.10.1"
+    image: "mojaloop/sdk-scheme-adapter:v11.10.4"
     env_file: ./scheme-adapter.env
     volumes:
       - "./secrets:/src/secrets"

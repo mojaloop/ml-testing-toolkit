@@ -46,6 +46,7 @@ const utilsInternal = require('../utilsInternal')
 const dbAdapter = require('../db/adapters/dbAdapter')
 const objectStore = require('../objectStore')
 const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
+const httpAgentStore = require('../httpAgentStore')
 
 var terminateTraceIds = {}
 
@@ -443,7 +444,7 @@ const getUrlPrefix = (baseUrl) => {
 const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId, contextObj = {}) => {
   return new Promise((resolve, reject) => {
     (async () => {
-      const httpsProps = {}
+      const httpAgentProps = {}
       const user = dfspId ? { dfspId } : undefined
       const userConfig = await Config.getUserConfig(user)
       const uniqueId = UniqueIdGenerator.generateUniqueId()
@@ -466,18 +467,35 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           customLogger.logMessage('error', errorMsg, { user })
           reject(new Error(JSON.stringify({ errorCode: 4000, errorDescription: errorMsg })))
         }
-        httpsProps.httpsAgent = new https.Agent({
+        httpAgentProps.httpsAgent = new https.Agent({
           cert: tlsConfig.dfsps[dfspId].hubClientCert,
           key: tlsConfig.hubClientKey,
           ca: [tlsConfig.dfsps[dfspId].dfspServerCaRootCert],
           rejectUnauthorized: true
         })
         urlGenerated = urlGenerated.replace('http:', 'https:')
-      } else {
-        if (urlGenerated.startsWith('https:')) {
-          httpsProps.httpsAgent = new https.Agent({
+      } else if (userConfig.CLIENT_MUTUAL_TLS_ENABLED) {
+        const urlObject = new URL(urlGenerated)
+        const cred = userConfig.CLIENT_TLS_CREDS.filter(item => item.HOST === urlObject.host)
+        if (Array.isArray(cred) && cred.length === 1) {
+          customLogger.logMessage('info', `Found the Client certificate for ${urlObject.host}`, { notification: false })
+          httpAgentProps.httpsAgent = httpAgentStore.getHttpsAgent(urlObject.host, {
+            cert: cred[0].CERT,
+            key: cred[0].KEY,
             rejectUnauthorized: false
           })
+          urlGenerated = urlGenerated.replace('http:', 'https:')
+        } else {
+          const errorMsg = `client mutual TLS is enabled, but there is no TLS config found for ${urlObject.host}`
+          customLogger.logMessage('error', errorMsg, { notification: false })
+        }
+      } else {
+        if (urlGenerated.startsWith('https:')) {
+          httpAgentProps.httpsAgent = httpAgentStore.getHttpsAgent('generic', {
+            rejectUnauthorized: false
+          })
+        } else {
+          httpAgentProps.httpAgent = httpAgentStore.getHttpAgent('generic')
         }
       }
 
@@ -492,7 +510,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         validateStatus: function (status) {
           return status < 900 // Reject only if the status code is greater than or equal to 900
         },
-        ...httpsProps
+        ...httpAgentProps
       }
 
       if (contextObj.requestVariables && contextObj.requestVariables.TTK_JWS_SIGN_KEY) {
