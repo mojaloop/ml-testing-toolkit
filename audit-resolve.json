@@ -104,6 +104,14 @@
       "decision": "ignore",
       "madeAt": 1618849298685,
       "expiresAt": 1621441289773
+    },
+    "1665|socket.io>socket.io-client>engine.io-client>xmlhttprequest-ssl": {
+      "decision": "postpone",
+      "madeAt": 1620234779182
+    },
+    "1665|socket.io-client>engine.io-client>xmlhttprequest-ssl": {
+      "decision": "postpone",
+      "madeAt": 1620234779834
     }
   },
   "rules": {},

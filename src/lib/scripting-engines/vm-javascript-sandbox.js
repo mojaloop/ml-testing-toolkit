@@ -24,11 +24,11 @@
 
 const Sandbox = require('vm')
 const axiosModule = require('axios').default
-const https = require('https')
 const atob = require('atob')
 const WebSocketClientManager = require('../webSocketClient/WebSocketClientManager').WebSocketClientManager
 const JwsSigning = require('../jws/JwsSigning')
 const Config = require('../config')
+const httpAgentStore = require('../httpAgentStore')
 
 const axios = axiosModule.create()
 
@@ -47,9 +47,14 @@ const registerAxiosRequestInterceptor = (userConfig) => {
       } else {
         console.log(`Client certificate not found for ${urlObject.host}`)
       }
+      config.httpsAgent = httpAgentStore.getHttpsAgent(urlObject.host, options)
+    } else {
+      if (config.url.startsWith('https:')) {
+        config.httpsAgent = httpAgentStore.getHttpsAgent('generic', options)
+      } else {
+        config.httpAgent = httpAgentStore.getHttpAgent('generic')
+      }
     }
-    const httpsAgent = new https.Agent(options)
-    config.httpsAgent = httpsAgent
     return config
   })
 }

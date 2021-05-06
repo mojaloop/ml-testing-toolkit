@@ -32,6 +32,7 @@ const JwsSigning = require('./jws/JwsSigning')
 const ConnectionProvider = require('./configuration-providers/mb-connection-manager')
 const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 const UniqueIdGenerator = require('./uniqueIdGenerator')
+const httpAgentStore = require('./httpAgentStore')
 
 const handleCallback = async (callbackObject, context, req) => {
   if (callbackObject.delay) {
@@ -77,7 +78,7 @@ const handleCallback = async (callbackObject, context, req) => {
     delete callbackObject.headers.host
   }
 
-  const httpsProps = {}
+  const httpAgentProps = {}
   let urlGenerated = callbackEndpoint + callbackObject.path
   if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED) {
     const tlsConfig = await ConnectionProvider.getTlsConfig()
@@ -92,19 +93,18 @@ const handleCallback = async (callbackObject, context, req) => {
       ca: [tlsConfig.dfsps[callbackObject.callbackInfo.fspid].dfspServerCaRootCert],
       rejectUnauthorized: true
     })
-    httpsProps.httpsAgent = httpsAgent
+    httpAgentProps.httpsAgent = httpsAgent
     urlGenerated = urlGenerated.replace('http:', 'https:')
   } else if (userConfig.CLIENT_MUTUAL_TLS_ENABLED) {
     const urlObject = new URL(urlGenerated)
     const cred = userConfig.CLIENT_TLS_CREDS.filter(item => item.HOST === urlObject.host)
     if (Array.isArray(cred) && cred.length === 1) {
       customLogger.logMessage('info', `Found the Client certificate for ${urlObject.host}`, { request: req, notification: false })
-      const httpsAgent = new https.Agent({
+      httpAgentProps.httpsAgent = httpAgentStore.getHttpsAgent(urlObject.host, {
         cert: cred[0].CERT,
         key: cred[0].KEY,
         rejectUnauthorized: false
       })
-      httpsProps.httpsAgent = httpsAgent
       urlGenerated = urlGenerated.replace('http:', 'https:')
     } else {
       const errorMsg = `client mutual TLS is enabled, but there is no TLS config found for ${urlObject.host}`
@@ -112,9 +112,11 @@ const handleCallback = async (callbackObject, context, req) => {
     }
   } else {
     if (urlGenerated.startsWith('https:')) {
-      httpsProps.httpsAgent = new https.Agent({
+      httpAgentProps.httpsAgent = httpAgentStore.getHttpsAgent('generic', {
         rejectUnauthorized: false
       })
+    } else {
+      httpAgentProps.httpAgent = httpAgentStore.getHttpAgent('generic')
     }
   }
 
@@ -134,7 +136,7 @@ const handleCallback = async (callbackObject, context, req) => {
     headers: callbackObject.headers,
     data: callbackObject.body,
     timeout: userConfig.DEFAULT_REQUEST_TIMEOUT || 3000,
-    ...httpsProps
+    ...httpAgentProps
   }
 
   // JwsSigning
