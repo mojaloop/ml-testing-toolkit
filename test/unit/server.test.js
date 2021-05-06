@@ -28,11 +28,13 @@ const Server = require('../../src/server')
 const Config = require('../../src/lib/config')
 const ConnectionProvider = require('../../src/lib/configuration-providers/mb-connection-manager')
 const ObjectStore = require('../../src/lib/objectStore')
+const httpAgentStore = require('../../src/lib/httpAgentStore')
 const OpenApiMockHandler = require('../../src/lib/mocking/openApiMockHandler')
 
 const SpyWaitForTlsHubCerts = jest.spyOn(ConnectionProvider, 'waitForTlsHubCerts')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
 const SpyInitObjectStore = jest.spyOn(ObjectStore, 'initObjectStore')
+const SpyInitHttpAgentStore = jest.spyOn(httpAgentStore, 'init')
 const SpyInitilizeMockHandler = jest.spyOn(OpenApiMockHandler, 'initilizeMockHandler')
 
 const customLogger = require('../../src/lib/requestLogger')
@@ -65,6 +67,7 @@ describe('Server', () => {
   describe('initialize', () => {
     it('initialize should not throw an error', async () => {
       SpyInitilizeMockHandler.mockResolvedValue()
+      SpyInitHttpAgentStore.mockReturnValue()
       Config.getSystemConfig.mockReturnValueOnce({
         API_PORT: 5051
       })

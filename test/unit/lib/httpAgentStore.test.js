@@ -24,6 +24,8 @@
 
 'use strict'
 
+const Config = require('../../../src/lib/config')
+const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 const httpAgentStore = require('../../../src/lib/httpAgentStore')
 
 describe('httpAgentStore', () => {
@@ -83,8 +85,17 @@ describe('httpAgentStore', () => {
     let httpsAgent1
     it('Start the timer', async () => {
       jest.useFakeTimers()
+      SpyGetSystemConfig.mockReturnValue({
+        API_DEFINITIONS: [],
+        HTTP_CLIENT: {
+          KEEP_ALIVE: true,
+          MAX_SOCKETS: 50,
+          UNUSED_AGENTS_EXPIRY_MS: 0,
+          UNUSED_AGENTS_CHECK_TIMER_MS: 1
+        }
+      })
       httpAgentStore.init()
-      httpAgentStore.setUnusedAgentsClearTimerMs(0)
+      SpyGetSystemConfig.mockClear()
     })
     it('Create a https agent', async () => {
       httpsAgent1 = httpAgentStore.getHttpsAgent('agent1', { option1: 'value1' })
