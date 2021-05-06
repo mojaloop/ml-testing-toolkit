@@ -495,6 +495,10 @@
     "1677|standard>eslint-plugin-import>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info": {
       "decision": "postpone",
       "madeAt": 1620324279797
+    },
+    "1681|json-ref-lite>property-expr": {
+      "decision": "postpone",
+      "madeAt": 1620325832238
     }
   },
   "rules": {},
