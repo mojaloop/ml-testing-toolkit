@@ -98,7 +98,7 @@ const getHttpsAgent = (key, options) => {
 const _clear = (agentStoreObj, interval) => {
   for (const item in agentStoreObj) {
     const timeDiff = Date.now() - agentStoreObj[item].lastAccessDate
-    if (timeDiff > interval) {
+    if (timeDiff >= interval) {
       // TODO: Check the current socket connections that this agent is using. Destroy only if the agent is free
       try {
         agentStoreObj[item].agent.destroy()
