@@ -110,6 +110,14 @@ const ifFailedTestCase = (testCase) => {
   }
 }
 
+const ifSkippedRequest = (status) => {
+  if (status && status === 'SKIPPED') {
+    return true
+  } else {
+    return false
+  }
+}
+
 const jsonStringify = (inputObject) => {
   return JSON.stringify(inputObject, null, 2)
 }
@@ -136,5 +144,6 @@ module.exports = {
   ifFailedTestCase,
   jsonStringify,
   isAssertionPassed,
-  isAssertionSkipped
+  isAssertionSkipped,
+  ifSkippedRequest
 }

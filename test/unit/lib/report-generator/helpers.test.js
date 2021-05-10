@@ -181,6 +181,18 @@ describe('Handlebar Helper Functions', () => {
     })
   })
 
+  describe('ifSkippedRequest', () => {
+    it('should return true if request is skipped', async () => {
+      expect(HandlebarHelpers.ifSkippedRequest('SKIPPED')).toEqual(true)
+    })
+    it('should return false if request is executed', async () => {
+      expect(HandlebarHelpers.ifSkippedRequest('ERROR')).toEqual(false)
+    })
+    it('should return false if status is null', async () => {
+      expect(HandlebarHelpers.ifSkippedRequest(null)).toEqual(false)
+    })
+  })
+
   describe('jsonStringify', () => {
     it('should return strigified value of json', async () => {
       expect(HandlebarHelpers.jsonStringify({})).toEqual('{}')

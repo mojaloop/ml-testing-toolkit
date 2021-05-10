@@ -95,6 +95,9 @@ const customWrapperFn = (requestVariables) => {
     },
     setRequestTimeout: function (timeout) {
       requestVariables.REQUEST_TIMEOUT = timeout
+    },
+    skipRequest: function () {
+      requestVariables.SKIP_REQUEST = true
     }
   }
 }
