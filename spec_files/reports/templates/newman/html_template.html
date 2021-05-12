@@ -565,10 +565,14 @@ input:checked + .slider:before {
             <div class="row iteration-0">
                 <div class="col-sm-12 mb-3 iteration-0">
                 <div class="card iteration-0">
-                    {{#if (ifAllTestsPassedInRequest request)}}
-                    <div class="card-header  bg-success iteration-0">
+                    {{#if (ifSkippedRequest status)}}
+                        <div class="card-header  bg-warning iteration-0">
                     {{else}}
-                    <div class="card-header  bg-danger iteration-0">
+                        {{#if (ifAllTestsPassedInRequest request)}}
+                        <div class="card-header  bg-success iteration-0">
+                        {{else}}
+                        <div class="card-header  bg-danger iteration-0">
+                        {{/if}}
                     {{/if}}
                         <a data-toggle="collapse" href="#" data-target="#collapse-{{../id}}-{{request.id}}" aria-expanded="false" aria-controls="collapse" id="requests-{{../id}}-{{request.id}}" class="collapsed text-white z-block">
                         {{request.description}} <i class="float-lg-right fa fa-chevron-down"></i>
@@ -582,6 +586,13 @@ input:checked + .slider:before {
                                 <div class="card border-info" style="width: 50rem;">
                                     <div class="card-body">
                                     <h5 class="card-title text-uppercase text-white text-center bg-info">Request Information</h5>
+                                    {{#if (ifSkippedRequest status)}}
+                                    <div class="progress" style="height: 40px;">
+                                        <div class="progress-bar  bg-warning" style="width: 100%" role="progressbar">
+                                            <h5><strong>SKIPPED</strong></h5>
+                                        </div>
+                                    </div>
+                                    {{/if}}
                                     <span><i class="fas fa-info-circle"></i></span><strong> Request Method:</strong> <span class="badge-outline-success badge badge-success"> {{request.method}}</span><br>
                                     <span><i class="fas fa-info-circle"></i></span><strong> Request URL:</strong> {{request.path}} <br>
                                     </div>
@@ -596,10 +607,14 @@ input:checked + .slider:before {
                                     <h5 class="card-title text-uppercase text-white text-center bg-info">Test Pass Percentage</h5>
                                     <div>
                                         <div class="progress" style="height: 40px;">
-                                            {{#if (ifAllTestsPassedInRequest request)}}
-                                            <div class="progress-bar  bg-success" style="width: 100%" role="progressbar">
+                                            {{#if (ifSkippedRequest status)}}
+                                                <div class="progress-bar  bg-warning" style="width: 100%" role="progressbar">
                                             {{else}}
-                                            <div class="progress-bar  bg-danger" style="width: 100%" role="progressbar">
+                                                {{#if (ifAllTestsPassedInRequest request)}}
+                                                    <div class="progress-bar  bg-success" style="width: 100%" role="progressbar">
+                                                {{else}}
+                                                    <div class="progress-bar  bg-danger" style="width: 100%" role="progressbar">
+                                                {{/if}}
                                             {{/if}}
                                             <h5><strong>{{testPassPercentage request.tests}} %</strong></h5>
                                             </div>

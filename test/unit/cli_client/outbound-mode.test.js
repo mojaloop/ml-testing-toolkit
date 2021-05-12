@@ -79,6 +79,76 @@ describe('Cli client', () => {
       }).not.toThrowError()
     })
   })
+  describe('when status is not FINISHED should not throw an error where there are assertions', () => {
+    const progress = {
+      "status": "IN PROGRESS",
+      requestSent: {
+        tests: {
+          assertions: [
+            {
+              id: 1
+            },
+            {
+              id: 2
+            },
+            {
+              id: 3              }
+          ]
+        }
+      },
+      testResult: {
+        results: {
+          1: {
+            status: 'SUCCESS'
+          },
+          2: {
+            status: 'SKIPPED'
+          },
+          3: {
+            status: 'FAILED'
+          }
+        }
+      }
+    }
+    it('Without loglevel', async () => {
+      const config = {
+        inputFiles: "sample-cli.json",
+        environmentFile: "sample-environement.json",
+      }
+      objectStore.set('config', config)
+
+      spyExit.mockReturnValueOnce({})
+      expect(() => {
+        outbound.handleIncomingProgress(progress)
+      }).not.toThrowError()
+    })
+    it('With loglevel 1', async () => {
+      const config = {
+        inputFiles: "sample-cli.json",
+        environmentFile: "sample-environement.json",
+        logLevel: '1'
+      }
+      objectStore.set('config', config)
+
+      spyExit.mockReturnValueOnce({})
+      expect(() => {
+        outbound.handleIncomingProgress(progress)
+      }).not.toThrowError()
+    })
+    it('With loglevel 2', async () => {
+      const config = {
+        inputFiles: "sample-cli.json",
+        environmentFile: "sample-environement.json",
+        logLevel: '2'
+      }
+      objectStore.set('config', config)
+
+      spyExit.mockReturnValueOnce({})
+      expect(() => {
+        outbound.handleIncomingProgress(progress)
+      }).not.toThrowError()
+    })
+  })
   describe('run sendTemplate', () => {
     it('when generateTemplate is successful should not throw an error', async () => {
       spyPromisify.mockReturnValueOnce(() => {

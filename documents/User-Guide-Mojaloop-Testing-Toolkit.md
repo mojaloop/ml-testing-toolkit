@@ -371,6 +371,9 @@ You can write scripts in two formats.
     - _**custom.jws.signRequest**(<PRIVATE_KEY>)_ - To sign the outgoing request using the private key
     - _**custom.jws.validateCallback**(<callback.headers>, <callback.body>, <PUBLIC_CERTIFICATE>)_ - To validate the incoming callback using public certificate. This will validate protected headers too.
     - _**custom.jws.validateCallbackProtectedHeaders**(<callback.headers>)_ - To validate only protected headers in the FSPIOP-Signature header
+  - **custom.skipRequest** - function
+
+    By using this function in the pre-request script, you can skip the current request including post-request-scripts and assertions. You can see the request and assertions as skipped in the UI and in the report as well.
 
 
 ![Sample Pre Request and Post Request Scripts](/assets/images/test-case-editor-scripts.png)

@@ -268,9 +268,12 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
           errorCallbackUrl = errorCallback.method + ' ' + replaceVariables(errorCallback.pathPattern, null, convertedRequest)
         }
       }
-
-      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId, contextObj)
-      await setResponse(convertedRequest, resp, variableData, request, 'SUCCESS', tracing, testCase, scriptsExecution, contextObj, globalConfig)
+      if (contextObj.requestVariables && contextObj.requestVariables.SKIP_REQUEST) {
+        await setSkippedResponse(convertedRequest, request, 'SKIPPED', tracing, testCase, scriptsExecution, globalConfig)
+      } else {
+        const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId, contextObj)
+        await setResponse(convertedRequest, resp, variableData, request, 'SUCCESS', tracing, testCase, scriptsExecution, contextObj, globalConfig)
+      }
     } catch (err) {
       let resp
       try {
@@ -331,6 +334,40 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
       requestSent: convertedRequest,
       additionalInfo: {
         curlRequest: resp.curlRequest,
+        scriptsExecution: scriptsExecution
+      },
+      testResult
+    }, tracing.sessionID)
+  }
+}
+
+const setSkippedResponse = async (convertedRequest, request, status, tracing, testCase, scriptsExecution, globalConfig) => {
+  let testResult = null
+  if (globalConfig.testsExecution) {
+    testResult = await setAllTestsSkipped(convertedRequest)
+  }
+  request.appended = {
+    status: status,
+    testResult,
+    response: null,
+    callback: null,
+    request: convertedRequest,
+    additionalInfo: {
+      curlRequest: null
+    }
+  }
+  if (tracing.outboundID && globalConfig.broadcastOutboundProgressEnabled) {
+    notificationEmitter.broadcastOutboundProgress({
+      outboundID: tracing.outboundID,
+      testCaseId: testCase.id,
+      testCaseName: testCase.name,
+      status: status,
+      requestId: request.id,
+      response: null,
+      callback: null,
+      requestSent: convertedRequest,
+      additionalInfo: {
+        curlRequest: null,
         scriptsExecution: scriptsExecution
       },
       testResult
@@ -428,6 +465,21 @@ const handleTests = async (request, response = null, callback = null, environmen
     console.log(err)
     return null
   }
+}
+
+const setAllTestsSkipped = async (request) => {
+  const results = {}
+  let passedCount = 0
+  if (request.tests && request.tests.assertions.length > 0) {
+    for (const k in request.tests.assertions) {
+      const testCase = request.tests.assertions[k]
+      results[testCase.id] = {
+        status: 'SKIPPED'
+      }
+      passedCount++
+    }
+  }
+  return { results, passedCount }
 }
 
 const getUrlPrefix = (baseUrl) => {

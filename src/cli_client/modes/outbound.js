@@ -87,13 +87,16 @@ const printProgress = (progress) => {
     case '2':
     {
       printTotalProgressCounts()
-      console.log('\n  ' + fStr.blue(progress.testCaseName + ' -> ' + progress.requestSent.description))
+      console.log('\n  ' + fStr.cyan(progress.testCaseName + ' -> ' + progress.requestSent.description))
+      if (progress.status === 'SKIPPED') {
+        console.log('  ' + fStr.yellow('(Request Skipped)'))
+      }
       if (progress.requestSent && progress.requestSent.tests && progress.requestSent.tests.assertions) {
         progress.requestSent.tests.assertions.forEach(assertion => {
           if (progress.testResult.results[assertion.id].status === 'SUCCESS') {
-            console.log('\t' + fStr.green('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.cyan(assertion.description))
+            console.log('\t' + fStr.green('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.green(assertion.description))
           } else if (progress.testResult.results[assertion.id].status === 'SKIPPED') {
-            console.log('\t' + fStr.yellow('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.cyan(assertion.description))
+            console.log('\t' + fStr.yellow('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.yellow(assertion.description))
           } else {
             console.log('\t' + fStr.red('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.red(assertion.description))
           }
