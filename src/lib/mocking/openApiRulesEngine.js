@@ -34,6 +34,7 @@ const objectStore = require('../objectStore')
 const utilsInternal = require('../utilsInternal')
 const uuid = require('uuid')
 const postmanContext = require('../scripting-engines/postman-sandbox')
+const javascriptContext = require('../scripting-engines/vm-javascript-sandbox')
 const { OpenApiMockGenerator } = require('ml-testing-toolkit-shared-lib')
 
 // const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
@@ -51,8 +52,11 @@ const executeScripts = async (curEvent, req) => {
   if (curEvent.params.scripts && curEvent.params.scripts.exec && curEvent.params.scripts.exec.length > 0 && curEvent.params.scripts.exec !== ['']) {
     const sandboxEnvironment = objectStore.get('inboundEnvironment')
     customLogger.logMessage('debug', 'Inbound Script: Starting...', { additionalData: curEvent.params.scripts.exec, request: req })
-
-    const contextObj = await postmanContext.generateContextObj(sandboxEnvironment)
+    let context = postmanContext
+    if (curEvent.params.scripts.scriptingEngine && curEvent.params.scripts.scriptingEngine === 'javascript') {
+      context = javascriptContext
+    }
+    const contextObj = await context.generateContextObj(sandboxEnvironment)
 
     const postmanRequest = {
       body: JSON.stringify(req.payload),
@@ -73,10 +77,11 @@ const executeScripts = async (curEvent, req) => {
         value: JSON.stringify(userConfig)
       }
     )
-    const postmanSandbox = await postmanContext.executeAsync(curEvent.params.scripts.exec, { context: { ...contextObj, request: postmanRequest, globals }, id: uuid.v4() }, contextObj)
+    const postmanSandbox = await context.executeAsync(curEvent.params.scripts.exec, { context: { ...contextObj, request: postmanRequest, globals }, id: uuid.v4() }, contextObj)
 
     const additionalData = {
-      consoleLogArray: postmanSandbox.consoleLog && postmanSandbox.consoleLog.map(log => log[2])
+      consoleLogArray: postmanSandbox.consoleLog && postmanSandbox.consoleLog.map(log => log[2]),
+      environment: postmanSandbox.environment
     }
     customLogger.logMessage('debug', 'Inbound Script: Executed', { additionalData, request: req })
     // replace inbound environment with the sandbox environment
