@@ -121,6 +121,7 @@ module.exports.handleRequest = async (req, h) => {
     customLogger.logMessage('error', 'Resource not found', { request: req })
     return h.response({ error: 'Not Found' }).code(404)
   }
+  customLogger.logMessage('info', 'API matched: ' + apis[selectedVersion].type, { request: req })
   if (apis[selectedVersion].type === 'fspiop' && (await Config.getUserConfig(req.customInfo.user)).VERSIONING_SUPPORT_ENABLE) {
     const fspiopApis = apis.filter(item => {
       return item.type === 'fspiop'
