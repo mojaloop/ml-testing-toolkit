@@ -94,7 +94,14 @@ const mapping = {
           body: {
 
           },
-          delay: 100
+          delay: 100,
+          scripts: {
+            enabled: true,
+            exec: [
+              "console.log('test')"
+            ],
+            scriptingEngine: 'javascript'
+          },
         }
       }
     ],
