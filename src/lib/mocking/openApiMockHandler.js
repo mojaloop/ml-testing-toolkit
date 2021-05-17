@@ -190,6 +190,7 @@ module.exports.getOpenApiObjects = () => {
 
 const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
   customLogger.logMessage('debug', 'Schema Validation Passed', { request: req })
+  MyEventEmitter.getEmitter('inboundRequest', req.customInfo.user).emit('newInbound', { method: req.method, path: req.path, headers: req.headers, body: req.payload })
   if (req.method === 'put') {
     MyEventEmitter.getEmitter('testOutbound', req.customInfo.user).emit(req.method + ' ' + req.path, req.headers, req.payload)
     let assertionPath = req.path
