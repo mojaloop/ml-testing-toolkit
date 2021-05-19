@@ -117,7 +117,7 @@ class InboundEventListener {
           // Listen for message
           this.eventListeners[clientName].eventEmitter.once('newMessage', (message) => {
             clearTimeout(timer)
-            this.destory(clientName)
+            this.destroy(clientName)
             resolve(this.parseMessage(message))
           })
         }
