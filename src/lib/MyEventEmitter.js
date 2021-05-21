@@ -28,7 +28,8 @@ const emitters = {
   data: {
     testOutbound: null,
     assertionRequest: null,
-    assertionCallback: null
+    assertionCallback: null,
+    inboundRequest: null
   }
 }
 

@@ -26,6 +26,7 @@ const Sandbox = require('vm')
 const axiosModule = require('axios').default
 const atob = require('atob')
 const WebSocketClientManager = require('../webSocketClient/WebSocketClientManager').WebSocketClientManager
+const InboundEventListener = require('../eventListenerClient/inboundEventListener').InboundEventListener
 const JwsSigning = require('../jws/JwsSigning')
 const Config = require('../config')
 const httpAgentStore = require('../httpAgentStore')
@@ -124,6 +125,8 @@ const generateContextObj = async (environmentObj = {}) => {
   const customFn = customWrapperFn(requestVariables)
   const websocket = new WebSocketClientManager(consoleFn)
   await websocket.init()
+  const inboundEvent = new InboundEventListener(consoleFn)
+  await inboundEvent.init()
 
   const userConfig = await Config.getStoredUserConfig()
   registerAxiosRequestInterceptor(userConfig)
@@ -140,6 +143,7 @@ const generateContextObj = async (environmentObj = {}) => {
     customWrapperFn,
     executeAsync,
     websocket,
+    inboundEvent,
     console: consoleFn,
     custom: customFn,
     consoleOutObj,

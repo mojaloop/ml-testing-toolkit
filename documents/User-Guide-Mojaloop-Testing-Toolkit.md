@@ -390,6 +390,68 @@ You can write scripts in two formats.
     ```
     environment.payeeRequest.headers['content-type']
     ```
+
+  - **inboundEvent** - library
+
+    With inboundEvent library, you can listen on an inbound request to testing toolkit
+
+    Functions supported:
+    
+    - _**inboundEvent.addListener(clientName, method, path, [conditionFn], [timeout])**_
+
+      To start listening for the inbound messsages to TTK
+
+      Parameters:
+      - **clientName** - Client name to be referred later in postrequest script
+
+        Type: [`String`]
+
+      - **method** - Http method to match
+
+        Type: [`Request`]
+
+      - **path** - Http path to match
+
+        Type: [`Request`]
+  
+      - **conditionFn** (optional) - An optional function to call for addional matching logic
+
+        Type: [`Function`]
+
+        Parameters passed: (`request.headers, request.body`)
+
+        Return Value: [`Boolean`]
+
+
+      - **timeout** - Time in ms to wait for the inbound request
+
+        Type: [`integer`]
+
+      Example usage:
+      ```javascript
+      await inboundEvent.addListener('quote1', 'post', '/quotes', (headers, body) => {
+        return body.quoteId === '<SOME_ID_HERE>'
+      })
+      ```
+    
+    - _**inboundEvent.getMessage(clientName, [timeout])**_
+
+      To get the message arrived. This function can also wait for the message some time. The session will be disconnected automatically after returning the message
+
+      Parameters:
+      - **clientName** - Client name to get the message from. The name should match with the name provided in the addListener call.
+
+        Type: [`String`]
+
+      - **timeout** - Time in ms to wait for the inbound request
+
+        Type: [`integer`]
+
+      Example usage:
+      ```javascript
+      await inboundEvent.getMessage('quote1')
+      ```
+
   - **custom.setRequestTimeout** - To set a specific timeout value for the request in milli seconds (Default: 3000ms)
   - **custom.sleep** - To wait for particular amount of milli seconds
   - **custom.jws** - library
