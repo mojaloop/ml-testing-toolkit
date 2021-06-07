@@ -417,6 +417,7 @@ const replaceVariablesFromRequest = async (inputObject, context, req) => {
   }
 
   if (typeof inputObject === 'object') {
+    console.log(resultObject)
     return JSON.parse(resultObject)
   } else {
     return resultObject

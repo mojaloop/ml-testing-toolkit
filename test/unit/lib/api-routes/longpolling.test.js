@@ -95,5 +95,64 @@ describe('API route /longpolling/requests/*', () => {
       expect(res.statusCode).toEqual(500)
     })
   })
- 
+  describe('GET /longpolling/history/requests', () => {
+    it('Gets request history', async () => {
+      objectStore.getRequestsHistory.mockReturnValueOnce({
+        "post /participants/MSISDN/123456789": {
+          "insertedDate":1623097538472,
+          "data":{
+            "headers":{
+              "accept":"application/vnd.interoperability.participants+json;version=1",
+              "date":"Mon, 07 Jun 2021 20:17:38 GMT",
+              "fspiop-source":"dfspa",
+              "content-type":"application/json",
+              "user-agent":"PostmanRuntime/7.26.8",
+              "postman-token":"f7b6e478-1d11-48e1-ad1c-ae167a92fe3e",
+              "host":"localhost:5000",
+              "accept-encoding":"gzip, deflate, br",
+              "connection":"keep-alive",
+              "content-length":"47"},
+            "body":{
+              "fspId":"dfspa",
+              "currency":"USD"
+            }
+          }
+        }
+      })
+      const res = await request(app).get(`/longpolling/history/requests`)
+      expect(res.statusCode).toEqual(200)
+      expect(res).toHaveProperty('body')
+    })
+  })
+  describe('GET /longpolling/history/callbacks', () => {
+    it('Gets callback history', async () => {
+      objectStore.getCallbacksHistory.mockReturnValueOnce({
+        "put /participants/MSISDN/123456789":{
+          "insertedDate":1623097538617,
+          "data":{
+            "headers":{
+              "Content-Type":"application/vnd.interoperability.participants+json;version=1.1",
+              "Date":"Mon, 07 Jun 2021 20:17:38 GMT",
+              "X-Forwarded-For":"est velit irure",
+              "FSPIOP-Source":"testingtoolkitdfsp",
+              "FSPIOP-Destination":"dfspa",
+              "FSPIOP-Encryption":"veniam velit cupidatat",
+              "FSPIOP-Signature":"aliquip esse sint consequat",
+              "FSPIOP-URI":"ex",
+              "FSPIOP-HTTP-Method":"exercitation eiusmod incididunt",
+              "Content-Length":"123",
+              "traceparent":"00-ccdd4f128aaa3565919aa583d8d864-0123456789abcdef0-00"
+            },
+            "body":{
+              "fspId":"voluptate au",
+              "pariatur6cb":true
+            }
+          }
+        }
+      })
+      const res = await request(app).get(`/longpolling/history/callbacks`)
+      expect(res.statusCode).toEqual(200)
+      expect(res).toHaveProperty('body')
+    })
+  })
 })

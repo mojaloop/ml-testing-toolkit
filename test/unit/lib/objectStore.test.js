@@ -104,4 +104,22 @@ describe('ObjectStore', () => {
       expect(result).toBeUndefined()
     })
   })
+  describe('getRequestHistory', () => {
+    it('should return objectStore requestsHistory object', async () => {
+      ObjectStore.set('requestsHistory', {
+        'post /participants/MSISDN/123456789': {}
+      })
+      const requestHistory = ObjectStore.getRequestsHistory()
+      expect(requestHistory).toBeDefined()
+    })
+  })
+  describe('getCallbacksHistory', () => {
+    it('should return objectStore callbacksHistory object', async () => {
+      ObjectStore.set('callbacksHistory', {
+        'put /participants/MSISDN/123456789': {}
+      })
+      const callbackHistory = ObjectStore.getCallbacksHistory()
+      expect(callbackHistory).toBeDefined()
+    })
+  })
 })

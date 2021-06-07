@@ -62,4 +62,30 @@ router.get('/callbacks/*', async (req, res, next) => {
   }
 })
 
+router.get('/history/requests', async (req, res, next) => {
+  try {
+    const requestsHistory = objectStore.getRequestsHistory()
+    if (requestsHistory) {
+      res.status(200).json({ data: requestsHistory })
+    } else {
+      res.status(200).json({})
+    }
+  } catch (err) {
+    res.status(500).json({ error: err && err.message })
+  }
+})
+
+router.get('/history/callbacks', async (req, res, next) => {
+  try {
+    const callbacksHistory = objectStore.getCallbacksHistory()
+    if (callbacksHistory) {
+      res.status(200).json({ data: callbacksHistory })
+    } else {
+      res.status(200).json({})
+    }
+  } catch (err) {
+    res.status(500).json({ error: err && err.message })
+  }
+})
+
 module.exports = router

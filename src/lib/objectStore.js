@@ -89,6 +89,16 @@ const popObject = (key, item, user) => {
   return null
 }
 
+const getRequestsHistory = () => {
+  return storedObject.data.requestsHistory
+}
+
+const getCallbacksHistory = () => {
+  return storedObject.data.callbacksHistory
+}
+const getSO = () => {
+  return storedObject
+}
 const clearOldObjects = () => {
   const interval = 10 * 60 * 1000
   clear('transactions', interval)
@@ -108,5 +118,8 @@ module.exports = {
   initObjectStore,
   push,
   clear,
-  popObject
+  popObject,
+  getRequestsHistory,
+  getCallbacksHistory,
+  getSO
 }
