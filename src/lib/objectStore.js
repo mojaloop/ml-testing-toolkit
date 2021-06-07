@@ -96,9 +96,7 @@ const getRequestsHistory = () => {
 const getCallbacksHistory = () => {
   return storedObject.data.callbacksHistory
 }
-const getSO = () => {
-  return storedObject
-}
+
 const clearOldObjects = () => {
   const interval = 10 * 60 * 1000
   clear('transactions', interval)
@@ -120,6 +118,5 @@ module.exports = {
   clear,
   popObject,
   getRequestsHistory,
-  getCallbacksHistory,
-  getSO
+  getCallbacksHistory
 }
