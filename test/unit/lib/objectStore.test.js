@@ -110,7 +110,9 @@ describe('ObjectStore', () => {
         'post /participants/MSISDN/123456789': {}
       })
       const requestHistory = ObjectStore.getRequestsHistory()
-      expect(requestHistory).toBeDefined()
+      expect(requestHistory).toStrictEqual({
+        'post /participants/MSISDN/123456789': {}
+      })
     })
   })
   describe('getCallbacksHistory', () => {
@@ -119,7 +121,9 @@ describe('ObjectStore', () => {
         'put /participants/MSISDN/123456789': {}
       })
       const callbackHistory = ObjectStore.getCallbacksHistory()
-      expect(callbackHistory).toBeDefined()
+      expect(callbackHistory).toStrictEqual({
+        'put /participants/MSISDN/123456789': {}
+      })
     })
   })
 })
