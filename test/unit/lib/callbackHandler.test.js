@@ -26,6 +26,7 @@ const Config = require('../../../src/lib/config')
 const callbackHandler = require('../../../src/lib/callbackHandler')
 const JwsSigning = require('../../../src/lib/jws/JwsSigning')
 const ObjectStore = require('../../../src/lib/objectStore')
+const ArrayStore = require('../../../src/lib/arrayStore')
 const RequestLogger = require('../../../src/lib/requestLogger')
 const MyEventEmitter = require('../../../src/lib/MyEventEmitter')
 const axios = require('axios').default
@@ -34,6 +35,7 @@ const ConnectionProvider = require('../../../src/lib/configuration-providers/mb-
 
 const SpySign = jest.spyOn(JwsSigning, 'sign')
 const SpyPush = jest.spyOn(ObjectStore, 'push')
+const SpyArrayPush = jest.spyOn(ArrayStore, 'push')
 const SpyRequestLogger = jest.spyOn(RequestLogger, 'logMessage')
 const SpyMyEventEmitter = jest.spyOn(MyEventEmitter, 'getEmitter')
 const SpyAgent = jest.spyOn(https, 'Agent')
@@ -44,6 +46,7 @@ jest.mock('../../../src/lib/config')
 
 describe('callbackHandler', () => {
   beforeEach(() => {
+    SpyArrayPush.mockReturnValue()
     jest.resetAllMocks()
   })
   afterAll(() => {

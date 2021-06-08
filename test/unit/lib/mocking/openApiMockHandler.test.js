@@ -37,6 +37,7 @@ const QuotesAssociation = require('../../../../src/lib/mocking/middleware-functi
 const TransactionRequestsService = require('../../../../src/lib/mocking/middleware-functions/transactionRequestsService')
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
 const ObjectStore = require('../../../../src/lib/objectStore')
+const ArrayStore = require('../../../../src/lib/arrayStore')
 const OpenApiVersionTools = require('../../../../src/lib/mocking/openApiVersionTools')
 
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
@@ -70,6 +71,7 @@ const SpyNegotiateVersion = jest.spyOn(OpenApiVersionTools, 'negotiateVersion')
 const SpyValidateContentTypeHeader = jest.spyOn(OpenApiVersionTools, 'validateContentTypeHeader')
 
 jest.mock('../../../../src/lib/objectStore')
+jest.mock('../../../../src/lib/arrayStore')
 
 jest.setTimeout(10000)
 const quoteRequestBody = {
@@ -197,6 +199,7 @@ describe('OpenApiMockHandler', () => {
         } 
       }
       ObjectStore.push.mockReturnValueOnce()
+      ArrayStore.push.mockReturnValueOnce()
       SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
         '/quotes': {
           put: {}
@@ -210,6 +213,7 @@ describe('OpenApiMockHandler', () => {
       
       req.path = '/quotes/{ID}/error'
       ObjectStore.push.mockReturnValueOnce()
+      ArrayStore.push.mockReturnValueOnce()
       SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
         '/quotes/{ID}/error': {
           put: {}
