@@ -64,10 +64,28 @@ router.get('/requests', async (req, res, next) => {
   }
 })
 
+router.delete('/requests', async (req, res, next) => {
+  try {
+    arrayStore.reset('requestsHistory', req.user)
+    res.status(200).send()
+  } catch (err) {
+    res.status(500).json({ error: err && err.message })
+  }
+})
+
 router.get('/callbacks', async (req, res, next) => {
   try {
     const callbacksHistoryData = arrayStore.get('callbacksHistory', undefined, req.user)
     res.status(200).json((callbacksHistoryData && callbacksHistoryData.map(item => item.data)) || [])
+  } catch (err) {
+    res.status(500).json({ error: err && err.message })
+  }
+})
+
+router.delete('/callbacks', async (req, res, next) => {
+  try {
+    arrayStore.reset('callbacksHistory', req.user)
+    res.status(200).send()
   } catch (err) {
     res.status(500).json({ error: err && err.message })
   }

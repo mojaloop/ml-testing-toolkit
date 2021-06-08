@@ -38,6 +38,7 @@ const requestLogger = require('../../../../src/lib/requestLogger')
 const arrayStore = require('../../../../src/lib/arrayStore')
 
 const SpyArrayStoreGet = jest.spyOn(arrayStore, 'get')
+const SpyArrayStoreReset = jest.spyOn(arrayStore, 'reset')
 jest.mock('../../../../src/lib/requestLogger')
 jest.mock('../../../../src/lib/db/adapters/dbAdapter')
 
@@ -125,6 +126,13 @@ describe('API route /api/hisotry for requests and callbacks', () => {
       expect(res.statusCode).toEqual(500)
     })
   })
+  describe('DELETE /api/history/requests', () => {
+    it('Delete requests history', async () => {
+      SpyArrayStoreReset.mockReturnValue()
+      const res = await request(app).delete(`/api/history/requests`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+  })
   describe('GET /api/history/callbacks', () => {
     it('Get callbacks history', async () => {
       SpyArrayStoreGet.mockReturnValue([{ data: {sample: 'SampleText'}}])
@@ -153,6 +161,13 @@ describe('API route /api/hisotry for requests and callbacks', () => {
       })
       const res = await request(app).get(`/api/history/callbacks`).send()
       expect(res.statusCode).toEqual(500)
+    })
+  })
+  describe('DELETE /api/history/callbacks', () => {
+    it('Delete callbacks history', async () => {
+      SpyArrayStoreReset.mockReturnValue()
+      const res = await request(app).delete(`/api/history/callbacks`).send()
+      expect(res.statusCode).toEqual(200)
     })
   })
 })

@@ -65,6 +65,20 @@ describe('ArrayStore', () => {
       expect(item2Result).toEqual([])
     })
   })
+  describe('when reset object', () => {
+    it('push some object', async () => {
+      ArrayStore.push('transactions3', { sample: 'sampleText' })
+      const itemResult = ArrayStore.get('transactions3')
+      expect(Array.isArray(itemResult)).toBe(true)
+      expect(itemResult.length).toStrictEqual(1)
+    })
+    it('reset the array', async () => {
+      ArrayStore.reset('transactions3')
+      const itemResult = ArrayStore.get('transactions3')
+      expect(Array.isArray(itemResult)).toBe(true)
+      expect(itemResult.length).toStrictEqual(0)
+    })
+  })
   describe('initArrayStore', () => {
     it('Initialize Array Store should not throw and error', async (done) => {
       const curDate = new Date()

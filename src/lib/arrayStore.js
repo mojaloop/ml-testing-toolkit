@@ -40,6 +40,11 @@ const init = (key, user) => {
   return context
 }
 
+const reset = (key, user) => {
+  const context = init(key, user)
+  storedObject[context][key] = []
+}
+
 const get = (key, user) => {
   const context = init(key, user)
   return [...storedObject[context][key]]
@@ -84,6 +89,7 @@ const initArrayStore = () => {
 
 module.exports = {
   get,
+  reset,
   initArrayStore,
   push,
   clear
