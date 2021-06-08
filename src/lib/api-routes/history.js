@@ -25,6 +25,7 @@
 const express = require('express')
 const router = new express.Router()
 const dbAdapter = require('../db/adapters/dbAdapter')
+const arrayStore = require('../arrayStore')
 
 router.get('/reports', async (req, res, next) => {
   try {
@@ -48,6 +49,43 @@ router.get('/logs', async (req, res, next) => {
   try {
     const logs = (await dbAdapter.read('logs', req.user, { query: req.query }))
     res.status(200).send(logs)
+  } catch (err) {
+    res.status(500).json({ error: err && err.message })
+  }
+})
+
+// Endpoints for getting the requests to TTK and callbacks from TTK
+router.get('/requests', async (req, res, next) => {
+  try {
+    const requestsHistoryData = arrayStore.get('requestsHistory', undefined, req.user)
+    res.status(200).json((requestsHistoryData && requestsHistoryData.map(item => item.data)) || [])
+  } catch (err) {
+    res.status(500).json({ error: err && err.message })
+  }
+})
+
+router.delete('/requests', async (req, res, next) => {
+  try {
+    arrayStore.reset('requestsHistory', req.user)
+    res.status(200).send()
+  } catch (err) {
+    res.status(500).json({ error: err && err.message })
+  }
+})
+
+router.get('/callbacks', async (req, res, next) => {
+  try {
+    const callbacksHistoryData = arrayStore.get('callbacksHistory', undefined, req.user)
+    res.status(200).json((callbacksHistoryData && callbacksHistoryData.map(item => item.data)) || [])
+  } catch (err) {
+    res.status(500).json({ error: err && err.message })
+  }
+})
+
+router.delete('/callbacks', async (req, res, next) => {
+  try {
+    arrayStore.reset('callbacksHistory', req.user)
+    res.status(200).send()
   } catch (err) {
     res.status(500).json({ error: err && err.message })
   }

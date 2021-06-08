@@ -24,77 +24,67 @@
 
 'use strict'
 
-const ObjectStore = require('../../../src/lib/objectStore')
+const ArrayStore = require('../../../src/lib/arrayStore')
 
-describe('ObjectStore', () => {
+describe('ArrayStore', () => {
   const user = {
     dfspId: 'test'
   }
   describe('when push object', () => {
     it('store the new object', async () => {
-      const result = ObjectStore.push('transactions', 'item', {})
+      const result = ArrayStore.push('requestsHistory', {})
       expect(result).toBeUndefined()
     })
     it('store the new object again should not set object store again', async () => {
-      const result = ObjectStore.push('transactions', 'item', {})
+      const result = ArrayStore.push('requestsHistory', {})
       expect(result).toBeUndefined()
     })
     it('store dfsp wise the new object', async () => {
-      const result = ObjectStore.push('transactions', 'item', {}, user)
-      expect(result).toBeUndefined()
-    })
-  })
-  describe('when pop object', () => {
-    it('pop existing object', async () => {
-      const result = ObjectStore.popObject('transactions', 'item')
-      expect(result).toStrictEqual({})
-    })
-    it('pop existing dfsp wise object', async () => {
-      const result = ObjectStore.popObject('transactions', 'item', user)
-      expect(result).toStrictEqual({})
-    })
-    it('pop again will return null', async () => {
-      const result = ObjectStore.popObject('transactions', 'item')
-      expect(result).toBeNull()
-    })
-  })
-  describe('when set object', () => {
-    it('set new object', async () => {
-      const result = ObjectStore.set('transactions', {})
-      expect(result).toBeUndefined()
-    })
-    it('set new dfsp wise object', async () => {
-      const result = ObjectStore.set('transactions', {}, user)
+      const result = ArrayStore.push('requestsHistory', {}, user)
       expect(result).toBeUndefined()
     })
   })
   describe('when get object', () => {
     it('get not existing object', async () => {
-      const result = ObjectStore.get('transactions', undefined)
+      const result = ArrayStore.get('transactions')
       expect(result).toBeDefined
     })
     it('get not existing dfsp wise object', async () => {
-      const result = ObjectStore.get('transactions', undefined, user)
-      expect(result).toStrictEqual({})
+      const result = ArrayStore.get('transactions', user)
+      expect(result).toStrictEqual([])
     })
     it('get dfsp wise object', async () => {
-      ObjectStore.push('transactions', 'item', {}, user)
-      const itemResult = ObjectStore.get('transactions', 'item', user)
-      const item2Result = ObjectStore.get('transactions', 'item2', user)
-      expect(itemResult.data).toStrictEqual({})
-      expect(item2Result).toBeNull()
+      ArrayStore.push('transactions', { sample: 'sampleText' }, user)
+      const itemResult = ArrayStore.get('transactions', user)
+      const item2Result = ArrayStore.get('transactions2', user)
+      expect(Array.isArray(itemResult)).toBe(true)
+      expect(itemResult.length).toStrictEqual(1)
+      expect(itemResult[0]).toHaveProperty('data')
+      expect(itemResult[0].data).toHaveProperty('sample')
+      expect(itemResult[0].data.sample).toEqual('sampleText')
+      expect(item2Result).toEqual([])
     })
   })
-  describe('initObjectStore', () => {
-    it('Initialize Object Store should not throw and error', async (done) => {
+  describe('when reset object', () => {
+    it('push some object', async () => {
+      ArrayStore.push('transactions3', { sample: 'sampleText' })
+      const itemResult = ArrayStore.get('transactions3')
+      expect(Array.isArray(itemResult)).toBe(true)
+      expect(itemResult.length).toStrictEqual(1)
+    })
+    it('reset the array', async () => {
+      ArrayStore.reset('transactions3')
+      const itemResult = ArrayStore.get('transactions3')
+      expect(Array.isArray(itemResult)).toBe(true)
+      expect(itemResult.length).toStrictEqual(0)
+    })
+  })
+  describe('initArrayStore', () => {
+    it('Initialize Array Store should not throw and error', async (done) => {
       const curDate = new Date()
       const expiredDate = new Date(curDate.setMinutes(curDate.getMinutes() - 10))
-      ObjectStore.set('transactions', {
-        '123': {transactionDate: expiredDate.getTime()},
-        '124': {transactionDate: Date.now()}
-      })
       jest.useFakeTimers()
-      const result = ObjectStore.initObjectStore()
+      const result = ArrayStore.initArrayStore()
       setTimeout(() => {done()}, 2000);      
       jest.advanceTimersByTime(2000)
       jest.useRealTimers()
@@ -102,8 +92,8 @@ describe('ObjectStore', () => {
     })
   })
   describe('clear', () => {
-    it('clear Object Store should not throw and error', async () => {
-      const result = ObjectStore.clear('transactions', 1)
+    it('clear Array Store should not throw and error', async () => {
+      const result = ArrayStore.clear('transactions', 1)
       expect(result).toBeUndefined()
     })
   })

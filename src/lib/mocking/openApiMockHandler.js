@@ -36,6 +36,7 @@ const MyEventEmitter = require('../MyEventEmitter')
 const utils = require('../utils')
 const Config = require('../config')
 const objectStore = require('../objectStore')
+const arrayStore = require('../arrayStore')
 const JwsSigning = require('../jws/JwsSigning')
 
 var path = require('path')
@@ -203,7 +204,7 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
     MyEventEmitter.getEmitter('assertionRequest', req.customInfo.user).emit(assertionPath, assertionData)
   }
   // Store all the inbound requests
-  objectStore.push('requestsHistory', req.method + ' ' + req.path, { headers: req.headers, body: req.payload })
+  arrayStore.push('requestsHistory', { timestamp: Date.now(), method: req.method, path: req.path, headers: req.headers, body: req.payload })
 
   req.customInfo.specFile = item.specFile
   req.customInfo.jsfRefFile = item.jsfRefFile

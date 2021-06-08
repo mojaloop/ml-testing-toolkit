@@ -35,7 +35,10 @@ const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
 const dbAdapter = require('../../../../src/lib/db/adapters/dbAdapter')
 const requestLogger = require('../../../../src/lib/requestLogger')
+const arrayStore = require('../../../../src/lib/arrayStore')
 
+const SpyArrayStoreGet = jest.spyOn(arrayStore, 'get')
+const SpyArrayStoreReset = jest.spyOn(arrayStore, 'reset')
 jest.mock('../../../../src/lib/requestLogger')
 jest.mock('../../../../src/lib/db/adapters/dbAdapter')
 
@@ -81,6 +84,90 @@ describe('API route /api/hisotry', () => {
       dbAdapter.read.mockRejectedValueOnce({message: ''})
       const res = await request(app).get(`/api/history/logs`).send()
       expect(res.statusCode).toEqual(500)
+    })
+  })
+})
+
+describe('API route /api/hisotry for requests and callbacks', () => {
+  beforeAll(() => {
+    jest.resetAllMocks()
+    requestLogger.logMessage.mockReturnValue()
+  })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+  describe('GET /api/history/requests', () => {
+    it('Get requests history', async () => {
+      SpyArrayStoreGet.mockReturnValue([{ data: {sample: 'SampleText'}}])
+      const res = await request(app).get(`/api/history/requests`).send()
+      expect(res.statusCode).toEqual(200)
+      expect(Array.isArray(res.body)).toBe(true)
+      expect(res.body.length).toEqual(1)
+      expect(res.body[0]).toHaveProperty('sample')
+      expect(res.body[0].sample).toEqual('SampleText')
+    })
+    it('Get requests history empty array', async () => {
+      SpyArrayStoreGet.mockReturnValue([])
+      const res = await request(app).get(`/api/history/requests`).send()
+      expect(res.statusCode).toEqual(200)
+      expect(res.body).toEqual([])
+    })
+    it('Get requests history null value', async () => {
+      SpyArrayStoreGet.mockReturnValue(null)
+      const res = await request(app).get(`/api/history/requests`).send()
+      expect(res.statusCode).toEqual(200)
+      expect(res.body).toEqual([])
+    })
+    it('Get requests history exeception', async () => {
+      SpyArrayStoreGet.mockImplementation(() => {
+        throw new Error('Some error')
+      })
+      const res = await request(app).get(`/api/history/requests`).send()
+      expect(res.statusCode).toEqual(500)
+    })
+  })
+  describe('DELETE /api/history/requests', () => {
+    it('Delete requests history', async () => {
+      SpyArrayStoreReset.mockReturnValue()
+      const res = await request(app).delete(`/api/history/requests`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+  })
+  describe('GET /api/history/callbacks', () => {
+    it('Get callbacks history', async () => {
+      SpyArrayStoreGet.mockReturnValue([{ data: {sample: 'SampleText'}}])
+      const res = await request(app).get(`/api/history/callbacks`).send()
+      expect(res.statusCode).toEqual(200)
+      expect(Array.isArray(res.body)).toBe(true)
+      expect(res.body.length).toEqual(1)
+      expect(res.body[0]).toHaveProperty('sample')
+      expect(res.body[0].sample).toEqual('SampleText')
+    })
+    it('Get callbacks history empty array', async () => {
+      SpyArrayStoreGet.mockReturnValue([])
+      const res = await request(app).get(`/api/history/callbacks`).send()
+      expect(res.statusCode).toEqual(200)
+      expect(res.body).toEqual([])
+    })
+    it('Get callbacks history null value', async () => {
+      SpyArrayStoreGet.mockReturnValue(null)
+      const res = await request(app).get(`/api/history/callbacks`).send()
+      expect(res.statusCode).toEqual(200)
+      expect(res.body).toEqual([])
+    })
+    it('Get callbacks history exeception', async () => {
+      SpyArrayStoreGet.mockImplementation(() => {
+        throw new Error('Some error')
+      })
+      const res = await request(app).get(`/api/history/callbacks`).send()
+      expect(res.statusCode).toEqual(500)
+    })
+  })
+  describe('DELETE /api/history/callbacks', () => {
+    it('Delete callbacks history', async () => {
+      SpyArrayStoreReset.mockReturnValue()
+      const res = await request(app).delete(`/api/history/callbacks`).send()
+      expect(res.statusCode).toEqual(200)
     })
   })
 })

@@ -27,6 +27,7 @@ const Config = require('./config')
 const axios = require('axios').default
 const https = require('https')
 const objectStore = require('./objectStore')
+const arrayStore = require('./arrayStore')
 const MyEventEmitter = require('./MyEventEmitter')
 const JwsSigning = require('./jws/JwsSigning')
 const ConnectionProvider = require('./configuration-providers/mb-connection-manager')
@@ -167,7 +168,7 @@ const handleCallback = async (callbackObject, context, req) => {
   MyEventEmitter.getEmitter('assertionCallback', req.customInfo.user).emit(assertionPath, assertionData)
 
   // Store all the callbacks in callbacksHistory
-  objectStore.push('callbacksHistory', callbackObject.method + ' ' + callbackObject.path, { headers: callbackObject.headers, body: callbackObject.body })
+  arrayStore.push('callbacksHistory', { timestamp: Date.now(), url: urlGenerated, method: callbackObject.method, path: callbackObject.path, headers: callbackObject.headers, body: callbackObject.body })
 
   // Send callback
   if (userConfig.SEND_CALLBACK_ENABLE) {
