@@ -44,7 +44,7 @@ const openApiDefinitionsModel = require('../mocking/openApiDefinitionsModel')
 const uuid = require('uuid')
 const utilsInternal = require('../utilsInternal')
 const dbAdapter = require('../db/adapters/dbAdapter')
-const objectStore = require('../objectStore')
+const arrayStore = require('../arrayStore')
 const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 const httpAgentStore = require('../httpAgentStore')
 
@@ -296,9 +296,9 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
 }
 
 const setResponse = async (convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig) => {
-  // Get the requestsHistory and callbacksHistory from the objectStore
-  const requestsHistoryObj = objectStore.get('requestsHistory')
-  const callbacksHistoryObj = objectStore.get('callbacksHistory')
+  // Get the requestsHistory and callbacksHistory from the arrayStore
+  const requestsHistoryObj = arrayStore.get('requestsHistory')
+  const callbacksHistoryObj = arrayStore.get('callbacksHistory')
   const backgroundData = {
     requestsHistory: requestsHistoryObj,
     callbacksHistory: callbacksHistoryObj
