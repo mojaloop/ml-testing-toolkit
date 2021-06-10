@@ -30,14 +30,25 @@ const InboundEventListener = require('../eventListenerClient/inboundEventListene
 const JwsSigning = require('../jws/JwsSigning')
 const Config = require('../config')
 const httpAgentStore = require('../httpAgentStore')
+const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
+const customLogger = require('../requestLogger')
 
-const axios = axiosModule.create()
-
-const registerAxiosRequestInterceptor = (userConfig) => {
+const registerAxiosRequestInterceptor = (userConfig, axios) => {
   axios.interceptors.request.use(config => {
-    // get the httpsAgent before the request is sent
     const options = { rejectUnauthorized: false }
-
+    // Log the request
+    const uniqueId = UniqueIdGenerator.generateUniqueId()
+    config.uniqueId = uniqueId
+    const reqObject = {
+      method: config.method,
+      url: config.url,
+      path: config.url,
+      headers: config.headers,
+      data: config.body
+    }
+    config.reqObject = reqObject
+    customLogger.logOutboundRequest('info', 'Request: ' + reqObject.method + ' ' + reqObject.url, { additionalData: { request: reqObject }, request: reqObject, uniqueId })
+    // get the httpsAgent before the request is sent
     const urlObject = new URL(config.url)
     if (userConfig.CLIENT_MUTUAL_TLS_ENABLED) {
       const cred = userConfig.CLIENT_TLS_CREDS.filter(item => item.HOST === urlObject.host)
@@ -57,6 +68,19 @@ const registerAxiosRequestInterceptor = (userConfig) => {
       }
     }
     return config
+  })
+  axios.interceptors.response.use(res => {
+    const config = res.config
+    const uniqueId = config.uniqueId
+    const reqObject = config.reqObject
+    customLogger.logOutboundRequest('info', 'Response: ' + res.status + ' ' + res.statusText, { additionalData: { response: res }, request: reqObject, uniqueId })
+    return res
+  }, error => {
+    const config = error.config
+    const reqObject = config.reqObject
+    const uniqueId = config.uniqueId
+    customLogger.logOutboundRequest('error', 'Error Response: ' + error.message, { additionalData: error.stack, request: reqObject, uniqueId })
+    return Promise.reject(error)
   })
 }
 
@@ -129,7 +153,9 @@ const generateContextObj = async (environmentObj = {}) => {
   await inboundEvent.init()
 
   const userConfig = await Config.getStoredUserConfig()
-  registerAxiosRequestInterceptor(userConfig)
+
+  const axios = axiosModule.create()
+  registerAxiosRequestInterceptor(userConfig, axios)
 
   const contextObj = {
     ctx: {

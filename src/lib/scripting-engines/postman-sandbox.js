@@ -26,6 +26,7 @@ const Sandbox = require('postman-sandbox')
 const util = require('util')
 const axios = require('axios').default
 const customLogger = require('../requestLogger')
+const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 
 // const createContextAsync = util.promisify(Sandbox.createContext)
 const createContextAsync = () => {
@@ -56,7 +57,7 @@ const generateContextObj = async (environment = {}) => {
 
 const executeAsync = async (script, data, contextObj) => {
   let consoleLog = []
-
+  const uniqueId = UniqueIdGenerator.generateUniqueId()
   // Append ctx and environment to data.context
   if (!data.context) {
     data.context = {}
@@ -87,12 +88,12 @@ const executeAsync = async (script, data, contextObj) => {
         path: '/' + req.url.path.join('/'),
         timeout: 3000
       }
-      customLogger.logOutboundRequest('info', 'Request: ' + reqObject.method + ' ' + reqObject.path, { additionalData: { request: reqObject }, request: reqObject })
+      customLogger.logOutboundRequest('info', 'Request: ' + reqObject.method + ' ' + reqObject.path, { additionalData: { request: reqObject }, request: reqObject, uniqueId })
       try {
         response = await axios(reqObject)
-        customLogger.logOutboundRequest('info', 'Response: ' + response.status + ' ' + response.statusText, { additionalData: { response: response }, request: reqObject })
+        customLogger.logOutboundRequest('info', 'Response: ' + response.status + ' ' + response.statusText, { additionalData: { response: response }, request: reqObject, uniqueId })
       } catch (err) {
-        customLogger.logOutboundRequest('error', 'Error Response: ' + err.message, { additionalData: err, request: reqObject })
+        customLogger.logOutboundRequest('error', 'Error Response: ' + err.message, { additionalData: err, request: reqObject, uniqueId })
         throw (err)
       }
     } catch (err) {

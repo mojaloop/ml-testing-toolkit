@@ -55,7 +55,7 @@ const logRequest = (request, user) => {
 const logOutboundRequest = (verbosity, message, externalData = {}) => {
   externalData.notificationType = 'newOutboundLog'
 
-  if (externalData.request.headers.traceparent) {
+  if (externalData.request.headers && externalData.request.headers.traceparent) {
     const traceparentHeaderArr = externalData.request.headers.traceparent.split('-')
     if (traceparentHeaderArr.length > 1) {
       const traceID = traceparentHeaderArr[1]
