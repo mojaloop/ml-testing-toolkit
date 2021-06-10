@@ -1061,6 +1061,14 @@
     "1748|jest>jest-cli>jest-config>jest-environment-jsdom>jsdom>ws": {
       "decision": "fix",
       "madeAt": 1623169079437
+    },
+    "1755|nodemon>update-notifier>latest-version>package-json>got>cacheable-request>normalize-url": {
+      "decision": "postpone",
+      "madeAt": 1623346400028
+    },
+    "1755|npm-check-updates>update-notifier>latest-version>package-json>got>cacheable-request>normalize-url": {
+      "decision": "postpone",
+      "madeAt": 1623346400028
     }
   },
   "rules": {},
