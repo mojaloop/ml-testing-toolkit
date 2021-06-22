@@ -1,4 +1,4 @@
-TTK_UI_TAG="v12.2.0"
+TTK_UI_TAG="v12.2.2"
 
 HelpMessage () {
   echo "Usage: $0 -platform [macos|linux|win] -arch [x64|x86|armv6|armv7]"
