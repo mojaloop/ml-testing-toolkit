@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   mojaloop-testing-toolkit:
-    image: mojaloop/ml-testing-toolkit:v12.4.1
+    image: mojaloop/ml-testing-toolkit:v12.4.0
     #image: mojaloop-testing-toolkit:local
     #build:
     #  context: .
