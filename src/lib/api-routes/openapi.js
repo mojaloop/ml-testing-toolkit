@@ -77,6 +77,10 @@ router.get('/definition/:type/:version', async (req, res, next) => {
 })
 
 router.post('/definition', upload.single('file'), async (req, res, next) => {
+  const regex = new RegExp(/^([0-9]+)\.([0-9]+)$/)
+  if (!regex.test(req.body.version)) {
+    return res.status(422).json({ errors: ['Version should be in the format x.x'] })
+  }
   if (req.file) {
     try {
       await APIManagement.addDefinition(req.file.path, req.body.name, req.body.version, req.body.asynchronous)
