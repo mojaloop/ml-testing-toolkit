@@ -145,7 +145,7 @@ describe('API route /api/openapi', () => {
     })
     it('Without passing API file', async () => {
       SpyAddApiDefinition.mockResolvedValue({})
-      const res = await request(app).post(`/api/openapi/definition`)
+      const res = await request(app).post(`/api/openapi/definition`).field('name', 'name').field('version', '1.0')
       expect(res.statusCode).toEqual(404)
     })
     it('When validation failed', async () => {
@@ -153,7 +153,18 @@ describe('API route /api/openapi', () => {
       const res = await request(app)
         .post(`/api/openapi/definition`)
         .attach('file', specFilePrefix + 'api_spec_sync.yaml')
+        .field('name', 'name').field('version', '1.0')
       expect(res.statusCode).toEqual(404)
+    })
+    it('When version format is wrong', async () => {
+      SpyAddApiDefinition.mockResolvedValue({})
+      const res = await request(app)
+        .post(`/api/openapi/definition`)
+        .attach('file', specFilePrefix + 'api_spec_sync.yaml')
+        .field('name', 'name')
+        .field('version', '1.0.0')
+        .field('asynchronous', 'false')
+      expect(res.statusCode).toEqual(422)
     })
   })
   describe('DELETE /api/openapi/definition/:type/:version', () => {
