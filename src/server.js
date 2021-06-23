@@ -129,7 +129,7 @@ const onPreHandler = async (request, h) => {
   // Generate UniqueID
   request.customInfo.uniqueId = UniqueIdGenerator.generateUniqueId(request)
   // Parse the traceparent header if present
-  if (request.headers.traceparent) {
+  if (request.headers && request.headers.traceparent) {
     const traceparentHeaderArr = request.headers.traceparent.split('-')
     const traceID = traceparentHeaderArr[1]
     request.customInfo.traceID = traceID
