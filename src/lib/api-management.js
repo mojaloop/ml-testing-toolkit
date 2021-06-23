@@ -46,14 +46,14 @@ const addDefinition = async (apiFilePath, name, version, asynchronous) => {
   // Validate the definition first
   await validateDefinition(apiFilePath)
   // Create a folder with api name and copy the uploaded file there
-  await Utils.makeDirectoryAsync(apiDefinitionsPath + name)
-  await Utils.renameFileAsync(apiFilePath, apiDefinitionsPath + name + '/api_spec.yaml')
+  await Utils.makeDirectoryAsync(apiDefinitionsPath + name + '_' + version)
+  await Utils.renameFileAsync(apiFilePath, apiDefinitionsPath + name + '_' + version + '/api_spec.yaml')
   // Add the entry to system config
   const apiDefinitions = Config.getSystemConfig().API_DEFINITIONS
   apiDefinitions.push({
     type: name,
     version,
-    folderPath: name,
+    folderPath: name + '_' + version,
     asynchronous: asynchronous === 'true' || asynchronous === 'TRUE',
     additionalApi: true
   })

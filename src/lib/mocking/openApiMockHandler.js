@@ -217,7 +217,7 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
       const responseInfo = responseMap[context.operation.path][context.request.method]
       req.customInfo.responseInfo = responseInfo
     } else {
-      customLogger.logMessage('error', 'Response info not found for method in response map file for ' + context.operation.path + context.request.method, { request: req })
+      customLogger.logMessage('error', 'Response info not found for method in response map file for ' + context.request.method + ' ' + context.operation.path, { request: req })
       return
     }
   } catch (err) { }
