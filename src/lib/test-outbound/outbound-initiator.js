@@ -637,8 +637,8 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           status: 500,
           statusText: err.message
         }
-        customLogger.logOutboundRequest('error', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: err, user, uniqueId, request: reqOpts })
-        customLogger.logMessage('error', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: err, notification: false, user })
+        customLogger.logOutboundRequest('error', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: { errorStack: err.stack }, user, uniqueId, request: reqOpts })
+        customLogger.logMessage('error', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: { errorStack: err.stack }, notification: false, user })
         reject(new Error(JSON.stringify({ errorCode: 4000, syncResponse })))
       })
     })()

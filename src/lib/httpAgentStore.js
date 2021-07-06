@@ -101,6 +101,7 @@ const _clear = (agentStoreObj, interval) => {
     if (timeDiff >= interval) {
       // TODO: Check the current socket connections that this agent is using. Destroy only if the agent is free
       try {
+        customLogger.logMessage('info', 'Destroying http/https agent for ' + item + ': Timeout reached ' + timeDiff + 'ms', { notification: false })
         agentStoreObj[item].agent.destroy()
       } catch (err) {
         console.log('INFO: Error destroying http/https agent', err.stack)
