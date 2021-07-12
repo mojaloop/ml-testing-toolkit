@@ -66,11 +66,23 @@ const getTracing = (traceID, dfspId) => {
 }
 
 const OutboundSend = async (inputTemplate, traceID, dfspId) => {
+  const totalCounts = getTotalCounts(inputTemplate)
   const globalConfig = {
     broadcastOutboundProgressEnabled: true,
     scriptExecution: true,
-    testsExecution: true
+    testsExecution: true,
+    totalProgress: {
+      testCasesTotal: totalCounts.totalTestCases,
+      testCasesProcessed: 0,
+      requestsTotal: totalCounts.totalRequests,
+      requestsProcessed: 0,
+      assertionsTotal: totalCounts.totalAssertions,
+      assertionsProcessed: 0,
+      assertionsPassed: 0,
+      assertionsFailed: 0
+    }
   }
+
   const startedTimeStamp = new Date()
   const tracing = getTracing(traceID, dfspId)
 
@@ -79,6 +91,7 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
   }
   try {
     for (const i in inputTemplate.test_cases) {
+      globalConfig.totalProgress.testCasesProcessed++
       await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, variableData, dfspId, globalConfig)
     }
 
@@ -322,6 +335,13 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
       curlRequest: resp.curlRequest
     }
   }
+
+  // Update total progress counts
+  globalConfig.totalProgress.requestsProcessed++
+  globalConfig.totalProgress.assertionsProcessed += request.tests && request.tests.assertions ? request.tests.assertions.length : 0
+  globalConfig.totalProgress.assertionsPassed += testResult.passedCount
+  globalConfig.totalProgress.assertionsFailed += request.tests && request.tests.assertions ? (request.tests.assertions.length - testResult.passedCount) : 0
+
   if (tracing.outboundID && globalConfig.broadcastOutboundProgressEnabled) {
     notificationEmitter.broadcastOutboundProgress({
       outboundID: tracing.outboundID,
@@ -336,7 +356,8 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
         curlRequest: resp.curlRequest,
         scriptsExecution: scriptsExecution
       },
-      testResult
+      testResult,
+      totalProgress: globalConfig.totalProgress
     }, tracing.sessionID)
   }
 }
@@ -356,6 +377,13 @@ const setSkippedResponse = async (convertedRequest, request, status, tracing, te
       curlRequest: null
     }
   }
+
+  // Update total progress counts
+  globalConfig.totalProgress.requestsProcessed++
+  globalConfig.totalProgress.assertionsProcessed += request.tests && request.tests.assertions && request.tests.assertions.length
+  globalConfig.totalProgress.assertionsPassed += testResult.passedCount
+  // globalConfig.totalProgress.assertionsFailed += 0
+
   if (tracing.outboundID && globalConfig.broadcastOutboundProgressEnabled) {
     notificationEmitter.broadcastOutboundProgress({
       outboundID: tracing.outboundID,
@@ -370,7 +398,8 @@ const setSkippedResponse = async (convertedRequest, request, status, tracing, te
         curlRequest: null,
         scriptsExecution: scriptsExecution
       },
-      testResult
+      testResult,
+      totalProgress: globalConfig.totalProgress
     }, tracing.sessionID)
   }
 }
@@ -764,6 +793,25 @@ const replacePathVariables = (operationPath, params) => {
 // Execute the function and return the result
 const getFunctionResult = (param, inputValues, request) => {
   return utilsInternal.getFunctionResult(param, inputValues, request)
+}
+
+// Get Total Counts
+const getTotalCounts = (inputTemplate) => {
+  var result = {
+    totalTestCases: 0,
+    totalRequests: 0,
+    totalAssertions: 0
+  }
+  const { test_cases } = inputTemplate  // eslint-disable-line
+  result.totalTestCases = test_cases.length
+  test_cases.forEach(testCase => {
+    const { requests } = testCase
+    result.totalRequests += requests.length
+    requests.forEach(request => {
+      result.totalAssertions += request.tests && request.tests.assertions && request.tests.assertions.length
+    })
+  })
+  return result
 }
 
 // Generate consolidated final report
