@@ -1,0 +1,21 @@
+{
+  "/parties/{Type}/{ID}": {
+    "get": {
+      "response": {
+        "bodyOverride": {
+          "party": {
+            "partyIdInfo": {
+              "partyIdType": "{$request.params.Type}",
+              "partyIdentifier": "{$request.params.ID}",
+              "fspId": "ttk",
+              "partySubIdOrType": null,
+              "extensionList": null
+            },
+            "accounts": null,
+            "merchantClassificationCode": null
+          }
+        }
+      }
+    }
+  }
+}

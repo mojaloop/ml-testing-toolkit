@@ -39,6 +39,7 @@ const refreshApiDefinitions = async () => {
       minorVersion: +item.version.split('.')[1],
       majorVersion: +item.version.split('.')[0],
       type: item.type,
+      caption: item.caption,
       asynchronous: item.asynchronous,
       additionalApi: item.additionalApi,
       specFile: specFilePrefix + item.folderPath + '/api_spec.yaml',
