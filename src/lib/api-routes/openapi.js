@@ -39,6 +39,7 @@ router.get('/api_versions', async (req, res, next) => {
           minorVersion: item.minorVersion,
           majorVersion: item.majorVersion,
           type: item.type,
+          caption: item.caption,
           asynchronous: item.asynchronous,
           additionalApi: item.additionalApi
         }

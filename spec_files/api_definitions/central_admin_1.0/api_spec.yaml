@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: Central Ledger API Documentation
-  version: 9.3.0
+  version: "1.0"
 servers:
 - url: http://127.0.0.1:3001/
 tags: []
@@ -63,7 +63,7 @@ paths:
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/Model%201'
+              $ref: '#/components/schemas/PostParticipantsRequest'
         required: false
       responses:
         default:
@@ -281,7 +281,12 @@ paths:
       - participants
       operationId: getParticipantsName
       parameters:
-      - $ref: '#/components/parameters/name'
+      - name: name
+        in: path
+        description: Participant name
+        required: true
+        schema:
+          type: string
       responses:
         default:
           description: Successful
@@ -304,7 +309,7 @@ paths:
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/Model%207'
+              $ref: '#/components/schemas/ParticipantIsActive'
         required: false
       responses:
         default:
@@ -362,7 +367,7 @@ paths:
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/Model%202'
+              $ref: '#/components/schemas/PostParticipantsNameEndpointsRequest'
         required: false
       responses:
         default:
@@ -608,7 +613,7 @@ paths:
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/Model%209'
+              $ref: '#/components/schemas/PutParticipantsNameLimitsRequest'
         required: false
       responses:
         default:
@@ -869,7 +874,7 @@ paths:
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/Model%204'
+              $ref: '#/components/schemas/PostParticipantsNameAccountsRequest'
         required: false
       responses:
         default:
@@ -902,7 +907,7 @@ paths:
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/Model%203'
+              $ref: '#/components/schemas/PostInitialPositionAndLimitsRequest'
         required: false
       responses:
         default:
@@ -944,7 +949,7 @@ paths:
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/Model%2010'
+              $ref: '#/components/schemas/CurrencyIsActive'
         required: false
       responses:
         default:
@@ -985,7 +990,7 @@ paths:
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/Model%206'
+              $ref: '#/components/schemas/Participants'
         required: false
       responses:
         default:
@@ -1036,8 +1041,42 @@ paths:
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/Model%2011'
+              $ref: '#/components/schemas/RecordFundsOut'
         required: false
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+      x-codegen-request-body-name: body
+  /ledgerAccountTypes:
+    get:
+      tags:
+      - ledgerAccountTypes
+      summary: View all ledger account types
+      operationId: getLedgerAccountTypes
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LedgerAccountType'
+    post:
+      tags:
+      - ledgerAccountType
+      summary: Create a ledgerAccount type
+      operationId: postLedgerAccountType
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/LedgerAccountType'
+        required: true
       responses:
         default:
           description: Successful
@@ -1050,6 +1089,7 @@ paths:
     get:
       tags:
       - settlementModels
+      summary: View all settlement models
       operationId: getSettlementmodels
       responses:
         default:
@@ -1061,12 +1101,14 @@ paths:
     post:
       tags:
       - settlementModels
+      summary: Create a settlement model. This will create  any associated ledgerAccountTypes
+        for every participant that matches the settlementModel's currency
       operationId: postSettlementmodels
       requestBody:
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/Model%2012'
+              $ref: '#/components/schemas/SettlementModel'
         required: false
       responses:
         default:
@@ -1080,6 +1122,7 @@ paths:
     get:
       tags:
       - settlementModels
+      summary: View settlement model by name
       operationId: getSettlementmodelsName
       parameters:
       - name: name
@@ -1098,6 +1141,7 @@ paths:
     put:
       tags:
       - settlementModels
+      summary: Update a settlement model
       operationId: putSettlementmodelsName
       parameters:
       - name: name
@@ -1110,7 +1154,7 @@ paths:
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/Model%2013'
+              $ref: '#/components/schemas/SettlementModelIsActive'
         required: false
       responses:
         default:
@@ -1120,16 +1164,29 @@ paths:
               schema:
                 type: string
       x-codegen-request-body-name: body
+  /transactions/{id}:
+    get:
+      tags:
+      - transaction
+      summary: Retrieve transaction details by a transferId
+      operationId: getTransfer
+      parameters:
+      - name: id
+        in: path
+        description: Transfer Id
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GetTransactionResponse'
 components:
-  parameters:
-    name: 
-      name: name
-      in: path
-      required: true
-      schema:
-        type: string
   schemas:
-    Model 1:
+    PostParticipantsRequest:
       required:
       - name
       type: object
@@ -1142,187 +1199,8 @@ components:
           x-format:
             alphanum: true
         currency:
-          type: string
-          description: Currency code
-          enum:
-          - AED
-          - AFA
-          - AFN
-          - ALL
-          - AMD
-          - ANG
-          - AOA
-          - AOR
-          - ARS
-          - AUD
-          - AWG
-          - AZN
-          - BAM
-          - BBD
-          - BDT
-          - BGN
-          - BHD
-          - BIF
-          - BMD
-          - BND
-          - BOB
-          - BRL
-          - BSD
-          - BTN
-          - BWP
-          - BYN
-          - BZD
-          - CAD
-          - CDF
-          - CHF
-          - CLP
-          - CNY
-          - COP
-          - CRC
-          - CUC
-          - CUP
-          - CVE
-          - CZK
-          - DJF
-          - DKK
-          - DOP
-          - DZD
-          - EEK
-          - EGP
-          - ERN
-          - ETB
-          - EUR
-          - FJD
-          - FKP
-          - GBP
-          - GEL
-          - GGP
-          - GHS
-          - GIP
-          - GMD
-          - GNF
-          - GTQ
-          - GYD
-          - HKD
-          - HNL
-          - HRK
-          - HTG
-          - HUF
-          - IDR
-          - ILS
-          - IMP
-          - INR
-          - IQD
-          - IRR
-          - ISK
-          - JEP
-          - JMD
-          - JOD
-          - JPY
-          - KES
-          - KGS
-          - KHR
-          - KMF
-          - KPW
-          - KRW
-          - KWD
-          - KYD
-          - KZT
-          - LAK
-          - LBP
-          - LKR
-          - LRD
-          - LSL
-          - LTL
-          - LVL
-          - LYD
-          - MAD
-          - MDL
-          - MGA
-          - MKD
-          - MMK
-          - MNT
-          - MOP
-          - MRO
-          - MUR
-          - MVR
-          - MWK
-          - MXN
-          - MYR
-          - MZN
-          - NAD
-          - NGN
-          - NIO
-          - NOK
-          - NPR
-          - NZD
-          - OMR
-          - PAB
-          - PEN
-          - PGK
-          - PHP
-          - PKR
-          - PLN
-          - PYG
-          - QAR
-          - RON
-          - RSD
-          - RUB
-          - RWF
-          - SAR
-          - SBD
-          - SCR
-          - SDG
-          - SEK
-          - SGD
-          - SHP
-          - SLL
-          - SOS
-          - SPL
-          - SRD
-          - STD
-          - SVC
-          - SYP
-          - SZL
-          - THB
-          - TJS
-          - TMT
-          - TND
-          - TOP
-          - TRY
-          - TTD
-          - TVD
-          - TWD
-          - TZS
-          - UAH
-          - UGX
-          - USD
-          - UYU
-          - UZS
-          - VEF
-          - VND
-          - VUV
-          - WST
-          - XAF
-          - XAG
-          - XAU
-          - XCD
-          - XDR
-          - XFO
-          - XFU
-          - XOF
-          - XPD
-          - XPF
-          - XPT
-          - YER
-          - ZAR
-          - ZMK
-          - ZMW
-          - ZWD
-          - ZWL
-          - ZWN
-          - ZWR
-    Model 2:
+          $ref: '#/components/schemas/Currency'
+    PostParticipantsNameEndpointsRequest:
       required:
       - type
       - value
@@ -1334,7 +1212,7 @@ components:
         value:
           type: string
           description: Endpoint Value
-    limit:
+    Limit:
       required:
       - type
       - value
@@ -1349,387 +1227,29 @@ components:
           x-constraint:
             positive: true
       description: Participant Limit
-    Model 3:
+    PostInitialPositionAndLimitsRequest:
       required:
       - limit
       type: object
       properties:
         currency:
-          type: string
-          description: Currency code
-          enum:
-          - AED
-          - AFA
-          - AFN
-          - ALL
-          - AMD
-          - ANG
-          - AOA
-          - AOR
-          - ARS
-          - AUD
-          - AWG
-          - AZN
-          - BAM
-          - BBD
-          - BDT
-          - BGN
-          - BHD
-          - BIF
-          - BMD
-          - BND
-          - BOB
-          - BRL
-          - BSD
-          - BTN
-          - BWP
-          - BYN
-          - BZD
-          - CAD
-          - CDF
-          - CHF
-          - CLP
-          - CNY
-          - COP
-          - CRC
-          - CUC
-          - CUP
-          - CVE
-          - CZK
-          - DJF
-          - DKK
-          - DOP
-          - DZD
-          - EEK
-          - EGP
-          - ERN
-          - ETB
-          - EUR
-          - FJD
-          - FKP
-          - GBP
-          - GEL
-          - GGP
-          - GHS
-          - GIP
-          - GMD
-          - GNF
-          - GTQ
-          - GYD
-          - HKD
-          - HNL
-          - HRK
-          - HTG
-          - HUF
-          - IDR
-          - ILS
-          - IMP
-          - INR
-          - IQD
-          - IRR
-          - ISK
-          - JEP
-          - JMD
-          - JOD
-          - JPY
-          - KES
-          - KGS
-          - KHR
-          - KMF
-          - KPW
-          - KRW
-          - KWD
-          - KYD
-          - KZT
-          - LAK
-          - LBP
-          - LKR
-          - LRD
-          - LSL
-          - LTL
-          - LVL
-          - LYD
-          - MAD
-          - MDL
-          - MGA
-          - MKD
-          - MMK
-          - MNT
-          - MOP
-          - MRO
-          - MUR
-          - MVR
-          - MWK
-          - MXN
-          - MYR
-          - MZN
-          - NAD
-          - NGN
-          - NIO
-          - NOK
-          - NPR
-          - NZD
-          - OMR
-          - PAB
-          - PEN
-          - PGK
-          - PHP
-          - PKR
-          - PLN
-          - PYG
-          - QAR
-          - RON
-          - RSD
-          - RUB
-          - RWF
-          - SAR
-          - SBD
-          - SCR
-          - SDG
-          - SEK
-          - SGD
-          - SHP
-          - SLL
-          - SOS
-          - SPL
-          - SRD
-          - STD
-          - SVC
-          - SYP
-          - SZL
-          - THB
-          - TJS
-          - TMT
-          - TND
-          - TOP
-          - TRY
-          - TTD
-          - TVD
-          - TWD
-          - TZS
-          - UAH
-          - UGX
-          - USD
-          - UYU
-          - UZS
-          - VEF
-          - VND
-          - VUV
-          - WST
-          - XAF
-          - XAG
-          - XAU
-          - XCD
-          - XDR
-          - XFO
-          - XFU
-          - XOF
-          - XPD
-          - XPF
-          - XPT
-          - YER
-          - ZAR
-          - ZMK
-          - ZMW
-          - ZWD
-          - ZWL
-          - ZWN
-          - ZWR
+          $ref: '#/components/schemas/Currency'
         limit:
-          $ref: '#/components/schemas/limit'
+          $ref: '#/components/schemas/Limit'
         initialPosition:
           type: number
           description: Initial Position Value
-    Model 4:
+    PostParticipantsNameAccountsRequest:
       required:
       - type
       type: object
       properties:
         currency:
-          type: string
-          description: Currency code
-          enum:
-          - AED
-          - AFA
-          - AFN
-          - ALL
-          - AMD
-          - ANG
-          - AOA
-          - AOR
-          - ARS
-          - AUD
-          - AWG
-          - AZN
-          - BAM
-          - BBD
-          - BDT
-          - BGN
-          - BHD
-          - BIF
-          - BMD
-          - BND
-          - BOB
-          - BRL
-          - BSD
-          - BTN
-          - BWP
-          - BYN
-          - BZD
-          - CAD
-          - CDF
-          - CHF
-          - CLP
-          - CNY
-          - COP
-          - CRC
-          - CUC
-          - CUP
-          - CVE
-          - CZK
-          - DJF
-          - DKK
-          - DOP
-          - DZD
-          - EEK
-          - EGP
-          - ERN
-          - ETB
-          - EUR
-          - FJD
-          - FKP
-          - GBP
-          - GEL
-          - GGP
-          - GHS
-          - GIP
-          - GMD
-          - GNF
-          - GTQ
-          - GYD
-          - HKD
-          - HNL
-          - HRK
-          - HTG
-          - HUF
-          - IDR
-          - ILS
-          - IMP
-          - INR
-          - IQD
-          - IRR
-          - ISK
-          - JEP
-          - JMD
-          - JOD
-          - JPY
-          - KES
-          - KGS
-          - KHR
-          - KMF
-          - KPW
-          - KRW
-          - KWD
-          - KYD
-          - KZT
-          - LAK
-          - LBP
-          - LKR
-          - LRD
-          - LSL
-          - LTL
-          - LVL
-          - LYD
-          - MAD
-          - MDL
-          - MGA
-          - MKD
-          - MMK
-          - MNT
-          - MOP
-          - MRO
-          - MUR
-          - MVR
-          - MWK
-          - MXN
-          - MYR
-          - MZN
-          - NAD
-          - NGN
-          - NIO
-          - NOK
-          - NPR
-          - NZD
-          - OMR
-          - PAB
-          - PEN
-          - PGK
-          - PHP
-          - PKR
-          - PLN
-          - PYG
-          - QAR
-          - RON
-          - RSD
-          - RUB
-          - RWF
-          - SAR
-          - SBD
-          - SCR
-          - SDG
-          - SEK
-          - SGD
-          - SHP
-          - SLL
-          - SOS
-          - SPL
-          - SRD
-          - STD
-          - SVC
-          - SYP
-          - SZL
-          - THB
-          - TJS
-          - TMT
-          - TND
-          - TOP
-          - TRY
-          - TTD
-          - TVD
-          - TWD
-          - TZS
-          - UAH
-          - UGX
-          - USD
-          - UYU
-          - UZS
-          - VEF
-          - VND
-          - VUV
-          - WST
-          - XAF
-          - XAG
-          - XAU
-          - XCD
-          - XDR
-          - XFO
-          - XFU
-          - XOF
-          - XPD
-          - XPF
-          - XPT
-          - YER
-          - ZAR
-          - ZMK
-          - ZMW
-          - ZWD
-          - ZWL
-          - ZWN
-          - ZWR
+          $ref: '#/components/schemas/Currency'
         type:
           type: string
           description: Account type
-    No amount provided:
+    NoAmountProvided:
       required:
       - amount
       type: object
@@ -1740,203 +1260,8 @@ components:
             precision: 4
             positive: true
         currency:
-          type: string
-          description: Currency code
-          enum:
-          - AED
-          - AFA
-          - AFN
-          - ALL
-          - AMD
-          - ANG
-          - AOA
-          - AOR
-          - ARS
-          - AUD
-          - AWG
-          - AZN
-          - BAM
-          - BBD
-          - BDT
-          - BGN
-          - BHD
-          - BIF
-          - BMD
-          - BND
-          - BOB
-          - BRL
-          - BSD
-          - BTN
-          - BWP
-          - BYN
-          - BZD
-          - CAD
-          - CDF
-          - CHF
-          - CLP
-          - CNY
-          - COP
-          - CRC
-          - CUC
-          - CUP
-          - CVE
-          - CZK
-          - DJF
-          - DKK
-          - DOP
-          - DZD
-          - EEK
-          - EGP
-          - ERN
-          - ETB
-          - EUR
-          - FJD
-          - FKP
-          - GBP
-          - GEL
-          - GGP
-          - GHS
-          - GIP
-          - GMD
-          - GNF
-          - GTQ
-          - GYD
-          - HKD
-          - HNL
-          - HRK
-          - HTG
-          - HUF
-          - IDR
-          - ILS
-          - IMP
-          - INR
-          - IQD
-          - IRR
-          - ISK
-          - JEP
-          - JMD
-          - JOD
-          - JPY
-          - KES
-          - KGS
-          - KHR
-          - KMF
-          - KPW
-          - KRW
-          - KWD
-          - KYD
-          - KZT
-          - LAK
-          - LBP
-          - LKR
-          - LRD
-          - LSL
-          - LTL
-          - LVL
-          - LYD
-          - MAD
-          - MDL
-          - MGA
-          - MKD
-          - MMK
-          - MNT
-          - MOP
-          - MRO
-          - MUR
-          - MVR
-          - MWK
-          - MXN
-          - MYR
-          - MZN
-          - NAD
-          - NGN
-          - NIO
-          - NOK
-          - NPR
-          - NZD
-          - OMR
-          - PAB
-          - PEN
-          - PGK
-          - PHP
-          - PKR
-          - PLN
-          - PYG
-          - QAR
-          - RON
-          - RSD
-          - RUB
-          - RWF
-          - SAR
-          - SBD
-          - SCR
-          - SDG
-          - SEK
-          - SGD
-          - SHP
-          - SLL
-          - SOS
-          - SPL
-          - SRD
-          - STD
-          - SVC
-          - SYP
-          - SZL
-          - THB
-          - TJS
-          - TMT
-          - TND
-          - TOP
-          - TRY
-          - TTD
-          - TVD
-          - TWD
-          - TZS
-          - UAH
-          - UGX
-          - USD
-          - UYU
-          - UZS
-          - VEF
-          - VND
-          - VUV
-          - WST
-          - XAF
-          - XAG
-          - XAU
-          - XCD
-          - XDR
-          - XFO
-          - XFU
-          - XOF
-          - XPD
-          - XPF
-          - XPT
-          - YER
-          - ZAR
-          - ZMK
-          - ZMW
-          - ZWD
-          - ZWL
-          - ZWN
-          - ZWR
-    Model 5:
-      type: object
-      properties:
-        key:
-          type: string
-        value:
-          type: string
-    extension:
-      type: array
-      items:
-        $ref: '#/components/schemas/Model%205'
-    extensionList:
-      type: object
-      properties:
-        extension:
-          $ref: '#/components/schemas/extension'
-    Model 6:
+          $ref: '#/components/schemas/Currency'
+    Participants:
       required:
       - action
       - amount
@@ -1959,10 +1284,10 @@ components:
         reason:
           type: string
         amount:
-          $ref: '#/components/schemas/No%20amount%20provided'
+          $ref: '#/components/schemas/NoAmountProvided'
         extensionList:
-          $ref: '#/components/schemas/extensionList'
-    Model 7:
+          $ref: '#/components/schemas/ExtensionList'
+    ParticipantIsActive:
       required:
       - isActive
       type: object
@@ -1970,7 +1295,7 @@ components:
         isActive:
           type: boolean
           description: Participant isActive boolean
-    Model 8:
+    ParticipantLimit:
       required:
       - alarmPercentage
       - type
@@ -1987,195 +1312,16 @@ components:
           type: number
           description: limit threshold alarm percentage value
       description: Participant Limit
-    Model 9:
+    PutParticipantsNameLimitsRequest:
       required:
       - limit
       type: object
       properties:
         currency:
-          type: string
-          description: Currency code
-          enum:
-          - AED
-          - AFA
-          - AFN
-          - ALL
-          - AMD
-          - ANG
-          - AOA
-          - AOR
-          - ARS
-          - AUD
-          - AWG
-          - AZN
-          - BAM
-          - BBD
-          - BDT
-          - BGN
-          - BHD
-          - BIF
-          - BMD
-          - BND
-          - BOB
-          - BRL
-          - BSD
-          - BTN
-          - BWP
-          - BYN
-          - BZD
-          - CAD
-          - CDF
-          - CHF
-          - CLP
-          - CNY
-          - COP
-          - CRC
-          - CUC
-          - CUP
-          - CVE
-          - CZK
-          - DJF
-          - DKK
-          - DOP
-          - DZD
-          - EEK
-          - EGP
-          - ERN
-          - ETB
-          - EUR
-          - FJD
-          - FKP
-          - GBP
-          - GEL
-          - GGP
-          - GHS
-          - GIP
-          - GMD
-          - GNF
-          - GTQ
-          - GYD
-          - HKD
-          - HNL
-          - HRK
-          - HTG
-          - HUF
-          - IDR
-          - ILS
-          - IMP
-          - INR
-          - IQD
-          - IRR
-          - ISK
-          - JEP
-          - JMD
-          - JOD
-          - JPY
-          - KES
-          - KGS
-          - KHR
-          - KMF
-          - KPW
-          - KRW
-          - KWD
-          - KYD
-          - KZT
-          - LAK
-          - LBP
-          - LKR
-          - LRD
-          - LSL
-          - LTL
-          - LVL
-          - LYD
-          - MAD
-          - MDL
-          - MGA
-          - MKD
-          - MMK
-          - MNT
-          - MOP
-          - MRO
-          - MUR
-          - MVR
-          - MWK
-          - MXN
-          - MYR
-          - MZN
-          - NAD
-          - NGN
-          - NIO
-          - NOK
-          - NPR
-          - NZD
-          - OMR
-          - PAB
-          - PEN
-          - PGK
-          - PHP
-          - PKR
-          - PLN
-          - PYG
-          - QAR
-          - RON
-          - RSD
-          - RUB
-          - RWF
-          - SAR
-          - SBD
-          - SCR
-          - SDG
-          - SEK
-          - SGD
-          - SHP
-          - SLL
-          - SOS
-          - SPL
-          - SRD
-          - STD
-          - SVC
-          - SYP
-          - SZL
-          - THB
-          - TJS
-          - TMT
-          - TND
-          - TOP
-          - TRY
-          - TTD
-          - TVD
-          - TWD
-          - TZS
-          - UAH
-          - UGX
-          - USD
-          - UYU
-          - UZS
-          - VEF
-          - VND
-          - VUV
-          - WST
-          - XAF
-          - XAG
-          - XAU
-          - XCD
-          - XDR
-          - XFO
-          - XFU
-          - XOF
-          - XPD
-          - XPF
-          - XPT
-          - YER
-          - ZAR
-          - ZMK
-          - ZMW
-          - ZWD
-          - ZWL
-          - ZWN
-          - ZWR
+          $ref: '#/components/schemas/Currency'
         limit:
-          $ref: '#/components/schemas/Model%208'
-    Model 10:
+          $ref: '#/components/schemas/ParticipantLimit'
+    CurrencyIsActive:
       required:
       - isActive
       type: object
@@ -2183,7 +1329,7 @@ components:
         isActive:
           type: boolean
           description: Participant currency isActive boolean
-    Model 11:
+    RecordFundsOut:
       required:
       - reason
       type: object
@@ -2195,12 +1341,37 @@ components:
           - recordFundsOutAbort
         reason:
           type: string
-    Model 12:
+    LedgerAccountType:
+      required:
+      - description
+      - isActive
+      - isSettleable
+      - name
+      type: object
+      properties:
+        name:
+          maxLength: 30
+          minLength: 2
+          pattern: ^\w+$
+          type: string
+          description: Name of the ledger account type
+        description:
+          type: string
+          description: Description of the ledger account type
+        isActive:
+          type: boolean
+          description: Determines whether the ledger account is active
+        isSettleable:
+          type: boolean
+          description: Determines whether the ledger account is settleable
+    SettlementModel:
       required:
       - autoPositionReset
+      - currency
       - ledgerAccountType
       - name
       - requireLiquidityCheck
+      - settlementAccountType
       - settlementDelay
       - settlementGranularity
       - settlementInterchange
@@ -2232,215 +1403,25 @@ components:
           - DEFERRED
           - IMMEDIATE
         currency:
-          type: string
-          description: Currency code
-          enum:
-          - AED
-          - AFA
-          - AFN
-          - ALL
-          - AMD
-          - ANG
-          - AOA
-          - AOR
-          - ARS
-          - AUD
-          - AWG
-          - AZN
-          - BAM
-          - BBD
-          - BDT
-          - BGN
-          - BHD
-          - BIF
-          - BMD
-          - BND
-          - BOB
-          - BOV
-          - BRL
-          - BSD
-          - BTN
-          - BWP
-          - BYN
-          - BYR
-          - BZD
-          - CAD
-          - CDF
-          - CHE
-          - CHF
-          - CHW
-          - CLF
-          - CLP
-          - CNY
-          - COP
-          - COU
-          - CRC
-          - CUC
-          - CUP
-          - CVE
-          - CZK
-          - DJF
-          - DKK
-          - DOP
-          - DZD
-          - EEK
-          - EGP
-          - ERN
-          - ETB
-          - EUR
-          - FJD
-          - FKP
-          - GBP
-          - GEL
-          - GGP
-          - GHS
-          - GIP
-          - GMD
-          - GNF
-          - GTQ
-          - GYD
-          - HKD
-          - HNL
-          - HRK
-          - HTG
-          - HUF
-          - IDR
-          - ILS
-          - IMP
-          - INR
-          - IQD
-          - IRR
-          - ISK
-          - JEP
-          - JMD
-          - JOD
-          - JPY
-          - KES
-          - KGS
-          - KHR
-          - KMF
-          - KPW
-          - KRW
-          - KWD
-          - KYD
-          - KZT
-          - LAK
-          - LBP
-          - LKR
-          - LRD
-          - LSL
-          - LTL
-          - LVL
-          - LYD
-          - MAD
-          - MDL
-          - MGA
-          - MKD
-          - MMK
-          - MNT
-          - MOP
-          - MRO
-          - MUR
-          - MVR
-          - MWK
-          - MXN
-          - MXV
-          - MYR
-          - MZN
-          - NAD
-          - NGN
-          - NIO
-          - NOK
-          - NPR
-          - NZD
-          - OMR
-          - PAB
-          - PEN
-          - PGK
-          - PHP
-          - PKR
-          - PLN
-          - PYG
-          - QAR
-          - RON
-          - RSD
-          - RUB
-          - RWF
-          - SAR
-          - SBD
-          - SCR
-          - SDG
-          - SEK
-          - SGD
-          - SHP
-          - SLL
-          - SOS
-          - SPL
-          - SRD
-          - SSP
-          - STD
-          - SVC
-          - SYP
-          - SZL
-          - THB
-          - TJS
-          - TMT
-          - TND
-          - TOP
-          - TRY
-          - TTD
-          - TVD
-          - TWD
-          - TZS
-          - UAH
-          - UGX
-          - USD
-          - USN
-          - UYI
-          - UYU
-          - UZS
-          - VEF
-          - VND
-          - VUV
-          - WST
-          - XAF
-          - XAG
-          - XAU
-          - XCD
-          - XDR
-          - XFO
-          - XFU
-          - XOF
-          - XPD
-          - XPF
-          - XPT
-          - XSU
-          - XTS
-          - XUA
-          - XXX
-          - YER
-          - ZAR
-          - ZMK
-          - ZMW
-          - ZWD
-          - ZWL
-          - ZWN
-          - ZWR
+          $ref: '#/components/schemas/Currency'
         requireLiquidityCheck:
           type: boolean
           description: Liquidity Check boolean
         ledgerAccountType:
           type: string
-          description: Account type for the settlement model POSITION, SETTLEMENT
-            or INTERCHANGE_FEE
+          description: Account type for the settlement model
           enum:
           - INTERCHANGE_FEE
           - POSITION
+        settlementAccountType:
+          type: string
+          description: 'Account type into which the settlement should be settled into
+            :  POSITION, SETTLEMENT or INTERCHANGE_FEE_SETTLEMENT'
         autoPositionReset:
           type: boolean
           description: Automatic position reset setting, which determines whether
             to execute the settlement transfer or not
-    Model 13:
+    SettlementModelIsActive:
       required:
       - isActive
       type: object
@@ -2448,3 +1429,418 @@ components:
         isActive:
           type: boolean
           description: settlementModel isActive boolean
+    GetTransactionResponse:
+      title: GetTransactionResponse
+      type: object
+      properties:
+        quoteId:
+          $ref: '#/components/schemas/QuoteId'
+        transactionId:
+          $ref: '#/components/schemas/TransactionId'
+        transactionRequestId:
+          type: string
+          description: Identifies an optional previously-sent transaction request.
+        payee:
+          $ref: '#/components/schemas/Party'
+        payer:
+          $ref: '#/components/schemas/Party'
+        amount:
+          $ref: '#/components/schemas/Money'
+        transactionType:
+          $ref: '#/components/schemas/TransactionType'
+        note:
+          type: string
+          description: A memo that will be attached to the transaction.
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
+      description: GET /transaction/{id} response object
+    QuoteId:
+      title: QuoteId
+      minLength: 1
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      type: string
+      description: Quote Identifier. The API data type UUID (Universally Unique Identifier)
+        is a JSON String in canonical format, conforming to RFC 4122, that is restricted
+        by a regular expression for interoperability reasons. An UUID is always 36
+        characters long, 32 hexadecimal symbols and 4 dashes (‘-‘). A minLength of
+        1 has been specified due to the regex not being validated on empty strings,
+        this should be removed once the enjoi module has been fixed.
+    TransactionId:
+      title: TransactionId
+      minLength: 1
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      type: string
+      description: Transaction Identifier. The API data type UUID (Universally Unique
+        Identifier) is a JSON String in canonical format, conforming to RFC 4122,
+        that is restricted by a regular expression for interoperability reasons. An
+        UUID is always 36 characters long, 32 hexadecimal symbols and 4 dashes (‘-‘).
+        A minLength of 1 has been specified due to the regex not being validated on
+        empty strings, this should be removed once the enjoi module has been fixed.
+    Party:
+      title: Party
+      required:
+      - partyIdInfo
+      type: object
+      properties:
+        partyIdInfo:
+          $ref: '#/components/schemas/PartyIdInfo'
+        merchantClassificationCode:
+          type: string
+          description: Used in the context of Payee Information, where the Payee happens
+            to be a merchant accepting merchant payments.
+        name:
+          type: string
+          description: Display name of the Party, could be a real name or a nick name.
+        personalInfo:
+          $ref: '#/components/schemas/PartyPersonalInfo'
+      description: Data model for the complex type Party.
+    PartyIdInfo:
+      title: PartyIdInfo
+      required:
+      - partyIdType
+      - partyIdentifier
+      type: object
+      properties:
+        partyIdType:
+          $ref: '#/components/schemas/PartyIdType'
+        partyIdentifier:
+          $ref: '#/components/schemas/PartyIdentifier'
+        partySubIdOrType:
+          type: string
+          description: A sub-identifier or sub-type for the Party.
+        fspId:
+          type: string
+          description: FSP id (if known)
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
+      description: Data model for the complex type PartyIdInfo.
+    PartyIdType:
+      title: PartyIdTypeEnum
+      type: string
+      description: Below are the allowed values for the enumeration - MSISDN An MSISDN
+        (Mobile Station International Subscriber Directory Number, that is, the phone
+        number) is used as reference to a participant. The MSISDN identifier should
+        be in international format according to the ITU-T E.164 standard. Optionally,
+        the MSISDN may be prefixed by a single plus sign, indicating the international
+        prefix. - EMAIL An email is used as reference to a participant. The format
+        of the email should be according to the informational RFC 3696. - PERSONAL_ID
+        A personal identifier is used as reference to a participant. Examples of personal
+        identification are passport number, birth certificate number, and national
+        registration number. The identifier number is added in the PartyIdentifier
+        element. The personal identifier type is added in the PartySubIdOrType element.
+        - BUSINESS A specific Business (for example, an organization or a company)
+        is used as reference to a participant. The BUSINESS identifier can be in any
+        format. To make a transaction connected to a specific username or bill number
+        in a Business, the PartySubIdOrType element should be used. - DEVICE A specific
+        device (for example, a POS or ATM) id connected to a specific business or
+        organization is used as reference to a Party. For referencing a specific device
+        under a specific business or organization, use the PartySubIdOrType element.
+        - ACCOUNT_ID A bank account number or FSP account id should be used as reference
+        to a participant. The ACCOUNT_ID identifier can be in any format, as formats
+        can greatly differ depending on country and FSP. - IBAN A bank account number
+        or FSP account id is used as reference to a participant. The IBAN identifier
+        can consist of up to 34 alphanumeric characters and should be entered without
+        whitespace. - ALIAS An alias is used as reference to a participant. The alias
+        should be created in the FSP as an alternative reference to an account owner.
+        Another example of an alias is a username in the FSP system. The ALIAS identifier
+        can be in any format. It is also possible to use the PartySubIdOrType element
+        for identifying an account under an Alias defined by the PartyIdentifier.
+      enum:
+      - MSISDN
+      - EMAIL
+      - PERSONAL_ID
+      - BUSINESS
+      - DEVICE
+      - ACCOUNT_ID
+      - IBAN
+      - ALIAS
+    PartyIdentifier:
+      title: PartyIdentifier
+      maxLength: 128
+      minLength: 1
+      type: string
+      description: Identifier of the Party.
+    ExtensionList:
+      title: ExtensionList
+      required:
+      - extension
+      type: object
+      properties:
+        extension:
+          maxItems: 16
+          minItems: 1
+          type: array
+          description: Number of Extension elements
+          items:
+            $ref: '#/components/schemas/Extension'
+      description: Data model for the complex type ExtensionList
+    Extension:
+      title: Extension
+      required:
+      - key
+      - value
+      type: object
+      properties:
+        key:
+          type: string
+          description: Extension key.
+        value:
+          type: string
+          description: Extension value.
+      description: Data model for the complex type Extension
+    PartyPersonalInfo:
+      title: PartyPersonalInfo
+      type: object
+      properties:
+        complexName:
+          $ref: '#/components/schemas/PartyComplexName'
+        dateOfBirth:
+          type: string
+          description: Date of birth for the Party.
+      description: Data model for the complex type PartyPersonalInfo.
+    PartyComplexName:
+      title: PartyComplexName
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: Party’s first name.
+        middleName:
+          type: string
+          description: Party’s middle name.
+        lastName:
+          type: string
+          description: Party’s last name.
+      description: Data model for the complex type PartyComplexName.
+    TransactionType:
+      title: TransactionType
+      required:
+      - initiator
+      - initiatorType
+      - scenario
+      type: object
+      properties:
+        scenario:
+          type: string
+          description: Deposit, withdrawal, refund, …
+        subScenario:
+          type: string
+          description: Possible sub-scenario, defined locally within the scheme.
+        initiator:
+          type: string
+          description: Who is initiating the transaction - Payer or Payee
+        initiatorType:
+          type: string
+          description: Consumer, agent, business, …
+        refundInfo:
+          $ref: '#/components/schemas/Refund'
+        balanceOfPayments:
+          type: string
+          description: Balance of Payments code.
+      description: Data model for the complex type TransactionType.
+    Refund:
+      title: Refund
+      required:
+      - originalTransactionId
+      type: object
+      properties:
+        originalTransactionId:
+          type: string
+          description: Reference to the original transaction id that is requested
+            to be refunded.
+        refundReason:
+          type: string
+          description: Free text indicating the reason for the refund.
+      description: Data model for the complex type Refund.
+    Money:
+      title: Money
+      required:
+      - amount
+      - currency
+      type: object
+      properties:
+        currency:
+          $ref: '#/components/schemas/Currency'
+        amount:
+          $ref: '#/components/schemas/Amount'
+      description: Data model for the complex type Money.
+    Currency:
+      title: CurrencyEnum
+      maxLength: 3
+      minLength: 3
+      type: string
+      description: The currency codes defined in ISO 4217 as three-letter alphabetic
+        codes are used as the standard naming representation for currencies.
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BBD
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BND
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CUP
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GGP
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - IMP
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JEP
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MOP
+      - MRO
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SPL
+      - SRD
+      - STD
+      - SVC
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TVD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XDR
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+    Amount:
+      title: Amount
+      pattern: ^([0]|([1-9][0-9]{0,17}))([.][0-9]{0,3}[1-9])?$
+      type: string
+      description: The API data type Amount is a JSON String in a canonical format
+        that is restricted by a regular expression for interoperability reasons. This
+        pattern does not allow any trailing zeroes at all, but allows an amount without
+        a minor currency unit. It also only allows four digits in the minor currency
+        unit; a negative value is not allowed. Using more than 18 digits in the major
+        currency unit is not allowed.
