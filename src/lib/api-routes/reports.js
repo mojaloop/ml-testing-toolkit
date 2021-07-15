@@ -47,4 +47,21 @@ router.post('/testcase/:format', async (req, res, next) => {
   }
 })
 
+// Generate report
+router.post('/testcase_definition/:format', async (req, res, next) => {
+  const template = req.body
+  const format = req.params.format
+  let downloadFileSuffix = '.html'
+
+  downloadFileSuffix = '-' + template.name + downloadFileSuffix
+  try {
+    const result = await reportGenerator.generateTestcaseDefinition(template, format)
+    res.setHeader('Content-disposition', 'attachment; filename=TTK-Testcase-Definition' + downloadFileSuffix)
+    res.setHeader('TTK-FileName', 'TTK-Testcase-Definition' + downloadFileSuffix)
+    res.status(200).send(result)
+  } catch (err) {
+    res.status(500).json({ error: err && err.message })
+  }
+})
+
 module.exports = router
