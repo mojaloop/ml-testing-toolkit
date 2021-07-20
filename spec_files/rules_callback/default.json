@@ -26,9 +26,43 @@
       ]
     },
     "event": {
-      "method": null,
-      "path": null,
-      "params": {},
+      "method": "put",
+      "path": "/quotes/{ID}",
+      "params": {
+          "body": {
+              "transferAmount": {
+                  "currency": "{$request.body.amount.currency}",
+                  "amount": "{$environment.quoteTransferAmount}"
+              },
+              "payeeReceiveAmount": {
+                  "currency": "USD",
+                  "amount": "{$environment.quotePayeeReceiveAmount}"
+              },
+              "payeeFspFee": {
+                  "currency": "USD",
+                  "amount": "{$environment.quotePayeeFspFee}"
+              },
+              "payeeFspCommission": {
+                  "currency": "USD",
+                  "amount": "{$environment.quotePayeeFspCommission}"
+              },
+              "expiration": "{$environment.quoteExpiration}"
+          },
+          "scripts": {
+              "exec": [
+                  "const quoteBody = JSON.parse(request.body)",
+                  "environment.quoteTransferAmount = quoteBody.amount.amount",
+                  "environment.quotePayeeFspFee = 0.2",
+                  "environment.quotePayeeFspCommission = 0.3",
+                  "environment.quotePayeeReceiveAmount = quoteBody.amount.amount",
+                  "if (quoteBody.amountType === 'RECEIVE') {",
+                  "  environment.quoteTransferAmount = (+quoteBody.amount.amount) + environment.quotePayeeFspFee + environment.quotePayeeFspCommission",
+                  "}",
+                  "environment.quoteExpiration =new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString()"
+              ],
+              "scriptingEngine": "javascript"
+          }
+      },
       "delay": 0,
       "type": "MOCK_CALLBACK"
     }
