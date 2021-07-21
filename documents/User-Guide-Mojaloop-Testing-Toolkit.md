@@ -573,7 +573,7 @@ If you select the _**Edit**_ button now, you will notice the addition of the res
 
 #### 5.9 Download Testcase Definition
 
-You could download a report with all the definitions of testcases like description of each request in a test case and expected results. Currently only HTML format is supported and by clicking on _Download Definition_ at the right side of begining of the test cases.
+You can download a report with all the definitions of testcases (like descriptions for all the requests in a test case, expected results ...etc) Currently only HTML format is supported and by clicking on _Download Definition_ at the right side of begining of the test cases.
 
 ![Download Testcase Definition](/assets/images/testcase-definition-download.png)
 
