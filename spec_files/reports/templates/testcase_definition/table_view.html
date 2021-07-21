@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#customers {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#customers td, #customers th {
+  border: 1px solid #ddd;
+  padding: 14px;
+}
+
+#customers tr:nth-child(even){background-color: #f9f9f9;}
+
+#customers tr:hover {background-color: #eee;}
+
+#customers th {
+  padding-top: 16px;
+  padding-bottom: 16px;
+  text-align: left;
+  background-color: #EEE;
+  color: black;
+}
+
+#customers .headerBlue th {
+  background-color: #E0EfFE;
+  color: black;
+  /* padding-left: 25px; */
+
+}
+
+#customers .headerYellow th {
+  background-color: #FFFDDD;
+  color: black;
+  /* padding-left: 35px; */
+}
+
+</style>
+</head>
+<body>
+
+<table id="customers">
+  <tr>
+    <th>Testcase</th>
+    <th>Request Description</th>
+    <th>Test Scenario</th>
+    <th>Expected Result</th>
+  </tr>
+  <tr class='headerBlue'>
+    <th colspan='100%'>Folder Name > File Name</th>
+  </tr>
+  {{#each test_cases}}
+  <tr class='headerYellow'>
+    <th colspan='100%'>{{name}}</th>
+  </tr>
+  {{#each requests}}
+  <tr>
+    <td>{{#if @first}}{{../meta.info}}{{/if}} </td>
+    <td>{{meta.info}}</td>
+    <td>{{description}} <br />({{method}} {{operationPath}})</td>
+    <td>
+      {{#if tests.assertions}}
+        <ul>
+        {{#each tests.assertions}}
+          <li>{{description}}</li>
+        {{/each}}
+        </ul>
+      {{/if}}
+    </td>
+  </tr>
+  {{/each}}
+  {{/each}}
+
+</table>
+
+</body>
+</html>

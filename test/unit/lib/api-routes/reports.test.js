@@ -262,4 +262,22 @@ describe('API route /api/reports', () => {
     })
   })
 
+  describe('POST /api/reports/testcase_definition/:format', () => {
+    it('Send a proper html request', async () => {
+      reportGenerator.generateTestcaseDefinition.mockImplementationOnce( () => {
+        return Promise.resolve('asdf')
+      })
+      const res = await request(app).post(`/api/reports/testcase_definition/html`).send({})
+      expect(res.statusCode).toEqual(200)
+      expect(res.text).toEqual('asdf')
+    })
+    it('Send a bad request html request', async () => {
+      reportGenerator.generateTestcaseDefinition.mockImplementationOnce( () => {
+        return Promise.reject('asdf')
+      })
+      const res = await request(app).post(`/api/reports/testcase_definition/html`).send({})
+      expect(res.statusCode).toEqual(500)
+    })
+  })
+
 })

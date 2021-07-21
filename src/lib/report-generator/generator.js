@@ -26,9 +26,9 @@ const { readFileAsync } = require('../utils')
 const reportHelpers = require('./helpers')
 const customLogger = require('../requestLogger')
 
-const BASE_TEMPLATE_PATH = 'spec_files/reports/templates/newman'
+const BASE_TEMPLATE_PATH = 'spec_files/reports/templates'
 
-const templates = {
+const testResultTemplates = {
   html: {
     file: 'html_template.html',
     handle: null
@@ -39,19 +39,39 @@ const templates = {
   }
 }
 
-const initialize = async () => {
-  customLogger.logMessage('info', 'Initializing Report Generator...')
-  for (var key of Object.keys(templates)) {
-    const templateContent = await readFileAsync(BASE_TEMPLATE_PATH + '/' + templates[key].file)
-    templates[key].handle = Handlebars.compile(templateContent.toString())
+const testcaseDefinitionTemplates = {
+  html: {
+    file: 'table_view.html',
+    handle: null
+  }
+}
+
+const _initializeTestReports = async () => {
+  for (var key of Object.keys(testResultTemplates)) {
+    const templateContent = await readFileAsync(BASE_TEMPLATE_PATH + '/newman/' + testResultTemplates[key].file)
+    testResultTemplates[key].handle = Handlebars.compile(templateContent.toString())
     customLogger.logMessage('debug', key + ' template compiled')
   }
 }
 
+const _initializeTestcaseDefinition = async () => {
+  for (var key of Object.keys(testcaseDefinitionTemplates)) {
+    const templateContent = await readFileAsync(BASE_TEMPLATE_PATH + '/testcase_definition/' + testcaseDefinitionTemplates[key].file)
+    testcaseDefinitionTemplates[key].handle = Handlebars.compile(templateContent.toString())
+    customLogger.logMessage('debug', key + ' template compiled')
+  }
+}
+
+const initialize = async () => {
+  customLogger.logMessage('info', 'Initializing Report Generator...')
+  await _initializeTestReports()
+  await _initializeTestcaseDefinition()
+}
+
 const generateReport = async (jsonReport, format) => {
-  let templateHandle = templates.html.handle
+  let templateHandle = testResultTemplates.html.handle
   if (format === 'pdf' || format === 'printhtml') {
-    templateHandle = templates.pdf.handle
+    templateHandle = testResultTemplates.pdf.handle
   }
 
   if (templateHandle) {
@@ -73,7 +93,30 @@ const generateReport = async (jsonReport, format) => {
   }
 }
 
+const generateTestcaseDefinition = async (template, format) => {
+  const templateHandle = testcaseDefinitionTemplates.html.handle
+
+  if (templateHandle) {
+    try {
+      const data = template
+      const options = {
+        // helpers: reportHelpers
+      }
+      const result = templateHandle(data, options)
+      customLogger.logMessage('debug', 'Report generated in ' + format + ' format')
+      return result
+    } catch (err) {
+      customLogger.logMessage('error', 'Error in generating template: ' + err.message)
+      throw (err)
+    }
+  } else {
+    customLogger.logMessage('error', 'No template generator found for ' + format)
+    throw (new Error('No template generator found for ' + format))
+  }
+}
+
 module.exports = {
   initialize,
-  generateReport
+  generateReport,
+  generateTestcaseDefinition
 }
