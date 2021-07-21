@@ -48,7 +48,9 @@
 
     5.7 [Save](#57-save)
 
-    5.7 [Send](#57-send)
+    5.8 [Send](#58-send)
+
+    5.9 [Download Testcase Definition](#59-download-testcase-definition)
 
 6. [Settings](#6-settings)
 
@@ -568,6 +570,16 @@ You could execute the whole template by clicking on _Send_ button in the top rig
 If you select the _**Edit**_ button now, you will notice the addition of the response tab. Select that to view all the responses for the operation.
 
 ![View Response](/assets/images/view-response.png)
+
+#### 5.9 Download Testcase Definition
+
+You could download a report with all the definitions of testcases like description of each request in a test case and expected results. Currently only HTML format is supported and by clicking on _Download Definition_ at the right side of begining of the test cases.
+
+![Download Testcase Definition](/assets/images/testcase-definition-download.png)
+
+And you can edit meta information about each testcase and request using the option provided.
+
+![Edit Meta Info](/assets/images/testcase-definition-edit-meta-info.png)
 
 ### 6 Settings
 
