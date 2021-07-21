@@ -35,15 +35,15 @@
                   "amount": "{$environment.quoteTransferAmount}"
               },
               "payeeReceiveAmount": {
-                  "currency": "USD",
+                  "currency": "{$request.body.amount.currency}",
                   "amount": "{$environment.quotePayeeReceiveAmount}"
               },
               "payeeFspFee": {
-                  "currency": "USD",
+                  "currency": "{$request.body.amount.currency}",
                   "amount": "{$environment.quotePayeeFspFee}"
               },
               "payeeFspCommission": {
-                  "currency": "USD",
+                  "currency": "{$request.body.amount.currency}",
                   "amount": "{$environment.quotePayeeFspCommission}"
               },
               "expiration": "{$environment.quoteExpiration}"
