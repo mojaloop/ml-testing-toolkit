@@ -34,7 +34,8 @@
       "path": "/parties/{Type}/{ID}",
       "params": {
         "headers": {
-          "Content-Type": "application/vnd.interoperability.parties+json;version=1.0"
+          "Content-Type": "application/vnd.interoperability.parties+json;version=1.0",
+          "FSPIOP-Source": "greenbankfsp"
         },
         "body": {
           "party": {
