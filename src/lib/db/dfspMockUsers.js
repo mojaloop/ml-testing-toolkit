@@ -58,8 +58,12 @@ const getKeyCloakUsers = async (keycloakToken) => {
     const users = []
     getUsersResp.data.map(user => {
       if (user.username !== systemConfig.KEYCLOAK.USERNAME) {
+        let userId = user.attributes.dfspId[0]
+        if (Array.isArray(user.attributes.dfspId)) {
+          userId = user.attributes.dfspId[0]
+        }
         users.push({
-          id: user.attributes.dfspId,
+          id: userId,
           name: `${user.firstName} ${user.lastName}`
         })
       }
