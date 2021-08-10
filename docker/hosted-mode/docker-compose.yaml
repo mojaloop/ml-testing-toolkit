@@ -1,0 +1,64 @@
+version: '3.7'
+
+volumes:
+  mysql_data:
+      driver: local
+
+services:
+  mojaloop-testing-toolkit:
+    image: mojaloop/ml-testing-toolkit:v13.3.0
+    #image: mojaloop-testing-toolkit:local
+    #build:
+    #  context: .
+    #  target: builder
+    volumes:
+      - "./spec_files:/opt/mojaloop-testing-toolkit/spec_files"
+      - "./secrets:/opt/mojaloop-testing-toolkit/secrets"
+    ports:
+      - "5000:5000"
+      - "5050:5050"
+    command:
+      - sh
+      - -c
+      - "npm start"
+  mojaloop-testing-toolkit-ui:
+    image: mojaloop/ml-testing-toolkit-ui:v13.3.0
+    ports:
+      - "6060:6060"
+    environment:
+      - API_BASE_URL=http://localhost:5050
+      - AUTH_ENABLED=FALSE
+    command:
+      - sh
+      - /usr/share/nginx/start.sh
+
+  keycloak-mysql:
+    image: mysql:5.7
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    volumes:
+      - "./keycloak/keycloak-realm.json:/realm/realm.json"
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: keycloak-mysql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_IMPORT: /realm/realm.json -Dkeycloak.profile.feature.upload_scripts=enabled
+    ports:
+      - 8080:8080
+    depends_on:
+      - keycloak-mysql
+
+networks:
+  default:
+    name: mojaloop-testing-toolkit
