@@ -2,7 +2,9 @@ version: '3.7'
 
 volumes:
   mysql_data:
-      driver: local
+    driver: local
+  ttk-db-data:
+    driver: local
 
 services:
   mojaloop-testing-toolkit:
@@ -12,8 +14,8 @@ services:
     #  context: .
     #  target: builder
     volumes:
-      - "./spec_files:/opt/mojaloop-testing-toolkit/spec_files"
-      - "./secrets:/opt/mojaloop-testing-toolkit/secrets"
+      - "./spec_files/system_config.json:/opt/mojaloop-testing-toolkit/spec_files/system_config.json"
+      - "./spec_files/user_config.json:/opt/mojaloop-testing-toolkit/spec_files/user_config.json"
     ports:
       - "5000:5000"
       - "5050:5050"
@@ -21,13 +23,15 @@ services:
       - sh
       - -c
       - "npm start"
+    depends_on:
+      - ttk-mongodb
   mojaloop-testing-toolkit-ui:
     image: mojaloop/ml-testing-toolkit-ui:v13.3.0
     ports:
       - "6060:6060"
     environment:
       - API_BASE_URL=http://localhost:5050
-      - AUTH_ENABLED=FALSE
+      - AUTH_ENABLED=TRUE
     command:
       - sh
       - /usr/share/nginx/start.sh
@@ -58,6 +62,22 @@ services:
       - 8080:8080
     depends_on:
       - keycloak-mysql
+
+  ttk-mongodb:
+    image: 'bitnami/mongodb:latest'
+    restart: always
+    environment:
+      # MONGO_INITDB_ROOT_USERNAME: admin-user
+      # MONGO_INITDB_ROOT_PASSWORD: admin-password
+      # MONGO_INITDB_DATABASE: ttk
+      MONGODB_USERNAME: ttk
+      MONGODB_PASSWORD: ttk
+      MONGODB_DATABASE: ttk
+    ports:
+      - 27017:27017
+    volumes:
+      - ttk-db-data:/data/db
+      # - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh
 
 networks:
   default:

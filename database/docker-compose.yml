@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  mojaloop-testing-toolkit-db:
+  ttk-mongodb:
     image: mongo:latest
     # Disable logging as it is far too verbose for debugging locally
     logging:

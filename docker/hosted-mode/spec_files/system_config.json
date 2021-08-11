@@ -1,6 +1,6 @@
 {
   "API_PORT": 5000,
-  "HOSTING_ENABLED": false,
+  "HOSTING_ENABLED": true,
   "CONFIG_VERSIONS": {
     "response": 1,
     "callback": 1,
@@ -9,18 +9,19 @@
     "userSettings": 1
   },
   "DB": {
-    "URI": "mongodb://ttk-mongodb:27017/dfsps"
+    "URI": "mongodb://ttk:ttk@ttk-mongodb:27017/ttk"
   },
   "OAUTH": {
-    "AUTH_ENABLED": false,
-    "APP_OAUTH_CLIENT_KEY": "asdf",
-    "APP_OAUTH_CLIENT_SECRET": "asdf",
+    "AUTH_ENABLED": true,
+    "APP_OAUTH_CLIENT_KEY": "ttk",
+    "APP_OAUTH_CLIENT_SECRET": "23b898a5-63d2-4055-bbe1-54efcda37e7d",
     "MTA_ROLE": "Application/MTA",
     "PTA_ROLE": "Application/PTA",
     "EVERYONE_ROLE": "Internal/everyone",
-    "OAUTH2_ISSUER": "http://mojaloop-testing-toolkit:5050/api/oauth2/token",
+    "OAUTH2_TOKEN_ISS": "http://keycloak:8080/auth/realms/testingtoolkit",
+    "OAUTH2_ISSUER": "http://keycloak:8080/auth/realms/testingtoolkit/protocol/openid-connect/token",
     "JWT_COOKIE_NAME": "TTK-API_ACCESS_TOKEN",
-    "EMBEDDED_CERTIFICATE": "password"
+    "EMBEDDED_CERTIFICATE": "-----BEGIN CERTIFICATE-----\nMIICrDCCAhWgAwIBAgIUBQ88qYAqQ1+I+ISsaIgYPqbya9QwDQYJKoZIhvcNAQEL\nBQAwaDELMAkGA1UEBhMCVUsxDzANBgNVBAgMBkxvbmRvbjEPMA0GA1UEBwwGTG9u\nZG9uMREwDwYDVQQKDAhNb2R1c2JveDERMA8GA1UECwwITW9kdXNib3gxETAPBgNV\nBAMMCE1vZHVzYm94MB4XDTIwMDkzMDE3MDYwNloXDTIxMDkzMDE3MDYwNlowaDEL\nMAkGA1UEBhMCVUsxDzANBgNVBAgMBkxvbmRvbjEPMA0GA1UEBwwGTG9uZG9uMREw\nDwYDVQQKDAhNb2R1c2JveDERMA8GA1UECwwITW9kdXNib3gxETAPBgNVBAMMCE1v\nZHVzYm94MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDda1T6cyWogfG/xlUb\n3+gWZI0jsnlSGbf3PF89NCgS+n6HUJ0A2Ezmu/n9Gfkm8Rjyst914Vq9ebsueXHI\nc+Ad76+q3MASF1hRUTfnvH/v6rDguPvI6Jb/M9jGn5b2hglcg3B9Y7Tgv70bcV7o\nCweP68CPbIrTWjR9gyjmSHfYhwIDAQABo1MwUTAdBgNVHQ4EFgQUEE+og3aDjUzC\nywQo45Fhjp5S9EowHwYDVR0jBBgwFoAUEE+og3aDjUzCywQo45Fhjp5S9EowDwYD\nVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOBgQC2a7sxisCTQa9oRGMZRmJs\nFMZjia126qlRYm6ljjM2wWlqIBdxjzLhLJbAiWMyzGKTZdMOG51Ujc+NapKRLS4K\nHVnzcbtgRNq6GZk5C1L8BEzR6NxU/CdOkm2Vx811CTOT/YijpjtjF01K1aIZE+z8\nmdzyVY9ZybXqbNclLU7rwA==\n-----END CERTIFICATE-----"
   },
   "CONNECTION_MANAGER": {
     "API_URL": "http://connection-manager-api:5061",
