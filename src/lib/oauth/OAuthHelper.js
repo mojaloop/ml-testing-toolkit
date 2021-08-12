@@ -31,7 +31,7 @@ const customLogger = require('../requestLogger')
 
 function cookieExtractor (req) {
   const cookies = new Cookies(req)
-  const token = cookies.get(Config.getSystemConfig().OAUTH.JWT_COOKIE_NAME)
+  const token = cookies.get('TTK-API_ACCESS_TOKEN')
   return token
 }
 

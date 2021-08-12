@@ -34,7 +34,8 @@ const customLogger = require('../requestLogger')
  * If successful, sets the JWT token in a cookie and returns the token payload
  */
 exports.loginUser = async function (username, password, req, res) {
-  if (!Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
+  const tokenObj = await this.getTokenInfo(username, password)
+  if (tokenObj === null) {
     return {
       ok: false,
       token: {
@@ -54,14 +55,26 @@ exports.loginUser = async function (username, password, req, res) {
       }
     }
   }
+
+  const response = buildJWTResponse(tokenObj.decodedIdToken, tokenObj.access_token, tokenObj.expires_in, req, res)
+  return response
+}
+
+/**
+ * Gets the access token and decoded token
+ * If successful, sets the JWT token in a cookie and returns the token payload
+ */
+exports.getTokenInfo = async function (username, password) {
+  if (!Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
+    return null
+  }
   try {
     const loginResponseObj = await wso2Client.getToken(username, password)
-
     const decodedIdToken = jwt.decode(loginResponseObj.id_token)
-
-    const response = buildJWTResponse(decodedIdToken, loginResponseObj.access_token, loginResponseObj.expires_in, req, res)
-
-    return response
+    return {
+      ...loginResponseObj,
+      decodedIdToken
+    }
   } catch (error) {
     customLogger.logMessage('error', 'login user failed', error, { notification: false })
     if (error && error.statusCode === 400 && error.message.includes('Authentication failed')) {
@@ -94,7 +107,7 @@ const buildJWTResponse = (decodedIdToken, accessToken, expiresIn, req, res) => {
 
   const cookies = new Cookies(req, res)
   const cookieOptions = { maxAge: expiresIn * 1000, httpOnly: true, sameSite: 'strict' } // secure is automatic based on HTTP or HTTPS used
-  cookies.set(Config.getSystemConfig().OAUTH.JWT_COOKIE_NAME, accessToken, cookieOptions)
+  cookies.set('TTK-API_ACCESS_TOKEN', accessToken, cookieOptions)
   return {
     ok: true,
     token: {
@@ -111,5 +124,5 @@ const buildJWTResponse = (decodedIdToken, accessToken, expiresIn, req, res) => {
  */
 exports.logoutUser = async function (req, res) {
   const cookies = new Cookies(req, res)
-  cookies.set(Config.getSystemConfig().OAUTH.JWT_COOKIE_NAME)
+  cookies.set('TTK-API_ACCESS_TOKEN')
 }

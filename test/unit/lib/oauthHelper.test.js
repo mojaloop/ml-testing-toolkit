@@ -55,7 +55,6 @@ describe('OAuthHelper tests', () => {
     it('should not throw an error', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
         OAUTH: {
-          JWT_COOKIE_NAME: 'JWT_COOKIE_NAME'
         }
       })
       OAuthHelper.cookieExtractor({})

@@ -52,7 +52,6 @@ describe('LoginService tests', () => {
         }
       }).mockReturnValueOnce({
         OAUTH: {
-          JWT_COOKIE_NAME: 'JWT_COOKIE_NAME'
         }
       })
       SpyWso2Client.mockResolvedValueOnce({
@@ -75,7 +74,6 @@ describe('LoginService tests', () => {
         }
       }).mockReturnValueOnce({
         OAUTH: {
-          JWT_COOKIE_NAME: 'JWT_COOKIE_NAME'
         }
       })
       SpyWso2Client.mockResolvedValueOnce({
@@ -91,8 +89,7 @@ describe('LoginService tests', () => {
     it('should throw detailed error if token was not found and message include Authentication failed', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
         OAUTH: {
-          AUTH_ENABLED: true,
-          JWT_COOKIE_NAME: 'JWT_COOKIE_NAME'
+          AUTH_ENABLED: true
         }
       })
       SpyWso2Client.mockRejectedValueOnce({})
@@ -105,7 +102,6 @@ describe('LoginService tests', () => {
         }
       }).mockReturnValueOnce({
         OAUTH: {
-          JWT_COOKIE_NAME: 'JWT_COOKIE_NAME'
         }
       })
       SpyWso2Client.mockRejectedValueOnce({
@@ -116,10 +112,9 @@ describe('LoginService tests', () => {
     });
   });
   describe('logoutUser', () => {
-    it('should set JWT_COOKIE_NAME cookie to undefined', async () => {
+    it('should set TTK-API_ACCESS_TOKEN cookie to undefined', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
         OAUTH: {
-          JWT_COOKIE_NAME: 'JWT_COOKIE_NAME'
         }
       })
       const res = await LoginService.logoutUser()

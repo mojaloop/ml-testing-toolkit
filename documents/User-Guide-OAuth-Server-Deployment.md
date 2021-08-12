@@ -232,7 +232,6 @@ Open the URL http://localhost:8080/auth/admin and login with username 'admin' an
     "EVERYONE_ROLE": "Internal/everyone",
     "OAUTH2_TOKEN_ISS": "http://<KEYCLOAK_HOST>:8080/auth/realms/testingtoolkit",
     "OAUTH2_ISSUER": "http://<KEYCLOAK_HOST>:8080/auth/realms/testingtoolkit/protocol/openid-connect/token",
-    "JWT_COOKIE_NAME": "TTK-API_ACCESS_TOKEN",
     "EMBEDDED_CERTIFICATE": "-----BEGIN PUBLIC KEY-----\n<PUBLIC_KEY_COPIED_FROM_KEYCLOAK>\n-----END PUBLIC KEY-----"
   }
   ```
