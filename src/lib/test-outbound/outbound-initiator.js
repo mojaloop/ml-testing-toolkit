@@ -530,14 +530,6 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
       const userConfig = await Config.getUserConfig(user)
       const uniqueId = UniqueIdGenerator.generateUniqueId()
       let urlGenerated = userConfig.CALLBACK_ENDPOINT + path
-      if (Config.getSystemConfig().HOSTING_ENABLED) {
-        const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
-        if (endpointsConfig.dfspEndpoints && dfspId && endpointsConfig.dfspEndpoints[dfspId]) {
-          urlGenerated = endpointsConfig.dfspEndpoints[dfspId] + path
-        } else {
-          customLogger.logMessage('warning', 'Hosting is enabled, But there is no endpoint configuration found for DFSP ID: ' + dfspId, { user })
-        }
-      }
       if (baseUrl) {
         urlGenerated = getUrlPrefix(baseUrl) + path
       }
