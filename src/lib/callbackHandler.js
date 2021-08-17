@@ -128,6 +128,7 @@ const handleCallback = async (callbackObject, context, req) => {
     path: callbackObject.path,
     headers: callbackObject.headers,
     data: callbackObject.body,
+    customInfo: req.customInfo,
     timeout: userConfig.DEFAULT_REQUEST_TIMEOUT || 3000,
     ...httpAgentProps
   }

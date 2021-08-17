@@ -127,16 +127,9 @@ const onPreHandler = async (request, h) => {
     if (request.headers.authorization && request.headers.authorization.startsWith('Bearer')) {
       const token = request.headers.authorization.replace(/^Bearer\s/, '')
       try {
-        const decodedToken = await verifyToken(token)
-        let dfspId = decodedToken.dfspId
-        if (!dfspId) {
-          const dfspGroup = decodedToken.groups.find(groupName => groupName.startsWith('Application/DFSP:'))
-          if (dfspGroup) {
-            dfspId = dfspGroup.replace('Application/DFSP:', '')
-          }
-        }
+        const tokenResponse = await verifyToken(token)
         request.customInfo.user = {
-          dfspId
+          dfspId: tokenResponse.dfspId
         }
       } catch (err) {
         RequestLogger.logMessage('error', err.message, { additionalData: { errorStack: err.stack }, request })

@@ -60,6 +60,7 @@ const initServer = () => {
   app.use('/api/config', verifyUserMiddleware, require('./api-routes/config'))
   app.use('/longpolling', verifyUserMiddleware, require('./api-routes/longpolling'))
   app.use('/api/oauth2', require('./api-routes/oauth2'))
+  app.use('/api/keycloak', verifyUserMiddleware, require('./api-routes/keycloak'))
   app.use('/api/reports', verifyUserMiddleware, require('./api-routes/reports'))
   app.use('/api/settings', verifyUserMiddleware, require('./api-routes/settings'))
   app.use('/api/samples', verifyUserMiddleware, require('./api-routes/samples'))

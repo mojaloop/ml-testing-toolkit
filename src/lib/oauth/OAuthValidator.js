@@ -56,7 +56,28 @@ const verifyToken = async (token) => {
   // const jwtStrategy = new JwtStrategy(jwtOpts, verifyCallback)
   const jwtPayload = await promisify(jwt.verify)(token, certContent, jwtOpts)
   additionalVerification(jwtPayload)
-  return jwtPayload
+  const dfspId = getDfspIdFromClientToken(jwtPayload)
+  return {
+    dfspId,
+    decodedToken: jwtPayload
+  }
+}
+
+// function getDfspIdFromUserToken (jwtPayload) {
+//   let dfspId = null
+//   if (jwtPayload.dfspId) {
+//     dfspId = jwtPayload.dfspId
+//   } else {
+//     const dfspGroup = jwtPayload.groups.find(groupName => groupName.startsWith('Application/DFSP:'))
+//     if (dfspGroup) {
+//       dfspId = dfspGroup.replace('Application/DFSP:', '')
+//     }
+//   }
+//   return dfspId
+// }
+
+function getDfspIdFromClientToken (jwtPayload) {
+  return jwtPayload.clientId
 }
 
 function additionalVerification (jwtPayload) {
@@ -70,14 +91,19 @@ function additionalVerification (jwtPayload) {
     customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`, { notification: false })
     throw (new Error(message))
   }
-  const systemConfig = Config.getSystemConfig()
-  if (jwtPayload.iss !== systemConfig.OAUTH.OAUTH2_ISSUER && jwtPayload.iss !== systemConfig.OAUTH.OAUTH2_TOKEN_ISS) {
-    const message = `Invalid Authentication: wrong issuer ${jwtPayload.iss}, expecting: ${systemConfig.OAUTH.OAUTH2_ISSUER} or ${systemConfig.OAUTH.OAUTH2_TOKEN_ISS}`
-    customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`, { notification: false })
-    throw (new Error(message))
-  }
-  if (!jwtPayload.groups) {
-    const message = 'Invalid Authentication info: no groups'
+  // const systemConfig = Config.getSystemConfig()
+  // if (jwtPayload.iss !== systemConfig.OAUTH.OAUTH2_ISSUER && jwtPayload.iss !== systemConfig.OAUTH.OAUTH2_TOKEN_ISS) {
+  //   const message = `Invalid Authentication: wrong issuer ${jwtPayload.iss}, expecting: ${systemConfig.OAUTH.OAUTH2_ISSUER} or ${systemConfig.OAUTH.OAUTH2_TOKEN_ISS}`
+  //   customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`, { notification: false })
+  //   throw (new Error(message))
+  // }
+  // if (!jwtPayload.groups) {
+  //   const message = 'Invalid Authentication info: no groups'
+  //   customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`, { notification: false })
+  //   throw (new Error(message))
+  // }
+  if (!jwtPayload.clientId) {
+    const message = 'There is no clientId specified'
     customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`, { notification: false })
     throw (new Error(message))
   }

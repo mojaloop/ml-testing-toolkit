@@ -39,15 +39,6 @@ router.post('/login', async (req, res, next) => {
   }
 })
 
-router.post('/tokeninfo', async (req, res, next) => {
-  try {
-    const response = await LoginService.getTokenInfo(req.body.username, req.body.password)
-    res.status(200).json(response)
-  } catch (err) {
-    res.status(500).json({ error: err && err.message })
-  }
-})
-
 router.get('/logout', verifyUser(), async (req, res, next) => {
   try {
     await LoginService.logoutUser(req, res)
