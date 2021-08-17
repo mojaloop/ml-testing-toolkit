@@ -30,10 +30,12 @@
   },
   "KEYCLOAK": {
     "ENABLED": false,
-    "API_URL": "http://172.17.0.1:9080",
+    "API_URL": "http://localhost:8080",
     "REALM": "testingtoolkit",
-    "USERNAME": "hub",
-    "PASSWORD": "hub"
+    "ADMIN_REALM": "master",
+    "ADMIN_USERNAME": "admin",
+    "ADMIN_PASSWORD": "admin",
+    "ADMIN_CLIENT_ID": "admin-cli"
   },
   "SERVER_LOGS": {
     "ENABLED": true,
