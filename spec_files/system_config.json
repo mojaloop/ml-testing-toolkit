@@ -1,6 +1,6 @@
 {
   "API_PORT": 5000,
-  "HOSTING_ENABLED": false,
+  "HOSTING_ENABLED": true,
   "CONFIG_VERSIONS": {
     "response": 1,
     "callback": 1,
@@ -9,20 +9,21 @@
     "userSettings": 1
   },
   "DB": {
-    "URI": "mongodb://ttk-mongodb:27017/dfsps"
+    "URI": "mongodb://ttk:ttk@localhost:27017/ttk"
   },
   "OAUTH": {
     "AUTH_ENABLED": false,
-    "APP_OAUTH_CLIENT_KEY": "asdf",
-    "APP_OAUTH_CLIENT_SECRET": "asdf",
+    "APP_OAUTH_CLIENT_KEY": "ttk",
+    "APP_OAUTH_CLIENT_SECRET": "secret",
     "MTA_ROLE": "Application/MTA",
     "PTA_ROLE": "Application/PTA",
     "EVERYONE_ROLE": "Internal/everyone",
+    "OAUTH2_TOKEN_ISS": "http://mojaloop-testing-toolkit:5050/api/oauth2/token",
     "OAUTH2_ISSUER": "http://mojaloop-testing-toolkit:5050/api/oauth2/token",
-    "JWT_COOKIE_NAME": "TTK-API_ACCESS_TOKEN",
-    "EMBEDDED_CERTIFICATE": "password"
+    "EMBEDDED_CERTIFICATE": "CERTIFICATE"
   },
   "CONNECTION_MANAGER": {
+    "ENABLED": false,
     "API_URL": "http://connection-manager-api:5061",
     "AUTH_ENABLED": false,
     "HUB_USERNAME": "hub",
