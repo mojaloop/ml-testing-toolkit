@@ -9,16 +9,35 @@ volumes:
 services:
   mojaloop-testing-toolkit:
     image: mojaloop/ml-testing-toolkit:v13.3.0
-    #image: mojaloop-testing-toolkit:local
-    #build:
+    # image: mojaloop-testing-toolkit:local
+    # build:
     #  context: .
     #  target: builder
     volumes:
-      - "./spec_files/system_config.json:/opt/mojaloop-testing-toolkit/spec_files/system_config.json"
-      - "./spec_files/user_config.json:/opt/mojaloop-testing-toolkit/spec_files/user_config.json"
+      - "../../spec_files:/opt/mojaloop-testing-toolkit/spec_files"
     ports:
       - "5000:5000"
       - "5050:5050"
+    environment:
+      TTK_SYSTEM_CONFIG: |-
+        {
+          "HOSTING_ENABLED": true,
+          "DB": {
+            "URI": "mongodb://ttk:ttk@ttk-mongodb:27017/ttk"
+          },
+          "OAUTH": {
+            "AUTH_ENABLED": true,
+            "APP_OAUTH_CLIENT_KEY": "ttk",
+            "APP_OAUTH_CLIENT_SECRET": "23b898a5-63d2-4055-bbe1-54efcda37e7d",
+            "OAUTH2_TOKEN_ISS": "http://keycloak:8080/auth/realms/testingtoolkit",
+            "OAUTH2_ISSUER": "http://keycloak:8080/auth/realms/testingtoolkit/protocol/openid-connect/token",
+            "EMBEDDED_CERTIFICATE": "-----BEGIN CERTIFICATE-----\nMIICrDCCAhWgAwIBAgIUBQ88qYAqQ1+I+ISsaIgYPqbya9QwDQYJKoZIhvcNAQEL\nBQAwaDELMAkGA1UEBhMCVUsxDzANBgNVBAgMBkxvbmRvbjEPMA0GA1UEBwwGTG9u\nZG9uMREwDwYDVQQKDAhNb2R1c2JveDERMA8GA1UECwwITW9kdXNib3gxETAPBgNV\nBAMMCE1vZHVzYm94MB4XDTIwMDkzMDE3MDYwNloXDTIxMDkzMDE3MDYwNlowaDEL\nMAkGA1UEBhMCVUsxDzANBgNVBAgMBkxvbmRvbjEPMA0GA1UEBwwGTG9uZG9uMREw\nDwYDVQQKDAhNb2R1c2JveDERMA8GA1UECwwITW9kdXNib3gxETAPBgNVBAMMCE1v\nZHVzYm94MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDda1T6cyWogfG/xlUb\n3+gWZI0jsnlSGbf3PF89NCgS+n6HUJ0A2Ezmu/n9Gfkm8Rjyst914Vq9ebsueXHI\nc+Ad76+q3MASF1hRUTfnvH/v6rDguPvI6Jb/M9jGn5b2hglcg3B9Y7Tgv70bcV7o\nCweP68CPbIrTWjR9gyjmSHfYhwIDAQABo1MwUTAdBgNVHQ4EFgQUEE+og3aDjUzC\nywQo45Fhjp5S9EowHwYDVR0jBBgwFoAUEE+og3aDjUzCywQo45Fhjp5S9EowDwYD\nVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOBgQC2a7sxisCTQa9oRGMZRmJs\nFMZjia126qlRYm6ljjM2wWlqIBdxjzLhLJbAiWMyzGKTZdMOG51Ujc+NapKRLS4K\nHVnzcbtgRNq6GZk5C1L8BEzR6NxU/CdOkm2Vx811CTOT/YijpjtjF01K1aIZE+z8\nmdzyVY9ZybXqbNclLU7rwA==\n-----END CERTIFICATE-----"
+          },
+          "KEYCLOAK": {
+            "ENABLED": true,
+            "API_URL": "http://keycloak:8080"
+          }
+        }
     command:
       - sh
       - -c
