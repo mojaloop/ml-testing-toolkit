@@ -26,6 +26,7 @@
 const storageAdapter = require('./storageAdapter')
 const SYSTEM_CONFIG_FILE = 'spec_files/system_config.json'
 const USER_CONFIG_FILE = 'spec_files/user_config.json'
+const _ = require('lodash')
 
 var SYSTEM_CONFIG = {}
 var USER_CONFIG = {
@@ -80,10 +81,24 @@ const loadUserConfigDFSPWise = async (user) => {
 const loadSystemConfig = async () => {
   try {
     SYSTEM_CONFIG = (await storageAdapter.read(SYSTEM_CONFIG_FILE)).data
+    const systemConfigFromEnvironemnt = _getSystemConfigFromEnvironment()
+    _.merge(SYSTEM_CONFIG, systemConfigFromEnvironemnt)
   } catch (err) {
     console.log(`Can not read the file ${SYSTEM_CONFIG_FILE}`, err)
   }
   return true
+}
+
+const _getSystemConfigFromEnvironment = () => {
+  let systemConfigFromEnvironemnt = {}
+  if (process.env.TTK_SYSTEM_CONFIG) {
+    try {
+      systemConfigFromEnvironemnt = JSON.parse(process.env.TTK_SYSTEM_CONFIG)
+    } catch (err) {
+      console.log(`Failed to parse system config passed in environment ${process.env.TTK_SYSTEM_CONFIG}`)
+    }
+  }
+  return systemConfigFromEnvironemnt
 }
 
 const setSystemConfig = async (newConfig) => {
