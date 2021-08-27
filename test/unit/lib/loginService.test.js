@@ -50,16 +50,13 @@ describe('LoginService tests', () => {
         OAUTH: {
           AUTH_ENABLED: true
         }
-      }).mockReturnValueOnce({
-        OAUTH: {
-        }
       })
       SpyWso2Client.mockResolvedValueOnce({
         id_token: '',
         access_token: ''
       })
       SpyJWT.mockReturnValueOnce({
-        groups: [
+        groups: [ 
           'Application/PTA',
           'Application/DFSP:userdfsp'
         ]
@@ -71,9 +68,6 @@ describe('LoginService tests', () => {
       SpyGetSystemConfig.mockReturnValueOnce({
         OAUTH: {
           AUTH_ENABLED: true
-        }
-      }).mockReturnValueOnce({
-        OAUTH: {
         }
       })
       SpyWso2Client.mockResolvedValueOnce({

@@ -122,7 +122,7 @@ describe('callbackHandler', () => {
         callbackInfo: {
           fspid: 'userdfsp'
         },
-        path: 'http://localhost:5000/transfers/{ID}/error',
+        path: '/transfers/{ID}/error',
         headers: {},
         body: {}
       }
@@ -578,7 +578,7 @@ describe('callbackHandler', () => {
         callbackInfo: {
           fspid: 'userdfsp'
         },
-        path: 'http://localhost:5000/transfers/{ID}/error',
+        path: '/transfers/{ID}/error',
         headers: {},
         body: {}
       }

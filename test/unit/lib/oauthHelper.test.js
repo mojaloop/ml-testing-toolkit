@@ -33,13 +33,13 @@ describe('OAuthHelper tests', () => {
     requestLogger.logMessage.mockReturnValue()
   })
   it('handleMiddleware when AUTH is enabled should not throw an error', async () => {
-    SpyGetSystemConfig.mockReturnValueOnce({
+    SpyGetSystemConfig.mockReturnValue({
       OAUTH: {
-        AUTH_ENABLED: true
+        AUTH_ENABLED: true,
+        EMBEDDED_CERTIFICATE: 'asdf'
       }
-    }).mockReturnValueOnce({
-      OAUTH: {}
     })
+    SpyGetSystemConfig.mockClear()
     OAuthHelper.handleMiddleware()
   });
   it('handleMiddleware when AUTH is disabled should not throw an error', async () => {
@@ -55,41 +55,46 @@ describe('OAuthHelper tests', () => {
     it('should not throw an error', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
         OAUTH: {
+          AUTH_ENABLED: false
         }
       })
       OAuthHelper.cookieExtractor({})
     });
   });
   describe('createJwtStrategy', () => {
+    beforeEach(() => {
+      jest.resetAllMocks()
+    })
+    afterEach(() => {
+      jest.resetAllMocks()
+    })
     it('should not throw an error when extraExtractors is array', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         OAUTH: {
-          EMBEDDED_CERTIFICATE: null,
-          CERTIFICATE_FILE_NAME: null
+          AUTH_ENABLED: true,
+          EMBEDDED_CERTIFICATE: 'cert'
         }
       })
       OAuthHelper.createJwtStrategy([])
     });
     it('should not throw an error when extraExtractors is object', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         OAUTH: {
-          EMBEDDED_CERTIFICATE: null,
-          CERTIFICATE_FILE_NAME: null
+          EMBEDDED_CERTIFICATE: 'cert'
         }
       })
       OAuthHelper.createJwtStrategy({})
     });
     it('should not throw an error when EMBEDDED_CERTIFICATE and CERTIFICATE_FILE_NAME are empty', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         OAUTH: {
-          EMBEDDED_CERTIFICATE: null,
-          CERTIFICATE_FILE_NAME: null
+          EMBEDDED_CERTIFICATE: 'cert'
         }
       })
       OAuthHelper.createJwtStrategy()
     });
     it('should not throw an error when EMBEDDED_CERTIFICATE is not empty', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         OAUTH: {
           EMBEDDED_CERTIFICATE: 'EMBEDDED_CERTIFICATE'
         }
@@ -97,7 +102,7 @@ describe('OAuthHelper tests', () => {
       OAuthHelper.createJwtStrategy()
     });
     it('should not throw an error when EMBEDDED_CERTIFICATE is empty and CERTIFICATE_FILE_NAME is not empty and starts with "/"', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         OAUTH: {
           EMBEDDED_CERTIFICATE: null,
           CERTIFICATE_FILE_NAME: '/CERTIFICATE_FILE_NAME'
@@ -108,7 +113,7 @@ describe('OAuthHelper tests', () => {
       } catch (err) {}
     });
     it('should not throw an error when EMBEDDED_CERTIFICATE is empty and CERTIFICATE_FILE_NAME is not empty and not starts with "/"', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
+      SpyGetSystemConfig.mockReturnValue({
         OAUTH: {
           EMBEDDED_CERTIFICATE: null,
           CERTIFICATE_FILE_NAME: 'test/CERTIFICATE_FILE_NAME'

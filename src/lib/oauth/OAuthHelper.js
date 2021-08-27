@@ -82,7 +82,7 @@ function createJwtStrategy (extraExtractors) {
   //   done(null, certContent)
   // }
   // jwtStrategyOpts.issuer = 'accounts.examplesoft.com'
-  jwtStrategyOpts.audience = systemConfig.OAUTH.APP_OAUTH_CLIENT_KEY // audience: If defined, the token audience (aud) will be verified against this value.
+  // jwtStrategyOpts.audience = systemConfig.OAUTH.APP_OAUTH_CLIENT_KEY // audience: If defined, the token audience (aud) will be verified against this value.
   const jwtStrategy = new JwtStrategy(jwtStrategyOpts, verifyCallback)
   return jwtStrategy
 }
