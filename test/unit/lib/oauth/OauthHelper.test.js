@@ -15,15 +15,15 @@
  *  limitations under the License.                                            *
  ******************************************************************************/
 
-const OAuthHelper = require('../../../src/lib/oauth/OAuthHelper')
+const OAuthHelper = require('../../../../src/lib/oauth/OAuthHelper')
 
 const Cookies = require('cookies')
-const Config = require('../../../src/lib/config')
+const Config = require('../../../../src/lib/config')
 const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
-const requestLogger = require('../../../src/lib/requestLogger')
+const requestLogger = require('../../../../src/lib/requestLogger')
 
 jest.mock('cookies')
-jest.mock('../../../src/lib/requestLogger')
+jest.mock('../../../../src/lib/requestLogger')
 
 Cookies.mockImplementation()
 
