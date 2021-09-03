@@ -534,6 +534,60 @@ describe('KeycloakHelper tests', () => {
 
       await expect(KeycloakHelper.getClientAuthInfo(user)).rejects.toThrowError()
     });
+    it('should throw error if authentication failed to get secret', async () => {
+      SpyGetSystemConfig.mockReturnValue({
+        KEYCLOAK: {
+          API_URL: 'http://localhost/api',
+          REALM: 'ttk',
+          USERNAME: 'user1'
+        },
+        OAUTH: {
+          OAUTH2_ISSUER: ''
+        }
+      })
+      const user = {
+        dfspId: 'dfsp1'
+      }
+      objectStore.get.mockImplementation(() => Promise.resolve('token'))
+      axios.get.mockImplementationOnce(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {
+          value: 'secret'
+        },
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: ['asdf'],
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {
+          type: 'not_secret'
+        },
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      axios.post.mockImplementation(() => Promise.resolve({
+        status: 201,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+
+      await expect(KeycloakHelper.getClientAuthInfo(user)).rejects.toThrowError()
+    });
 
   });
 });
