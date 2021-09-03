@@ -2290,7 +2290,7 @@ components:
       type: string
       minLength: 1
       maxLength: 128
-      pattern: ^(?!\s*$)[\w .,'-]{1,128}$
+      pattern: '^(?!\s*$)[\p{L}\p{gc=Mark}\p{digit}\p{gc=Connector_Punctuation}\p{Join_Control} .,''-]{1,128}$'
       description: First name of the Party (Name Type).
     FspId:
       title: FspId
@@ -2327,7 +2327,7 @@ components:
       type: string
       minLength: 1
       maxLength: 128
-      pattern: ^(?!\s*$)[\w .,'-]{1,128}$
+      pattern: '^(?!\s*$)[\p{L}\p{gc=Mark}\p{digit}\p{gc=Connector_Punctuation}\p{Join_Control} .,''-]{1,128}$'
       description: Last name of the Party (Name Type).
     Latitude:
       title: Latitude
@@ -2349,17 +2349,17 @@ components:
       type: string
       minLength: 1
       maxLength: 128
-      pattern: ^(?!\s*$)[\w .,'-]{1,128}$
+      pattern: '^(?!\s*$)[\p{L}\p{gc=Mark}\p{digit}\p{gc=Connector_Punctuation}\p{Join_Control} .,''-]{1,128}$'
       description: Middle name of the Party (Name Type).
     Name:
       title: Name
       type: string
-      pattern: ^(?!\s*$)[\w .,'-]{1,128}$
+      pattern: '^(?!\s*$)[\p{L}\p{gc=Mark}\p{digit}\p{gc=Connector_Punctuation}\p{Join_Control} .,''-]{1,128}$'
       description:
         The API data type Name is a JSON String, restricted by a regular expression to avoid characters which are generally not used in a name.
 
 
-        Regular Expression - The regular expression for restricting the Name type is "^(?!\s*$)[\w .,'-]{1,128}$". The restriction does not allow a string consisting of whitespace only, all Unicode characters are allowed, as well as the period (.) (apostrophe (‘), dash (-), comma (,) and space characters ( ).
+        Regular Expression - The regular expression for restricting the Name type is "'^(?!\s*$)[\p{L}\p{gc=Mark}\p{digit}\p{gc=Connector_Punctuation}\p{Join_Control} .,''-]{1,128}$'". The restriction does not allow a string consisting of whitespace only, all Unicode characters are allowed, as well as the period (.) (apostrophe (‘), dash (-), comma (,) and space characters ( ).
 
 
         **Note:** In some programming languages, Unicode support must be specifically enabled. For example, if Java is used, the flag UNICODE_CHARACTER_CLASS must be enabled to allow Unicode characters.
