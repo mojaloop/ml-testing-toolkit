@@ -25,7 +25,7 @@
 
 const express = require('express')
 const router = new express.Router()
-const KeycloakHelper = require('../oauth/keycloakHelper')
+const KeycloakHelper = require('../oauth/KeycloakHelper')
 
 router.get('/clientinfo', async (req, res, next) => {
   try {

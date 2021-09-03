@@ -11,7 +11,7 @@ const getKeyCloakUsers = async (keycloakToken) => {
     const users = []
     getUsersResp.data.map(user => {
       if (user.username !== systemConfig.KEYCLOAK.USERNAME) {
-        let userId = user.attributes.dfspId[0]
+        let userId = user.attributes.dfspId
         if (Array.isArray(user.attributes.dfspId)) {
           userId = user.attributes.dfspId[0]
         }
@@ -97,7 +97,7 @@ const getClientAuthInfo = async (user) => {
     }
   } catch (error) {
     customLogger.logMessage('error', error.stack, error, { notification: false })
-    if (error && error.statusCode === 400 && error.message.includes('Authentication failed')) {
+    if (error && error.statusCode === 400) {
       throw new Error('Authentication failed', error.error)
     }
     throw error
@@ -120,7 +120,7 @@ const _findClient = async (clientId, keycloakToken) => {
     throw new Error('Can not get client list from keycloak')
   } catch (error) {
     customLogger.logMessage('error', error.stack, error, { notification: false })
-    if (error && error.statusCode === 400 && error.message.includes('Authentication failed')) {
+    if (error && error.statusCode === 400) {
       throw new Error('Authentication failed', error.error)
     }
     throw error
@@ -176,7 +176,7 @@ const _createClient = async (clientId, keycloakToken) => {
     }
   } catch (error) {
     customLogger.logMessage('error', error.stack, error, { notification: false })
-    if (error && error.statusCode === 400 && error.message.includes('Authentication failed')) {
+    if (error && error.statusCode === 400) {
       throw new Error('Authentication failed', error.error)
     }
     throw error

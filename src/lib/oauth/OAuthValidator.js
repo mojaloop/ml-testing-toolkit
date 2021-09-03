@@ -23,12 +23,12 @@
  ******/
 
 const Config = require('../config')
-const fs = require('fs')
+const Utils = require('../utils')
 const path = require('path')
 const customLogger = require('../requestLogger')
 const { promisify } = require('util')
 const jwt = require('jsonwebtoken')
-const readFileAsync = promisify(fs.readFile)
+const readFileAsync = Utils.readFileAsync
 
 const verifyToken = async (token) => {
   const systemConfig = Config.getSystemConfig()
@@ -50,7 +50,6 @@ const verifyToken = async (token) => {
     customLogger.logMessage('warn', 'No value specified for Constants.OAUTH.CERTIFICATE_FILE_NAME or Constants.OAUTH.EMBEDDED_CERTIFICATE. Auth will probably fail to validate the tokens', { notification: false })
   }
   customLogger.logMessage('info', `Token Issuer loaded: ${certContent}`, { notification: false })
-
   const jwtOpts = {}
   // jwtOpts.audience = systemConfig.OAUTH.APP_OAUTH_CLIENT_KEY // audience: If defined, the token audience (aud) will be verified against this value.
   // const jwtStrategy = new JwtStrategy(jwtOpts, verifyCallback)
