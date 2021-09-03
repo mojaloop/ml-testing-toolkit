@@ -130,10 +130,22 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
 }
 
 const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
+  const totalCounts = getTotalCounts(inputTemplate)
+
   const globalConfig = {
     broadcastOutboundProgressEnabled: false,
     scriptExecution: true,
-    testsExecution: true
+    testsExecution: true,
+    totalProgress: {
+      testCasesTotal: totalCounts.totalTestCases,
+      testCasesProcessed: 0,
+      requestsTotal: totalCounts.totalRequests,
+      requestsProcessed: 0,
+      assertionsTotal: totalCounts.totalAssertions,
+      assertionsProcessed: 0,
+      assertionsPassed: 0,
+      assertionsFailed: 0
+    }
   }
   const tracing = getTracing(traceID, dfspId)
 
@@ -322,6 +334,7 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
   }
 
   let testResult = null
+  console.log('GVK', resp)
   if (globalConfig.testsExecution) {
     testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
   }
