@@ -28,6 +28,7 @@
 'use strict'
 
 const Hapi = require('@hapi/hapi')
+const Boom = require('@hapi/boom')
 // const Path = require('path')
 const Config = require('./lib/config')
 // const Plugins = require('./plugins')
@@ -39,6 +40,7 @@ const arrayStore = require('./lib/arrayStore')
 const httpAgentStore = require('./lib/httpAgentStore')
 const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
 const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
+const { verifyToken } = require('./lib/oauth/OAuthValidator')
 
 var serverInstance = null
 // const openAPIOptions = {
@@ -121,9 +123,26 @@ const createServer = async (port, user) => {
 const onPreHandler = async (request, h) => {
   request.customInfo = {}
   if (Config.getSystemConfig().HOSTING_ENABLED) {
-    request.customInfo.user = {
-      dfspId: request.headers['fspiop-source']
+    // Validate token here
+    if (request.headers.authorization && request.headers.authorization.startsWith('Bearer')) {
+      const token = request.headers.authorization.replace(/^Bearer\s/, '')
+      try {
+        const tokenResponse = await verifyToken(token)
+        request.customInfo.user = {
+          dfspId: tokenResponse.dfspId
+        }
+      } catch (err) {
+        RequestLogger.logMessage('error', err.message, { additionalData: { errorStack: err.stack }, request })
+        throw Boom.unauthorized('Authentication Failed: ' + err.message)
+      }
+    } else {
+      throw Boom.unauthorized('Authentication Failed: Provide Bearer token')
     }
+    // if (!request.customInfo.user && request.headers['fspiop-source']) {
+    //   request.customInfo.user = {
+    //     dfspId: request.headers['fspiop-source']
+    //   }
+    // }
   }
 
   // Generate UniqueID

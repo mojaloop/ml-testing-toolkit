@@ -96,3 +96,5 @@ spec_files/rules_validation/*
 spec_files/rules_response/*
 !spec_files/rules_response/config.json
 !spec_files/rules_response/default.json
+
+uploads/*

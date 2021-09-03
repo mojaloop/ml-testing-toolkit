@@ -130,10 +130,22 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
 }
 
 const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
+  const totalCounts = getTotalCounts(inputTemplate)
+
   const globalConfig = {
     broadcastOutboundProgressEnabled: false,
     scriptExecution: true,
-    testsExecution: true
+    testsExecution: true,
+    totalProgress: {
+      testCasesTotal: totalCounts.totalTestCases,
+      testCasesProcessed: 0,
+      requestsTotal: totalCounts.totalRequests,
+      requestsProcessed: 0,
+      assertionsTotal: totalCounts.totalAssertions,
+      assertionsProcessed: 0,
+      assertionsPassed: 0,
+      assertionsFailed: 0
+    }
   }
   const tracing = getTracing(traceID, dfspId)
 
@@ -322,6 +334,7 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
   }
 
   let testResult = null
+  console.log('GVK', resp)
   if (globalConfig.testsExecution) {
     testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
   }
@@ -530,14 +543,6 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
       const userConfig = await Config.getUserConfig(user)
       const uniqueId = UniqueIdGenerator.generateUniqueId()
       let urlGenerated = userConfig.CALLBACK_ENDPOINT + path
-      if (Config.getSystemConfig().HOSTING_ENABLED) {
-        const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
-        if (endpointsConfig.dfspEndpoints && dfspId && endpointsConfig.dfspEndpoints[dfspId]) {
-          urlGenerated = endpointsConfig.dfspEndpoints[dfspId] + path
-        } else {
-          customLogger.logMessage('warning', 'Hosting is enabled, But there is no endpoint configuration found for DFSP ID: ' + dfspId, { user })
-        }
-      }
       if (baseUrl) {
         urlGenerated = getUrlPrefix(baseUrl) + path
       }

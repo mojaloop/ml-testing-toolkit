@@ -46,7 +46,6 @@ Config.getSystemConfig.mockReturnValue({
     "PTA_ROLE": "Application/PTA",
     "EVERYONE_ROLE": "Internal/everyone",
     "OAUTH2_ISSUER": "http://172.17.0.1:5050/api/oauth2/token",
-    "JWT_COOKIE_NAME": "TTK-API_ACCESS_TOKEN",
     "EMBEDDED_CERTIFICATE": "password"
   },
   "API_DEFINITIONS": [

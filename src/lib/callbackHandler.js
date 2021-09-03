@@ -42,35 +42,27 @@ const handleCallback = async (callbackObject, context, req) => {
   const userConfig = await Config.getUserConfig(req.customInfo.user)
   const uniqueId = UniqueIdGenerator.generateUniqueId(req)
   let callbackEndpoint = userConfig.CALLBACK_ENDPOINT
-  if (Config.getSystemConfig().HOSTING_ENABLED) {
-    const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
-    if (endpointsConfig.dfspEndpoints && callbackObject.callbackInfo.fspid && endpointsConfig.dfspEndpoints[callbackObject.callbackInfo.fspid]) {
-      callbackEndpoint = endpointsConfig.dfspEndpoints[callbackObject.callbackInfo.fspid]
+
+  const endpointsDfspWise = userConfig.ENDPOINTS_DFSP_WISE
+  if (userConfig.HUB_ONLY_MODE && callbackObject.callbackInfo && callbackObject.callbackInfo.fspid && endpointsDfspWise.dfsps[callbackObject.callbackInfo.fspid]) {
+    const dfspEndpoints = endpointsDfspWise.dfsps[callbackObject.callbackInfo.fspid]
+    const dfspEndpoint = dfspEndpoints.endpoints.find(endpoint => endpoint.method === callbackObject.method && endpoint.path && callbackObject.path && endpoint.endpoint)
+    if (dfspEndpoint) {
+      callbackEndpoint = dfspEndpoint.endpoint
     } else {
-      customLogger.logMessage('warning', 'Hosting is enabled, But there is no endpoint configuration found for DFSP ID: ' + callbackObject.callbackInfo.fspid, { request: req })
+      callbackEndpoint = dfspEndpoints.defaultEndpoint
     }
-  } else {
-    const endpointsDfspWise = userConfig.ENDPOINTS_DFSP_WISE
-    if (userConfig.HUB_ONLY_MODE && callbackObject.callbackInfo && callbackObject.callbackInfo.fspid && endpointsDfspWise.dfsps[callbackObject.callbackInfo.fspid]) {
-      const dfspEndpoints = endpointsDfspWise.dfsps[callbackObject.callbackInfo.fspid]
-      const dfspEndpoint = dfspEndpoints.endpoints.find(endpoint => endpoint.method === callbackObject.method && endpoint.path && callbackObject.path && endpoint.endpoint)
-      if (dfspEndpoint) {
-        callbackEndpoint = dfspEndpoint.endpoint
-      } else {
-        callbackEndpoint = dfspEndpoints.defaultEndpoint
+  } else if (userConfig.CALLBACK_RESOURCE_ENDPOINTS && userConfig.CALLBACK_RESOURCE_ENDPOINTS.enabled) {
+    const callbackEndpoints = userConfig.CALLBACK_RESOURCE_ENDPOINTS
+    const matchedObject = callbackEndpoints.endpoints.find(item => {
+      if (item.method === callbackObject.method) {
+        const path = new RegExp(item.path.replace(/{.*}/, '.*'))
+        return path.test(callbackObject.path)
       }
-    } else if (userConfig.CALLBACK_RESOURCE_ENDPOINTS && userConfig.CALLBACK_RESOURCE_ENDPOINTS.enabled) {
-      const callbackEndpoints = userConfig.CALLBACK_RESOURCE_ENDPOINTS
-      const matchedObject = callbackEndpoints.endpoints.find(item => {
-        if (item.method === callbackObject.method) {
-          const path = new RegExp(item.path.replace(/{.*}/, '.*'))
-          return path.test(callbackObject.path)
-        }
-        return false
-      })
-      if (matchedObject && matchedObject.endpoint) {
-        callbackEndpoint = matchedObject.endpoint
-      }
+      return false
+    })
+    if (matchedObject && matchedObject.endpoint) {
+      callbackEndpoint = matchedObject.endpoint
     }
   }
 
@@ -136,6 +128,7 @@ const handleCallback = async (callbackObject, context, req) => {
     path: callbackObject.path,
     headers: callbackObject.headers,
     data: callbackObject.body,
+    customInfo: req.customInfo,
     timeout: userConfig.DEFAULT_REQUEST_TIMEOUT || 3000,
     ...httpAgentProps
   }

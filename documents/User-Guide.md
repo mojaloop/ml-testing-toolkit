@@ -47,3 +47,7 @@ The document below covers the use-cases with the **Mojaloop Simulator** and **Mo
 ### Provisioning new API
 
 - [API Provisioning User Guide](/documents/User-Guide-API-Provisioning.md)
+
+### Hosted mode with docker-compose
+
+- [Hosted mode with docker-compose](/documents/User-Guide-Hosted-Mode-Docker-Compose.md)

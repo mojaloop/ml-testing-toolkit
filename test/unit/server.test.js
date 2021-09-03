@@ -31,6 +31,8 @@ const ObjectStore = require('../../src/lib/objectStore')
 const ArrayStore = require('../../src/lib/arrayStore')
 const httpAgentStore = require('../../src/lib/httpAgentStore')
 const OpenApiMockHandler = require('../../src/lib/mocking/openApiMockHandler')
+const OAuthValidator = require('../../src/lib/oauth/OAuthValidator')
+
 
 const SpyWaitForTlsHubCerts = jest.spyOn(ConnectionProvider, 'waitForTlsHubCerts')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
@@ -43,6 +45,7 @@ const customLogger = require('../../src/lib/requestLogger')
 
 jest.mock('../../src/lib/requestLogger')
 jest.mock('../../src/lib/config')
+jest.mock('../../src/lib/oauth/OAuthValidator')
 
 jest.setTimeout(30000)
 
@@ -160,15 +163,19 @@ describe('Server', () => {
     const req = {
       customInfo: {},
       headers: {
-        'fspiop-source': 'data'
+        'fspiop-source': 'data',
+        authorization: 'Bearer TOKEN'
       }
     }
     it('onPreHandler should not throw an error', async () => {
-      Config.getSystemConfig.mockReturnValue({
+      Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
       })
       Config.getUserConfig.mockResolvedValueOnce({
         FSPID: 'test'
+      })
+      OAuthValidator.verifyToken.mockResolvedValueOnce({
+        dfspId: 'test'
       })
       await Server.onPreHandler(req, h)
     })
@@ -180,12 +187,16 @@ describe('Server', () => {
     const req = {
       customInfo: {},
       headers: {
-        'fspiop-source': 'data'
+        'fspiop-source': 'data',
+        authorization: 'Bearer TOKEN'
       }
     }
     it('onPreHandler should not throw an error', async () => {
       Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
+      })
+      OAuthValidator.verifyToken.mockResolvedValueOnce({
+        dfspId: 'test'
       })
       await Server.onPreHandler(req, h)
     })

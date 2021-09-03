@@ -31,7 +31,7 @@ const customLogger = require('../requestLogger')
 
 function cookieExtractor (req) {
   const cookies = new Cookies(req)
-  const token = cookies.get(Config.getSystemConfig().OAUTH.JWT_COOKIE_NAME)
+  const token = cookies.get('TTK-API_ACCESS_TOKEN')
   return token
 }
 
@@ -77,11 +77,12 @@ function createJwtStrategy (extraExtractors) {
   }
   customLogger.logMessage('info', `Token Issuer loaded: ${certContent}`, { notification: false })
 
-  jwtStrategyOpts.secretOrKeyProvider = (request, rawJwtToken, done) => {
-    done(null, certContent)
-  }
+  jwtStrategyOpts.secretOrKey = certContent
+  // jwtStrategyOpts.secretOrKeyProvider = (request, rawJwtToken, done) => {
+  //   done(null, certContent)
+  // }
   // jwtStrategyOpts.issuer = 'accounts.examplesoft.com'
-  jwtStrategyOpts.audience = systemConfig.OAUTH.APP_OAUTH_CLIENT_KEY // audience: If defined, the token audience (aud) will be verified against this value.
+  // jwtStrategyOpts.audience = systemConfig.OAUTH.APP_OAUTH_CLIENT_KEY // audience: If defined, the token audience (aud) will be verified against this value.
   const jwtStrategy = new JwtStrategy(jwtStrategyOpts, verifyCallback)
   return jwtStrategy
 }

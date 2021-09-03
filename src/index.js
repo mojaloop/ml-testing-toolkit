@@ -47,7 +47,10 @@ const init = async () => {
   await Config.loadUserConfig()
   apiServer.startServer(5050)
   socketServer.initServer(apiServer.getHttp())
-  await require('./lib/configuration-providers/mb-connection-manager').initialize()
+  const systemConfig = Config.getSystemConfig()
+  if (systemConfig.CONNECTION_MANAGER.ENABLED) {
+    await require('./lib/configuration-providers/mb-connection-manager').initialize()
+  }
   await require('./lib/report-generator/generator').initialize()
   await require('./server').initialize()
   RequestLogger.logMessage('info', 'Toolkit Initialization completed.', { notification: false, additionalData: welcomeMessage })
