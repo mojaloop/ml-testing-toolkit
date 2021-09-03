@@ -8,7 +8,7 @@ volumes:
 
 services:
   mojaloop-testing-toolkit:
-    image: mojaloop/ml-testing-toolkit:v13.3.0
+    image: mojaloop/ml-testing-toolkit:v13.4.0
     # image: mojaloop-testing-toolkit:local
     # build:
     #  context: .
@@ -45,7 +45,7 @@ services:
     depends_on:
       - ttk-mongodb
   mojaloop-testing-toolkit-ui:
-    image: mojaloop/ml-testing-toolkit-ui:v13.3.0
+    image: mojaloop/ml-testing-toolkit-ui:v13.4.0
     ports:
       - "6060:6060"
     environment:
