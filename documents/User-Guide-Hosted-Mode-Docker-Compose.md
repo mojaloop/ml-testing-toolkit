@@ -12,7 +12,7 @@
 
 4. [Login into TTK UI](#4-login-into-ttk-ui)
 
-5. [Sending a Transfer](#4-sending-a-transfer)
+5. [Sending a Transfer](#5-sending-a-transfer)
 
 
 ## 1. Introduction
