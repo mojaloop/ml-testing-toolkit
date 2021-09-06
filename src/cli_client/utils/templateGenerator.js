@@ -18,7 +18,7 @@ const getFileData = async (fileToRead, fileStat) => {
   }
 }
 const getFolderRawData = async (folderItem) => {
-  var importFolderRawData = []
+  const importFolderRawData = []
   const stat = await fileStatAsync(folderItem)
   if (stat.isFile() && folderItem.endsWith('.json')) {
     const fileItemData = await getFileData(folderItem, stat)
@@ -27,7 +27,7 @@ const getFolderRawData = async (folderItem) => {
     }
   } else if (stat.isDirectory()) {
     const fileList = await readRecursiveAsync(folderItem)
-    for (var j = 0; j < fileList.length; j++) {
+    for (let j = 0; j < fileList.length; j++) {
       const fileItemData = await getFileData(fileList[j], stat)
       if (fileItemData) {
         importFolderRawData.push(fileItemData)
@@ -40,8 +40,8 @@ const getFolderRawData = async (folderItem) => {
 
 const generateTemplate = async (fileList) => {
   try {
-    var testCases = []
-    for (var i = 0; i < fileList.length; i++) {
+    let testCases = []
+    for (let i = 0; i < fileList.length; i++) {
       const importFolderRawData = await getFolderRawData(fileList[i])
       const folderData = FolderParser.getFolderData(importFolderRawData)
       const folderTestCases = FolderParser.getTestCases(folderData)

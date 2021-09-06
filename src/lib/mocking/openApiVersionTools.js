@@ -24,7 +24,7 @@
 
 const customLogger = require('../requestLogger')
 
-const acceptHeaderRE = new RegExp('^application/vnd.interoperability\\.([a-zA-Z0-9\\*]+)?(\\+json)?(;)?(version=(([0-9]+)(\\.([0-9]+))?)?)?$')
+const acceptHeaderRE = new RegExp('^application/vnd.interoperability\\.([a-zA-Z0-9\\*]+)?(\\+json)?(;)?(version=(([0-9]+)(\\.([0-9]+))?)?)?$')  // eslint-disable-line
 
 module.exports.validateAcceptHeader = (acceptHeader) => {
   const validationFailed = !acceptHeaderRE.test(acceptHeader)

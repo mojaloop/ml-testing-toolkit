@@ -47,7 +47,7 @@ const testcaseDefinitionTemplates = {
 }
 
 const _initializeTestReports = async () => {
-  for (var key of Object.keys(testResultTemplates)) {
+  for (const key of Object.keys(testResultTemplates)) {
     const templateContent = await readFileAsync(BASE_TEMPLATE_PATH + '/newman/' + testResultTemplates[key].file)
     testResultTemplates[key].handle = Handlebars.compile(templateContent.toString())
     customLogger.logMessage('debug', key + ' template compiled')
@@ -55,7 +55,7 @@ const _initializeTestReports = async () => {
 }
 
 const _initializeTestcaseDefinition = async () => {
-  for (var key of Object.keys(testcaseDefinitionTemplates)) {
+  for (const key of Object.keys(testcaseDefinitionTemplates)) {
     const templateContent = await readFileAsync(BASE_TEMPLATE_PATH + '/testcase_definition/' + testcaseDefinitionTemplates[key].file)
     testcaseDefinitionTemplates[key].handle = Handlebars.compile(templateContent.toString())
     customLogger.logMessage('debug', key + ' template compiled')

@@ -48,7 +48,7 @@ const arrayStore = require('../arrayStore')
 const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 const httpAgentStore = require('../httpAgentStore')
 
-var terminateTraceIds = {}
+const terminateTraceIds = {}
 
 const getTracing = (traceID, dfspId) => {
   const tracing = {
@@ -614,9 +614,9 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         }
       }
 
-      var syncResponse = {}
-      var curlRequest = ''
-      var timer = null
+      let syncResponse = {}
+      let curlRequest = ''
+      let timer = null
       if (successCallbackUrl && errorCallbackUrl && (ignoreCallbacks !== true)) {
         timer = setTimeout(() => {
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
@@ -707,7 +707,7 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
           const temp = element.replace(/{\$prev.(.*)}/, '$1')
           const tempArr = temp.split('.')
           try {
-            var replacedValue = _.get(requestsObj[tempArr[0]].appended, temp.replace(tempArr[0] + '.', ''))
+            const replacedValue = _.get(requestsObj[tempArr[0]].appended, temp.replace(tempArr[0] + '.', ''))
             if (replacedValue) {
               resultObject = resultObject.replace(element, replacedValue)
             }
@@ -766,8 +766,8 @@ const _replaceGenericVariables = (inputRequest, replaceObject, variablePrefix) =
       const splitArr = element.split('.')
       if (splitArr[0] === '{$' + variablePrefix) {
         const regExp1 = new RegExp('{\\$' + variablePrefix + '.(.*)}')
-        var temp2 = element.replace(regExp1, '$1')
-        var replacedValue2 = _.get(replaceObject, temp2)
+        const temp2 = element.replace(regExp1, '$1')
+        const replacedValue2 = _.get(replaceObject, temp2)
         if (replacedValue2 !== undefined) {
           resultObject = resultObject.replace(element, replacedValue2)
         }
@@ -785,7 +785,7 @@ const replacePathVariables = (operationPath, params) => {
   const matchedArray = resultObject.match(/{([^}]+)}/g)
   if (matchedArray) {
     matchedArray.forEach(element => {
-      var temp = element.replace(/{([^}]+)}/, '$1')
+      const temp = element.replace(/{([^}]+)}/, '$1')
       if (params && params[temp]) {
         resultObject = resultObject.replace(element, params[temp])
       }
@@ -802,7 +802,7 @@ const getFunctionResult = (param, inputValues, request) => {
 
 // Get Total Counts
 const getTotalCounts = (inputTemplate) => {
-  var result = {
+  const result = {
     totalTestCases: 0,
     totalRequests: 0,
     totalAssertions: 0

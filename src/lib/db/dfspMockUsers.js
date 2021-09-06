@@ -67,8 +67,8 @@ const getKeyCloakUsers = async (keycloakToken) => {
           name: `${user.firstName} ${user.lastName}`
         })
       }
+      return users
     })
-    return users
   } else {
     throw new Error(`Some error while getting users from as ${systemConfig.KEYCLOAK.USERNAME}`)
   }

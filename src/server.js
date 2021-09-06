@@ -42,7 +42,7 @@ const ConnectionProvider = require('./lib/configuration-providers/mb-connection-
 const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
 const { verifyToken } = require('./lib/oauth/OAuthValidator')
 
-var serverInstance = null
+let serverInstance = null
 // const openAPIOptions = {
 //   api: Path.resolve(__dirname, './interface/api_swagger.json'),
 //   handlers: Path.resolve(__dirname, './handlers')

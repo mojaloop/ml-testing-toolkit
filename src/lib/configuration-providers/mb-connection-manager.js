@@ -36,20 +36,20 @@ const customLogger = require('../requestLogger')
 const DEFAULT_ENVIRONMENT_NAME = 'TESTING-TOOLKIT'
 const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
 const CM_CHECK_INTERVAL = 10000
-var CONNECTION_MANAGER = null
+let CONNECTION_MANAGER = null
 
-var currentCookies = [null]
-var currentEnvironment = null
+let currentCookies = [null]
+let currentEnvironment = null
 // var currentTestingToolkitDFSP = null
 // var currentUserDFSP = null
 
-var currentJWSConfig = {
+const currentJWSConfig = {
   dfsps: {}
 }
-var currentTlsConfig = {
+const currentTlsConfig = {
   dfsps: {}
 }
-var currentEndpoints = {}
+const currentEndpoints = {}
 
 const initEnvironment = async () => {
   // Check whether an environment exists with the name testing-toolkit
