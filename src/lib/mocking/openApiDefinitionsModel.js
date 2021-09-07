@@ -23,7 +23,7 @@
  ******/
 
 const Config = require('../config')
-let apiDefinitions = null
+var apiDefinitions = null
 const specFilePrefix = 'spec_files/api_definitions/'
 
 const getApiDefinitions = async () => {

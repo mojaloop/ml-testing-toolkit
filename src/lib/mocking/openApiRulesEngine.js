@@ -23,7 +23,7 @@
  ******/
 
 const fs = require('fs')
-const path = require('path')
+var path = require('path')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const customLogger = require('../requestLogger')
@@ -378,7 +378,7 @@ const forwardRules = async (context, req) => {
 }
 
 const replaceVariablesFromRequest = async (inputObject, context, req) => {
-  let resultObject
+  var resultObject
   // Check whether inputObject is string or object. If it is object, then convert that to JSON string and parse it while return
   if (typeof inputObject === 'string') {
     resultObject = inputObject

@@ -102,7 +102,7 @@ class InboundEventListener {
           resolve(retMessage)
         } else {
           // Listen for the new message for some time
-          let timer = null
+          var timer = null
           // Set the timer
           timer = setTimeout(() => {
             try {
