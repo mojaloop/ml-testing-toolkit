@@ -1,0 +1,37 @@
+{
+  "/parties/{idType}/{idValue}": {
+    "get": {
+      "response": {
+        "bodyOverride": {
+          "idType": "{$request.params.idType}",
+          "idValue": "{$request.params.idValue}",
+          "merchantClassificationCode": null
+        }
+      }
+    }
+  },
+  "/quoterequests": {
+    "post": {
+      "response": {
+        "bodyOverride": {
+          "quoteId": "{$request.body.quoteId}",
+          "transactionId": "{$request.body.transactionId}",
+          "transferAmount": "{$request.body.amount}",
+          "transferAmountCurrency": "{$request.body.currency}",
+          "expiration": "{$request.body.expiration}",
+          "geoCode": null,
+          "extensionList": null
+        }
+      }
+    }
+  },
+  "/transfers": {
+    "post": {
+      "response": {
+        "bodyOverride": {
+          "homeTransactionId": "{$request.body.transferId}"
+        }
+      }
+    }
+  }
+}

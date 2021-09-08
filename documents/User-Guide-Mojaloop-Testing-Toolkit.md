@@ -468,7 +468,25 @@ You can write scripts in two formats.
   - **custom.skipRequest** - function
 
     By using this function in the pre-request script, you can skip the current request including post-request-scripts and assertions. You can see the request and assertions as skipped in the UI and in the report as well.
+    
+  - _**custom.pushMessage(message, [sessionID])**_
 
+    By using this function in the scripts in rules for inbound requests, you can push a websocket message to the clients listening on the websocket server of TTK and on topic 'pushMessage'. There is an optional sessionId that we can pass as second argument to this function
+
+    Parameters:
+    - **message** - The message object to emit to the clients.
+
+      Type: [`Object`]
+
+    - **sessionID** - Optional sessionID to send message to targetted clients who are listening on the topic 'pushMessage/<sessionID>'
+
+      Type: [`string`]
+
+    Example usage:
+    ```javascript
+    await custom.pushMessage({ name: 'Sample Name' })
+    await custom.pushMessage({ name: 'Sample Name' }, 'client1')
+    ```
 
 ![Sample Pre Request and Post Request Scripts](/assets/images/test-case-editor-scripts.png)
 

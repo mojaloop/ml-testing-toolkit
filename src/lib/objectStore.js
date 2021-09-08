@@ -23,6 +23,8 @@
  --------------
  ******/
 
+const _ = require('lodash')
+
 var storedObject = {
   data: {
     transactions: {},
@@ -98,7 +100,10 @@ const clearOldObjects = () => {
   clear('callbacksHistory', interval)
 }
 
-const initObjectStore = () => {
+const initObjectStore = (initConfig = null) => {
+  if (initConfig) {
+    _.merge(storedObject.data, initConfig)
+  }
   setInterval(clearOldObjects, 1000)
 }
 

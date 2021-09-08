@@ -1,0 +1,1078 @@
+openapi: 3.0.1
+info:
+  title: Mojaloop SDK Inbound Scheme Adapter API
+  description: Mojaloop SDK Inbound Scheme Adapter API - To be implemented by DFSP backend
+  license:
+    name: Open API for FSP Interoperability (FSPIOP)
+    url: http://www.majaloop.io
+  version: 1.0.0
+
+paths:
+  /:
+    get:
+      summary: Health check endpoint.
+      operationId: healthCheck
+      responses:
+        200:
+          description: Returns empty body if the service is running.
+  /participants/{idType}/{idValue}:
+    get:
+      summary: Asks for the FSPID of the scheme participant that can handle transfers for the specified identifier type and value
+      tags:
+        - Participants
+      operationId: ParticipantsGetByTypeAndID
+      parameters:
+        - name: idType
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idType'
+        - name: idValue
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idValue'
+      responses:
+        200:
+          description: Response containing details of the requested party
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/participantsResponse'
+        404:
+          description: The party specified by the provided identifier type and value is not known to the server
+        400:
+          description: Malformed or missing required headers or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        500:
+          description: An error occured processing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /participants/{idType}/{idValue}/{subIdValue}:
+    get:
+      summary: Asks for the FSPID of the scheme participant that can handle transfers for the specified identifier type, value and subId value
+      tags:
+        - Participants
+      operationId: ParticipantsGetByTypeIDAndSubId
+      parameters:
+        - name: idType
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idType'
+        - name: idValue
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idValue'
+        - name: subIdValue
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/subIdValue'
+      responses:
+        200:
+          description: Response containing details of the requested party
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/participantsResponse'
+        404:
+          description: The party specified by the provided identifier type and value/subId is not known to the server
+        400:
+          description: Malformed or missing required headers or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        500:
+          description: An error occured processing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /parties/{idType}/{idValue}:
+    get:
+      summary: Requests information relating to a transfer party identified by the specified identifier type and value
+      tags:
+        - Parties
+      operationId: PartiesGetByTypeAndID
+      parameters:
+        - name: idType
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idType'
+        - name: idValue
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idValue'
+      responses:
+        200:
+          description: Response containing details of the requested party
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transferParty'
+        404:
+          description: The party specified by the provided identifier type and value is not known to the server
+        400:
+          description: Malformed or missing required headers or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        500:
+          description: An error occured processing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /parties/{idType}/{idValue}/{subIdValue}:
+    get:
+      summary: Requests information relating to a transfer party identified by the specified identifier type, value and subId value
+      tags:
+        - Parties
+      operationId: PartiesGetByTypeIdAndSubId
+      parameters:
+        - name: idType
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idType'
+        - name: idValue
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idValue'
+        - name: subIdValue
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/subIdValue'
+      responses:
+        200:
+          description: Response containing details of the requested party
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transferParty'
+        404:
+          description: The party specified by the provided identifier type and value is not known to the server
+        400:
+          description: Malformed or missing required headers or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        500:
+          description: An error occured processing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /quoterequests:
+    post:
+      summary: Requests a quote for the specified transfer
+      tags:
+        - Quotes
+      operationId: QuoteRequest
+      requestBody:
+        description: Request for a transfer quotation
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/quoteRequest'
+      responses:
+        200:
+          description: A response to the transfer quotation request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/quoteResponse'
+        400:
+          description: Malformed or missing required headers or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        500:
+          description: An error occured processing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /transactionrequests:
+    post:
+      summary: transaction request that supports pull based transfers
+      tags:
+        - TransactionRequest
+      operationId: TransactionRequest
+      requestBody:
+        description: Request for Transaction Request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transactionRequest'
+      responses:
+        200:
+          description: A response to the transfer transaction request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transactionRequestResponse'
+        400:
+          description: Malformed or missing required headers or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        500:
+          description: An error occured processing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /transfers:
+    post:
+      summary: Transfers funds from an external account to an internal account
+      tags:
+        - Transfers
+      operationId: TransfersPost
+      requestBody:
+        description: An incoming transfer request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transferRequest'
+      responses:
+        200:
+          description: The transfer was accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transferResponse'
+        400:
+          description: Malformed or missing required headers or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        500:
+          description: An error occured processing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /transfers/{transferId}:
+    put:
+      summary: Receive notification for a specific transfer
+      description: The HTTP request `PUT /transfers/{transferId}` is used to receive notification for transfer being fulfiled when the FSP is a Payee
+      parameters:
+        - name: transferId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idValue'
+      tags:
+        - Transfers
+      operationId: TransfersPut
+      requestBody:
+        description: An incoming notification for fulfiled transfer
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/fulfilNotification'
+      responses:
+        200:
+          description: The notification was accepted
+        500:
+          description: An error occured processing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+
+  /otp/{requestToPayId}:
+    get:
+      summary: Requests OTP 
+      tags:
+        - OTP
+      operationId: OtpGet
+      parameters:
+        - name: requestToPayId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idValue'
+      responses:
+        200:
+          description: Response containing details of the OTP
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/otpDetails'
+        404:
+          description: The party specified by the provided identifier type and value is not known to the server
+        400:
+          description: Malformed or missing required headers or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        500:
+          description: An error occured processing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+  
+  /bulkQuotes:
+    post:
+      summary: Requests a bulk quote
+      tags:
+        - BulkQuotes
+      operationId: BulkQuotesPost
+      requestBody:
+        description: Incoming request for a bulk quotation
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/bulkQuoteRequest'
+      responses:
+        200:
+          description: A response to the bulk quote request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulkQuoteResponse'
+        400:
+          description: Malformed or missing required headers or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        500:
+          description: An error occured processing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /bulkQuotes/{idValue}:
+    get:
+      summary: Requests information relating to a bulk quote identified by the specified identifier value
+      tags:
+        - BulkQuotes
+      operationId: BulkQuotesGet
+      parameters:
+        - name: idValue
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idValue'
+      responses:
+        200:
+          description: Response containing details of the requested bulk quote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulkQuoteResponse'
+        404:
+          description: The bulk quote specified by the provided identifier value is not known to the server
+        400:
+          description: Malformed or missing required headers or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        500:
+          description: An error occured processing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /bulkTransfers:
+    post:
+      summary: Execute bulk transfer of funds from an external account to internal accounts
+      tags:
+        - BulkTransfers
+      operationId: BulkTransfersPost
+      requestBody:
+        description: An incoming bulk transfer request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/bulkTransferRequest'
+      responses:
+        200:
+          description: The bulk transfer was accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulkTransferResponse'
+        400:
+          description: Malformed or missing required headers or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        500:
+          description: An error occured processing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /bulkTransfers/{idValue}:
+    get:
+      summary: Requests information relating to a bulk transfer identified by the specified identifier value
+      tags:
+        - BulkTransfers
+      operationId: BulkTransfersGet
+      parameters:
+        - name: idValue
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/idValue'
+      responses:
+        200:
+          description: Response containing details of the requested bulk transfer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulkTransferResponse'
+        404:
+          description: The bulk transfer specified by the provided identifier value is not known to the server
+        400:
+          description: Malformed or missing required headers or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        500:
+          description: An error occured processing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+components:
+  schemas:
+    quoteRequest:
+      type: object
+      description: A request for a quote for transfer from the DFSP backend
+      required:
+        - quoteId
+        - transactionId
+        - to
+        - from
+        - amountType
+        - amount
+        - currency
+        - transactionType
+        - initiator
+        - initiatorType
+      properties:
+        quoteId:
+          $ref: '#/components/schemas/quoteId'
+        transactionId:
+          $ref: '#/components/schemas/transactionId'
+        to:
+          $ref: '#/components/schemas/transferParty'
+        from:
+          $ref: '#/components/schemas/transferParty'
+        amountType:
+          $ref: '#/components/schemas/amountType'
+        amount:
+          $ref: '#/components/schemas/money'
+        currency:
+          $ref: '#/components/schemas/currency'
+        feesAmount:
+          $ref: '#/components/schemas/money'
+        feesCurrency:
+          $ref: '#/components/schemas/currency'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+        initiator:
+          $ref: '#/components/schemas/initiator'
+        initiatorType:
+          $ref: '#/components/schemas/initiatorType'
+        geoCode:
+          $ref: '#/components/schemas/geoCode'
+        note:
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: An optional note associated with the requested transfer
+        expiration:
+          $ref: '#/components/schemas/timestamp'
+
+    transactionRequest:
+      type: object
+      description: A request for a pull based transfer
+      required:
+        - transactionRequestId
+        - to
+        - from
+        - amount
+        - currency
+        - transactionType
+        - initiator
+        - initiatorType
+      properties:
+        transactionRequestId:
+          $ref: '#/components/schemas/transactionRequestId'
+        to:
+          $ref: '#/components/schemas/transferParty'
+        from:
+          $ref: '#/components/schemas/transferParty'
+        amount:
+          $ref: '#/components/schemas/money'
+        currency:
+          $ref: '#/components/schemas/currency'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+        initiator:
+          $ref: '#/components/schemas/initiator'
+        initiatorType:
+          $ref: '#/components/schemas/initiatorType'
+        geoCode:
+          $ref: '#/components/schemas/geoCode'
+        note:
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: An optional note associated with the requested transfer
+        expiration:
+          $ref: '#/components/schemas/timestamp'
+
+    timestamp:
+      type: string
+      description: An ISO-8601 formatted timestamp
+      pattern: ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:(\.\d{3}))(?:Z|[+-][01]\d:[0-5]\d)$
+   
+    dateOfBirth:
+      type: string
+      description: Date of birth in the form YYYY-MM-DD
+      pattern: ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)$
+ 
+    initiator:
+      type: string
+      enum:
+        - PAYER
+        - PAYEE
+        
+    initiatorType:
+      type: string
+      enum:
+        - CONSUMER
+        - AGENT
+        - BUSINESS
+        - DEVICE
+      
+    quoteResponse:
+      type: object
+      description: A response to a request for a quote
+      required:
+        - quoteId
+        - transactionId
+        - transferAmount
+        - transferAmountCurrency
+      properties:
+        quoteId:
+          $ref: '#/components/schemas/quoteId'
+        transactionId:
+          $ref: '#/components/schemas/transactionId'
+        transferAmount:
+          $ref: '#/components/schemas/money'
+        transferAmountCurrency:
+          $ref: '#/components/schemas/currency'
+        payeeReceiveAmount:  
+          $ref: '#/components/schemas/money'
+        payeeReceiveAmountCurrency:
+          $ref: '#/components/schemas/currency'
+        payeeFspFeeAmount:
+          $ref: '#/components/schemas/money'
+        payeeFspFeeAmountCurrency:
+          $ref: '#/components/schemas/currency'      
+        payeeFspCommissionAmount:
+          $ref: '#/components/schemas/money'
+        payeeFspCommissionAmountCurrency:
+          $ref: '#/components/schemas/currency'  
+        expiration:
+          $ref: '#/components/schemas/timestamp'
+        geoCode:
+          $ref: '#/components/schemas/geoCode'
+        extensionList:
+          $ref: '#/components/schemas/extensionList'
+
+    transactionRequestResponse:
+      type: object
+      description: A response to a request for a quote
+      required:
+        - transactionId
+        - transactionRequestState
+      properties:
+        transactionId:
+          $ref: '#/components/schemas/transactionId'
+        transferAmount:
+          $ref: '#/components/schemas/transactionRequestState'
+
+    participantsResponse:
+      type: object
+      properties:
+        fspId:
+          $ref: '#/components/schemas/fspId'
+  
+    fspId:
+      type: string
+      minLength: 1
+      maxLength: 32
+  
+    payerType:
+      type: string
+      enum:
+      - CONSUMER
+      - AGENT
+      - BUSINESS
+      - DEVICE
+      
+    amountType:
+      type: string
+      enum:
+      - SEND
+      - RECEIVE
+      
+    transactionType:
+      type: string
+      enum:
+      - TRANSFER
+      - DEPOSIT
+      - PAYMENT
+
+    transactionRequestState:
+      type: string
+      enum:
+      - RECEIVED
+      - PENDING
+      - ACCEPTED
+      - REJECTED
+      
+    transferRequest:
+      type: object
+      required:
+        - transferId
+        - currency
+        - amount
+      properties:
+        transferId:
+          $ref: '#/components/schemas/transferId'
+        quote:
+          $ref: '#/components/schemas/quoteResponse'
+        from:
+          $ref: '#/components/schemas/transferParty'
+        to:
+          $ref: '#/components/schemas/transferParty'
+        amountType:
+          $ref: '#/components/schemas/amountType'
+        currency:
+          $ref: '#/components/schemas/currency'
+        amount:
+          $ref: '#/components/schemas/money'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+        note:
+          maxLength: 128
+          type: string
+
+    otpDetails:
+      type: object
+      required:
+        - otpValue
+      properties:
+        otpValue:
+          type: string
+          description: OTP value
+      
+    idType:
+      type: string
+      enum:
+      - MSISDN
+      - ACCOUNT_NO
+      - EMAIL
+      - PERSONAL_ID
+      - BUSINESS
+      - DEVICE
+      - ACCOUNT_ID
+      - IBAN
+      - ALIAS
+      
+    idValue:
+      type: string
+      minLength: 1
+      maxLength: 128
+      
+    subIdValue:
+      type: string
+      minLength: 1
+      maxLength: 128
+      
+    money:
+      pattern: ^([0]|([1-9][0-9]{0,17}))([.][0-9]{0,3}[1-9])?$
+      type: string
+      
+    transferResponse:
+      type: object
+      required:
+        - homeTransactionId
+      properties:
+        homeTransactionId:
+          type: string
+          description: Transaction ID from the DFSP backend, used to reconcile transactions between the switch and DFSP backend systems
+          
+    currency:
+      maxLength: 3
+      minLength: 3
+      type: string
+      
+    transferId:
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      type: string
+      description: A Mojaloop API transfer identifier (UUID)
+      
+    quoteId:
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      type: string
+      description: A Mojaloop API quote identifier (UUID)
+    
+    transactionRequestId:
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      type: string
+      description: A Mojaloop API transaction request identifier (UUID)
+      
+    transactionId:
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      type: string
+      description: ID of the transaction, the ID is decided by the Payer FSP during the creation of the quote
+      
+    transferParty:
+      type: object
+      required:
+        - idType
+        - idValue
+      properties:
+        type:
+          $ref: '#/components/schemas/payerType'
+        idType:
+          $ref: '#/components/schemas/idType'
+        idValue:
+          type: string
+          description: The identifier string used to identify the sender
+        subIdValue:
+          type: string
+          description: The sub identifier string used to identify the sender
+        displayName:
+          type: string
+          description: Display name of the sender if known
+        firstName:
+          type: string
+          description: Party first name
+        middleName:
+          type: string
+          description: Party moddle name
+        lastName:
+          type: string
+          description: Party last name
+        dateOfBirth:
+          $ref: '#/components/schemas/dateOfBirth'
+        merchantClassificationCode:
+          type: string
+          description: Up to 4 digits specifying the senders merchant classification, if known and applicable
+    
+    bulkQuoteRequest:
+      type: object
+      description: A request for a bulk quote
+      required:
+        - bulkQuoteId
+        - from
+        - individualQuotes
+      properties:
+        bulkQuoteId:
+          $ref: '#/components/schemas/bulkQuoteId'
+        from:
+          $ref: '#/components/schemas/transferParty'
+        geoCode:
+          $ref: '#/components/schemas/geoCode'
+        expiration:
+          $ref: '#/components/schemas/timestamp'
+        individualQuotes:
+          type: array
+          minItems: 1
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/IndividualQuote'
+
+    bulkQuoteResponse:
+      type: object
+      description: A response to a request for a bulk quote
+      required:
+        - bulkQuoteId
+        - individualQuoteResults
+      properties:
+        bulkQuoteId:
+          $ref: '#/components/schemas/bulkQuoteId'
+        expiration:
+          $ref: '#/components/schemas/timestamp'
+        individualQuoteResults:
+          type: array
+          minItems: 1
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/IndividualQuoteResult'
+          description: Fees for each individual transaction, if any of them are charged per
+            transaction.
+    
+    IndividualQuote:
+      type: object
+      description: Data model for individual quote in a bulk quote request
+      required:
+        - quoteId
+        - transactionId
+        - to
+        - amountType
+        - amount
+        - currency
+        - transactionType
+        - initiator
+        - initiatorType
+      properties:
+        quoteId:
+          $ref: '#/components/schemas/quoteId'
+        transactionId:
+          $ref: '#/components/schemas/transactionId'
+        to:
+          $ref: '#/components/schemas/transferParty'
+        amountType:
+          $ref: '#/components/schemas/amountType'
+        amount:
+          $ref: '#/components/schemas/money'
+        currency:
+          $ref: '#/components/schemas/currency'
+        feesAmount:
+          $ref: '#/components/schemas/money'
+        feesCurrency:
+          $ref: '#/components/schemas/currency'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+        initiator:
+          $ref: '#/components/schemas/initiator'
+        initiatorType:
+          $ref: '#/components/schemas/initiatorType'
+        note:
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: An optional note associated with the quote
+        
+    IndividualQuoteResult:
+      type: object
+      description: Data model for individual quote in a bulk quote response
+      properties:
+        quoteId:
+          $ref: '#/components/schemas/quoteId'
+        transferAmount:
+          $ref: '#/components/schemas/money'
+        transferAmountCurrency:
+          $ref: '#/components/schemas/currency'
+        payeeReceiveAmount:  
+          $ref: '#/components/schemas/money'
+        payeeReceiveAmountCurrency:
+          $ref: '#/components/schemas/currency'
+        payeeFspFeeAmount:
+          $ref: '#/components/schemas/money'
+        payeeFspFeeAmountCurrency:
+          $ref: '#/components/schemas/currency'      
+        payeeFspCommissionAmount:
+          $ref: '#/components/schemas/money'
+        payeeFspCommissionAmountCurrency:
+          $ref: '#/components/schemas/currency'  
+
+    bulkQuoteId:
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      type: string
+      description: A Mojaloop API bulk quote identifier (UUID)
+    
+    bulkTransferRequest:
+      type: object
+      required:
+        - bulkTransferId
+        - individualTransfers
+      properties:
+        bulkTransferId:
+          $ref: '#/components/schemas/bulkTransferId'
+        bulkQuote:
+          $ref: '#/components/schemas/bulkQuoteResponse'
+        from:
+          $ref: '#/components/schemas/transferParty'
+        individualTransfers:
+          type: array
+          minItems: 1
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/IndividualTransfer'
+    
+    IndividualTransfer:
+      type: object
+      description: Data model for individual transfer in a bulk transfer request
+      required:
+        - transferId
+        - amount
+        - currency
+      properties:
+        transferId:
+          $ref: '#/components/schemas/transferId'
+        to:
+          $ref: '#/components/schemas/transferParty'
+        amountType:
+          $ref: '#/components/schemas/amountType'
+        amount:
+          $ref: '#/components/schemas/money'
+        currency:
+          $ref: '#/components/schemas/currency'
+        feesAmount:
+          $ref: '#/components/schemas/money'
+        feesCurrency:
+          $ref: '#/components/schemas/currency'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+        initiator:
+          $ref: '#/components/schemas/initiator'
+        initiatorType:
+          $ref: '#/components/schemas/initiatorType'
+        note:
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: An optional note associated with the quote
+    
+    bulkTransferResponse:
+      type: object
+      required:
+        - homeTransactionId
+      properties:
+        bulkTransferId:
+          $ref: '#/components/schemas/bulkTransferId'
+        homeTransactionId:
+          type: string
+          description: Transaction ID from the DFSP backend, used to reconcile transactions between the switch and DFSP backend systems
+        from:
+          $ref: '#/components/schemas/transferParty'
+        individualTransfers:
+          type: array
+          minItems: 1
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/IndividualTransfer'
+
+    bulkTransferId:
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      type: string
+      description: A Mojaloop API transfer identifier (UUID)
+          
+    geoCode:
+      type: object
+      description: Indicates the geographic location from where the transaction was initiated.
+      properties:
+        latitude:
+          $ref: '#/components/schemas/latitude'
+        longitude:
+          $ref: '#/components/schemas/longitude'
+      required:
+        - latitude
+        - longitude
+        
+    latitude:
+      type: string
+      pattern: ^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$
+      description: The API data type Latitude is a JSON String in a lexical format that is restricted by a regular expression for interoperability reasons.
+    
+    longitude:
+      type: string
+      pattern: ^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$
+      description: The API data type Longitude is a JSON String in a lexical format that is restricted by a regular expression for interoperability reasons.
+          
+    errorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: string
+          description: Error code as string
+        message:
+          type: string
+          description: Error message text
+    
+    extensionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/extensionItem'
+      minItems: 0
+      maxItems: 16
+
+    extensionItem:
+      type: object
+      properties:
+        key:
+          type: string
+          minLength: 1
+          maxLength: 32
+        value:
+          type: string
+          minLength: 1
+          maxLength: 128
+
+    transferState:
+      type: string
+      enum:
+        - RECEIVED
+        - RESERVED
+        - COMMITTED
+        - ABORTED
+      description: >
+        Below are the allowed values for the enumeration
+        - RECEIVED DFSP has received the transfer.
+        - RESERVED DFSP has reserved the transfer.
+        - COMMITTED DFSP has successfully performed the transfer.
+        - ABORTED DFSP has aborted the transfer due a rejection or failure to perform the transfer.
+
+    fulfilNotification:
+      title: TransfersIDPatchResponse
+      type: object
+      description: PUT /transfers/{transferId} object
+      properties:
+        completedTimestamp:
+          $ref: '#/components/schemas/timestamp'
+        transferState:
+          $ref: '#/components/schemas/transferState'
+        extensionList:
+          $ref: '#/components/schemas/extensionList'
+      required:
+        - completedTimestamp
+        - transferState
+

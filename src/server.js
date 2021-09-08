@@ -182,7 +182,8 @@ const initialize = async () => {
   serverInstance = await createServer(Config.getSystemConfig().API_PORT)
 
   if (serverInstance) {
-    objectStore.initObjectStore()
+    const objectStoreInitConfig = await Config.getObjectStoreInitConfig()
+    objectStore.initObjectStore(objectStoreInitConfig)
     arrayStore.initArrayStore()
     httpAgentStore.init()
     RequestLogger.logMessage('info', `Toolkit Server running on ${serverInstance.info.uri}`, { notification: false })
