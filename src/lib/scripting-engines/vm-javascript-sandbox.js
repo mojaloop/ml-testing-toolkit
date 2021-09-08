@@ -27,6 +27,7 @@ const axiosModule = require('axios').default
 const atob = require('atob')
 const WebSocketClientManager = require('../webSocketClient/WebSocketClientManager').WebSocketClientManager
 const InboundEventListener = require('../eventListenerClient/inboundEventListener').InboundEventListener
+const notificationEmitter = require('../notificationEmitter')
 const JwsSigning = require('../jws/JwsSigning')
 const Config = require('../config')
 const httpAgentStore = require('../httpAgentStore')
@@ -123,6 +124,10 @@ const customWrapperFn = (requestVariables) => {
     },
     skipRequest: function () {
       requestVariables.SKIP_REQUEST = true
+    },
+    pushMessage: function (message, sessionID = null) {
+      customLogger.logMessage('info', 'Sending Push Message to topic pushMessage' + (sessionID ? '/' + sessionID : ''), { additionalData: { message }, notification: false })
+      notificationEmitter.sendMessage(message, sessionID)
     }
   }
 }

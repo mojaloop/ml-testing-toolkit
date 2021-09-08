@@ -38,6 +38,10 @@ const broadcastLog = (log, sessionID = null) => {
   broadcast(log, sessionID, 'newLog')
 }
 
+const sendMessage = (message, sessionID = null) => {
+  broadcast(message, sessionID, 'pushMessage')
+}
+
 const broadcastOutboundLog = (log, sessionID = null) => {
   broadcast(log, sessionID, 'newOutboundLog')
 }
@@ -50,5 +54,6 @@ const broadcastOutboundProgress = (status, sessionID = null) => {
 module.exports = {
   broadcastLog,
   broadcastOutboundLog,
-  broadcastOutboundProgress
+  broadcastOutboundProgress,
+  sendMessage
 }

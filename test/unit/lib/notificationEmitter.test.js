@@ -51,4 +51,12 @@ describe('NotificationEmitter', () => {
       expect(() => NotificationEmitter.broadcastOutboundProgress({}, 'sessionID')).not.toThrowError()
     })
   })
+  describe('sendMessage', () => {
+    it('should not throw an error when sessionID is missing', () => {
+      expect(() => NotificationEmitter.sendMessage({})).not.toThrowError()
+    })
+    it('should not throw an error', () => {
+      expect(() => NotificationEmitter.sendMessage({}, 'sessionID')).not.toThrowError()
+    })
+  })
 })
