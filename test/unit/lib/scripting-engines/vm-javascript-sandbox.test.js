@@ -27,10 +27,13 @@
 const uuid = require('uuid')
 const axios = require('axios').default
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
+const NotificationEmitter = require('../../../../src/lib/notificationEmitter')
 jest.mock('axios')
 axios.create.mockImplementation((config) => axios)
 jest.mock('../../../../src/lib/jws/JwsSigning')
 const Context = require('../../../../src/lib/scripting-engines/vm-javascript-sandbox')
+
+const spyNotificationEmitterSendMessage = jest.spyOn(NotificationEmitter, 'sendMessage')
 
 
 describe('Test Outbound Context', () => {
@@ -254,6 +257,28 @@ describe('Test Outbound Context', () => {
       expect(scriptResult.consoleLog[0][1]).toEqual('log')
       expect(scriptResult.consoleLog[0][2]).toEqual('SAMPLE_OUTPUT_AFTER_SLEEP')
 
+    })
+
+    it('executeAsync should call custom.pushMessage function', async () => {
+
+      const contextObj = await Context.generateContextObj({})
+
+      const args = {
+        script: [
+          "await custom.pushMessage({})",
+        ],
+        data: { context: {...contextObj}, id: uuid.v4()},
+        contextObj: contextObj
+      }
+
+      let scriptResult
+      try {
+        scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
+      } finally {
+        contextObj.ctx.dispose()
+        contextObj.ctx = null
+      }
+      expect(spyNotificationEmitterSendMessage).toBeCalled()
     })
 
     it('executeAsync should call custom.setRequestTimeout function', async () => {
