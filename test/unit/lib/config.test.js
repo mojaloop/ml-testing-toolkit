@@ -137,4 +137,17 @@ describe('Config', () => {
       expect(res).toBe(false)
     })
   })
+  describe('getObjectStoreInitConfig', async () => {
+    it('should not throw an error if env is not passed', async () => {
+      await expect(Config.getObjectStoreInitConfig()).resolves.toBeTruthy()
+    })
+    it('should not throw an error if env is passed', async () => {
+      process.env.TTK_OBJECT_STORE_INIT_CONFIG="{ \"sampleData\": { \"name\": \"asdf\" } }"
+      await expect(Config.getObjectStoreInitConfig()).resolves.toBeTruthy()
+    })
+    it('should not throw an error if invalid json env is passed', async () => {
+      process.env.TTK_OBJECT_STORE_INIT_CONFIG="{ asdf }"
+      await expect(Config.getObjectStoreInitConfig()).resolves.toBeTruthy()
+    })
+  })
 })
