@@ -111,6 +111,22 @@ const setSystemConfig = async (newConfig) => {
   }
 }
 
+const _getObjectStoreInitConfigFromEnvironment = () => {
+  let objectStoreInitConfigFromEnvironment = {}
+  if (process.env.TTK_OBJECT_STORE_INIT_CONFIG) {
+    try {
+      objectStoreInitConfigFromEnvironment = JSON.parse(process.env.TTK_OBJECT_STORE_INIT_CONFIG)
+    } catch (err) {
+      console.log(`Failed to parse objectStore init config passed in environment ${process.env.TTK_OBJECT_STORE_INIT_CONFIG}`)
+    }
+  }
+  return objectStoreInitConfigFromEnvironment
+}
+
+const getObjectStoreInitConfig = async () => {
+  return _getObjectStoreInitConfigFromEnvironment()
+}
+
 module.exports = {
   getUserConfig: getUserConfig,
   getStoredUserConfig: getStoredUserConfig,
@@ -118,5 +134,6 @@ module.exports = {
   loadUserConfig: loadUserConfig,
   getSystemConfig: getSystemConfig,
   loadSystemConfig: loadSystemConfig,
-  setSystemConfig: setSystemConfig
+  setSystemConfig: setSystemConfig,
+  getObjectStoreInitConfig: getObjectStoreInitConfig
 }

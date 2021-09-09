@@ -107,4 +107,19 @@ describe('ObjectStore', () => {
       expect(result).toBeUndefined()
     })
   })
+  describe('initObjectStore with initData', () => {
+    it('Initialize Object Store should set passed initData', (done) => {
+      jest.useFakeTimers()
+      ObjectStore.initObjectStore({
+        someInitData: {
+          name: 'something'
+        }
+      })
+      const itemResult = ObjectStore.get('someInitData')
+      expect(itemResult.name).toStrictEqual('something')
+      setTimeout(() => {done()}, 2000)
+      jest.advanceTimersByTime(2000)
+      jest.useRealTimers()
+    })
+  })
 })
