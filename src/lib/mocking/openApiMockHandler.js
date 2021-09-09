@@ -73,8 +73,8 @@ module.exports.initilizeMockHandler = async () => {
             value: context.validation.errors[0].keyword
           },
           {
-            key: 'dataPath',
-            value: context.validation.errors[0].dataPath
+            key: 'instancePath',
+            value: context.validation.errors[0].instancePath
           }]
           for (const [key, value] of Object.entries(context.validation.errors[0].params)) {
             extensionList.push({ key, value })
