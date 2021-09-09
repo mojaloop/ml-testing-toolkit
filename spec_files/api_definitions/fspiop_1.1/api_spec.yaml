@@ -46,7 +46,6 @@ paths:
       operationId: ParticipantsByIDAndType
       parameters:
         #Headers
-        - $ref: "#/components/parameters/Accept"
         - $ref: "#/components/parameters/Content-Length"
       requestBody:
         description: Participant information to be created.
@@ -59,7 +58,7 @@ paths:
         202:
           description: Accepted
           content:
-            application/vnd.interoperability.participants+json;version=1.1:
+             application/vnd.interoperability.participants+json;version=1:
               schema:
                 type: object
                 nullable: true
@@ -85,12 +84,15 @@ paths:
       tags:
         - participants
       operationId: ParticipantsByTypeAndID
-      parameters:
-        #Headers
-        - $ref: "#/components/parameters/Accept"
+
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.participants+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -152,12 +154,14 @@ paths:
       tags:
         - participants
       operationId: ParticipantsByTypeAndID2
-      parameters:
-        #Headers
-        - $ref: "#/components/parameters/Accept"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.participants+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -244,7 +248,6 @@ paths:
       operationId: ParticipantsSubIdByTypeAndIDPost
       parameters:
         #Headers
-        - $ref: "#/components/parameters/Accept"
         - $ref: "#/components/parameters/Content-Length"
       requestBody:
         description: Participant information to be created.
@@ -255,7 +258,12 @@ paths:
               $ref: "#/components/schemas/ParticipantsTypeIDSubIDPostRequest"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.participants+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -278,12 +286,14 @@ paths:
       tags:
         - participants
       operationId: ParticipantsSubIdByTypeAndID
-      parameters:
-        #Headers
-        - $ref: "#/components/parameters/Accept"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.participants+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -345,12 +355,14 @@ paths:
       tags:
         - participants
       operationId: ParticipantsSubIdByTypeAndID2
-      parameters:
-        #Headers
-        - $ref: "#/components/parameters/Accept"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.participants+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -423,7 +435,6 @@ paths:
       operationId: Participants1
       parameters:
         #Headers
-        - $ref: "#/components/parameters/Accept"
         - $ref: "#/components/parameters/Content-Length"
         - $ref: "#/components/parameters/Date"
         - $ref: "#/components/parameters/X-Forwarded-For"
@@ -442,7 +453,12 @@ paths:
               $ref: "#/components/schemas/ParticipantsPostRequest"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.participants+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -573,12 +589,14 @@ paths:
       tags:
         - parties
       operationId: PartiesByTypeAndID
-      parameters:
-        #Headers
-        - $ref: "#/components/parameters/Accept"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.parties+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -698,12 +716,14 @@ paths:
       tags:
         - parties
       operationId: PartiesSubIdByTypeAndID
-      parameters:
-        #Headers
-        - $ref: "#/components/parameters/Accept"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.parties+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -814,7 +834,6 @@ paths:
       operationId: TransactionRequests
       parameters:
         #Headers
-        - $ref: "#/components/parameters/Accept"
         - $ref: "#/components/parameters/Content-Length"
         - $ref: "#/components/parameters/Date"
         - $ref: "#/components/parameters/X-Forwarded-For"
@@ -833,7 +852,12 @@ paths:
               $ref: "#/components/schemas/TransactionRequestsPostRequest"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.transactionRequests+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -869,12 +893,14 @@ paths:
       tags:
         - transactionRequests
       operationId: TransactionRequestsByID
-      parameters:
-        #Headers
-        - $ref: "#/components/parameters/Accept"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.transactionRequests+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -983,7 +1009,6 @@ paths:
       operationId: Quotes
       parameters:
         #Headers
-        - $ref: "#/components/parameters/Accept"
         - $ref: "#/components/parameters/Content-Length"
         - $ref: "#/components/parameters/Date"
         - $ref: "#/components/parameters/X-Forwarded-For"
@@ -1002,7 +1027,12 @@ paths:
               $ref: "#/components/schemas/QuotesPostRequest"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.quotes+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -1038,12 +1068,14 @@ paths:
       tags:
         - quotes
       operationId: QuotesByID
-      parameters:
-        #Headers
-        - $ref: "#/components/parameters/Accept"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.quotes+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -1181,12 +1213,14 @@ paths:
       tags:
         - authorizations
       operationId: AuthorizationsByIDGet
-      parameters:
-        #Headers
-        - $ref: "#/components/parameters/Accept"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.authorizations+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -1295,7 +1329,6 @@ paths:
       operationId: transfers
       parameters:
         #Headers
-        - $ref: "#/components/parameters/Accept"
         - $ref: "#/components/parameters/Content-Length"
         - $ref: "#/components/parameters/Date"
         - $ref: "#/components/parameters/X-Forwarded-For"
@@ -1314,7 +1347,12 @@ paths:
               $ref: "#/components/schemas/TransfersPostRequest"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.transfers+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -1350,12 +1388,14 @@ paths:
       tags:
         - transfers
       operationId: TransfersByIDGet
-      parameters:
-        #Headers
-        - $ref: "#/components/parameters/Accept"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.transfers+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -1508,12 +1548,14 @@ paths:
       tags:
         - transactions
       operationId: TransactionsByID
-      parameters:
-        #Headers
-        - $ref: "#/components/parameters/Accept"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.transactions+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -1622,7 +1664,6 @@ paths:
       operationId: BulkQuotes
       parameters:
         #Headers
-        - $ref: "#/components/parameters/Accept"
         - $ref: "#/components/parameters/Content-Length"
         - $ref: "#/components/parameters/Date"
         - $ref: "#/components/parameters/X-Forwarded-For"
@@ -1641,7 +1682,12 @@ paths:
               $ref: "#/components/schemas/BulkQuotesPostRequest"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.bulkQuotes+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -1677,12 +1723,14 @@ paths:
       tags:
         - bulkQuotes
       operationId: BulkQuotesByID
-      parameters:
-        #Headers
-        - $ref: "#/components/parameters/Accept"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.bulkQuotes+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -1791,7 +1839,6 @@ paths:
       operationId: BulkTransfers
       parameters:
         #Headers
-        - $ref: "#/components/parameters/Accept"
         - $ref: "#/components/parameters/Content-Length"
         - $ref: "#/components/parameters/Date"
         - $ref: "#/components/parameters/X-Forwarded-For"
@@ -1810,7 +1857,12 @@ paths:
               $ref: "#/components/schemas/BulkTransfersPostRequest"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.bulkTransfers+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -1846,12 +1898,14 @@ paths:
       tags:
         - bulkTransfers
       operationId: BulkTransferByID
-      parameters:
-        #Headers
-        - $ref: "#/components/parameters/Accept"
       responses:
         202:
-          $ref: "#/components/responses/202"
+          description: Accepted
+          content:
+             application/vnd.interoperability.bulkTransfers+json;version=1:
+              schema:
+                type: object
+                nullable: true
         400:
           $ref: "#/components/responses/400"
         401:
@@ -3704,13 +3758,6 @@ components:
 
   parameters:
     #Header parameters
-    Accept:
-      name: Accept
-      in: header
-      required: true
-      schema:
-        type: string
-      description: The `Accept` header field indicates the version of the API the client would like the server to use.
     Content-Length:
       name: Content-Length
       in: header
