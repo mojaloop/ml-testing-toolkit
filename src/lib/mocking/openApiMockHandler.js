@@ -61,7 +61,7 @@ module.exports.initilizeMockHandler = async () => {
     const tempObj = new OpenApiBackend({
       definition: path.join(item.specFile),
       strict: true,
-      quick: false,
+      quick: true,
       handlers: {
         notImplemented: async (context, req, h) => {
           const resp = await openApiBackendNotImplementedHandler(context, req, h, item)
