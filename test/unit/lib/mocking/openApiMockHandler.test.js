@@ -154,7 +154,7 @@ describe('OpenApiMockHandler', () => {
         validation: {
           errors: [{
             keyword: 'keyword',
-            dataPath: 'dataPath',
+            instancePath: 'instancePath',
             params: {
               'key1': 'value1'
             },
