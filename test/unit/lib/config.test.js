@@ -139,15 +139,26 @@ describe('Config', () => {
   })
   describe('getObjectStoreInitConfig', async () => {
     it('should not throw an error if env is not passed', async () => {
+      storageAdapter.read.mockResolvedValueOnce({
+        data: {}
+      })
+      await Config.loadSystemConfig()
       await expect(Config.getObjectStoreInitConfig()).resolves.toBeTruthy()
     })
     it('should not throw an error if env is passed', async () => {
-      process.env.TTK_OBJECT_STORE_INIT_CONFIG="{ \"sampleData\": { \"name\": \"asdf\" } }"
+      storageAdapter.read.mockResolvedValueOnce({
+        data: {
+          INIT_CONFIG: {
+            objectStore: {
+              test1: 'value1'
+            }
+          }
+        }
+      })
+      await Config.loadSystemConfig()
       await expect(Config.getObjectStoreInitConfig()).resolves.toBeTruthy()
-    })
-    it('should not throw an error if invalid json env is passed', async () => {
-      process.env.TTK_OBJECT_STORE_INIT_CONFIG="{ asdf }"
-      await expect(Config.getObjectStoreInitConfig()).resolves.toBeTruthy()
+      const objectStoreInit = await Config.getObjectStoreInitConfig()
+      expect(objectStoreInit).toHaveProperty('test1')
     })
   })
 })

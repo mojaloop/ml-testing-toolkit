@@ -53,6 +53,9 @@
     "UNUSED_AGENTS_EXPIRY_MS": 1800000,
     "UNUSED_AGENTS_CHECK_TIMER_MS": 300000
   },
+  "INIT_CONFIG": {
+    "objectStore": {}
+  },
   "API_DEFINITIONS": [
     {
       "type": "fspiop",
