@@ -24,7 +24,6 @@
 
 const express = require('express')
 const Config = require('../config')
-const Server = require('../../server')
 const router = new express.Router()
 const { check, validationResult } = require('express-validator')
 
@@ -35,9 +34,7 @@ const userConfigView = (obj) => {
 
   const hiddenProperties = [
     'HUB_ONLY_MODE',
-    'ENDPOINTS_DFSP_WISE',
-    'INBOUND_MUTUAL_TLS_ENABLED',
-    'OUTBOUND_MUTUAL_TLS_ENABLED'
+    'ENDPOINTS_DFSP_WISE'
   ]
   const newConfig = {}
   Object.keys(obj).forEach(key => {
@@ -70,16 +67,7 @@ router.put('/user', [
   }
   try {
     await Config.setStoredUserConfig(req.body, req.user)
-    const runtime = userConfigView(await Config.getUserConfig(req.user))
-    const stored = userConfigView(await Config.getStoredUserConfig(req.user))
-    let reloadServer = false
-    if (runtime.INBOUND_MUTUAL_TLS_ENABLED !== stored.INBOUND_MUTUAL_TLS_ENABLED) {
-      reloadServer = true
-    }
     await Config.loadUserConfig(req.user)
-    if (reloadServer) {
-      Server.restartServer(req.user)
-    }
     res.status(200).json({ status: 'OK' })
   } catch (err) {
     // next(err)

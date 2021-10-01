@@ -25,7 +25,6 @@
 const express = require('express')
 const router = new express.Router()
 const Config = require('../config')
-const Server = require('../../server')
 const importExport = require('../importExport')
 const RulesEngineModel = require('../rulesEngineModel')
 
@@ -54,18 +53,7 @@ router.post('/import', async (req, res, next) => {
         case 'rules_response': await RulesEngineModel.reloadResponseRules(req.user); break
         case 'rules_callback': await RulesEngineModel.reloadCallbackRules(req.user); break
         case 'rules_validation': await RulesEngineModel.reloadValidationRules(req.user); break
-        case 'user_config.json': {
-          const runtime = await Config.getUserConfig(req.user)
-          const stored = await Config.getStoredUserConfig(req.user)
-          let reloadServer = false
-          if (runtime.INBOUND_MUTUAL_TLS_ENABLED !== stored.INBOUND_MUTUAL_TLS_ENABLED) {
-            reloadServer = true
-          }
-          await Config.loadUserConfig(req.user)
-          if (reloadServer) {
-            Server.restartServer(req.user)
-          }
-        }
+        case 'user_config.json': await Config.loadUserConfig(req.user); break
       }
     }
     res.status(200).json({ status: 'OK' })

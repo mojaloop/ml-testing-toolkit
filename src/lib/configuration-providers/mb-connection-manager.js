@@ -478,7 +478,7 @@ const checkConnectionManager = async () => {
     }
   }
 
-  if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED || userConfig.INBOUND_MUTUAL_TLS_ENABLED) {
+  if (Config.getSystemConfig().OUTBOUND_MUTUAL_TLS_ENABLED || Config.getSystemConfig().INBOUND_MUTUAL_TLS_ENABLED) {
     try {
       await initDFSPHelper()
       await tlsChecker()
@@ -547,10 +547,18 @@ const auth = async () => {
   return cookies
 }
 
+const startLoop = async () => {
+  try {
+    await checkConnectionManager()
+  } catch (err) {
+    console.log('Error connection manager: ' + err.message)
+  }
+  setTimeout(startLoop, CM_CHECK_INTERVAL)
+}
+
 const initialize = async () => {
   await objectStore.init()
-  await checkConnectionManager()
-  setInterval(checkConnectionManager, CM_CHECK_INTERVAL)
+  startLoop()
 }
 
 const waitForTlsHubCerts = async (interval = 2) => {

@@ -1,6 +1,8 @@
 {
   "API_PORT": 5000,
   "HOSTING_ENABLED": false,
+  "INBOUND_MUTUAL_TLS_ENABLED": false,
+  "OUTBOUND_MUTUAL_TLS_ENABLED": false,
   "CONFIG_VERSIONS": {
     "response": 1,
     "callback": 1,

@@ -546,7 +546,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
       if (baseUrl) {
         urlGenerated = getUrlPrefix(baseUrl) + path
       }
-      if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED) {
+      if (Config.getSystemConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
         const tlsConfig = await ConnectionProvider.getTlsConfig()
         if (!tlsConfig.dfsps[dfspId]) {
           const errorMsg = 'Outbound TLS is enabled, but there is no TLS config found for DFSP ID: ' + dfspId
