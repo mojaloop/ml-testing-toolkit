@@ -1,0 +1,163 @@
+version: '3.7'
+
+volumes:
+  mysql_data:
+    driver: local
+  ttk-db-data:
+    driver: local
+
+services:
+  mojaloop-testing-toolkit:
+    # image: mojaloop/ml-testing-toolkit:v13.5.2
+    image: mojaloop-testing-toolkit:local
+    # build:
+    #  context: .
+    #  target: builder
+    volumes:
+      - "../../spec_files:/opt/mojaloop-testing-toolkit/spec_files"
+    ports:
+      - "5000:5000"
+      - "5050:5050"
+    environment:
+      TTK_SYSTEM_CONFIG: |-
+        {
+          "HOSTING_ENABLED": true,
+          "INBOUND_MUTUAL_TLS_ENABLED": true,
+          "OUTBOUND_MUTUAL_TLS_ENABLED": true,
+          "DB": {
+            "URI": "mongodb://ttk:ttk@ttk-mongodb:27017/ttk"
+          },
+          "OAUTH": {
+            "AUTH_ENABLED": true,
+            "APP_OAUTH_CLIENT_KEY": "ttk",
+            "APP_OAUTH_CLIENT_SECRET": "23b898a5-63d2-4055-bbe1-54efcda37e7d",
+            "OAUTH2_TOKEN_ISS": "http://keycloak:8080/auth/realms/testingtoolkit",
+            "OAUTH2_ISSUER": "http://keycloak:8080/auth/realms/testingtoolkit/protocol/openid-connect/token",
+            "EMBEDDED_CERTIFICATE": "-----BEGIN CERTIFICATE-----\nMIICrDCCAhWgAwIBAgIUBQ88qYAqQ1+I+ISsaIgYPqbya9QwDQYJKoZIhvcNAQEL\nBQAwaDELMAkGA1UEBhMCVUsxDzANBgNVBAgMBkxvbmRvbjEPMA0GA1UEBwwGTG9u\nZG9uMREwDwYDVQQKDAhNb2R1c2JveDERMA8GA1UECwwITW9kdXNib3gxETAPBgNV\nBAMMCE1vZHVzYm94MB4XDTIwMDkzMDE3MDYwNloXDTIxMDkzMDE3MDYwNlowaDEL\nMAkGA1UEBhMCVUsxDzANBgNVBAgMBkxvbmRvbjEPMA0GA1UEBwwGTG9uZG9uMREw\nDwYDVQQKDAhNb2R1c2JveDERMA8GA1UECwwITW9kdXNib3gxETAPBgNVBAMMCE1v\nZHVzYm94MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDda1T6cyWogfG/xlUb\n3+gWZI0jsnlSGbf3PF89NCgS+n6HUJ0A2Ezmu/n9Gfkm8Rjyst914Vq9ebsueXHI\nc+Ad76+q3MASF1hRUTfnvH/v6rDguPvI6Jb/M9jGn5b2hglcg3B9Y7Tgv70bcV7o\nCweP68CPbIrTWjR9gyjmSHfYhwIDAQABo1MwUTAdBgNVHQ4EFgQUEE+og3aDjUzC\nywQo45Fhjp5S9EowHwYDVR0jBBgwFoAUEE+og3aDjUzCywQo45Fhjp5S9EowDwYD\nVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOBgQC2a7sxisCTQa9oRGMZRmJs\nFMZjia126qlRYm6ljjM2wWlqIBdxjzLhLJbAiWMyzGKTZdMOG51Ujc+NapKRLS4K\nHVnzcbtgRNq6GZk5C1L8BEzR6NxU/CdOkm2Vx811CTOT/YijpjtjF01K1aIZE+z8\nmdzyVY9ZybXqbNclLU7rwA==\n-----END CERTIFICATE-----"
+          },
+          "KEYCLOAK": {
+            "ENABLED": true,
+            "API_URL": "http://keycloak:8080"
+          },
+          "CONNECTION_MANAGER": {
+            "ENABLED": true,
+            "API_URL": "http://connection-manager-api:5061",
+            "AUTH_ENABLED": true,
+            "HUB_USERNAME": "hub",
+            "HUB_PASSWORD": "hub"
+          }
+        }
+    command:
+      - sh
+      - -c
+      - "npm start"
+    depends_on:
+      - ttk-mongodb
+
+  mojaloop-testing-toolkit-ui:
+    image: mojaloop/ml-testing-toolkit-ui:v13.5.3
+    ports:
+      - "6060:6060"
+    environment:
+      - API_BASE_URL=http://localhost:5050
+      - AUTH_ENABLED=TRUE
+    command:
+      - sh
+      - /usr/share/nginx/start.sh
+
+  keycloak-mysql:
+    image: mysql:5.7
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    volumes:
+      - "./keycloak/keycloak-realm.json:/realm/realm.json"
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: keycloak-mysql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_IMPORT: /realm/realm.json -Dkeycloak.profile.feature.upload_scripts=enabled
+    ports:
+      - 8080:8080
+    depends_on:
+      - keycloak-mysql
+
+  ttk-mongodb:
+    image: 'bitnami/mongodb:latest'
+    restart: always
+    environment:
+      # MONGO_INITDB_ROOT_USERNAME: admin-user
+      # MONGO_INITDB_ROOT_PASSWORD: admin-password
+      # MONGO_INITDB_DATABASE: ttk
+      MONGODB_USERNAME: ttk
+      MONGODB_PASSWORD: ttk
+      MONGODB_DATABASE: ttk
+    ports:
+      - 27017:27017
+    volumes:
+      - ttk-db-data:/data/db
+      # - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh
+
+  ## TLS related services
+  connection-manager-db:
+    # Using mariadb because mysql doesn't show any helpful error when docker disk is full as per https://github.com/docker-library/mysql/issues/69
+    image: mariadb
+    hostname: connection-manager-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=modus123
+      - MYSQL_DATABASE=mcm
+      - MYSQL_USER=mcm
+      - MYSQL_PASSWORD=mcm
+    restart: always
+    command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
+  connection-manager-api:
+    image: modusbox/connection-manager-api:1.5.3
+    hostname: connection-manager-api
+    environment:
+      - DATABASE_HOST=connection-manager-db
+      - DATABASE_PORT=3306
+      - DATABASE_USER=mcm
+      - DATABASE_PASSWORD=mcm
+      - DATABASE_SCHEMA=mcm
+      - MYSQL_ROOT_PASSWORD=modus123
+      - PORT=5061
+      - P12_PASS_PHRASE='SOME_S3C4R3_P@SS'
+      - OAUTH2_ISSUER=http://keycloak:8080/auth/realms/testingtoolkit/protocol/openid-connect/token
+      - OAUTH2_TOKEN_ISS=http://keycloak:8080/auth/realms/testingtoolkit
+      - AUTH_ENABLED="TRUE"
+      - APP_OAUTH_CLIENT_KEY=ttk
+      - APP_OAUTH_CLIENT_SECRET=23b898a5-63d2-4055-bbe1-54efcda37e7d
+      - EMBEDDED_CERTIFICATE="-----BEGIN CERTIFICATE-----\nMIICrDCCAhWgAwIBAgIUBQ88qYAqQ1+I+ISsaIgYPqbya9QwDQYJKoZIhvcNAQEL\nBQAwaDELMAkGA1UEBhMCVUsxDzANBgNVBAgMBkxvbmRvbjEPMA0GA1UEBwwGTG9u\nZG9uMREwDwYDVQQKDAhNb2R1c2JveDERMA8GA1UECwwITW9kdXNib3gxETAPBgNV\nBAMMCE1vZHVzYm94MB4XDTIwMDkzMDE3MDYwNloXDTIxMDkzMDE3MDYwNlowaDEL\nMAkGA1UEBhMCVUsxDzANBgNVBAgMBkxvbmRvbjEPMA0GA1UEBwwGTG9uZG9uMREw\nDwYDVQQKDAhNb2R1c2JveDERMA8GA1UECwwITW9kdXNib3gxETAPBgNVBAMMCE1v\nZHVzYm94MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDda1T6cyWogfG/xlUb\n3+gWZI0jsnlSGbf3PF89NCgS+n6HUJ0A2Ezmu/n9Gfkm8Rjyst914Vq9ebsueXHI\nc+Ad76+q3MASF1hRUTfnvH/v6rDguPvI6Jb/M9jGn5b2hglcg3B9Y7Tgv70bcV7o\nCweP68CPbIrTWjR9gyjmSHfYhwIDAQABo1MwUTAdBgNVHQ4EFgQUEE+og3aDjUzC\nywQo45Fhjp5S9EowHwYDVR0jBBgwFoAUEE+og3aDjUzCywQo45Fhjp5S9EowDwYD\nVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOBgQC2a7sxisCTQa9oRGMZRmJs\nFMZjia126qlRYm6ljjM2wWlqIBdxjzLhLJbAiWMyzGKTZdMOG51Ujc+NapKRLS4K\nHVnzcbtgRNq6GZk5C1L8BEzR6NxU/CdOkm2Vx811CTOT/YijpjtjF01K1aIZE+z8\nmdzyVY9ZybXqbNclLU7rwA==\n-----END CERTIFICATE-----"
+    tty: true
+    stdin_open: true
+    ports:
+     - "9091:5061"
+    restart: always
+    depends_on:
+      - connection-manager-db
+  connection-manager-ui:
+    image: modusbox/connection-manager-ui:1.6.9
+    hostname: connection-manager-ui
+    environment:
+      - API_BASE_URL=http://localhost:9091
+      - AUTH_ENABLED="TRUE"
+    tty: true
+    stdin_open: true  
+    ports:
+     - "9090:8080"
+    restart: always
+
+
+networks:
+  default:
+    name: mojaloop-testing-toolkit
