@@ -38,14 +38,49 @@ const getFolderRawData = async (folderItem) => {
   return importFolderRawData
 }
 
-const generateTemplate = async (fileList) => {
+const generateTemplate = async (fileList, selectedLabels = null) => {
   try {
-    var testCases = []
+    const testCases = []
     for (var i = 0; i < fileList.length; i++) {
+      let masterFileIndex
       const importFolderRawData = await getFolderRawData(fileList[i])
+      for (var j = 0; j < importFolderRawData.length; j++) {
+        if (importFolderRawData[j].name.endsWith('master.json')) {
+          masterFileIndex = j
+          break
+        }
+      }
+      const masterFileContent = importFolderRawData[masterFileIndex].content
+      importFolderRawData.splice(masterFileIndex, 1)
+
+      let selectedFiles
+      if (selectedLabels && selectedLabels.length > 0 && masterFileContent) {
+        selectedFiles = []
+        for (var o = 0; o < masterFileContent.order.length; o++) {
+          let selectedFileIndex
+          const order = masterFileContent.order[o]
+          for (var k = 0; k < importFolderRawData.length; k++) {
+            if (importFolderRawData[k].name.endsWith(order.name)) {
+              if (order.labels) {
+                for (var l = 0; l < order.labels.length; l++) {
+                  const label = order.labels[l]
+                  if (selectedLabels.includes(label)) {
+                    selectedFileIndex = k
+                    break
+                  }
+                }
+              }
+            }
+            if (selectedFileIndex) {
+              selectedFiles.push(importFolderRawData[selectedFileIndex].name)
+              break
+            }
+          }
+        }
+      }
       const folderData = FolderParser.getFolderData(importFolderRawData)
-      const folderTestCases = FolderParser.getTestCases(folderData)
-      testCases = testCases.concat(folderTestCases)
+      const folderTestCases = FolderParser.getTestCases(folderData, selectedFiles)
+      testCases.push(...folderTestCases)
     }
     FolderParser.sequenceTestCases(testCases)
     const template = {}

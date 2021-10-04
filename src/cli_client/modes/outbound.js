@@ -123,7 +123,8 @@ const sendTemplate = async (sessionId) => {
     const outboundRequestID = traceIdPrefix + sessionId + currentEndToEndId
 
     const inputFiles = config.inputFiles.split(',')
-    const template = await TemplateGenerator.generateTemplate(inputFiles)
+    const selectedLabels = config.labels ? config.labels.split(',') : []
+    const template = await TemplateGenerator.generateTemplate(inputFiles, selectedLabels)
     template.inputValues = JSON.parse(await readFileAsync(config.environmentFile, 'utf8')).inputValues
 
     template.test_cases.forEach(testCase => {
