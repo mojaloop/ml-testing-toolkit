@@ -33,25 +33,74 @@ const TemplateGenerator = require('../../../src/cli_client/utils/templateGenerat
 
 describe('Cli client', () => {
   describe('run template generator', () => {
-    it('when there are no errors, template should be generated', async () => {
-      Utils.fileStatAsync
-        .mockResolvedValueOnce({
-          isFile: () => true
-        })
-        .mockResolvedValueOnce({
-          isFile: () => false,
-          isDirectory: () => true
-        })
-      Utils.readFileAsync
-        .mockResolvedValueOnce(JSON.stringify({}))
-        .mockResolvedValueOnce(JSON.stringify({}))
-      Utils.readRecursiveAsync
-        .mockResolvedValueOnce(["test.json"])
+    it('when passing a file, template should be generated', async () => {
+      const fileList = ['test.json']
+      
+      Utils.fileStatAsync.mockResolvedValueOnce({
+        isFile: () => true
+      })
+      Utils.readFileAsync.mockResolvedValueOnce(JSON.stringify({}))
+      SharedLib.FolderParser.getFolderData.mockReturnValueOnce({})
+      SharedLib.FolderParser.getTestCases.mockReturnValueOnce([])
 
-      const fileList = ['test.json', 'test-folder']
       await expect(TemplateGenerator.generateTemplate(fileList)).resolves.toBeDefined()
     })
-    it('when there are errors, template should not be generated', async () => {
+    it('when passing a folder without master file and no selected labels, template should be generated', async () => {
+      const fileList = ['test-folder']
+
+      // fileList['test-folder']
+      Utils.fileStatAsync.mockResolvedValueOnce({
+        isFile: () => false,
+        isDirectory: () => true
+      }) 
+      Utils.readRecursiveAsync.mockResolvedValueOnce(["test.json"])
+
+      // fileList['test-folder']['test.json']
+      Utils.readFileAsync.mockResolvedValueOnce(JSON.stringify({}))
+      SharedLib.FolderParser.getFolderData.mockReturnValueOnce({})
+      SharedLib.FolderParser.getTestCases.mockReturnValueOnce([])
+      
+      await expect(TemplateGenerator.generateTemplate(fileList)).resolves.toBeDefined()
+    })
+    it('when passing a folder with master file and selected labels, template should be generated', async () => {
+      const fileList = ['test-labels']
+      const selectedLabels = ["test"]
+      
+      // fileList['test-labels']
+      Utils.fileStatAsync.mockResolvedValueOnce({
+        isFile: () => false,
+        isDirectory: () => true
+      }) 
+      Utils.readRecursiveAsync.mockResolvedValueOnce(["test.json", "test2.json", "master.json"])
+      
+      // fileList['test-labels']['test.json']
+      Utils.readFileAsync.mockResolvedValueOnce(JSON.stringify({}))
+      SharedLib.FolderParser.getFolderData.mockReturnValueOnce({})
+      SharedLib.FolderParser.getTestCases.mockReturnValueOnce([])
+
+      // fileList['test-labels']['test2.json']
+      Utils.readFileAsync.mockResolvedValueOnce(JSON.stringify({}))
+      SharedLib.FolderParser.getFolderData.mockReturnValueOnce({})
+      SharedLib.FolderParser.getTestCases.mockReturnValueOnce()
+
+      // fileList['test-labels']['master.json']
+      Utils.readFileAsync.mockResolvedValueOnce(JSON.stringify({
+        order: [
+          {
+            name: "test.json",
+            type: "file",
+            labels: ["test"]
+          },
+          {
+            name: "test2.json",
+            type: "file"
+          }
+        ]
+      }))
+      
+      await expect(TemplateGenerator.generateTemplate(fileList, selectedLabels)).resolves.toBeDefined()
+    })
+    it('when a file can not be read, template should not be generated', async () => {
       Utils.fileStatAsync
         .mockResolvedValueOnce({
           isFile: () => true
