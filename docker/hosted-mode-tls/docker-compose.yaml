@@ -15,6 +15,7 @@ services:
     #  target: builder
     volumes:
       - "../../spec_files:/opt/mojaloop-testing-toolkit/spec_files"
+      - "../../secrets:/opt/mojaloop-testing-toolkit/secrets"
     ports:
       - "5000:5000"
       - "5050:5050"
@@ -78,6 +79,8 @@ services:
     image: quay.io/keycloak/keycloak:latest
     volumes:
       - "./keycloak/keycloak-realm.json:/realm/realm.json"
+      - "../../secrets/tls/hub_server_cert.pem:/etc/x509/https/tls.crt"
+      - "../../secrets/tls/hub_server_key.key:/etc/x509/https/tls.key"
     environment:
       DB_VENDOR: MYSQL
       DB_ADDR: keycloak-mysql
@@ -89,6 +92,7 @@ services:
       KEYCLOAK_IMPORT: /realm/realm.json -Dkeycloak.profile.feature.upload_scripts=enabled
     ports:
       - 8080:8080
+      - 8443:8443
     depends_on:
       - keycloak-mysql
 

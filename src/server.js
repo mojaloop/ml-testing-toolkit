@@ -75,7 +75,7 @@ const createServer = async (port, user) => {
         key: tlsConfig.hubServerKey,
         ca: [tlsConfig.hubCaCert],
         rejectUnauthorized: true,
-        requestCert: false
+        requestCert: true
       },
       routes: {
         cors: {
