@@ -79,12 +79,12 @@ describe('callbackHandler', () => {
       }
       Config.getUserConfig.mockReturnValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: true,
         SEND_CALLBACK_ENABLE: true
       })
       Config.getSystemConfig.mockImplementation(() => {
         return {
-          HOSTING_ENABLED: true
+          HOSTING_ENABLED: true,
+          OUTBOUND_MUTUAL_TLS_ENABLED: true
         }
       })
       SpySign.mockReturnValue()
@@ -210,12 +210,12 @@ describe('callbackHandler', () => {
       }
       Config.getUserConfig.mockReturnValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: true,
         SEND_CALLBACK_ENABLE: true
       })
       Config.getSystemConfig.mockImplementation(() => {
         return {
-          HOSTING_ENABLED: true
+          HOSTING_ENABLED: true,
+          OUTBOUND_MUTUAL_TLS_ENABLED: true
         }
       })
       SpySign.mockReturnValue()
@@ -271,12 +271,12 @@ describe('callbackHandler', () => {
         },
         HUB_ONLY_MODE: false,
         ENDPOINTS_DFSP_WISE: {},
-        OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
       Config.getSystemConfig.mockImplementation(() => {
         return {
-          HOSTING_ENABLED: false
+          HOSTING_ENABLED: false,
+          OUTBOUND_MUTUAL_TLS_ENABLED: false
         }
       })
       SpySign.mockImplementationOnce(() => {
@@ -328,12 +328,12 @@ describe('callbackHandler', () => {
             }
           }
         },
-        OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
       Config.getSystemConfig.mockImplementation(() => {
         return {
-          HOSTING_ENABLED: false
+          HOSTING_ENABLED: false,
+          OUTBOUND_MUTUAL_TLS_ENABLED: false
         }
       })
       SpySign.mockImplementationOnce(() => {
@@ -381,11 +381,11 @@ describe('callbackHandler', () => {
             }
           }
         },
-        OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
       Config.getSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: false
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: false
       })
       SpySign.mockImplementationOnce(() => {
         throw new Error('log error if jws signign fails')
@@ -430,11 +430,11 @@ describe('callbackHandler', () => {
             }
           }
         },
-        OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
       Config.getSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: false
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: false
       })
       SpySign.mockImplementationOnce(() => {
         throw new Error('log error if jws signign fails')
@@ -478,11 +478,11 @@ describe('callbackHandler', () => {
         },
         HUB_ONLY_MODE: false,
         ENDPOINTS_DFSP_WISE: {},
-        OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: true
       })
       Config.getSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: false
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: false
       })
       SpySign.mockImplementationOnce(() => {
         throw new Error('log error if jws signign fails')
@@ -518,11 +518,11 @@ describe('callbackHandler', () => {
         }
       }
       Config.getSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: false
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: false
       })
       Config.getUserConfig.mockReturnValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: false
       })
       SpySign.mockReturnValue()
@@ -556,11 +556,11 @@ describe('callbackHandler', () => {
         }
       }
       Config.getSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: false
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: false
       })
       Config.getUserConfig.mockReturnValue({
         CALLBACK_ENDPOINT: 'https://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: false
       })
       SpySign.mockReturnValue()

@@ -59,26 +59,24 @@ describe('Server', () => {
   describe('restartServer', () => {
     it('restartServer should not throw an error', async () => {
       Config.getSystemConfig.mockReturnValue({
-        API_PORT: 5051
-      })
-      Config.getUserConfig.mockResolvedValue({
+        API_PORT: 5051,
         INBOUND_MUTUAL_TLS_ENABLED: true
       })
-      SpyWaitForTlsHubCerts.mockRejectedValue()
+      Config.getUserConfig.mockResolvedValue({})
+      SpyWaitForTlsHubCerts.mockRejectedValue(new Error('something'))
       const server = await Server.restartServer()
       expect(server).toBeUndefined()
     })
   })
   describe('initialize', () => {
-    it('initialize should not throw an error', async () => {
+    it('initialize should not throw an error 1', async () => {
       SpyInitilizeMockHandler.mockResolvedValue()
       SpyInitHttpAgentStore.mockReturnValue()
-      Config.getSystemConfig.mockReturnValueOnce({
-        API_PORT: 5051
-      })
-      Config.getUserConfig.mockResolvedValueOnce({
+      Config.getSystemConfig.mockReturnValue({
+        API_PORT: 5051,
         INBOUND_MUTUAL_TLS_ENABLED: true
       })
+      Config.getUserConfig.mockResolvedValueOnce({})
       SpyWaitForTlsHubCerts.mockResolvedValueOnce()
       SpyGetTlsConfig.mockReturnValueOnce({
         hubServerCert: '',
@@ -111,29 +109,27 @@ describe('Server', () => {
         server.stop()
       }
     })
-    it('initialize should not throw an error', async () => {
+    it('initialize should not throw an error 2', async () => {
       SpyInitilizeMockHandler.mockResolvedValueOnce()
       Config.getSystemConfig.mockReturnValue({
-        API_PORT: 5051
-      })
-      Config.getUserConfig.mockResolvedValue({
+        API_PORT: 5051,
         INBOUND_MUTUAL_TLS_ENABLED: true
       })
-      SpyWaitForTlsHubCerts.mockRejectedValueOnce()
+      Config.getUserConfig.mockResolvedValue({})
+      SpyWaitForTlsHubCerts.mockRejectedValueOnce(new Error('something'))
       const server = await Server.initialize()
       expect(server).toBeDefined()
       if (server) {
         server.stop()
       }
     })
-    it('initialize should not throw an error', async () => {
+    it('initialize should not throw an error 3', async () => {
       SpyInitilizeMockHandler.mockResolvedValueOnce()
       Config.getSystemConfig.mockReturnValue({
-        API_PORT: 5051
-      })
-      Config.getUserConfig.mockResolvedValue({
+        API_PORT: 5051,
         INBOUND_MUTUAL_TLS_ENABLED: false
       })
+      Config.getUserConfig.mockResolvedValue({})
       const server = await Server.initialize()
       expect(server).toBeDefined()
       if (server) {
@@ -144,12 +140,11 @@ describe('Server', () => {
   describe('restartServer', () => {
     it('restartServer should not throw an error', async () => {
       Config.getSystemConfig.mockReturnValue({
-        API_PORT: 5051
-      })
-      Config.getUserConfig.mockResolvedValue({
+        API_PORT: 5051,
         INBOUND_MUTUAL_TLS_ENABLED: true
       })
-      SpyWaitForTlsHubCerts.mockRejectedValueOnce()
+      Config.getUserConfig.mockResolvedValue({})
+      SpyWaitForTlsHubCerts.mockRejectedValueOnce(new Error('something'))
       const server = await Server.restartServer()
       if (server) {
         server.stop()
