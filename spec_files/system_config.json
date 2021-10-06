@@ -111,6 +111,12 @@
       "type": "payment_manager",
       "version": "1.4",
       "folderPath": "payment_manager_1.4"
+    },
+    {
+      "type": "fx-api",
+      "version": "2.0",
+      "folderPath": "fx-api_2.0",
+      "asynchronous": true
     }
   ]
 }
