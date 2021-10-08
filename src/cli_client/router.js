@@ -54,7 +54,8 @@ const cli = (commander) => {
     slackPassedImage: configFile.slackPassedImage,
     slackFailedImage: configFile.slackFailedImage,
     baseURL: commander.baseUrl || configFile.baseURL,
-    extraSummaryInformation: commander.extraSummaryInformation || configFile.extraSummaryInformation
+    extraSummaryInformation: commander.extraSummaryInformation || configFile.extraSummaryInformation,
+    labels: commander.labels || configFile.labels
   }
 
   objectStore.set('config', config)
