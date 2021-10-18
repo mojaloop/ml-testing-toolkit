@@ -610,6 +610,7 @@ const setEndpointsConfig = async () => {
 
 module.exports = {
   initialize,
+  checkConnectionManager,
   getTestingToolkitDfspJWSCerts,
   getUserDfspJWSCerts,
   getTestingToolkitDfspJWSPrivateKey,
