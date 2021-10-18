@@ -31,7 +31,7 @@ const arrayStore = require('./arrayStore')
 const MyEventEmitter = require('./MyEventEmitter')
 const JwsSigning = require('./jws/JwsSigning')
 const ConnectionProvider = require('./configuration-providers/mb-connection-manager')
-const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
+const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 const UniqueIdGenerator = require('./uniqueIdGenerator')
 const httpAgentStore = require('./httpAgentStore')
 

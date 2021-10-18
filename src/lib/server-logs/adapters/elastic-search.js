@@ -78,7 +78,7 @@ const _toQueryObject = (query) => {
     }
   }
   const predicates = []
-  Object.entries(query).map((kv, i) => {
+  Object.entries(query).forEach((kv, i) => {
     const predicate = {}
     predicate[kv[0]] = kv[1]
     predicates[i] = { match: predicate }

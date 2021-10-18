@@ -137,7 +137,7 @@ describe('Config', () => {
       expect(res).toBe(false)
     })
   })
-  describe('getObjectStoreInitConfig', async () => {
+  describe('getObjectStoreInitConfig', () => {
     it('should not throw an error if env is not passed', async () => {
       storageAdapter.read.mockResolvedValueOnce({
         data: {}

@@ -39,10 +39,10 @@ const objectStore = require('./lib/objectStore')
 const arrayStore = require('./lib/arrayStore')
 const httpAgentStore = require('./lib/httpAgentStore')
 const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
-const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
+const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 const { verifyToken } = require('./lib/oauth/OAuthValidator')
 
-var serverInstance = null
+let serverInstance = null
 // const openAPIOptions = {
 //   api: Path.resolve(__dirname, './interface/api_swagger.json'),
 //   handlers: Path.resolve(__dirname, './handlers')

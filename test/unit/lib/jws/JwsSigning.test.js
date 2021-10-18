@@ -122,12 +122,15 @@ describe('JwsSigning', () => {
   }
 
   describe('Happy Path Sign and Validate', () => {
-    mockDefinePrivateKey(privateKey)
-    mockDefinePublicCert(publicCert)
-    // Deep copy reqOpts
     var reqOpts = JSON.parse(JSON.stringify(origReqOpts))
-    // Rename the body prop with data
-    reqOpts.data = reqOpts.body
+
+    beforeAll(() => {
+      mockDefinePrivateKey(privateKey)
+      mockDefinePublicCert(publicCert)
+      // Rename the body prop with data
+      reqOpts.data = reqOpts.body
+    })
+
     it('Signed request should contain required fspiop headers', async () => {
       // Sign with JWS
       await expect(JwsSigning.sign(reqOpts)).resolves.toBeDefined();
@@ -198,17 +201,20 @@ describe('JwsSigning', () => {
 
   describe('Signing Negative scenarios', () => {
     describe('Passing wrong request', () => {
-      mockDefinePrivateKey(privateKey)
-      // Deep copy reqOpts
-      var reqOpts = JSON.parse(JSON.stringify(origReqOpts))
-      // Rename the body prop with data
-      reqOpts.data = reqOpts.body
+      var reqOpts = {}
+      beforeAll(() => {
+        reqOpts = JSON.parse(JSON.stringify(origReqOpts))
+        mockDefinePrivateKey(privateKey)
+        // Rename the body prop with data
+        reqOpts.data = reqOpts.body
+      })
+
       it('Without data property', async () => {
-        const { data, tmpReqOpts } = reqOpts
+        const { data, ...tmpReqOpts } = reqOpts
         await expect(JwsSigning.sign(tmpReqOpts)).rejects.toThrowError()
       })
       it('Without header property', async () => {
-        const { header, tmpReqOpts } = reqOpts
+        const { headers, ...tmpReqOpts } = reqOpts
         await expect(JwsSigning.sign(tmpReqOpts)).rejects.toThrowError()
       })
     })
@@ -228,38 +234,45 @@ describe('JwsSigning', () => {
     })
   })
 
-  describe('Validation negative scenarios', async () => {
+  describe('Validation negative scenarios', () => {
 
-    // Signing
-    mockDefinePrivateKey(privateKey)
-    // Deep copy reqOpts
-    var reqOpts = JSON.parse(JSON.stringify(origReqOpts))
     // Rename the body prop with data
-    reqOpts.data = reqOpts.body
-    delete reqOpts.headers['FSPIOP-Destination']
-    await JwsSigning.sign(reqOpts)
-    // Replace the data prop with payload
-    reqOpts.payload = reqOpts.data
-  
+    var reqOpts = {}
+
+    beforeAll((done) => {
+      reqOpts = JSON.parse(JSON.stringify(origReqOpts))
+      // Signing
+      mockDefinePrivateKey(privateKey)
+      reqOpts.data = reqOpts.body
+      delete reqOpts.headers['FSPIOP-Destination']
+      JwsSigning.sign(reqOpts).then(() => {
+        // Replace the data prop with payload
+        reqOpts.payload = reqOpts.data
+        done()
+      })
+    })
+
     describe('Passing wrong request', () => {
-      mockDefinePublicCert(publicCert)
+      beforeAll(() => {
+        mockDefinePublicCert(publicCert)
+      })
       it('Without payload property', async () => {
-        const { payload, tmpReqOpts } = reqOpts
-        await expect(JwsSigning.validate(tmpReqOpts)).resolves.toBeDefined();
+        const { payload, ...tmpReqOpts } = reqOpts
+        await expect(JwsSigning.validate(tmpReqOpts)).rejects.toThrowError();
       })
       it('Without header property', async () => {
-        const { header, tmpReqOpts } = reqOpts
-        await expect(JwsSigning.validate(tmpReqOpts)).resolves.toBeDefined();
+        const { headers, ...tmpReqOpts } = reqOpts
+        await expect(JwsSigning.validate(tmpReqOpts)).rejects.toThrowError();
       })
     })
     describe('Passing invalid keys', () => {
       it('Without public certificate', async () => {
         mockDefinePublicCert(null)
-        await expect(JwsSigning.validate(reqOpts)).resolves.toBeDefined();
+        await expect(JwsSigning.validate(reqOpts)).rejects.toThrowError();
       })
       it('With invalid certificate4', async () => {
         mockDefinePublicCert('asdf')
-        await expect(JwsSigning.validate(reqOpts)).resolves.toBeDefined();
+        await expect(JwsSigning.validate(reqOpts)).rejects.toThrowError();
       })
     })
   })

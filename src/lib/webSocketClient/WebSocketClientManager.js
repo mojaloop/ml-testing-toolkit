@@ -115,7 +115,7 @@ class WebSocketClientManager {
           resolve(retMessage)
         } else {
           // Listen for the new message for some time
-          var timer = null
+          let timer = null
           // Set the timer
           timer = setTimeout(() => {
             try {

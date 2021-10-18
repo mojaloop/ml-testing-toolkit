@@ -23,10 +23,10 @@
  ******/
 'use strict'
 
-const SharedLib = require('ml-testing-toolkit-shared-lib')
+const SharedLib = require('@mojaloop/ml-testing-toolkit-shared-lib')
 const Utils = require('../../../src/lib/utils')
 
-jest.mock('ml-testing-toolkit-shared-lib')
+jest.mock('@mojaloop/ml-testing-toolkit-shared-lib')
 jest.mock('../../../src/lib/utils')
 
 const TemplateGenerator = require('../../../src/cli_client/utils/templateGenerator')
