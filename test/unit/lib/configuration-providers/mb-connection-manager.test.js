@@ -36,13 +36,13 @@ jest.mock('../../../../src/lib/requestLogger')
 const userConfig = {
   JWS_SIGN: true,
   VALIDATE_INBOUND_JWS: true,
-  OUTBOUND_MUTUAL_TLS_ENABLED: true,
-  INBOUND_MUTUAL_TLS_ENABLED: true,
   DEFAULT_USER_FSPID: 'userdfsp'
 }
 
 const systemConfig = {
   HOSTING_ENABLED: true,
+  OUTBOUND_MUTUAL_TLS_ENABLED: true,
+  INBOUND_MUTUAL_TLS_ENABLED: true,
   CONNECTION_MANAGER: {
     API_URL: '',
     AUTH_ENABLED: true,
@@ -306,6 +306,9 @@ describe('mb-connection-manager', () => {
     beforeEach(() => {
       jest.useFakeTimers()
     })
+    afterEach(() => {
+      jest.useRealTimers()
+    })
     it('should not throw error', async () => {
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
     })
@@ -327,7 +330,7 @@ describe('mb-connection-manager', () => {
         return newSystemConfig
       })
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
-      Config.getUserConfig.mockImplementation(() => {
+      Config.getSystemConfig.mockImplementation(() => {
         return systemConfig
       })
     })
@@ -335,14 +338,22 @@ describe('mb-connection-manager', () => {
       const newUserConfig = {...userConfig}
       newUserConfig.JWS_SIGN = false
       newUserConfig.VALIDATE_INBOUND_JWS = false
-      newUserConfig.OUTBOUND_MUTUAL_TLS_ENABLED = false
-      newUserConfig.INBOUND_MUTUAL_TLS_ENABLED = false
       Config.getUserConfig.mockImplementation(() => {
         return newUserConfig
+      })
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          ...systemConfig,
+          OUTBOUND_MUTUAL_TLS_ENABLED: false,
+          INBOUND_MUTUAL_TLS_ENABLED: false
+        }
       })
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       Config.getUserConfig.mockImplementation(() => {
         return userConfig
+      })
+      Config.getSystemConfig.mockImplementation(() => {
+        return systemConfig
       })
     })
     it('should not throw error', async () => {
@@ -727,6 +738,21 @@ describe('mb-connection-manager', () => {
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
       reject.post['/api/environments/1/hub/servercerts'] = false
       mapping.get['/api/environments/1/hub/servercerts'] = original
+    })
+  })
+  describe('waitForTlsHubCerts', () => {
+    it('should not throw error', async () => {
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          ...systemConfig,
+          OUTBOUND_MUTUAL_TLS_ENABLED: true,
+          INBOUND_MUTUAL_TLS_ENABLED: true
+        }
+      })
+      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+    })
+    it('should wait for tls certs', async () => {
+      await expect(MBConnectionManagerProvider.waitForTlsHubCerts()).resolves.toBe(true)
     })
   })
   describe('getTlsConfig', () => {
