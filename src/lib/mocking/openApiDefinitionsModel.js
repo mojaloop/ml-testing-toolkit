@@ -22,33 +22,36 @@
  --------------
  ******/
 
-// TODO: Implement a logger and log the messages with different verbosity
-// TODO: Write unit tests
-
-const Config = require('../config.js')
-
-var apiDefinitions = null
+const Config = require('../config')
+let apiDefinitions = null
 const specFilePrefix = 'spec_files/api_definitions/'
 
-module.exports.getApiDefinitions = async () => {
+const getApiDefinitions = async () => {
   if (!apiDefinitions) {
-    if (!Config.getSystemConfig().API_DEFINITIONS) {
-      await Config.loadSystemConfig()
-    }
-    apiDefinitions = Config.getSystemConfig().API_DEFINITIONS.map(item => {
-      return {
-        minorVersion: +item.version.split('.')[1],
-        majorVersion: +item.version.split('.')[0],
-        type: item.type,
-        asynchronous: item.asynchronous,
-        specFile: specFilePrefix + item.folderPath + '/api_spec.yaml',
-        callbackMapFile: specFilePrefix + item.folderPath + '/callback_map.json',
-        responseMapFile: specFilePrefix + item.folderPath + '/response_map.json',
-        jsfRefFile: specFilePrefix + item.folderPath + '/mockRef.json',
-        triggerTemplatesFolder: specFilePrefix + item.folderPath + '/trigger_templates'
-      }
-    })
+    refreshApiDefinitions()
   }
-
   return apiDefinitions
+}
+
+const refreshApiDefinitions = async () => {
+  apiDefinitions = Config.getSystemConfig().API_DEFINITIONS.map(item => {
+    return {
+      minorVersion: +item.version.split('.')[1],
+      majorVersion: +item.version.split('.')[0],
+      type: item.type,
+      caption: item.caption,
+      asynchronous: item.asynchronous,
+      additionalApi: item.additionalApi,
+      specFile: specFilePrefix + item.folderPath + '/api_spec.yaml',
+      callbackMapFile: specFilePrefix + item.folderPath + '/callback_map.json',
+      responseMapFile: specFilePrefix + item.folderPath + '/response_map.json',
+      jsfRefFile: specFilePrefix + item.folderPath + '/mockRef.json',
+      triggerTemplatesFolder: specFilePrefix + item.folderPath + '/trigger_templates'
+    }
+  })
+}
+
+module.exports = {
+  getApiDefinitions,
+  refreshApiDefinitions
 }

@@ -1,8 +1,117 @@
 [
   {
+    "ruleId": 20,
+    "priority": 1,
+    "description": "get /parties/{Type}/{ID} for pinkbank",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "pinkbankfsp",
+          "path": "FSPIOP-Source"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.parties+json;version=1.0",
+          "FSPIOP-Source": "greenbankfsp"
+        },
+        "body": {
+          "party": {
+            "partyIdInfo": {
+              "fspId": "greenbankfsp"
+            },
+            "merchantClassificationCode": null,
+            "name": "Justin Pierre",
+            "personalInfo": {
+              "complexName": {
+                "firstName": "Justin",
+                "middleName": "Pierre",
+                "lastName": "Trudeau"
+              },
+              "dateOfBirth": "1971-12-25"
+            }
+          }
+        },
+        "scripts": {
+          "scriptingEngine": "postman"
+        }
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 1,
+    "priority": 1,
+    "description": "get /parties/{Type}/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.parties+json;version=1.0"
+        },
+        "body": {
+          "party": {
+            "partyIdInfo": {
+              "partySubIdOrType": null
+            }
+          }
+        },
+        "scripts": {}
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
     "type": "callback",
     "version": 1,
-    "ruleId": 1,
+    "ruleId": 2,
     "priority": 1,
     "description": "post /quotes",
     "apiVersion": {
@@ -26,9 +135,43 @@
       ]
     },
     "event": {
-      "method": null,
-      "path": null,
-      "params": {},
+      "method": "put",
+      "path": "/quotes/{ID}",
+      "params": {
+        "body": {
+          "transferAmount": {
+            "currency": "{$request.body.amount.currency}",
+            "amount": "{$environment.quoteTransferAmount}"
+          },
+          "payeeReceiveAmount": {
+            "currency": "{$request.body.amount.currency}",
+            "amount": "{$environment.quotePayeeReceiveAmount}"
+          },
+          "payeeFspFee": {
+            "currency": "{$request.body.amount.currency}",
+            "amount": "{$environment.quotePayeeFspFee}"
+          },
+          "payeeFspCommission": {
+            "currency": "{$request.body.amount.currency}",
+            "amount": "{$environment.quotePayeeFspCommission}"
+          },
+          "expiration": "{$environment.quoteExpiration}"
+        },
+        "scripts": {
+          "exec": [
+            "const quoteBody = JSON.parse(request.body)",
+            "environment.quoteTransferAmount = quoteBody.amount.amount",
+            "environment.quotePayeeFspFee = 0.2",
+            "environment.quotePayeeFspCommission = 0.3",
+            "environment.quotePayeeReceiveAmount = quoteBody.amount.amount",
+            "if (quoteBody.amountType === 'RECEIVE') {",
+            "  environment.quoteTransferAmount = (+quoteBody.amount.amount) + environment.quotePayeeFspFee + environment.quotePayeeFspCommission",
+            "}",
+            "environment.quoteExpiration =new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString()"
+          ],
+          "scriptingEngine": "javascript"
+        }
+      },
       "delay": 0,
       "type": "MOCK_CALLBACK"
     }
@@ -36,7 +179,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 2,
+    "ruleId": 3,
     "priority": 1,
     "description": "post /transfers",
     "apiVersion": {
@@ -66,41 +209,6 @@
       "delay": 0,
       "type": "MOCK_CALLBACK"
     }
-  },
-  {
-    "ruleId": 22,
-    "priority": 1,
-    "description": "get /parties/{Type}/{ID}",
-    "apiVersion": {
-      "minorVersion": 0,
-      "majorVersion": 1,
-      "type": "fspiop",
-      "asynchronous": true
-    },
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/parties/{Type}/{ID}"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "get"
-        }
-      ]
-    },
-    "event": {
-      "method": "put",
-      "path": "/parties/{Type}/{ID}",
-      "params": {
-        "scripts": {}
-      },
-      "type": "MOCK_CALLBACK"
-    },
-    "type": "callback",
-    "version": 1
   },
   {
     "type": "callback",

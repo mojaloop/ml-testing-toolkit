@@ -1,0 +1,1389 @@
+openapi: 3.0.1
+info:
+  title: Payment Manager for Mojaloop API
+  description: >
+    Specification for the Payment Manager for Mojaloop API
+    This API can be used by DFSP backends to simplify the process of sending and receiving funds within a Mojaloop scheme.
+    **Note on terminology:** The term "Switch" is equal to the term "Hub", and the term "FSP" is equal to the term "DFSP".
+  license:
+    name: Apache License Version 2.0, January 2004
+    url: http://www.apache.org/licenses/
+  version: 1.4.0
+
+
+paths:
+  #Outbound API (Payer DFSP → Payment Manager → Mojaloop Switch)
+  /health:
+    get:
+      description: >
+        The HTTP request `GET /health` is used to check if the application is up and running.
+      operationId: getHealth
+      tags:
+        - health
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+  /sendmoney:
+    post:
+      summary: Sends money from one account to another
+      operationId: postSendMoney
+      description: >
+        The HTTP request `POST /sendmoney` is used by the Payer DFSP to request the movement of funds from the Payer DFSP to the Payee DFSP.
+        The underlying Mojaloop API has three stages for money transfer:
+          1. Party lookup (discovery phase). This facilitates a check by the sending party that the destination party is correct before proceeding with a money movement.
+          2. Quotation (agreement phase). This facilitates the exchange of fee information and the construction of a cryptographic "contract" between the Payee and Payer DFSPs before funds are transferred.
+          3. Transfer (transfer phase). The enactment of the previously agreed "contract".
+        This method has several modes of operation.
+        - If the configuration variable `AUTO_ACCEPT_PARTY` is set to `"false"`, this method will terminate when the Payee party has been resolved and Payee party details have been returned.
+          If the Payer wishes to proceed with the transfer, then a subsequent `PUT /sendmoney/{transferId}` request (accepting the Payee party) is required to continue the operation.
+          The Payment Manager will then proceed to the quotation stage.
+        - If the configuration variable `AUTO_ACCEPT_QUOTES` is set to `"false"`, this method will terminate and return the quotation when it has been received from the Payee DFSP.
+          If the Payee wishes to proceed with the transfer, then a subsequent `PUT /sendmoney/{transferId}` request (accepting the quote) is required to continue the operation.
+          The Payment Manager will then proceed to the transfer state.
+        If the configuration variables `AUTO_ACCEPT_PARTY` and `AUTO_ACCEPT_QUOTES` are both set to `"true"`, this method will block until all three transfer stages are complete.
+        Upon completion, it will return the entire set of transfer details received during the operation.
+        Combinations of settings for `AUTO_ACCEPT...` configuration variables allow the Payment Manager user to decide which mode of operation best suits their use cases. i.e., the Payment Manager can be configured to "break" the three-stage transfer at these points in order to execute backend logic such as party verification, quoted fees assessments, etc.
+      tags:
+        - sendmoney
+      requestBody:
+        description: Transfer request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transferRequest'
+        required: true
+      responses:
+        200:
+          $ref: '#/components/responses/transferSuccess'
+        400:
+          $ref: '#/components/responses/transferBadRequest'
+        500:
+          $ref: '#/components/responses/transferServerError'
+        504:
+          $ref: '#/components/responses/transferTimeout'
+
+  /sendmoney/{transferId}:
+    put:
+      summary: Continues a transfer that has paused at the party lookup and/or quote stage in order to accept or reject Payee party and/or quote
+      operationId: putSendMoneyByTransferId
+      description: >
+        The HTTP request `PUT /sendmoney/{transferId}` is used by the Payer DFSP to continue a transfer initiated via the `POST /sendmoney` method that has halted after party lookup and/or quotation stage.
+        The request body should contain either the "acceptParty" or "acceptQuote" property set to `true` as required to continue the transfer.
+        See the description of the `POST /sendmoney` HTTP method for more information on modes of transfer.
+      tags:
+        - sendmoney
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transferContinuationAccept'
+#              oneOf:
+#                - $ref: '#/components/schemas/transferContinuationAcceptParty'
+#                - $ref: '#/components/schemas/transferContinuationAcceptQuote'
+      parameters:
+        - $ref: '#/components/parameters/transferId'
+      responses:
+        200:
+          $ref: '#/components/responses/transferSuccess'
+        500:
+          $ref: '#/components/responses/transferServerError'
+        504:
+          $ref: '#/components/responses/transferTimeout'
+
+  #Inbound API (Mojaloop Switch → Payment Manager → Payee DFSP)
+  /parties/{idType}/{idValue}:
+    get:
+      summary: Requests information relating to a transfer party identified by the specified identifier type and value
+      operationId: getPartiesByIdTypeIdValue
+      description: The HTTP request `GET /parties/{idType}/{idValue}` is sent to the Payee DFSP, and it is used to look up information regarding the requested transfer party, identified by `{idType}` and `{idValue}`.
+      tags:
+        - parties
+      parameters:
+        - $ref: '#/components/parameters/idType'
+        - $ref: '#/components/parameters/idValue'
+      responses:
+        200:
+          description: Response containing details of the requested party
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transferPartyInbound'
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+
+  /quoterequests:
+    post:
+      summary: Requests a quote for the specified transfer
+      operationId: postQuoteRequests
+      description: The HTTP request `POST /quoterequests` is sent to the Payee DFSP, and it is used to request the creation of a quote for the provided financial transaction.
+      tags:
+        - quoterequests
+      requestBody:
+        description: Request for a transfer quotation
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/quoteRequest'
+      responses:
+        200:
+          description: A response to the transfer quotation request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/quoteResponse'
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+
+  /transfers:
+    post:
+      summary: Transfers funds from an external account to an internal account
+      operationId: postTransfers
+      description: The HTTP request `POST /transfers` is sent to the Payee DFSP, and it is used to request the creation of a transfer for the transfer party.
+      tags:
+        - transfers
+      requestBody:
+        description: An incoming transfer request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transferRequestInbound'
+      responses:
+        200:
+          description: The transfer was accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transferResponseInbound'
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+
+  /transfers/{transferId}:
+    put:
+      summary: Provides a notification about the success/failure of a specific transfer
+      operationId: putTransfersByTransferId
+      description: The HTTP request `PUT /transfers/{transferId}` is sent to the Payee DFSP, and it is used to notify the Payee DFSP about the final state of a transfer, to indicate whether the transfer has been committed or aborted in the Switch.
+      tags:
+        - transfers
+      parameters:
+        - $ref: '#/components/parameters/transferId'
+      requestBody:
+        description: An incoming notification for a fulfilled transfer
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/fulfilNotification'
+      responses:
+        200:
+          description: The notification was accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transferResponseInbound'
+        500:
+          $ref: '#/components/responses/500'
+
+
+components:
+  schemas:
+
+    amountType:
+      type: string
+      enum:
+        - SEND
+        - RECEIVE
+      description: SEND for send amount. RECEIVE for receive amount.
+    
+    currency:
+      maxLength: 3
+      minLength: 3
+      type: string
+      enum:
+        - AED
+        - AFN
+        - ALL
+        - AMD
+        - ANG
+        - AOA
+        - ARS
+        - AUD
+        - AWG
+        - AZN
+        - BAM
+        - BBD
+        - BDT
+        - BGN
+        - BHD
+        - BIF
+        - BMD
+        - BND
+        - BOB
+        - BRL
+        - BSD
+        - BTN
+        - BWP
+        - BYN
+        - BZD
+        - CAD
+        - CDF
+        - CHF
+        - CLP
+        - CNY
+        - COP
+        - CRC
+        - CUC
+        - CUP
+        - CVE
+        - CZK
+        - DJF
+        - DKK
+        - DOP
+        - DZD
+        - EGP
+        - ERN
+        - ETB
+        - EUR
+        - FJD
+        - FKP
+        - GBP
+        - GEL
+        - GGP
+        - GHS
+        - GIP
+        - GMD
+        - GNF
+        - GTQ
+        - GYD
+        - HKD
+        - HNL
+        - HRK
+        - HTG
+        - HUF
+        - IDR
+        - ILS
+        - IMP
+        - INR
+        - IQD
+        - IRR
+        - ISK
+        - JEP
+        - JMD
+        - JOD
+        - JPY
+        - KES
+        - KGS
+        - KHR
+        - KMF
+        - KPW
+        - KRW
+        - KWD
+        - KYD
+        - KZT
+        - LAK
+        - LBP
+        - LKR
+        - LRD
+        - LSL
+        - LYD
+        - MAD
+        - MDL
+        - MGA
+        - MKD
+        - MMK
+        - MNT
+        - MOP
+        - MRO
+        - MUR
+        - MVR
+        - MWK
+        - MXN
+        - MYR
+        - MZN
+        - NAD
+        - NGN
+        - NIO
+        - NOK
+        - NPR
+        - NZD
+        - OMR
+        - PAB
+        - PEN
+        - PGK
+        - PHP
+        - PKR
+        - PLN
+        - PYG
+        - QAR
+        - RON
+        - RSD
+        - RUB
+        - RWF
+        - SAR
+        - SBD
+        - SCR
+        - SDG
+        - SEK
+        - SGD
+        - SHP
+        - SLL
+        - SOS
+        - SPL
+        - SRD
+        - STD
+        - SVC
+        - SYP
+        - SZL
+        - THB
+        - TJS
+        - TMT
+        - TND
+        - TOP
+        - TRY
+        - TTD
+        - TVD
+        - TWD
+        - TZS
+        - UAH
+        - UGX
+        - USD
+        - UYU
+        - UZS
+        - VEF
+        - VND
+        - VUV
+        - WST
+        - XAF
+        - XCD
+        - XDR
+        - XOF
+        - XPF
+        - XTS
+        - XXX
+        - YER
+        - ZAR
+        - ZMW
+        - ZWD
+
+    dateShort:
+      type: string
+      pattern: ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)$
+      description: Date in the form YYYY-MM-DD.
+
+    errorCode:
+      title: ErrorCode
+      type: string
+      pattern: '^[1-9]\d{3}$'
+      description: >
+        The API data type errorCode is a JSON String of four characters,
+        consisting of digits only. Negative numbers are not allowed. A leading
+        zero is not allowed. Each error code in the API is a four-digit number,
+        for example, 1234, where the first number (1 in the example) represents
+        the high-level error category, the second number (2 in the example)
+        represents the low-level error category, and the last two numbers (34 in
+        the example) represents the specific error.
+
+    errorDescription:
+      title: ErrorDescription
+      type: string
+      minLength: 1
+      maxLength: 128
+      description: Error description string.
+
+    errorInformation:
+      title: ErrorInformation
+      type: object
+      description: A Mojaloop API error information construct.
+      properties:
+        errorCode:
+          $ref: '#/components/schemas/errorCode'
+        errorDescription:
+          $ref: '#/components/schemas/errorDescription'
+        extensionList:
+          $ref: '#/components/schemas/extensionListComplex'
+      required:
+        - errorCode
+        - errorDescription
+
+    errorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: string
+          pattern: ^[1-9]\d{2,3}$
+          description: Error code as string.
+        message:
+          type: string
+          maxLength: 4096
+          description: Error message text.
+
+    errorTransferResponse:
+      allOf:
+        - $ref: '#/components/schemas/errorResponse'
+        - type: object
+          required:
+            - transferState
+          properties:
+            transferState:
+              $ref: '#/components/schemas/transferResponse'
+
+    extensionItem:
+      type: object
+      properties:
+        key:
+          type: string
+          minLength: 1
+          maxLength: 32
+        value:
+          type: string
+          minLength: 1
+          maxLength: 128
+
+    extensionList:
+      type: array
+      items:
+        $ref: '#/components/schemas/extensionItem'
+      minItems: 0
+      maxItems: 16
+
+    extensionListComplex:
+      type: object
+      description: Data model for the complex type ExtensionList
+      properties:
+        extension:
+          type: array
+          items:
+            $ref: '#/components/schemas/extensionItem'
+          minItems: 1
+          maxItems: 16
+          description: Number of Extension elements
+      required:
+        - extension
+
+    fspId:
+      type: string
+      minLength: 1
+      maxLength: 32
+      description: FSP with which the party is associated.
+
+    fulfilNotification:
+      title: TransfersIDPatchResponse
+      type: object
+      description: PUT /transfers/{transferId} object
+      properties:
+        transferId:
+          $ref: '#/components/schemas/transferId'
+        direction:
+          type: string
+          enum:
+            - INBOUND
+        quoteRequest: 
+          type: object
+          properties: 
+            headers: 
+              type: object
+            body: 
+              $ref: '#/components/schemas/mojaloopQuoteRequestObject'
+        quoteResponse: 
+          type: object
+          properties: 
+            headers: 
+              type: object
+            body: 
+              type: string
+#              $ref: '#/components/schemas/mojaloopQuoteResponseObject'
+#              type: object
+        prepare: 
+          type: object
+          properties: 
+            body: 
+              type: object
+              properties: 
+                transferId: 
+                  $ref: '#/components/schemas/transferId'
+                payeeFsp: 
+                  $ref: '#/components/schemas/fspId'
+                payerFsp: 
+                  $ref: '#/components/schemas/fspId'
+                amount: 
+                  $ref: '#/components/schemas/mojaloopMoney'
+                ilpPacket: 
+                  $ref: '#/components/schemas/ilpPacket'
+                condition: 
+                  $ref: '#/components/schemas/ilpCondition'
+                expiration: 
+                  $ref: '#/components/schemas/timestamp'
+                extensionList:  
+                  $ref: '#/components/schemas/extensionList'
+              required:
+                - amount
+            headers: 
+              type: object
+        fulfil: 
+          type: object
+          properties: 
+            headers: 
+              type: object
+            body: 
+              type: string
+#              type: object
+#              properties:
+#                completedTimestamp:
+#                  $ref: '#/components/schemas/timestamp'
+#                transferState:
+#                  $ref: '#/components/schemas/mojaloopTransferState'
+#                fulfilment:
+#                  $ref: '#/components/schemas/ilpFulfilment'
+#                extensionList:  
+#                  $ref: '#/components/schemas/extensionList'
+        quote: 
+          type: object
+          properties: 
+            request: 
+              $ref: '#/components/schemas/mojaloopQuoteRequestObject'
+            internalRequest: 
+              $ref: '#/components/schemas/quoteRequest'
+            response: 
+              $ref: '#/components/schemas/quoteResponse'
+            mojaloopResponse: 
+              $ref: '#/components/schemas/mojaloopQuoteResponseObject'
+            fulfilment: 
+              $ref: '#/components/schemas/ilpFulfilment'
+        currentState: 
+          $ref: '#/components/schemas/transferStatus'
+        lastError:
+          $ref: '#/components/schemas/transferError'
+        initiatedTimestamp: 
+          $ref: '#/components/schemas/timestamp'
+        finalNotification: 
+          type: object
+          properties: 
+            completedTimestamp: 
+              $ref: '#/components/schemas/timestamp'
+            transferState: 
+              $ref: '#/components/schemas/transferState'
+            extensionList:
+              $ref: '#/components/schemas/extensionList'
+          required:
+            - completedTimestamp
+            - transferState
+
+    geoCode:
+      type: object
+      description: >
+        Data model for the Mojaloop API complex type GeoCode. Indicates a geographic location
+      properties:
+        latitude:
+          $ref: '#/components/schemas/latitude'
+        longitude:
+          $ref: '#/components/schemas/longitude'
+      required:
+        - latitude
+        - longitude
+
+    homeTransactionId:
+      type: string
+      maxLength: 255
+      description: Transaction ID from the DFSP backend, used to reconcile transactions between the Switch and DFSP backend systems.
+
+    idType:
+      type: string
+      enum:
+        - MSISDN
+        - ACCOUNT_ID
+      description: Below are the allowed values for the enumeration.
+
+        - MSISDN -  An MSISDN (Mobile Station International Subscriber Directory Number, that is, the phone number) is used as reference to a participant. The MSISDN identifier should be in international format according to the [ITU-T E.164 standard](https://www.itu.int/rec/T-REC-E.164/en). Optionally, the MSISDN may be prefixed by a single plus sign, indicating the international prefix.
+        - ACCOUNT_ID - A bank account number or FSP account ID should be used as reference to a participant. The ACCOUNT_ID identifier can be in any format, as formats can greatly differ depending on country and FSP.
+
+    idValue:
+      type: string
+      pattern: '^[A-Za-z0-9]{4,125}$'
+      minLength: 4
+      maxLength: 125
+      description: Identifier of the party.
+
+    ilpCondition:
+      type: string
+      pattern: '^[A-Za-z0-9-_]{43}$'
+      maxLength: 48
+      description: Condition that must be attached to the transfer by the Payer.
+
+    ilpFulfilment:
+      type: string
+      pattern: '^[A-Za-z0-9-_]{43}$'
+      maxLength: 48
+      description: Fulfilment that must be attached to the transfer by the Payee.
+
+    ilpPacket:
+      type: string
+      pattern: '^[A-Za-z0-9-_]+[=]{0,2}$'
+      minLength: 1
+      maxLength: 32768
+      description: Information for recipient (transport layer information).
+
+    initiator:
+      type: string
+      enum:
+        - PAYER
+        - PAYEE
+      description: Specifies if the initiator of the transfer is the Payer or Payee.
+
+    initiatorType:
+      type: string
+      enum:
+        - CONSUMER
+        - AGENT
+        - BUSINESS
+        - DEVICE
+      description: >
+        Below are the allowed values for the enumeration
+        - CONSUMER Consumer is the initiator of the transaction. Example - peer-to-peer transfer or loan repayment from wallet.
+        - AGENT Agent is the initiator of the transaction. Example - loan repayment via an agent.
+        - BUSINESS Business is the initiator of the transaction. Example - loan disbursement.
+        - DEVICE Device is the initiator of the transaction. Example - merchant-initiated merchant payment authorized on POS.
+
+    latitude:
+      type: string
+      pattern: >-
+        ^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$
+      description: >
+        The API data type Latitude is a JSON String in a lexical format that is
+        restricted by a regular expression for interoperability reasons.
+
+    longitude:
+      type: string
+      pattern: >-
+        ^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$
+      description: >-
+        The API data type Longitude is a JSON String in a lexical format that is
+        restricted by a regular expression for interoperability reasons.
+
+    merchantClassificationCode:
+      type: string
+      pattern: ^[\d]{1,4}$
+      description: Up to 4 digits specifying the sender's merchant classification, if known and applicable.
+
+    mojaloopError:
+      type: object
+      properties:
+        errorInformation:
+          $ref: '#/components/schemas/errorInformation'
+
+    mojaloopIdentifier:
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      type: string
+      description: A Mojaloop API identifier (UUID).
+
+    mojaloopMoney:
+      title: Money
+      type: object
+      description: Data model for the Mojaloop API complex type Money.
+      properties:
+        currency:
+          $ref: '#/components/schemas/currency'
+        amount:
+          $ref: '#/components/schemas/money'
+      required:
+        - currency
+        - amount
+
+    mojaloopQuoteRequestObject: 
+      type: object
+      properties: 
+        quoteId: 
+          $ref: '#/components/schemas/quoteId'
+        transactionId: 
+          $ref: '#/components/schemas/transactionId'
+        amountType: 
+          $ref: '#/components/schemas/amountType'
+        amount: 
+          $ref: '#/components/schemas/mojaloopMoney'
+        fees: 
+          $ref: '#/components/schemas/mojaloopMoney'
+        expiration: 
+          $ref: '#/components/schemas/timestamp'
+        payer: 
+          $ref: '#/components/schemas/Party'
+        payee: 
+          $ref: '#/components/schemas/Party'
+        transactionType: 
+          $ref: '#/components/schemas/mojaloopTransactionType'
+        note: 
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: An optional note associated with the requested transfer.
+        extensionList:  
+          $ref: '#/components/schemas/extensionList'
+      required:
+        - quoteId
+        - transactionId
+        - amountType
+        - amount
+        - payee
+        - payer
+        - transactionType
+
+    mojaloopQuoteResponseObject: 
+      type: object
+      properties:
+        transferAmount:
+          $ref: '#/components/schemas/mojaloopMoney'
+        expiration:
+          $ref: '#/components/schemas/timestamp'
+        ilpPacket: 
+          $ref: '#/components/schemas/ilpPacket'
+        condition: 
+          $ref: '#/components/schemas/ilpCondition'
+        payeeReceiveAmount:
+          $ref: '#/components/schemas/mojaloopMoney'
+        payeeFspFee:
+          $ref: '#/components/schemas/mojaloopMoney'
+        payeeFspCommission:
+          $ref: '#/components/schemas/mojaloopMoney'
+        geoCode:
+          $ref: '#/components/schemas/geoCode'
+        extensionList:
+          $ref: '#/components/schemas/extensionList'
+      required:
+        - transferAmount
+        - expiration
+        - ilpPacket
+        - condition
+
+    mojaloopTransactionType:
+      title: mojaloopTransactionType
+      type: object
+      description: Data model for the complex type mojaloopTransactionType.
+      properties:
+        scenario:
+          $ref: '#/components/schemas/TransactionScenario'
+        subScenario:
+          type: string
+          pattern: ^[A-Z_]{1,32}$
+          description: Possible sub-scenario, defined locally within the scheme (UndefinedEnum Type).
+        initiator:
+          $ref: '#/components/schemas/initiator'
+        initiatorType:
+          $ref: '#/components/schemas/initiatorType'
+      required:
+        - scenario
+        - initiator
+        - initiatorType
+
+    mojaloopTransferState:
+      type: string
+      enum:
+        - RECEIVED
+        - RESERVED
+        - COMMITTED
+        - ABORTED
+      description: >
+        Below are the allowed values for the enumeration
+        - RECEIVED The Switch has received the transfer.
+        - RESERVED The Switch has reserved the transfer.
+        - COMMITTED The Switch has successfully performed the transfer.
+        - ABORTED The Switch has aborted the transfer due a rejection or failure to perform the transfer.
+
+    money:
+      pattern: ^([0]|([1-9][0-9]{0,17}))([.][0-9]{0,3}[1-9])?$
+      type: string
+
+    Party:
+      title: Party
+      type: object
+      description: Data model for the complex type Party.
+      properties:
+        partyIdInfo:
+          $ref: '#/components/schemas/PartyIdInfo'
+        merchantClassificationCode:
+          $ref: '#/components/schemas/merchantClassificationCode'
+        name:
+          $ref: '#/components/schemas/partyName'
+        personalInfo:
+          $ref: '#/components/schemas/PartyPersonalInfo'
+      required:
+        - partyIdInfo
+
+    PartyComplexName:
+      title: PartyComplexName
+      type: object
+      description: Data model for the complex type PartyComplexName.
+      properties:
+        firstName:
+          $ref: '#/components/schemas/partyName'
+        middleName:
+          $ref: '#/components/schemas/partyName'
+        lastName:
+          $ref: '#/components/schemas/partyName'
+
+    PartyIdInfo:
+      title: PartyIdInfo
+      type: object
+      description: Data model for the complex type PartyIdInfo.
+      properties:
+        partyIdType:
+          $ref: '#/components/schemas/idType'
+        partyIdentifier:
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: An identifier for the Party.
+        partySubIdOrType:
+          type: string
+          minLength: 1
+          maxLength: 128          
+          description: A sub-identifier or sub-type for the Party.
+        fspId:
+          $ref: '#/components/schemas/fspId'
+        extensionList:
+          $ref: '#/components/schemas/extensionList'
+      required:
+        - partyIdType
+        - partyIdentifier
+
+    partyName:
+      type: string
+      minLength: 1
+      maxLength: 128
+
+    PartyPersonalInfo:
+      title: PartyPersonalInfo
+      type: object
+      description: Data model for the complex type PartyPersonalInfo.
+      properties:
+        complexName:
+          $ref: '#/components/schemas/PartyComplexName'
+        dateOfBirth:
+          $ref: '#/components/schemas/dateShort'
+
+    payerType:
+      type: string
+      enum:
+        - CONSUMER
+        - AGENT
+        - BUSINESS
+        - DEVICE
+      description: >
+        Below are the allowed values for the enumeration
+        - CONSUMER Consumer is the initiator of the transaction. Example - peer-to-peer transfer or loan repayment from wallet.
+        - AGENT Agent is the initiator of the transaction. Example - loan repayment via an agent.
+        - BUSINESS Business is the initiator of the transaction. Example - loan disbursement.
+        - DEVICE Device is the initiator of the transaction. Example - merchant-initiated merchant payment authorized on POS.
+
+    quote:
+      type: object
+      description: Mojaloop API response to a quote request
+      properties:
+        transferAmount:
+          $ref: '#/components/schemas/mojaloopMoney'
+        payeeReceiveAmount:
+          $ref: '#/components/schemas/mojaloopMoney'
+        payeeFspFee:
+          $ref: '#/components/schemas/mojaloopMoney'
+        payeeFspCommission:
+          $ref: '#/components/schemas/mojaloopMoney'
+        expiration:
+          $ref: '#/components/schemas/timestamp'
+        geoCode:
+          $ref: '#/components/schemas/geoCode'
+        ilpPacket:
+          $ref: '#/components/schemas/ilpPacket'
+        condition:
+          $ref: '#/components/schemas/ilpCondition'
+        extensionList:
+          $ref: '#/components/schemas/extensionListComplex'
+      required:
+        - transferAmount
+        - expiration
+        - ilpPacket
+        - condition
+
+    quoteId:
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      type: string
+      description: A Mojaloop API quote identifier (UUID).
+
+    quoteRequest:
+      type: object
+      description: A request for a quote for transfer from the DFSP backend.
+      required:
+        - quoteId
+        - transactionId
+        - to
+        - from
+        - amountType
+        - amount
+        - currency
+        - transactionType
+        - initiator
+        - initiatorType
+      properties:
+        quoteId:
+          $ref: '#/components/schemas/quoteId'
+        transactionId:
+          $ref: '#/components/schemas/transactionId'
+        to:
+          $ref: '#/components/schemas/transferPartyInbound'
+        from:
+          $ref: '#/components/schemas/transferPartyInbound'
+        amountType:
+          $ref: '#/components/schemas/amountType'
+        amount:
+          $ref: '#/components/schemas/money'
+        currency:
+          $ref: '#/components/schemas/currency'
+        feesAmount:
+          $ref: '#/components/schemas/money'
+        feesCurrency:
+          $ref: '#/components/schemas/currency'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+        initiator:
+          $ref: '#/components/schemas/initiator'
+        initiatorType:
+          $ref: '#/components/schemas/initiatorType'
+        geoCode:
+          $ref: '#/components/schemas/geoCode'
+        note:
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: An optional note associated with the requested transfer.
+        expiration:
+          $ref: '#/components/schemas/timestamp'
+
+    quoteResponse:
+      type: object
+      description: A response to a request for a quote.
+      required:
+        - quoteId
+        - transactionId
+        - transferAmount
+        - transferAmountCurrency
+      properties:
+        quoteId:
+          $ref: '#/components/schemas/quoteId'
+        transactionId:
+          $ref: '#/components/schemas/transactionId'
+        transferAmount:
+          $ref: '#/components/schemas/money'
+        transferAmountCurrency:
+          $ref: '#/components/schemas/currency'
+        payeeReceiveAmount:
+          $ref: '#/components/schemas/money'
+        payeeReceiveAmountCurrency:
+          $ref: '#/components/schemas/currency'
+        payeeFspFeeAmount:
+          $ref: '#/components/schemas/money'
+        payeeFspFeeAmountCurrency:
+          $ref: '#/components/schemas/currency'
+        payeeFspCommissionAmount:
+          $ref: '#/components/schemas/money'
+        payeeFspCommissionAmountCurrency:
+          $ref: '#/components/schemas/currency'
+        expiration:
+          $ref: '#/components/schemas/timestamp'
+        geoCode:
+          $ref: '#/components/schemas/geoCode'
+        extensionList:  
+          $ref: '#/components/schemas/extensionList'
+
+    timestamp:
+      type: string
+      pattern: ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:(\.\d{3}))(?:Z|[+-][01]\d:[0-5]\d)$
+      description: An ISO-8601 formatted timestamp.
+
+    transactionId:
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      type: string
+      description: ID of the transaction, the ID is decided by the Payer FSP during the creation of the quote.
+
+    TransactionScenario:
+      title: TransactionScenario
+      type: string
+      enum:
+        - DEPOSIT
+        - WITHDRAWAL
+        - TRANSFER
+        - PAYMENT
+        - REFUND
+      description: Below are the allowed values for the enumeration.
+
+        - DEPOSIT - Used for performing a Cash-In (deposit) transaction. In a normal scenario, electronic funds are transferred from a Business account to a Consumer account, and physical cash is given from the Consumer to the Business User.
+        - WITHDRAWAL - Used for performing a Cash-Out (withdrawal) transaction. In a normal scenario, electronic funds are transferred from a Consumer’s account to a Business account, and physical cash is given from the Business User to the Consumer.
+        - TRANSFER - Used for performing a P2P (Peer to Peer, or Consumer to Consumer) transaction.
+        - PAYMENT - Usually used for performing a transaction from a Consumer to a Merchant or Organization, but could also be for a B2B (Business to Business) payment. The transaction could be online for a purchase in an Internet store, in a physical store where both the Consumer and Business User are present, a bill payment, a donation, and so on.
+        - REFUND - Used for performing a refund of transaction.
+
+    transactionType:
+      type: string
+      enum:
+        - LOAN_REPAYMENT
+        - SAVINGS_DEPOSIT
+        - TRANSFER
+      description: Type of transaction. Below are the allowed values for the enumeration.
+
+        - LOAN_REPAYMENT - Used in the loan repayment use case when the loan repayment goes to a loan account.
+        - SAVINGS_DEPOSIT - Used in the loan repayment use case when the loan repayment goes to a savings account.
+        - TRANSFER - Used in the loan disbursement use case.
+
+    # transferContinuationAcceptParty:
+    #   type: object
+    #   required:
+    #     - acceptParty
+    #   properties:
+    #     acceptParty:
+    #       type: boolean
+    #       enum:
+    #         - true
+    #         - false
+    #     amount:
+    #       $ref: '#/components/schemas/money'
+    #     to: 
+    #       $ref: '#/components/schemas/transferParty'
+
+    # transferContinuationAcceptQuote:
+    #   type: object
+    #   required:
+    #     - acceptQuote
+    #   properties:
+    #     acceptQuote:
+    #       type: boolean
+    #       enum:
+    #         - true
+    #         - false
+    #     amount:
+    #       $ref: '#/components/schemas/money'
+    #     to: 
+    #       $ref: '#/components/schemas/transferParty'
+
+    transferContinuationAccept:
+      type: object
+      properties:
+        acceptQuote:
+          type: boolean
+          enum:
+            - true
+            - false
+        acceptParty:
+          type: boolean
+          enum:
+            - true
+            - false
+        amount:
+          $ref: '#/components/schemas/money'
+        to: 
+          $ref: '#/components/schemas/transferParty'
+
+    transferError:
+      type: object
+      description: This object represents a Mojaloop API error received at any time during the transfer process
+      properties:
+        httpStatusCode:
+          type: integer
+          description: The HTTP status code returned to the caller. This is the same as the actual HTTP status code returned with the response.
+        mojaloopError:
+          $ref: '#/components/schemas/mojaloopError'
+
+    transferFulfilment:
+      type: object
+      description: A Mojaloop API transfer fulfilment
+      properties:
+        fulfilment:
+          $ref: '#/components/schemas/ilpFulfilment'
+        completedTimestamp:
+          $ref: '#/components/schemas/timestamp'
+        transferState:
+          $ref: '#/components/schemas/mojaloopTransferState'
+        extensionList:
+          $ref: '#/components/schemas/extensionListComplex'
+      required:
+        - transferState
+
+    transferId:
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      type: string
+      description: A Mojaloop API transfer identifier (UUID).
+
+    transferParty:
+      type: object
+      required:
+        - idType
+        - idValue
+      properties:
+        type:
+          $ref: '#/components/schemas/payerType'
+        idType:
+          $ref: '#/components/schemas/idType'
+        idValue:
+          $ref: '#/components/schemas/idValue'
+        displayName:
+          $ref: '#/components/schemas/partyName'
+        firstName:
+          $ref: '#/components/schemas/partyName'
+        middleName:
+          $ref: '#/components/schemas/partyName'
+        lastName:
+          $ref: '#/components/schemas/partyName'
+        dateOfBirth:
+          $ref: '#/components/schemas/dateShort'
+        merchantClassificationCode:
+          $ref: '#/components/schemas/merchantClassificationCode'
+        fspId:
+          $ref: '#/components/schemas/fspId'
+        extensionList:
+          $ref: '#/components/schemas/extensionList'
+
+    transferPartyInbound:
+      type: object
+      required:
+        - idType
+        - idValue
+      properties:
+        type:
+          $ref: '#/components/schemas/payerType'
+        idType:
+          $ref: '#/components/schemas/idType'
+        idValue:
+          type: string
+          description: The identifier string used to identify the sender.
+        displayName:
+          $ref: '#/components/schemas/partyName'
+        firstName:
+          $ref: '#/components/schemas/partyName'
+        middleName:
+          $ref: '#/components/schemas/partyName'
+        lastName:
+          $ref: '#/components/schemas/partyName'
+        dateOfBirth:
+          $ref: '#/components/schemas/dateShort'
+        merchantClassificationCode:
+          $ref: '#/components/schemas/merchantClassificationCode'
+        fspId:
+          $ref: '#/components/schemas/fspId'
+        extensionList:
+          $ref: '#/components/schemas/extensionList'
+
+    transferRequest:
+      type: object
+      required:
+        - homeTransactionId
+        - from
+        - to
+        - amountType
+        - currency
+        - amount
+        - transactionType
+      properties:
+        homeTransactionId:
+          $ref: '#/components/schemas/homeTransactionId'
+        from:
+          $ref: '#/components/schemas/transferParty'
+        to:
+          $ref: '#/components/schemas/transferParty'
+        amountType:
+          $ref: '#/components/schemas/amountType'
+        currency:
+          $ref: '#/components/schemas/currency'
+        amount:
+          $ref: '#/components/schemas/money'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+        note:
+          maxLength: 128
+          type: string
+        quoteRequestExtensions:
+          $ref: '#/components/schemas/extensionList'
+        transferRequestExtensions:
+          $ref: '#/components/schemas/extensionList'
+
+    transferRequestInbound:
+      type: object
+      required:
+        - transferId
+        - quote
+        - from
+        - to
+        - amountType
+        - currency
+        - amount
+        - transactionType
+      properties:
+        transferId:
+          $ref: '#/components/schemas/transferId'
+        quote:
+          $ref: '#/components/schemas/quoteResponse'
+        from:
+          $ref: '#/components/schemas/transferPartyInbound'
+        to:
+          $ref: '#/components/schemas/transferPartyInbound'
+        amountType:
+          $ref: '#/components/schemas/amountType'
+        currency:
+          $ref: '#/components/schemas/currency'
+        amount:
+          $ref: '#/components/schemas/money'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+        note:
+          maxLength: 128
+          type: string
+
+    transferResponse:
+      type: object
+      required:
+        - homeTransactionId
+        - from
+        - to
+        - amountType
+        - currency
+        - amount
+        - transactionType
+      properties:
+        transferId:
+          $ref: '#/components/schemas/mojaloopIdentifier'
+        homeTransactionId:
+          $ref: '#/components/schemas/homeTransactionId'
+        from:
+          $ref: '#/components/schemas/transferParty'
+        to:
+          $ref: '#/components/schemas/transferParty'
+        amountType:
+          $ref: '#/components/schemas/amountType'
+        currency:
+          $ref: '#/components/schemas/currency'
+        amount:
+          $ref: '#/components/schemas/money'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+        note:
+          maxLength: 128
+          type: string
+        currentState:
+          $ref: '#/components/schemas/transferStatus'
+        quoteId:
+          $ref: '#/components/schemas/mojaloopIdentifier'
+        quoteResponse:
+          $ref: '#/components/schemas/quote'
+        quoteResponseSource:
+          $ref: '#/components/schemas/fspId'
+        fulfil:
+          $ref: '#/components/schemas/transferFulfilment'
+        lastError:
+          $ref: '#/components/schemas/transferError'
+
+    transferResponseInbound:
+      type: object
+      #required:
+        #- homeTransactionId
+      properties:
+        homeTransactionId:
+          $ref: '#/components/schemas/homeTransactionId'
+
+    transferState:
+      type: string
+      enum:
+        - COMMITTED
+        - ABORTED
+      description: >
+        Below are the allowed values for the enumeration
+        - COMMITTED The transfer has been committed in the Switch. The Payee DFSP responds to the `COMMITTED` state with an HTTP 200 message, and then marks the transfer as completed. in its internal records.
+        - ABORTED The transfer has been aborted in the Switch. The Payee DFSP responds to the `ABORTED` state with an HTTP 200 message, and then aborts the transfer in its internal records.
+
+    transferStatus:
+      type: string
+      enum:
+        - ERROR_OCCURRED
+        - WAITING_FOR_PARTY_ACCEPTANCE
+        - WAITING_FOR_QUOTE_ACCEPTANCE
+        - COMPLETED
+      description: >
+        Below are the allowed values for the enumeration
+        - ERROR_OCCURRED An error has occurred during the transfer process.
+        - WAITING_FOR_PARTY_ACCEPTANCE `AUTO_ACCEPT_PARTY` is set to "false" and party information has been returned, waiting to be accepted by the Payer DFSP using a `PUT /sendmoney/{transferId}` request.
+        - WAITING_FOR_QUOTE_ACCEPTANCE `AUTO_ACCEPT_QUOTE` is set to "false" and quote information has been returned, waiting to be accepted by the Payer DFSP using a `PUT /sendmoney/{transferId}` request.
+        - COMPLETED The transfer has completed successfully.
+
+  responses:
+    '400':
+      description: Malformed or missing required headers or parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+    '404':
+      description: The party specified by the provided identifier type and value is not known to the server
+    '500':
+      description: An error occurred processing the request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+    transferSuccess:
+      description: Transfer completed successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/transferResponse'
+    transferBadRequest:
+      description: Malformed or missing required body, headers or parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorTransferResponse'
+    transferServerError:
+      description: An error occurred processing the transfer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorTransferResponse'
+    transferTimeout:
+      description: Timeout occurred processing the transfer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorTransferResponse'
+
+  parameters:
+    idType:
+      name: idType
+      in: path
+      required: true
+      schema:
+        type: string
+        enum:
+          - MSISDN
+          - ACCOUNT_ID
+      description: Below are the allowed values for the enumeration.
+        - MSISDN -  An MSISDN (Mobile Station International Subscriber Directory Number, that is, the phone number) is used as reference to a participant. The MSISDN identifier should be in international format according to the [ITU-T E.164 standard](https://www.itu.int/rec/T-REC-E.164/en). Optionally, the MSISDN may be prefixed by a single plus sign, indicating the international prefix.
+        - ACCOUNT_ID - A bank account number or FSP account ID should be used as reference to a participant. The ACCOUNT_ID identifier can be in any format, as formats can greatly differ depending on country and FSP.
+
+    idValue:
+      name: idValue
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+      description: Identifier of the party.
+    transferId:
+      name: transferId
+      in: path
+      required: true
+      schema:
+        pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+        type: string
+      description: Transfer identifier.

@@ -21,12 +21,27 @@
  * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
-const { readFileAsync, readRecursiveAsync } = require('./utils')
+const { readFileAsync, readRecursiveAsync, fileStatAsync } = require('./utils')
+const fs = require('fs')
 
 // load collections or environments
 const getCollectionsOrEnvironments = async (exampleType, type) => {
   const data = await readRecursiveAsync(`examples/${exampleType}/${type || ''}`)
   return data.filter(filename => filename.endsWith('.json'))
+}
+
+// load collections or environments with file sizes
+const getCollectionsOrEnvironmentsWithFileSize = async (exampleType, type) => {
+  const dir = `examples/${exampleType}/${type || ''}`
+  const data = await readRecursiveAsync(dir)
+  const jsonFileList = data.filter(filename => filename.endsWith('.json'))
+  const jsonFileListWithFileSize = jsonFileList.map(file => {
+    return {
+      name: file,
+      size: fs.statSync(file).size
+    }
+  })
+  return jsonFileListWithFileSize
 }
 
 // load samples content
@@ -68,7 +83,38 @@ const getSample = async (queryParams) => {
   return sample
 }
 
+// load samples content
+const getSampleWithFolderWise = async (queryParams) => {
+  const collections = []
+  if (queryParams.collections) {
+    for (const i in queryParams.collections) {
+      const fileContent = await readFileAsync(queryParams.collections[i], 'utf8')
+      const fileStat = await fileStatAsync(queryParams.collections[i])
+      // collections.push(JSON.parse(collection))
+      collections.push({
+        name: queryParams.collections[i],
+        path: queryParams.collections[i],
+        size: fileStat.size,
+        modified: fileStat.mtime,
+        content: JSON.parse(fileContent)
+      })
+    }
+  }
+
+  let environment = {}
+  if (queryParams.environment) {
+    environment = JSON.parse(await readFileAsync(queryParams.environment, 'utf8')).inputValues
+  }
+
+  return {
+    collections,
+    environment
+  }
+}
+
 module.exports = {
   getCollectionsOrEnvironments,
-  getSample
+  getCollectionsOrEnvironmentsWithFileSize,
+  getSample,
+  getSampleWithFolderWise
 }

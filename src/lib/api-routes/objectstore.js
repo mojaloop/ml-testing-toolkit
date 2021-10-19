@@ -29,19 +29,19 @@ const objectStore = require('../objectStore')
 // Get runtime and stored user config
 router.get('/:object', async (req, res, next) => {
   try {
-    const object = objectStore.get(req.params.object)
+    const object = objectStore.get(req.params.object, undefined, req.user)
     res.status(200).json(object)
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
 router.delete('/:object', async (req, res, next) => {
   try {
-    objectStore.set(req.params.object, {})
+    objectStore.set(req.params.object, {}, req.user)
     res.status(200).json({})
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 

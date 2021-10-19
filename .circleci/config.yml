@@ -6,7 +6,11 @@ defaults_working_directory: &defaults_working_directory
 
 defaults_docker_node: &defaults_docker_node
   docker:
-    - image: node:12.16.0-alpine
+    - image: node:12.16.3-alpine
+
+defaults_docker_ubuntu: &defaults_docker_ubuntu
+  docker:
+    - image: cimg/node:12.16.3
 
 defaults_docker_helm_kube: &defaults_docker_helm_kube
   docker:
@@ -100,6 +104,7 @@ jobs:
   test-unit:
     <<: *defaults_working_directory
     <<: *defaults_docker_node
+    # resource_class: large
     steps:
       - run:
           name: Install general dependencies
@@ -111,11 +116,10 @@ jobs:
           name: Create dir for test results
           command: mkdir -p ./test/results
       - run:
-          name: Install jest
-          command: npm install -g jest
-      - run:
           name: Execute unit tests
-          command: npm run test:unit --silent -- --json --outputFile ./test/results/unit.json
+          command: |
+            export NODE_OPTIONS=--max_old_space_size=4096
+            npm run test:unit --silent -- --json --maxWorkers=2 --outputFile ./test/results/unit.json
       - store_artifacts:
           path: ./test/results
           prefix: test
@@ -173,7 +177,9 @@ jobs:
             - dependency-cache-
       - run:
           name: Execute code coverage check
-          command: npm -s run test:coverage-check
+          command: |
+            export NODE_OPTIONS=--max_old_space_size=4096
+            npm -s run test:coverage-check -- --maxWorkers=2
       - store_artifacts:
           path: coverage
           prefix: test
@@ -189,52 +195,6 @@ jobs:
             else
                 echo "Not a release (env CIRCLE_BRANCH != 'master'), skipping sending lcov.info to SonarQube."
             fi
-  # test-integration:
-  #   machine: true
-  #   <<: *defaults_working_directory
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         key: dependency-cache-{{ checksum "package.json" }}
-  #     - run:
-  #         name: Create dir for test results
-  #         command: mkdir -p ./test/results
-  #     - run:
-  #         name: Execute integration tests
-  #         command: npm -s run test:integration
-  #     - store_artifacts:
-  #         path: ./test/results
-  #         prefix: test
-  #     - store_test_results:
-  #         path: ./test/results
-
-  # test-functional:
-  #   machine: true
-  #   <<: *defaults_working_directory
-  #   steps:
-  #     - run:
-  #         name: Add the Postgres 9.6 binaries to the path.
-  #         command: echo ‘/usr/lib/postgresql/9.6/bin/:$PATH’ >> $BASH_ENV
-  #     - run:
-  #         name: Install Docker Compose
-  #         command: |
-  #           curl -L https://github.com/docker/compose/releases/download/1.11.2/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-  #           chmod +x ~/docker-compose
-  #           mv ~/docker-compose /usr/local/bin/docker-compose
-  #     - checkout
-  #     - restore_cache:
-  #         key: dependency-cache-{{ checksum "package.json" }}
-  #     - run:
-  #         name: Create dir for test results
-  #         command: mkdir -p ./test/results
-  #     - run:
-  #         name: Execute functional tests
-  #         command: npm -s run test:functional
-  #     - store_artifacts:
-  #         path: ./test/results
-  #         prefix: test
-  #     - store_test_results:
-  #         path: ./test/results
 
   vulnerability-check:
     <<: *defaults_working_directory
@@ -278,6 +238,73 @@ jobs:
           path: /tmp/license-scanner/results
           prefix: licenses
 
+  build-native-app:
+    <<: *defaults_working_directory
+    <<: *defaults_docker_ubuntu
+    steps:
+      - run:
+          name: Install dependencies
+          command: |
+            # curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+            # sudo apt-get install -y nodejs
+            # sudo apt install zip
+            # sudo apt install git
+            # Installing Docker CLI
+            sudo npm install -g pkg
+      - checkout
+      - run:
+          name: Check if release exists
+          command: |
+            if [[ ! $(git ls-remote origin "refs/tags/${CIRCLE_TAG}") ]]; then
+              echo "Release doesn't exist"
+              exit 1
+            fi
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_caching: true
+      - run:
+          name: Installing NPM Dependencies
+          command: npm install
+      - run:
+          name: Preparing Native App for MacOS
+          command: |
+            sh ./native-app-generation/build-native-app.sh -arch x64 -platform macos
+            cd out_native_bin
+            zip -r ${CIRCLE_PROJECT_REPONAME}_${CIRCLE_TAG}_macos_x64.zip macos-x64/*
+            rm -rf macos-x64
+      - run:
+          name: Preparing Native App for Linux
+          command: |
+            sh ./native-app-generation/build-native-app.sh -arch x64 -platform linux
+            cd out_native_bin/linux-x64
+            tar czf ../${CIRCLE_PROJECT_REPONAME}_${CIRCLE_TAG}_linux_x64.tar.gz *
+            cd ..
+            rm -rf linux-x64
+      - run:
+          name: Preparing Native App for Windows
+          command: |
+            sh ./native-app-generation/build-native-app.sh -arch x64 -platform win
+            cd out_native_bin
+            zip -r ${CIRCLE_PROJECT_REPONAME}_${CIRCLE_TAG}_win_x64.zip win-x64/*
+            rm -rf win-x64
+      - run:
+          name: Download GitHub Releases tool
+          command: |
+            curl -Ls https://github.com/tcnksm/ghr/releases/download/v0.12.0/ghr_v0.12.0_linux_amd64.tar.gz | tar -xvz -C /tmp/
+            sudo cp /tmp/ghr_v0.12.0_linux_amd64/ghr /usr/local/bin/
+      - run:
+          name: Updating release with artefacts
+          command: |
+            ghr \
+              --token ${GITHUB_TOKEN} \
+              --username ${CIRCLE_PROJECT_USERNAME} \
+              --repository ${CIRCLE_PROJECT_REPONAME} \
+              --commitish ${CIRCLE_SHA1} \
+              --name "Release ${CIRCLE_TAG}" \
+              --replace \
+              --body "Automatic Release" \
+                ${CIRCLE_TAG} out_native_bin
+
   build-snapshot:
     machine: true
     <<: *defaults_working_directory
@@ -309,14 +336,14 @@ jobs:
           <<: *defaults_build_docker_login
       - run:
           <<: *defaults_build_docker_build
-      # - run:
-      #     <<: *defaults_license_scanner
-      # - run:
-      #     name: Run the license-scanner
-      #     command: cd /tmp/license-scanner && mode=docker dockerImage=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG make run
-      # - store_artifacts:
-      #     path: /tmp/license-scanner/results
-      #     prefix: licenses
+      - run:
+          <<: *defaults_license_scanner
+      - run:
+          name: Run the license-scanner
+          command: cd /tmp/license-scanner && mode=docker dockerImages=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG make run
+      - store_artifacts:
+          path: /tmp/license-scanner/results
+          prefix: licenses
       - run:
           <<: *defaults_build_docker_publish
       - run:
@@ -369,28 +396,6 @@ workflows:
               ignore:
                 - /feature*/
                 - /bugfix*/
-      # - test-integration:
-      #     context: org-global
-      #     requires:
-      #       - setup
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore:
-      #           - /feature*/
-      #           - /bugfix*/
-      # - test-functional:
-      #     context: org-global
-      #     requires:
-      #       - setup
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore:
-      #           - /feature*/
-      #           - /bugfix*/
       - vulnerability-check:
           context: org-global
           requires:
@@ -413,16 +418,28 @@ workflows:
               ignore:
                 - /feature*/
                 - /bugfix*/
+      - build-native-app:
+          context: org-global
+          requires:
+            - setup
+            - test-unit
+            - test-coverage
+            - vulnerability-check
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
+            branches:
+              ignore:
+                - /.*/
+
       - build-snapshot:
           context: org-global
           requires:
             - setup
             - test-unit
             - test-coverage
-            # - test-integration
-            # - test-functional
             - vulnerability-check
-            # - audit-licenses
+            - audit-licenses
           filters:
             tags:
               only: /v[0-9]+(\.[0-9]+)*\-snapshot/
@@ -435,10 +452,8 @@ workflows:
             - setup
             - test-unit
             - test-coverage
-            # - test-integration
-            # - test-functional
             - vulnerability-check
-            # - audit-licenses
+            - audit-licenses
           filters:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/

@@ -1,0 +1,393 @@
+{
+  "name": "hub-p2p-fundsinout-block-transfers",
+  "test_cases": [
+    {
+      "id": 4,
+      "name": "block_transfer ( p>ndc )",
+      "requests": [
+        {
+          "id": 1,
+          "description": "GET limits-payerfsp",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/limits",
+          "path": "/participants/{$inputs.fromFspId}/limits",
+          "method": "get",
+          "params": {
+            "name": "{$inputs.fromFspId}"
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 200",
+                "exec": [
+                  "expect(response.status).to.equal(200)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "var jsonData = pm.response.body;\r",
+                "var payerNDC = jsonData[0].limit.value\r",
+                "pm.environment.set(\"payerNDC\", payerNDC)"
+              ]
+            },
+            "preRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "id": 2,
+          "description": "GET limits-payerfsp Copy",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/limits",
+          "path": "/participants/{$inputs.toFspId}/limits",
+          "method": "get",
+          "params": {
+            "name": "{$inputs.toFspId}"
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 200",
+                "exec": [
+                  "expect(response.status).to.equal(200)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "var jsonData = pm.response.body;\r",
+                "var payeeNDC = jsonData[0].limit.value\r",
+                "pm.environment.set('payeeNDC', payeeNDC)"
+              ]
+            },
+            "preRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "id": 3,
+          "description": "Get payerfsp position before TheTransfer",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/positions",
+          "path": "/participants/{$inputs.fromFspId}/positions",
+          "method": "get",
+          "params": {
+            "name": "{$inputs.fromFspId}"
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 200",
+                "exec": [
+                  "expect(response.status).to.equal(200)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "var jsonData = pm.response.body;\r",
+                "var result;\r",
+                "\r",
+                "jsonData.forEach(entry => {\r",
+                "    (entry.currency === pm.environment.get(\"currency\")) ? result = entry.value : result =\r",
+                "        undefined\r",
+                "})\r",
+                "\r",
+                "pm.environment.set(\"payerfspPositionBeforeTransfer\", result);"
+              ]
+            }
+          }
+        },
+        {
+          "id": 4,
+          "description": "Get payerfsp position before TheTransfer Copy",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/positions",
+          "path": "/participants/{$inputs.toFspId}/positions",
+          "method": "get",
+          "params": {
+            "name": "{$inputs.toFspId}"
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 200",
+                "exec": [
+                  "expect(response.status).to.equal(200)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "var jsonData = pm.response.body;\r",
+                "var result;\r",
+                "\r",
+                "jsonData.forEach(entry => {\r",
+                "    (entry.currency === pm.environment.get(\"currency\")) ? result = entry.value : result =\r",
+                "        undefined\r",
+                "})\r",
+                "\r",
+                "pm.environment.set(\"payeefspPositionBeforeTransfer\", result);"
+              ]
+            }
+          }
+        },
+        {
+          "id": 5,
+          "description": "Send quote",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/quotes",
+          "method": "post",
+          "headers": {
+            "Accept": "application/vnd.interoperability.quotes+json;version=1.0",
+            "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$inputs.toFspId}"
+          },
+          "body": {
+            "quoteId": "{$function.generic.generateUUID}",
+            "transactionId": "{$function.generic.generateUUID}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "{$inputs.fromIdType}",
+                "partyIdentifier": "{$inputs.fromIdValue}",
+                "fspId": "{$inputs.fromFspId}"
+              },
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "{$inputs.fromFirstName}",
+                  "lastName": "{$inputs.fromLastName}"
+                },
+                "dateOfBirth": "{$inputs.fromDOB}"
+              }
+            },
+            "payee": {
+              "partyIdInfo": {
+                "partyIdType": "{$inputs.toIdType}",
+                "partyIdentifier": "{$inputs.toIdValue}",
+                "fspId": "{$inputs.toFspId}"
+              }
+            },
+            "amountType": "SEND",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$inputs.currency}"
+            },
+            "transactionType": {
+              "scenario": "TRANSFER",
+              "initiator": "PAYER",
+              "initiatorType": "CONSUMER"
+            },
+            "note": "{$inputs.note}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              }
+            ]
+          },
+          "params": {
+            "Type": "",
+            "ID": ""
+          },
+          "url": "{$inputs.HOST_QUOTING_SERVICE}",
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var amount = Number(pm.variables.get(\"payerNDC\")) - Number(pm.variables.get(\"payerfspPositionBeforeTransfer\")) + 100",
+                "pm.environment.set('transferAmount', amount)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 6,
+          "description": "Send transfer",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transfers",
+          "method": "post",
+          "headers": {
+            "Accept": "application/vnd.interoperability.transfers+json;version=1.0",
+            "Content-Type": "application/vnd.interoperability.transfers+json;version=1.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "body": {
+            "transferId": "{$function.generic.generateUUID}",
+            "payerFsp": "{$inputs.fromFspId}",
+            "payeeFsp": "{$inputs.toFspId}",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$inputs.currency}"
+            },
+            "expiration": "{$environment.transferExpiration}",
+            "ilpPacket": "{$prev.5.callback.body.ilpPacket}",
+            "condition": "{$prev.5.callback.body.condition}"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Response status to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              }
+            ]
+          },
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "pm.environment.set('transferDate', (new Date()).toUTCString());",
+                "pm.environment.set(\"transferExpiration\",new Date(new Date().getTime() + 600000))",
+                "",
+                "var amount = Number(pm.environment.get(\"payerNDC\")) - Number( pm.variables.get(\"payerfspPositionBeforeTransfer\")) + 100",
+                "pm.environment.set('transferAmount', amount)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 7,
+          "description": "Get payerfsp position after the transfer",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/positions",
+          "path": "/participants/{$inputs.fromFspId}/positions",
+          "method": "get",
+          "params": {
+            "name": "{$inputs.fromFspId}"
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 200",
+                "exec": [
+                  "expect(response.status).to.equal(200)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "payerfsp Position After Transfer is the same",
+                "exec": [
+                  "expect(Number(environment.payerfspPositionAfterTransfer)).to.equal(Number(environment.payerfspPositionBeforeTransfer))"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "var jsonData = pm.response.body;",
+                "pm.environment.set(\"payerfspPositionAfterTransfer\", jsonData[0].value)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 8,
+          "description": "Get payeefsp position after the transfer",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/positions",
+          "path": "/participants/{$inputs.toFspId}/positions",
+          "method": "get",
+          "params": {
+            "name": "{$inputs.toFspId}"
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 200",
+                "exec": [
+                  "expect(response.status).to.equal(200)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "payeefsp Position After Transfer is the same",
+                "exec": [
+                  "expect(Number(environment.payeefspPositionAfterTransfer)).to.equal(Number(environment.payeefspPositionBeforeTransfer))"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "var jsonData = pm.response.body;",
+                "pm.environment.set(\"payeefspPositionAfterTransfer\", jsonData[0].value)"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

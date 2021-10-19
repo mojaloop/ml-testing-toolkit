@@ -24,14 +24,14 @@
 
 const Cookies = require('cookies')
 const passport = require('passport')
-let Config
+const Config = require('../config')
 const fs = require('fs')
 const path = require('path')
+const customLogger = require('../requestLogger')
 
 function cookieExtractor (req) {
-  const Constants = Config.getSystemConfig()
   const cookies = new Cookies(req)
-  const token = cookies.get(Constants.OAUTH.JWT_COOKIE_NAME)
+  const token = cookies.get('TTK-API_ACCESS_TOKEN')
   return token
 }
 
@@ -40,7 +40,7 @@ function cookieExtractor (req) {
  * @see http://www.passportjs.org/packages/passport-jwt/
  */
 function createJwtStrategy (extraExtractors) {
-  const Constants = Config.getSystemConfig()
+  const systemConfig = Config.getSystemConfig()
   const JwtStrategy = require('passport-jwt').Strategy
   const ExtractJwt = require('passport-jwt').ExtractJwt
 
@@ -60,28 +60,29 @@ function createJwtStrategy (extraExtractors) {
   jwtStrategyOpts.passReqToCallback = true // passReqToCallback: If true the request will be passed to the verify callback. i.e. verify(request, jwt_payload, done_callback).
   jwtStrategyOpts.jsonWebTokenOptions = {}
   let certContent
-  if (Constants.OAUTH.EMBEDDED_CERTIFICATE) {
-    console.log('Setting Token Issuer certificate from Constants.OAUTH.EMBEDDED_CERTIFICATE')
-    certContent = Constants.OAUTH.EMBEDDED_CERTIFICATE
-  } else if (Constants.OAUTH.CERTIFICATE_FILE_NAME) {
-    console.log(`Setting Token Issuer certificate from Constants.OAUTH.CERTIFICATE_FILE_NAME: ${Constants.OAUTH.CERTIFICATE_FILE_NAME}`)
-    if (Constants.OAUTH.CERTIFICATE_FILE_NAME.startsWith('/')) {
-      console.log('Token Issuer Constants.OAUTH.CERTIFICATE_FILE_NAME absolute path')
-      certContent = fs.readFileSync(Constants.OAUTH.CERTIFICATE_FILE_NAME, 'utf8')
+  if (systemConfig.OAUTH.EMBEDDED_CERTIFICATE) {
+    customLogger.logMessage('info', 'Setting Token Issuer certificate from Constants.OAUTH.EMBEDDED_CERTIFICATE', { notification: false })
+    certContent = systemConfig.OAUTH.EMBEDDED_CERTIFICATE
+  } else if (systemConfig.OAUTH.CERTIFICATE_FILE_NAME) {
+    customLogger.logMessage('info', `Setting Token Issuer certificate from Constants.OAUTH.CERTIFICATE_FILE_NAME: ${systemConfig.OAUTH.CERTIFICATE_FILE_NAME}`, { notification: false })
+    if (systemConfig.OAUTH.CERTIFICATE_FILE_NAME.startsWith('/')) {
+      customLogger.logMessage('info', 'Token Issuer Constants.OAUTH.CERTIFICATE_FILE_NAME absolute path', { notification: false })
+      certContent = fs.readFileSync(systemConfig.OAUTH.CERTIFICATE_FILE_NAME, 'utf8')
     } else {
-      console.log('Token Issuer Constants.OAUTH.CERTIFICATE_FILE_NAME relative path')
-      certContent = fs.readFileSync(path.join(__dirname, '..', Constants.OAUTH.CERTIFICATE_FILE_NAME), 'utf8')
+      customLogger.logMessage('info', 'Token Issuer Constants.OAUTH.CERTIFICATE_FILE_NAME relative path', { notification: false })
+      certContent = fs.readFileSync(path.join(__dirname, '..', systemConfig.OAUTH.CERTIFICATE_FILE_NAME), 'utf8')
     }
   } else {
-    console.warn('No value specified for Constants.OAUTH.CERTIFICATE_FILE_NAME or Constants.OAUTH.EMBEDDED_CERTIFICATE. Auth will probably fail to validate the tokens')
+    customLogger.logMessage('warn', 'No value specified for Constants.OAUTH.CERTIFICATE_FILE_NAME or Constants.OAUTH.EMBEDDED_CERTIFICATE. Auth will probably fail to validate the tokens', { notification: false })
   }
-  console.log(`Token Issuer loaded: ${certContent}`)
+  customLogger.logMessage('info', `Token Issuer loaded: ${certContent}`, { notification: false })
 
-  jwtStrategyOpts.secretOrKeyProvider = (request, rawJwtToken, done) => {
-    done(null, certContent)
-  }
+  jwtStrategyOpts.secretOrKey = certContent
+  // jwtStrategyOpts.secretOrKeyProvider = (request, rawJwtToken, done) => {
+  //   done(null, certContent)
+  // }
   // jwtStrategyOpts.issuer = 'accounts.examplesoft.com'
-  jwtStrategyOpts.audience = Constants.OAUTH.APP_OAUTH_CLIENT_KEY // audience: If defined, the token audience (aud) will be verified against this value.
+  // jwtStrategyOpts.audience = systemConfig.OAUTH.APP_OAUTH_CLIENT_KEY // audience: If defined, the token audience (aud) will be verified against this value.
   const jwtStrategy = new JwtStrategy(jwtStrategyOpts, verifyCallback)
   return jwtStrategy
 }
@@ -99,37 +100,34 @@ function createJwtStrategy (extraExtractors) {
 function verifyCallback (req, jwtPayload, done) {
   if (!jwtPayload.sub) {
     const message = 'Invalid Authentication info: no sub'
-    console.log(`OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`)
+    customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`, { notification: false })
     return done(null, false, message)
   }
   if (!jwtPayload.iss) {
     const message = 'Invalid Authentication info: no iss'
-    console.log(`OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`)
+    customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`, { notification: false })
     return done(null, false, message)
   }
-  const issuer = jwtPayload.iss
-  const Constants = Config.getSystemConfig()
-  if (issuer !== Constants.OAUTH.OAUTH2_ISSUER && issuer !== Constants.OAUTH.OAUTH2_TOKEN_ISS) {
-    const message = `Invalid Authentication: wrong issuer ${issuer}, expecting: ${Constants.OAUTH.OAUTH2_ISSUER} or ${Constants.OAUTH.OAUTH2_TOKEN_ISS}`
-    console.log(`OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`)
+  const systemConfig = Config.getSystemConfig()
+  if (jwtPayload.iss !== systemConfig.OAUTH.OAUTH2_ISSUER && jwtPayload.iss !== systemConfig.OAUTH.OAUTH2_TOKEN_ISS) {
+    const message = `Invalid Authentication: wrong issuer ${jwtPayload.iss}, expecting: ${systemConfig.OAUTH.OAUTH2_ISSUER} or ${systemConfig.OAUTH.OAUTH2_TOKEN_ISS}`
+    customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`, { notification: false })
     return done(null, false, message)
   }
   if (!jwtPayload.groups) {
     const message = 'Invalid Authentication info: no groups'
-    console.log(`OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`)
+    customLogger.logMessage('error', `OAuthHelper.verifyCallback received ${jwtPayload}. Verification failed because ${message}`, { notification: false })
     return done(null, false, message)
   }
-  console.log(`verifyCallback: user ${jwtPayload.sub} with roles ${jwtPayload.groups}`)
-  const foundMTA = jwtPayload.groups.includes(Constants.OAUTH.MTA_ROLE)
-  const foundPTA = jwtPayload.groups.includes(Constants.OAUTH.PTA_ROLE)
-  const foundEveryone = jwtPayload.groups.includes(Constants.OAUTH.EVERYONE_ROLE)
+  const foundMTA = jwtPayload.groups.includes(systemConfig.OAUTH.MTA_ROLE)
+  const foundPTA = jwtPayload.groups.includes(systemConfig.OAUTH.PTA_ROLE)
+  const foundEveryone = jwtPayload.groups.includes(systemConfig.OAUTH.EVERYONE_ROLE)
   const client = { name: jwtPayload.sub, dfspId: jwtPayload.dfspId }
   const roles = { mta: foundMTA, pta: foundPTA, everyone: foundEveryone }
   for (const group of jwtPayload.groups) {
     roles[group] = true
   }
   const authInfo = { roles: roles }
-  console.log(`verifyCallback: returning authInfo: ${JSON.stringify(authInfo)} `)
   return done(null, client, authInfo)
 }
 
@@ -144,16 +142,11 @@ function getOAuth2Middleware () {
 }
 
 const handleMiddleware = () => {
-  Config = require('../config')
-  if (Object.keys(Config.getSystemConfig()).length === 0) {
-    Config.loadSystemConfigMiddleware()
-  }
-  const Constants = Config.getSystemConfig()
-  if (Constants.OAUTH.AUTH_ENABLED) {
-    console.log(`Enabling OAUTH. Constants.OAUTH.AUTH_ENABLED = ${Constants.OAUTH.AUTH_ENABLED}`)
+  if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
+    customLogger.logMessage('info', 'Enabling OAUTH', { notification: false })
     getOAuth2Middleware()
   } else {
-    console.log(`NOT enabling OAUTH. Constants.OAUTH.AUTH_ENABLED = ${Constants.OAUTH.AUTH_ENABLED}`)
+    customLogger.logMessage('info', 'NOT enabling OAUTH', { notification: false })
   }
 }
 

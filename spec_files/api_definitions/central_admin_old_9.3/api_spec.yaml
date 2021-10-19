@@ -1,0 +1,2451 @@
+openapi: 3.0.1
+info:
+  title: Central Ledger API
+  version: 9.3.0 old
+  description: Central Ledger API, this is old version. The version number is baselined to 1.0 with some changes in the API. So please use the latest version 1.0.
+servers:
+- url: http://127.0.0.1:3001/
+tags: []
+paths:
+  /enums:
+    get:
+      tags:
+      - enums
+      operationId: getEnums
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+  /health:
+    get:
+      tags:
+      - health
+      operationId: getHealth
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+  /metrics:
+    get:
+      tags:
+      - metrics
+      summary: Prometheus metrics endpoint
+      operationId: getMetrics
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+  /participants:
+    get:
+      tags:
+      - participants
+      operationId: getParticipants
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+    post:
+      tags:
+      - participants
+      operationId: postParticipants
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Model%201'
+        required: false
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+      x-codegen-request-body-name: body
+  /participants/limits:
+    get:
+      tags:
+      - participants
+      summary: View limits for all participants
+      operationId: getParticipantsLimits
+      parameters:
+      - name: currency
+        in: query
+        description: Currency code
+        schema:
+          type: string
+          enum:
+          - AED
+          - AFA
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - AOR
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYN
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EEK
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GGP
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - IMP
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JEP
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LVL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SPL
+          - SRD
+          - STD
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TVD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - UYU
+          - UZS
+          - VEF
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XAG
+          - XAU
+          - XCD
+          - XDR
+          - XFO
+          - XFU
+          - XOF
+          - XPD
+          - XPF
+          - XPT
+          - YER
+          - ZAR
+          - ZMK
+          - ZMW
+          - ZWD
+          - ZWL
+          - ZWN
+          - ZWR
+      - name: type
+        in: query
+        description: Limit Type
+        schema:
+          type: string
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+  /participants/{name}:
+    get:
+      tags:
+      - participants
+      operationId: getParticipantsName
+      parameters:
+      - $ref: '#/components/parameters/name'
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+    put:
+      tags:
+      - participants
+      operationId: putParticipantsName
+      parameters:
+      - name: name
+        in: path
+        description: Participant name
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Model%207'
+        required: false
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+      x-codegen-request-body-name: body
+  /participants/{name}/endpoints:
+    get:
+      tags:
+      - participants
+      summary: View participant endpoints
+      operationId: getParticipantsNameEndpoints
+      parameters:
+      - name: name
+        in: path
+        description: Name of the participant
+        required: true
+        schema:
+          maxLength: 30
+          minLength: 2
+          type: string
+          x-format:
+            alphanum: true
+        x-format:
+          alphanum: true
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+    post:
+      tags:
+      - participants
+      summary: Add/Update participant endpoints
+      operationId: postParticipantsNameEndpoints
+      parameters:
+      - name: name
+        in: path
+        description: Name of the participant
+        required: true
+        schema:
+          maxLength: 30
+          minLength: 2
+          type: string
+          x-format:
+            alphanum: true
+        x-format:
+          alphanum: true
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Model%202'
+        required: false
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+      x-codegen-request-body-name: body
+  /participants/{name}/limits:
+    get:
+      tags:
+      - participants
+      summary: View participant limits
+      operationId: getParticipantsNameLimits
+      parameters:
+      - name: name
+        in: path
+        description: Name of the participant
+        required: true
+        schema:
+          maxLength: 30
+          minLength: 2
+          type: string
+          x-format:
+            alphanum: true
+        x-format:
+          alphanum: true
+      - name: currency
+        in: query
+        description: Currency code
+        schema:
+          type: string
+          enum:
+          - AED
+          - AFA
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - AOR
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYN
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EEK
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GGP
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - IMP
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JEP
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LVL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SPL
+          - SRD
+          - STD
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TVD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - UYU
+          - UZS
+          - VEF
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XAG
+          - XAU
+          - XCD
+          - XDR
+          - XFO
+          - XFU
+          - XOF
+          - XPD
+          - XPF
+          - XPT
+          - YER
+          - ZAR
+          - ZMK
+          - ZMW
+          - ZWD
+          - ZWL
+          - ZWN
+          - ZWR
+      - name: type
+        in: query
+        description: Limit Type
+        schema:
+          type: string
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+    put:
+      tags:
+      - participants
+      summary: Adjust participant limits
+      operationId: putParticipantsNameLimits
+      parameters:
+      - name: name
+        in: path
+        description: Name of the participant
+        required: true
+        schema:
+          maxLength: 30
+          minLength: 2
+          type: string
+          x-format:
+            alphanum: true
+        x-format:
+          alphanum: true
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Model%209'
+        required: false
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+      x-codegen-request-body-name: body
+  /participants/{name}/positions:
+    get:
+      tags:
+      - participants
+      summary: View participant positions
+      operationId: getParticipantsNamePositions
+      parameters:
+      - name: name
+        in: path
+        description: Name of the participant
+        required: true
+        schema:
+          maxLength: 30
+          minLength: 2
+          type: string
+          x-format:
+            alphanum: true
+        x-format:
+          alphanum: true
+      - name: currency
+        in: query
+        description: Currency code
+        schema:
+          type: string
+          enum:
+          - AED
+          - AFA
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - AOR
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYN
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EEK
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GGP
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - IMP
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JEP
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LVL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SPL
+          - SRD
+          - STD
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TVD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - UYU
+          - UZS
+          - VEF
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XAG
+          - XAU
+          - XCD
+          - XDR
+          - XFO
+          - XFU
+          - XOF
+          - XPD
+          - XPF
+          - XPT
+          - YER
+          - ZAR
+          - ZMK
+          - ZMW
+          - ZWD
+          - ZWL
+          - ZWN
+          - ZWR
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+  /participants/{name}/accounts:
+    get:
+      tags:
+      - participants
+      summary: View participant accounts and balances
+      operationId: getParticipantsNameAccounts
+      parameters:
+      - name: name
+        in: path
+        description: Name of the participant
+        required: true
+        schema:
+          maxLength: 30
+          minLength: 2
+          type: string
+          x-format:
+            alphanum: true
+        x-format:
+          alphanum: true
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+    post:
+      tags:
+      - participants
+      summary: Create hub accounts
+      operationId: postParticipantsNameAccounts
+      parameters:
+      - name: name
+        in: path
+        description: Participant name
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Model%204'
+        required: false
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+      x-codegen-request-body-name: body
+  /participants/{name}/initialPositionAndLimits:
+    post:
+      tags:
+      - participants
+      summary: Add initial participant limits and position
+      operationId: postParticipantsNameInitialpositionandlimits
+      parameters:
+      - name: name
+        in: path
+        description: Name of the participant
+        required: true
+        schema:
+          maxLength: 30
+          minLength: 2
+          type: string
+          x-format:
+            alphanum: true
+        x-format:
+          alphanum: true
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Model%203'
+        required: false
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+      x-codegen-request-body-name: body
+  /participants/{name}/accounts/{id}:
+    put:
+      tags:
+      - participants
+      summary: Update participant accounts
+      operationId: putParticipantsNameAccountsId
+      parameters:
+      - name: name
+        in: path
+        description: Name of the participant
+        required: true
+        schema:
+          maxLength: 30
+          minLength: 2
+          type: string
+          x-format:
+            alphanum: true
+        x-format:
+          alphanum: true
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          x-constraint:
+            positive: true
+        x-constraint:
+          positive: true
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Model%2010'
+        required: false
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+      x-codegen-request-body-name: body
+    post:
+      tags:
+      - participants
+      summary: Record Funds In or Out of participant account
+      operationId: postParticipantsNameAccountsId
+      parameters:
+      - name: name
+        in: path
+        description: Name of the participant
+        required: true
+        schema:
+          maxLength: 30
+          minLength: 2
+          type: string
+          x-format:
+            alphanum: true
+        x-format:
+          alphanum: true
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          x-constraint:
+            positive: true
+        x-constraint:
+          positive: true
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Model%206'
+        required: false
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+      x-codegen-request-body-name: body
+  /participants/{name}/accounts/{id}/transfers/{transferId}:
+    put:
+      tags:
+      - participants
+      summary: Record Funds In or Out of participant account
+      operationId: putParticipantsNameAccountsIdTransfersTransferid
+      parameters:
+      - name: name
+        in: path
+        description: Name of the participant
+        required: true
+        schema:
+          maxLength: 30
+          minLength: 2
+          type: string
+          x-format:
+            alphanum: true
+        x-format:
+          alphanum: true
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          x-constraint:
+            positive: true
+        x-constraint:
+          positive: true
+      - name: transferId
+        in: path
+        required: true
+        schema:
+          type: string
+          x-format:
+            guid: true
+        x-format:
+          guid: true
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Model%2011'
+        required: false
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+      x-codegen-request-body-name: body
+  /settlementModels:
+    get:
+      tags:
+      - settlementModels
+      operationId: getSettlementmodels
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+    post:
+      tags:
+      - settlementModels
+      operationId: postSettlementmodels
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Model%2012'
+        required: false
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+      x-codegen-request-body-name: body
+  /settlementModels/{name}:
+    get:
+      tags:
+      - settlementModels
+      operationId: getSettlementmodelsName
+      parameters:
+      - name: name
+        in: path
+        description: SettlementModel name
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+    put:
+      tags:
+      - settlementModels
+      operationId: putSettlementmodelsName
+      parameters:
+      - name: name
+        in: path
+        description: settlementModel name
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Model%2013'
+        required: false
+      responses:
+        default:
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                type: string
+      x-codegen-request-body-name: body
+components:
+  parameters:
+    name: 
+      name: name
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    Model 1:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          maxLength: 30
+          minLength: 2
+          type: string
+          description: Name of the participant
+          x-format:
+            alphanum: true
+        currency:
+          type: string
+          description: Currency code
+          enum:
+          - AED
+          - AFA
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - AOR
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYN
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EEK
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GGP
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - IMP
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JEP
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LVL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SPL
+          - SRD
+          - STD
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TVD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - UYU
+          - UZS
+          - VEF
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XAG
+          - XAU
+          - XCD
+          - XDR
+          - XFO
+          - XFU
+          - XOF
+          - XPD
+          - XPF
+          - XPT
+          - YER
+          - ZAR
+          - ZMK
+          - ZMW
+          - ZWD
+          - ZWL
+          - ZWN
+          - ZWR
+    Model 2:
+      required:
+      - type
+      - value
+      type: object
+      properties:
+        type:
+          type: string
+          description: Endpoint Type
+        value:
+          type: string
+          description: Endpoint Value
+    limit:
+      required:
+      - type
+      - value
+      type: object
+      properties:
+        type:
+          type: string
+          description: Limit Type
+        value:
+          type: number
+          description: Limit Value
+          x-constraint:
+            positive: true
+      description: Participant Limit
+    Model 3:
+      required:
+      - limit
+      type: object
+      properties:
+        currency:
+          type: string
+          description: Currency code
+          enum:
+          - AED
+          - AFA
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - AOR
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYN
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EEK
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GGP
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - IMP
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JEP
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LVL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SPL
+          - SRD
+          - STD
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TVD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - UYU
+          - UZS
+          - VEF
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XAG
+          - XAU
+          - XCD
+          - XDR
+          - XFO
+          - XFU
+          - XOF
+          - XPD
+          - XPF
+          - XPT
+          - YER
+          - ZAR
+          - ZMK
+          - ZMW
+          - ZWD
+          - ZWL
+          - ZWN
+          - ZWR
+        limit:
+          $ref: '#/components/schemas/limit'
+        initialPosition:
+          type: number
+          description: Initial Position Value
+    Model 4:
+      required:
+      - type
+      type: object
+      properties:
+        currency:
+          type: string
+          description: Currency code
+          enum:
+          - AED
+          - AFA
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - AOR
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYN
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EEK
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GGP
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - IMP
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JEP
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LVL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SPL
+          - SRD
+          - STD
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TVD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - UYU
+          - UZS
+          - VEF
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XAG
+          - XAU
+          - XCD
+          - XDR
+          - XFO
+          - XFU
+          - XOF
+          - XPD
+          - XPF
+          - XPT
+          - YER
+          - ZAR
+          - ZMK
+          - ZMW
+          - ZWD
+          - ZWL
+          - ZWN
+          - ZWR
+        type:
+          type: string
+          description: Account type
+    No amount provided:
+      required:
+      - amount
+      type: object
+      properties:
+        amount:
+          type: number
+          x-constraint:
+            precision: 4
+            positive: true
+        currency:
+          type: string
+          description: Currency code
+          enum:
+          - AED
+          - AFA
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - AOR
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYN
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EEK
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GGP
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - IMP
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JEP
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LVL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SPL
+          - SRD
+          - STD
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TVD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - UYU
+          - UZS
+          - VEF
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XAG
+          - XAU
+          - XCD
+          - XDR
+          - XFO
+          - XFU
+          - XOF
+          - XPD
+          - XPF
+          - XPT
+          - YER
+          - ZAR
+          - ZMK
+          - ZMW
+          - ZWD
+          - ZWL
+          - ZWN
+          - ZWR
+    Model 5:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+    extension:
+      type: array
+      items:
+        $ref: '#/components/schemas/Model%205'
+    extensionList:
+      type: object
+      properties:
+        extension:
+          $ref: '#/components/schemas/extension'
+    Model 6:
+      required:
+      - action
+      - amount
+      - externalReference
+      - reason
+      - transferId
+      type: object
+      properties:
+        transferId:
+          type: string
+          x-format:
+            guid: true
+        externalReference:
+          type: string
+        action:
+          type: string
+          enum:
+          - recordFundsIn
+          - recordFundsOutPrepareReserve
+        reason:
+          type: string
+        amount:
+          $ref: '#/components/schemas/No%20amount%20provided'
+        extensionList:
+          $ref: '#/components/schemas/extensionList'
+    Model 7:
+      required:
+      - isActive
+      type: object
+      properties:
+        isActive:
+          type: boolean
+          description: Participant isActive boolean
+    Model 8:
+      required:
+      - alarmPercentage
+      - type
+      - value
+      type: object
+      properties:
+        type:
+          type: string
+          description: Limit Type
+        value:
+          type: number
+          description: Limit Value
+        alarmPercentage:
+          type: number
+          description: limit threshold alarm percentage value
+      description: Participant Limit
+    Model 9:
+      required:
+      - limit
+      type: object
+      properties:
+        currency:
+          type: string
+          description: Currency code
+          enum:
+          - AED
+          - AFA
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - AOR
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYN
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EEK
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GGP
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - IMP
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JEP
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LVL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SPL
+          - SRD
+          - STD
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TVD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - UYU
+          - UZS
+          - VEF
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XAG
+          - XAU
+          - XCD
+          - XDR
+          - XFO
+          - XFU
+          - XOF
+          - XPD
+          - XPF
+          - XPT
+          - YER
+          - ZAR
+          - ZMK
+          - ZMW
+          - ZWD
+          - ZWL
+          - ZWN
+          - ZWR
+        limit:
+          $ref: '#/components/schemas/Model%208'
+    Model 10:
+      required:
+      - isActive
+      type: object
+      properties:
+        isActive:
+          type: boolean
+          description: Participant currency isActive boolean
+    Model 11:
+      required:
+      - reason
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+          - recordFundsOutCommit
+          - recordFundsOutAbort
+        reason:
+          type: string
+    Model 12:
+      required:
+      - autoPositionReset
+      - ledgerAccountType
+      - name
+      - requireLiquidityCheck
+      - settlementDelay
+      - settlementGranularity
+      - settlementInterchange
+      type: object
+      properties:
+        name:
+          maxLength: 30
+          minLength: 2
+          type: string
+          description: Name of the settlement model
+          x-format:
+            alphanum: true
+        settlementGranularity:
+          type: string
+          description: Granularity type for the settlement model GROSS or NET
+          enum:
+          - GROSS
+          - NET
+        settlementInterchange:
+          type: string
+          description: Interchange type for the settlement model BILATERAL or MULTILATERAL
+          enum:
+          - BILATERAL
+          - MULTILATERAL
+        settlementDelay:
+          type: string
+          description: Delay type for the settlement model IMMEDIATE or DEFERRED
+          enum:
+          - DEFERRED
+          - IMMEDIATE
+        currency:
+          type: string
+          description: Currency code
+          enum:
+          - AED
+          - AFA
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - AOR
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BOV
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYN
+          - BYR
+          - BZD
+          - CAD
+          - CDF
+          - CHE
+          - CHF
+          - CHW
+          - CLF
+          - CLP
+          - CNY
+          - COP
+          - COU
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EEK
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GGP
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - IMP
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JEP
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LVL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MXV
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SPL
+          - SRD
+          - SSP
+          - STD
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TVD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - USN
+          - UYI
+          - UYU
+          - UZS
+          - VEF
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XAG
+          - XAU
+          - XCD
+          - XDR
+          - XFO
+          - XFU
+          - XOF
+          - XPD
+          - XPF
+          - XPT
+          - XSU
+          - XTS
+          - XUA
+          - XXX
+          - YER
+          - ZAR
+          - ZMK
+          - ZMW
+          - ZWD
+          - ZWL
+          - ZWN
+          - ZWR
+        requireLiquidityCheck:
+          type: boolean
+          description: Liquidity Check boolean
+        ledgerAccountType:
+          type: string
+          description: Account type for the settlement model POSITION, SETTLEMENT
+            or INTERCHANGE_FEE
+          enum:
+          - INTERCHANGE_FEE
+          - POSITION
+        autoPositionReset:
+          type: boolean
+          description: Automatic position reset setting, which determines whether
+            to execute the settlement transfer or not
+    Model 13:
+      required:
+      - isActive
+      type: object
+      properties:
+        isActive:
+          type: boolean
+          description: settlementModel isActive boolean

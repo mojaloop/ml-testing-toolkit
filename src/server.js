@@ -28,18 +28,21 @@
 'use strict'
 
 const Hapi = require('@hapi/hapi')
+const Boom = require('@hapi/boom')
 // const Path = require('path')
-const Config = require('./lib/config.js')
+const Config = require('./lib/config')
 // const Plugins = require('./plugins')
 const RequestLogger = require('./lib/requestLogger')
 const OpenApiMockHandler = require('./lib/mocking/openApiMockHandler')
 const UniqueIdGenerator = require('./lib/uniqueIdGenerator')
 const objectStore = require('./lib/objectStore')
-const assertionStore = require('./lib/assertionStore')
+const arrayStore = require('./lib/arrayStore')
+const httpAgentStore = require('./lib/httpAgentStore')
 const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
-const traceHeaderUtils = require('./lib/traceHeaderUtils')
+const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
+const { verifyToken } = require('./lib/oauth/OAuthValidator')
 
-var serverInstance = null
+let serverInstance = null
 // const openAPIOptions = {
 //   api: Path.resolve(__dirname, './interface/api_swagger.json'),
 //   handlers: Path.resolve(__dirname, './handlers')
@@ -53,14 +56,15 @@ var serverInstance = null
  * @param {number} port Port to register the Server against
  * @returns {Promise<Server>} Returns the Server object
  */
-const createServer = async (port) => {
+const createServer = async (port, user) => {
   let server
-  if (Config.getUserConfig().INBOUND_MUTUAL_TLS_ENABLED) {
+  const systemConfig = Config.getSystemConfig()
+  if (systemConfig.INBOUND_MUTUAL_TLS_ENABLED) {
     // Make sure hub server certificates are set in connection provider
     try {
       await ConnectionProvider.waitForTlsHubCerts()
     } catch (err) {
-      console.log('Tls certificates initiation failed.')
+      RequestLogger.logMessage('error', 'TLS certificates initiation failed. Error: ' + err.message, { notification: false })
       return null
     }
     const tlsConfig = await ConnectionProvider.getTlsConfig()
@@ -71,12 +75,28 @@ const createServer = async (port) => {
         key: tlsConfig.hubServerKey,
         ca: [tlsConfig.hubCaCert],
         rejectUnauthorized: true,
-        requestCert: false
+        requestCert: true
+      },
+      routes: {
+        cors: {
+          origin: ['*'],
+          credentials: true,
+          headers: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+          exposedHeaders: ['Content-Disposition']
+        }
       }
     })
   } else {
     server = new Hapi.Server({
-      port
+      port,
+      routes: {
+        cors: {
+          origin: ['*'],
+          credentials: true,
+          headers: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+          exposedHeaders: ['Content-Disposition']
+        }
+      }
     })
   }
 
@@ -100,26 +120,53 @@ const createServer = async (port) => {
   return server
 }
 
-const onPreHandler = (request, h) => {
-  // Generate UniqueID
+const onPreHandler = async (request, h) => {
   request.customInfo = {}
+  if (Config.getSystemConfig().HOSTING_ENABLED) {
+    // Validate token here
+    if (request.headers.authorization && request.headers.authorization.startsWith('Bearer')) {
+      const token = request.headers.authorization.replace(/^Bearer\s/, '')
+      try {
+        const tokenResponse = await verifyToken(token)
+        request.customInfo.user = {
+          dfspId: tokenResponse.dfspId
+        }
+      } catch (err) {
+        RequestLogger.logMessage('error', err.message, { additionalData: { errorStack: err.stack }, request })
+        throw Boom.unauthorized('Authentication Failed: ' + err.message)
+      }
+    } else {
+      throw Boom.unauthorized('Authentication Failed: Provide Bearer token')
+    }
+    // if (!request.customInfo.user && request.headers['fspiop-source']) {
+    //   request.customInfo.user = {
+    //     dfspId: request.headers['fspiop-source']
+    //   }
+    // }
+  }
+
+  // Generate UniqueID
   request.customInfo.uniqueId = UniqueIdGenerator.generateUniqueId(request)
   // Parse the traceparent header if present
-  if (request.headers.traceparent) {
+  if (request.headers && request.headers.traceparent) {
     const traceparentHeaderArr = request.headers.traceparent.split('-')
     const traceID = traceparentHeaderArr[1]
     request.customInfo.traceID = traceID
-    if (traceHeaderUtils.isCustomTraceID(traceID)) {
-      request.customInfo.endToEndID = traceHeaderUtils.getEndToEndID(traceID)
-      request.customInfo.sessionID = traceHeaderUtils.getSessionID(traceID)
+    if (TraceHeaderUtils.isCustomTraceID(traceID)) {
+      request.customInfo.endToEndID = TraceHeaderUtils.getEndToEndID(traceID)
+      request.customInfo.sessionID = TraceHeaderUtils.getSessionID(traceID)
     }
+  } else {
+    request.customInfo.traceID = TraceHeaderUtils.generateRandTraceId()
+
+    RequestLogger.logMessage('info', 'Traceparent header not found. Generated a random traceID.', { additionalData: { traceID: request.customInfo.traceID }, request })
   }
-  RequestLogger.logRequest(request)
+  RequestLogger.logRequest(request, request.customInfo.user)
   return h.continue
 }
 
 const onPreResponse = (request, h) => {
-  RequestLogger.logResponse(request)
+  RequestLogger.logResponse(request, request.customInfo.user)
   if (request.customInfo && request.customInfo.negotiatedContentType) {
     if (request.response.isBoom) {
       request.response.output.headers['content-type'] = request.customInfo.negotiatedContentType
@@ -135,19 +182,21 @@ const initialize = async () => {
   serverInstance = await createServer(Config.getSystemConfig().API_PORT)
 
   if (serverInstance) {
-    objectStore.initObjectStore()
-    assertionStore.initAssertionStore()
-
-    console.log(`Toolkit Server running on port ${serverInstance.info.port}`)
+    const objectStoreInitConfig = await Config.getObjectStoreInitConfig()
+    objectStore.initObjectStore(objectStoreInitConfig)
+    arrayStore.initArrayStore()
+    httpAgentStore.init()
+    RequestLogger.logMessage('info', `Toolkit Server running on ${serverInstance.info.uri}`, { notification: false })
   }
   return serverInstance
 }
 
-const restartServer = async () => {
+const restartServer = async (user) => {
   if (serverInstance) {
-    console.log(`Toolkit Server restarted on port ${serverInstance.info.port}`)
+    RequestLogger.logMessage('info', `Toolkit Server restarted on ${serverInstance.info.uri}`, { user })
     serverInstance.stop()
-    serverInstance = await createServer(Config.getSystemConfig().API_PORT)
+    serverInstance = await createServer(Config.getSystemConfig().API_PORT, user)
+    return serverInstance
   }
 }
 

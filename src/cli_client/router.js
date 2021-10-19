@@ -22,18 +22,40 @@
  --------------
  ******/
 const fs = require('fs')
+const _ = require('lodash')
 const objectStore = require('./objectStore')
+const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
+
+const TESTS_EXECUTION_TIMEOUT = 1000 * 60 * 15 // 15min timout
 
 const cli = (commander) => {
-  const configFile = JSON.parse(fs.readFileSync(commander.config || 'cli-default-config.json', 'utf8'))
+  const configFile = {
+    mode: 'outbound',
+    reportFormat: 'json',
+    baseURL: 'http://localhost:5050',
+    logLevel: '0',
+    reportAutoFilenameEnable: false
+  }
+
+  if (fs.existsSync(commander.config)) {
+    const newConfig = JSON.parse(fs.readFileSync(commander.config, 'utf8'))
+    _.merge(configFile, newConfig)
+  }
 
   const config = {
     mode: commander.mode || configFile.mode,
     inputFiles: commander.inputFiles,
+    logLevel: commander.logLevel || configFile.logLevel,
     environmentFile: commander.environmentFile,
     reportFormat: commander.reportFormat || configFile.reportFormat,
-    reportFilename: commander.reportFilename,
-    baseURL: commander.baseURL || configFile.baseURL
+    reportAutoFilenameEnable: commander.reportAutoFilenameEnable === 'true' || configFile.reportAutoFilenameEnable === true,
+    reportTarget: commander.reportTarget || configFile.reportTarget,
+    slackWebhookUrl: commander.slackWebhookUrl || configFile.slackWebhookUrl,
+    slackPassedImage: configFile.slackPassedImage,
+    slackFailedImage: configFile.slackFailedImage,
+    baseURL: commander.baseUrl || configFile.baseURL,
+    extraSummaryInformation: commander.extraSummaryInformation || configFile.extraSummaryInformation,
+    labels: commander.labels || configFile.labels
   }
 
   objectStore.set('config', config)
@@ -45,8 +67,14 @@ const cli = (commander) => {
     case 'outbound':
       if (config.inputFiles) {
         if (config.environmentFile) {
-          require('./utils/listeners').outbound()
-          require('./modes/outbound').sendTemplate()
+          // Generate a session ID
+          const sessionId = TraceHeaderUtils.generateSessionId()
+          require('./utils/listeners').outbound(sessionId)
+          require('./modes/outbound').sendTemplate(sessionId)
+          setTimeout(() => {
+            console.log('Tests execution timed out....')
+            process.exit(1)
+          }, TESTS_EXECUTION_TIMEOUT)
         } else {
           console.log('error: required option \'-e, --environment-file <environmentFile>\' not specified')
           process.exit(1)

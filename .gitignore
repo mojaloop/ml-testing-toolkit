@@ -75,11 +75,18 @@ jsconfig.json
 # Executables from pkg if any
 *.exe
 
+# Static HTML files if any
+public_html
+
+# Binaries
+out_native_bin
+
 # Some rules files which will be generated dynamically
 spec_files/rules_callback/*
 !spec_files/rules_callback/config.json
 !spec_files/rules_callback/default.json
 !spec_files/rules_callback/p2p-limit.json
+!spec_files/rules_callback/fspiop-1.1.json
 
 spec_files/rules_validation/*
 !spec_files/rules_validation/config.json
@@ -89,3 +96,5 @@ spec_files/rules_validation/*
 spec_files/rules_response/*
 !spec_files/rules_response/config.json
 !spec_files/rules_response/default.json
+
+uploads/*

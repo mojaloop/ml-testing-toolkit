@@ -25,16 +25,23 @@
 const EventEmitter = require('events')
 class MyEmitter extends EventEmitter {}
 const emitters = {
-  testOutbound: null,
-  assertionRequest: null,
-  assertionCallback: null
+  data: {
+    testOutbound: null,
+    assertionRequest: null,
+    assertionCallback: null,
+    inboundRequest: null
+  }
 }
 
-const getEmitter = (emitter) => {
-  if (!emitters[emitter]) {
-    emitters[emitter] = new MyEmitter()
+const getEmitter = (emitter, user) => {
+  const context = user ? user.dfspId : 'data'
+  if (!emitters[context]) {
+    emitters[context] = {}
   }
-  return emitters[emitter]
+  if (!emitters[context][emitter]) {
+    emitters[context][emitter] = new MyEmitter()
+  }
+  return emitters[context][emitter]
 }
 
 module.exports = {

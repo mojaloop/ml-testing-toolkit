@@ -24,7 +24,6 @@
 
 'use strict'
 
-const fs = require('fs')
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
 const Config = require('../../../../src/lib/config')
 const ConnectionProvider = require('../../../../src/lib/configuration-providers/mb-connection-manager')
@@ -37,6 +36,10 @@ Config.getUserConfig.mockImplementation(() => {
     VALIDATE_INBOUND_JWS: true,
     DEFAULT_USER_FSPID: 'userdfsp'
   }
+})
+
+Config.getSystemConfig.mockImplementation(() => {
+  return {}
 })
 
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -119,16 +122,18 @@ describe('JwsSigning', () => {
   }
 
   describe('Happy Path Sign and Validate', () => {
-    mockDefinePrivateKey(privateKey)
-    mockDefinePublicCert(publicCert)
-    // Deep copy reqOpts
     var reqOpts = JSON.parse(JSON.stringify(origReqOpts))
-    // Rename the body prop with data
-    reqOpts.data = reqOpts.body
+
+    beforeAll(() => {
+      mockDefinePrivateKey(privateKey)
+      mockDefinePublicCert(publicCert)
+      // Rename the body prop with data
+      reqOpts.data = reqOpts.body
+    })
+
     it('Signed request should contain required fspiop headers', async () => {
       // Sign with JWS
-      await JwsSigning.sign(reqOpts)
-      // console.log('GVK',reqOpts)
+      await expect(JwsSigning.sign(reqOpts)).resolves.toBeDefined();
       expect(reqOpts.headers).toHaveProperty('fspiop-uri')
       expect(reqOpts.headers).toHaveProperty('fspiop-http-method')
       expect(reqOpts.headers).toHaveProperty('fspiop-signature')
@@ -140,9 +145,21 @@ describe('JwsSigning', () => {
       // Replace the data prop with payload
       reqOpts.payload = reqOpts.data
       // Validate with JWS
-      expect(() => {
-        const validationResult = JwsSigning.validate(reqOpts)
-      }).not.toThrowError()
+      await expect(JwsSigning.validate(reqOpts)).resolves.toBeDefined();
+    })
+    it('Validate only protected headers', () => {
+      // Validate with JWS
+      expect(JwsSigning.validateProtectedHeaders(reqOpts.headers)).toEqual(true)
+    })
+    it('Validate only protected headers negative', () => {
+      // Validate with JWS
+      let result
+      try {
+        result = JwsSigning.validateProtectedHeaders({ ...reqOpts.headers, 'fspiop-signature': null })
+      } catch(err) {
+        result = false
+      }
+      expect(result).toEqual(false)
     })
   })
 
@@ -184,17 +201,20 @@ describe('JwsSigning', () => {
 
   describe('Signing Negative scenarios', () => {
     describe('Passing wrong request', () => {
-      mockDefinePrivateKey(privateKey)
-      // Deep copy reqOpts
-      var reqOpts = JSON.parse(JSON.stringify(origReqOpts))
-      // Rename the body prop with data
-      reqOpts.data = reqOpts.body
+      var reqOpts = {}
+      beforeAll(() => {
+        reqOpts = JSON.parse(JSON.stringify(origReqOpts))
+        mockDefinePrivateKey(privateKey)
+        // Rename the body prop with data
+        reqOpts.data = reqOpts.body
+      })
+
       it('Without data property', async () => {
-        const { data, tmpReqOpts } = reqOpts
+        const { data, ...tmpReqOpts } = reqOpts
         await expect(JwsSigning.sign(tmpReqOpts)).rejects.toThrowError()
       })
       it('Without header property', async () => {
-        const { header, tmpReqOpts } = reqOpts
+        const { headers, ...tmpReqOpts } = reqOpts
         await expect(JwsSigning.sign(tmpReqOpts)).rejects.toThrowError()
       })
     })
@@ -214,46 +234,45 @@ describe('JwsSigning', () => {
     })
   })
 
-  describe('Validation negative scenarios', async () => {
+  describe('Validation negative scenarios', () => {
 
-    // Signing
-    mockDefinePrivateKey(privateKey)
-    // Deep copy reqOpts
-    var reqOpts = JSON.parse(JSON.stringify(origReqOpts))
     // Rename the body prop with data
-    reqOpts.data = reqOpts.body
-    delete reqOpts.headers['FSPIOP-Destination']
-    await JwsSigning.sign(reqOpts)
-    // Replace the data prop with payload
-    reqOpts.payload = reqOpts.data
-  
+    var reqOpts = {}
+
+    beforeAll((done) => {
+      reqOpts = JSON.parse(JSON.stringify(origReqOpts))
+      // Signing
+      mockDefinePrivateKey(privateKey)
+      reqOpts.data = reqOpts.body
+      delete reqOpts.headers['FSPIOP-Destination']
+      JwsSigning.sign(reqOpts).then(() => {
+        // Replace the data prop with payload
+        reqOpts.payload = reqOpts.data
+        done()
+      })
+    })
+
     describe('Passing wrong request', () => {
-      mockDefinePublicCert(publicCert)
+      beforeAll(() => {
+        mockDefinePublicCert(publicCert)
+      })
       it('Without payload property', async () => {
-        const { payload, tmpReqOpts } = reqOpts
-        expect(() => {
-          JwsSigning.validate(tmpReqOpts)
-        }).toThrowError()
+        const { payload, ...tmpReqOpts } = reqOpts
+        await expect(JwsSigning.validate(tmpReqOpts)).rejects.toThrowError();
       })
       it('Without header property', async () => {
-        const { header, tmpReqOpts } = reqOpts
-        expect(() => {
-          JwsSigning.validate(tmpReqOpts)
-        }).toThrowError()
+        const { headers, ...tmpReqOpts } = reqOpts
+        await expect(JwsSigning.validate(tmpReqOpts)).rejects.toThrowError();
       })
     })
     describe('Passing invalid keys', () => {
       it('Without public certificate', async () => {
         mockDefinePublicCert(null)
-        expect(() => {
-          JwsSigning.validate(reqOpts)
-        }).toThrowError()
+        await expect(JwsSigning.validate(reqOpts)).rejects.toThrowError();
       })
       it('With invalid certificate4', async () => {
         mockDefinePublicCert('asdf')
-        expect(() => {
-          JwsSigning.validate(reqOpts)
-        }).toThrowError()
+        await expect(JwsSigning.validate(reqOpts)).rejects.toThrowError();
       })
     })
   })

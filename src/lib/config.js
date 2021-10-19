@@ -23,65 +23,116 @@
  --------------
  ******/
 
-const utils = require('./utils')
-
+const storageAdapter = require('./storageAdapter')
 const SYSTEM_CONFIG_FILE = 'spec_files/system_config.json'
 const USER_CONFIG_FILE = 'spec_files/user_config.json'
+const _ = require('lodash')
 
-var SYSTEM_CONFIG = {}
-var USER_CONFIG = {}
+let SYSTEM_CONFIG = {}
+const USER_CONFIG = {
+  data: undefined
+}
 
 const getSystemConfig = () => {
   return SYSTEM_CONFIG
 }
 
-const getUserConfig = () => {
-  return USER_CONFIG
-}
-
-const getStoredUserConfig = async () => {
-  let storedConfig = {}
-  try {
-    const contents = await utils.readFileAsync(USER_CONFIG_FILE)
-    storedConfig = JSON.parse(contents)
-  } catch (err) {
-    console.log('Error: Can not read the file spec_files/user_config.json')
+const getUserConfig = async (user) => {
+  const item = user ? user.dfspId : 'data'
+  if (!USER_CONFIG[item]) {
+    await loadUserConfig(user)
   }
-  return storedConfig
+  return USER_CONFIG[item]
 }
 
-const setStoredUserConfig = async (newConfig) => {
+const getStoredUserConfig = async (user) => {
   try {
-    await utils.writeFileAsync(USER_CONFIG_FILE, JSON.stringify(newConfig, null, 2))
+    const storedConfig = await loadUserConfigDFSPWise(user)
+    return storedConfig
+  } catch (err) {
+    console.log(`Can not read the file ${USER_CONFIG_FILE}`)
+    return {}
+  }
+}
+
+const setStoredUserConfig = async (newConfig, user) => {
+  try {
+    await storageAdapter.upsert(USER_CONFIG_FILE, { ...getUserConfig(), ...newConfig }, user)
     return true
   } catch (err) {
     return false
   }
 }
 
-const loadUserConfig = async () => {
+const loadUserConfig = async (user) => {
   try {
-    const contents = await utils.readFileAsync(USER_CONFIG_FILE)
-    USER_CONFIG = JSON.parse(contents)
+    USER_CONFIG[user ? user.dfspId : 'data'] = await loadUserConfigDFSPWise(user)
   } catch (err) {
-    console.log('Error: Can not read the file ' + USER_CONFIG_FILE)
+    console.log(`Can not read the file ${USER_CONFIG_FILE}`, err)
   }
   return true
 }
 
-// Function to load system configuration
+const loadUserConfigDFSPWise = async (user) => {
+  const userConfig = await storageAdapter.read(USER_CONFIG_FILE, user)
+  return userConfig.data
+}
+
 const loadSystemConfig = async () => {
   try {
-    const contents = await utils.readFileAsync(SYSTEM_CONFIG_FILE)
-    SYSTEM_CONFIG = JSON.parse(contents)
+    SYSTEM_CONFIG = (await storageAdapter.read(SYSTEM_CONFIG_FILE)).data
+    const systemConfigFromEnvironemnt = _getSystemConfigFromEnvironment()
+    _.merge(SYSTEM_CONFIG, systemConfigFromEnvironemnt)
   } catch (err) {
-    console.log('Error: Can not read the file ' + SYSTEM_CONFIG_FILE)
+    console.log(`Can not read the file ${SYSTEM_CONFIG_FILE}`, err)
   }
   return true
 }
 
-const loadSystemConfigMiddleware = () => {
-  SYSTEM_CONFIG = require('../../' + SYSTEM_CONFIG_FILE)
+const _getSystemConfigFromEnvironment = () => {
+  let systemConfigFromEnvironemnt = {}
+  if (process.env.TTK_SYSTEM_CONFIG) {
+    try {
+      systemConfigFromEnvironemnt = JSON.parse(process.env.TTK_SYSTEM_CONFIG)
+    } catch (err) {
+      console.log(`Failed to parse system config passed in environment ${process.env.TTK_SYSTEM_CONFIG}`)
+    }
+  }
+  return systemConfigFromEnvironemnt
+}
+
+const setSystemConfig = async (newConfig) => {
+  try {
+    await storageAdapter.upsert(SYSTEM_CONFIG_FILE, { ...getSystemConfig(), ...newConfig })
+    await loadSystemConfig()
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
+// const _getObjectStoreInitConfigFromEnvironment = () => {
+//   let objectStoreInitConfigFromEnvironment = {}
+//   if (process.env.TTK_OBJECT_STORE_INIT_CONFIG) {
+//     try {
+//       objectStoreInitConfigFromEnvironment = JSON.parse(process.env.TTK_OBJECT_STORE_INIT_CONFIG)
+//     } catch (err) {
+//       console.log(`Failed to parse objectStore init config passed in environment ${process.env.TTK_OBJECT_STORE_INIT_CONFIG}`)
+//     }
+//   }
+//   return objectStoreInitConfigFromEnvironment
+// }
+
+const _getObjectStoreInitConfigFromSystemConfig = () => {
+  let objectStoreInitConfigFromSystemConfig = {}
+  if (SYSTEM_CONFIG.INIT_CONFIG && SYSTEM_CONFIG.INIT_CONFIG.objectStore) {
+    objectStoreInitConfigFromSystemConfig = SYSTEM_CONFIG.INIT_CONFIG.objectStore
+  }
+  return objectStoreInitConfigFromSystemConfig
+}
+
+const getObjectStoreInitConfig = async () => {
+  return _getObjectStoreInitConfigFromSystemConfig()
 }
 
 module.exports = {
@@ -91,5 +142,6 @@ module.exports = {
   loadUserConfig: loadUserConfig,
   getSystemConfig: getSystemConfig,
   loadSystemConfig: loadSystemConfig,
-  loadSystemConfigMiddleware: loadSystemConfigMiddleware
+  setSystemConfig: setSystemConfig,
+  getObjectStoreInitConfig: getObjectStoreInitConfig
 }

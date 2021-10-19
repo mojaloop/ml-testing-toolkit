@@ -1,0 +1,525 @@
+{
+  "name": "hub-quoting-service-tests",
+  "test_cases": [
+    {
+      "id": 1,
+      "name": "Run Quotes",
+      "requests": [
+        {
+          "id": 1,
+          "description": "Check Send Quote",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/quotes",
+          "path": "/quotes",
+          "method": "post",
+          "url": "{$environment.HOST_QUOTING_SERVICE}",
+          "ignoreCallbacks": true,
+          "headers": {
+            "Accept": "{$inputs.acceptQuotes}",
+            "Content-Type": "{$inputs.contentTypeQuotes}",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "payeefsp",
+            "Date": "{$function.generic.curDate}"
+          },
+          "body": {
+            "quoteId": "{$environment.quoteId}",
+            "transactionId": "{$environment.transactionId}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "MSISDN",
+                "partyIdentifier": "27713803912",
+                "fspId": "payerfsp"
+              },
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "Mats",
+                  "lastName": "Hagman"
+                },
+                "dateOfBirth": "1983-10-25"
+              }
+            },
+            "payee": {
+              "partyIdInfo": {
+                "partyIdType": "MSISDN",
+                "partyIdentifier": "22556999125",
+                "fspId": "payeefsp"
+              }
+            },
+            "amountType": "SEND",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "transactionType": {
+              "scenario": "TRANSFER",
+              "initiator": "PAYER",
+              "initiatorType": "CONSUMER"
+            },
+            "note": "hej"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Send Quote Amount in 4 decimal returned",
+                "exec": [
+                  "expect(+environment.checkSendQuoteResponse.data.transferAmount.amount).to.equal(environment.transferAmount)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Health Expected Status is OK",
+                "exec": [
+                  "expect(environment.healthQuotingServiceResponse.status).to.equal('OK')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "Health Expected body to have services array",
+                "exec": [
+                  "expect(Array.isArray(environment.healthQuotingServiceResponse.services)).to.equal(true)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "",
+                "pm.environment.set('quoteId', uuid.v4());",
+                "pm.environment.set('transactionId', uuid.v4());",
+                "pm.environment.set('transferAmount', 60.1234);",
+                "pm.environment.set('quoteDate', (new Date()).toUTCString());",
+                "",
+                "pm.sendRequest(pm.environment.get(\"HOST_QUOTING_SERVICE\")+\"/health\", function (err, response) {",
+                "  pm.environment.set(\"healthQuotingServiceResponse\", response.json())",
+                "  console.log(response.json())",
+                "});",
+                ""
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"HOST_SIMULATOR\")+\"/payerfsp/callbacks/\"+pm.environment.get(\"quoteId\"), function (err, response) {",
+                "      pm.environment.set(\"checkSendQuoteResponse\", response.json())",
+                "      console.log(response.json())",
+                "  });",
+                "}, 500)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 2,
+          "description": "Get Quote",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/quotes/{ID}",
+          "path": "/quotes/{$environment.quoteId}",
+          "method": "get",
+          "params": {
+            "ID": "{$environment.quoteId}"
+          },
+          "url": "{$environment.HOST_QUOTING_SERVICE}",
+          "ignoreCallbacks": true,
+          "headers": {
+            "Accept": "{$inputs.acceptQuotes}",
+            "Content-Type": "{$inputs.contentTypeQuotes}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "payeefsp"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Send Quote Amount in 4 decimal returned",
+                "exec": [
+                  "expect(+environment.healthQuotingServiceCallback.data.transferAmount.amount).to.equal(environment.transferAmount)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "payerfsp fspiop-source is payeefsp",
+                "exec": [
+                  "expect(environment.healthQuotingServiceCallback.headers['fspiop-source']).to.equal('payeefsp')"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "payerfsp fspiop-destination is payerfsp",
+                "exec": [
+                  "expect(environment.healthQuotingServiceCallback.headers['fspiop-destination']).to.equal('payerfsp')"
+                ]
+              },
+              {
+                "id": 5,
+                "description": "payeefsp fspiop-http-method is PUT",
+                "exec": [
+                  "expect(environment.healthQuotingServiceCallback.headers['fspiop-http-method']).to.equal('PUT')"
+                ]
+              },
+              {
+                "id": 6,
+                "description": "payeefsp content-typeis same as sent in the request",
+                "exec": [
+                  "expect(environment.healthQuotingServiceCallback.headers['content-type']).to.equal(environment.contentTypeQuotes)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {",
+                "  pm.sendRequest(pm.environment.get(\"HOST_SIMULATOR\")+\"/payerfsp/callbacks/\"+pm.variables.get(\"quoteId\"), function (err, response) {",
+                "    pm.environment.set(\"healthQuotingServiceCallback\", response.json())",
+                "    console.log(response.json())",
+                "  });",
+                "}, 500)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 3,
+          "description": "Check Send Quote - Missing Date",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/quotes",
+          "path": "/quotes",
+          "method": "post",
+          "url": "{$environment.HOST_QUOTING_SERVICE}",
+          "ignoreCallbacks": true,
+          "headers": {
+            "Accept": "{$inputs.acceptQuotes}",
+            "Content-Type": "{$inputs.contentTypeQuotes}",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "payeefsp"
+          },
+          "body": {
+            "quoteId": "{$environment.quoteId}",
+            "transactionId": "{$environment.transactionId}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "MSISDN",
+                "partyIdentifier": "27713803912",
+                "fspId": "payerfsp"
+              },
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "Mats",
+                  "lastName": "Hagman"
+                },
+                "dateOfBirth": "1983-10-25"
+              }
+            },
+            "payee": {
+              "partyIdInfo": {
+                "partyIdType": "MSISDN",
+                "partyIdentifier": "22556999125",
+                "fspId": "payeefsp"
+              }
+            },
+            "amountType": "SEND",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "transactionType": {
+              "scenario": "TRANSFER",
+              "initiator": "PAYER",
+              "initiatorType": "CONSUMER"
+            },
+            "note": "hej"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Check Missing mandatory element - Date",
+                "exec": [
+                  "expect(response.body.errorInformation.errorDescription).to.include(\"Missing mandatory element - .header should have required property 'date'\")"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Check Error code 3102",
+                "exec": [
+                  "expect(response.body.errorInformation.errorCode).to.equal('3102')"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "",
+                "pm.environment.set('quoteId', uuid.v4());",
+                "pm.environment.set('transactionId', uuid.v4());",
+                "pm.environment.set('transferAmount', 60.1234);",
+                "pm.environment.set('quoteDate', (new Date()).toUTCString());",
+                ""
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "id": 4,
+          "description": "Check Send Quote - Missing Accept Header",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/quotes",
+          "path": "/quotes",
+          "method": "post",
+          "url": "{$environment.HOST_QUOTING_SERVICE}",
+          "ignoreCallbacks": true,
+          "headers": {
+            "Content-Type": "{$inputs.contentTypeQuotes}",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "payeefsp",
+            "Date": "{$function.generic.curDate}"
+          },
+          "body": {
+            "quoteId": "{$environment.quoteId}",
+            "transactionId": "{$environment.transactionId}",
+            "payer": {
+              "partyIdInfo": {
+                "partyIdType": "MSISDN",
+                "partyIdentifier": "27713803912",
+                "fspId": "payerfsp"
+              },
+              "personalInfo": {
+                "complexName": {
+                  "firstName": "Mats",
+                  "lastName": "Hagman"
+                },
+                "dateOfBirth": "1983-10-25"
+              }
+            },
+            "payee": {
+              "partyIdInfo": {
+                "partyIdType": "MSISDN",
+                "partyIdentifier": "22556999125",
+                "fspId": "payeefsp"
+              }
+            },
+            "amountType": "SEND",
+            "amount": {
+              "amount": "{$environment.transferAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "transactionType": {
+              "scenario": "TRANSFER",
+              "initiator": "PAYER",
+              "initiatorType": "CONSUMER"
+            },
+            "note": "hej"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Check Missing mandatory element - Invalid accept header",
+                "exec": [
+                  "expect(response.body.errorInformation.errorDescription).to.equal(\"Missing mandatory element - .header should have required property 'accept'\")"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Check Error code 3101",
+                "exec": [
+                  "expect(response.body.errorInformation.errorCode).to.equal('3102')"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "var uuid = require('uuid');",
+                "",
+                "pm.environment.set('quoteId', uuid.v4());",
+                "pm.environment.set('transactionId', uuid.v4());",
+                "pm.environment.set('transferAmount', 60.1234);",
+                "pm.environment.set('quoteDate', (new Date()).toUTCString());",
+                ""
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "id": 5,
+          "description": "Get Quote - Missing content type",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/quotes/{ID}",
+          "path": "/quotes/{$environment.quoteId}",
+          "method": "get",
+          "params": {
+            "ID": "{$environment.quoteId}"
+          },
+          "url": "{$environment.HOST_QUOTING_SERVICE}",
+          "ignoreCallbacks": true,
+          "headers": {
+            "Accept": "{$inputs.acceptQuotes}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "payeefsp"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Check Missing mandatory element",
+                "exec": [
+                  "expect(response.body.errorInformation.errorDescription).to.include('Missing mandatory element')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Check Error code 3102",
+                "exec": [
+                  "expect(response.body.errorInformation.errorCode).to.equal('3102')"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "id": 6,
+          "description": "Get Quote - Invalid content type",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/quotes/{ID}",
+          "path": "/quotes/{$environment.quoteId}",
+          "method": "get",
+          "params": {
+            "ID": "{$environment.quoteId}"
+          },
+          "url": "{$environment.HOST_QUOTING_SERVICE}",
+          "ignoreCallbacks": true,
+          "headers": {
+            "Accept": "{$inputs.acceptQuotes}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "payerfsp",
+            "FSPIOP-Destination": "payeefsp",
+            "Content-Type": "application/vnd.interoperability.quotes+xml;version=1.0"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 400",
+                "exec": [
+                  "expect(response.status).to.equal(400)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "Check Malformed syntax",
+                "exec": [
+                  "expect(response.body.errorInformation.errorDescription).to.include('Malformed syntax')"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "Check Error code 3101",
+                "exec": [
+                  "expect(response.body.errorInformation.errorCode).to.equal('3101')"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "postRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

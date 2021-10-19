@@ -22,78 +22,136 @@
  --------------
  ******/
 const axios = require('axios').default
-const cliProgress = require('cli-progress')
 const report = require('../utils/report')
 const logger = require('../utils/logger')
 const fStr = require('node-strings')
 const fs = require('fs')
 const { promisify } = require('util')
 const objectStore = require('../objectStore')
+const slackBroadcast = require('../extras/slack-broadcast')
+const TemplateGenerator = require('../utils/templateGenerator')
+const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 
-const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
+const totalProgress = {
+  totalTestCases: 0,
+  totalRequests: 0,
+  totalAssertions: 0,
+  passedAssertions: 0,
+  skippedAssertions: 0,
+  failedAssertions: 0
+}
 
-const sendTemplate = async () => {
+const updateTotalProgressCounts = (progress) => {
+  if (progress.requestSent && progress.requestSent.tests && progress.requestSent.tests.assertions) {
+    progress.requestSent.tests.assertions.forEach(assertion => {
+      if (progress.testResult.results[assertion.id].status === 'SUCCESS') {
+        totalProgress.passedAssertions++
+      } else if (progress.testResult.results[assertion.id].status === 'SKIPPED') {
+        totalProgress.skippedAssertions++
+      } else {
+        totalProgress.failedAssertions++
+      }
+    })
+  }
+}
+
+const printTotalProgressCounts = () => {
+  const progressStr = '[ ' + fStr.green(totalProgress.passedAssertions + ' passed, ') + fStr.yellow(totalProgress.skippedAssertions + ' skipped, ') + fStr.red(totalProgress.failedAssertions + ' failed') + ' of ' + totalProgress.totalAssertions + ' ]'
+  process.stdout.write(progressStr)
+}
+
+const printProgress = (progress) => {
+  const config = objectStore.get('config')
+  switch (config.logLevel) {
+    // Only Errors
+    case '1':
+    {
+      printTotalProgressCounts()
+      let failedAssertions = ''
+      if (progress.requestSent && progress.requestSent.tests && progress.requestSent.tests.assertions) {
+        progress.requestSent.tests.assertions.forEach(assertion => {
+          if (progress.testResult.results[assertion.id].status !== 'SUCCESS') {
+            failedAssertions += '\t' + fStr.red('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.red(assertion.description) + '\n'
+          }
+        })
+      }
+      console.log('\n  ' + fStr.blue(progress.testCaseName + ' -> ' + progress.requestSent.description))
+      if (failedAssertions) {
+        console.log(failedAssertions)
+      } else {
+        console.log()
+      }
+      break
+    }
+    // All assertions
+    case '2':
+    {
+      printTotalProgressCounts()
+      console.log('\n  ' + fStr.cyan(progress.testCaseName + ' -> ' + progress.requestSent.description))
+      if (progress.status === 'SKIPPED') {
+        console.log('  ' + fStr.yellow('(Request Skipped)'))
+      }
+      if (progress.requestSent && progress.requestSent.tests && progress.requestSent.tests.assertions) {
+        progress.requestSent.tests.assertions.forEach(assertion => {
+          if (progress.testResult.results[assertion.id].status === 'SUCCESS') {
+            console.log('\t' + fStr.green('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.green(assertion.description))
+          } else if (progress.testResult.results[assertion.id].status === 'SKIPPED') {
+            console.log('\t' + fStr.yellow('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.yellow(assertion.description))
+          } else {
+            console.log('\t' + fStr.red('[ ' + progress.testResult.results[assertion.id].status + ' ]') + '\t' + fStr.red(assertion.description))
+          }
+        })
+      }
+      break
+    }
+    // Only Requests and test counts
+    default:
+      printTotalProgressCounts()
+      console.log('\t' + fStr.blue(progress.testCaseName + ' -> ' + progress.requestSent.description))
+      break
+  }
+}
+
+const sendTemplate = async (sessionId) => {
   const config = objectStore.get('config')
   try {
     const readFileAsync = promisify(fs.readFile)
-    const readFilesAsync = promisify(fs.readdir)
-    const outboundRequestID = Math.random().toString(36).substring(7)
-    const collections = []
+
+    // Calculate the outbound request ID based on sessionId for catching progress notifications
+    const traceIdPrefix = TraceHeaderUtils.getTraceIdPrefix()
+    const currentEndToEndId = TraceHeaderUtils.generateEndToEndId()
+    const outboundRequestID = traceIdPrefix + sessionId + currentEndToEndId
+
     const inputFiles = config.inputFiles.split(',')
-    for (let i = 0; i < inputFiles.length; i++) {
-      try {
-        if (inputFiles[i].endsWith('.json')) {
-          collections.push(JSON.parse(await readFileAsync(inputFiles[i], 'utf8')))
-        } else {
-          const files = await readFilesAsync(inputFiles[i])
-          for (let j = 0; j < files.length; j++) {
-            collections.push(JSON.parse(await readFileAsync(`${inputFiles[i]}/${files[j]}`, 'utf8')))
-          }
-        }
-      } catch (err) {
-        console.log(err)
-      }
-    }
+    const selectedLabels = config.labels ? config.labels.split(',') : []
+    const template = await TemplateGenerator.generateTemplate(inputFiles, selectedLabels)
+    template.inputValues = JSON.parse(await readFileAsync(config.environmentFile, 'utf8')).inputValues
 
-    const template = {
-      inputValues: JSON.parse(await readFileAsync(config.environmentFile, 'utf8')).inputValues,
-      test_cases: []
-    }
-    if (collections.length > 1) {
-      template.name = 'multi'
-      let index = 1
-      collections.forEach(collection => {
-        collection.test_cases.forEach(testCase => {
-          const { id, ...remainingTestCaseProps } = testCase
-          template.test_cases.push({
-            id: index++,
-            ...remainingTestCaseProps
-          })
-        })
-      })
-    } else {
-      template.name = collections[0].name
-      template.test_cases = collections[0].test_cases
-    }
-
-    let totalRequests = 0
     template.test_cases.forEach(testCase => {
-      totalRequests += testCase.requests.length
+      totalProgress.totalTestCases++
+      if (testCase.requests) {
+        totalProgress.totalRequests += testCase.requests.length
+      }
+      testCase.requests.forEach(request => {
+        if (request.tests && request.tests.assertions) {
+          totalProgress.totalAssertions += request.tests.assertions.length
+        }
+      })
     })
-    bar.start(totalRequests, 0)
     await axios.post(`${config.baseURL}/api/outbound/template/` + outboundRequestID, template, { headers: { 'Content-Type': 'application/json' } })
   } catch (err) {
     console.log(err)
+    process.exit(1)
   }
 }
 
 const handleIncomingProgress = async (progress) => {
   if (progress.status === 'FINISHED') {
-    bar.stop()
     let passed
     try {
       passed = logger.outbound(progress.totalResult)
-      await report.outbound(progress.totalResult)
+      const resultReport = await report.outbound(progress.totalResult)
+      await slackBroadcast.sendSlackNotification(progress.totalResult, resultReport.uploadedReportURL)
     } catch (err) {
       console.log(err)
       passed = false
@@ -106,7 +164,8 @@ const handleIncomingProgress = async (progress) => {
       process.exit(1)
     }
   } else {
-    bar.increment()
+    updateTotalProgressCounts(progress)
+    printProgress(progress)
   }
 }
 

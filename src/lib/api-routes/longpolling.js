@@ -23,7 +23,7 @@
  ******/
 
 const express = require('express')
-const assertionStore = require('../assertionStore')
+const objectStore = require('../objectStore')
 const longpollingEmitter = require('../longpollingEmitter')
 // const Config = require('../config')
 
@@ -35,14 +35,14 @@ router.get('/requests/*', async (req, res, next) => {
   const eventPath = req.path.replace('/requests', '')
   try {
     // Check if the required path is already in the assertion store
-    const storedAssertion = assertionStore.popRequest(eventPath)
+    const storedAssertion = objectStore.popObject('requests', eventPath, req.user)
     if (storedAssertion) {
       res.status(200).json({ headers: storedAssertion.headers, data: storedAssertion.body })
     } else {
-      longpollingEmitter.setAssertionStoreEmitter('requests', eventPath, res)
+      longpollingEmitter.setAssertionStoreEmitter('requests', eventPath, res, req.user)
     }
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 
@@ -51,14 +51,14 @@ router.get('/callbacks/*', async (req, res, next) => {
   const eventPath = req.path.replace('/callbacks', '')
   try {
     // Check if the required path is already in the assertion store
-    const storedAssertion = assertionStore.popCallback(eventPath)
+    const storedAssertion = objectStore.popObject('callbacks', eventPath)
     if (storedAssertion) {
       res.status(200).json({ headers: storedAssertion.headers, data: storedAssertion.body })
     } else {
-      longpollingEmitter.setAssertionStoreEmitter('callbacks', eventPath, res)
+      longpollingEmitter.setAssertionStoreEmitter('callbacks', eventPath, res, req.user)
     }
   } catch (err) {
-    next(err)
+    res.status(500).json({ error: err && err.message })
   }
 })
 

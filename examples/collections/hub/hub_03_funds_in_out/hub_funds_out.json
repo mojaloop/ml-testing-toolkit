@@ -1,0 +1,780 @@
+{
+  "name": "hub-p2p-fundsinout-block-transfers",
+  "test_cases": [
+    {
+      "id": 2,
+      "name": "funds_out - Reserve&Commit",
+      "requests": [
+        {
+          "id": 1,
+          "description": "Record Funds Out Prepare&Reserve- payerfsp",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/accounts/{id}",
+          "path": "/participants/{$inputs.fromFspId}/accounts/{$environment.accountId}",
+          "method": "post",
+          "params": {
+            "name": "{$inputs.fromFspId}",
+            "id": "{$environment.accountId}"
+          },
+          "headers": {
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "transferId": "{$function.generic.generateUUID}",
+            "externalReference": "string",
+            "action": "recordFundsOutPrepareReserve",
+            "reason": "string",
+            "amount": {
+              "amount": "{$environment.fundsOutPrepareReserveAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "status code to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "hub Recon Account Balance After Funds In is as expected",
+                "exec": [
+                  "expect(Number(environment.hubReconAccountBalanceAfterFundsOutPrepare)).to.equal(Number(environment.hubReconAccountBalanceBeforeFundsOutPrepare))"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "payerfsp Settlement Account Balance After Funds In is as expected",
+                "exec": [
+                  "expect(Number(environment.payerfspSettlementAccountBalanceAfterFundsOutPrepare)).to.equal(Number(environment.payerfspSettlementAccountBalanceBeforeFundsOutPrepare) + environment.fundsOutPrepareReserveAmount)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "pm.environment.set('fundsOutPrepareReserveAmount', 1000);\r",
+                "\r",
+                "const payerfspGetStatusRequest = {\r",
+                "    url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/' + pm.environment.get(\"payerfsp\") + '/accounts',\r",
+                "    method: 'GET',\r",
+                "    header: {\r",
+                "        \"Authorization\": \"Bearer \" + pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "        \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "        \"Content-Type\": \"application/json\"\r",
+                "    }\r",
+                "};\r",
+                "\r",
+                "pm.sendRequest(payerfspGetStatusRequest, function (err, response) {\r",
+                "    console.log(response.json())\r",
+                "    var jsonData = response.json()\r",
+                "    for (var i in jsonData) {\r",
+                "        if (jsonData[i].ledgerAccountType === 'SETTLEMENT' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "            pm.environment.set(\"payerfspSettlementAccountId\", jsonData[i].id)\r",
+                "            pm.environment.set(\"payerfspSettlementAccountBalanceBeforeFundsOutPrepare\", jsonData[i].value)\r",
+                "        }\r",
+                "    }\r",
+                "});\r",
+                "\r",
+                "const hubGetStatusRequest = {\r",
+                "    url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/Hub/accounts',\r",
+                "    method: 'GET',\r",
+                "    header: {\r",
+                "        \"Authorization\": \"Bearer \" + pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "        \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "        \"Content-Type\": \"application/json\"\r",
+                "    }\r",
+                "};\r",
+                "pm.sendRequest(hubGetStatusRequest, function (err, response) {\r",
+                "    console.log(response.json())\r",
+                "    var jsonData = response.json()\r",
+                "    for (var i in jsonData) {\r",
+                "        if (jsonData[i].ledgerAccountType === 'HUB_RECONCILIATION' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "            pm.environment.set(\"hubReconAccountBalanceBeforeFundsOutPrepare\", jsonData[i].value)\r",
+                "        }\r",
+                "    }\r",
+                "});"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {\r",
+                "    const payerfspGetStatusRequest = {\r",
+                "        url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/' + pm.environment.get(\"payerfsp\") + '/accounts',\r",
+                "        method: 'GET',\r",
+                "        header: {\r",
+                "            \"Authorization\": \"Bearer \" + pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "            \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "            \"Content-Type\": \"application/json\"\r",
+                "        }\r",
+                "    };\r",
+                "    pm.sendRequest(payerfspGetStatusRequest, function (err, response) {\r",
+                "        console.log(response.json())\r",
+                "        var jsonData = response.json()\r",
+                "        var payerfspSettlementAccountBalanceAfterFundsOutPrepare\r",
+                "        for (var i in jsonData) {\r",
+                "            if (jsonData[i].ledgerAccountType === 'SETTLEMENT' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "              pm.environment.set(\"payerfspSettlementAccountBalanceAfterFundsOutPrepare\", jsonData[i].value)\r",
+                "            }\r",
+                "        }\r",
+                "\r",
+                "    });\r",
+                "\r",
+                "    const hubGetStatusRequest = {\r",
+                "        url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/Hub/accounts',\r",
+                "        method: 'GET',\r",
+                "        header: {\r",
+                "            \"Authorization\": \"Bearer \" + pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "            \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "            \"Content-Type\": \"application/json\"\r",
+                "        }\r",
+                "    };\r",
+                "    pm.sendRequest(hubGetStatusRequest, function (err, response) {\r",
+                "        console.log(response.json())\r",
+                "        var jsonData = response.json()\r",
+                "        var hubReconAccountBalanceAfterFundsOutPrepare\r",
+                "        for (var i in jsonData) {\r",
+                "            if (jsonData[i].ledgerAccountType === 'HUB_RECONCILIATION' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "              pm.environment.set(\"hubReconAccountBalanceAfterFundsOutPrepare\", jsonData[i].value)\r",
+                "            }\r",
+                "        }\r",
+                "    });\r",
+                "}, 500)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 2,
+          "description": "Record Funds Out Prepare&Reserve - transfer status",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transfers/{ID}",
+          "path": "/transfers/{$prev.1.request.body.transferId}",
+          "method": "get",
+          "params": {
+            "ID": "{$prev.1.request.body.transferId}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentTransfers}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.acceptTransfers}"
+          },
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "test",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "RESERVED",
+                "exec": [
+                  "expect(callback.body.transferState).to.equal('RESERVED')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "Record Funds Out Commit - payerfsp",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/accounts/{id}/transfers/{transferId}",
+          "path": "/participants/{$inputs.fromFspId}/accounts/{$environment.accountId}/transfers/{$prev.1.request.body.transferId}",
+          "method": "put",
+          "params": {
+            "name": "{$inputs.fromFspId}",
+            "id": "{$environment.accountId}",
+            "transferId": "{$prev.1.request.body.transferId}"
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "headers": {
+            "FSPIOP-Source": "{$inputs.hub_operator}",
+            "Content-Type": "application/json"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "status code to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "hub Recon Account Balance After Funds In is as expected",
+                "exec": [
+                  "expect(Number(environment.payerfspSettlementAccountBalanceAfterFundsOutCommit)).to.equal(Number(environment.payerfspSettlementAccountBalanceBeforeFundsOutCommit))"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "payerfsp Settlement Account Balance After Funds In is as expected",
+                "exec": [
+                  "expect(Number(environment.hubReconAccountBalanceAfterFundsOutCommit)).to.equal(Number(environment.hubReconAccountBalanceBeforeFundsOutCommit) - environment.fundsOutCommitAmount)"
+                ]
+              }
+            ]
+          },
+          "body": {
+            "action": "recordFundsOutCommit",
+            "reason": "Reason for out flow of funds"
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "pm.environment.set('fundsOutCommitAmount', 1000);\r",
+                "\r",
+                "\r",
+                "const payerfspGetStatusRequest = {\r",
+                "  url: pm.environment.get(\"HOST_CENTRAL_LEDGER\")+pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\")+'/participants/'+pm.environment.get(\"payerfsp\")+'/accounts',\r",
+                "  method: 'GET',\r",
+                "  header: {\r",
+                "      \"Authorization\":\"Bearer \"+pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "      \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "      \"Content-Type\": \"application/json\"\r",
+                "  }\r",
+                "};\r",
+                "pm.sendRequest(payerfspGetStatusRequest, function (err, response) {\r",
+                "    console.log(response.json())\r",
+                "    var jsonData = response.json()\r",
+                "    for(var i in jsonData) {\r",
+                "        if(jsonData[i].ledgerAccountType === 'SETTLEMENT' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "            pm.environment.set(\"payerfspSettlementAccountBalanceBeforeFundsOutCommit\",jsonData[i].value)\r",
+                "        }\r",
+                "    }\r",
+                "});\r",
+                "\r",
+                "const hubGetStatusRequest = {\r",
+                "  url: pm.environment.get(\"HOST_CENTRAL_LEDGER\")+pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\")+'/participants/Hub/accounts',\r",
+                "  method: 'GET',\r",
+                "  header: {\r",
+                "      \"Authorization\":\"Bearer \"+pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "      \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "      \"Content-Type\": \"application/json\"\r",
+                "  }\r",
+                "};\r",
+                "pm.sendRequest(hubGetStatusRequest, function (err, response) {\r",
+                "    console.log(response.json())\r",
+                "    var jsonData = response.json()\r",
+                "    for(var i in jsonData) {\r",
+                "        if(jsonData[i].ledgerAccountType === 'HUB_RECONCILIATION' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "            pm.environment.set(\"hubReconAccountBalanceBeforeFundsOutCommit\",jsonData[i].value)\r",
+                "        }\r",
+                "    }\r",
+                "});"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {\r",
+                "    const payerfspGetStatusRequest = {\r",
+                "        url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/' + pm.environment.get(\"payerfsp\") + '/accounts',\r",
+                "        method: 'GET',\r",
+                "        header: {\r",
+                "            \"Authorization\": \"Bearer \" + pm.environment.get(\"HUBOPERATOR_BEARER_TOKEN\"),\r",
+                "            \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "            \"Content-Type\": \"application/json\"\r",
+                "        }\r",
+                "    };\r",
+                "    pm.sendRequest(payerfspGetStatusRequest, function (err, response) {\r",
+                "        console.log(response.json())\r",
+                "        var jsonData = response.json()\r",
+                "        var payerfspSettlementAccountBalanceAfterFundsOutCommit\r",
+                "        for (var i in jsonData) {\r",
+                "            if (jsonData[i].ledgerAccountType === 'SETTLEMENT' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "                pm.environment.set(\"payerfspSettlementAccountBalanceAfterFundsOutCommit\", jsonData[i].value)\r",
+                "            }\r",
+                "        }\r",
+                "    });\r",
+                "\r",
+                "    const hubGetStatusRequest = {\r",
+                "        url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/Hub/accounts',\r",
+                "        method: 'GET',\r",
+                "        header: {\r",
+                "            \"Authorization\": \"Bearer \" + pm.environment.get(\"HUBOPERATOR_BEARER_TOKEN\"),\r",
+                "            \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "            \"Content-Type\": \"application/json\"\r",
+                "        }\r",
+                "    };\r",
+                "    pm.sendRequest(hubGetStatusRequest, function (err, response) {\r",
+                "        console.log(response.json())\r",
+                "        var jsonData = response.json()\r",
+                "        var hubReconAccountBalanceAfterFundsOutCommit\r",
+                "        for (var i in jsonData) {\r",
+                "            if (jsonData[i].ledgerAccountType === 'HUB_RECONCILIATION' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "                pm.environment.set(\"hubReconAccountBalanceAfterFundsOutCommit\", jsonData[i].value)\r",
+                "            }\r",
+                "        }\r",
+                "    });\r",
+                "}, 500)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 4,
+          "description": "Record Funds Out Commit - transfer status",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transfers/{ID}",
+          "path": "/transfers/{$prev.1.request.body.transferId}",
+          "method": "get",
+          "params": {
+            "ID": "{$prev.1.request.body.transferId}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentTransfers}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.acceptTransfers}"
+          },
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "test",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "COMMITTED",
+                "exec": [
+                  "expect(callback.body.transferState).to.equal('COMMITTED')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "funds_out - Reserve&Abort",
+      "requests": [
+        {
+          "id": 1,
+          "description": "test",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/accounts/{id}",
+          "path": "/participants/{$inputs.fromFspId}/accounts/{$environment.accountId}",
+          "method": "post",
+          "params": {
+            "name": "{$inputs.fromFspId}",
+            "id": "{$environment.accountId}"
+          },
+          "headers": {
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "transferId": "{$function.generic.generateUUID}",
+            "externalReference": "string",
+            "action": "recordFundsOutPrepareReserve",
+            "reason": "string",
+            "amount": {
+              "amount": "{$environment.fundsOutPrepareReserveAmount}",
+              "currency": "{$environment.currency}"
+            },
+            "extensionList": {
+              "extension": [
+                {
+                  "key": "string",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "status code to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "hub Recon Account Balance After Funds In is as expected",
+                "exec": [
+                  "expect(Number(environment.hubReconAccountBalanceAfterFundsOutPrepare)).to.equal(Number(environment.hubReconAccountBalanceBeforeFundsOutPrepare))"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "payerfsp Settlement Account Balance After Funds In is as expected",
+                "exec": [
+                  "expect(Number(environment.payerfspSettlementAccountBalanceAfterFundsOutPrepare)).to.equal(Number(environment.payerfspSettlementAccountBalanceBeforeFundsOutPrepare) + environment.fundsOutPrepareReserveAmount)"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "pm.environment.set('fundsOutPrepareReserveAmount', 1000);\r",
+                "\r",
+                "const payerfspGetStatusRequest = {\r",
+                "    url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/' + pm.environment.get(\"payerfsp\") + '/accounts',\r",
+                "    method: 'GET',\r",
+                "    header: {\r",
+                "        \"Authorization\": \"Bearer \" + pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "        \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "        \"Content-Type\": \"application/json\"\r",
+                "    }\r",
+                "};\r",
+                "\r",
+                "pm.sendRequest(payerfspGetStatusRequest, function (err, response) {\r",
+                "    console.log(response.json())\r",
+                "    var jsonData = response.json()\r",
+                "    for (var i in jsonData) {\r",
+                "        if (jsonData[i].ledgerAccountType === 'SETTLEMENT' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "            pm.environment.set(\"payerfspSettlementAccountId\", jsonData[i].id)\r",
+                "            pm.environment.set(\"payerfspSettlementAccountBalanceBeforeFundsOutPrepare\", jsonData[i].value)\r",
+                "        }\r",
+                "    }\r",
+                "});\r",
+                "\r",
+                "const hubGetStatusRequest = {\r",
+                "    url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/Hub/accounts',\r",
+                "    method: 'GET',\r",
+                "    header: {\r",
+                "        \"Authorization\": \"Bearer \" + pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "        \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "        \"Content-Type\": \"application/json\"\r",
+                "    }\r",
+                "};\r",
+                "pm.sendRequest(hubGetStatusRequest, function (err, response) {\r",
+                "    console.log(response.json())\r",
+                "    var jsonData = response.json()\r",
+                "    for (var i in jsonData) {\r",
+                "        if (jsonData[i].ledgerAccountType === 'HUB_RECONCILIATION' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "            pm.environment.set(\"hubReconAccountBalanceBeforeFundsOutPrepare\", jsonData[i].value)\r",
+                "        }\r",
+                "    }\r",
+                "});"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {\r",
+                "    const payerfspGetStatusRequest = {\r",
+                "        url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/' + pm.environment.get(\"payerfsp\") + '/accounts',\r",
+                "        method: 'GET',\r",
+                "        header: {\r",
+                "            \"Authorization\": \"Bearer \" + pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "            \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "            \"Content-Type\": \"application/json\"\r",
+                "        }\r",
+                "    };\r",
+                "    pm.sendRequest(payerfspGetStatusRequest, function (err, response) {\r",
+                "        console.log(response.json())\r",
+                "        var jsonData = response.json()\r",
+                "        var payerfspSettlementAccountBalanceAfterFundsOutPrepare\r",
+                "        for (var i in jsonData) {\r",
+                "            if (jsonData[i].ledgerAccountType === 'SETTLEMENT' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "              pm.environment.set(\"payerfspSettlementAccountBalanceAfterFundsOutPrepare\", jsonData[i].value)\r",
+                "            }\r",
+                "        }\r",
+                "\r",
+                "    });\r",
+                "\r",
+                "    const hubGetStatusRequest = {\r",
+                "        url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/Hub/accounts',\r",
+                "        method: 'GET',\r",
+                "        header: {\r",
+                "            \"Authorization\": \"Bearer \" + pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "            \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "            \"Content-Type\": \"application/json\"\r",
+                "        }\r",
+                "    };\r",
+                "    pm.sendRequest(hubGetStatusRequest, function (err, response) {\r",
+                "        console.log(response.json())\r",
+                "        var jsonData = response.json()\r",
+                "        var hubReconAccountBalanceAfterFundsOutPrepare\r",
+                "        for (var i in jsonData) {\r",
+                "            if (jsonData[i].ledgerAccountType === 'HUB_RECONCILIATION' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "              pm.environment.set(\"hubReconAccountBalanceAfterFundsOutPrepare\", jsonData[i].value)\r",
+                "            }\r",
+                "        }\r",
+                "    });\r",
+                "}, 500)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 2,
+          "description": "Record Funds In - prepare transfer status",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transfers/{ID}",
+          "path": "/transfers/{$prev.1.request.body.transferId}",
+          "method": "get",
+          "params": {
+            "ID": "{$prev.1.request.body.transferId}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentTransfers}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.acceptTransfers}"
+          },
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "RESERVED",
+                "exec": [
+                  "expect(callback.body.transferState).to.equal('RESERVED')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "Record Funds Out Abort - payerfsp",
+          "apiVersion": {
+            "minorVersion": 3,
+            "majorVersion": 9,
+            "type": "central_admin"
+          },
+          "operationPath": "/participants/{name}/accounts/{id}/transfers/{transferId}",
+          "path": "/participants/{$inputs.fromFspId}/accounts/{$environment.accountId}/transfers/{$prev.1.request.body.transferId}",
+          "method": "put",
+          "params": {
+            "name": "{$inputs.fromFspId}",
+            "id": "{$environment.accountId}",
+            "transferId": "{$prev.1.request.body.transferId}"
+          },
+          "url": "{$inputs.HOST_CENTRAL_LEDGER}",
+          "headers": {
+            "FSPIOP-Source": "{$inputs.hub_operator}",
+            "Content-Type": "application/json"
+          },
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "status code to be 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 3,
+                "description": "hub Recon Account Balance After Funds In is as expected",
+                "exec": [
+                  "expect(Number(environment.payerfspSettlementAccountBalanceAfterFundsOutAbort)).to.equal(Number(environment.payerfspSettlementAccountBalanceBeforeFundsOutPrepare))"
+                ]
+              },
+              {
+                "id": 4,
+                "description": "payerfsp Settlement Account Balance After Funds In is as expected",
+                "exec": [
+                  "expect(Number(environment.hubReconAccountBalanceAfterFundsOutAbort)).to.equal(Number(environment.hubReconAccountBalanceBeforeFundsOutAbort))"
+                ]
+              }
+            ]
+          },
+          "body": {
+            "action": "recordFundsOutAbort",
+            "reason": "Reason for out flow of funds"
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "pm.environment.set('fundsOutCommitAmount', 1000);\r",
+                "\r",
+                "setTimeout(function () {\r",
+                "  const payerfspGetStatusRequest = {\r",
+                "    url: pm.environment.get(\"HOST_CENTRAL_LEDGER\")+pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\")+'/participants/'+pm.environment.get(\"payerfsp\")+'/accounts',\r",
+                "    method: 'GET',\r",
+                "    header: {\r",
+                "        \"Authorization\":\"Bearer \"+pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "        \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "        \"Content-Type\": \"application/json\"\r",
+                "    }\r",
+                "  };\r",
+                "  pm.sendRequest(payerfspGetStatusRequest, function (err, response) {\r",
+                "      console.log(response.json())\r",
+                "      var jsonData = response.json()\r",
+                "      for(var i in jsonData) {\r",
+                "          if(jsonData[i].ledgerAccountType === 'SETTLEMENT' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "              pm.environment.set(\"payerfspSettlementAccountBalanceBeforeFundsOutAbort\",jsonData[i].value)\r",
+                "          }\r",
+                "      }\r",
+                "  });\r",
+                "  \r",
+                "  const hubGetStatusRequest = {\r",
+                "    url: pm.environment.get(\"HOST_CENTRAL_LEDGER\")+pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\")+'/participants/Hub/accounts',\r",
+                "    method: 'GET',\r",
+                "    header: {\r",
+                "        \"Authorization\":\"Bearer \"+pm.environment.get(\"HUB_OPERATOR_BEARER_TOKEN\"),\r",
+                "        \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "        \"Content-Type\": \"application/json\"\r",
+                "    }\r",
+                "  };\r",
+                "  pm.sendRequest(hubGetStatusRequest, function (err, response) {\r",
+                "      console.log(response.json())\r",
+                "      var jsonData = response.json()\r",
+                "      for(var i in jsonData) {\r",
+                "          if(jsonData[i].ledgerAccountType === 'HUB_RECONCILIATION' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "              pm.environment.set(\"hubReconAccountBalanceBeforeFundsOutAbort\",jsonData[i].value)\r",
+                "          }\r",
+                "      }\r",
+                "  });\r",
+                "}, 500)"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "setTimeout(function () {\r",
+                "    const payerfspGetStatusRequest = {\r",
+                "        url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/' + pm.environment.get(\"payerfsp\") + '/accounts',\r",
+                "        method: 'GET',\r",
+                "        header: {\r",
+                "            \"Authorization\": \"Bearer \" + pm.environment.get(\"HUBOPERATOR_BEARER_TOKEN\"),\r",
+                "            \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "            \"Content-Type\": \"application/json\"\r",
+                "        }\r",
+                "    };\r",
+                "    pm.sendRequest(payerfspGetStatusRequest, function (err, response) {\r",
+                "        console.log(response.json())\r",
+                "        var jsonData = response.json()\r",
+                "        var payerfspSettlementAccountBalanceAfterFundsOutCommit\r",
+                "        for (var i in jsonData) {\r",
+                "            if (jsonData[i].ledgerAccountType === 'SETTLEMENT' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "                pm.environment.set(\"payerfspSettlementAccountBalanceAfterFundsOutAbort\", jsonData[i].value)\r",
+                "            }\r",
+                "        }\r",
+                "    });\r",
+                "\r",
+                "    const hubGetStatusRequest = {\r",
+                "        url: pm.environment.get(\"HOST_CENTRAL_LEDGER\") + pm.environment.get(\"BASE_CENTRAL_LEDGER_ADMIN\") + '/participants/Hub/accounts',\r",
+                "        method: 'GET',\r",
+                "        header: {\r",
+                "            \"Authorization\": \"Bearer \" + pm.environment.get(\"HUBOPERATOR_BEARER_TOKEN\"),\r",
+                "            \"FSPIOP-Source\": pm.environment.get(\"hub_operator\"),\r",
+                "            \"Content-Type\": \"application/json\"\r",
+                "        }\r",
+                "    };\r",
+                "    pm.sendRequest(hubGetStatusRequest, function (err, response) {\r",
+                "        console.log(response.json())\r",
+                "        var jsonData = response.json()\r",
+                "        var hubReconAccountBalanceAfterFundsOutCommit\r",
+                "        for (var i in jsonData) {\r",
+                "            if (jsonData[i].ledgerAccountType === 'HUB_RECONCILIATION' && (jsonData[i].currency === pm.environment.get(\"currency\"))) {\r",
+                "                pm.environment.set(\"hubReconAccountBalanceAfterFundsOutAbort\", jsonData[i].value)\r",
+                "            }\r",
+                "        }\r",
+                "    });\r",
+                "}, 500)"
+              ]
+            }
+          }
+        },
+        {
+          "id": 4,
+          "description": "Record Funds In - prepare transfer status Copy",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": true
+          },
+          "operationPath": "/transfers/{ID}",
+          "path": "/transfers/{$prev.1.request.body.transferId}",
+          "method": "get",
+          "params": {
+            "ID": "{$prev.1.request.body.transferId}"
+          },
+          "headers": {
+            "Content-Type": "{$inputs.contentTransfers}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.acceptTransfers}"
+          },
+          "url": "{$inputs.HOST_ML_API_ADAPTER}",
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "Status code is 202",
+                "exec": [
+                  "expect(response.status).to.equal(202)"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "ABORTED",
+                "exec": [
+                  "expect(callback.body.transferState).to.equal('ABORTED')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

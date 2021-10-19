@@ -26,7 +26,8 @@ const fs = require('fs')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const outbound = require('../../test-outbound/outbound-initiator')
-const TraceHeaderUtils = require('../../traceHeaderUtils')
+const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
+const customLogger = require('../../requestLogger')
 
 const handleRequest = async (context, request, callback, triggerFolder) => {
   // Check whether the request is POST /transactionRequests
@@ -49,6 +50,7 @@ const handleRequest = async (context, request, callback, triggerFolder) => {
         outboundTemplate.inputValues.TrsScenario = transactionRequest.transactionType.scenario
         outboundTemplate.inputValues.TrsInitiator = transactionRequest.transactionType.initiator
         outboundTemplate.inputValues.TrsInitiatorType = transactionRequest.transactionType.initiatorType
+        outboundTemplate.inputValues.TrsTransactionRequestId = transactionRequest.transactionRequestId
 
         // Replace the transaction ID from the generated callback
         outboundTemplate.inputValues.transactionId = callback.body.transactionId
@@ -58,7 +60,7 @@ const handleRequest = async (context, request, callback, triggerFolder) => {
           outbound.OutboundSend(outboundTemplate, null, callback.fspId)
         }
       } catch (err) {
-        console.log(err)
+        customLogger.logMessage('error', err.message, err, { notification: false })
       }
     }
   }

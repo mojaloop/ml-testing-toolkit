@@ -22,35 +22,38 @@
  --------------
  ******/
 
-const io = require('./api-server').socketIO
+const SocketServer = require('./socket-server')
 
-const broadcastLog = (log, sessionID = null) => {
-  io.emit('newLog', {
-    logTime: new Date(),
-    ...log
-  })
-  if (sessionID) {
-    io.emit('newLog/' + sessionID, {
-      logTime: new Date(),
-      ...log
-    })
+const broadcast = (log, sessionID = null, type) => {
+  const io = SocketServer.getIO()
+  if (io) {
+    io.emit(type, log)
+    if (sessionID) {
+      io.emit(`${type}/` + sessionID, log)
+    }
   }
 }
 
+const broadcastLog = (log, sessionID = null) => {
+  broadcast(log, sessionID, 'newLog')
+}
+
+const sendMessage = (message, sessionID = null) => {
+  broadcast(message, sessionID, 'pushMessage')
+}
+
+const broadcastOutboundLog = (log, sessionID = null) => {
+  broadcast(log, sessionID, 'newOutboundLog')
+}
+
 const broadcastOutboundProgress = (status, sessionID = null) => {
-  io.emit('outboundProgress', {
-    reportTime: new Date(),
-    ...status
-  })
-  if (sessionID) {
-    io.emit('outboundProgress/' + sessionID, {
-      reportTime: new Date(),
-      ...status
-    })
-  }
+  status.reportTime = new Date()
+  broadcast(status, sessionID, 'outboundProgress')
 }
 
 module.exports = {
   broadcastLog,
-  broadcastOutboundProgress
+  broadcastOutboundLog,
+  broadcastOutboundProgress,
+  sendMessage
 }

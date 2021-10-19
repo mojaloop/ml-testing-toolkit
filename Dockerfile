@@ -1,4 +1,4 @@
-FROM node:12.16.0-alpine AS builder
+FROM node:12.16.3-alpine AS builder
 
 WORKDIR /opt/mojaloop-testing-toolkit
 
@@ -9,13 +9,14 @@ RUN apk add --no-cache -t build-dependencies git make gcc g++ python libtool aut
 
 COPY package.json package-lock.json* /opt/mojaloop-testing-toolkit/
 RUN npm install
+RUN npm install -g bunyan
 
 COPY src /opt/mojaloop-testing-toolkit/src
 COPY spec_files /opt/mojaloop-testing-toolkit/spec_files
 COPY examples /opt/mojaloop-testing-toolkit/examples
 COPY secrets /opt/mojaloop-testing-toolkit/secrets
 
-FROM node:12.16.0-alpine
+FROM node:12.16.3-alpine
 
 WORKDIR /opt/mojaloop-testing-toolkit
 
@@ -24,4 +25,4 @@ RUN npm prune --production
 
 EXPOSE 5000
 EXPOSE 5050
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start", "|bunyan"]

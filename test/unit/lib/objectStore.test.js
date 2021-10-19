@@ -27,76 +27,99 @@
 const ObjectStore = require('../../../src/lib/objectStore')
 
 describe('ObjectStore', () => {
-  describe('Transaction Related Functions', () => {
-    it('Save transaction should not throw error', async () => {
-      expect(() => {
-        const result = ObjectStore.saveTransaction('123')
-      }).not.toThrowError();
+  const user = {
+    dfspId: 'test'
+  }
+  describe('when push object', () => {
+    it('store the new object', async () => {
+      const result = ObjectStore.push('transactions', 'item', {})
+      expect(result).toBeUndefined()
     })
-    it('Search for the transaction', async () => {
-      const result = ObjectStore.searchTransaction('123')
-      expect(result).toBe(true)
+    it('store the new object again should not set object store again', async () => {
+      const result = ObjectStore.push('transactions', 'item', {})
+      expect(result).toBeUndefined()
     })
-    it('Get existing transaction', async () => {
-      const result = ObjectStore.getTransaction('123')
-      expect(result).not.toBe(null)
-    })
-    it('Get not existing transaction', async () => {
-      const result = ObjectStore.getTransaction('1234')
-      expect(result).toBe(null)
-    })
-    it('Delete the transaction', async () => {
-      expect(() => {
-        const result = ObjectStore.deleteTransaction('123')
-      }).not.toThrowError();
-    })
-    it('Search again for the transaction', async () => {
-      const result = ObjectStore.searchTransaction('123')
-      expect(result).toBe(false)
+    it('store dfsp wise the new object', async () => {
+      const result = ObjectStore.push('transactions', 'item', {}, user)
+      expect(result).toBeUndefined()
     })
   })
-  describe('Generic Functions', () => {
-    it('Initialize Object Store', async (done) => {
+  describe('when pop object', () => {
+    it('pop existing object', async () => {
+      const result = ObjectStore.popObject('transactions', 'item')
+      expect(result).toStrictEqual({})
+    })
+    it('pop existing dfsp wise object', async () => {
+      const result = ObjectStore.popObject('transactions', 'item', user)
+      expect(result).toStrictEqual({})
+    })
+    it('pop again will return null', async () => {
+      const result = ObjectStore.popObject('transactions', 'item')
+      expect(result).toBeNull()
+    })
+  })
+  describe('when set object', () => {
+    it('set new object', async () => {
+      const result = ObjectStore.set('transactions', {})
+      expect(result).toBeUndefined()
+    })
+    it('set new dfsp wise object', async () => {
+      const result = ObjectStore.set('transactions', {}, user)
+      expect(result).toBeUndefined()
+    })
+  })
+  describe('when get object', () => {
+    it('get not existing object', async () => {
+      const result = ObjectStore.get('transactions', undefined)
+      expect(result).toBeDefined
+    })
+    it('get not existing dfsp wise object', async () => {
+      const result = ObjectStore.get('transactions', undefined, user)
+      expect(result).toStrictEqual({})
+    })
+    it('get dfsp wise object', async () => {
+      ObjectStore.push('transactions', 'item', {}, user)
+      const itemResult = ObjectStore.get('transactions', 'item', user)
+      const item2Result = ObjectStore.get('transactions', 'item2', user)
+      expect(itemResult.data).toStrictEqual({})
+      expect(item2Result).toBeNull()
+    })
+  })
+  describe('initObjectStore', () => {
+    it('Initialize Object Store should not throw and error', (done) => {
       const curDate = new Date()
       const expiredDate = new Date(curDate.setMinutes(curDate.getMinutes() - 10))
       ObjectStore.set('transactions', {
         '123': {transactionDate: expiredDate.getTime()},
         '124': {transactionDate: Date.now()}
       })
-      setTimeout(() => {done()}, 2000);
-      expect(() => {
-        const result = ObjectStore.initObjectStore()
-      }).not.toThrowError();
-    })
-    it('Set a value in object store', async () => {
-      expect(() => {
-        const result = ObjectStore.set('person', {name: 'test'})
-      }).not.toThrowError();
-    })
-    it('Get the value', async () => {
-      const result = ObjectStore.get('person')
-      expect(result).toHaveProperty('name')
-      expect(result['name']).toEqual('test')
+      jest.useFakeTimers()
+      const result = ObjectStore.initObjectStore()
+      setTimeout(() => {done()}, 2000);      
+      jest.advanceTimersByTime(2000)
+      jest.useRealTimers()
+      expect(result).toBeUndefined()
     })
   })
-  describe('inbound environment Related Functions', () => {
-    it('Save inbound environment should not throw error', async () => {
-      expect(() => {
-        const result = ObjectStore.push('inboundEnvironment', '123')
-      }).not.toThrowError();
+  describe('clear', () => {
+    it('clear Object Store should not throw and error', async () => {
+      const result = ObjectStore.clear('transactions', 1)
+      expect(result).toBeUndefined()
     })
-    it('Get existing inbound environment', async () => {
-      const result = ObjectStore.getObject('inboundEnvironment', '123')
-      expect(result).not.toBe(null)
-    })
-    it('Get not existing inbound environment', async () => {
-      const result = ObjectStore.getObject('inboundEnvironment', '1234')
-      expect(result).toBe(null)
-    })
-    it('Delete the inbound environment', async () => {
-      expect(() => {
-        const result = ObjectStore.clear('inboundEnvironment', 0)
-      }).not.toThrowError();
+  })
+  describe('initObjectStore with initData', () => {
+    it('Initialize Object Store should set passed initData', (done) => {
+      jest.useFakeTimers()
+      ObjectStore.initObjectStore({
+        someInitData: {
+          name: 'something'
+        }
+      })
+      const itemResult = ObjectStore.get('someInitData')
+      expect(itemResult.name).toStrictEqual('something')
+      setTimeout(() => {done()}, 2000)
+      jest.advanceTimersByTime(2000)
+      jest.useRealTimers()
     })
   })
 })

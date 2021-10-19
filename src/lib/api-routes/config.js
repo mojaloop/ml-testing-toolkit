@@ -24,18 +24,36 @@
 
 const express = require('express')
 const Config = require('../config')
-const Server = require('../../server')
 const router = new express.Router()
 const { check, validationResult } = require('express-validator')
+
+const userConfigView = (obj) => {
+  if (!Config.getSystemConfig().HOSTING_ENABLED) {
+    return obj
+  }
+
+  const hiddenProperties = [
+    'HUB_ONLY_MODE',
+    'ENDPOINTS_DFSP_WISE'
+  ]
+  const newConfig = {}
+  Object.keys(obj).forEach(key => {
+    if (!hiddenProperties.includes(key)) {
+      newConfig[key] = obj[key]
+    }
+  })
+  return newConfig
+}
 
 // Get runtime and stored user config
 router.get('/user', async (req, res, next) => {
   try {
-    const runtime = Config.getUserConfig()
-    const stored = await Config.getStoredUserConfig()
+    const runtime = userConfigView(await Config.getUserConfig(req.user))
+    const stored = userConfigView(await Config.getStoredUserConfig(req.user))
     res.status(200).json({ runtime, stored })
   } catch (err) {
-    next(err)
+    // next(err)
+    res.status(404).json({ error: err && err.message })
   }
 })
 
@@ -48,20 +66,12 @@ router.put('/user', [
     return res.status(422).json({ errors: errors.array() })
   }
   try {
-    await Config.setStoredUserConfig(req.body)
-    const runtime = await Config.getUserConfig()
-    const stored = await Config.getStoredUserConfig()
-    let reloadServer = false
-    if (runtime.INBOUND_MUTUAL_TLS_ENABLED !== stored.INBOUND_MUTUAL_TLS_ENABLED) {
-      reloadServer = true
-    }
-    await Config.loadUserConfig()
-    if (reloadServer) {
-      Server.restartServer()
-    }
+    await Config.setStoredUserConfig(req.body, req.user)
+    await Config.loadUserConfig(req.user)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    next(err)
+    // next(err)
+    res.status(404).json({ error: err && err.message })
   }
 })
 

@@ -2,10 +2,11 @@ version: "3.7"
 
 services:
   mojaloop-testing-toolkit:
-    image: mojaloop-testing-toolkit:local
-    build:
-      context: .
-      target: builder
+    image: mojaloop/ml-testing-toolkit:v14.0.0
+    #image: mojaloop-testing-toolkit:local
+    #build:
+    #  context: .
+    #  target: builder
     volumes:
       - "./spec_files:/opt/mojaloop-testing-toolkit/spec_files"
       - "./secrets:/opt/mojaloop-testing-toolkit/secrets"
@@ -17,7 +18,7 @@ services:
       - -c
       - "npm start"
   mojaloop-testing-toolkit-ui:
-    image: mojaloop/ml-testing-toolkit-ui:v10.6.0
+    image: mojaloop/ml-testing-toolkit-ui:v13.5.4
     ports:
       - "6060:6060"
     environment:
@@ -26,6 +27,7 @@ services:
     command:
       - sh
       - /usr/share/nginx/start.sh
+
 networks:
   default:
     name: mojaloop-testing-toolkit

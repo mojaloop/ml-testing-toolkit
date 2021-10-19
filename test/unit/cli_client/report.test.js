@@ -28,7 +28,14 @@ const spyPromisify = jest.spyOn(util, 'promisify')
 const axios = require('axios')
 jest.mock('axios')
 const objectStore = require('../../../src/cli_client/objectStore')
+const spyObjectStoreGet = jest.spyOn(objectStore, 'get')
+const s3Upload = require('../../../src/cli_client/extras/s3-upload')
+jest.mock('../../../src/cli_client/extras/s3-upload')
 const report = require('../../../src/cli_client/utils/report')
+const Utils = require('../../../src/lib/utils')
+const SpyWriteFileAsync = jest.spyOn(Utils, 'writeFileAsync')
+
+
 
 const data = { 
   runtimeInformation: {
@@ -44,9 +51,9 @@ describe('Cli client', () => {
         reportFormat: 'json'
       }
       objectStore.set('config', config)
-      await expect(report.outbound(data)).resolves.toBe(undefined)
+      await expect(report.outbound(data)).resolves.not.toBeNull
     })
-    it('when the report format is html and reportFilename present should not throw an error', async () => {
+    it('when the report format is html and reportAutoFilenameEnable present should not throw an error', async () => {
       const response = {
         'headers': {
           'content-disposition': 'attachment; filename=TTK-Assertion-Report-Test1-2020-05-08T13:53:51.887Z.html'
@@ -56,7 +63,7 @@ describe('Cli client', () => {
       spyPromisify.mockReturnValueOnce(jest.fn())
       const config = {
         reportFormat: 'html',
-        reportFilename: 'report'
+        reportAutoFilenameEnable: true
       }
       objectStore.set('config', config)
       await expect(report.outbound(data)).resolves.not.toBeNull
@@ -73,7 +80,7 @@ describe('Cli client', () => {
         reportFormat: 'html'
       }
       objectStore.set('config', config)
-      await expect(report.outbound(data)).resolves.toBe(undefined)
+      await expect(report.outbound(data)).resolves.not.toBeNull
     })
     it('when the report format is html and content-disposition not present should not throw an error', async () => {
       const response = {
@@ -85,7 +92,7 @@ describe('Cli client', () => {
         reportFormat: 'printhtml'
       }
       objectStore.set('config', config)
-      await expect(report.outbound(data)).resolves.toBe(undefined)
+      await expect(report.outbound(data)).resolves.not.toBeNull
     })
     it('when the report format is html and wrong data not present should not throw an error', async () => {
       const response = {
@@ -99,7 +106,7 @@ describe('Cli client', () => {
         reportFormat: 'printhtml'
       }
       objectStore.set('config', config)
-      await expect(report.outbound(data)).resolves.toBe(undefined)
+      await expect(report.outbound(data)).resolves.not.toBeNull
     })
     it('when the report format is printhtml and reportFilename not present should not throw an error', async () => {
       const response = {
@@ -113,7 +120,7 @@ describe('Cli client', () => {
         reportFormat: 'printhtml'
       }
       objectStore.set('config', config)
-      await expect(report.outbound(data)).resolves.toBe(undefined)
+      await expect(report.outbound(data)).resolves.not.toBeNull
     })
     it('when the report format is printhtml and reportFilename not present should not throw an error', async () => {
       const response = {
@@ -127,11 +134,112 @@ describe('Cli client', () => {
         reportFormat: 'printhtml'
       }
       objectStore.set('config', config)
-      await expect(report.outbound(data)).resolves.toBe(undefined)
+      await expect(report.outbound(data)).resolves.not.toBeNull
     })
+
+
+    it('when the report format is printhtml and extraSummaryInformation is supplied', async () => {
+      const response = {
+        'headers': {
+          'content-disposition': 'attachment; filename=TTK-Assertion-Report-Test1-2020-05-08T13:53:51.887Z.html'
+        }
+      }
+      axios.post.mockReturnValueOnce(response)
+      spyPromisify.mockReturnValueOnce(jest.fn())
+      const config = {
+        reportFormat: 'printhtml',
+        extraSummaryInformation:  'Title:Mocktitle,Summary:MockSummary'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.not.toBeNull
+    })
+
+
     it('when the report format is not supported should not throw an error', async () => {
       const config = {
         reportFormat: 'default'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.not.toBeNull
+    })
+    it('when the reportTarget is file should not throw an error', async () => {
+      const response = {
+        'headers': {
+          'content-disposition': 'attachment; filename=TTK-Assertion-Report-Test1-2020-05-08T13:53:51.887Z.html'
+        }
+      }
+      axios.post.mockReturnValueOnce(response)
+      SpyWriteFileAsync.mockResolvedValueOnce()
+      spyPromisify.mockReturnValueOnce(jest.fn())
+      const config = {
+        reportFormat: 'html',
+        reportTarget: 'file://asdf'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.not.toBeNull
+    })
+    it('when the reportTarget is of type file with path adn auto filename enabled should not throw an error', async () => {
+      const response = {
+        'headers': {
+          'content-disposition': 'attachment; filename=TTK-Assertion-Report-Test1-2020-05-08T13:53:51.887Z.html'
+        }
+      }
+      axios.post.mockReturnValueOnce(response)
+      SpyWriteFileAsync.mockResolvedValueOnce()
+      spyPromisify.mockReturnValueOnce(jest.fn())
+      const config = {
+        reportFormat: 'html',
+        reportAutoFilenameEnable: true,
+        reportTarget: 'file://asdf/dasfe.html'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.not.toBeNull
+    })
+    it('when the reportTarget is of type file with filename and auto filename enabled should not throw an error', async () => {
+      const response = {
+        'headers': {
+          'content-disposition': 'attachment; filename=TTK-Assertion-Report-Test1-2020-05-08T13:53:51.887Z.html'
+        }
+      }
+      axios.post.mockReturnValueOnce(response)
+      SpyWriteFileAsync.mockResolvedValueOnce()
+      spyPromisify.mockReturnValueOnce(jest.fn())
+      const config = {
+        reportFormat: 'html',
+        reportAutoFilenameEnable: true,
+        reportTarget: 'file://dasfe.html'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.not.toBeNull
+    })
+    it('when the reportTarget is s3 should not throw an error', async () => {
+      const response = {
+        'headers': {
+          'content-disposition': 'attachment; filename=TTK-Assertion-Report-Test1-2020-05-08T13:53:51.887Z.html'
+        }
+      }
+      axios.post.mockReturnValueOnce(response)
+      s3Upload.uploadFileDataToS3.mockReturnValueOnce('http://some_upload_url')
+      spyPromisify.mockReturnValueOnce(jest.fn())
+      const config = {
+        reportFormat: 'html',
+        reportTarget: 's3://asdf'
+      }
+      objectStore.set('config', config)
+      await expect(report.outbound(data)).resolves.toHaveProperty('uploadedReportURL')
+
+    })
+    it('when the reportTarget is unknown should return undefined', async () => {
+      const response = {
+        'headers': {
+          'content-disposition': 'attachment; filename=TTK-Assertion-Report-Test1-2020-05-08T13:53:51.887Z.html'
+        }
+      }
+      axios.post.mockReturnValueOnce(response)
+      spyPromisify.mockReturnValueOnce(jest.fn())
+      const config = {
+        reportFormat: 'html',
+        reportTarget: 'asdf://asdf'
       }
       objectStore.set('config', config)
       await expect(report.outbound(data)).resolves.toBe(undefined)

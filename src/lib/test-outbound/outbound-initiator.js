@@ -30,63 +30,176 @@ const https = require('https')
 const Config = require('../config')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
-const fs = require('fs')
-const { promisify } = require('util')
-const readFileAsync = promisify(fs.readFile)
-const expect = require('chai').expect // eslint-disable-line
+const { readFileAsync } = require('../utils')
+const expectOriginal = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
-const traceHeaderUtils = require('../traceHeaderUtils')
+const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
 require('request-to-curl')
 require('atob') // eslint-disable-line
 delete axios.defaults.headers.common.Accept
-const context = require('./context')
+const postmanContext = require('../scripting-engines/postman-sandbox')
+const javascriptContext = require('../scripting-engines/vm-javascript-sandbox')
 const openApiDefinitionsModel = require('../mocking/openApiDefinitionsModel')
 const uuid = require('uuid')
 const utilsInternal = require('../utilsInternal')
+const dbAdapter = require('../db/adapters/dbAdapter')
+const arrayStore = require('../arrayStore')
+const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
+const httpAgentStore = require('../httpAgentStore')
 
-var terminateTraceIds = {}
+const terminateTraceIds = {}
+
+const getTracing = (traceID, dfspId) => {
+  const tracing = {
+    outboundID: traceID,
+    sessionID: null
+  }
+  if (traceID && TraceHeaderUtils.isCustomTraceID(traceID)) {
+    tracing.outboundID = TraceHeaderUtils.getEndToEndID(traceID)
+    tracing.sessionID = TraceHeaderUtils.getSessionID(traceID)
+  }
+  if (Config.getSystemConfig().HOSTING_ENABLED) {
+    tracing.sessionID = dfspId
+  }
+  return tracing
+}
 
 const OutboundSend = async (inputTemplate, traceID, dfspId) => {
-  const startedTimeStamp = new Date()
-  let outboundID = traceID
-  let sessionID = null
-  if (traceID && traceHeaderUtils.isCustomTraceID(traceID)) {
-    outboundID = traceHeaderUtils.getEndToEndID(traceID)
-    sessionID = traceHeaderUtils.getSessionID(traceID)
+  const totalCounts = getTotalCounts(inputTemplate)
+  const globalConfig = {
+    broadcastOutboundProgressEnabled: true,
+    scriptExecution: true,
+    testsExecution: true,
+    totalProgress: {
+      testCasesTotal: totalCounts.totalTestCases,
+      testCasesProcessed: 0,
+      requestsTotal: totalCounts.totalRequests,
+      requestsProcessed: 0,
+      assertionsTotal: totalCounts.totalAssertions,
+      assertionsProcessed: 0,
+      assertionsPassed: 0,
+      assertionsFailed: 0
+    }
   }
 
-  const environmentVariables = {
-    items: Object.entries(inputTemplate.inputValues).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
+  const startedTimeStamp = new Date()
+  const tracing = getTracing(traceID, dfspId)
+
+  const variableData = {
+    environment: { ...inputTemplate.inputValues }
   }
   try {
     for (const i in inputTemplate.test_cases) {
-      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, environmentVariables, dfspId)
+      globalConfig.totalProgress.testCasesProcessed++
+      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, variableData, dfspId, globalConfig)
     }
 
     const completedTimeStamp = new Date()
     const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
     // Send the total result to client
-    if (outboundID) {
+    if (tracing.outboundID) {
       const runtimeInformation = {
         completedTimeISO: completedTimeStamp.toISOString(),
         startedTime: startedTimeStamp.toUTCString(),
         completedTime: completedTimeStamp.toUTCString(),
         runDurationMs: runDurationMs,
-        avgResponseTime: 'NA'
+        avgResponseTime: 'NA',
+        totalAssertions: 0,
+        totalPassedAssertions: 0
       }
       const totalResult = generateFinalReport(inputTemplate, runtimeInformation)
+      if (Config.getSystemConfig().HOSTING_ENABLED) {
+        const totalResultCopy = JSON.parse(JSON.stringify(totalResult))
+        totalResultCopy.runtimeInformation.completedTimeISO = completedTimeStamp
+        dbAdapter.upsert('reports', totalResultCopy, { dfspId })
+      }
       notificationEmitter.broadcastOutboundProgress({
         status: 'FINISHED',
-        outboundID: outboundID,
+        outboundID: tracing.outboundID,
         totalResult
-      }, sessionID)
+      }, tracing.sessionID)
+    }
+  } catch (err) {
+    console.log(err)
+    notificationEmitter.broadcastOutboundProgress({
+      status: 'TERMINATED',
+      outboundID: tracing.outboundID
+    }, tracing.sessionID)
+  }
+}
+
+const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
+  const totalCounts = getTotalCounts(inputTemplate)
+
+  const globalConfig = {
+    broadcastOutboundProgressEnabled: false,
+    scriptExecution: true,
+    testsExecution: true,
+    totalProgress: {
+      testCasesTotal: totalCounts.totalTestCases,
+      testCasesProcessed: 0,
+      requestsTotal: totalCounts.totalRequests,
+      requestsProcessed: 0,
+      assertionsTotal: totalCounts.totalAssertions,
+      assertionsProcessed: 0,
+      assertionsPassed: 0,
+      assertionsFailed: 0
+    }
+  }
+  const tracing = getTracing(traceID, dfspId)
+
+  const environmentVariables = { ...inputTemplate.inputValues }
+  try {
+    const totalStartedTimeStamp = new Date()
+    const totalReport = {
+      iterations: []
+    }
+    for (let itn = 0; itn < iterations; itn++) {
+      const startedTimeStamp = new Date()
+      // Deep copy the template
+      const tmpTemplate = JSON.parse(JSON.stringify(inputTemplate))
+      // Execute all the test cases in the template
+      for (const i in tmpTemplate.test_cases) {
+        await processTestCase(tmpTemplate.test_cases[i], traceID, tmpTemplate.inputValues, environmentVariables, dfspId, globalConfig)
+      }
+      const completedTimeStamp = new Date()
+      const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
+      const runtimeInformation = {
+        iterationNumber: itn,
+        completedTimeISO: completedTimeStamp.toISOString(),
+        startedTime: startedTimeStamp.toUTCString(),
+        completedTime: completedTimeStamp.toUTCString(),
+        runDurationMs: runDurationMs,
+        totalAssertions: 0,
+        totalPassedAssertions: 0
+      }
+      // TODO: This can be optimized by storing only results into the iterations array
+      totalReport.iterations.push(generateFinalReport(tmpTemplate, runtimeInformation))
+      notificationEmitter.broadcastOutboundProgress({
+        status: 'ITERATION_PROGRESS',
+        outboundID: tracing.outboundID,
+        iterationStatus: runtimeInformation
+      }, tracing.sessionID)
+    }
+
+    const totalCompletedTimeStamp = new Date()
+    const totalRunDurationMs = totalCompletedTimeStamp.getTime() - totalStartedTimeStamp.getTime()
+    // Send the total result to client
+    if (tracing.outboundID) {
+      notificationEmitter.broadcastOutboundProgress({
+        status: 'ITERATIONS_FINISHED',
+        outboundID: tracing.outboundID,
+        totalRunDurationMs,
+        totalReport
+      }, tracing.sessionID)
     }
   } catch (err) {
     notificationEmitter.broadcastOutboundProgress({
-      status: 'TERMINATED',
-      outboundID: outboundID
-    }, sessionID)
+      status: 'ITERATIONS_TERMINATED',
+      outboundID: tracing.outboundID,
+      errorMessage: err.message
+    }, tracing.sessionID)
   }
 }
 
@@ -94,16 +207,10 @@ const terminateOutbound = (traceID) => {
   terminateTraceIds[traceID] = true
 }
 
-const processTestCase = async (testCase, traceID, inputValues, environmentVariables, dfspId) => {
-  let outboundID = traceID
-  let sessionID = null
-  if (traceID && traceHeaderUtils.isCustomTraceID(traceID)) {
-    outboundID = traceHeaderUtils.getEndToEndID(traceID)
-    sessionID = traceHeaderUtils.getSessionID(traceID)
-  }
+const processTestCase = async (testCase, traceID, inputValues, variableData, dfspId, globalConfig) => {
+  const tracing = getTracing(traceID)
 
   // Load the requests array into an object by the request id to access a particular object faster
-  // console.log(testCase.requests)
   const requestsObj = {}
   // Store the request ids into a new array
   const templateIDArr = []
@@ -115,8 +222,6 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
   templateIDArr.sort((a, b) => {
     return a > b
   })
-  // console.log(requestsObj)
-  // console.log(templateIDArr)
 
   const apiDefinitions = await openApiDefinitionsModel.getApiDefinitions()
   // Iterate the request ID array
@@ -135,38 +240,47 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
       )
     })
 
+    if (request.delay) {
+      await new Promise(resolve => setTimeout(resolve, request.delay))
+    }
+
     let convertedRequest = JSON.parse(JSON.stringify(request))
-    // console.log(request)
+
     // Form the actual http request headers, body, path and method by replacing configurable parameters
     // Replace the parameters
     convertedRequest = replaceVariables(request, inputValues, request, requestsObj)
     convertedRequest = replaceRequestVariables(convertedRequest)
 
-    // console.log(convertedRequest)
     // Form the path from params and operationPath
     convertedRequest.path = replacePathVariables(request.operationPath, convertedRequest.params)
 
     // Insert traceparent header if sessionID passed
-    if (sessionID) {
+    if (tracing.sessionID) {
+      convertedRequest.headers = convertedRequest.headers || {}
       convertedRequest.headers.traceparent = '00-' + traceID + '-0123456789abcdef0-00'
     }
 
     const scriptsExecution = {}
-    let environment
+    let contextObj = null
+    if (globalConfig.scriptExecution) {
+      let context = postmanContext
+      if (convertedRequest.scriptingEngine && convertedRequest.scriptingEngine === 'javascript') {
+        context = javascriptContext
+      }
+      contextObj = await context.generateContextObj(variableData.environment)
+    }
+
     // Send http request
     try {
-      const contextObj = await context.generageContextObj(environmentVariables.items)
-
-      if (request.scripts && request.scripts.preRequest && request.scripts.preRequest.exec.length > 0 && request.scripts.preRequest.exec !== ['']) {
-        scriptsExecution.preRequest = await context.executeAsync(request.scripts.preRequest.exec, { context: { ...contextObj, request: convertedRequest }, id: uuid.v4() }, contextObj)
-        environmentVariables.items = scriptsExecution.preRequest.environment
+      // Extra step to access request variables that consists of environment variables in scripts
+      const tmpRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
+      if (globalConfig.scriptExecution) {
+        await executePreRequestScript(tmpRequest, scriptsExecution, contextObj, variableData)
       }
 
-      environment = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
-      convertedRequest = replaceEnvironmentVariables(convertedRequest, environment)
+      convertedRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
+      convertedRequest = replaceRequestLevelEnvironmentVariables(convertedRequest, contextObj.requestVariables)
 
-      // Form callbacks
-      // TODO: Get version from accept / content-type headers
       let successCallbackUrl = null
       let errorCallbackUrl = null
       if (request.apiVersion.asynchronous === true) {
@@ -179,85 +293,25 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
           errorCallbackUrl = errorCallback.method + ' ' + replaceVariables(errorCallback.pathPattern, null, convertedRequest)
         }
       }
-
-      if (request.delay) {
-        await new Promise(resolve => setTimeout(resolve, request.delay))
-      }
-      const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId)
-
-      if (request.scripts && request.scripts.postRequest && request.scripts.postRequest.exec.length > 0 && request.scripts.postRequest.exec !== ['']) {
-        const response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.data }
-        scriptsExecution.postRequest = await context.executeAsync(request.scripts.postRequest.exec, { context: { ...contextObj, response }, id: uuid.v4() }, contextObj)
-        environmentVariables.items = scriptsExecution.postRequest.environment
-      }
-
-      environment = environmentVariables.items.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
-
-      contextObj.ctx.dispose()
-      contextObj.ctx = null
-
-      const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environment)
-      request.appended = {
-        status: 'SUCCESS',
-        testResult,
-        response: resp.syncResponse,
-        callback: resp.callback,
-        request: convertedRequest,
-        additionalInfo: {
-          curlRequest: resp.curlRequest
-        }
-      }
-      if (outboundID) {
-        notificationEmitter.broadcastOutboundProgress({
-          outboundID: outboundID,
-          testCaseId: testCase.id,
-          status: 'SUCCESS',
-          requestId: request.id,
-          response: resp.syncResponse,
-          callback: resp.callback,
-          requestSent: convertedRequest,
-          additionalInfo: {
-            curlRequest: resp.curlRequest,
-            scriptsExecution: scriptsExecution
-          },
-          testResult
-        }, sessionID)
+      if (contextObj.requestVariables && contextObj.requestVariables.SKIP_REQUEST) {
+        await setSkippedResponse(convertedRequest, request, 'SKIPPED', tracing, testCase, scriptsExecution, globalConfig)
+      } else {
+        const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId, contextObj)
+        await setResponse(convertedRequest, resp, variableData, request, 'SUCCESS', tracing, testCase, scriptsExecution, contextObj, globalConfig)
       }
     } catch (err) {
       let resp
       try {
         resp = JSON.parse(err.message)
-      } catch (err) {
+      } catch (parsingErr) {
         resp = err.message
       }
-      const testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, environment)
-      request.appended = {
-        status: 'ERROR',
-        testResult,
-        response: resp.syncResponse,
-        callback: resp.callback,
-        request: convertedRequest,
-        additionalInfo: {
-          curlRequest: resp.curlRequest
-        }
+      await setResponse(convertedRequest, resp, variableData, request, 'ERROR', tracing, testCase, scriptsExecution, contextObj, globalConfig)
+    } finally {
+      if (contextObj) {
+        contextObj.ctx.dispose()
+        contextObj.ctx = null
       }
-      if (outboundID) {
-        notificationEmitter.broadcastOutboundProgress({
-          outboundID: outboundID,
-          testCaseId: testCase.id,
-          status: 'ERROR',
-          requestId: request.id,
-          response: resp.syncResponse,
-          callback: resp.callback,
-          requestSent: convertedRequest,
-          additionalInfo: {
-            curlRequest: resp.curlRequest,
-            scriptsExecution: scriptsExecution
-          },
-          testResult
-        }, sessionID)
-      }
-      // break
     }
   }
 
@@ -266,21 +320,181 @@ const processTestCase = async (testCase, traceID, inputValues, environmentVariab
   // Set a timeout if the response callback is not received in a particular time
 }
 
-const handleTests = async (request, response = null, callback = null, environment = []) => {
+const setResponse = async (convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig) => {
+  // Get the requestsHistory and callbacksHistory from the arrayStore
+  const requestsHistoryObj = arrayStore.get('requestsHistory')
+  const callbacksHistoryObj = arrayStore.get('callbacksHistory')
+  const backgroundData = {
+    requestsHistory: requestsHistoryObj,
+    callbacksHistory: callbacksHistoryObj
+  }
+
+  if (globalConfig.scriptExecution) {
+    await executePostRequestScript(convertedRequest, resp, scriptsExecution, contextObj, variableData, backgroundData)
+  }
+
+  let testResult = null
+  console.log('GVK', resp)
+  if (globalConfig.testsExecution) {
+    testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
+  }
+  request.appended = {
+    status: status,
+    testResult,
+    response: resp.syncResponse,
+    callback: resp.callback,
+    request: convertedRequest,
+    additionalInfo: {
+      curlRequest: resp.curlRequest
+    }
+  }
+
+  // Update total progress counts
+  globalConfig.totalProgress.requestsProcessed++
+  globalConfig.totalProgress.assertionsProcessed += request.tests && request.tests.assertions ? request.tests.assertions.length : 0
+  globalConfig.totalProgress.assertionsPassed += testResult.passedCount
+  globalConfig.totalProgress.assertionsFailed += request.tests && request.tests.assertions ? (request.tests.assertions.length - testResult.passedCount) : 0
+
+  if (tracing.outboundID && globalConfig.broadcastOutboundProgressEnabled) {
+    notificationEmitter.broadcastOutboundProgress({
+      outboundID: tracing.outboundID,
+      testCaseId: testCase.id,
+      testCaseName: testCase.name,
+      status: status,
+      requestId: request.id,
+      response: resp.syncResponse,
+      callback: resp.callback,
+      requestSent: convertedRequest,
+      additionalInfo: {
+        curlRequest: resp.curlRequest,
+        scriptsExecution: scriptsExecution
+      },
+      testResult,
+      totalProgress: globalConfig.totalProgress
+    }, tracing.sessionID)
+  }
+}
+
+const setSkippedResponse = async (convertedRequest, request, status, tracing, testCase, scriptsExecution, globalConfig) => {
+  let testResult = null
+  if (globalConfig.testsExecution) {
+    testResult = await setAllTestsSkipped(convertedRequest)
+  }
+  request.appended = {
+    status: status,
+    testResult,
+    response: null,
+    callback: null,
+    request: convertedRequest,
+    additionalInfo: {
+      curlRequest: null
+    }
+  }
+
+  // Update total progress counts
+  globalConfig.totalProgress.requestsProcessed++
+  globalConfig.totalProgress.assertionsProcessed += request.tests && request.tests.assertions && request.tests.assertions.length
+  globalConfig.totalProgress.assertionsPassed += testResult.passedCount
+  // globalConfig.totalProgress.assertionsFailed += 0
+
+  if (tracing.outboundID && globalConfig.broadcastOutboundProgressEnabled) {
+    notificationEmitter.broadcastOutboundProgress({
+      outboundID: tracing.outboundID,
+      testCaseId: testCase.id,
+      testCaseName: testCase.name,
+      status: status,
+      requestId: request.id,
+      response: null,
+      callback: null,
+      requestSent: convertedRequest,
+      additionalInfo: {
+        curlRequest: null,
+        scriptsExecution: scriptsExecution
+      },
+      testResult,
+      totalProgress: globalConfig.totalProgress
+    }, tracing.sessionID)
+  }
+}
+
+const executePreRequestScript = async (convertedRequest, scriptsExecution, contextObj, variableData) => {
+  if (convertedRequest.scripts && convertedRequest.scripts.preRequest && convertedRequest.scripts.preRequest.exec.length > 0 && convertedRequest.scripts.preRequest.exec !== ['']) {
+    let context = postmanContext
+    if (convertedRequest.scriptingEngine && convertedRequest.scriptingEngine === 'javascript') {
+      context = javascriptContext
+    }
+    const requestToPass = {
+      url: convertedRequest.url,
+      method: convertedRequest.method,
+      path: convertedRequest.path,
+      queryParams: convertedRequest.queryParams,
+      headers: convertedRequest.headers,
+      body: convertedRequest.body
+    }
+    scriptsExecution.preRequest = await context.executeAsync(convertedRequest.scripts.preRequest.exec, { context: { request: requestToPass }, id: uuid.v4() }, contextObj)
+    variableData.environment = scriptsExecution.preRequest.environment
+  }
+}
+
+const executePostRequestScript = async (convertedRequest, resp, scriptsExecution, contextObj, variableData, backgroundData) => {
+  if (convertedRequest.scripts && convertedRequest.scripts.postRequest && convertedRequest.scripts.postRequest.exec.length > 0 && convertedRequest.scripts.postRequest.exec !== ['']) {
+    let response
+    if (_.isString(resp)) {
+      response = resp
+    } else if (resp.syncResponse) {
+      response = { code: resp.syncResponse.status, status: resp.syncResponse.statusText, body: resp.syncResponse.body || resp.syncResponse.data }
+    }
+
+    let callback
+    if (resp.callback) {
+      callback = resp.callback
+    }
+
+    // Pass the requestsHistory and callbacksHistory to postman sandbox
+    const collectionVariables = []
+    collectionVariables.push(
+      {
+        type: 'any',
+        key: 'requestsHistory',
+        value: JSON.stringify(backgroundData.requestsHistory)
+      },
+      {
+        type: 'any',
+        key: 'callbacksHistory',
+        value: JSON.stringify(backgroundData.callbacksHistory)
+      }
+    )
+    let context = postmanContext
+    if (convertedRequest.scriptingEngine && convertedRequest.scriptingEngine === 'javascript') {
+      context = javascriptContext
+    }
+    scriptsExecution.postRequest = await context.executeAsync(convertedRequest.scripts.postRequest.exec, { context: { response, callback, collectionVariables }, id: uuid.v4() }, contextObj)
+    variableData.environment = scriptsExecution.postRequest.environment
+  }
+}
+
+const handleTests = async (request, response = null, callback = null, environment = {}, backgroundData = {}, requestVariables = {}) => {
   try {
     const results = {}
     let passedCount = 0
     if (request.tests && request.tests.assertions.length > 0) {
       for (const k in request.tests.assertions) {
         const testCase = request.tests.assertions[k]
-        // console.log(testCase.description, response)
         try {
-          eval(testCase.exec.join('\n')) // eslint-disable-line
+          let status = 'SKIPPED'
+          const expect = (args) => { // eslint-disable-line
+            status = 'SUCCESS'
+            return expectOriginal(args)
+          }
+          const testsString = testCase.exec.join('\n')
+
+          eval(testsString) // eslint-disable-line
           results[testCase.id] = {
-            status: 'SUCCESS'
+            status
           }
           passedCount++
         } catch (err) {
+          console.log(err)
           results[testCase.id] = {
             status: 'FAILED',
             message: err.message
@@ -290,8 +504,24 @@ const handleTests = async (request, response = null, callback = null, environmen
     }
     return { results, passedCount }
   } catch (err) {
+    console.log(err)
     return null
   }
+}
+
+const setAllTestsSkipped = async (request) => {
+  const results = {}
+  let passedCount = 0
+  if (request.tests && request.tests.assertions.length > 0) {
+    for (const k in request.tests.assertions) {
+      const testCase = request.tests.assertions[k]
+      results[testCase.id] = {
+        status: 'SKIPPED'
+      }
+      passedCount++
+    }
+  }
+  return { results, passedCount }
 }
 
 const getUrlPrefix = (baseUrl) => {
@@ -305,37 +535,54 @@ const getUrlPrefix = (baseUrl) => {
   return returnUrl
 }
 
-const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId) => {
+const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId, contextObj = {}) => {
   return new Promise((resolve, reject) => {
     (async () => {
-      const httpsProps = {}
-      let urlGenerated = Config.getUserConfig().CALLBACK_ENDPOINT + path
-      if (Config.getSystemConfig().HOSTING_ENABLED) {
-        const endpointsConfig = await ConnectionProvider.getEndpointsConfig()
-        if (endpointsConfig.dfspEndpoints && dfspId && endpointsConfig.dfspEndpoints[dfspId]) {
-          urlGenerated = endpointsConfig.dfspEndpoints[dfspId] + path
-        } else {
-          customLogger.logMessage('warning', 'Hosting is enabled, But there is no endpoint configuration found for DFSP ID: ' + dfspId, null, true, null)
-        }
-      }
+      const httpAgentProps = {}
+      const user = dfspId ? { dfspId } : undefined
+      const userConfig = await Config.getUserConfig(user)
+      const uniqueId = UniqueIdGenerator.generateUniqueId()
+      let urlGenerated = userConfig.CALLBACK_ENDPOINT + path
       if (baseUrl) {
         urlGenerated = getUrlPrefix(baseUrl) + path
       }
-      if (Config.getUserConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
+      if (Config.getSystemConfig().OUTBOUND_MUTUAL_TLS_ENABLED) {
         const tlsConfig = await ConnectionProvider.getTlsConfig()
         if (!tlsConfig.dfsps[dfspId]) {
           const errorMsg = 'Outbound TLS is enabled, but there is no TLS config found for DFSP ID: ' + dfspId
-          customLogger.logMessage('error', errorMsg, null, true, null)
+          customLogger.logMessage('error', errorMsg, { user })
           reject(new Error(JSON.stringify({ errorCode: 4000, errorDescription: errorMsg })))
         }
-        const httpsAgent = new https.Agent({
+        httpAgentProps.httpsAgent = new https.Agent({
           cert: tlsConfig.dfsps[dfspId].hubClientCert,
           key: tlsConfig.hubClientKey,
           ca: [tlsConfig.dfsps[dfspId].dfspServerCaRootCert],
           rejectUnauthorized: true
         })
-        httpsProps.httpsAgent = httpsAgent
         urlGenerated = urlGenerated.replace('http:', 'https:')
+      } else if (userConfig.CLIENT_MUTUAL_TLS_ENABLED) {
+        const urlObject = new URL(urlGenerated)
+        const cred = userConfig.CLIENT_TLS_CREDS.filter(item => item.HOST === urlObject.host)
+        if (Array.isArray(cred) && cred.length === 1) {
+          customLogger.logMessage('info', `Found the Client certificate for ${urlObject.host}`, { notification: false })
+          httpAgentProps.httpsAgent = httpAgentStore.getHttpsAgent(urlObject.host, {
+            cert: cred[0].CERT,
+            key: cred[0].KEY,
+            rejectUnauthorized: false
+          })
+          urlGenerated = urlGenerated.replace('http:', 'https:')
+        } else {
+          const errorMsg = `client mutual TLS is enabled, but there is no TLS config found for ${urlObject.host}`
+          customLogger.logMessage('error', errorMsg, { notification: false })
+        }
+      } else {
+        if (urlGenerated.startsWith('https:')) {
+          httpAgentProps.httpsAgent = httpAgentStore.getHttpsAgent('generic', {
+            rejectUnauthorized: false
+          })
+        } else {
+          httpAgentProps.httpAgent = httpAgentStore.getHttpAgent('generic')
+        }
       }
 
       const reqOpts = {
@@ -345,67 +592,104 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         params: queryParams,
         headers: headers,
         data: body,
-        timeout: 3000,
+        timeout: (contextObj.requestVariables && contextObj.requestVariables.REQUEST_TIMEOUT) || userConfig.DEFAULT_REQUEST_TIMEOUT,
         validateStatus: function (status) {
           return status < 900 // Reject only if the status code is greater than or equal to 900
         },
-        ...httpsProps
+        ...httpAgentProps
       }
-      try {
-        await JwsSigning.sign(reqOpts)
-      } catch (err) {
-        console.log(err)
+
+      if (contextObj.requestVariables && contextObj.requestVariables.TTK_JWS_SIGN_KEY) {
+        try {
+          await JwsSigning.signWithKey(reqOpts, contextObj.requestVariables.TTK_JWS_SIGN_KEY)
+        } catch (err) {
+          customLogger.logMessage('error', err.message, { additionalData: err })
+        }
+      } else {
+        try {
+          await JwsSigning.sign(reqOpts)
+          customLogger.logOutboundRequest('info', 'JWS signed', { uniqueId, request: reqOpts })
+        } catch (err) {
+          customLogger.logMessage('error', err.message, { additionalData: err })
+        }
       }
+
+      let syncResponse = {}
+      let curlRequest = ''
+      let timer = null
+      if (successCallbackUrl && errorCallbackUrl && (ignoreCallbacks !== true)) {
+        timer = setTimeout(() => {
+          MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
+          MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
+          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
+        }, userConfig.CALLBACK_TIMEOUT)
+        // Listen for success callback
+        MyEventEmitter.getEmitter('testOutbound', user).once(successCallbackUrl, (callbackHeaders, callbackBody) => {
+          clearTimeout(timer)
+          MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
+          customLogger.logMessage('info', 'Received success callback ' + successCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
+          resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
+        })
+        // Listen for error callback
+        MyEventEmitter.getEmitter('testOutbound', user).once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
+          clearTimeout(timer)
+          MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
+          customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
+          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
+        })
+      }
+
+      customLogger.logOutboundRequest('info', 'Sending request ' + reqOpts.method + ' ' + reqOpts.url, { additionalData: { request: reqOpts }, user, uniqueId, request: reqOpts })
+
       axios(reqOpts).then((result) => {
-        const syncResponse = {
+        syncResponse = {
           status: result.status,
           statusText: result.statusText,
-          data: result.data
+          body: result.data,
+          headers: result.headers
         }
-        const curlRequest = result.request ? result.request.toCurl() : ''
+        curlRequest = result.request ? result.request.toCurl() : ''
 
         if (result.status > 299) {
+          customLogger.logOutboundRequest('error', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: { response: result }, user, uniqueId, request: reqOpts })
+          if (timer) {
+            clearTimeout(timer)
+            MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
+            MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
+          }
           reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
+        } else {
+          customLogger.logOutboundRequest('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: { response: result }, user, uniqueId, request: reqOpts })
         }
 
-        customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, result.data, false)
-        if (successCallbackUrl && errorCallbackUrl && (ignoreCallbacks !== true)) {
-          const timer = setTimeout(() => {
-            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
-            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
-            reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
-          }, Config.getUserConfig().CALLBACK_TIMEOUT)
-          // Listen for success callback
-          MyEventEmitter.getEmitter('testOutbound').once(successCallbackUrl, (callbackHeaders, callbackBody) => {
-            clearTimeout(timer)
-            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(errorCallbackUrl)
-            resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { headers: callbackHeaders, body: callbackBody } })
-          })
-          // Listen for error callback
-          MyEventEmitter.getEmitter('testOutbound').once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
-            clearTimeout(timer)
-            MyEventEmitter.getEmitter('testOutbound').removeAllListeners(successCallbackUrl)
-            reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { body: callbackBody } })))
-          })
-        } else {
+        if (!successCallbackUrl || !errorCallbackUrl || ignoreCallbacks) {
           resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
         }
+        customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user })
       }, (err) => {
-        customLogger.logMessage('info', 'Failed to send request ' + method + ' Error: ' + err.message, err, false)
-        reject(new Error(JSON.stringify({ errorCode: 4000 })))
+        syncResponse = {
+          status: 500,
+          statusText: err.message
+        }
+        customLogger.logOutboundRequest('error', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: { errorStack: err.stack }, user, uniqueId, request: reqOpts })
+        customLogger.logMessage('error', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: { errorStack: err.stack }, notification: false, user })
+        reject(new Error(JSON.stringify({ errorCode: 4000, syncResponse })))
       })
     })()
   })
 }
 
-const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
-  var resultObject
-  // Check whether inputObject is string or object. If it is object, then convert that to JSON string and parse it while return
+const setResultObject = (inputObject) => {
   if (typeof inputObject === 'string') {
-    resultObject = inputObject
+    return inputObject
   } else if (typeof inputObject === 'object') {
-    resultObject = JSON.stringify(inputObject)
-  } else {
+    return JSON.stringify(inputObject)
+  }
+}
+
+const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
+  let resultObject = setResultObject(inputObject)
+  if (!resultObject) {
     return inputObject
   }
   // Check the string for any inclusions like {$some_param}
@@ -415,121 +699,83 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
       // Check for the function type of param, if its function we need to call a function in custom-functions and replace the returned value
       const splitArr = element.split('.')
       switch (splitArr[0]) {
-        case '{$function':
+        case '{$function': {
           resultObject = resultObject.replace(element, getFunctionResult(element, inputValues, request))
           break
-        case '{$prev':
-          var temp1 = element.replace(/{\$prev.(.*)}/, '$1')
-          var temp1Arr = temp1.split('.')
+        }
+        case '{$prev': {
+          const temp = element.replace(/{\$prev.(.*)}/, '$1')
+          const tempArr = temp.split('.')
           try {
-            var replacedValue = _.get(requestsObj[temp1Arr[0]].appended, temp1.replace(temp1Arr[0] + '.', ''))
+            const replacedValue = _.get(requestsObj[tempArr[0]].appended, temp.replace(tempArr[0] + '.', ''))
             if (replacedValue) {
               resultObject = resultObject.replace(element, replacedValue)
             }
           } catch (err) {
-            console.log(`${element} not found`)
+            customLogger.logMessage('error', `${element} not found`, { notification: false })
           }
           break
-        case '{$request':
-          var temp2 = element.replace(/{\$request.(.*)}/, '$1')
-          var replacedValue2 = _.get(request, temp2)
-          if (replacedValue2 && !replacedValue2.startsWith('{$')) {
-            resultObject = resultObject.replace(element, replacedValue2)
+        }
+        case '{$request': {
+          const temp = element.replace(/{\$request.(.*)}/, '$1')
+          const replacedValue = _.get(request, temp)
+          if (replacedValue && !replacedValue.startsWith('{$')) {
+            resultObject = resultObject.replace(element, replacedValue)
           }
           break
-        case '{$inputs':
-          var temp = element.replace(/{\$inputs.(.*)}/, '$1')
+        }
+        case '{$inputs': {
+          const temp = element.replace(/{\$inputs.(.*)}/, '$1')
           if (inputValues[temp]) {
             resultObject = resultObject.replace(element, inputValues[temp])
           }
           break
+        }
         default:
           break
       }
     })
   }
 
-  if (typeof inputObject === 'object') {
-    return JSON.parse(resultObject)
-  } else {
-    return resultObject
-  }
+  return (typeof inputObject === 'object') ? JSON.parse(resultObject) : resultObject
 }
 
 const replaceRequestVariables = (inputRequest) => {
-  var resultObject
-  // Check whether inputRequest is string or object. If it is object, then convert that to JSON string and parse it while return
-  if (typeof inputRequest === 'string') {
-    resultObject = inputRequest
-  } else if (typeof inputRequest === 'object') {
-    resultObject = JSON.stringify(inputRequest)
-  } else {
-    return inputRequest
-  }
-
-  // Check once again for the replaced request variables
-  const matchedArray2 = resultObject.match(/{\$([^}]+)}/g)
-  if (matchedArray2) {
-    matchedArray2.forEach(element => {
-      // Check for the function type of param, if its function we need to call a function in custom-functions and replace the returned value
-      const splitArr = element.split('.')
-      switch (splitArr[0]) {
-        case '{$request':
-          var temp2 = element.replace(/{\$request.(.*)}/, '$1')
-          var replacedValue2 = _.get(inputRequest, temp2)
-          if (replacedValue2) {
-            resultObject = resultObject.replace(element, replacedValue2)
-          }
-          break
-        default:
-          break
-      }
-    })
-  }
-
-  if (typeof inputRequest === 'object') {
-    return JSON.parse(resultObject)
-  } else {
-    return resultObject
-  }
+  return _replaceGenericVariables(inputRequest, inputRequest, 'request')
 }
 
 const replaceEnvironmentVariables = (inputRequest, environment) => {
-  var resultObject
-  // Check whether inputRequest is string or object. If it is object, then convert that to JSON string and parse it while return
-  if (typeof inputRequest === 'string') {
-    resultObject = inputRequest
-  } else if (typeof inputRequest === 'object') {
-    resultObject = JSON.stringify(inputRequest)
-  } else {
+  return _replaceGenericVariables(inputRequest, environment, 'environment')
+}
+
+const replaceRequestLevelEnvironmentVariables = (inputRequest, requestVariables) => {
+  return _replaceGenericVariables(inputRequest, requestVariables, 'requestVariables')
+}
+
+const _replaceGenericVariables = (inputRequest, replaceObject, variablePrefix) => {
+  let resultObject = setResultObject(inputRequest)
+  if (!resultObject) {
     return inputRequest
   }
 
   // Check once again for the replaced request variables
-  const matchedArray2 = resultObject.match(/{\$([^}]+)}/g)
-  if (matchedArray2) {
-    matchedArray2.forEach(element => {
+  const matchedArray = resultObject.match(/{\$([^}]+)}/g)
+  if (matchedArray) {
+    matchedArray.forEach(element => {
       // Check for the function type of param, if its function we need to call a function in custom-functions and replace the returned value
       const splitArr = element.split('.')
-      switch (splitArr[0]) {
-        case '{$environment':
-          var temp2 = element.replace(/{\$environment.(.*)}/, '$1')
-          var replacedValue2 = _.get(environment, temp2)
-          if (replacedValue2) {
-            resultObject = resultObject.replace(element, replacedValue2)
-          }
-          break
-        default:
-          break
+      if (splitArr[0] === '{$' + variablePrefix) {
+        const regExp1 = new RegExp('{\\$' + variablePrefix + '.(.*)}')
+        const temp2 = element.replace(regExp1, '$1')
+        const replacedValue2 = _.get(replaceObject, temp2)
+        if (replacedValue2 !== undefined) {
+          resultObject = resultObject.replace(element, replacedValue2)
+        }
       }
     })
   }
 
-  if (typeof inputRequest === 'object') {
-    return JSON.parse(resultObject)
-  } else {
-    return resultObject
-  }
+  return (typeof inputRequest === 'object') ? JSON.parse(resultObject) : resultObject
 }
 
 const replacePathVariables = (operationPath, params) => {
@@ -539,7 +785,7 @@ const replacePathVariables = (operationPath, params) => {
   const matchedArray = resultObject.match(/{([^}]+)}/g)
   if (matchedArray) {
     matchedArray.forEach(element => {
-      var temp = element.replace(/{([^}]+)}/, '$1')
+      const temp = element.replace(/{([^}]+)}/, '$1')
       if (params && params[temp]) {
         resultObject = resultObject.replace(element, params[temp])
       }
@@ -552,6 +798,25 @@ const replacePathVariables = (operationPath, params) => {
 // Execute the function and return the result
 const getFunctionResult = (param, inputValues, request) => {
   return utilsInternal.getFunctionResult(param, inputValues, request)
+}
+
+// Get Total Counts
+const getTotalCounts = (inputTemplate) => {
+  const result = {
+    totalTestCases: 0,
+    totalRequests: 0,
+    totalAssertions: 0
+  }
+  const { test_cases } = inputTemplate  // eslint-disable-line
+  result.totalTestCases = test_cases.length
+  test_cases.forEach(testCase => {
+    const { requests } = testCase
+    result.totalRequests += requests.length
+    requests.forEach(request => {
+      result.totalAssertions += request.tests && request.tests.assertions && request.tests.assertions.length
+    })
+  })
+  return result
 }
 
 // Generate consolidated final report
@@ -569,6 +834,8 @@ const generateFinalReport = (inputTemplate, runtimeInformation) => {
           }
         })
         request.tests.passedAssertionsCount = testResult.passedCount
+        runtimeInformation.totalAssertions += request.tests.assertions.length
+        runtimeInformation.totalPassedAssertions += request.tests.passedAssertionsCount
       }
       return {
         request,
@@ -589,12 +856,14 @@ const generateFinalReport = (inputTemplate, runtimeInformation) => {
 
 module.exports = {
   OutboundSend,
+  OutboundSendLoop,
   terminateOutbound,
   handleTests,
   sendRequest,
   replaceVariables,
   replaceRequestVariables,
   replaceEnvironmentVariables,
+  replaceRequestLevelEnvironmentVariables,
   replacePathVariables,
   getFunctionResult,
   generateFinalReport

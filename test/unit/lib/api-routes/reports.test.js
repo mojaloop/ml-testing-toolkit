@@ -23,21 +23,22 @@
  --------------
  ******/
 
+const Config = require('../../../../src/lib/config')
+jest.mock('../../../../src/lib/config')
+Config.getSystemConfig.mockReturnValue({
+  OAUTH: {
+    AUTH_ENABLED: false
+  }
+})
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
-const fs = require('fs')
-const jsreportCore = require('jsreport-core')
+const reportGenerator = require('../../../../src/lib/report-generator/generator')
+const requestLogger = require('../../../../src/lib/requestLogger')
 
 const app = apiServer.getApp()
-const axios = require('axios').default
 
-jest.mock('axios')
-axios.mockImplementation(() => Promise.resolve(true))
-
-jest.mock('fs')
-jest.mock('jsreport-core')
-
-fs.readFile.mockImplementation((_, callback) => callback(null, Buffer.from('Sample')))
+jest.mock('../../../../src/lib/report-generator/generator')
+jest.mock('../../../../src/lib/requestLogger')
 
 const properJsonReport = {
   name: 'dfsp-p2p-tests',
@@ -219,49 +220,62 @@ const properJsonReport = {
 }
 
 describe('API route /api/reports', () => {
+  beforeAll(() => {
+    jest.resetAllMocks()
+    requestLogger.logMessage.mockReturnValue()
+  })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
   describe('POST /api/reports/testcase/:format', () => {
     it('Send a proper html request', async () => {
-      jsreportCore.mockImplementationOnce( () => {
-        return {
-          init: jest.fn(),
-          render: () => Promise.resolve({ content: 'asdf'})
-        }
+      reportGenerator.generateReport.mockImplementationOnce( () => {
+        return Promise.resolve('asdf')
       })
       const res = await request(app).post(`/api/reports/testcase/html`).send(properJsonReport)
       expect(res.statusCode).toEqual(200)
       expect(res.text).toEqual('asdf')
     })
     it('Send a proper pdf request', async () => {
-      jsreportCore.mockImplementationOnce( () => {
-        return {
-          init: jest.fn(),
-          render: () => Promise.resolve({ content: 'asdf'})
-        }
+      reportGenerator.generateReport.mockImplementationOnce( () => {
+        return Promise.resolve('asdf')
       })
       const res = await request(app).post(`/api/reports/testcase/pdf`).send(properJsonReport)
       expect(res.statusCode).toEqual(200)
       expect(res.text).toEqual('asdf')
     })
     it('Send a proper printhtml request', async () => {
-      jsreportCore.mockImplementationOnce( () => {
-        return {
-          init: jest.fn(),
-          render: () => Promise.resolve({ content: 'asdf'})
-        }
+      reportGenerator.generateReport.mockImplementationOnce( () => {
+        return Promise.resolve('asdf')
       })
       const res = await request(app).post(`/api/reports/testcase/printhtml`).send(properJsonReport)
       expect(res.statusCode).toEqual(200)
       expect(res.text).toEqual('asdf')
     })
     it('Send a bad request html request', async () => {
-      jsreportCore.mockImplementationOnce( () => {
-        return {
-          init: jest.fn(),
-          render: () => Promise.reject({ content: 'asdf'})
-        }
+      reportGenerator.generateReport.mockImplementationOnce( () => {
+        return Promise.reject('asdf')
       })
       const {runtimeInformation, ...data} = properJsonReport
       const res = await request(app).post(`/api/reports/testcase/printhtml`).send(data)
+      expect(res.statusCode).toEqual(500)
+    })
+  })
+
+  describe('POST /api/reports/testcase_definition/:format', () => {
+    it('Send a proper html request', async () => {
+      reportGenerator.generateTestcaseDefinition.mockImplementationOnce( () => {
+        return Promise.resolve('asdf')
+      })
+      const res = await request(app).post(`/api/reports/testcase_definition/html`).send({})
+      expect(res.statusCode).toEqual(200)
+      expect(res.text).toEqual('asdf')
+    })
+    it('Send a bad request html request', async () => {
+      reportGenerator.generateTestcaseDefinition.mockImplementationOnce( () => {
+        return Promise.reject('asdf')
+      })
+      const res = await request(app).post(`/api/reports/testcase_definition/html`).send({})
       expect(res.statusCode).toEqual(500)
     })
   })

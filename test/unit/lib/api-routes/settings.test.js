@@ -22,30 +22,40 @@
  --------------
  ******/
 
+const Config = require('../../../../src/lib/config')
+jest.mock('../../../../src/lib/config')
+Config.getSystemConfig.mockReturnValue({
+  OAUTH: {
+    AUTH_ENABLED: false
+  }
+})
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
-const app = apiServer.getApp()
 const Server = require('../../../../src/server')
 const ImportExport = require('../../../../src/lib/importExport')
-const Config = require('../../../../src/lib/config')
 const RulesEngineModel = require('../../../../src/lib/rulesEngineModel')
+const requestLogger = require('../../../../src/lib/requestLogger')
+const app = apiServer.getApp()
 
-const SpyServer = jest.spyOn(Server, 'restartServer')
-const SpyImportSpecFiles = jest.spyOn(ImportExport, 'importSpecFiles')
-const SpyExportSpecFiles = jest.spyOn(ImportExport, 'exportSpecFiles')
-const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
-const SpyGetStoredUserConfig = jest.spyOn(Config, 'getStoredUserConfig')
-const SpyLoadUserConfig = jest.spyOn(Config, 'loadUserConfig')
-const SpyReloadResponseRules = jest.spyOn(RulesEngineModel, 'reloadResponseRules')
-const SpyReloadCallbackRules = jest.spyOn(RulesEngineModel, 'reloadCallbackRules')
-const SpyReloadValidationRules = jest.spyOn(RulesEngineModel, 'reloadValidationRules')
+jest.mock('../../../../src/server')
+jest.mock('../../../../src/lib/requestLogger')
+jest.mock('../../../../src/lib/config')
+jest.mock('../../../../src/lib/importExport')
+jest.mock('../../../../src/lib/rulesEngineModel')
 
 describe('API route /api/settings', () => {
+  beforeAll(() => {
+    jest.resetAllMocks()
+    requestLogger.logMessage.mockReturnValue()
+  })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
   describe('import', () => {
     describe('GET /api/settings/export', () => {
       it('Send a proper request', async () => {
         const options = ['rules_response','rules_callback']
-        SpyExportSpecFiles.mockResolvedValueOnce()
+        ImportExport.exportSpecFiles.mockResolvedValueOnce()
         const exportResponse = await request(app)
           .get(`/api/settings/export`)
           .query({options})
@@ -53,7 +63,6 @@ describe('API route /api/settings', () => {
         expect(exportResponse.statusCode).toEqual(200)
       })
       it('Send a bad request - no options', async () => {
-        SpyExportSpecFiles.mockResolvedValueOnce()
         const exportResponse = await request(app)
           .get(`/api/settings/export`)
           .send()
@@ -61,7 +70,7 @@ describe('API route /api/settings', () => {
       })
       it('Send a bad request - export spec files fails', async () => {
         const options = ['rules_response','rules_callback']
-        SpyExportSpecFiles.mockRejectedValueOnce()
+        ImportExport.exportSpecFiles.mockRejectedValueOnce()
         const exportResponse = await request(app)
           .get(`/api/settings/export`)
           .query({options})
@@ -71,15 +80,14 @@ describe('API route /api/settings', () => {
     })
     describe('POST /api/settings/import', () => {
       it('Send a proper request with INBOUND_MUTUAL_TLS_ENABLED: false', async () => {
-        SpyReloadResponseRules.mockResolvedValueOnce()
-        SpyReloadCallbackRules.mockResolvedValueOnce()
-        SpyReloadValidationRules.mockResolvedValueOnce()
-        SpyGetUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
-        SpyGetStoredUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: false})
-        SpyLoadUserConfig.mockResolvedValueOnce()
-        SpyServer.mockResolvedValueOnce()
+        RulesEngineModel.reloadResponseRules.mockResolvedValueOnce()
+        RulesEngineModel.reloadCallbackRules.mockResolvedValueOnce()
+        RulesEngineModel.reloadValidationRules.mockResolvedValueOnce()
+        Config.getUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
+        Config.getStoredUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: false})
+        Server.restartServer.mockResolvedValueOnce()
         const options = ['rules_response','rules_callback','rules_validation','user_config.json']
-        SpyImportSpecFiles.mockResolvedValueOnce()
+        ImportExport.importSpecFiles.mockResolvedValueOnce()
         const res = await request(app)
           .post(`/api/settings/import`)
           .query({options})
@@ -87,14 +95,13 @@ describe('API route /api/settings', () => {
         expect(res.statusCode).toEqual(200)
       })
       it('Send a proper request with INBOUND_MUTUAL_TLS_ENABLED: true', async () => {
-        SpyReloadResponseRules.mockResolvedValueOnce()
-        SpyReloadCallbackRules.mockResolvedValueOnce()
-        SpyReloadValidationRules.mockResolvedValueOnce()
-        SpyGetUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
-        SpyGetStoredUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
-        SpyLoadUserConfig.mockResolvedValueOnce()
+        RulesEngineModel.reloadResponseRules.mockResolvedValueOnce()
+        RulesEngineModel.reloadCallbackRules.mockResolvedValueOnce()
+        RulesEngineModel.reloadValidationRules.mockResolvedValueOnce()
+        Config.getUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
+        Config.getStoredUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
         const options = ['rules_response','rules_callback','rules_validation','user_config.json']
-        SpyImportSpecFiles.mockResolvedValueOnce()
+        ImportExport.importSpecFiles.mockResolvedValueOnce()
         const res = await request(app)
           .post(`/api/settings/import`)
           .query({options})
@@ -103,7 +110,7 @@ describe('API route /api/settings', () => {
       })
       it('Send a bad request - import spec files fails', async () => {
         const options = ['rules_response','rules_callback','rules_validation','user_config.json']
-        SpyImportSpecFiles.mockRejectedValueOnce({message: ''})
+        ImportExport.importSpecFiles.mockRejectedValueOnce({message: ''})
         const res = await request(app)
           .post(`/api/settings/import`)
           .query({options})

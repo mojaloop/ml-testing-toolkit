@@ -1,0 +1,22 @@
+[
+  {
+    "id": "party.personalInfo.dateOfBirth",
+    "pattern": "^(19)\\d\\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|2[0-8])$"
+  },
+  { 
+    "id": "party.name",
+    "pattern": "Vijay Kumar Guthi"
+  },
+  { 
+    "id": "party.personalInfo.complexName.firstName",
+    "pattern": "Vijay"
+  },
+  { 
+    "id": "party.personalInfo.complexName.lastName",
+    "pattern": "Kumar"
+  },
+  { 
+    "id": "party.personalInfo.complexName.middleName",
+    "pattern": "Guthi"
+  }
+]

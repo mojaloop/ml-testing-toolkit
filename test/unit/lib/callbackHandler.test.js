@@ -25,26 +25,33 @@
 const Config = require('../../../src/lib/config')
 const callbackHandler = require('../../../src/lib/callbackHandler')
 const JwsSigning = require('../../../src/lib/jws/JwsSigning')
-const AssertionStore = require('../../../src/lib/assertionStore')
+const ObjectStore = require('../../../src/lib/objectStore')
+const ArrayStore = require('../../../src/lib/arrayStore')
 const RequestLogger = require('../../../src/lib/requestLogger')
 const MyEventEmitter = require('../../../src/lib/MyEventEmitter')
 const axios = require('axios').default
 const https = require('https')
 const ConnectionProvider = require('../../../src/lib/configuration-providers/mb-connection-manager')
-const OpenApiMockHandler = require('../../../src/lib/mocking/openApiMockHandler')
 
-const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
-const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 const SpySign = jest.spyOn(JwsSigning, 'sign')
-const SpyPushCallback = jest.spyOn(AssertionStore, 'pushCallback')
+const SpyPush = jest.spyOn(ObjectStore, 'push')
+const SpyArrayPush = jest.spyOn(ArrayStore, 'push')
 const SpyRequestLogger = jest.spyOn(RequestLogger, 'logMessage')
 const SpyMyEventEmitter = jest.spyOn(MyEventEmitter, 'getEmitter')
 const SpyAgent = jest.spyOn(https, 'Agent')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
 const SpyEndpointsConfig = jest.spyOn(ConnectionProvider, 'getEndpointsConfig')
 jest.mock('axios')
+jest.mock('../../../src/lib/config')
 
 describe('callbackHandler', () => {
+  beforeEach(() => {
+    SpyArrayPush.mockReturnValue()
+    jest.resetAllMocks()
+  })
+  afterAll(() => {
+    jest.resetAllMocks()
+  })
   describe('handleCallback should not throw an error', () => {
     it('when CALLBACK_RESOURCE_ENDPOINTS, OUTBOUND_MUTUAL_TLS_ENABLED and SEND_CALLBACK_ENABLE is enabled', async () => {
       const callbackObject = {
@@ -67,38 +74,26 @@ describe('callbackHandler', () => {
       const req = {
         headers: {
           traceparent: 'traceparent'
-        }
-      }
-      SpyGetUserConfig.mockReturnValueOnce({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
-        CALLBACK_RESOURCE_ENDPOINTS: {
-          enabled: true,
-          endpoints: [
-            {
-              method: 'put',
-              path: '/',
-              endpoint: 'http://localhost:3000'
-            },
-            {
-              method: 'post',
-              path: '/transfers/{ID}/error',
-              endpoint: 'http://localhost:3001'
-            }
-          ]
         },
-        OUTBOUND_MUTUAL_TLS_ENABLED: true,
+        customInfo: {}
+      }
+      Config.getUserConfig.mockReturnValue({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
         SEND_CALLBACK_ENABLE: true
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
-        HOSTING_ENABLED: true
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          HOSTING_ENABLED: true,
+          OUTBOUND_MUTUAL_TLS_ENABLED: true
+        }
       })
-      SpySign.mockReturnValueOnce()
-      SpyPushCallback.mockReturnValueOnce()
-      SpyMyEventEmitter.mockReturnValueOnce({
+      SpySign.mockReturnValue()
+      SpyPush.mockReturnValue()
+      SpyMyEventEmitter.mockReturnValue({
         emit: () => {}
       })
       SpyRequestLogger.mockReturnValue()
-      SpyGetTlsConfig.mockReturnValueOnce({
+      SpyGetTlsConfig.mockReturnValue({
         hubClientCert: 'cert',
         hubClientKey: 'key',
         dfspServerCaRootCert: 'ca',
@@ -106,7 +101,7 @@ describe('callbackHandler', () => {
           userdfsp: {}
         }
       })
-      SpyEndpointsConfig.mockReturnValueOnce({
+      SpyEndpointsConfig.mockReturnValue({
         dfspEndpoints: {
           userdfsp: 'userdfspcallbackendpint'
         }
@@ -114,7 +109,76 @@ describe('callbackHandler', () => {
       SpyAgent.mockImplementationOnce(() => {
         return {httpsAgent: {}}
       })
-      axios.mockResolvedValueOnce({
+      axios.mockResolvedValue({
+        status: '200',
+        statusText: 'OK'
+      })
+      await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
+    })
+    it('when CALLBACK_RESOURCE_ENDPOINTS, CLIENT_MUTUAL_TLS_ENABLED and SEND_CALLBACK_ENABLE is enabled', async () => {
+      const callbackObject = {
+        delay: 100,
+        method: 'post',
+        callbackInfo: {
+          fspid: 'userdfsp'
+        },
+        path: '/transfers/{ID}/error',
+        headers: {},
+        body: {}
+      }
+      const context = {
+        api: {
+          validateRequest: async () => {
+            return {valid: true}
+          }
+        }
+      }
+      const req = {
+        headers: {
+          traceparent: 'traceparent'
+        },
+        customInfo: {}
+      }
+      Config.getUserConfig.mockReturnValue({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CLIENT_MUTUAL_TLS_ENABLED: true,
+        SEND_CALLBACK_ENABLE: true,
+        CLIENT_TLS_CREDS: [
+          {
+            HOST: 'localhost:5000',
+            CERT: 'certificate',
+            KEY: 'key'
+          }
+        ]
+      })
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          HOSTING_ENABLED: true
+        }
+      })
+      SpySign.mockReturnValue()
+      SpyPush.mockReturnValue()
+      SpyMyEventEmitter.mockReturnValue({
+        emit: () => {}
+      })
+      SpyRequestLogger.mockReturnValue()
+      SpyGetTlsConfig.mockReturnValue({
+        hubClientCert: 'cert',
+        hubClientKey: 'key',
+        dfspServerCaRootCert: 'ca',
+        dfsps: {
+          userdfsp: {}
+        }
+      })
+      SpyEndpointsConfig.mockReturnValue({
+        dfspEndpoints: {
+          userdfsp: 'userdfspcallbackendpint'
+        }
+      })
+      SpyAgent.mockImplementationOnce(() => {
+        return {httpsAgent: {}}
+      })
+      axios.mockResolvedValue({
         status: '200',
         statusText: 'OK'
       })
@@ -141,44 +205,32 @@ describe('callbackHandler', () => {
       const req = {
         headers: {
           traceparent: 'traceparent'
-        }
-      }
-      SpyGetUserConfig.mockReturnValueOnce({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
-        CALLBACK_RESOURCE_ENDPOINTS: {
-          enabled: true,
-          endpoints: [
-            {
-              method: 'put',
-              path: '/',
-              endpoint: 'http://localhost:3000'
-            },
-            {
-              method: 'post',
-              path: '/transfers/{ID}/error',
-              endpoint: 'http://localhost:3001'
-            }
-          ]
         },
-        OUTBOUND_MUTUAL_TLS_ENABLED: true,
+        customInfo: {}
+      }
+      Config.getUserConfig.mockReturnValue({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
         SEND_CALLBACK_ENABLE: true
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
-        HOSTING_ENABLED: true
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          HOSTING_ENABLED: true,
+          OUTBOUND_MUTUAL_TLS_ENABLED: true
+        }
       })
-      SpySign.mockReturnValueOnce()
-      SpyPushCallback.mockReturnValueOnce()
-      SpyMyEventEmitter.mockReturnValueOnce({
+      SpySign.mockReturnValue()
+      SpyPush.mockReturnValue()
+      SpyMyEventEmitter.mockReturnValue({
         emit: () => {}
       })
       SpyRequestLogger.mockReturnValue()
-      SpyGetTlsConfig.mockReturnValueOnce({
+      SpyGetTlsConfig.mockReturnValue({
         hubClientCert: 'cert',
         hubClientKey: 'key',
         dfspServerCaRootCert: 'ca',
         dfsps: {}
       })
-      SpyEndpointsConfig.mockReturnValueOnce({
+      SpyEndpointsConfig.mockReturnValue({
         dfspEndpoints: {}
       })
       await expect(callbackHandler.handleCallback(callbackObject, context, req)).rejects.toBe('Outbound TLS is enabled, but there is no TLS config found for DFSP ID: userdfsp')
@@ -198,9 +250,10 @@ describe('callbackHandler', () => {
         }
       }
       const req = {
-        headers: {}
+        headers: {},
+        customInfo: {}
       }
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getUserConfig.mockReturnValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
         CALLBACK_RESOURCE_ENDPOINTS: {
           enabled: true,
@@ -211,25 +264,235 @@ describe('callbackHandler', () => {
             },
             {
               method: 'post',
-              path: '/transfers/{ID}'
+              path: '/transfers/{ID}',
+              endpoint: 'http://localhost:3000'
             }
           ]
         },
-        OUTBOUND_MUTUAL_TLS_ENABLED: false,
+        HUB_ONLY_MODE: false,
+        ENDPOINTS_DFSP_WISE: {},
         SEND_CALLBACK_ENABLE: true
       })
-      SpyGetSystemConfig.mockReturnValueOnce({
-        HOSTING_ENABLED: false
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          HOSTING_ENABLED: false,
+          OUTBOUND_MUTUAL_TLS_ENABLED: false
+        }
       })
       SpySign.mockImplementationOnce(() => {
         throw new Error('log error if jws signign fails')
       })
-      SpyPushCallback.mockReturnValueOnce()
-      SpyMyEventEmitter.mockReturnValueOnce({
+      SpyPush.mockReturnValue()
+      SpyMyEventEmitter.mockReturnValue({
         emit: () => {}
       })
       SpyRequestLogger.mockReturnValue()
-      axios.mockRejectedValueOnce({err: {}})
+      axios.mockRejectedValue({err: {}})
+      await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
+    })
+    it('when CALLBACK_RESOURCE_ENDPOINTS and SEND_CALLBACK_ENABLE is enabled and OUTBOUND_MUTUAL_TLS_ENABLED disabled', async () => {
+      const callbackObject = {
+        method: 'post',
+        path: '/transfers/{ID}',
+        headers: {
+          host: 'http://localhost:5050'
+        },
+        body: {},
+        callbackInfo: {
+          fspid: 'userdfsp'
+        }
+      }
+      const context = {
+        api: {
+          validateRequest: async () => {
+            return {valid: false}
+          }
+        }
+      }
+      const req = {
+        headers: {},
+        customInfo: {}
+      }
+      Config.getUserConfig.mockReturnValue({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        HUB_ONLY_MODE: true,
+        ENDPOINTS_DFSP_WISE: {
+          dfsps: {
+            userdfsp: {
+              defaultEndpoint: 'http://localhost:5000',
+              endpoints: [{
+                method: 'post',
+                path: '/transfers',
+                endpoint: 'http://localhost:5000'
+              }]
+            }
+          }
+        },
+        SEND_CALLBACK_ENABLE: true
+      })
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          HOSTING_ENABLED: false,
+          OUTBOUND_MUTUAL_TLS_ENABLED: false
+        }
+      })
+      SpySign.mockImplementationOnce(() => {
+        throw new Error('log error if jws signign fails')
+      })
+      SpyPush.mockReturnValue()
+      SpyMyEventEmitter.mockReturnValue({
+        emit: () => {}
+      })
+      SpyRequestLogger.mockReturnValue()
+      axios.mockRejectedValue({err: {}})
+      await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
+    })
+    it('when CALLBACK_RESOURCE_ENDPOINTS and SEND_CALLBACK_ENABLE is enabled and OUTBOUND_MUTUAL_TLS_ENABLED disabled', async () => {
+      const callbackObject = {
+        method: 'post',
+        path: '/transfers',
+        headers: {},
+        body: {},
+        callbackInfo: {
+          fspid: 'userdfsp'
+        }
+      }
+      const context = {
+        api: {
+          validateRequest: async () => {
+            return {valid: false}
+          }
+        }
+      }
+      const req = {
+        headers: {},
+        customInfo: {
+          traceID: 'traceID'
+        }
+      }
+      Config.getUserConfig.mockReturnValue({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        HUB_ONLY_MODE: true,
+        ENDPOINTS_DFSP_WISE: {
+          dfsps: {
+            userdfsp: {
+              defaultEndpoint: 'http://localhost:5000',
+              endpoints: []
+            }
+          }
+        },
+        SEND_CALLBACK_ENABLE: true
+      })
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: false
+      })
+      SpySign.mockImplementationOnce(() => {
+        throw new Error('log error if jws signign fails')
+      })
+      SpyPush.mockReturnValue()
+      SpyMyEventEmitter.mockReturnValue({
+        emit: () => {}
+      })
+      SpyRequestLogger.mockReturnValue()
+      axios.mockRejectedValue({err: {}})
+      await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
+    })
+    it('when CALLBACK_RESOURCE_ENDPOINTS and SEND_CALLBACK_ENABLE is enabled and OUTBOUND_MUTUAL_TLS_ENABLED disabled', async () => {
+      const callbackObject = {
+        method: 'put',
+        path: '/transfers',
+        headers: {},
+        body: {},
+        callbackInfo: {
+          fspid: 'userdfsp'
+        }
+      }
+      const context = {
+        api: {
+          validateRequest: async () => {
+            return {valid: false}
+          }
+        }
+      }
+      const req = {
+        headers: {},
+        customInfo: {}
+      }
+      Config.getUserConfig.mockReturnValue({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        HUB_ONLY_MODE: true,
+        ENDPOINTS_DFSP_WISE: {
+          dfsps: {
+            userdfsp: {
+              defaultEndpoint: 'http://localhost:5000',
+              endpoints: []
+            }
+          }
+        },
+        SEND_CALLBACK_ENABLE: true
+      })
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: false
+      })
+      SpySign.mockImplementationOnce(() => {
+        throw new Error('log error if jws signign fails')
+      })
+      SpyPush.mockReturnValue()
+      SpyMyEventEmitter.mockReturnValue({
+        emit: () => {}
+      })
+      SpyRequestLogger.mockReturnValue()
+      axios.mockRejectedValue({err: {}})
+      await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
+    })
+    it('when CALLBACK_RESOURCE_ENDPOINTS and SEND_CALLBACK_ENABLE is enabled and OUTBOUND_MUTUAL_TLS_ENABLED disabled', async () => {
+      const callbackObject = {
+        method: 'post',
+        path: '/transfers/{ID}',
+        headers: {},
+        body: {}
+      }
+      const context = {
+        api: {
+          validateRequest: async () => {
+            return {valid: false}
+          }
+        }
+      }
+      const req = {
+        headers: {},
+        customInfo: {}
+      }
+      Config.getUserConfig.mockReturnValue({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CALLBACK_RESOURCE_ENDPOINTS: {
+          enabled: true,
+          endpoints: [
+            {
+              method: 'get',
+              path: '/transfers/{ID}'
+            }
+          ]
+        },
+        HUB_ONLY_MODE: false,
+        ENDPOINTS_DFSP_WISE: {},
+        SEND_CALLBACK_ENABLE: true
+      })
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: false
+      })
+      SpySign.mockImplementationOnce(() => {
+        throw new Error('log error if jws signign fails')
+      })
+      SpyPush.mockReturnValue()
+      SpyMyEventEmitter.mockReturnValue({
+        emit: () => {}
+      })
+      SpyRequestLogger.mockReturnValue()
+      axios.mockRejectedValue({err: {}})
       await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
     })
     it('when CALLBACK_RESOURCE_ENDPOINTS, SEND_CALLBACK_ENABLE and OUTBOUND_MUTUAL_TLS_ENABLED disabled', async () => {
@@ -247,20 +510,139 @@ describe('callbackHandler', () => {
         }
       }
       const req = {
-        headers: {}
+        headers: {},
+        customInfo: {
+          user: {
+            dfspId: 'test'
+          }
+        }
       }
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: false
+      })
+      Config.getUserConfig.mockReturnValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: false,
         SEND_CALLBACK_ENABLE: false
       })
-      SpySign.mockReturnValueOnce()
-      SpyPushCallback.mockReturnValueOnce()
-      SpyMyEventEmitter.mockReturnValueOnce({
+      SpySign.mockReturnValue()
+      SpyPush.mockReturnValue()
+      SpyMyEventEmitter.mockReturnValue({
         emit: () => {}
       })
       SpyRequestLogger.mockReturnValue()
       await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
+    })
+    it('when CALLBACK_RESOURCE_ENDPOINTS, SEND_CALLBACK_ENABLE and OUTBOUND_MUTUAL_TLS_ENABLED disabled and the url is https', async () => {
+      const callbackObject = {
+        method: 'post',
+        path: '/transfers/{ID}',
+        headers: {},
+        body: {}
+      }
+      const context = {
+        api: {
+          validateRequest:  async () => {
+            return {valid: true}
+          }
+        }
+      }
+      const req = {
+        headers: {},
+        customInfo: {
+          user: {
+            dfspId: 'test'
+          }
+        }
+      }
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: false
+      })
+      Config.getUserConfig.mockReturnValue({
+        CALLBACK_ENDPOINT: 'https://localhost:5000',
+        SEND_CALLBACK_ENABLE: false
+      })
+      SpySign.mockReturnValue()
+      SpyPush.mockReturnValue()
+      SpyMyEventEmitter.mockReturnValue({
+        emit: () => {}
+      })
+      SpyRequestLogger.mockReturnValue()
+      await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
+    })
+    it('when CALLBACK_RESOURCE_ENDPOINTS, CLIENT_MUTUAL_TLS_ENABLED and SEND_CALLBACK_ENABLE is enabled, CLIENT_TLS_CREDS is missing', async () => {
+      const callbackObject = {
+        delay: 100,
+        method: 'post',
+        callbackInfo: {
+          fspid: 'userdfsp'
+        },
+        path: '/transfers/{ID}/error',
+        headers: {},
+        body: {}
+      }
+      const context = {
+        api: {
+          validateRequest: async () => {
+            return {valid: true}
+          }
+        }
+      }
+      const req = {
+        headers: {
+          traceparent: 'traceparent'
+        },
+        customInfo: {}
+      }
+      Config.getUserConfig.mockReturnValue({
+        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CLIENT_MUTUAL_TLS_ENABLED: true,
+        SEND_CALLBACK_ENABLE: true,
+        CLIENT_TLS_CREDS: [
+          {
+            HOST: 'unknownhost:5000',
+            CERT: 'certificate',
+            KEY: 'key'
+          }
+        ]
+      })
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          HOSTING_ENABLED: true
+        }
+      })
+      SpySign.mockReturnValue()
+      SpyPush.mockReturnValue()
+      SpyMyEventEmitter.mockReturnValue({
+        emit: () => {}
+      })
+      SpyRequestLogger.mockReturnValue()
+      SpyGetTlsConfig.mockReturnValue({
+        hubClientCert: 'cert',
+        hubClientKey: 'key',
+        dfspServerCaRootCert: 'ca',
+        dfsps: {
+          userdfsp: {}
+        }
+      })
+      SpyEndpointsConfig.mockReturnValue({
+        dfspEndpoints: {
+          userdfsp: 'userdfspcallbackendpint'
+        }
+      })
+      SpyAgent.mockImplementationOnce(() => {
+        return {httpsAgent: {}}
+      })
+      axios.mockResolvedValue({
+        status: '200',
+        statusText: 'OK'
+      })
+      try {      
+        await callbackHandler.handleCallback(callbackObject, context, req)
+      } catch (err) {
+        expect(err instanceof Error).toBeTruthy()
+      }
     })
   })
 })

@@ -23,7 +23,7 @@
  ******/
 
 const customLogger = require('../requestLogger')
-
+// eslint-disable-next-line
 const acceptHeaderRE = new RegExp('^application/vnd.interoperability\\.([a-zA-Z0-9\\*]+)?(\\+json)?(;)?(version=(([0-9]+)(\\.([0-9]+))?)?)?$')
 
 module.exports.validateAcceptHeader = (acceptHeader) => {
@@ -106,7 +106,7 @@ module.exports.negotiateVersion = (req, apis) => {
       responseContentTypeHeader = `application/vnd.interoperability.${parsedAcceptHeader.resource}+json;version=${apis[negotiatedIndex].majorVersion}.${apis[negotiatedIndex].minorVersion}`
     }
   }
-  customLogger.logMessage('debug', negotiationFailed ? 'Version negotiation failed for the Accept / Content-Type header ' + acceptHeader : 'Version negotiation succeeded, picked up the version ' + apis[negotiatedIndex].majorVersion + '.' + apis[negotiatedIndex].minorVersion, null, true, req)
+  customLogger.logMessage('debug', negotiationFailed ? 'Version negotiation failed for the Accept / Content-Type header ' + acceptHeader : 'Version negotiation succeeded, picked up the version ' + apis[negotiatedIndex].majorVersion + '.' + apis[negotiatedIndex].minorVersion, { request: req })
   return {
     negotiationFailed: negotiationFailed,
     message: negotiationFailed ? 'Version negotiation failed for the Accept / Content-Type header ' + acceptHeader : 'OK',

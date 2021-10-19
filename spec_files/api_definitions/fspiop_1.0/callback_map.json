@@ -7,7 +7,7 @@
         "path": "/transfers/{ID}",
         "pathPattern": "/transfers/{$request.body.transferId}",
         "headerOverride": {
-          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Source": "{$request.body.payeeFsp}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
           "Content-Type": "{$session.negotiatedContentType}",
           "Date": "{$request.headers.date}"
@@ -66,7 +66,7 @@
         "path": "/quotes/{ID}",
         "pathPattern": "/quotes/{$request.body.quoteId}",
         "headerOverride": {
-          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Source": "{$request.body.payee.partyIdInfo.fspId}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
           "Content-Type": "{$session.negotiatedContentType}",
           "Date": "{$request.headers.date}"
@@ -253,7 +253,7 @@
       "successCallback": {
         "method": "put",
         "path": "/participants/{ID}",
-        "pathPattern": "/participants/{$request.body.partyList[0].partyIdentifier}",
+        "pathPattern": "/participants/{$request.body.requestId}",
         "headerOverride": {
           "FSPIOP-Source": "{$config.FSPID}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
@@ -264,7 +264,7 @@
       "errorCallback": {
         "method": "put",
         "path": "/participants/{ID}/error",
-        "pathPattern": "/participants/{$request.body.partyList[0].partyIdentifier}/error",
+        "pathPattern": "/participants/{$request.body.requestId}/error",
         "headerOverride": {
           "FSPIOP-Source": "{$config.FSPID}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
@@ -301,6 +301,31 @@
       }
     },
     "post": {
+      "fspid": "{$request.headers.fspiop-source}",
+      "successCallback": {
+        "method": "put",
+        "path": "/participants/{Type}/{ID}",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      },
+      "errorCallback": {
+        "method": "put",
+        "path": "/participants/{Type}/{ID}/error",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}/error",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      }
+    },
+    "delete": {
       "fspid": "{$request.headers.fspiop-source}",
       "successCallback": {
         "method": "put",

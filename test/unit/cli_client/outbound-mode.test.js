@@ -32,6 +32,7 @@ const spyPromisify = jest.spyOn(require('util'), 'promisify')
 const objectStore = require('../../../src/cli_client/objectStore')
 
 const outbound = require('../../../src/cli_client/modes/outbound')
+const spyGenerateTemplate = jest.spyOn(require('../../../src/cli_client/utils/templateGenerator'), 'generateTemplate')
 
 describe('Cli client', () => {
   describe('run outbound mode', () => {
@@ -78,74 +79,113 @@ describe('Cli client', () => {
       }).not.toThrowError()
     })
   })
+  describe('when status is not FINISHED should not throw an error where there are assertions', () => {
+    const progress = {
+      "status": "IN PROGRESS",
+      requestSent: {
+        tests: {
+          assertions: [
+            {
+              id: 1
+            },
+            {
+              id: 2
+            },
+            {
+              id: 3              }
+          ]
+        }
+      },
+      testResult: {
+        results: {
+          1: {
+            status: 'SUCCESS'
+          },
+          2: {
+            status: 'SKIPPED'
+          },
+          3: {
+            status: 'FAILED'
+          }
+        }
+      }
+    }
+    it('Without loglevel', async () => {
+      const config = {
+        inputFiles: "sample-cli.json",
+        environmentFile: "sample-environement.json",
+      }
+      objectStore.set('config', config)
+
+      spyExit.mockReturnValueOnce({})
+      expect(() => {
+        outbound.handleIncomingProgress(progress)
+      }).not.toThrowError()
+    })
+    it('With loglevel 1', async () => {
+      const config = {
+        inputFiles: "sample-cli.json",
+        environmentFile: "sample-environement.json",
+        logLevel: '1'
+      }
+      objectStore.set('config', config)
+
+      spyExit.mockReturnValueOnce({})
+      expect(() => {
+        outbound.handleIncomingProgress(progress)
+      }).not.toThrowError()
+    })
+    it('With loglevel 2', async () => {
+      const config = {
+        inputFiles: "sample-cli.json",
+        environmentFile: "sample-environement.json",
+        logLevel: '2'
+      }
+      objectStore.set('config', config)
+
+      spyExit.mockReturnValueOnce({})
+      expect(() => {
+        outbound.handleIncomingProgress(progress)
+      }).not.toThrowError()
+    })
+  })
   describe('run sendTemplate', () => {
-    it('when inputFiles contains files should not throw an error', async () => {
+    it('when generateTemplate is successful should not throw an error', async () => {
       spyPromisify.mockReturnValueOnce(() => {
         return JSON.stringify({
-          "test_cases": [
-            {
-              "requests": []
-            }
-          ]
+          "inputValues": {}
         })
       })
       const config = {
-        inputFiles: "sample-cli.json"
+        inputFiles: "sample-cli.json",
+        environmentFile: "sample-environement.json"
       }
+      spyGenerateTemplate.mockResolvedValueOnce({
+        "test_cases": [
+          {
+            "requests": []
+          }
+        ]
+      })
+      objectStore.set('config', config)
+
+      spyAxios.mockResolvedValueOnce({})
+      await expect(outbound.sendTemplate()).resolves.toBe(undefined)
+    })
+    it('when generateTemplate failed should throw an error', async () => {
+      spyPromisify.mockReturnValueOnce(() => {
+        return JSON.stringify({
+          "inputValues": {}
+        })
+      })
+      const config = {
+        inputFiles: "sample-cli.json",
+        environmentFile: "sample-environement.json"
+      }
+      spyGenerateTemplate.mockRejectedValueOnce({})
       objectStore.set('config', config)
 
       spyAxios.mockReturnValue({})
-      await expect(outbound.sendTemplate()).resolves.toBe(undefined)
-    })
-    it('when inputFiles contains files and directories should not throw an error', async () => {
-      spyPromisify.mockReturnValueOnce(() => {
-        return JSON.stringify({
-          "test_cases": [
-            {
-              "requests": []
-            }
-          ]
-        })
-      })
-      spyPromisify.mockReturnValueOnce(() => {
-        return JSON.stringify([
-          "file1"
-        ])
-      })
-
-      const config = {
-        inputFiles: "sample-cli.json,sample-dir"
-      }
-      objectStore.set('config', config)
-      spyAxios.mockReturnValue({})
-      await expect(outbound.sendTemplate()).resolves.toBe(undefined)
-    })
-    it('when readFile throws error should not throw an error', async () => {
-      spyPromisify.mockReturnValueOnce(() => {throw new Error('expected error')})
-
-      const config = {
-        inputFiles: "sample-cli.json"
-      }
-      objectStore.set('config', config)
-      await expect(outbound.sendTemplate()).resolves.toBe(undefined)
-    })
-    it('when readFile throws error should not throw an error', async () => {
-      spyPromisify.mockReturnValueOnce(() => {
-        return JSON.stringify({
-          "test_cases": [
-            {
-              "requests": []
-            }
-          ]
-        })
-      })
-      spyPromisify.mockReturnValueOnce(() => {throw new Error('expected error')})
-      
-      const config = {
-        inputFiles: "sample-cli.json,sample-dir"
-      }
-      objectStore.set('config', config)
-
       await expect(outbound.sendTemplate()).resolves.toBe(undefined)
     })
   })

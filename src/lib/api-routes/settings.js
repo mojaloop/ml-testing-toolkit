@@ -25,7 +25,6 @@
 const express = require('express')
 const router = new express.Router()
 const Config = require('../config')
-const Server = require('../../server')
 const importExport = require('../importExport')
 const RulesEngineModel = require('../rulesEngineModel')
 
@@ -35,41 +34,32 @@ router.get('/export', async (req, res, next) => {
   try {
     if (!req.query || !req.query.options) {
       res.status(400).send('options query param is required')
+    } else {
+      const resp = await importExport.exportSpecFiles(req.query.options, req.user)
+      res.status(200).json({ status: 'OK', body: resp })
     }
-    const resp = await importExport.exportSpecFiles(req.query.options)
-    res.status(200).json({ status: 'OK', body: resp })
   } catch (err) {
-    next(err)
+    // next(err)
+    res.status(404).json({ error: err && err.message })
   }
 })
 
 router.post('/import', async (req, res, next) => {
   try {
     const options = req.query.options
-    await importExport.importSpecFiles(req.body.buffer, options)
+    await importExport.importSpecFiles(req.body.buffer, options, req.user)
     for (const index in options) {
       switch (options[index]) {
-        case 'rules_response': await RulesEngineModel.reloadResponseRules(); break
-        case 'rules_callback': await RulesEngineModel.reloadCallbackRules(); break
-        case 'rules_validation': await RulesEngineModel.reloadValidationRules(); break
-        case 'user_config.json': {
-          const runtime = await Config.getUserConfig()
-          const stored = await Config.getStoredUserConfig()
-          let reloadServer = false
-          if (runtime.INBOUND_MUTUAL_TLS_ENABLED !== stored.INBOUND_MUTUAL_TLS_ENABLED) {
-            reloadServer = true
-          }
-          await Config.loadUserConfig()
-          if (reloadServer) {
-            Server.restartServer()
-          }
-        }
+        case 'rules_response': await RulesEngineModel.reloadResponseRules(req.user); break
+        case 'rules_callback': await RulesEngineModel.reloadCallbackRules(req.user); break
+        case 'rules_validation': await RulesEngineModel.reloadValidationRules(req.user); break
+        case 'user_config.json': await Config.loadUserConfig(req.user); break
       }
     }
     res.status(200).json({ status: 'OK' })
   } catch (err) {
     res.status(400).send(err.message)
-    next(err)
+    // next(err)
   }
 })
 

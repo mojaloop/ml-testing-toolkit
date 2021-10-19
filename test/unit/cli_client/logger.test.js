@@ -24,6 +24,11 @@
 'use strict'
 
 const logger = require('../../../src/cli_client/utils/logger')
+const objectStore = require('../../../src/cli_client/objectStore')
+const spyConsole = jest.spyOn(console, 'log')
+
+jest.mock('../../../src/cli_client/objectStore')
+
 const sampleOutboundProgress = {
   "status": "FINISHED",
   "test_cases": [
@@ -216,10 +221,18 @@ const sampleOutboundProgress = {
 describe('Cli client', () => {
   describe('run logger functionality', () => {
     it('when the cli mode is outbound should not throw an error', async () => {
+      objectStore.get.mockReturnValueOnce({})
       expect(() => {
         logger.outbound(sampleOutboundProgress)
       }).not.toThrowError()
-    }),
+    })
+    it('when extraSummaryInformation is supplied, it should be logged', async () => {
+      objectStore.get.mockReturnValueOnce({
+        extraSummaryInformation: 'Title:Mocktitle,Summary:MockSummary'
+      })
+      logger.outbound(sampleOutboundProgress)
+      expect(spyConsole).toBeCalled()
+    })
     it('when the cli mode is monitoring should not throw an error 1', async () => {
       const sampleMonitoringProgress = {
         "logTime": "Thu, 07 May 2020 10:44:00 GMT",

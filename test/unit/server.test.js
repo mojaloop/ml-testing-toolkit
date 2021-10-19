@@ -28,48 +28,55 @@ const Server = require('../../src/server')
 const Config = require('../../src/lib/config')
 const ConnectionProvider = require('../../src/lib/configuration-providers/mb-connection-manager')
 const ObjectStore = require('../../src/lib/objectStore')
-const AssertionStore = require('../../src/lib/assertionStore')
+const ArrayStore = require('../../src/lib/arrayStore')
+const httpAgentStore = require('../../src/lib/httpAgentStore')
 const OpenApiMockHandler = require('../../src/lib/mocking/openApiMockHandler')
-const { default: Axios } = require('axios')
-const { setActiveResponseRulesFile } = require('../../src/lib/rulesEngineModel')
+const OAuthValidator = require('../../src/lib/oauth/OAuthValidator')
 
-
-const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
-const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 
 const SpyWaitForTlsHubCerts = jest.spyOn(ConnectionProvider, 'waitForTlsHubCerts')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
 const SpyInitObjectStore = jest.spyOn(ObjectStore, 'initObjectStore')
-const SpyInitAssertionStore = jest.spyOn(AssertionStore, 'initAssertionStore')
+const SpyInitArrayStore = jest.spyOn(ArrayStore, 'initArrayStore')
+const SpyInitHttpAgentStore = jest.spyOn(httpAgentStore, 'init')
 const SpyInitilizeMockHandler = jest.spyOn(OpenApiMockHandler, 'initilizeMockHandler')
-const SpyHandleRequest = jest.spyOn(OpenApiMockHandler, 'handleRequest')
 
+const customLogger = require('../../src/lib/requestLogger')
+
+jest.mock('../../src/lib/requestLogger')
+jest.mock('../../src/lib/config')
+jest.mock('../../src/lib/oauth/OAuthValidator')
 
 jest.setTimeout(30000)
 
 describe('Server', () => {
+  beforeAll(() => {
+    customLogger.logMessage.mockReturnValue()
+  })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
   describe('restartServer', () => {
     it('restartServer should not throw an error', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
-        API_PORT: 5051
-      })
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValue({
+        API_PORT: 5051,
         INBOUND_MUTUAL_TLS_ENABLED: true
       })
-      SpyWaitForTlsHubCerts.mockRejectedValue()
+      Config.getUserConfig.mockResolvedValue({})
+      SpyWaitForTlsHubCerts.mockRejectedValue(new Error('something'))
       const server = await Server.restartServer()
       expect(server).toBeUndefined()
     })
   })
   describe('initialize', () => {
-    it('initialize should not throw an error', async () => {
-      SpyInitilizeMockHandler.mockResolvedValueOnce()
-      SpyGetSystemConfig.mockReturnValueOnce({
-        API_PORT: 5051
-      })
-      SpyGetUserConfig.mockReturnValueOnce({
+    it('initialize should not throw an error 1', async () => {
+      SpyInitilizeMockHandler.mockResolvedValue()
+      SpyInitHttpAgentStore.mockReturnValue()
+      Config.getSystemConfig.mockReturnValue({
+        API_PORT: 5051,
         INBOUND_MUTUAL_TLS_ENABLED: true
       })
+      Config.getUserConfig.mockResolvedValueOnce({})
       SpyWaitForTlsHubCerts.mockResolvedValueOnce()
       SpyGetTlsConfig.mockReturnValueOnce({
         hubServerCert: '',
@@ -77,7 +84,7 @@ describe('Server', () => {
         hubCaCert: ''
       })
       SpyInitObjectStore.mockReturnValueOnce()
-      SpyInitAssertionStore.mockReturnValueOnce()
+      SpyInitArrayStore.mockReturnValueOnce()
       const server = await Server.initialize()
       await server.inject({
         method: 'GET',
@@ -97,44 +104,96 @@ describe('Server', () => {
         method: 'GET',
         url: '/'
       })
-      server.stop()
+      expect(server).toBeDefined()
+      if (server) {
+        server.stop()
+      }
     })
-    it('initialize should not throw an error', async () => {
+    it('initialize should not throw an error 2', async () => {
       SpyInitilizeMockHandler.mockResolvedValueOnce()
-      SpyGetSystemConfig.mockReturnValueOnce({
-        API_PORT: 5051
-      })
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValue({
+        API_PORT: 5051,
         INBOUND_MUTUAL_TLS_ENABLED: true
       })
-      SpyWaitForTlsHubCerts.mockRejectedValueOnce()
-      const server = await Server.initialize()
-      expect(server).toBeNull()
-    })
-    it('initialize should not throw an error', async () => {
-      SpyInitilizeMockHandler.mockResolvedValueOnce()
-      SpyGetSystemConfig.mockReturnValueOnce({
-        API_PORT: 5051
-      })
-      SpyGetUserConfig.mockReturnValueOnce({
-        INBOUND_MUTUAL_TLS_ENABLED: false
-      })
+      Config.getUserConfig.mockResolvedValue({})
+      SpyWaitForTlsHubCerts.mockRejectedValueOnce(new Error('something'))
       const server = await Server.initialize()
       expect(server).toBeDefined()
-      server.stop()
+      if (server) {
+        server.stop()
+      }
+    })
+    it('initialize should not throw an error 3', async () => {
+      SpyInitilizeMockHandler.mockResolvedValueOnce()
+      Config.getSystemConfig.mockReturnValue({
+        API_PORT: 5051,
+        INBOUND_MUTUAL_TLS_ENABLED: false
+      })
+      Config.getUserConfig.mockResolvedValue({})
+      const server = await Server.initialize()
+      expect(server).toBeDefined()
+      if (server) {
+        server.stop()
+      }
     })
   })
   describe('restartServer', () => {
     it('restartServer should not throw an error', async () => {
-      SpyGetSystemConfig.mockReturnValueOnce({
-        API_PORT: 5051
-      })
-      SpyGetUserConfig.mockReturnValueOnce({
+      Config.getSystemConfig.mockReturnValue({
+        API_PORT: 5051,
         INBOUND_MUTUAL_TLS_ENABLED: true
       })
-      SpyWaitForTlsHubCerts.mockRejectedValue()
+      Config.getUserConfig.mockResolvedValue({})
+      SpyWaitForTlsHubCerts.mockRejectedValueOnce(new Error('something'))
       const server = await Server.restartServer()
-      expect(server).toBeUndefined()
+      if (server) {
+        server.stop()
+      }
+    })
+  })
+  describe('onPreHandler', () => {
+    const h = {
+      continue: () => {}
+    }
+    const req = {
+      customInfo: {},
+      headers: {
+        'fspiop-source': 'data',
+        authorization: 'Bearer TOKEN'
+      }
+    }
+    it('onPreHandler should not throw an error', async () => {
+      Config.getSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: true
+      })
+      Config.getUserConfig.mockResolvedValueOnce({
+        FSPID: 'test'
+      })
+      OAuthValidator.verifyToken.mockResolvedValueOnce({
+        dfspId: 'test'
+      })
+      await Server.onPreHandler(req, h)
+    })
+  })
+  describe('onPreHandler', () => {
+    const h = {
+      continue: () => {}
+    }
+    const req = {
+      customInfo: {},
+      headers: {
+        'fspiop-source': 'data',
+        authorization: 'Bearer TOKEN'
+      }
+    }
+    it('onPreHandler should not throw an error', async () => {
+      Config.getSystemConfig.mockReturnValueOnce({
+        HOSTING_ENABLED: true
+      })
+      OAuthValidator.verifyToken.mockResolvedValueOnce({
+        dfspId: 'test'
+      })
+      await Server.onPreHandler(req, h)
     })
   })
   describe('onPreResponse', () => {

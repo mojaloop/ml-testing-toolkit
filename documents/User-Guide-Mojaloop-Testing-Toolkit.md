@@ -8,45 +8,51 @@
 
 1. [At first glance](#1-at-first-glance)
 
-2. [Dashboard](#2-dashboard)
+2. [Welcome Page](#2-welcome-page)
 
 3. [Monitoring](#3-monitoring)
 
-4. [Sync Response Rules](#4-sync-response-rules)
+4. [Rules](#4-rules)
 
-    4.1 [Building your own Rules File](#41-building-your-own-rules-file)
+    4.1 [Sync Response Rules](#41-sync-response-rules)
 
-5. [Validation Rules (_Error Callbacks_)](#5-validation-rules)
+    4.2. [Validation Rules (_Error Callbacks_)](#42-validation-rules)
 
-6. [Callback Rules (_Success Callbacks_)](#6-callback-rules)
+    4.3. [Callback Rules (_Success Callbacks_)](#43-callback-rules)
 
-7. [Outbound Request](#7-outbound-request)
+    4.4  [Building your own Rules File](#44-building-your-own-rules-file)
 
-    7.1 [Import Collection](#71-import-collection)
+    4.5  [Inbound Scripting](#45-inbound-scripting)
 
-    7.2 [Import Environment](#72-import-environment)
+5. [Outbound Request](#5-outbound-request)
 
-    7.3 [Test Cases](#73-test-cases)
+    5.1 [Collection Manager](#51-collection-manager)
 
-      7.3.1 [Request](#731-request)
+    5.2 [Import Environment](#52-import-environment)
 
-      7.3.2 [Test Editor](#732-editor)
+    5.3 [Test Cases](#53-test-cases)
 
-      7.3.3 [Test Scripts](#733-scripts)
+      5.3.1 [Request](#531-request)
 
-      7.3.4 [Tests](#734-tests)
+      5.3.2 [Test Editor](#532-editor)
 
-    7.4 [Download Report](#74-download-report)
+      5.3.3 [Test Scripts](#533-scripts)
 
-    7.5 [New Template](#75-new-template)
+      5.3.4 [Tests](#534-tests)
 
-    7.6 [Show Template](#76-dhow-template)
+    5.4 [Download Report](#54-download-report)
 
-    7.7 [Save](#77-save)
+    5.5 [New Template](#55-new-template)
 
-    7.7 [Send](#77-send)
+    5.6 [Show Template](#56-dhow-template)
 
-8. [Settings](#8-settings)
+    5.7 [Save](#57-save)
+
+    5.8 [Send](#58-send)
+
+    5.9 [Download Testcase Definition](#59-download-testcase-definition)
+
+6. [Settings](#6-settings)
 
 ### 1 At first glance
 
@@ -56,7 +62,7 @@ When you open the **Mojaloop Testing Toolkit** in your browser, you will be welc
 
 Take note of the navigation bar on the left. The navigational items are;
 
-- **Dashboard**
+- **Welcome Page**
 - **Monitoring**
 - **Sync Response Rules**
 - **Validation Rules (Error Callbacks)**
@@ -66,17 +72,15 @@ Take note of the navigation bar on the left. The navigational items are;
 
 We will work through each one of the items and provide you with a fair understanding of the current functionality.
 
-### 2 Dashboard
+### 2 Welcome Page
 
-The _Dashboard_ is the default opening window. It will provide the user with valuable statistical data pertaining to request and response activities (Request and Responses statistics, including Rules Engine "Hits" statistics).
-
-The static data will be replaced with accurate information once the development of this functionality is at a more advanced stage.
+The _Welcome page_ is the default opening window.
 
 ![Opening view](/assets/images/opening-view.png)
 
 ### 3 Monitoring
 
-The _Monitoring_ navigation tab allows you to monitor _incoming_ requests from the **Mojaloop Simulator**.
+The _Monitoring_ navigation tab allows you to monitor _incoming_ and _outgoing_ requests to / from the **Testing Toolkit**.
 
 ![Monitoring Initial State](/assets/images/monitoring-initial-state.png) 
 
@@ -121,7 +125,9 @@ When you send more transfers from the **Mojaloop Simulator UI**, these transacti
 
 ![Additional transfers](/assets/images/additional-transfers.png)
 
-### 4 Sync Response Rules
+### 4 Rules
+
+#### 4.1 Sync Response Rules
 
 **_Validation and synchronous response based on the schema of the code_**
 
@@ -137,7 +143,27 @@ Below is a sample **FIXED_RESPONSE**
 
 ![Sample - Fixed Response](/assets/images/fixed-response-sample.png)
 
-#### 4.1 Building your own Rules File
+#### 4.2 Validation Rules 
+
+_**Error Callbacks**_
+
+This Rules section is to simulate asynchronous error callbacks.
+
+The setup and functionality is similar to [4 Sync Response Rules](#24-sync-response-rules) with the ability to create your own Rules file. This has already been explained in the previous section under [4.1 Building your own Rules File](#241-building-your-own-rules-file).
+
+![Validation Rules Screen](/assets/images/validation-rules-screen.png)
+
+#### 4.3 Callback Rules
+
+_**Success Callbacks**_
+
+This Rules section is to simulate asynchronous success callbacks.
+
+The same applies for this section, the functionality is similar to [4 Sync Response Rules](#4-sync-response-rules) with the ability to create your own Rules file. This has already been explained in the previous section under [4.1 Building your own Rules File](#41-building-your-own-rules-file).
+
+![Callback Rules Screen](/assets/images/callback-rules-screen.png)
+
+#### 4.4 Building your own Rules File
 
 The toolset allows you to create your own file with a collection of rules to suite your specific testing requirements. A rule can be created completely with the web UI. But for advanced users and a comprehensive insight, please view the [Rules Engine](/RULES_ENGINE.md) document for more information related to the **Rules Engine**. 
 
@@ -158,16 +184,6 @@ Firstly, select your desired **API** from the drop down list provided.  All of t
 Next, select the _operationId_ you require for the new rule in the **Resource** dropdown list. All the _operationId_'s are listed in the dropdown list. Click on the down arrow to provide the selection. The list is as per the Swagger definition of the API selected. 
 
 ![Resource selection](/assets/images/resource-selection.png)
-
-You have the option to enable or disable inbound requests scripts. You can use Scripts tab to set dfsp positions and do validations later. In the given example we are updating the ttkdfspTotalAmount if the transfer request is successfull for testingtoolkit dfsp. You could execute p2p-happy-path with fromFspId equal to testingtoolkitdfsp and go back to Environment tab to see the total amount.
-
-![Inbound Requests Scripts](/assets/images/inbound-requests-scripts.png)
-
-In the Environment tab you could observe the current environment state. 
-
-![Inbound Requests Environment](/assets/images/inbound-requests-environment.png)
-
-You have the option to include one or more **CONDITIONS** for the new rule. Select the _**Add Condition**_ button should you wish to add an additional condition to your rule. 
 
 ![Add Condition Button](/assets/images/add-condition-button.png)
 
@@ -218,29 +234,43 @@ Going forward, the option exist to updated the rule or delete it by selecting th
 
 Lastly, set the new rule file as active by selecting the new rule file on the right hand side window and selecting the _**Set as active**_ button. You will see the _**√**_ mark next to it to indicate it is active.
 
-### 5 Validation Rules 
+You have the option to include one or more **CONDITIONS** for the new rule. Select the _**Add Condition**_ button should you wish to add an additional condition to your rule. 
 
-_**Error Callbacks**_
+#### 4.5 Inbound Scripting
 
-This Rules section is to simulate asynchronous error callbacks.
+You have the option to enable or disable inbound requests scripts. You can use Scripts tab to set dfsp positions and do validations later. In the given example we are updating the ttkdfspTotalAmount if the transfer request is successfull for testingtoolkit dfsp. You could execute p2p-happy-path with fromFspId equal to testingtoolkitdfsp and go back to Environment tab to see the total amount.
 
-The setup and functionality is similar to [4 Sync Response Rules](#24-sync-response-rules) with the ability to create your own Rules file. This has already been explained in the previous section under [4.1 Building your own Rules File](#241-building-your-own-rules-file).
+![Inbound Requests Scripts](/assets/images/inbound-requests-scripts.png)
 
-![Validation Rules Screen](/assets/images/validation-rules-screen.png)
+In the Environment tab you could observe the current environment state. 
 
-### 6 Callback Rules
+![Inbound Requests Environment](/assets/images/inbound-requests-environment.png)
 
-_**Success Callbacks**_
 
-This Rules section is to simulate asynchronous success callbacks.
+You can write scripts in two formats.
 
-The same applies for this section, the functionality is similar to [4 Sync Response Rules](#4-sync-response-rules) with the ability to create your own Rules file. This has already been explained in the previous section under [4.1 Building your own Rules File](#41-building-your-own-rules-file).
+- **Postman Script:**
 
-![Callback Rules Screen](/assets/images/callback-rules-screen.png)
+  If you select postman script option, you can use the same functions like pm.sendRequest as in postman. _(Postman script format in the Testing Toolkit is deprecated and not encouraged, please use javascript format)_
 
-### 7 Outbound Request
+- **Java Script:**
 
-This sections will enable you to intiate requests from the testing toolkit to your DFSP implementation.
+  If you want advanced features and flexibility, you can select javascript option. This option enables you to write the scripts in javascript format and you can use the following functions.
+  - **console.log** - function
+  - **request** - variable
+  - **environment** - variable
+  - **axios** - library
+    
+    With axios library, you can use various functions like axios.get, axios.post...etc. Please note these functions are async functions and you may need to use `await` before the function.
+    ```
+    const resp = await axios.get('http://someurl')
+    ```
+    You can find the documentation about axios at this link https://github.com/axios/axios#axios-api
+
+
+### 5 Outbound Request
+
+This sections will enable you to intiate requests from the testing toolkit to your DFSP / HUB implementations.
 
 The user can create a collection of operations and add a number of assertions to these operations. The assertions can be setup and customized to support your testing requirements and verify both positive and negative requests and responses. 
 
@@ -250,22 +280,21 @@ Selecting the _**Outbound Request**_ navigation tab on the left side, the follow
 
 At the top of the screen, you will notice the following buttons on the main window, starting from the left.
 
-- _**Import Collection**_
-- _**Import Environment**_
-- _**New Template**_
-- _**Show Template**_
-- _**Save**_
+- _**Collections Manager**_
+- _**Load Sample**_
+- _**Show Current Template**_
+- _**Iteration Runner**_
 - _**Send**_
 
-The window on the left contains the _**Template**_ with the _Test Cases_ and operations. 
+You can see two tabs _'Test Cases'_ and _'Input Values'_. 
 
 ![Template Window](/assets/images/template-window.png)
 
-#### 7.1 Import Collection
+#### 5.1 Collection Manager
 
-By selecting the _**Import Collection**_ button, it will allow you to import a collection. For your exploration, sample collections are available under the project root directory under [/examples/collections](/examples/collections) sub directory. To select one of the sample files, on the file explorer window that poped up when you selected the _**Import Collection**_ button, navigate to [/examples/collections/dfsp](/examples/collections/dfsp) under the project root directory. Select the ```p2p_happy_path.json``` file to import into the **Mojaloop Testing Toolkit** application. This sample file consist of a couple of test samples. You could add more test cases by clicking on _Add Test Case_ button
+By selecting the _**Collection Manager**_ button, it will open a drawer on left which contains a number of file operations. That will allow you to import, export and modify a collection. For your exploration, sample collections are available under the project root directory under [/examples/collections](/examples/collections) sub directory. To select one of the sample files, on the file explorer window that poped up when you selected the _**Import File**_ button, navigate to [/examples/collections/dfsp](/examples/collections/dfsp) under the project root directory. Select the ```p2p_happy_path.json``` file to import into the **Mojaloop Testing Toolkit** application. You should select the file in the collection manager, and observe the test cases should be loaded in the main screen. You could add more test cases by clicking on _Add Test Case_ button
 
-![Import Collection](/assets/images/import-template.png)
+![Collection Manager](/assets/images/import-template.png)
 
 _**P2P Transfer Happy Path**_
 
@@ -277,10 +306,8 @@ _**P2P Transfer Happy Path**_
 
 ![Opened Imported Template](/assets/images/opened-imported-template.png)
 
-#### 7.2 Import Environment
-By selecting the _**Import Environment**_ button, it will allow you to import input values. For your exploration, sample environments are available under the project root directory under [/examples/environments](/examples/environments) sub directory. To select one of the sample files, on the file explorer window that poped up when you selected the _**Import Environment**_ button, navigate to [/examples/environments](/examples/environments) under the project root directory. Select the ```dfsp_local_environment.json``` file to import into the **Mojaloop Testing Toolkit** application. This sample file consist of a couple of input values.
-
-![Import Environment](/assets/images/import-template.png)
+#### 5.2 Import Environment
+By selecting the _**Import Environment**_ button in _Input Values_ tab, it will allow you to import input values. For your exploration, sample environments are available under the project root directory under [/examples/environments](/examples/environments) sub directory. To select one of the sample files, on the file explorer window that poped up when you selected the _**Import Environment**_ button, navigate to [/examples/environments](/examples/environments) under the project root directory. Select the ```dfsp_local_environment.json``` file to import into the **Mojaloop Testing Toolkit** application. This sample file consist of a couple of input values.
 
 It is possible to update the **Input Values** on the right hand side window. Additional input values can be added, by selecting the _**Add Input Value**_ button on the top right of this right hand side window. These values relates to the specified variable that you can select and use in any **Request** that you create.
 
@@ -294,30 +321,172 @@ To update values of exisiting variable(s) to the **Input Values**, simply select
 
 ![Add New Input Value](/assets/images/add-new-input-value.png)
 
-#### 7.3 Test Cases
+#### 5.3 Test Cases
 
 Click on the _**Edit**_ button, to open up the _**Test Case**_ in the edit mode.
 
 ![Test-Case Editor](/assets/images/test-case-editor.png)
 
-##### 7.3.1 Request
+##### 5.3.1 Request
 
 The **Request** tab reflects both the appropriate _Header_ and _Body_ that makes up the request as per the selected **API** swagger specification. These values can be changed in the **Editor** tab.
 
 ![Sample Request](/assets/images/sample-request.png)
 
-##### 7.3.2 Editor
+##### 5.3.2 Editor
 
 The **Editor** tab displays request content and it can be updated manually on this window. Depending on how the request was defined, you will be able to see the selected **API**, the _operationId_, the _Header_ and _Body_ content. Options to _**Duplicate**_, _**Delete**_ or _**Rename**_ are also available as buttons above. There are some additional options like _Override with Custom URL_ or _Ignore Callbacks_. You can also build your own new request by selecting the _**Add New Request**_ button on the top right of this window. The process to build a new request is similar to the one explained in [2.4 Sync Response Rules](#24-sync-response-rules)
 
 ![Sample Scripts](/assets/images/sample-editor.png)
 
-##### 7.3.3 Scripts
+##### 5.3.3 Scripts
 
-The **Scripts** tab allows you to use postman like pre request and test scripts. Make sure that advanced features options is enabled. 
-- pm.test - not supported - Use Testing Toolkit Tests for this purpose. In **Tests** You could use values stored in the environment. To access thoes values use environment.'key'
-- pm.response - to get the response object outside pm.sendRequest use pm.response.body not pm.response.json()
-- everything else should work the same way is in postman
+The **Scripts** tab allows you to use postman like pre request and test scripts. Make sure that advanced features options is enabled.
+
+You can write scripts in two formats.
+
+- **Postman Script:**
+
+  If you select postman script option, you can use the same functions like pm.sendRequest as in postman. This option is usefull when you want to convert your existing postman tests to testing toolkit format.
+  - pm.test - not supported - Use Testing Toolkit Tests for this purpose. In **Tests** You could use values stored in the environment. To access thoes values use environment.'key'
+  - pm.response - to get the response object outside pm.sendRequest use pm.response.body not pm.response.json()
+  - everything else should work the same way is in postman
+
+- **Java Script:**
+
+  If you want advanced features and flexibility, you can select javascript option. This option enables you to write the scripts in javascript format and you can use the following functions.
+  - **console.log** - function
+  - **response** - variable
+  - **environment** - variable
+  - **axios** - library
+    
+    With axios library, you can use various functions like axios.get, axios.post...etc. Please note these functions are async functions and you may need to use `await` before the function.
+    ```
+    const resp = await axios.get('http://someurl')
+    ```
+    You can find the documentation about axios at this link https://github.com/axios/axios#axios-api
+  - **websocket** - library
+
+    With websocket library, you can connect to a websocket server and get the first message from the server.
+
+    Functions supported:
+    
+    - _**websocket.connect**_ - To connect to a websocket URL and listen for messsages
+    - _**websocket.getMessage**_ - To get the message arrived. This function can also wait for the message some time. The session will be disconnected automatically after returning the message
+    - _**websocket.disconnect**_ - To disconnect a particular session
+    - _**websocket.disconnectAll**_ - To disconnect all the sessions
+    
+    This will be used to assert on the payee side data from the sdk-scheme-adapter in tests cases. You may need to enable websocket capabilities in the sdk-scheme-adapter.
+    
+    **Examaple:**
+
+    In Pre-request
+    ```
+    await websocket.connect('ws://localhost:4002/requests/{$inputs.toIdValue}', 'payeeRequest')
+    ```
+    In Post-request
+    ```
+    environment.payeeRequest = await websocket.getMessage('payeeRequest')
+    ```
+    Then you can use the above environment variable in assertions.
+    ```
+    environment.payeeRequest.headers['content-type']
+    ```
+
+  - **inboundEvent** - library
+
+    With inboundEvent library, you can listen on an inbound request to testing toolkit
+
+    Functions supported:
+    
+    - _**inboundEvent.addListener(clientName, method, path, [conditionFn], [timeout])**_
+
+      To start listening for the inbound messsages to TTK
+
+      Parameters:
+      - **clientName** - Client name to be referred later in postrequest script
+
+        Type: [`String`]
+
+      - **method** - Http method to match
+
+        Type: [`Request`]
+
+      - **path** - Http path to match
+
+        Type: [`Request`]
+  
+      - **conditionFn** (optional) - An optional function to call for addional matching logic
+
+        Type: [`Function`]
+
+        Parameters passed: (`request.headers, request.body`)
+
+        Return Value: [`Boolean`]
+
+
+      - **timeout** - Time in ms to wait for the inbound request
+
+        Type: [`integer`]
+
+      Example usage:
+      ```javascript
+      await inboundEvent.addListener('quote1', 'post', '/quotes', (headers, body) => {
+        return body.quoteId === '<SOME_ID_HERE>'
+      })
+      ```
+    
+    - _**inboundEvent.getMessage(clientName, [timeout])**_
+
+      To get the message arrived. This function can also wait for the message some time. The session will be disconnected automatically after returning the message
+
+      Parameters:
+      - **clientName** - Client name to get the message from. The name should match with the name provided in the addListener call.
+
+        Type: [`String`]
+
+      - **timeout** - Time in ms to wait for the inbound request
+
+        Type: [`integer`]
+
+      Example usage:
+      ```javascript
+      await inboundEvent.getMessage('quote1')
+      ```
+
+  - **custom.setRequestTimeout** - To set a specific timeout value for the request in milli seconds (Default: 3000ms)
+  - **custom.sleep** - To wait for particular amount of milli seconds
+  - **custom.jws** - library
+
+    With custom.jws library, you can sign and validate an FSPIOP request using JWS
+
+    Functions supported:
+    
+    - _**custom.jws.signRequest**(<PRIVATE_KEY>)_ - To sign the outgoing request using the private key
+    - _**custom.jws.validateCallback**(<callback.headers>, <callback.body>, <PUBLIC_CERTIFICATE>)_ - To validate the incoming callback using public certificate. This will validate protected headers too.
+    - _**custom.jws.validateCallbackProtectedHeaders**(<callback.headers>)_ - To validate only protected headers in the FSPIOP-Signature header
+  - **custom.skipRequest** - function
+
+    By using this function in the pre-request script, you can skip the current request including post-request-scripts and assertions. You can see the request and assertions as skipped in the UI and in the report as well.
+    
+  - _**custom.pushMessage(message, [sessionID])**_
+
+    By using this function in the scripts in rules for inbound requests, you can push a websocket message to the clients listening on the websocket server of TTK and on topic 'pushMessage'. There is an optional sessionId that we can pass as second argument to this function
+
+    Parameters:
+    - **message** - The message object to emit to the clients.
+
+      Type: [`Object`]
+
+    - **sessionID** - Optional sessionID to send message to targetted clients who are listening on the topic 'pushMessage/<sessionID>'
+
+      Type: [`string`]
+
+    Example usage:
+    ```javascript
+    await custom.pushMessage({ name: 'Sample Name' })
+    await custom.pushMessage({ name: 'Sample Name' }, 'client1')
+    ```
 
 ![Sample Pre Request and Post Request Scripts](/assets/images/test-case-editor-scripts.png)
 
@@ -332,7 +501,7 @@ After executing the test case you will see _Console Log_ and _Environment State_
 ![Sample Scripts - Environment State](/assets/images/test-case-editor-environment-state.png)
 
 
-##### 7.3.4 Tests
+##### 5.3.4 Tests
 
 The **Tests** tab contains the assertions that was setup for the specified _operationId_. These are similar to PostMan tests and will evaluate the request and/or the response based on the requirements of the assertion. The below is an assertion from the sample _Import Template_ imported earlier, and validate the Callback and expect the _**response.status**_ to be equal to _**202**_.
 
@@ -380,7 +549,7 @@ To get a better understanding of how this will work, please refer to the below. 
 
 ![Configurable Parameter Assertion](/assets/images/configurable-parameter-assertion.png)
 
-#### 7.4 Download Report
+#### 5.4 Download Report
 
 You could download a report in several formats by clicking on _Download Report_ in the top right corner:
 - JSON
@@ -389,19 +558,19 @@ You could download a report in several formats by clicking on _Download Report_ 
 
 ![Download Report](/assets/images/download-report.png)
 
-#### 7.5 New Template
+#### 5.5 New Template
 
 You could create a new template by clicking on _New Template_ button the top right corner
 
-#### 7.6 Show Template
+#### 5.6 Show Template
 
 You could view the template by clicking on _Show Template_ button in the top right corner
 
-#### 7.7 Save
+#### 5.7 Save
 
 You could save the collection or the environment by clicking on _Save_ button in the top right corner
 
-#### 7.8 Send
+#### 5.8 Send
 
 You could execute the whole template by clicking on _Send_ button in the top right corner. Please insure you added a user with {MSISDN} and value found in the **Input Values** on the simulator (see [Frequently Asked Questions](/documents/Mojaloop-Testing-Toolkit.md#4-frequently-asked-questions) section [4.2 Generic ID not found](/documents/Mojaloop-Testing-Toolkit.md#42-eneric-id-not-found)). 
 (/documents/Mojaloop-Testing-Toolkit.md#7-architecture)
@@ -420,7 +589,17 @@ If you select the _**Edit**_ button now, you will notice the addition of the res
 
 ![View Response](/assets/images/view-response.png)
 
-### 8 Settings
+#### 5.9 Download Testcase Definition
+
+You can download a report with all the definitions of testcases (like descriptions for all the requests in a test case, expected results ...etc) Currently only HTML format is supported and by clicking on _Download Definition_ at the right side of begining of the test cases.
+
+![Download Testcase Definition](/assets/images/testcase-definition-download.png)
+
+And you can edit meta information about each testcase and request using the option provided.
+
+![Edit Meta Info](/assets/images/testcase-definition-edit-meta-info.png)
+
+### 6 Settings
 
 The _**SETTINGS**_ navigation tab will open to the **SETTINGS** window. Below is the default view of this page.
 
