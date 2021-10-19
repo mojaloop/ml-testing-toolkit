@@ -273,6 +273,10 @@ const deleteForwardRulesFile = async (fileName, user) => {
 
 // common functions
 const reloadRules = async (model, user) => {
+  const fetchedActiveRulesFile = await getActiveRulesFile(model, user)
+  if (fetchedActiveRulesFile) {
+    model.activeRulesFile = fetchedActiveRulesFile
+  }
   customLogger.logMessage('info', `Reloading ${model.ruleType} Rules from file ` + model.activeRulesFile, { notification: false })
   const userRules = await storageAdapter.read(model.rulesFilePathPrefix + model.activeRulesFile, user)
   model.rules = userRules.data
@@ -289,6 +293,11 @@ const setActiveRulesFile = async (model, fileName, user) => {
   await storageAdapter.upsert(model.rulesFilePathPrefix + CONFIG_FILE_NAME, rulesConfig, user)
   model.activeRulesFile = fileName
   await reloadRules(model, user)
+}
+
+const getActiveRulesFile = async (model, user) => {
+  const configFileContent = await storageAdapter.read(model.rulesFilePathPrefix + CONFIG_FILE_NAME, user)
+  return configFileContent.data.activeRulesFile
 }
 
 const getRules = async (model, user) => {
@@ -330,6 +339,9 @@ const getRulesFiles = async (model, user) => {
     resp.files = files.data.filter(item => {
       return (item !== CONFIG_FILE_NAME)
     })
+    if (model.rules === null) {
+      await reloadRules(model, user)
+    }
     resp.activeRulesFile = model.activeRulesFile
     return resp
   } catch (err) {
