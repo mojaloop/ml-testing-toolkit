@@ -22,7 +22,7 @@
  --------------
  ******/
 
-var storedObject = {
+const storedObject = {
   data: {
     requestsHistory: [],
     callbacksHistory: []

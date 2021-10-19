@@ -23,7 +23,7 @@
  --------------
  ******/
 
-var storedObject = {
+const storedObject = {
   transactions: {}
 }
 

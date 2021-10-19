@@ -23,7 +23,7 @@
  ******/
 
 const fs = require('fs')
-var path = require('path')
+const path = require('path')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const customLogger = require('../requestLogger')
@@ -35,7 +35,7 @@ const utilsInternal = require('../utilsInternal')
 const uuid = require('uuid')
 const postmanContext = require('../scripting-engines/postman-sandbox')
 const javascriptContext = require('../scripting-engines/vm-javascript-sandbox')
-const { OpenApiMockGenerator } = require('ml-testing-toolkit-shared-lib')
+const { OpenApiMockGenerator } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 
 // const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
 
@@ -378,7 +378,7 @@ const forwardRules = async (context, req) => {
 }
 
 const replaceVariablesFromRequest = async (inputObject, context, req) => {
-  var resultObject
+  let resultObject
   // Check whether inputObject is string or object. If it is object, then convert that to JSON string and parse it while return
   if (typeof inputObject === 'string') {
     resultObject = inputObject

@@ -39,10 +39,10 @@ const objectStore = require('./lib/objectStore')
 const arrayStore = require('./lib/arrayStore')
 const httpAgentStore = require('./lib/httpAgentStore')
 const ConnectionProvider = require('./lib/configuration-providers/mb-connection-manager')
-const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
+const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 const { verifyToken } = require('./lib/oauth/OAuthValidator')
 
-var serverInstance = null
+let serverInstance = null
 // const openAPIOptions = {
 //   api: Path.resolve(__dirname, './interface/api_swagger.json'),
 //   handlers: Path.resolve(__dirname, './handlers')
@@ -58,13 +58,13 @@ var serverInstance = null
  */
 const createServer = async (port, user) => {
   let server
-  const userConfig = await Config.getUserConfig(user)
-  if (userConfig.INBOUND_MUTUAL_TLS_ENABLED) {
+  const systemConfig = Config.getSystemConfig()
+  if (systemConfig.INBOUND_MUTUAL_TLS_ENABLED) {
     // Make sure hub server certificates are set in connection provider
     try {
       await ConnectionProvider.waitForTlsHubCerts()
     } catch (err) {
-      RequestLogger.logMessage('error', 'Tls certificates initiation failed.', { notification: false })
+      RequestLogger.logMessage('error', 'TLS certificates initiation failed. Error: ' + err.message, { notification: false })
       return null
     }
     const tlsConfig = await ConnectionProvider.getTlsConfig()
@@ -75,7 +75,7 @@ const createServer = async (port, user) => {
         key: tlsConfig.hubServerKey,
         ca: [tlsConfig.hubCaCert],
         rejectUnauthorized: true,
-        requestCert: false
+        requestCert: true
       },
       routes: {
         cors: {

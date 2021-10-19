@@ -54,8 +54,8 @@ const outbound = async (data) => {
       reportData = response.data
       const disposition = response.headers['content-disposition']
       if (disposition && disposition.indexOf('attachment') !== -1) {
-        var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
-        var matches = filenameRegex.exec(disposition)
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+        const matches = filenameRegex.exec(disposition)
         if (matches != null && matches[1]) {
           reportFilename = matches[1].replace(/['"]/g, '')
         }

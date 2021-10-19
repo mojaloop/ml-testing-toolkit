@@ -30,7 +30,7 @@ const Logger = require('@mojaloop/central-services-logger')
 const Config = require('./config')
 const NotificationEmitter = require('./notificationEmitter')
 const DBAdapter = require('./db/adapters/dbAdapter')
-const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
+const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 
 const logRequest = (request, user) => {
   let message = `Request: ${request.method} ${request.path}`

@@ -33,7 +33,7 @@ const getKeyCloakUsers = async (keycloakToken) => {
   const getUsersResp = await axios.get(systemConfig.KEYCLOAK.API_URL + `/auth/admin/realms/${systemConfig.KEYCLOAK.REALM}/users`, { headers: { Authorization: `Bearer ${keycloakToken.accessToken}` } })
   if (getUsersResp.status === 200) {
     const users = []
-    getUsersResp.data.map(user => {
+    getUsersResp.data.forEach(user => {
       if (user.username !== systemConfig.KEYCLOAK.USERNAME) {
         let userId = user.attributes.dfspId
         if (Array.isArray(user.attributes.dfspId)) {

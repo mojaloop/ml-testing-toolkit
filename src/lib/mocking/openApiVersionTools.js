@@ -23,7 +23,7 @@
  ******/
 
 const customLogger = require('../requestLogger')
-
+// eslint-disable-next-line
 const acceptHeaderRE = new RegExp('^application/vnd.interoperability\\.([a-zA-Z0-9\\*]+)?(\\+json)?(;)?(version=(([0-9]+)(\\.([0-9]+))?)?)?$')
 
 module.exports.validateAcceptHeader = (acceptHeader) => {

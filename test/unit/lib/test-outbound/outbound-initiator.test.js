@@ -502,11 +502,11 @@ describe('Outbound Initiator Functions', () => {
         hubClientKey: 'key'
       }))
       SpyGetUserConfig.mockResolvedValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: true
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
       })
       SpyGetSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: false
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
       const sampleRequest = {
         headers: {
@@ -555,11 +555,11 @@ describe('Outbound Initiator Functions', () => {
         hubClientKey: 'key'
       }))
       SpyGetSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: false
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
       SpyGetUserConfig.mockResolvedValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: true,
         CALLBACK_TIMEOUT: 5
       })
       const sampleRequest = {
@@ -610,11 +610,11 @@ describe('Outbound Initiator Functions', () => {
         hubClientKey: 'key'
       })
       SpyGetSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: false
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
       SpyGetUserConfig.mockResolvedValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: true,
         CALLBACK_TIMEOUT: 5000
       })
       const sampleRequest = {
@@ -664,11 +664,11 @@ describe('Outbound Initiator Functions', () => {
         hubClientKey: 'key'
       })
       SpyGetSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: false
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
       SpyGetUserConfig.mockResolvedValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: true
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
       })
       const sampleRequest = {
         headers: {
@@ -717,11 +717,11 @@ describe('Outbound Initiator Functions', () => {
         hubClientKey: 'key'
       })
       SpyGetSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: true
+        HOSTING_ENABLED: true,
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
       SpyGetUserConfig.mockResolvedValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: true
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
       })
       SpyGetEndpointsConfig.mockResolvedValue({
         dfspEndpoints: {
@@ -775,7 +775,8 @@ describe('Outbound Initiator Functions', () => {
         hubClientKey: 'key'
       })
       SpyGetSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: true
+        HOSTING_ENABLED: true,
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
       SpyGetEndpointsConfig.mockResolvedValue({
         dfspEndpoints: {
@@ -783,8 +784,7 @@ describe('Outbound Initiator Functions', () => {
         }
       })
       SpyGetUserConfig.mockResolvedValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: true
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
       })
       const sampleRequest = {
         headers: {
@@ -825,11 +825,11 @@ describe('Outbound Initiator Functions', () => {
         hubClientKey: 'key'
       })
       SpyGetUserConfig.mockResolvedValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: true
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
       })
       SpyGetSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: true
+        HOSTING_ENABLED: true,
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
       SpyGetEndpointsConfig.mockResolvedValue({
         dfspEndpoints: {}
@@ -981,11 +981,11 @@ describe('Outbound Initiator Functions', () => {
         dfspEndpoints: {}
       })
       SpyGetUserConfig.mockResolvedValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: true
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
       })
       SpyGetSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: false
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
       const sampleRequest = {
         headers: {
@@ -1039,11 +1039,11 @@ describe('Outbound Initiator Functions', () => {
         dfspEndpoints: {}
       })
       SpyGetUserConfig.mockResolvedValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
-        OUTBOUND_MUTUAL_TLS_ENABLED: true
+        CALLBACK_ENDPOINT: 'http://localhost:5000'
       })
       SpyGetSystemConfig.mockReturnValue({
-        HOSTING_ENABLED: false
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: true
       })
       const sampleRequest = {
         headers: {
@@ -1394,6 +1394,7 @@ describe('Outbound Initiator Functions', () => {
       SpyGetSystemConfig.mockReturnValue({
         "API_PORT": 5000,
         "HOSTING_ENABLED": false,
+        "OUTBOUND_MUTUAL_TLS_ENABLED": true,
         "CONFIG_VERSIONS": {
           "response": 1,
           "callback": 1,
@@ -1441,8 +1442,7 @@ describe('Outbound Initiator Functions', () => {
       })
       SpyGetUserConfig.mockResolvedValue({
         CALLBACK_ENDPOINT: 'http://localhost:5000',
-        CALLBACK_TIMEOUT: 5000,
-        OUTBOUND_MUTUAL_TLS_ENABLED: true
+        CALLBACK_TIMEOUT: 5000
       })
     })
 

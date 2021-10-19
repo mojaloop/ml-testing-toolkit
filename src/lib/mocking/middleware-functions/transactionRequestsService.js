@@ -26,7 +26,7 @@ const fs = require('fs')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
 const outbound = require('../../test-outbound/outbound-initiator')
-const { TraceHeaderUtils } = require('ml-testing-toolkit-shared-lib')
+const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 const customLogger = require('../../requestLogger')
 
 const handleRequest = async (context, request, callback, triggerFolder) => {

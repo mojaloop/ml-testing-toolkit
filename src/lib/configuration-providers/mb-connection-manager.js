@@ -36,20 +36,20 @@ const customLogger = require('../requestLogger')
 const DEFAULT_ENVIRONMENT_NAME = 'TESTING-TOOLKIT'
 const DEFAULT_TESTING_TOOLKIT_FSPID = 'testingtoolkitdfsp'
 const CM_CHECK_INTERVAL = 10000
-var CONNECTION_MANAGER = null
+let CONNECTION_MANAGER = {}
 
-var currentCookies = [null]
-var currentEnvironment = null
+let currentCookies = [null]
+let currentEnvironment = null
 // var currentTestingToolkitDFSP = null
 // var currentUserDFSP = null
 
-var currentJWSConfig = {
+const currentJWSConfig = {
   dfsps: {}
 }
-var currentTlsConfig = {
+const currentTlsConfig = {
   dfsps: {}
 }
-var currentEndpoints = {}
+const currentEndpoints = {}
 
 const initEnvironment = async () => {
   // Check whether an environment exists with the name testing-toolkit
@@ -478,7 +478,7 @@ const checkConnectionManager = async () => {
     }
   }
 
-  if (userConfig.OUTBOUND_MUTUAL_TLS_ENABLED || userConfig.INBOUND_MUTUAL_TLS_ENABLED) {
+  if (Config.getSystemConfig().OUTBOUND_MUTUAL_TLS_ENABLED || Config.getSystemConfig().INBOUND_MUTUAL_TLS_ENABLED) {
     try {
       await initDFSPHelper()
       await tlsChecker()
@@ -547,10 +547,18 @@ const auth = async () => {
   return cookies
 }
 
+const startLoop = async () => {
+  try {
+    await checkConnectionManager()
+  } catch (err) {
+    console.log('Error connection manager: ' + err.message)
+  }
+  setTimeout(startLoop, CM_CHECK_INTERVAL)
+}
+
 const initialize = async () => {
   await objectStore.init()
-  await checkConnectionManager()
-  setInterval(checkConnectionManager, CM_CHECK_INTERVAL)
+  startLoop()
 }
 
 const waitForTlsHubCerts = async (interval = 2) => {
@@ -602,6 +610,7 @@ const setEndpointsConfig = async () => {
 
 module.exports = {
   initialize,
+  checkConnectionManager,
   getTestingToolkitDfspJWSCerts,
   getUserDfspJWSCerts,
   getTestingToolkitDfspJWSPrivateKey,

@@ -23,6 +23,7 @@
  ******/
 
 const fs = require('fs')
+const mv = require('mv')
 const { files } = require('node-dir')
 const { promisify } = require('util')
 const readFileAsync = promisify(fs.readFile)
@@ -35,6 +36,7 @@ const makeDirectoryAsync = promisify(fs.mkdir)
 const fileStatAsync = promisify(fs.stat)
 const readRecursiveAsync = promisify(files)
 const rmdirAsync = promisify(fs.rmdir)
+const mvAsync = promisify(mv)
 
 module.exports = {
   readFileAsync,
@@ -46,5 +48,6 @@ module.exports = {
   makeDirectoryAsync,
   fileStatAsync,
   readRecursiveAsync,
-  rmdirAsync
+  rmdirAsync,
+  mvAsync
 }

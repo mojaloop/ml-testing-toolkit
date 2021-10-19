@@ -86,7 +86,7 @@ describe('ObjectStore', () => {
     })
   })
   describe('initObjectStore', () => {
-    it('Initialize Object Store should not throw and error', async (done) => {
+    it('Initialize Object Store should not throw and error', (done) => {
       const curDate = new Date()
       const expiredDate = new Date(curDate.setMinutes(curDate.getMinutes() - 10))
       ObjectStore.set('transactions', {

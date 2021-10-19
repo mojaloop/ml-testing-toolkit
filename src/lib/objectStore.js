@@ -25,7 +25,7 @@
 
 const _ = require('lodash')
 
-var storedObject = {
+const storedObject = {
   data: {
     transactions: {},
     inboundEnvironment: {},
