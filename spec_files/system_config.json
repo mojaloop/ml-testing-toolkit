@@ -1,6 +1,8 @@
 {
   "API_PORT": 5000,
   "HOSTING_ENABLED": false,
+  "INBOUND_MUTUAL_TLS_ENABLED": false,
+  "OUTBOUND_MUTUAL_TLS_ENABLED": false,
   "CONFIG_VERSIONS": {
     "response": 1,
     "callback": 1,
@@ -109,6 +111,12 @@
       "type": "payment_manager",
       "version": "1.4",
       "folderPath": "payment_manager_1.4"
+    },
+    {
+      "type": "fx-api",
+      "version": "2.0",
+      "folderPath": "fx-api_2.0",
+      "asynchronous": true
     },
     {
       "type": "thirdparty_sdk_outbound",

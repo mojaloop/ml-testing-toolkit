@@ -37,6 +37,8 @@ SpyMyEventEmitter.mockReturnValue({
   }
 })
 
+jest.setTimeout(8000)
+
 // const webSocketPositiveMock = () => {
 //   return {
 //     on: (eventType, callbackFn) => {

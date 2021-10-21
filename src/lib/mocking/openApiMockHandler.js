@@ -39,11 +39,11 @@ const objectStore = require('../objectStore')
 const arrayStore = require('../arrayStore')
 const JwsSigning = require('../jws/JwsSigning')
 
-var path = require('path')
+const path = require('path')
 
 const IlpModel = require('./middleware-functions/ilpModel')
 
-var apis = []
+let apis = []
 
 // TODO: Implement a logger and log the messages with different verbosity
 // TODO: Write unit tests

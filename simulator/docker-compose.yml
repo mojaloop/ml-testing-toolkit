@@ -13,7 +13,7 @@ services:
     image: "mojaloop/sdk-scheme-adapter:v11.10.4"
     env_file: ./scheme-adapter.env
     volumes:
-      - "./secrets:/src/secrets"
+      - "./secrets:/secrets"
     ports:
       - "4000:4000"
       - "4002:4002"

@@ -80,7 +80,7 @@ describe('ArrayStore', () => {
     })
   })
   describe('initArrayStore', () => {
-    it('Initialize Array Store should not throw and error', async (done) => {
+    it('Initialize Array Store should not throw and error', (done) => {
       const curDate = new Date()
       const expiredDate = new Date(curDate.setMinutes(curDate.getMinutes() - 10))
       jest.useFakeTimers()

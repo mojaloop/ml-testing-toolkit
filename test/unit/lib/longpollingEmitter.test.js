@@ -41,7 +41,6 @@ describe('longpollingEmitter', () => {
     })
     it('should not throw an error', async () => {
       longpollingEmitter.setAssertionStoreEmitter('callbacks','/123', res)
-      await new Promise(resolve => setTimeout(resolve, 5000))
     })
   })
 })

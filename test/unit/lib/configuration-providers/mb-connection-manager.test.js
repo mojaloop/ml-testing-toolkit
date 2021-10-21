@@ -36,13 +36,13 @@ jest.mock('../../../../src/lib/requestLogger')
 const userConfig = {
   JWS_SIGN: true,
   VALIDATE_INBOUND_JWS: true,
-  OUTBOUND_MUTUAL_TLS_ENABLED: true,
-  INBOUND_MUTUAL_TLS_ENABLED: true,
   DEFAULT_USER_FSPID: 'userdfsp'
 }
 
 const systemConfig = {
   HOSTING_ENABLED: true,
+  OUTBOUND_MUTUAL_TLS_ENABLED: true,
+  INBOUND_MUTUAL_TLS_ENABLED: true,
   CONNECTION_MANAGER: {
     API_URL: '',
     AUTH_ENABLED: true,
@@ -306,8 +306,19 @@ describe('mb-connection-manager', () => {
     beforeEach(() => {
       jest.useFakeTimers()
     })
+    afterEach(() => {
+      jest.useRealTimers()
+    })
     it('should not throw error', async () => {
       await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+    })
+  })
+  describe('checkConnectionManager', () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
+    afterEach(() => {
+      jest.useRealTimers()
     })
     it('should not throw error', async () => {
       const newSystemConfig = {...systemConfig}
@@ -315,7 +326,7 @@ describe('mb-connection-manager', () => {
       Config.getSystemConfig.mockImplementation(() => {
         return newSystemConfig
       })
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       Config.getSystemConfig.mockImplementation(() => {
         return systemConfig
       })
@@ -326,8 +337,8 @@ describe('mb-connection-manager', () => {
       Config.getSystemConfig.mockImplementation(() => {
         return newSystemConfig
       })
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
-      Config.getUserConfig.mockImplementation(() => {
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
+      Config.getSystemConfig.mockImplementation(() => {
         return systemConfig
       })
     })
@@ -335,14 +346,22 @@ describe('mb-connection-manager', () => {
       const newUserConfig = {...userConfig}
       newUserConfig.JWS_SIGN = false
       newUserConfig.VALIDATE_INBOUND_JWS = false
-      newUserConfig.OUTBOUND_MUTUAL_TLS_ENABLED = false
-      newUserConfig.INBOUND_MUTUAL_TLS_ENABLED = false
       Config.getUserConfig.mockImplementation(() => {
         return newUserConfig
       })
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          ...systemConfig,
+          OUTBOUND_MUTUAL_TLS_ENABLED: false,
+          INBOUND_MUTUAL_TLS_ENABLED: false
+        }
+      })
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       Config.getUserConfig.mockImplementation(() => {
         return userConfig
+      })
+      Config.getSystemConfig.mockImplementation(() => {
+        return systemConfig
       })
     })
     it('should not throw error', async () => {
@@ -351,7 +370,7 @@ describe('mb-connection-manager', () => {
         status: 200,
         headers: {}
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.post['/api/login'] = original
     })
     it('should not throw error', async () => {
@@ -359,7 +378,7 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/login'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.post['/api/login'] = original
     })
     it('should not throw error', async () => {
@@ -368,7 +387,7 @@ describe('mb-connection-manager', () => {
         status: 200,
         data: []
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments'] = original
     })
     it('should not throw error', async () => {
@@ -376,7 +395,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments'] = original
     })
     it('should not throw error', async () => {
@@ -385,7 +404,7 @@ describe('mb-connection-manager', () => {
         status: 400,
         data: []
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.post['/api/environments'] = original
     })
     it('should not throw error', async () => {
@@ -396,7 +415,7 @@ describe('mb-connection-manager', () => {
           id: 'userdfsp'
         }]
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps'] = original
     })
     it('should not throw error', async () => {
@@ -404,7 +423,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps'] = original
     })
     it('should not throw error', async () => {
@@ -412,7 +431,7 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/environments/1/dfsps'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.post['/api/environments/1/dfsps'] = original
     })
     it('should not throw error', async () => {
@@ -421,7 +440,7 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/environments/1/dfsps'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.post['/api/environments/1/dfsps'] = original
       reject.post['/api/environments/1/dfsps'] = false
     })
@@ -431,7 +450,7 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/environments/1/dfsps'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.post['/api/environments/1/dfsps'] = original
       reject.post['/api/environments/1/dfsps'] = false
     })
@@ -447,7 +466,7 @@ describe('mb-connection-manager', () => {
           jwsCertificate: 'asdf'
         }
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
     })
     it('should not throw error', async () => {
@@ -455,7 +474,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
     })
     it('should not throw error', async () => {
@@ -463,7 +482,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/userdfsp/endpoints'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/userdfsp/endpoints'] = original
     })
     it('should not throw error', async () => {
@@ -478,7 +497,7 @@ describe('mb-connection-manager', () => {
         }
       }
       mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = mockData
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
     })
     
@@ -487,18 +506,18 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
     })
 
     it('should not throw error', async () => {
       reject.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts']  = {}
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       reject.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts']  = false
     })
     it('should not throw error', async () => {
       reject.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts']  = {response: {data: {}}}
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       reject.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts']  = false
     })
     it('should not throw error', async () => {
@@ -506,7 +525,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/userdfsp/jwscerts'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/userdfsp/jwscerts'] = original
     })
     it('should not throw error', async () => {
@@ -514,7 +533,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/userdfsp/ca'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/userdfsp/ca'] = original
     })
     it('should not throw error', async () => {
@@ -525,7 +544,7 @@ describe('mb-connection-manager', () => {
           certificate: 'asdf'
         }
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/ca/rootCert'] = original
     })
     it('should not throw error', async () => {
@@ -533,7 +552,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/ca/rootCert'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/ca/rootCert'] = original
     })
     it('should not throw error', async () => {
@@ -541,17 +560,17 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/environments/1/cas'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.post['/api/environments/1/cas'] = original
     })
     it('should not throw error', async () => {
       reject.post['/api/environments/1/cas'] = {}
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       reject.post['/api/environments/1/cas'] = false
     })
     it('should not throw error', async () => {
       reject.post['/api/environments/1/cas'] = {response: {data: {}}}
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       reject.post['/api/environments/1/cas'] = false
     })
     it('should not throw error', async () => {
@@ -563,7 +582,7 @@ describe('mb-connection-manager', () => {
           validationState: 'VALID'
         }
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = original
     })
     it('should not throw error', async () => {
@@ -571,7 +590,7 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = original
     })
     it('should not throw error', async () => {
@@ -579,7 +598,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/inbound'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/inbound'] = original
     })
     it('should not throw error', async () => {
@@ -595,7 +614,7 @@ describe('mb-connection-manager', () => {
           }
         ]
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = original
     })
     it('should not throw error', async () => {
@@ -603,7 +622,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = original
     })
     it('should not throw error', async () => {
@@ -611,7 +630,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/hub/servercerts'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/hub/servercerts'] = original
     })
     it('should not throw error', async () => {
@@ -619,7 +638,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/hub/servercerts'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/hub/servercerts'] = original
     })
     it('should not throw error', async () => {
@@ -627,20 +646,20 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/userdfsp/servercerts'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/userdfsp/servercerts'] = original
     })
     it('should not throw error', async () => {
       reject.post['/api/environments/1/dfsps'] = {}
       reject.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = {}
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       reject.post['/api/environments/1/dfsps'] = false
       reject.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = false
     })
     it('should not throw error', async () => {
       reject.post['/api/environments/1/dfsps'] = {response: {data: {}}}
       reject.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = {response: {data: {}}}
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       reject.post['/api/environments/1/dfsps'] = false
       reject.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = false
     })
@@ -650,7 +669,7 @@ describe('mb-connection-manager', () => {
         status: 400
       }
       reject.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {}
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = original
       reject.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = false
     })
@@ -660,7 +679,7 @@ describe('mb-connection-manager', () => {
         status: 400
       }
       reject.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {response: {data: {}}}
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = original
       reject.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = false
     })
@@ -673,26 +692,26 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = originalGet
       mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = originalPost
     })
     it('should not throw error', async () => {
-      const original = mapping.put['/api/environments/1/hub/servercerts'] 
-      mapping.put['/api/environments/1/hub/servercerts'] = {
+      const original = mapping.get['/api/environments/1/hub/servercerts'] 
+      mapping.get['/api/environments/1/hub/servercerts'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
-      mapping.put['/api/environments/1/hub/servercerts'] = original
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
+      mapping.get['/api/environments/1/hub/servercerts'] = original
     })
     it('should not throw error', async () => {
       reject.put['/api/environments/1/hub/servercerts'] = {}
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       reject.put['/api/environments/1/hub/servercerts'] = false
     })
     it('should not throw error', async () => {
       reject.put['/api/environments/1/hub/servercerts'] = {response: {data: {}}}
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       reject.put['/api/environments/1/hub/servercerts'] = false
     })
     it('should not throw error', async () => {
@@ -704,7 +723,7 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/environments/1/hub/servercerts'] = {
         status: 400
       }
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/hub/servercerts'] = originalGet
       mapping.post['/api/environments/1/hub/servercerts'] = originalPost
     })
@@ -714,7 +733,7 @@ describe('mb-connection-manager', () => {
         status: 400
       }
       reject.post['/api/environments/1/hub/servercerts'] = {}
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       reject.post['/api/environments/1/hub/servercerts'] = false
       mapping.get['/api/environments/1/hub/servercerts'] = original
     })
@@ -724,9 +743,24 @@ describe('mb-connection-manager', () => {
         status: 400
       }
       reject.post['/api/environments/1/hub/servercerts'] = {response: {data: {}}}
-      await expect(MBConnectionManagerProvider.initialize()).resolves.toBeUndefined()
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       reject.post['/api/environments/1/hub/servercerts'] = false
       mapping.get['/api/environments/1/hub/servercerts'] = original
+    })
+  })
+  describe('waitForTlsHubCerts', () => {
+    it('should not throw error', async () => {
+      Config.getSystemConfig.mockImplementation(() => {
+        return {
+          ...systemConfig,
+          OUTBOUND_MUTUAL_TLS_ENABLED: true,
+          INBOUND_MUTUAL_TLS_ENABLED: true
+        }
+      })
+      await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
+    })
+    it('should wait for tls certs', async () => {
+      await expect(MBConnectionManagerProvider.waitForTlsHubCerts()).resolves.toBe(true)
     })
   })
   describe('getTlsConfig', () => {

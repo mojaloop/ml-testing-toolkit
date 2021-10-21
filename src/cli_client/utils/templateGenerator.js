@@ -1,4 +1,4 @@
-const { FolderParser } = require('ml-testing-toolkit-shared-lib')
+const { FolderParser } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 const { readFileAsync, readRecursiveAsync, fileStatAsync } = require('../../lib/utils')
 
 const getFileData = async (fileToRead, fileStat) => {
@@ -18,7 +18,7 @@ const getFileData = async (fileToRead, fileStat) => {
   }
 }
 const getFolderRawData = async (folderItem) => {
-  var importFolderRawData = []
+  const importFolderRawData = []
   const stat = await fileStatAsync(folderItem)
   if (stat.isFile() && folderItem.endsWith('.json')) {
     const fileItemData = await getFileData(folderItem, stat)
@@ -27,7 +27,7 @@ const getFolderRawData = async (folderItem) => {
     }
   } else if (stat.isDirectory()) {
     const fileList = await readRecursiveAsync(folderItem)
-    for (var j = 0; j < fileList.length; j++) {
+    for (let j = 0; j < fileList.length; j++) {
       const fileItemData = await getFileData(fileList[j], stat)
       if (fileItemData) {
         importFolderRawData.push(fileItemData)
@@ -41,10 +41,10 @@ const getFolderRawData = async (folderItem) => {
 const generateTemplate = async (fileList, selectedLabels = null) => {
   try {
     const testCases = []
-    for (var i = 0; i < fileList.length; i++) {
+    for (let i = 0; i < fileList.length; i++) {
       let masterFileIndex
       const importFolderRawData = await getFolderRawData(fileList[i])
-      for (var j = 0; j < importFolderRawData.length; j++) {
+      for (let j = 0; j < importFolderRawData.length; j++) {
         if (importFolderRawData[j].name.endsWith('master.json')) {
           masterFileIndex = j
           break
@@ -59,13 +59,13 @@ const generateTemplate = async (fileList, selectedLabels = null) => {
       let selectedFiles
       if (selectedLabels && selectedLabels.length > 0 && masterFileContent) {
         selectedFiles = []
-        for (var o = 0; o < masterFileContent.order.length; o++) {
+        for (let o = 0; o < masterFileContent.order.length; o++) {
           const order = masterFileContent.order[o]
-          for (var k = 0; k < importFolderRawData.length; k++) {
+          for (let k = 0; k < importFolderRawData.length; k++) {
             if (importFolderRawData[k].name.endsWith(order.name)) {
               if (order.labels) {
                 let included = false
-                for (var l = 0; l < order.labels.length; l++) {
+                for (let l = 0; l < order.labels.length; l++) {
                   const label = order.labels[l]
                   if (selectedLabels.includes(label)) {
                     included = true
