@@ -127,6 +127,7 @@ const sendTemplate = async (sessionId) => {
     const template = await TemplateGenerator.generateTemplate(inputFiles, selectedLabels)
     template.inputValues = JSON.parse(await readFileAsync(config.environmentFile, 'utf8')).inputValues
 
+    // is this is where the test cases are evaluated and executed?
     template.test_cases.forEach(testCase => {
       totalProgress.totalTestCases++
       if (testCase.requests) {
