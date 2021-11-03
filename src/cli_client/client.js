@@ -27,7 +27,7 @@ const router = require('./router')
 commander
   .version('1.0.0', '-v, --version')
   .option('-c, --config <config>', 'default configuration: {"mode": "outbound", "reportFormat": "json"}')
-  .option('-m, --mode <mode>', 'default: "outbound" --- supported modes: "monitoring", "outbound"')
+  .option('-m, --mode <mode>', 'default: "outbound" --- supported modes: "monitoring", "outbound", "testcaseDefinitionReport"')
   .option('-u, --base-url <baseUrl>', 'default: "http://localhost:5050"')
   .option('-i, --input-files <inputFiles>', 'csv list of json files or directories; required when the mode is "outbound" --- supported formats: "json"')
   .option('-e, --environment-file <environmentFile>', 'required when the mode is "outbound" --- supported formats: "json"')

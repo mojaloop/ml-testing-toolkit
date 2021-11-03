@@ -84,6 +84,18 @@ const cli = (commander) => {
         process.exit(1)
       }
       break
+    case 'testcaseDefinitionReport':
+      if (config.inputFiles) {
+        if (!commander.reportFormat) {
+          config.reportFormat = 'printhtml'
+          objectStore.set('config', config)
+        }
+        require('./modes/testcaseDefinitionReport').download()
+      } else {
+        console.log('error: required option \'-i, --input-files <inputFiles>\' not specified')
+        process.exit(1)
+      }
+      break
     default:
       console.log('Mode is not supported')
       console.log('Terminate with exit code 1')

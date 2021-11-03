@@ -67,10 +67,10 @@
       <div class="row border border-white">
         <div class="col border border-white">
           <div class="row tableRow border border-secondary" >
-            <div class="col-sm tableHeaderBlue border border-secondary" >{{fileInfo.path}} 
-              {{#fileInfo.labels}}
-              - (Labels: {{.}})
-              {{/fileInfo.labels}}
+            <div class="col-sm tableHeaderBlue border border-secondary" >{{fileInfo.path}}
+              {{#if fileInfo.labels}}
+                - (Labels: {{fileInfo.labels}})
+              {{/if}}
             </div>
           </div>
           <div class="row tableRow border border-secondary">
