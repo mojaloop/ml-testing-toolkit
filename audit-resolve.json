@@ -26,6 +26,14 @@
     "1002718|json-ref-lite>property-expr": {
       "decision": "postpone",
       "madeAt": 1635515288777
+    },
+    "1004784|hapi-openapi>swagger-parser>z-schema>validator": {
+      "decision": "postpone",
+      "madeAt": 1635963635065
+    },
+    "1004784|express-validator>validator": {
+      "decision": "postpone",
+      "madeAt": 1635963635564
     }
   },
   "rules": {},
