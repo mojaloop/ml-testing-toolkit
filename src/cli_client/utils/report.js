@@ -29,6 +29,16 @@ const objectStore = require('../objectStore')
 const s3Upload = require('../extras/s3-upload')
 
 const outbound = async (data) => {
+  const testcaseReport = await report(data, 'testcase')
+  return testcaseReport
+}
+
+const testcaseDefinition = async (template) => {
+  const testcaseDefinitionReport = await report(template, 'testcase_definition')
+  return testcaseDefinitionReport
+}
+
+const report = async (data, reportType) => {
   const returnInfo = {}
   const config = objectStore.get('config')
   let reportData
@@ -50,7 +60,7 @@ const outbound = async (data) => {
           }
         })
       }
-      const response = await axios.post(`${config.baseURL}/api/reports/testcase/${config.reportFormat}`, data, { headers: { 'Content-Type': 'application/json' } })
+      const response = await axios.post(`${config.baseURL}/api/reports/${reportType}/${config.reportFormat}`, data, { headers: { 'Content-Type': 'application/json' } })
       reportData = response.data
       const disposition = response.headers['content-disposition']
       if (disposition && disposition.indexOf('attachment') !== -1) {
@@ -112,5 +122,6 @@ const replaceFileName = (fullPath, fileName) => {
 }
 
 module.exports = {
+  testcaseDefinition,
   outbound
 }

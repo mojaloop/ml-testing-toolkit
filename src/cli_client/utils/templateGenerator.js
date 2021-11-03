@@ -1,13 +1,14 @@
 const { FolderParser } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 const { readFileAsync, readRecursiveAsync, fileStatAsync } = require('../../lib/utils')
+const path = require('path')
 
 const getFileData = async (fileToRead, fileStat) => {
   try {
     const content = await readFileAsync(fileToRead, 'utf8')
     const fileContent = JSON.parse(content)
     return {
-      name: fileToRead,
-      path: fileToRead,
+      name: path.basename(fileToRead),
+      path: fileToRead.replace(/\\/g, '/'),
       size: fileStat.size,
       modified: '' + fileStat.mtime,
       content: fileContent
@@ -38,57 +39,16 @@ const getFolderRawData = async (folderItem) => {
   return importFolderRawData
 }
 
-const generateTemplate = async (fileList, selectedLabels = null) => {
+const generateTemplate = async (inputFiles, selectedLabels = null) => {
   try {
-    const testCases = []
-    for (let i = 0; i < fileList.length; i++) {
-      let masterFileIndex
-      const importFolderRawData = await getFolderRawData(fileList[i])
-      for (let j = 0; j < importFolderRawData.length; j++) {
-        if (importFolderRawData[j].name.endsWith('master.json')) {
-          masterFileIndex = j
-          break
-        }
-      }
-      let masterFileContent
-      if (masterFileIndex != null) {
-        masterFileContent = importFolderRawData[masterFileIndex].content
-        importFolderRawData.splice(masterFileIndex, 1)
-      }
-
-      let selectedFiles
-      if (selectedLabels && selectedLabels.length > 0 && masterFileContent) {
-        selectedFiles = []
-        for (let o = 0; o < masterFileContent.order.length; o++) {
-          const order = masterFileContent.order[o]
-          for (let k = 0; k < importFolderRawData.length; k++) {
-            if (importFolderRawData[k].name.endsWith(order.name)) {
-              if (order.labels) {
-                let included = false
-                for (let l = 0; l < order.labels.length; l++) {
-                  const label = order.labels[l]
-                  if (selectedLabels.includes(label)) {
-                    included = true
-                    break
-                  }
-                }
-                if (included) {
-                  selectedFiles.push(importFolderRawData[k].name)
-                  break
-                }
-              }
-            }
-          }
-        }
-      }
-      if ((!selectedLabels) || (selectedLabels && selectedLabels.length > 0 && selectedFiles && selectedFiles.length > 0)) {
-        const folderData = FolderParser.getFolderData(importFolderRawData)
-        const folderTestCases = FolderParser.getTestCases(folderData, selectedFiles)
-        if (folderTestCases) {
-          testCases.push(...folderTestCases)
-        }
-      }
+    const folderRawDataArray = []
+    for (let i = 0; i < inputFiles.length; i++) {
+      const inputFile = inputFiles[i]
+      const folderRawData = await getFolderRawData(inputFile)
+      folderRawDataArray.push(...folderRawData)
     }
+    const folderData = FolderParser.getFolderData(folderRawDataArray)
+    const testCases = FolderParser.getTestCases(folderData, null, selectedLabels)
     FolderParser.sequenceTestCases(testCases)
     const template = {}
     template.test_cases = testCases

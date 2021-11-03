@@ -44,7 +44,17 @@ const data = {
 }
 
 describe('Cli client', () => {
-  describe('run report functionality', () => {
+  describe('run testcaseDefinitionReport functionality', () => {
+    it('when the report format is json should not throw an error', async () => {
+      spyPromisify.mockReturnValueOnce(jest.fn())
+      const config = {
+        reportFormat: 'json'
+      }
+      objectStore.set('config', config)
+      await expect(report.testcaseDefinition(data)).resolves.not.toBeNull
+    })
+  })
+  describe('run outbound functionality', () => {
     it('when the report format is json should not throw an error', async () => {
       spyPromisify.mockReturnValueOnce(jest.fn())
       const config = {

@@ -28,6 +28,7 @@ const { cli } = require('../../../src/cli_client/router')
 
 jest.mock('../../../src/cli_client/utils/listeners')
 jest.mock('../../../src/cli_client/modes/outbound')
+jest.mock('../../../src/cli_client/modes/testcaseDefinitionReport')
 
 describe('Cli client', () => {
   describe('running router', () => {
@@ -64,6 +65,25 @@ describe('Cli client', () => {
     it('when mode is outbound and inputFile was not provided should not throw an error', async () => {
       const config = {
         "mode": "outbound"
+      }
+      spyExit.mockImplementationOnce(jest.fn())
+      expect(() => {
+        cli(config)
+      }).not.toThrowError();
+    })
+    it('when mode is testcaseDefinitionReport and inputFile was provided should not throw an error', async () => {
+      const config = {
+        "mode": "testcaseDefinitionReport",
+        "inputFiles": "test"
+      }
+      spyExit.mockImplementationOnce(jest.fn())
+      expect(() => {
+        cli(config)
+      }).not.toThrowError();
+    })
+    it('when mode is testcaseDefinitionReport and inputFile was not provided should throw an error', async () => {
+      const config = {
+        "mode": "testcaseDefinitionReport"
       }
       spyExit.mockImplementationOnce(jest.fn())
       expect(() => {
