@@ -1,0 +1,15 @@
+{
+  "inputValues": {
+    "fromIdType": "MSISDN",
+    "fromIdValue": "44123456789",
+    "fromFirstName": "Firstname-Test",
+    "fromLastName": "Lastname-Test",
+    "fromDOB": "1984-01-01",
+    "note": "test",
+    "currency": "PHP",
+    "amount": "100",
+    "fromFspId": "figmm",
+    "toIdValue": "329294234",
+    "toIdType": "MSISDN"
+  }
+}
