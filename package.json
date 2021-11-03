@@ -92,7 +92,6 @@
     "hapi-swagger": "^14.2.4",
     "ilp-packet": "^2.2.0",
     "js-yaml": "^3.13.1",
-    "json-ref-lite": "^1.1.0",
     "json-refs": "^3.0.13",
     "json-rules-engine": "5.0.3",
     "lodash": "^4.17.19",
@@ -124,7 +123,7 @@
   },
   "devDependencies": {
     "@types/jest": "24.0.22",
-    "eslint": "6.6.0",
+    "eslint": "^8.0.1",
     "get-port": "5.0.0",
     "jest": "^27.3.0",
     "jest-junit": "^13.0.0",

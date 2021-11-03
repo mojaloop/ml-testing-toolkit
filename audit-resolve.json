@@ -1,24 +1,27 @@
 {
   "decisions": {
     "1002401|eslint>strip-ansi>ansi-regex": {
-      "decision": "postpone",
-      "madeAt": 1634580035486
+      "decision": "fix",
+      "madeAt": 1634795582393
     },
     "1002401|eslint>table>string-width>strip-ansi>ansi-regex": {
-      "decision": "postpone",
-      "madeAt": 1634580035486
+      "decision": "fix",
+      "madeAt": 1634795582393
     },
     "1002401|npm-audit-resolver>yargs-unparser>yargs>string-width>strip-ansi>ansi-regex": {
-      "decision": "postpone",
-      "madeAt": 1634580036474
+      "decision": "ignore",
+      "madeAt": 1634795592843,
+      "expiresAt": 1637387558487
     },
     "1002401|npm-audit-resolver>yargs-unparser>yargs>cliui>string-width>strip-ansi>ansi-regex": {
-      "decision": "postpone",
-      "madeAt": 1634580036474
+      "decision": "ignore",
+      "madeAt": 1634795592843,
+      "expiresAt": 1637387558487
     },
     "1002401|npm-audit-resolver>yargs-unparser>yargs>cliui>wrap-ansi>string-width>strip-ansi>ansi-regex": {
-      "decision": "postpone",
-      "madeAt": 1634580036474
+      "decision": "ignore",
+      "madeAt": 1634795592843,
+      "expiresAt": 1637387558487
     },
     "1002718|json-ref-lite>property-expr": {
       "decision": "postpone",
