@@ -34,6 +34,78 @@
     "1004784|express-validator>validator": {
       "decision": "postpone",
       "madeAt": 1635963635564
+    },
+    "1004876|hapi-openapi>swagger-parser>z-schema>validator": {
+      "decision": "fix",
+      "madeAt": 1645016503326
+    },
+    "1006883|jsdoc>marked": {
+      "decision": "fix",
+      "madeAt": 1645016514215
+    },
+    "1006884|jsdoc>marked": {
+      "decision": "fix",
+      "madeAt": 1645016514215
+    },
+    "1006886|jsdoc>markdown-it": {
+      "decision": "fix",
+      "madeAt": 1645016514215
+    },
+    "1006904|hapi-swagger>swagger-ui-dist": {
+      "decision": "fix",
+      "madeAt": 1645016523343
+    },
+    "1006975|socket.io>engine.io": {
+      "decision": "fix",
+      "madeAt": 1645016531017
+    },
+    "1004876|express-validator>validator": {
+      "decision": "fix",
+      "madeAt": 1645016539391
+    },
+    "1006725|express-validator>validator": {
+      "decision": "fix",
+      "madeAt": 1645016539391
+    },
+    "1006724|request>http-signature>jsprim>json-schema": {
+      "decision": "fix",
+      "madeAt": 1645016548658
+    },
+    "1006724|npm-check-updates>pacote>@npmcli/run-script>node-gyp>request>http-signature>jsprim>json-schema": {
+      "decision": "fix",
+      "madeAt": 1645016548658
+    },
+    "1006865|axios>follow-redirects": {
+      "decision": "fix",
+      "madeAt": 1645016565689
+    },
+    "1006865|@slack/webhook>axios>follow-redirects": {
+      "decision": "fix",
+      "madeAt": 1645016565690
+    },
+    "1007026|axios>follow-redirects": {
+      "decision": "fix",
+      "madeAt": 1645016565690
+    },
+    "1007026|@slack/webhook>axios>follow-redirects": {
+      "decision": "fix",
+      "madeAt": 1645016565690
+    },
+    "1004946|npm-audit-resolver>yargs-unparser>yargs>string-width>strip-ansi>ansi-regex": {
+      "decision": "postpone",
+      "madeAt": 1645016571009
+    },
+    "1004946|npm-audit-resolver>yargs-unparser>yargs>cliui>string-width>strip-ansi>ansi-regex": {
+      "decision": "postpone",
+      "madeAt": 1645016571009
+    },
+    "1004946|npm-audit-resolver>yargs-unparser>yargs>cliui>wrap-ansi>string-width>strip-ansi>ansi-regex": {
+      "decision": "postpone",
+      "madeAt": 1645016571009
+    },
+    "1004876|hapi-swagger>swagger-parser>z-schema>validator": {
+      "decision": "postpone",
+      "madeAt": 1645016584737
     }
   },
   "rules": {},
