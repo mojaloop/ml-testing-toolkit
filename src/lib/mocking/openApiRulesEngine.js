@@ -219,6 +219,10 @@ const callbackRules = async (context, req) => {
   const generatedCallback = {}
   if (curEvent) {
     customLogger.logMessage('debug', 'Callback rules are matched', { additionalData: curEvent, request: req })
+    // Add event info to generated callback
+    generatedCallback.eventInfo = {
+      ...curEvent
+    }
     if (curEvent.params.delay) {
       generatedCallback.delay = curEvent.params.delay
     }
