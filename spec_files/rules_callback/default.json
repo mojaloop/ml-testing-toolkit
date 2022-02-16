@@ -2,7 +2,7 @@
   {
     "ruleId": 28,
     "priority": 1,
-    "description": "ttkpayeefsp PATCH Notifications Failure due to invalid fulfiment Test-case",
+    "description": "ttkpayeefsp PATCH Notifications Failure due to invalid FSPIOP-Destination",
     "apiVersion": {
       "minorVersion": 1,
       "majorVersion": 1,
@@ -51,8 +51,10 @@
       "method": "put",
       "path": "/transfers/{ID}",
       "params": {
+        "headers": {
+          "FSPIOP-Destination": "doesnotexistfsp"
+        },
         "body": {
-          "fulfilment": "WLctttbu2HvTsa1XWvUoGRcQozHsqeu9Ahl2JW9Bsu8",
           "completedTimestamp": "{$function.generic.curDateISO}",
           "transferState": "RESERVED",
           "extensionList": null
