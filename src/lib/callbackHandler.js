@@ -113,6 +113,9 @@ const handleCallback = async (callbackObject, context, req) => {
     }
   }
 
+  if (!callbackObject.headers) {
+    callbackObject.headers = {}
+  }
   // Pass on the traceparent header if exists
   if (req.headers && req.headers.traceparent) {
     callbackObject.headers.traceparent = req.headers.traceparent
