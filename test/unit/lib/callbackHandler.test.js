@@ -123,7 +123,6 @@ describe('callbackHandler', () => {
           fspid: 'userdfsp'
         },
         path: '/transfers/{ID}/error',
-        headers: {},
         body: {}
       }
       const context = {
