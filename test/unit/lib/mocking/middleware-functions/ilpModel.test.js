@@ -130,6 +130,56 @@ describe('ILP Model', () => {
       expect(response.body).toHaveProperty('condition')
       expect(fulfilment.length).toBeGreaterThan(5)
     })
+    it('handleQuoteIlp should not append ilpPacket and condition when ilpPacket is provided in rule eventInfo', () => {
+      const sampleContext = {
+        request: {
+          method: 'post',
+          path: '/quotes',
+          body: {...quoteRequestBody}
+        }
+      }
+      const response = {
+        method: 'put',
+        path: '/quotes/f27456e9-fffb-47c0-9f28-5c727434873d',
+        body: {...quotePartResponseBody},
+        eventInfo: {
+          params: {
+            body: {
+              ilpPacket: 'something'
+            }
+          }
+        }
+      }
+      const fulfilment1 = IlpModel.handleQuoteIlp(sampleContext, response)
+      expect(response.body).not.toHaveProperty('ilpPacket')
+      expect(response.body).not.toHaveProperty('condition')
+      expect(fulfilment1).toBe(null)
+    })
+    it('handleQuoteIlp should not append ilpPacket and condition when condition is provided in rule eventInfo', () => {
+      const sampleContext = {
+        request: {
+          method: 'post',
+          path: '/quotes',
+          body: {...quoteRequestBody}
+        }
+      }
+      const response = {
+        method: 'put',
+        path: '/quotes/f27456e9-fffb-47c0-9f28-5c727434873d',
+        body: {...quotePartResponseBody},
+        eventInfo: {
+          params: {
+            body: {
+              condition: 'something'
+            }
+          }
+        }
+      }
+      const fulfilment1 = IlpModel.handleQuoteIlp(sampleContext, response)
+      expect(response.body).not.toHaveProperty('ilpPacket')
+      expect(response.body).not.toHaveProperty('condition')
+      expect(fulfilment1).toBe(null)
+    })
     it('handleQuoteIlp should return null', () => {
       const sampleContext = {
         request: {
@@ -143,8 +193,8 @@ describe('ILP Model', () => {
         path: '/quotes/f27456e9-fffb-47c0-9f28-5c727434873d',
         body: {...quotePartResponseBody}
       }
-      const fulfilment = IlpModel.handleQuoteIlp(sampleContext, response)
-      expect(fulfilment).toBe(null)
+      const fulfilment1 = IlpModel.handleQuoteIlp(sampleContext, response)
+      expect(fulfilment1).toBe(null)
     })
     it('handleTransferIlp should append fulfilment', () => {
       const sampleContext = {
@@ -168,10 +218,6 @@ describe('ILP Model', () => {
     it('handleTransferIlp should not append fulfilment for get requests', () => {
       const sampleContext = {
         request: {
-          body: {
-            ...transferPartRequestBody,
-            ilpPacket: ilpPacket
-          },
           method: 'get'
         }
       }
@@ -179,6 +225,31 @@ describe('ILP Model', () => {
         method: 'put',
         path: '/transfers/asdfasdf',
         body: {...transferPartResponseBody}
+      }
+      IlpModel.handleTransferIlp(sampleContext, response)
+      expect(response.body).not.toHaveProperty('fulfilment')
+    })
+    it('handleTransferIlp should not append fulfilment when fulfilment is provided in rule eventInfo', () => {
+      const sampleContext = {
+        request: {
+          body: {
+            ...transferPartRequestBody,
+            ilpPacket: ilpPacket
+          },
+          method: 'post'
+        }
+      }
+      const response = {
+        method: 'put',
+        path: '/transfers/asdfasdf',
+        body: {...transferPartResponseBody},
+        eventInfo: {
+          params: {
+            body: {
+              fulfilment: 'something'
+            }
+          }
+        }
       }
       IlpModel.handleTransferIlp(sampleContext, response)
       expect(response.body).not.toHaveProperty('fulfilment')

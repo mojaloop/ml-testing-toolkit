@@ -38,6 +38,11 @@ const handleQuoteIlp = (context, response) => {
   // Check whether the request is POST /quotes
   const pathMatch = /\/quotes\/([^/]+)$/
   if (context.request.method === 'post' && response.method === 'put' && pathMatch.test(response.path)) {
+    if (response.eventInfo && response.eventInfo.params && response.eventInfo.params.body &&
+      (response.eventInfo.params.body.ilpPacket || response.eventInfo.params.body.condition)
+    ) {
+      return null
+    }
     // const transactionObject = {
     //   mockData: 'This is a test data from self testing toolkit'
     // }
@@ -62,6 +67,10 @@ const handleTransferIlp = (context, response) => {
   // Check whether the request is POST /transfers
   const pathMatch = /\/transfers\/([^/]+)$/
   if (context.request.method === 'post' && response.method === 'put' && pathMatch.test(response.path)) {
+    if (response.eventInfo && response.eventInfo.params && response.eventInfo.params.body &&
+      response.eventInfo.params.body.fulfilment) {
+      return null
+    }
     const generatedFulfilment = ilpObj.calculateFulfil(context.request.body.ilpPacket).replace('"', '')
     // const generatedCondition = ilpObj.calculateConditionFromFulfil(generatedFulfilment).replace('"', '')
     response.body.fulfilment = generatedFulfilment
