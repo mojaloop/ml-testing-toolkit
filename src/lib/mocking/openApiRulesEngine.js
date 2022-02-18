@@ -226,6 +226,10 @@ const callbackRules = async (context, req) => {
     await executeScripts(curEvent, req)
 
     if (curEvent.type === 'FIXED_CALLBACK') {
+      // Add event info to generated callback
+      generatedCallback.eventInfo = {
+        ...curEvent
+      }
       const operationCallback = req.customInfo.callbackInfo.successCallback.path
 
       // Check if pathPattern from callback_map file exists and determine the callback path
@@ -239,6 +243,10 @@ const callbackRules = async (context, req) => {
       generatedCallback.body = await replaceVariablesFromRequest(curEvent.params.body, context, req)
       generatedCallback.headers = await replaceVariablesFromRequest(curEvent.params.headers, context, req)
     } else if (curEvent.type === 'MOCK_CALLBACK') {
+      // Add event info to generated callback
+      generatedCallback.eventInfo = {
+        ...curEvent
+      }
       if (req.customInfo.specFile) {
         const callbackGenerator = new OpenApiMockGenerator()
         await callbackGenerator.load(path.join(req.customInfo.specFile))

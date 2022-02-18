@@ -477,7 +477,8 @@ describe('OpenApiRulesEngine', () => {
       delete sampleRequest.customInfo.specFile
       const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
       sampleRequest.customInfo.specFile = temp 
-      expect(result).toStrictEqual({delay: 100})
+      expect(result).toHaveProperty('delay')
+      expect(result.delay).toEqual(100)
     })
     it('Mock Callback', async () => {
       sampleContext.request.method = 'get'
