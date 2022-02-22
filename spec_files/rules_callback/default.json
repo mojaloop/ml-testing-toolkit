@@ -1,5 +1,63 @@
 [
   {
+    "ruleId": 30,
+    "priority": 1,
+    "description": "ttkpayeefsp PUT Notifications Failure Test-case due to invalid FSPIOP-Destination",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "testingtoolkitdfsp",
+          "path": "FSPIOP-Source"
+        },
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "ttkpayeefsp",
+          "path": "FSPIOP-Destination"
+        },
+        {
+          "fact": "body",
+          "operator": "numericEqual",
+          "value": "104",
+          "path": "amount.amount"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transfers/{ID}",
+      "params": {
+        "headers": {
+          "FSPIOP-Destination": "doesnotexistfsp"
+        },
+        "scripts": {
+          "scriptingEngine": "postman"
+        }
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
     "ruleId": 29,
     "priority": 1,
     "description": "ttkpayeefsp PATCH Notifications Failure Test-case due to invalid fulfilment",
