@@ -56,8 +56,9 @@
       "madeAt": 1645016523343
     },
     "1006975|socket.io>engine.io": {
-      "decision": "postpone",
-      "madeAt": 1645533853161
+      "decision": "ignore",
+      "madeAt": 1645526492871,
+      "expiresAt": 1648118482663
     },
     "1004876|express-validator>validator": {
       "decision": "fix",
@@ -92,20 +93,24 @@
       "madeAt": 1645016565690
     },
     "1004946|npm-audit-resolver>yargs-unparser>yargs>string-width>strip-ansi>ansi-regex": {
-      "decision": "postpone",
-      "madeAt": 1645533855125
+      "decision": "ignore",
+      "madeAt": 1645526498774,
+      "expiresAt": 1648118482663
     },
     "1004946|npm-audit-resolver>yargs-unparser>yargs>cliui>string-width>strip-ansi>ansi-regex": {
-      "decision": "postpone",
-      "madeAt": 1645533855125
+      "decision": "ignore",
+      "madeAt": 1645526498774,
+      "expiresAt": 1648118482663
     },
     "1004946|npm-audit-resolver>yargs-unparser>yargs>cliui>wrap-ansi>string-width>strip-ansi>ansi-regex": {
-      "decision": "postpone",
-      "madeAt": 1645533855125
+      "decision": "ignore",
+      "madeAt": 1645526498774,
+      "expiresAt": 1648118482663
     },
     "1004876|hapi-swagger>swagger-parser>z-schema>validator": {
-      "decision": "postpone",
-      "madeAt": 1645533854461
+      "decision": "ignore",
+      "madeAt": 1645526495866,
+      "expiresAt": 1648118482663
     }
   },
   "rules": {},
