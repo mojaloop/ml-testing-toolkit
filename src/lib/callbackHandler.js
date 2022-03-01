@@ -174,8 +174,8 @@ const handleCallback = async (callbackObject, context, req) => {
       customLogger.logOutboundRequest('info', 'Response: ' + reqOpts.method + ' ' + reqOpts.path, { additionalData: { response: result }, request: reqOpts, uniqueId })
       customLogger.logMessage('info', 'Received callback response ' + result.status + ' ' + result.statusText, { request: req })
     }, (err) => {
-      customLogger.logOutboundRequest('error', 'Response: ' + reqOpts.method + ' ' + reqOpts.path, { additionalData: err, request: reqOpts, uniqueId })
-      customLogger.logMessage('error', 'Failed to send callback ' + callbackObject.method + ' ' + reqOpts.url, { additionalData: err.message, request: req })
+      customLogger.logOutboundRequest('error', 'Response: ' + reqOpts.method + ' ' + reqOpts.path, { additionalData: err.response, request: reqOpts, uniqueId })
+      customLogger.logMessage('error', 'Failed to send callback ' + callbackObject.method + ' ' + reqOpts.url, { additionalData: { message: err.message, responseData: (err.response && err.response.data) ? err.response.data : {} }, request: req })
     })
   } else {
     customLogger.logMessage('info', 'Log callback ' + callbackObject.method + ' ' + callbackObject.path, { additionalData: callbackObject, request: req })
