@@ -34,7 +34,8 @@ const cli = (commander) => {
     reportFormat: 'json',
     baseURL: 'http://localhost:5050',
     logLevel: '0',
-    reportAutoFilenameEnable: false
+    reportAutoFilenameEnable: false,
+    breakRunOnError: false
   }
 
   if (fs.existsSync(commander.config)) {
@@ -46,6 +47,7 @@ const cli = (commander) => {
     mode: commander.mode || configFile.mode,
     inputFiles: commander.inputFiles,
     logLevel: commander.logLevel || configFile.logLevel,
+    breakRunOnError: commander.breakRunOnError || configFile.breakRunOnError,
     environmentFile: commander.environmentFile,
     reportFormat: commander.reportFormat || configFile.reportFormat,
     reportAutoFilenameEnable: commander.reportAutoFilenameEnable === 'true' || configFile.reportAutoFilenameEnable === true,

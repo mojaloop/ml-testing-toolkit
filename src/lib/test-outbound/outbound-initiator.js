@@ -232,6 +232,13 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
     }
     const request = requestsObj[templateIDArr[i]]
 
+    let convertedRequest = JSON.parse(JSON.stringify(request))
+
+    if (request.disabled) {
+      await setSkippedResponse(convertedRequest, request, 'SKIPPED', tracing, testCase, {}, globalConfig)
+      continue
+    }
+
     const reqApiDefinition = apiDefinitions.find((item) => {
       return (
         item.majorVersion === +request.apiVersion.majorVersion &&
@@ -243,8 +250,6 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
     if (request.delay) {
       await new Promise(resolve => setTimeout(resolve, request.delay))
     }
-
-    let convertedRequest = JSON.parse(JSON.stringify(request))
 
     // Form the actual http request headers, body, path and method by replacing configurable parameters
     // Replace the parameters
@@ -271,6 +276,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
     }
 
     // Send http request
+    let status
     try {
       // Extra step to access request variables that consists of environment variables in scripts
       const tmpRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
@@ -294,10 +300,12 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         }
       }
       if (contextObj.requestVariables && contextObj.requestVariables.SKIP_REQUEST) {
-        await setSkippedResponse(convertedRequest, request, 'SKIPPED', tracing, testCase, scriptsExecution, globalConfig)
+        status = 'SKIPPED'
+        await setSkippedResponse(convertedRequest, request, status, tracing, testCase, scriptsExecution, globalConfig)
       } else {
         const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId, contextObj)
-        await setResponse(convertedRequest, resp, variableData, request, 'SUCCESS', tracing, testCase, scriptsExecution, contextObj, globalConfig)
+        status = 'SUCCESS'
+        await setResponse(convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig)
       }
     } catch (err) {
       let resp
@@ -306,12 +314,16 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       } catch (parsingErr) {
         resp = err.message
       }
-      await setResponse(convertedRequest, resp, variableData, request, 'ERROR', tracing, testCase, scriptsExecution, contextObj, globalConfig)
+      status = 'ERROR'
+      await setResponse(convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig)
     } finally {
       if (contextObj) {
         contextObj.ctx.dispose()
         contextObj.ctx = null
       }
+    }
+    if (status === 'ERROR' && (testCase.breakOnError)) {
+      terminateOutbound(traceID)
     }
   }
 

@@ -637,11 +637,7 @@ describe('callbackHandler', () => {
         status: '200',
         statusText: 'OK'
       })
-      try {      
-        await callbackHandler.handleCallback(callbackObject, context, req)
-      } catch (err) {
-        expect(err instanceof Error).toBeTruthy()
-      }
+      await expect(callbackHandler.handleCallback(callbackObject, context, req)).resolves.toBe(undefined)
     })
   })
 })
