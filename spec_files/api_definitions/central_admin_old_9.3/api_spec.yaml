@@ -256,6 +256,8 @@ paths:
           - XPD
           - XPF
           - XPT
+          - XTS
+          - XXX
           - YER
           - ZAR
           - ZMK
@@ -567,6 +569,8 @@ paths:
           - XPD
           - XPF
           - XPT
+          - XTS
+          - XXX
           - YER
           - ZAR
           - ZMK
@@ -813,6 +817,8 @@ paths:
           - XPD
           - XPF
           - XPT
+          - XTS
+          - XXX
           - YER
           - ZAR
           - ZMK
@@ -1315,6 +1321,8 @@ components:
           - XPD
           - XPF
           - XPT
+          - XTS
+          - XXX
           - YER
           - ZAR
           - ZMK
@@ -1528,6 +1536,8 @@ components:
           - XPD
           - XPF
           - XPT
+          - XTS
+          - XXX
           - YER
           - ZAR
           - ZMK
@@ -1719,6 +1729,8 @@ components:
           - XPD
           - XPF
           - XPT
+          - XTS
+          - XXX
           - YER
           - ZAR
           - ZMK
@@ -1913,6 +1925,8 @@ components:
           - XPD
           - XPF
           - XPT
+          - XTS
+          - XXX
           - YER
           - ZAR
           - ZMK
@@ -2166,6 +2180,8 @@ components:
           - XPD
           - XPF
           - XPT
+          - XTS
+          - XXX
           - YER
           - ZAR
           - ZMK
