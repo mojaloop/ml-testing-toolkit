@@ -111,6 +111,26 @@
       "decision": "ignore",
       "madeAt": 1645526495866,
       "expiresAt": 1648118482663
+    },
+    "1065331|socket.io>engine.io": {
+      "decision": "postpone",
+      "madeAt": 1647611085667
+    },
+    "1064768|hapi-swagger>swagger-parser>z-schema>validator": {
+      "decision": "postpone",
+      "madeAt": 1647611086292
+    },
+    "1064843|npm-audit-resolver>yargs-unparser>yargs>string-width>strip-ansi>ansi-regex": {
+      "decision": "postpone",
+      "madeAt": 1647611086841
+    },
+    "1064843|npm-audit-resolver>yargs-unparser>yargs>cliui>string-width>strip-ansi>ansi-regex": {
+      "decision": "postpone",
+      "madeAt": 1647611086841
+    },
+    "1064843|npm-audit-resolver>yargs-unparser>yargs>cliui>wrap-ansi>string-width>strip-ansi>ansi-regex": {
+      "decision": "postpone",
+      "madeAt": 1647611086841
     }
   },
   "rules": {},
