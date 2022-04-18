@@ -156,6 +156,31 @@ router.get('/callback_map/:type/:version', async (req, res, next) => {
   }
 })
 
+router.put('/callback_map/:type/:version', async (req, res, next) => {
+  try {
+    const apiDefinitions = await require('../mocking/openApiDefinitionsModel').getApiDefinitions()
+    const reqVersionArr = req.params.version.split('.')
+    const apiType = req.params.type
+
+    const reqApiDefinition = apiDefinitions.find((item) => {
+      if (item.majorVersion === +reqVersionArr[0] && item.minorVersion === +reqVersionArr[1] && item.type === apiType) {
+        return true
+      } else {
+        return false
+      }
+    })
+    if (reqApiDefinition) {
+      await utils.writeFileAsync(reqApiDefinition.callbackMapFile, JSON.stringify(req.body, null, 2))
+      res.status(200).json({})
+    } else {
+      res.status(404).json({ error: 'Unknown Version' })
+    }
+  } catch (err) {
+    // next(err)
+    res.status(500).json({ error: err && err.message })
+  }
+})
+
 router.get('/response_map/:type/:version', async (req, res, next) => {
   try {
     const apiDefinitions = await require('../mocking/openApiDefinitionsModel').getApiDefinitions()
