@@ -39,6 +39,7 @@ const app = apiServer.getApp()
 
 const Utils = require('../../../../src/lib/utils')
 const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
+const SpyWriteFileAsync = jest.spyOn(Utils, 'writeFileAsync')
 const OpenApiDefinitionsModel = require('../../../../src/lib/mocking/openApiDefinitionsModel')
 const APIManagement = require('../../../../src/lib/api-management')
 const SpyGetApiDefinitions = jest.spyOn(OpenApiDefinitionsModel, 'getApiDefinitions')
@@ -258,6 +259,63 @@ describe('API route /api/openapi', () => {
       SpyGetApiDefinitions.mockImplementationOnce(() => {throw new Error()})
       const reqItem = mockGetApiDefinitionsResponse[0]
       const res = await request(app).get(`/api/openapi/callback_map/${reqItem.type}/${reqItem.majorVersion}.${reqItem.minorVersion}`)
+      expect(res.statusCode).toEqual(500)
+    })
+  })
+
+  describe('PUT /api/openapi/callback_map/:type/:version', () => {
+    it('Updating callback', async () => {
+      const reqItem = {
+        params: {
+          minorVersion: 0,
+          majorVersion: 1,
+          type: 'fspiop'
+        },
+        body: {}
+      }
+      const mockGetApiDefinitionsResponse = [{
+        minorVersion: reqItem.params.minorVersion,
+        majorVersion: reqItem.params.majorVersion,
+        type: reqItem.params.type,
+        asynchronous: true,
+        callbackMapFile: 'callback_map.json'
+      }]
+      SpyGetApiDefinitions.mockResolvedValueOnce(mockGetApiDefinitionsResponse)
+      SpyWriteFileAsync.mockResolvedValueOnce(JSON.stringify({}))
+      const res = await request(app).put(`/api/openapi/callback_map/${reqItem.params.type}/${reqItem.params.majorVersion}.${reqItem.params.minorVersion}`, reqItem.body)
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Updating callback 404', async () => {
+      const reqItem = {
+        params: {
+          minorVersion: 0,
+          majorVersion: 1,
+          type: 'notexisting'
+        },
+        body: {}
+      }
+      const mockGetApiDefinitionsResponse = [{
+        minorVersion: reqItem.params.minorVersion,
+        majorVersion: reqItem.params.majorVersion,
+        type: 'fspiop',
+        asynchronous: true,
+        callbackMapFile: 'callback_map.json'
+      }]
+      SpyGetApiDefinitions.mockResolvedValueOnce(mockGetApiDefinitionsResponse)
+      const res = await request(app).put(`/api/openapi/callback_map/${reqItem.params.type}/${reqItem.params.majorVersion}.${reqItem.params.minorVersion}`, reqItem.body)
+      expect(res.statusCode).toEqual(404)
+    })
+    it('Updating callback 500', async () => {
+      const reqItem = {
+        params: {
+          minorVersion: 0,
+          majorVersion: 1,
+          type: 'fspiop'
+        },
+        body: {}
+      }
+      SpyGetApiDefinitions.mockRejectedValueOnce({})
+      const res = await request(app).put(`/api/openapi/callback_map/${reqItem.params.type}/${reqItem.params.majorVersion}.${reqItem.params.minorVersion}`, reqItem.body)
       expect(res.statusCode).toEqual(500)
     })
   })

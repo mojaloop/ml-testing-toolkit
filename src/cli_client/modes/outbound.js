@@ -137,6 +137,7 @@ const sendTemplate = async (sessionId) => {
           totalProgress.totalAssertions += request.tests.assertions.length
         }
       })
+      testCase.breakOnError = (config.breakRunOnError === 'true')
     })
     await axios.post(`${config.baseURL}/api/outbound/template/` + outboundRequestID, template, { headers: { 'Content-Type': 'application/json' } })
   } catch (err) {
@@ -163,6 +164,9 @@ const handleIncomingProgress = async (progress) => {
       console.log(fStr.red('Terminate with exit code 1'))
       process.exit(1)
     }
+  } else if (progress.status === 'TERMINATED') {
+    console.log(fStr.red('Terminate with exit code 1'))
+    process.exit(1)
   } else {
     updateTotalProgressCounts(progress)
     printProgress(progress)
