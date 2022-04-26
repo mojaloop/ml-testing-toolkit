@@ -1,5 +1,261 @@
 [
   {
+    "ruleId": 30,
+    "priority": 1,
+    "description": "ttkpayeefsp PUT Notifications Failure Test-case due to invalid FSPIOP-Destination",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "testingtoolkitdfsp",
+          "path": "FSPIOP-Source"
+        },
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "ttkpayeefsp",
+          "path": "FSPIOP-Destination"
+        },
+        {
+          "fact": "body",
+          "operator": "numericEqual",
+          "value": "104",
+          "path": "amount.amount"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transfers/{ID}",
+      "params": {
+        "headers": {
+          "FSPIOP-Destination": "doesnotexistfsp"
+        },
+        "scripts": {
+          "scriptingEngine": "postman"
+        }
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 29,
+    "priority": 1,
+    "description": "ttkpayeefsp PATCH Notifications Failure Test-case due to invalid fulfilment",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "testingtoolkitdfsp",
+          "path": "FSPIOP-Source"
+        },
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "ttkpayeefsp",
+          "path": "FSPIOP-Destination"
+        },
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "application/vnd.interoperability.transfers+json;version=1.1",
+          "path": "Content-Type"
+        },
+        {
+          "fact": "body",
+          "operator": "numericEqual",
+          "value": "103",
+          "path": "amount.amount"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transfers/{ID}",
+      "params": {
+        "body": {
+          "fulfilment": "WLctttbu2HvTsa1XWvUoGRcQozHsqeu9Ahl2JW9Bsu8",
+          "completedTimestamp": "{$function.generic.curDateISO}",
+          "transferState": "RESERVED",
+          "extensionList": null
+        },
+        "scripts": {
+          "scriptingEngine": "postman"
+        }
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 28,
+    "priority": 1,
+    "description": "ttkpayeefsp PATCH Notifications Failure Test-case due to invalid FSPIOP-Destination",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "testingtoolkitdfsp",
+          "path": "FSPIOP-Source"
+        },
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "ttkpayeefsp",
+          "path": "FSPIOP-Destination"
+        },
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "application/vnd.interoperability.transfers+json;version=1.1",
+          "path": "Content-Type"
+        },
+        {
+          "fact": "body",
+          "operator": "numericEqual",
+          "value": "102",
+          "path": "amount.amount"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transfers/{ID}",
+      "params": {
+        "headers": {
+          "FSPIOP-Destination": "doesnotexistfsp"
+        },
+        "body": {
+          "transferState": "RESERVED"
+        },
+        "scripts": {
+          "scriptingEngine": "postman"
+        }
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 27,
+    "priority": 1,
+    "description": "ttkpayeefsp PATCH Notifications Success Test-case",
+    "apiVersion": {
+      "minorVersion": 1,
+      "majorVersion": 1,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "testingtoolkitdfsp",
+          "path": "FSPIOP-Source"
+        },
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "ttkpayeefsp",
+          "path": "FSPIOP-Destination"
+        },
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "application/vnd.interoperability.transfers+json;version=1.1",
+          "path": "Content-Type"
+        },
+        {
+          "fact": "body",
+          "operator": "numericEqual",
+          "value": "101",
+          "path": "amount.amount"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transfers/{ID}",
+      "params": {
+        "body": {
+          "transferState": "RESERVED"
+        },
+        "scripts": {
+          "scriptingEngine": "postman"
+        }
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
     "ruleId": 20,
     "priority": 1,
     "description": "get /parties/{Type}/{ID} for pinkbank",
