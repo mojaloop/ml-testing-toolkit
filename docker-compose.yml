@@ -2,14 +2,14 @@ version: "3.7"
 
 services:
   mojaloop-testing-toolkit:
-    image: mojaloop/ml-testing-toolkit:v14.1.0
-    #image: mojaloop-testing-toolkit:local
-    #build:
-    #  context: .
-    #  target: builder
+    # image: mojaloop/ml-testing-toolkit:v14.1.0
+    image: mojaloop-testing-toolkit:local
+    build:
+     context: .
+     target: builder
     volumes:
-      - "./spec_files:/opt/mojaloop-testing-toolkit/spec_files"
-      - "./secrets:/opt/mojaloop-testing-toolkit/secrets"
+      - "./spec_files:/opt/app/spec_files"
+      - "./secrets:/opt/app/secrets"
     ports:
       - "5000:5000"
       - "5050:5050"

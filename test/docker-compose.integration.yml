@@ -12,8 +12,8 @@ services:
       - -c
       - "tail -f /dev/null"
     volumes:
-      - ./src:/opt/mojaloop-testing-toolkit/src
-      - ./test:/opt/mojaloop-testing-toolkit/test
-      - ./package.json:/opt/mojaloop-testing-toolkit/package.json
-      - ./test/integration-config.json:/opt/mojaloop-testing-toolkit/config/default.json
+      - ./src:/opt/app/src
+      - ./test:/opt/app/test
+      - ./package.json:/opt/app/package.json
+      - ./test/integration-config.json:/opt/app/config/default.json
       - ./docker/wait-for:/opt/wait-for
