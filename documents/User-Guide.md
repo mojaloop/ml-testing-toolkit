@@ -30,7 +30,7 @@ The document below covers the use-cases with the **Mojaloop Simulator** and **Mo
 
 ### The Testing Toolkit CLI
 
-- [The Testing Toolkit CLI User Guide](/documents/User-Guide-CLI.md)
+- [The Testing Toolkit CLI User Guide](https://github.com/mojaloop/ml-testing-toolkit-client-lib/blob/master/README.md)
 
 ### Connection Manager
 

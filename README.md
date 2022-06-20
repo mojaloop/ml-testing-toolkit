@@ -57,7 +57,7 @@ After installation you can interact with the testing toolkit from either web int
 
 For Web interface follow this [Usage Guide](/documents/User-Guide.md)
 
-For Command line tool follow this [CLI User Guide](/documents/User-Guide-CLI.md)
+For Command line tool follow this [CLI User Guide](https://github.com/mojaloop/ml-testing-toolkit-client-lib/blob/master/README.md)
 
 
 **If you have your own DFSP implementation you can point the peer endpoint to *Mojaloop Testing Toolkit* on port 5000 and try to send requests from your implementation instead of using mojaloop-simulator.**
