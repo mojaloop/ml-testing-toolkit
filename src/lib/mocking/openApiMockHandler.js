@@ -113,17 +113,25 @@ module.exports.handleRequest = async (req, h) => {
     return h.response(errorResponseBuilder('3105', 'Invalid signature')).code(400)
   }
 
-  let selectedVersion = 0
+  let selectedApi
   // Pick a right api definition by searching for the requested resource in the definitions sequentially
   // TODO: This should be optimized by defining a hash table (object) of all the resources in all definition files on startup.
 
-  selectedVersion = pickApiByMethodAndPath(req)
-  if (selectedVersion === -1) {
+  selectedApi = pickApiByMethodPathHostnameAndPrefix(req)
+
+  if (!selectedApi) {
     customLogger.logMessage('error', 'Resource not found', { request: req })
     return h.response({ error: 'Not Found' }).code(404)
   }
-  customLogger.logMessage('info', 'API matched: ' + apis[selectedVersion].type, { request: req })
-  if (apis[selectedVersion].type === 'fspiop' && (await Config.getUserConfig(req.customInfo.user)).VERSIONING_SUPPORT_ENABLE) {
+
+  customLogger.logMessage('info', 'API matched: ' + selectedApi.type, { request: req })
+  // Modify request
+  if(selectedApi && selectedApi.prefix) {
+    req.path = req.path.slice(selectedApi.prefix.length)
+    customLogger.logMessage('info', 'Trimmed prefix from request path: ' + selectedApi.prefix, { request: req })
+  }
+  
+  if (selectedApi.type === 'fspiop' && (await Config.getUserConfig(req.customInfo.user)).VERSIONING_SUPPORT_ENABLE) {
     const fspiopApis = apis.filter(item => {
       return item.type === 'fspiop'
     })
@@ -154,9 +162,9 @@ module.exports.handleRequest = async (req, h) => {
       return h.response(errorResponseBuilder('3001', 'The Client requested an unsupported version, see extension list for supported version(s).', { extensionList })).code(406)
     }
     req.customInfo.negotiatedContentType = versionNegotiationResult.responseContentTypeHeader
-    selectedVersion = versionNegotiationResult.negotiatedIndex
+    selectedApi = apis[versionNegotiationResult.negotiatedIndex]
   }
-  return apis[selectedVersion].openApiBackendObject.handleRequest(
+  return selectedApi.openApiBackendObject.handleRequest(
     {
       method: req.method,
       path: req.path,
@@ -169,10 +177,32 @@ module.exports.handleRequest = async (req, h) => {
   )
 }
 
-const pickApiByMethodAndPath = (req) => {
-  return apis.findIndex(item => {
-    return item.openApiBackendObject.matchOperation(req)
+const pickApiByMethodPathHostnameAndPrefix = (req) => {
+  let pickedApis
+  const matchedPrefixApis = apis.filter(item => {
+    return item.prefix ? req.path.startsWith(item.prefix) : false
   })
+  if (matchedPrefixApis.length > 0) {
+    pickedApis = matchedPrefixApis.filter(item => {
+      return item.openApiBackendObject.matchOperation({ ...req, path: req.path.slice(item.prefix.length) })
+    })
+  } else {
+    const apisWithoutPrefix = apis.filter(item => {
+      return !item.prefix
+    })
+    pickedApis = apisWithoutPrefix.filter(item => {
+      return item.openApiBackendObject.matchOperation(req)
+    })
+  }
+
+  // Match hostnames
+  const matchedHostnameApis = pickedApis.filter(item => {
+    return item.hostnames ? item.hostnames.includes(req.info.hostname) : false
+  })
+  pickedApis = matchedHostnameApis.length > 0 ? matchedHostnameApis : pickedApis
+
+  // Return the first api item if multiple APIs matched
+  return pickedApis[0]
 }
 
 const errorResponseBuilder = (errorCode, errorDescription, additionalProperties = null) => {
