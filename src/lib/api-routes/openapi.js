@@ -35,14 +35,7 @@ router.get('/api_versions', async (req, res, next) => {
 
     if (apiDefinitions) {
       res.status(200).json(apiDefinitions.map(item => {
-        return {
-          minorVersion: item.minorVersion,
-          majorVersion: item.majorVersion,
-          type: item.type,
-          caption: item.caption,
-          asynchronous: item.asynchronous,
-          additionalApi: item.additionalApi
-        }
+        return item
       }))
     } else {
       res.status(404).json({ error: 'Can not read API versions' })
@@ -106,6 +99,18 @@ router.delete('/definition/:type/:version', async (req, res, next) => {
   } catch (err) {
     console.log(err)
     res.status(404).json({ error: 'Unknown format', message: err.message })
+  }
+})
+
+router.put('/definition/:type/:version', async (req, res, next) => {
+  const apiType = req.params.type
+  const apiVersion = req.params.version
+  try {
+    await APIManagement.patchDefinitionParams(apiType, apiVersion, req.body)
+    res.status(200).json({ message: 'API parameters have been modified successfully' })
+  } catch (err) {
+    console.log(err)
+    res.status(404).json({ error: 'Unknown error', message: err.message })
   }
 })
 

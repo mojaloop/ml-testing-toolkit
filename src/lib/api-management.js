@@ -97,8 +97,40 @@ const deleteDefinition = async (name, version) => {
   return true
 }
 
+const patchDefinitionParams = async (name, version, patchParams) => {
+  const apiDefinitions = Config.getSystemConfig().API_DEFINITIONS
+  const matchedApiIndex = apiDefinitions.findIndex(item => {
+    return item.type === name && item.version === version
+  })
+
+  if (matchedApiIndex === -1) {
+    throw new Error('Requested API is not found')
+  }
+  const matchedApi = apiDefinitions[matchedApiIndex]
+
+  // Mutate only editable values based on patchParams
+  if (patchParams.hostnames !== undefined) {
+    matchedApi.hostnames = patchParams.hostnames
+  }
+  if (patchParams.prefix !== undefined) {
+    matchedApi.prefix = patchParams.prefix
+  }
+
+  // Update the vlaues
+  await Config.setSystemConfig({ API_DEFINITIONS: apiDefinitions })
+
+  // Refresh openapi Definitions
+  await OpenApiDefinitionsModel.refreshApiDefinitions()
+
+  // Reload the openapimock handlers
+  OpenApiMockHandler.initilizeMockHandler()
+
+  return true
+}
+
 module.exports = {
   validateDefinition,
   addDefinition,
-  deleteDefinition
+  deleteDefinition,
+  patchDefinitionParams
 }
