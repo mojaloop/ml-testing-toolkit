@@ -53,8 +53,7 @@
     "audit:check": "SHELL=sh check-audit",
     "dep:check": "npx ncu -e 2",
     "dep:update": "npx ncu -u",
-    "genexec": "pkg -t node8-win .",
-    "cli": "node src/cli_client/client.js"
+    "genexec": "pkg -t node8-win ."
   },
   "dependencies": {
     "@elastic/elasticsearch": "^7.15.0",
