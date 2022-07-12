@@ -126,11 +126,11 @@ module.exports.handleRequest = async (req, h) => {
 
   customLogger.logMessage('info', 'API matched: ' + selectedApi.type, { request: req })
   // Modify request
-  if(selectedApi && selectedApi.prefix) {
+  if (selectedApi && selectedApi.prefix) {
     req.path = req.path.slice(selectedApi.prefix.length)
     customLogger.logMessage('info', 'Trimmed prefix from request path: ' + selectedApi.prefix, { request: req })
   }
-  
+
   if (selectedApi.type === 'fspiop' && (await Config.getUserConfig(req.customInfo.user)).VERSIONING_SUPPORT_ENABLE) {
     const fspiopApis = apis.filter(item => {
       return item.type === 'fspiop'
