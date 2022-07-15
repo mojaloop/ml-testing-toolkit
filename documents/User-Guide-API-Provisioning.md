@@ -6,11 +6,13 @@
 
 1. [Overview](#1-overview)
 
-2. [Synchronous API](#1-synchronous-api)
+2. [Synchronous API](#2-synchronous-api)
 
-3. [Asynchronous API](#2-asynchronous-api)
+3. [Asynchronous API](#3-asynchronous-api)
 
-4. [Provisioning through UI](#3-api-provisioning-through-ui)
+4. [Provisioning through UI](#4-api-provisioning-through-ui)
+
+5. [Prefix and Hostnames](#5-prefix-and-hostnames)
 
 
 ## 1. Overview
@@ -85,4 +87,33 @@ And also you can go ahead to create your own validation rules, callback rules an
 - After your file is been processed and validated by TTK, you can find the information about your API in the window. You can verify the details and change the name and other details populated there.
 
   ![API Management Add New API Confirmation](/assets/images/api-provisioning-add-new-api-confirmation.png)
-  
+
+## 5. Prefix and Hostnames
+
+We can also add a `prefix` to a provisioned API. For example if the API consists of a resource called `/pets`, we can configure a prefix for the pets api like `prefix: "/api"` in `system_config.json` file.
+Then the TTK accepts inbound requests on `/api/pets` instead of `/pets`.
+
+This is useful when two provisioned APIs have a common resource. Then we can clearly specify how TTK should work for the inbound requests on that common resource.
+
+In the same way we can also specify `hostnames` for an API. Then TTK selects the API based on the matching `hostname` of the inbound request. For example you can configure the hostname `127.0.0.1` for an API, then all that API will be selected only when the hostname of the inbound request in `127.0.0.1`. It doesn't match the inbound requests with the hostname `localhost`.
+
+Example configuration section of `system_config.json` file.
+```
+"API_DEFINITIONS": [
+  {
+    "type": "example-api-1",
+    "version": "1.0",
+    "folderPath": "example-api-1",
+    "hostnames": [],
+    "prefix": "api1"
+  },
+  {
+    "type": "example-api-2",
+    "version": "1.0",
+    "folderPath": "example-api-2",
+    "hostnames": [
+      "example2.localhost.localdomain"
+    ]
+  }
+}
+```
