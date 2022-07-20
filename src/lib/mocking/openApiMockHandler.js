@@ -197,7 +197,7 @@ const pickApiByMethodPathHostnameAndPrefix = (req) => {
 
   // Match hostnames
   const matchedHostnameApis = pickedApis.filter(item => {
-    return item.hostnames ? item.hostnames.includes(req.info.hostname) : false
+    return item.hostnames && req.info && req.info.hostname ? item.hostnames.includes(req.info.hostname) : false
   })
   pickedApis = matchedHostnameApis.length > 0 ? matchedHostnameApis : pickedApis
 

@@ -143,10 +143,19 @@ describe('OpenApiMockHandler', () => {
       SpyGetUserConfig.mockResolvedValueOnce({
         ILP_SECRET: 'secret'
       })
-      SpyGetApiDefinitions.mockResolvedValueOnce([{
-        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
-        type: 'fspiop'
-      }])
+      SpyGetApiDefinitions.mockResolvedValueOnce([
+        {
+          specFile: 'spec_files/api_definitions/mojaloop_sdk_outbound_scheme_adapter_1.0/api_spec.yaml',
+          type: 'mojaloop_sdk_outbound_scheme_adapter',
+          version: '1.0',
+          hostnames: [],
+          prefix: '/sdk-out'
+        },
+        {
+          specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+          type: 'fspiop'
+        }
+      ])
       await OpenApiMockHandler.initilizeMockHandler()
       const apis = OpenApiMockHandler.getOpenApiObjects()
       const openApiBackendObject = apis[0].openApiBackendObject
@@ -244,6 +253,13 @@ describe('OpenApiMockHandler', () => {
       sampleRequest.path = '/test'
       const result = await OpenApiMockHandler.handleRequest(sampleRequest, h)
       sampleRequest.method = 'post'
+      sampleRequest.path = '/quotes'
+      expect(result).toBeDefined
+    })
+    it('Should pickup the right API when prefix is passed', async () => {
+      // SpyValidate.mockReturnValueOnce(true)
+      sampleRequest.path = '/sdk-out/quotes'
+      const result = await OpenApiMockHandler.handleRequest(sampleRequest, h)
       sampleRequest.path = '/quotes'
       expect(result).toBeDefined
     })
