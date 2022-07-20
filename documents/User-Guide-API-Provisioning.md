@@ -95,6 +95,8 @@ Then the TTK accepts inbound requests on `/api/pets` instead of `/pets`.
 
 This is useful when two provisioned APIs have a common resource. Then we can clearly specify how TTK should work for the inbound requests on that common resource.
 
+**Note:** Prefix should always start with `/`
+
 In the same way we can also specify `hostnames` for an API. Then TTK selects the API based on the matching `hostname` of the inbound request. For example you can configure the hostname `127.0.0.1` for an API, then all that API will be selected only when the hostname of the inbound request in `127.0.0.1`. It doesn't match the inbound requests with the hostname `localhost`.
 
 Example configuration section of `system_config.json` file.
@@ -105,7 +107,7 @@ Example configuration section of `system_config.json` file.
     "version": "1.0",
     "folderPath": "example-api-1",
     "hostnames": [],
-    "prefix": "api1"
+    "prefix": "/api1"
   },
   {
     "type": "example-api-2",
