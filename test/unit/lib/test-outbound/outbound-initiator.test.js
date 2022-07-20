@@ -33,8 +33,10 @@ const Config = require('../../../../src/lib/config')
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
 const notificationEmitter = require('../../../../src/lib/notificationEmitter.js')
 const OpenApiDefinitionsModel = require('../../../../src/lib/mocking/openApiDefinitionsModel')
+const Utils = require('../../../../src/lib/utils')
 jest.mock('../../../../src/lib/webSocketClient/WebSocketClientManager')
 
+const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
 const SpyAgent = jest.spyOn(https, 'Agent')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
 const SpyGetEndpointsConfig= jest.spyOn(ConnectionProvider, 'getEndpointsConfig')
@@ -1521,6 +1523,87 @@ describe('Outbound Initiator Functions', () => {
         type: 'fspiop'
       }])
       await expect(OutboundInitiator.OutboundSendLoop(sampleTemplate, '123', null, 2)).resolves.not.toBeNull
+    })
+    it('OutboundSend with disabled request', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpyGetApiDefinitions.mockResolvedValue([{
+        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+        type: 'fspiop'
+      }])
+      const sampleTemplateModified1 = JSON.parse(JSON.stringify(sampleTemplate))
+      sampleTemplateModified1.test_cases[0].requests[0].disabled = true
+      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified1, '123')).resolves.not.toBeNull
+    })
+    it('OutboundSend with delayed request', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpyGetApiDefinitions.mockResolvedValue([{
+        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+        type: 'fspiop'
+      }])
+      const sampleTemplateModified2 = JSON.parse(JSON.stringify(sampleTemplate))
+      sampleTemplateModified2.test_cases[0].requests[0].delay = 100
+      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified2, '123')).resolves.not.toBeNull
+    })
+    it('OutboundSend with async requests', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
+        "/parties/{Type}/{ID}": {
+          "get": {
+            "fspid": "{$request.headers.fspiop-source}",
+            "successCallback": {
+              "method": "put",
+              "path": "/parties/{Type}/{ID}",
+              "pathPattern": "/parties/{$request.params.Type}/{$request.params.ID}",
+              "headerOverride": {
+                "FSPIOP-Source": "asdf"
+              },
+              "bodyOverride": {
+                "party": {
+                  "partyIdInfo": {
+                    "partyIdType": "asdf"
+                  }
+                }
+              }
+            },
+            "errorCallback": {
+              "method": "put",
+              "path": "/parties/{Type}/{ID}/error",
+              "pathPattern": "/parties/{$request.params.Type}/{$request.params.ID}/error",
+              "headerOverride": {
+                "FSPIOP-Source": "asdf"
+              }
+            }
+          }
+        }
+      }))
+      SpyGetApiDefinitions.mockResolvedValue([{
+        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+        type: 'fspiop'
+      }])
+      const sampleTemplateModified3 = JSON.parse(JSON.stringify(sampleTemplate))
+      sampleTemplateModified3.test_cases[0].requests[0].apiVersion.asynchronous = true      
+      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified3, '123')).resolves.not.toBeNull
     })
 
   })
