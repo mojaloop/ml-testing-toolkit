@@ -1,0 +1,37 @@
+version: "3.7"
+
+services:
+  mojaloop-testing-toolkit:
+    image: mojaloop/ml-testing-toolkit:local
+    volumes:
+      - "../../spec_files:/opt/mojaloop-testing-toolkit/spec_files"
+    ports:
+      - "5000:5000"
+      - "5050:5050"
+    command:
+      - sh
+      - -c
+      - "npm start"
+    healthcheck:
+      test: ["CMD-SHELL", "nc localhost 5000"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+
+  test-service:
+    image: postman/newman:5.3.1
+    depends_on:
+      mojaloop-testing-toolkit:
+        condition: service_healthy
+    volumes:
+      - "./postman:/etc/newman"
+    command:
+      - run
+      - ttk_func_collection.json
+      - "--environment=ttk_func_environment.json"
+
+networks:
+  default:
+    name: mojaloop-testing-toolkit
+
+

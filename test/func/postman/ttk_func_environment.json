@@ -54,7 +54,7 @@
 		},
 		{
 			"key": "HOST_CENTRAL_LEDGER",
-			"value": "http://localhost:5000",
+			"value": "http://mojaloop-testing-toolkit:5000",
 			"enabled": true
 		},
 		{
@@ -69,7 +69,7 @@
 		},
 		{
 			"key": "HOST_ML_API",
-			"value": "http://localhost:5000",
+			"value": "http://mojaloop-testing-toolkit:5000",
 			"enabled": true
 		},
 		{
@@ -79,7 +79,7 @@
 		},
 		{
 			"key": "HOST_CENTRAL_SETTLEMENT",
-			"value": "http://localhost:5000",
+			"value": "http://mojaloop-testing-toolkit:5000",
 			"enabled": true
 		},
 		{
@@ -139,7 +139,7 @@
 		},
 		{
 			"key": "HOST_SIMULATOR",
-			"value": "http://localhost:5000",
+			"value": "http://mojaloop-testing-toolkit:5000",
 			"enabled": true
 		},
 		{
@@ -239,7 +239,7 @@
 		},
 		{
 			"key": "HOST_ML_API_ADAPTER",
-			"value": "http://localhost:5000",
+			"value": "http://mojaloop-testing-toolkit:5000",
 			"enabled": true
 		},
 		{
@@ -259,7 +259,7 @@
 		},
 		{
 			"key": "HOST_SWITCH_TRANSFERS",
-			"value": "http://localhost:5000",
+			"value": "http://mojaloop-testing-toolkit:5000",
 			"enabled": true
 		},
 		{
@@ -269,7 +269,7 @@
 		},
 		{
 			"key": "HOST_SIMULATOR_K8S_CLUSTER",
-			"value": "http://localhost:5000",
+			"value": "http://mojaloop-testing-toolkit:5000",
 			"enabled": true
 		},
 		{
@@ -739,17 +739,17 @@
 		},
 		{
 			"key": "HOST_ACCOUNT_LOOKUP_SERVICE",
-			"value": "http://localhost:5000",
+			"value": "http://mojaloop-testing-toolkit:5000",
 			"enabled": true
 		},
 		{
 			"key": "HOST_ACCOUNT_LOOKUP_ADMIN",
-			"value": "http://localhost:5000",
+			"value": "http://mojaloop-testing-toolkit:5000",
 			"enabled": true
 		},
 		{
 			"key": "HOST_QUOTING_SERVICE",
-			"value": "http://localhost:5000",
+			"value": "http://mojaloop-testing-toolkit:5000",
 			"enabled": true
 		},
 		{

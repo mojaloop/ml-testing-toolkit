@@ -1,28 +1,31 @@
-FROM node:12.16.3-alpine AS builder
+FROM node:16.15.0-alpine as builder
 
-WORKDIR /opt/mojaloop-testing-toolkit
+WORKDIR /opt/app
 
-RUN apk add --no-cache -t build-dependencies git make gcc g++ python libtool autoconf automake \
+RUN apk add --no-cache -t build-dependencies make gcc g++ python3 libtool libressl-dev openssl-dev autoconf automake \
     && cd $(npm root -g)/npm \
     && npm config set unsafe-perm true \
     && npm install -g node-gyp
 
-COPY package.json package-lock.json* /opt/mojaloop-testing-toolkit/
+COPY package.json package-lock.json* /opt/app/
 RUN npm install
-RUN npm install -g bunyan
 
-COPY src /opt/mojaloop-testing-toolkit/src
-COPY spec_files /opt/mojaloop-testing-toolkit/spec_files
-COPY examples /opt/mojaloop-testing-toolkit/examples
-COPY secrets /opt/mojaloop-testing-toolkit/secrets
+COPY src /opt/app/src
+COPY spec_files /opt/app/spec_files
+COPY examples /opt/app/examples
+COPY secrets /opt/app/secrets
 
-FROM node:12.16.3-alpine
+FROM node:16.15.0-alpine
+WORKDIR /opt/app
 
-WORKDIR /opt/mojaloop-testing-toolkit
+# Create a non-root user: ml-user
+RUN adduser -D ml-user 
+USER ml-user
 
-COPY --from=builder /opt/mojaloop-testing-toolkit .
+COPY --chown=ml-user --from=builder /opt/app .
 RUN npm prune --production
 
 EXPOSE 5000
 EXPOSE 5050
-CMD ["npm", "run", "start", "|bunyan"]
+
+CMD ["npm", "run", "start"]
