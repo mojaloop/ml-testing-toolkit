@@ -248,8 +248,7 @@ jobs:
           prefix: licenses
 
   build-native-app:
-    <<: *defaults_working_directory
-    <<: *defaults_docker_ubuntu
+    executor: default-docker
     steps:
       - run:
           name: Install dependencies
