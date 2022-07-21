@@ -41,6 +41,8 @@ const refreshApiDefinitions = async () => {
       type: item.type,
       caption: item.caption,
       asynchronous: item.asynchronous,
+      prefix: item.prefix,
+      hostnames: item.hostnames,
       additionalApi: item.additionalApi,
       specFile: specFilePrefix + item.folderPath + '/api_spec.yaml',
       callbackMapFile: specFilePrefix + item.folderPath + '/callback_map.json',

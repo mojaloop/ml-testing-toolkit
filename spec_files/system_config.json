@@ -79,7 +79,8 @@
     {
       "type": "settlements",
       "version": "2.0",
-      "folderPath": "settlements_2.0"
+      "folderPath": "settlements_2.0",
+      "prefix": "v2"
     },
     {
       "type": "central_admin",
@@ -105,12 +106,17 @@
     {
       "type": "mojaloop_sdk_outbound_scheme_adapter",
       "version": "1.0",
-      "folderPath": "mojaloop_sdk_outbound_scheme_adapter_1.0"
+      "folderPath": "mojaloop_sdk_outbound_scheme_adapter_1.0",
+      "hostnames": [],
+      "prefix": "sdk-out"
     },
     {
       "type": "payment_manager",
       "version": "1.4",
-      "folderPath": "payment_manager_1.4"
+      "folderPath": "payment_manager_1.4",
+      "hostnames": [
+        "pm4ml.hostname.here"
+      ]
     },
     {
       "type": "fx-api",
