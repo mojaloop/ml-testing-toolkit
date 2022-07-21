@@ -118,6 +118,11 @@ You could download a report in several formats by clicking on _Download Report_ 
 
 ### 3.2 CLI tool
 
+You can install the TTK CLI using the following command.
+```
+npm install @mojaloop/ml-testing-toolkit-client-lib --global
+```
+
 #### 3.2.1 Help screen
 
 The help screen allows you to see the usage, possible options and default values
@@ -125,7 +130,7 @@ The help screen allows you to see the usage, possible options and default values
 command: 
 
 ```
-node src/cli_client/client -h
+ml-ttk-cli -h
 ```
 
 output:
@@ -149,7 +154,7 @@ Options:
 command:
 
 ```
-node src/cli_client/client -m outbound -i examples/collections/dfsp/p2p_happy_path.json -e examples/environments/dfsp_local_environment.json --report-format html
+ml-ttk-cli -m outbound -i examples/collections/dfsp/p2p_happy_path.json -e examples/environments/dfsp_local_environment.json --report-format html
 ```
 
 output:

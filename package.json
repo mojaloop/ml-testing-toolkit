@@ -29,13 +29,16 @@
       "simulator"
     ]
   },
+  "engines": {
+    "node": "=16.x"
+  },
   "pre-commit": [
-    "standard"
+    "lint"
   ],
   "scripts": {
     "start": "node src/index.js",
-    "standard": "standard",
-    "standard:fix": "standard --fix",
+    "lint": "npx standard",
+    "lint:fix": "npx standard --fix",
     "dev": "nodemon src/index.js",
     "test": "npm run test:unit",
     "test:unit": "jest --testMatch '**/test/unit/**/*.test.js'",
@@ -45,7 +48,7 @@
     "test:junit": "jest --reporters=default --reporters=jest-junit --testMatch '**/test/unit/**/*.test.js'",
     "test:integration": "./test/integration-runner.sh ",
     "cover": "npx nyc --all report --reporter=lcov npm run test",
-    "lint": "eslint --ignore-path ../.eslintignore .",
+    "lint2": "eslint --ignore-path ../.eslintignore .",
     "build": "docker build -t mojaloop-testing-toolkit:local -f ./Dockerfile .",
     "run": "docker run -p 5000:5000 --rm ",
     "generate-docs": "jsdoc -c jsdoc.json",
