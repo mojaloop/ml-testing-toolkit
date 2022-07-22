@@ -97,11 +97,5 @@ describe('api-server', () => {
       }).not.toThrowError()
     })
   })
-  const wait = async (ms = 0) => {
-    await act(async () => {
-      return new Promise(resolve => {
-        setTimeout(resolve, ms);
-      });
-    });
-  }
+  const wait = async (ms = 0) => new Promise(resolve => setTimeout(resolve, ms))
 })
