@@ -40,6 +40,12 @@ describe('Index', () => {
     it('Init should not throw an error', async () => {
       apiServer.startServer.mockReturnValue()
       Config.loadUserConfig.mockResolvedValue()
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false,
+        CONNECTION_MANAGER: {
+          ENABLED: false
+        }
+      })
       ConnectionProvider.initialize.mockResolvedValue()
       Server.initialize.mockResolvedValue()
       expect(() => {require('../../src/index')}).not.toThrowError();

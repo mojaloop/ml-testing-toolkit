@@ -194,7 +194,9 @@ const initialize = async () => {
 const restartServer = async (user) => {
   if (serverInstance) {
     RequestLogger.logMessage('info', `Toolkit Server restarted on ${serverInstance.info.uri}`, { user })
-    serverInstance.stop()
+    try {
+      await serverInstance.stop()
+    } catch(err) {}
     serverInstance = await createServer(Config.getSystemConfig().API_PORT, user)
     return serverInstance
   }
