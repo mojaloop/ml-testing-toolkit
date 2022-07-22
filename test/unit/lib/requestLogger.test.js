@@ -27,6 +27,7 @@ const Config = require('../../../src/lib/config')
 
 jest.mock('../../../src/lib/notificationEmitter')
 jest.mock('../../../src/lib/config')
+jest.mock('../../../src/lib/db/adapters/dbAdapter')
 
 const requestLogger = require('../../../src/lib/requestLogger')
 
