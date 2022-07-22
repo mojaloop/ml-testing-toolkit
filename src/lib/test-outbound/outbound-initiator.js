@@ -563,7 +563,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         if (!tlsConfig.dfsps[dfspId]) {
           const errorMsg = 'Outbound TLS is enabled, but there is no TLS config found for DFSP ID: ' + dfspId
           customLogger.logMessage('error', errorMsg, { user })
-          reject(new Error(JSON.stringify({ errorCode: 4000, errorDescription: errorMsg })))
+          return reject(new Error(JSON.stringify({ errorCode: 4000, errorDescription: errorMsg })))
         }
         httpAgentProps.httpsAgent = new https.Agent({
           cert: tlsConfig.dfsps[dfspId].hubClientCert,
@@ -633,21 +633,21 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         timer = setTimeout(() => {
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
-          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
+          return reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
         }, userConfig.CALLBACK_TIMEOUT)
         // Listen for success callback
         MyEventEmitter.getEmitter('testOutbound', user).once(successCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
           customLogger.logMessage('info', 'Received success callback ' + successCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
+          return resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
         })
         // Listen for error callback
         MyEventEmitter.getEmitter('testOutbound', user).once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
           customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
+          return reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
         })
       }
 
@@ -669,13 +669,13 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
             MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
             MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
           }
-          reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
+          return reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
         } else {
           customLogger.logOutboundRequest('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: { response: result }, user, uniqueId, request: reqOpts })
         }
 
         if (!successCallbackUrl || !errorCallbackUrl || ignoreCallbacks) {
-          resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
+          return resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
         }
         customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user })
       }, (err) => {
@@ -685,7 +685,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         }
         customLogger.logOutboundRequest('error', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: { errorStack: err.stack }, user, uniqueId, request: reqOpts })
         customLogger.logMessage('error', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: { errorStack: err.stack }, notification: false, user })
-        reject(new Error(JSON.stringify({ errorCode: 4000, syncResponse })))
+        return reject(new Error(JSON.stringify({ errorCode: 4000, syncResponse })))
       })
     })()
   })

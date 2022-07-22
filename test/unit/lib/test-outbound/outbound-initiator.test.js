@@ -48,6 +48,7 @@ const SpyGetApiDefinitions = jest.spyOn(OpenApiDefinitionsModel, 'getApiDefiniti
 
 jest.mock('../../../../src/lib/notificationEmitter.js')
 jest.mock('axios')
+jest.mock('../../../../src/lib/db/adapters/dbAdapter')
 
 
 describe('Outbound Initiator Functions', () => {
@@ -854,9 +855,10 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      try {
-        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'notExistingDfsp')
-      } catch (err) {}
+      // try {
+      //   await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'notExistingDfsp')
+      // } catch (err) {}
+      await expect(OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'notExistingDfsp')).rejects.toThrowError()
     })
     it('sendRequest should call axios with appropriate params 9 and with CLIENT_MUTUAL_TLS_ENABLED', async () => {
       axios.mockImplementation(() => Promise.resolve({
