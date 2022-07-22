@@ -29,6 +29,7 @@ jest.mock('../../../src/lib/utils')
 jest.mock('../../../src/lib/config')
 
 const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
+const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 
 const specFilePrefix = 'test/'
 
@@ -46,6 +47,9 @@ describe('API Management', () => {
     SpyGetSystemConfig.mockReturnValue({
       API_DEFINITIONS: []
     })
+    SpyGetUserConfig.mockReturnValue({
+      ILP_SECRET: ''
+    })
     it('should not throw an error', async () => {
       await expect(APIManagement.addDefinition(specFilePrefix + 'api_spec_sync.yaml', 'name', '1.0', 'false')).resolves.toBeUndefined()
     })
@@ -61,6 +65,9 @@ describe('API Management', () => {
           }
         ]
       })
+      SpyGetUserConfig.mockReturnValue({
+        ILP_SECRET: ''
+      })
       await expect(APIManagement.deleteDefinition('name', '1.0')).resolves.toBe(true)
     })
     it('should throw an error when API is inbuilt API', async () => {
@@ -73,11 +80,17 @@ describe('API Management', () => {
           }
         ]
       })
+      SpyGetUserConfig.mockReturnValue({
+        ILP_SECRET: ''
+      })
       await expect(APIManagement.deleteDefinition('name', '1.0')).rejects.toThrowError()
     })
     it('should throw an error when API not found', async () => {
       SpyGetSystemConfig.mockReturnValue({
         API_DEFINITIONS: []
+      })
+      SpyGetUserConfig.mockReturnValue({
+        ILP_SECRET: ''
       })
       await expect(APIManagement.deleteDefinition('name', '1.0')).rejects.toThrowError()
     })
