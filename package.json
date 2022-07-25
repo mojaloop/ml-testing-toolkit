@@ -33,7 +33,7 @@
     ]
   },
   "pre-commit": [
-    "standard"
+    "lint"
   ],
   "main": "src/index.js",
   "scripts": {
