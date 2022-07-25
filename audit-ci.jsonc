@@ -1,0 +1,12 @@
+{
+  "$schema": "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
+  // audit-ci supports reading JSON, JSONC, and JSON5 config files.
+  // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
+  "moderate": true,
+  "allowlist": [
+    // TODO: multer lib is using some vulnerable dependency
+    "GHSA-wm7h-9275-46v2",
+    // postman-collection: no fix available
+    "GHSA-mhxj-85r3-2x55"
+  ]
+}

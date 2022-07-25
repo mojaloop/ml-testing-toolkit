@@ -1,0 +1,7 @@
+# Ignore for publishing
+test/*
+.circleci/*
+uploads/*
+simulator/*
+simulator2/*
+native-app-generation/*
