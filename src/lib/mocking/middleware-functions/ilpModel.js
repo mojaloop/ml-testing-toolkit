@@ -29,7 +29,7 @@ let ilpObj = null
 
 const init = (secret) => {
   ilpObj = new Ilp({
-    secret: secret
+    secret
   })
 }
 

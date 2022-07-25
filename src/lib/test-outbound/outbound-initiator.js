@@ -103,7 +103,7 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
         completedTimeISO: completedTimeStamp.toISOString(),
         startedTime: startedTimeStamp.toUTCString(),
         completedTime: completedTimeStamp.toUTCString(),
-        runDurationMs: runDurationMs,
+        runDurationMs,
         avgResponseTime: 'NA',
         totalAssertions: 0,
         totalPassedAssertions: 0
@@ -170,7 +170,7 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
         completedTimeISO: completedTimeStamp.toISOString(),
         startedTime: startedTimeStamp.toUTCString(),
         completedTime: completedTimeStamp.toUTCString(),
-        runDurationMs: runDurationMs,
+        runDurationMs,
         totalAssertions: 0,
         totalPassedAssertions: 0
       }
@@ -351,7 +351,7 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
     testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
   }
   request.appended = {
-    status: status,
+    status,
     testResult,
     response: resp.syncResponse,
     callback: resp.callback,
@@ -372,14 +372,14 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
       outboundID: tracing.outboundID,
       testCaseId: testCase.id,
       testCaseName: testCase.name,
-      status: status,
+      status,
       requestId: request.id,
       response: resp.syncResponse,
       callback: resp.callback,
       requestSent: convertedRequest,
       additionalInfo: {
         curlRequest: resp.curlRequest,
-        scriptsExecution: scriptsExecution
+        scriptsExecution
       },
       testResult,
       totalProgress: globalConfig.totalProgress
@@ -393,7 +393,7 @@ const setSkippedResponse = async (convertedRequest, request, status, tracing, te
     testResult = await setAllTestsSkipped(convertedRequest)
   }
   request.appended = {
-    status: status,
+    status,
     testResult,
     response: null,
     callback: null,
@@ -414,14 +414,14 @@ const setSkippedResponse = async (convertedRequest, request, status, tracing, te
       outboundID: tracing.outboundID,
       testCaseId: testCase.id,
       testCaseName: testCase.name,
-      status: status,
+      status,
       requestId: request.id,
       response: null,
       callback: null,
       requestSent: convertedRequest,
       additionalInfo: {
         curlRequest: null,
-        scriptsExecution: scriptsExecution
+        scriptsExecution
       },
       testResult,
       totalProgress: globalConfig.totalProgress
@@ -598,11 +598,11 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
       }
 
       const reqOpts = {
-        method: method,
+        method,
         url: urlGenerated,
-        path: path,
+        path,
         params: queryParams,
-        headers: headers,
+        headers,
         data: body,
         timeout: (contextObj.requestVariables && contextObj.requestVariables.REQUEST_TIMEOUT) || userConfig.DEFAULT_REQUEST_TIMEOUT,
         validateStatus: function (status) {
@@ -633,21 +633,21 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         timer = setTimeout(() => {
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
-          return reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
+          return reject(new Error(JSON.stringify({ curlRequest, syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
         }, userConfig.CALLBACK_TIMEOUT)
         // Listen for success callback
         MyEventEmitter.getEmitter('testOutbound', user).once(successCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
           customLogger.logMessage('info', 'Received success callback ' + successCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          return resolve({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
+          return resolve({ curlRequest, syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
         })
         // Listen for error callback
         MyEventEmitter.getEmitter('testOutbound', user).once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
           customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          return reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse: syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
+          return reject(new Error(JSON.stringify({ curlRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
         })
       }
 
@@ -669,13 +669,13 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
             MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
             MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
           }
-          return reject(new Error(JSON.stringify({ curlRequest: curlRequest, syncResponse })))
+          return reject(new Error(JSON.stringify({ curlRequest, syncResponse })))
         } else {
           customLogger.logOutboundRequest('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: { response: result }, user, uniqueId, request: reqOpts })
         }
 
         if (!successCallbackUrl || !errorCallbackUrl || ignoreCallbacks) {
-          return resolve({ curlRequest: curlRequest, syncResponse: syncResponse })
+          return resolve({ curlRequest, syncResponse })
         }
         customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user })
       }, (err) => {
@@ -820,8 +820,8 @@ const getTotalCounts = (inputTemplate) => {
     totalAssertions: 0
   }
   const { test_cases } = inputTemplate  // eslint-disable-line
-  result.totalTestCases = test_cases.length
-  test_cases.forEach(testCase => {
+  result.totalTestCases = test_cases.length  // eslint-disable-line
+  test_cases.forEach(testCase => { // eslint-disable-line
     const { requests } = testCase
     result.totalRequests += requests.length
     requests.forEach(request => {
@@ -834,7 +834,7 @@ const getTotalCounts = (inputTemplate) => {
 // Generate consolidated final report
 const generateFinalReport = (inputTemplate, runtimeInformation) => {
   const { test_cases, ...remaingPropsInTemplate } = inputTemplate  // eslint-disable-line
-  const resultTestCases = test_cases.map(testCase => {
+  const resultTestCases = test_cases.map(testCase => { // eslint-disable-line
     const { requests, ...remainingPropsInTestCase } = testCase
     const resultRequests = requests.map(requestItem => {
       const { testResult, request, ...remainginPropsInRequest } = requestItem.appended
@@ -862,7 +862,7 @@ const generateFinalReport = (inputTemplate, runtimeInformation) => {
   return {
     ...remaingPropsInTemplate,
     test_cases: resultTestCases,
-    runtimeInformation: runtimeInformation
+    runtimeInformation
   }
 }
 

@@ -136,12 +136,12 @@ const getObjectStoreInitConfig = async () => {
 }
 
 module.exports = {
-  getUserConfig: getUserConfig,
-  getStoredUserConfig: getStoredUserConfig,
-  setStoredUserConfig: setStoredUserConfig,
-  loadUserConfig: loadUserConfig,
-  getSystemConfig: getSystemConfig,
-  loadSystemConfig: loadSystemConfig,
-  setSystemConfig: setSystemConfig,
-  getObjectStoreInitConfig: getObjectStoreInitConfig
+  getUserConfig,
+  getStoredUserConfig,
+  setStoredUserConfig,
+  loadUserConfig,
+  getSystemConfig,
+  loadSystemConfig,
+  setSystemConfig,
+  getObjectStoreInitConfig
 }

@@ -29,8 +29,8 @@ const customLogger = require('../requestLogger')
 
 exports.getToken = async (username, password) => {
   const form = {
-    username: username,
-    password: password,
+    username,
+    password,
     scope: 'openid',
     grant_type: 'password'
   }

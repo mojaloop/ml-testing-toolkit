@@ -112,7 +112,7 @@ const getClientAuthInfo = async (user) => {
     const clientSecretResp = await axios.get(systemConfig.KEYCLOAK.API_URL + `/auth/admin/realms/${systemConfig.KEYCLOAK.REALM}/clients/${clientKeycloakID}/client-secret`, { params: { clientId }, headers: { Authorization: `Bearer ${keycloakToken.accessToken}` } })
     if (clientSecretResp.status === 200 && clientSecretResp.data.type && clientSecretResp.data.type === 'secret') {
       return {
-        clientId: clientId,
+        clientId,
         clientSecret: clientSecretResp.data.value,
         tokenEndpoint: systemConfig.OAUTH.OAUTH2_ISSUER
       }
@@ -153,7 +153,7 @@ const _findClient = async (clientId, keycloakToken) => {
 
 const _createClient = async (clientId, keycloakToken) => {
   const clientRepresentationObj = {
-    clientId: clientId,
+    clientId,
     enabled: true,
     protocol: 'openid-connect',
     rootUrl: '',

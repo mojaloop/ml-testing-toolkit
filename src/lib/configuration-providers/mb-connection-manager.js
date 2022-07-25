@@ -110,7 +110,7 @@ const initDFSP = async (environmentId, dfspId, dfspName) => {
   // Create if not exists
   try {
     const dfspData = {
-      dfspId: dfspId,
+      dfspId,
       name: dfspName,
       monetaryZoneId: 'EUR'
     }
@@ -144,9 +144,9 @@ const initJWSCertificate = async (environmentId, dfspId, jwsCertificate, interme
   // Create if not exists or update if exists
   try {
     const jwsData = {
-      rootCertificate: rootCertificate,
+      rootCertificate,
       intermediateChain: intermediateCertificate,
-      jwsCertificate: jwsCertificate
+      jwsCertificate
     }
     let jwsCertResponse = null
     if (certExists) {
@@ -322,7 +322,7 @@ const uploadHubServerCerts = async (environmentId, rootCert, intermediateChain, 
 
   const newHubServerCerts = {
     rootCertificate: rootCert,
-    intermediateChain: intermediateChain,
+    intermediateChain,
     serverCertificate: serverCert
   }
 

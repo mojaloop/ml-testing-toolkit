@@ -208,8 +208,8 @@ const pickApiByMethodPathHostnameAndPrefix = (req) => {
 const errorResponseBuilder = (errorCode, errorDescription, additionalProperties = null) => {
   return {
     errorInformation: {
-      errorCode: errorCode,
-      errorDescription: errorDescription,
+      errorCode,
+      errorDescription,
       ...additionalProperties
     }
   }

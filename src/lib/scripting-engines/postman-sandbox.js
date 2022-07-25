@@ -49,8 +49,8 @@ const generateContextObj = async (environment = {}) => {
     console.log(cursor, err)
   })
   const contextObj = {
-    ctx: ctx,
-    environment: environment
+    ctx,
+    environment
   }
   return contextObj
 }
@@ -91,7 +91,7 @@ const executeAsync = async (script, data, contextObj) => {
       customLogger.logOutboundRequest('info', 'Request: ' + reqObject.method + ' ' + reqObject.path, { additionalData: { request: reqObject }, request: reqObject, uniqueId })
       try {
         response = await axios(reqObject)
-        customLogger.logOutboundRequest('info', 'Response: ' + response.status + ' ' + response.statusText, { additionalData: { response: response }, request: reqObject, uniqueId })
+        customLogger.logOutboundRequest('info', 'Response: ' + response.status + ' ' + response.statusText, { additionalData: { response }, request: reqObject, uniqueId })
       } catch (err) {
         customLogger.logOutboundRequest('error', 'Error Response: ' + err.message, { additionalData: err, request: reqObject, uniqueId })
         throw (err)
@@ -118,7 +118,7 @@ const executeAsync = async (script, data, contextObj) => {
     // consoleLog.push([{execution: 0}, 'executionError', err.message])
   }
   const result = {
-    consoleLog: consoleLog,
+    consoleLog,
     environment: { ...contextObj.environment }
   }
   consoleLog = []
