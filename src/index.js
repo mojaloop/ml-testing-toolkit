@@ -27,6 +27,9 @@ const RequestLogger = require('./lib/requestLogger')
 const apiServer = require('./lib/api-server')
 const socketServer = require('./lib/socket-server')
 const Config = require('./lib/config')
+const server = require('./server')
+const mbConnectionManager = require('./lib/configuration-providers/mb-connection-manager')
+const reportGenerator = require('./lib/report-generator/generator')
 
 const welcomeMessage = `
 -------------------------------------------------------------------------------------
@@ -49,10 +52,10 @@ const init = async () => {
   socketServer.initServer(apiServer.getHttp())
   const systemConfig = Config.getSystemConfig()
   if (systemConfig.CONNECTION_MANAGER.ENABLED) {
-    await require('./lib/configuration-providers/mb-connection-manager').initialize()
+    await mbConnectionManager.initialize()
   }
-  await require('./lib/report-generator/generator').initialize()
-  await require('./server').initialize()
+  await reportGenerator.initialize()
+  await server.initialize()
   RequestLogger.logMessage('info', 'Toolkit Initialization completed.', { notification: false, additionalData: welcomeMessage })
 }
 

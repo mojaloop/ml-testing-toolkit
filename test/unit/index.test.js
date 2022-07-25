@@ -33,6 +33,7 @@ const ConnectionProvider = require('../../src/lib/configuration-providers/mb-con
 jest.mock('../../src/lib/config')
 jest.mock('../../src/server')
 jest.mock('../../src/lib/api-server')
+jest.mock('../../src/lib/requestLogger')
 jest.mock('../../src/lib/configuration-providers/mb-connection-manager')
 
 describe('Index', () => {

@@ -25,13 +25,19 @@
 const APIManagement = require('../../../src/lib/api-management')
 const Utils = require('../../../src/lib/utils')
 const Config = require('../../../src/lib/config')
+const fs = require('fs')
+
 jest.mock('../../../src/lib/utils')
 jest.mock('../../../src/lib/config')
+
+const specFilePrefix = 'test/'
+const apiSpecSyncFile = fs.readFileSync(specFilePrefix + 'api_spec_sync.yaml')
+
+fs.readFile = jest.fn((path, callback) => { return callback(null, apiSpecSyncFile); });
 
 const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 
-const specFilePrefix = 'test/'
 
 describe('API Management', () => { 
   describe('validateDefinition', () => {
@@ -61,6 +67,7 @@ describe('API Management', () => {
           {
             type: 'name',
             version: '1.0',
+            folderPath: "name_1.0",
             additionalApi: true
           }
         ]
@@ -71,11 +78,13 @@ describe('API Management', () => {
       await expect(APIManagement.deleteDefinition('name', '1.0')).resolves.toBe(true)
     })
     it('should throw an error when API is inbuilt API', async () => {
+      
       SpyGetSystemConfig.mockReturnValue({
         API_DEFINITIONS: [
           {
             type: 'name',
             version: '1.0',
+            folderPath: "name_1.0",
             additionalApi: false
           }
         ]

@@ -1558,7 +1558,7 @@ describe('Outbound Initiator Functions', () => {
       }])
       const sampleTemplateModified2 = JSON.parse(JSON.stringify(sampleTemplate))
       sampleTemplateModified2.test_cases[0].requests[0].delay = 100
-      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified2, '123')).resolves.not.toBeNull
+      await OutboundInitiator.OutboundSend(sampleTemplateModified2, '123')
     })
     it('OutboundSend with async requests', async () => {
       axios.mockImplementation(() => Promise.resolve({
