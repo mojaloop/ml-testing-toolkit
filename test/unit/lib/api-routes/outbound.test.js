@@ -26,7 +26,7 @@
 const Config = require('../../../../src/lib/config')
 jest.mock('../../../../src/lib/config')
 Config.getSystemConfig.mockReturnValue({
-  "API_PORT": 5000,
+  "API_PORT": 4040,
   "HOSTING_ENABLED": false,
   "CONFIG_VERSIONS": {
     "response": 1,
@@ -74,7 +74,7 @@ Config.getSystemConfig.mockReturnValue({
   ]
 })
 Config.getUserConfig.mockResolvedValue({
-  CALLBACK_ENDPOINT: 'http://localhost:5000',
+  CALLBACK_ENDPOINT: 'http://localhost:4040',
   CALLBACK_TIMEOUT: 5000
 })
 

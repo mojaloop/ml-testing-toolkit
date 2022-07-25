@@ -11,7 +11,7 @@ services:
       - "./spec_files:/opt/mojaloop-testing-toolkit/spec_files"
       - "./secrets:/opt/mojaloop-testing-toolkit/secrets"
     ports:
-      - "5000:5000"
+      - "4040:4040"
       - "5050:5050"
     command:
       - sh

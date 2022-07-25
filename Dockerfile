@@ -26,7 +26,7 @@ USER ml-user
 COPY --chown=ml-user --from=builder /opt/app .
 RUN npm prune --production
 
-EXPOSE 5000
+EXPOSE 4040
 EXPOSE 5050
 
 CMD ["npm", "run", "start"]

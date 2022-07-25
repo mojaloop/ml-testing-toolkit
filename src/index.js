@@ -39,7 +39,7 @@ You can start using the testing toolkit by opening the following URL in your bro
 
 http://localhost:5050
 
-And you can send mojaloop requests to http://localhost:5000
+And you can send mojaloop requests to http://localhost:4040
 
 -------------------------------------------------------------------------------------
 `

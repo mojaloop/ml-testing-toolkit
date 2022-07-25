@@ -90,7 +90,7 @@ Listening on newLog events...
       "date": "Tue, 12 May 2020 12:23:32 GMT",
       "user-agent": "axios/0.19.2",
       "content-length": "256",
-      "host": "localhost:5000",
+      "host": "localhost:4040",
       "connection": "close"
     },
     "body": {

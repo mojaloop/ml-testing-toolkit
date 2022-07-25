@@ -16,7 +16,7 @@ services:
     volumes:
       - "../../spec_files:/opt/mojaloop-testing-toolkit/spec_files"
     ports:
-      - "5000:5000"
+      - "4040:4040"
       - "5050:5050"
     environment:
       TTK_SYSTEM_CONFIG: |-
