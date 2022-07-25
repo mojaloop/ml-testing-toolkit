@@ -8,7 +8,7 @@ RUN apk add --no-cache -t build-dependencies make gcc g++ python3 libtool libres
     && npm install -g node-gyp
 
 COPY package.json package-lock.json* /opt/app/
-RUN npm install
+RUN npm ci
 
 COPY src /opt/app/src
 COPY spec_files /opt/app/spec_files
