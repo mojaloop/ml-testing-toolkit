@@ -8,8 +8,8 @@ services:
     #  context: .
     #  target: builder
     volumes:
-      - "./spec_files:/opt/mojaloop-testing-toolkit/spec_files"
-      - "./secrets:/opt/mojaloop-testing-toolkit/secrets"
+      - "./spec_files:/opt/app/spec_files"
+      - "./secrets:/opt/app/secrets"
     ports:
       - "4040:4040"
       - "5050:5050"
