@@ -142,7 +142,7 @@ function getOAuth2Middleware () {
 }
 
 const handleMiddleware = () => {
-  if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
+  if (Config.getSystemConfig().OAUTH && Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
     customLogger.logMessage('info', 'Enabling OAUTH', { notification: false })
     getOAuth2Middleware()
   } else {
