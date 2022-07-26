@@ -13,7 +13,6 @@ RUN npm ci
 COPY src /opt/app/src
 COPY spec_files /opt/app/spec_files
 COPY examples /opt/app/examples
-COPY secrets /opt/app/secrets
 RUN mkdir /opt/app/uploads
 
 FROM node:16.15.0-alpine
