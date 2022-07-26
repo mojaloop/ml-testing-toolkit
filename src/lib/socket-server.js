@@ -26,7 +26,15 @@ const socketIO = require('socket.io')
 let socketIOObj = null
 
 const initServer = (http) => {
-  socketIOObj = socketIO(http)
+  socketIOObj = socketIO(http, {
+    cors: {
+      allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+      exposedHeaders: ['Content-Disposition'],
+      methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+      origin: true,
+      credentials: true
+    }
+  })
 }
 
 const getIO = () => {
