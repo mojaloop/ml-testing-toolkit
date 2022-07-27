@@ -1,6 +1,6 @@
 {
 	"id": "8cf3def3-2d5d-41b2-b880-8db0b4b3615f",
-	"name": "Mojaloop-PDP-Testing-tool",
+	"name": "Mojaloop-TTK-Docker",
 	"values": [
 		{
 			"key": "payeefsp",

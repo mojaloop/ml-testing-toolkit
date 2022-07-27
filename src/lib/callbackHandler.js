@@ -129,11 +129,21 @@ const handleCallback = async (callbackObject, context, req) => {
     method: callbackObject.method,
     url: urlGenerated,
     path: callbackObject.path,
-    headers: callbackObject.headers,
+    headers: {
+      ...callbackObject.headers
+    },
     data: callbackObject.body,
     customInfo: req.customInfo,
     timeout: userConfig.DEFAULT_REQUEST_TIMEOUT || 3000,
     ...httpAgentProps
+  }
+
+  // Remove content-length header
+  if (reqOpts.headers['Content-Length']) {
+    delete reqOpts.headers['Content-Length']
+  }
+  if (reqOpts.headers['content-cength']) {
+    delete reqOpts.headers['content-length']
   }
 
   // JwsSigning

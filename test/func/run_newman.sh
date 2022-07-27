@@ -1,1 +1,1 @@
-newman run --delay-request=10  --environment='postman/mojaloop-pdp-testing-tool.postman_environment.json' 'postman/mojaloop-pdp-testing-tool.postman_collection.json'
+newman run --delay-request=10  --environment='postman/ttk_func_environment.json' 'postman/ttk_func_collection.json'
