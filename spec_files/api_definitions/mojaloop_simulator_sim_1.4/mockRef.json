@@ -71,9 +71,5 @@
   {
     "id": "errorInformation.errorDescription",
     "pattern": "This is a mock error description"
-  },
-  {
-    "id": "Content-Length",
-    "pattern": "123"
   }
 ]
