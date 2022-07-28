@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   mojaloop-testing-toolkit:
-    image: mojaloop/ml-testing-toolkit:v14.1.0
+    image: mojaloop/ml-testing-toolkit:v15.0.0
     #image: mojaloop/ml-testing-toolkit:local
     #build:
     #  context: .
@@ -18,7 +18,7 @@ services:
       - -c
       - "npm start"
   mojaloop-testing-toolkit-ui:
-    image: mojaloop/ml-testing-toolkit-ui:v14.0.0
+    image: mojaloop/ml-testing-toolkit-ui:v15.0.0
     ports:
       - "6060:6060"
     environment:
