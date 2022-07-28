@@ -127,7 +127,7 @@ function verifyCallback (req, jwtPayload, done) {
   for (const group of jwtPayload.groups) {
     roles[group] = true
   }
-  const authInfo = { roles: roles }
+  const authInfo = { roles }
   return done(null, client, authInfo)
 }
 
@@ -142,7 +142,7 @@ function getOAuth2Middleware () {
 }
 
 const handleMiddleware = () => {
-  if (Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
+  if (Config.getSystemConfig().OAUTH && Config.getSystemConfig().OAUTH.AUTH_ENABLED) {
     customLogger.logMessage('info', 'Enabling OAUTH', { notification: false })
     getOAuth2Middleware()
   } else {

@@ -59,10 +59,9 @@ You should get the web interface on http://localhost:6060
 
 Setup database
 
-if you already have executed OSS-New-Deployment-FSP-Setup from postman repo then click on **Load Sample** button
+After executing hub setup collection (Refer mojaloop documentation for more information), click on **Load Sample** button
 in Outbound Requests section and import examples/collections/provisioning/testingtoolkitdfsp.json collection from provisioning tab
 and examples/environments/hub_local_environment.json environment from hub tab
-otherwise execute postman/hub_onboarding.sh or 
 
 The _**SETTINGS**_ navigation tab will open to the **SETTINGS** window. Below is the default view of this page.
 

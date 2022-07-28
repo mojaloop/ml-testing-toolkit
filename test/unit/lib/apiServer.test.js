@@ -22,14 +22,21 @@
  --------------
  ******/
 
-
 const Config = require('../../../src/lib/config')
 const requestLogger = require('../../../src/lib/requestLogger')
 
 jest.mock('../../../src/lib/requestLogger')
 jest.mock('../../../src/lib/config')
+jest.mock('../../../src/lib/oauth/OAuthHelper')
+
 
 const apiServer = require('../../../src/lib/api-server')
+
+Config.getSystemConfig.mockReturnValue({
+  OAUTH: {
+    AUTH_ENABLED: false
+  }
+})
 
 describe('api-server', () => { 
   beforeEach(() => {
@@ -88,20 +95,15 @@ describe('api-server', () => {
   })
   describe('when startServer is called', () => {
     it('the server should be initialized', async () => {
-      Config.getSystemConfig.mockReturnValue({
-        OAUTH: {}
-      })
-      expect(async () => {
+      // apiServer.startServer()
+      await expect((async () => {
         await wait(); 
         apiServer.startServer()
-      }).not.toThrowError()
+        await wait(); 
+        apiServer.stopServer()
+        return 'OK'
+      })()).resolves.toBeTruthy()
     })
   })
-  const wait = async (ms = 0) => {
-    await act(async () => {
-      return new Promise(resolve => {
-        setTimeout(resolve, ms);
-      });
-    });
-  }
+  const wait = async (ms = 0) => new Promise(resolve => setTimeout(resolve, ms))
 })

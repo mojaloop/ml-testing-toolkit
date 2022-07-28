@@ -106,7 +106,7 @@ describe('Server', () => {
       })
       expect(server).toBeDefined()
       if (server) {
-        server.stop()
+        await server.stop()
       }
     })
     it('initialize should not throw an error 2', async () => {
@@ -120,7 +120,7 @@ describe('Server', () => {
       const server = await Server.initialize()
       expect(server).toBeDefined()
       if (server) {
-        server.stop()
+        await server.stop()
       }
     })
     it('initialize should not throw an error 3', async () => {
@@ -133,7 +133,7 @@ describe('Server', () => {
       const server = await Server.initialize()
       expect(server).toBeDefined()
       if (server) {
-        server.stop()
+        await server.stop()
       }
     })
   })
@@ -147,7 +147,7 @@ describe('Server', () => {
       SpyWaitForTlsHubCerts.mockRejectedValueOnce(new Error('something'))
       const server = await Server.restartServer()
       if (server) {
-        server.stop()
+        await server.stop()
       }
     })
   })

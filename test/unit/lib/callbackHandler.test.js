@@ -78,7 +78,7 @@ describe('callbackHandler', () => {
         customInfo: {}
       }
       Config.getUserConfig.mockReturnValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CALLBACK_ENDPOINT: 'http://localhost:4040',
         SEND_CALLBACK_ENABLE: true
       })
       Config.getSystemConfig.mockImplementation(() => {
@@ -139,12 +139,12 @@ describe('callbackHandler', () => {
         customInfo: {}
       }
       Config.getUserConfig.mockReturnValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CALLBACK_ENDPOINT: 'http://localhost:4040',
         CLIENT_MUTUAL_TLS_ENABLED: true,
         SEND_CALLBACK_ENABLE: true,
         CLIENT_TLS_CREDS: [
           {
-            HOST: 'localhost:5000',
+            HOST: 'localhost:4040',
             CERT: 'certificate',
             KEY: 'key'
           }
@@ -208,7 +208,7 @@ describe('callbackHandler', () => {
         customInfo: {}
       }
       Config.getUserConfig.mockReturnValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CALLBACK_ENDPOINT: 'http://localhost:4040',
         SEND_CALLBACK_ENABLE: true
       })
       Config.getSystemConfig.mockImplementation(() => {
@@ -253,7 +253,7 @@ describe('callbackHandler', () => {
         customInfo: {}
       }
       Config.getUserConfig.mockReturnValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CALLBACK_ENDPOINT: 'http://localhost:4040',
         CALLBACK_RESOURCE_ENDPOINTS: {
           enabled: true,
           endpoints: [
@@ -313,16 +313,16 @@ describe('callbackHandler', () => {
         customInfo: {}
       }
       Config.getUserConfig.mockReturnValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CALLBACK_ENDPOINT: 'http://localhost:4040',
         HUB_ONLY_MODE: true,
         ENDPOINTS_DFSP_WISE: {
           dfsps: {
             userdfsp: {
-              defaultEndpoint: 'http://localhost:5000',
+              defaultEndpoint: 'http://localhost:4040',
               endpoints: [{
                 method: 'post',
                 path: '/transfers',
-                endpoint: 'http://localhost:5000'
+                endpoint: 'http://localhost:4040'
               }]
             }
           }
@@ -370,12 +370,12 @@ describe('callbackHandler', () => {
         }
       }
       Config.getUserConfig.mockReturnValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CALLBACK_ENDPOINT: 'http://localhost:4040',
         HUB_ONLY_MODE: true,
         ENDPOINTS_DFSP_WISE: {
           dfsps: {
             userdfsp: {
-              defaultEndpoint: 'http://localhost:5000',
+              defaultEndpoint: 'http://localhost:4040',
               endpoints: []
             }
           }
@@ -419,12 +419,12 @@ describe('callbackHandler', () => {
         customInfo: {}
       }
       Config.getUserConfig.mockReturnValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CALLBACK_ENDPOINT: 'http://localhost:4040',
         HUB_ONLY_MODE: true,
         ENDPOINTS_DFSP_WISE: {
           dfsps: {
             userdfsp: {
-              defaultEndpoint: 'http://localhost:5000',
+              defaultEndpoint: 'http://localhost:4040',
               endpoints: []
             }
           }
@@ -465,7 +465,7 @@ describe('callbackHandler', () => {
         customInfo: {}
       }
       Config.getUserConfig.mockReturnValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CALLBACK_ENDPOINT: 'http://localhost:4040',
         CALLBACK_RESOURCE_ENDPOINTS: {
           enabled: true,
           endpoints: [
@@ -521,7 +521,7 @@ describe('callbackHandler', () => {
         OUTBOUND_MUTUAL_TLS_ENABLED: false
       })
       Config.getUserConfig.mockReturnValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CALLBACK_ENDPOINT: 'http://localhost:4040',
         SEND_CALLBACK_ENABLE: false
       })
       SpySign.mockReturnValue()
@@ -559,7 +559,7 @@ describe('callbackHandler', () => {
         OUTBOUND_MUTUAL_TLS_ENABLED: false
       })
       Config.getUserConfig.mockReturnValue({
-        CALLBACK_ENDPOINT: 'https://localhost:5000',
+        CALLBACK_ENDPOINT: 'https://localhost:4040',
         SEND_CALLBACK_ENABLE: false
       })
       SpySign.mockReturnValue()
@@ -595,12 +595,12 @@ describe('callbackHandler', () => {
         customInfo: {}
       }
       Config.getUserConfig.mockReturnValue({
-        CALLBACK_ENDPOINT: 'http://localhost:5000',
+        CALLBACK_ENDPOINT: 'http://localhost:4040',
         CLIENT_MUTUAL_TLS_ENABLED: true,
         SEND_CALLBACK_ENABLE: true,
         CLIENT_TLS_CREDS: [
           {
-            HOST: 'unknownhost:5000',
+            HOST: 'unknownhost:4040',
             CERT: 'certificate',
             KEY: 'key'
           }

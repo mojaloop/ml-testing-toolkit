@@ -49,7 +49,7 @@ describe('API route /api/oauth2', () => {
   beforeAll(() => {
     requestLogger.logMessage.mockReturnValue()
     Object.assign(Config.getSystemConfig(), {
-      API_PORT: 5000,
+      API_PORT: 4040,
       HOSTING_ENABLED: false,
       OAUTH: {
         EMBEDDED_CERTIFICATE: "password"

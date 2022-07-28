@@ -33,6 +33,7 @@ const ConnectionProvider = require('../../src/lib/configuration-providers/mb-con
 jest.mock('../../src/lib/config')
 jest.mock('../../src/server')
 jest.mock('../../src/lib/api-server')
+jest.mock('../../src/lib/requestLogger')
 jest.mock('../../src/lib/configuration-providers/mb-connection-manager')
 
 describe('Index', () => {
@@ -40,6 +41,12 @@ describe('Index', () => {
     it('Init should not throw an error', async () => {
       apiServer.startServer.mockReturnValue()
       Config.loadUserConfig.mockResolvedValue()
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false,
+        CONNECTION_MANAGER: {
+          ENABLED: false
+        }
+      })
       ConnectionProvider.initialize.mockResolvedValue()
       Server.initialize.mockResolvedValue()
       expect(() => {require('../../src/index')}).not.toThrowError();

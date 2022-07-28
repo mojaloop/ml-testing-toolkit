@@ -1,5 +1,5 @@
 {
-  "API_PORT": 5000,
+  "API_PORT": 4040,
   "HOSTING_ENABLED": false,
   "INBOUND_MUTUAL_TLS_ENABLED": false,
   "OUTBOUND_MUTUAL_TLS_ENABLED": false,
@@ -108,7 +108,7 @@
       "version": "1.0",
       "folderPath": "mojaloop_sdk_outbound_scheme_adapter_1.0",
       "hostnames": [],
-      "prefix": "sdk-out"
+      "prefix": "/sdk-out"
     },
     {
       "type": "payment_manager",

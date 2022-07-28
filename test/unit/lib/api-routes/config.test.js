@@ -81,7 +81,7 @@ describe('API route /config', () => {
   describe('PUT /api/config/user', () => {
     it('Editting config', async () => {
       const newConfig = {
-        CALLBACK_ENDPOINT: 'http://localhost:5000/'
+        CALLBACK_ENDPOINT: 'http://localhost:4040/'
       }
       Config.setStoredUserConfig.mockResolvedValueOnce()
       Config.getUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
@@ -94,7 +94,7 @@ describe('API route /config', () => {
     })
     it('Editting config should relaod the server if INBOUND_MUTUAL_TLS_ENABLED was updated ', async () => {
       const newConfig = {
-        CALLBACK_ENDPOINT: 'http://localhost:5000/'
+        CALLBACK_ENDPOINT: 'http://localhost:4040/'
       }
       Config.setStoredUserConfig.mockResolvedValueOnce()
       Config.getUserConfig.mockResolvedValueOnce({INBOUND_MUTUAL_TLS_ENABLED: true})
@@ -116,7 +116,7 @@ describe('API route /config', () => {
     })
     it('Editting config should throw 404 if setStoredUserConfig fails', async () => {
       const newConfig = {
-        CALLBACK_ENDPOINT: 'http://localhost:5000/'
+        CALLBACK_ENDPOINT: 'http://localhost:4040/'
       }
       Config.setStoredUserConfig.mockRejectedValueOnce()
       const res = await request(app).put(`/api/config/user`).send(newConfig)

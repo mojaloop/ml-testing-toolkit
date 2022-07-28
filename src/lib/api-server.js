@@ -33,6 +33,7 @@ const util = require('util')
 const path = require('path')
 const fs = require('fs')
 const cors = require('cors')
+const OAuthHelper = require('./oauth/OAuthHelper')
 
 const initServer = () => {
   // For CORS policy
@@ -50,7 +51,7 @@ const initServer = () => {
 
   // For oauth
   app.use(cookieParser())
-  require('./oauth/OAuthHelper').handleMiddleware()
+  OAuthHelper.handleMiddleware()
 
   const verifyUserMiddleware = verifyUser()
   // For admin API
@@ -87,6 +88,11 @@ const startServer = port => {
   customLogger.logMessage('info', 'API Server started on port ' + port, { notification: false })
 }
 
+const stopServer = port => {
+  http.close()
+  customLogger.logMessage('info', 'API Server stopped', { notification: false })
+}
+
 const getApp = () => {
   if (!Object.prototype.hasOwnProperty.call(app, '_router')) { // To check whether app is initialized or not
     initServer()
@@ -114,6 +120,7 @@ const verifyUser = () => {
 
 module.exports = {
   startServer,
+  stopServer,
   getHttp,
   getApp,
   verifyUser

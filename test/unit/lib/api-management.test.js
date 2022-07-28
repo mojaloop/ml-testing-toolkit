@@ -25,12 +25,19 @@
 const APIManagement = require('../../../src/lib/api-management')
 const Utils = require('../../../src/lib/utils')
 const Config = require('../../../src/lib/config')
+const fs = require('fs')
+
 jest.mock('../../../src/lib/utils')
 jest.mock('../../../src/lib/config')
 
-const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
-
 const specFilePrefix = 'test/'
+const apiSpecSyncFile = fs.readFileSync(specFilePrefix + 'api_spec_sync.yaml')
+
+fs.readFile = jest.fn((path, callback) => { return callback(null, apiSpecSyncFile); });
+
+const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
+const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
+
 
 describe('API Management', () => { 
   describe('validateDefinition', () => {
@@ -46,6 +53,9 @@ describe('API Management', () => {
     SpyGetSystemConfig.mockReturnValue({
       API_DEFINITIONS: []
     })
+    SpyGetUserConfig.mockReturnValue({
+      ILP_SECRET: ''
+    })
     it('should not throw an error', async () => {
       await expect(APIManagement.addDefinition(specFilePrefix + 'api_spec_sync.yaml', 'name', '1.0', 'false')).resolves.toBeUndefined()
     })
@@ -57,27 +67,39 @@ describe('API Management', () => {
           {
             type: 'name',
             version: '1.0',
+            folderPath: "name_1.0",
             additionalApi: true
           }
         ]
       })
+      SpyGetUserConfig.mockReturnValue({
+        ILP_SECRET: ''
+      })
       await expect(APIManagement.deleteDefinition('name', '1.0')).resolves.toBe(true)
     })
     it('should throw an error when API is inbuilt API', async () => {
+      
       SpyGetSystemConfig.mockReturnValue({
         API_DEFINITIONS: [
           {
             type: 'name',
             version: '1.0',
+            folderPath: "name_1.0",
             additionalApi: false
           }
         ]
+      })
+      SpyGetUserConfig.mockReturnValue({
+        ILP_SECRET: ''
       })
       await expect(APIManagement.deleteDefinition('name', '1.0')).rejects.toThrowError()
     })
     it('should throw an error when API not found', async () => {
       SpyGetSystemConfig.mockReturnValue({
         API_DEFINITIONS: []
+      })
+      SpyGetUserConfig.mockReturnValue({
+        ILP_SECRET: ''
       })
       await expect(APIManagement.deleteDefinition('name', '1.0')).rejects.toThrowError()
     })

@@ -78,7 +78,7 @@ router.post('/token', async (req, res, next) => {
     const iat = Date.now() / 1000
     const plainAccessToken = {
       exp: iat + expiresIn,
-      iat: iat,
+      iat,
       aud: systemConfig.OAUTH.APP_OAUTH_CLIENT_KEY,
       sub: plainIdToken.username,
       iss: systemConfig.OAUTH.OAUTH2_ISSUER,

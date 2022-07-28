@@ -116,7 +116,7 @@ npm start
 
 ## 3. Ports
 
-The server will start and listen on port 5000. You can send the mojaloop api requests to this port number.
+The server will start and listen on port 4040. You can send the mojaloop api requests to this port number.
 The test api server will start on port 5050.
 
 And you can get the web interface on http://localhost:6060/
@@ -160,4 +160,4 @@ For Web interface follow this [Usage Guide](/documents/User-Guide.md)
 For Command line tool follow this [CLI User Guide](/documents/User-Guide-CLI.md)
 
 
-****If you have your own DFSP implementation you can point the peer endpoint to **Mojaloop Testing Toolkit** on port 5000 and try to send requests from your implementation instead of using mojaloop-simulator.**
+****If you have your own DFSP implementation you can point the peer endpoint to **Mojaloop Testing Toolkit** on port 4040 and try to send requests from your implementation instead of using mojaloop-simulator.**

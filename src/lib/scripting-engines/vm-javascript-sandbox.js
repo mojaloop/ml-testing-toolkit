@@ -138,10 +138,14 @@ const clearConsole = (consoleOutObj) => {
 
 const preScript = `
 (async () => {
+  try {
 `
 
 const postScript = `
-  return true
+    resolve()
+  } catch(err) {
+    reject(err)
+  }
 })()
 `
 
@@ -186,7 +190,6 @@ const generateContextObj = async (environmentObj = {}) => {
 const executeAsync = async (script, data, contextObj) => {
   const fullScript = preScript + script.join('\n') + postScript
   let consoleLog = []
-
   if (data.context.request) {
     contextObj.request = data.context.request
   }
@@ -198,14 +201,12 @@ const executeAsync = async (script, data, contextObj) => {
   if (data.context.callback) {
     contextObj.callback = data.context.callback
   }
-
   if (data.context.collectionVariables) {
     contextObj.collectionVariables = data.context.collectionVariables.reduce((rObj, item) => { rObj[item.key] = item.value; return rObj }, {})
   }
-
   try {
     const options = { timeout: (contextObj.userConfig && contextObj.userConfig.SCRIPT_TIMEOUT) || 30000, microtaskMode: 'afterEvaluate' }
-    await Sandbox.runInNewContext(fullScript, contextObj, options)
+    await _runScript(fullScript, contextObj, options)
     for (let i = 0; i < contextObj.consoleOutObj.stdOut.length; i++) {
       consoleLog.push([{ execution: 0 }, 'log', ...contextObj.consoleOutObj.stdOut[i]])
     }
@@ -216,14 +217,26 @@ const executeAsync = async (script, data, contextObj) => {
     }
     consoleLog.push([{ execution: 0 }, 'executionError', err.toString()])
   }
-
   const result = {
-    consoleLog: consoleLog,
+    consoleLog,
     environment: { ...contextObj.environment }
   }
   clearConsole(contextObj.consoleOutObj)
   consoleLog = []
   return result
+}
+
+async function _runScript (code, context = {}, options = {}) {
+  return new Promise((resolve, reject) => {
+    Sandbox.runInNewContext(code, Sandbox.createContext({
+      ...context,
+      resolve,
+      reject
+    }), {
+      ...options,
+      breakOnSigint: true
+    })
+  })
 }
 
 module.exports = {

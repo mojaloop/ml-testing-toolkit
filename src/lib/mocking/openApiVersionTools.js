@@ -32,7 +32,7 @@ module.exports.validateAcceptHeader = (acceptHeader) => {
     customLogger.logMessage('debug', 'Invalid accept header ' + acceptHeader)
   }
   return {
-    validationFailed: validationFailed,
+    validationFailed,
     message: validationFailed ? 'Unknown Accept header format' : 'OK'
   }
 }
@@ -43,7 +43,7 @@ module.exports.validateContentTypeHeader = (contentTypeHeader) => {
     customLogger.logMessage('debug', 'Invalid content-type header ' + contentTypeHeader)
   }
   return {
-    validationFailed: validationFailed,
+    validationFailed,
     message: validationFailed ? 'Unknown Content-Type header format' : 'OK'
   }
 }
@@ -108,10 +108,10 @@ module.exports.negotiateVersion = (req, apis) => {
   }
   customLogger.logMessage('debug', negotiationFailed ? 'Version negotiation failed for the Accept / Content-Type header ' + acceptHeader : 'Version negotiation succeeded, picked up the version ' + apis[negotiatedIndex].majorVersion + '.' + apis[negotiatedIndex].minorVersion, { request: req })
   return {
-    negotiationFailed: negotiationFailed,
+    negotiationFailed,
     message: negotiationFailed ? 'Version negotiation failed for the Accept / Content-Type header ' + acceptHeader : 'OK',
-    negotiatedIndex: negotiatedIndex,
-    responseContentTypeHeader: responseContentTypeHeader
+    negotiatedIndex,
+    responseContentTypeHeader
   }
 }
 
