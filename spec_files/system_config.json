@@ -108,7 +108,7 @@
       "version": "1.0",
       "folderPath": "mojaloop_sdk_outbound_scheme_adapter_1.0",
       "hostnames": [],
-      "prefix": "sdk-out"
+      "prefix": "/sdk-out"
     },
     {
       "type": "payment_manager",
