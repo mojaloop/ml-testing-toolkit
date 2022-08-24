@@ -33,5 +33,23 @@
         }
       }
     }
+  },
+  "/bulkQuotes": {
+    "post": {
+      "response": {
+        "bodyOverride": {
+          "bulkQuoteId": "{$request.body.bulkQuoteId}"
+        }
+      }
+    }
+  },
+  "/bulkTransfers": {
+    "post": {
+      "response": {
+        "bodyOverride": {
+          "bulkTransferId": "{$request.body.bulkTransferId}"
+        }
+      }
+    }
   }
 }
