@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.1.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.0.0...v15.1.0) (2022-08-24)
+
+
+### Features
+
+* **mojaloop/2814:** added moja sim inbound api ([#218](https://github.com/mojaloop/ml-testing-toolkit/issues/218)) ([0b877af](https://github.com/mojaloop/ml-testing-toolkit/commit/0b877af8f1d0cb27d17e29c62eb1c7b7219d23ac))
+
 ## [15.0.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v14.2.0...v15.0.0) (2022-07-28)
 
 
