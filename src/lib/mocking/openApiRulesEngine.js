@@ -87,6 +87,15 @@ const executeScripts = async (curEvent, req) => {
     // replace inbound environment with the sandbox environment
     const mergedInboundEnvironment = postmanSandbox.environment
     objectStore.set('inboundEnvironment', mergedInboundEnvironment)
+    // Mutating event based on script output
+    if (contextObj.requestVariables?.OVERRIDE_EVENT?.appendMode) {
+      customLogger.logMessage('debug', 'Mutating event body based on script', {
+        additionalData: contextObj.requestVariables.OVERRIDE_EVENT,
+        request: req
+      })
+      _.merge(curEvent.params.body, contextObj.requestVariables.OVERRIDE_EVENT?.body)
+
+    }
     contextObj.ctx.dispose()
     contextObj.ctx = null
   }
