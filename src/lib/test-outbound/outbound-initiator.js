@@ -284,6 +284,10 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         await executePreRequestScript(tmpRequest, scriptsExecution, contextObj, variableData)
       }
 
+      // Mutating request based on script output
+      if (contextObj.requestVariables?.OVERRIDE_REQUEST?.appendMode) {
+        _.merge(convertedRequest.body, contextObj.requestVariables.OVERRIDE_REQUEST?.body)
+      }
       convertedRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
       convertedRequest = replaceRequestLevelEnvironmentVariables(convertedRequest, contextObj.requestVariables)
 

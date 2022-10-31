@@ -488,6 +488,34 @@ You can write scripts in two formats.
     await custom.pushMessage({ name: 'Sample Name' }, 'client1')
     ```
 
+  - _**custom.appendRequestBody(requestBody)**_
+
+    By using this function in the outbound pre-request script, we can mutate the request and override some values in the request.
+
+    Parameters:
+    - **requestBody** - The request body to override.
+
+      Type: [`Object`]
+
+    Example usage:
+    ```javascript
+    await custom.appendRequestBody({ sampleKey: 'Sample Value' })
+    ```
+
+  - _**custom.appendEventBody(eventBody)**_
+
+    By using this function in the inbound script, we can modify the event body specified in the rule.
+
+    Parameters:
+    - **eventBody** - The event body to override.
+
+      Type: [`Object`]
+
+    Example usage:
+    ```javascript
+    await custom.appendEventBody({ sampleKey: 'Sample Value' })
+    ```
+
 ![Sample Pre Request and Post Request Scripts](/assets/images/test-case-editor-scripts.png)
 
 After executing the test case you will see _Console Log_ and _Environment State_ as well.

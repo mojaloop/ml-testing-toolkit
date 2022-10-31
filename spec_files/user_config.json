@@ -99,5 +99,10 @@
       "description": "tests related to quoting service",
       "color": "blue"
     }
-  ]
+  ],
+  "INSTANCE_NAME": "Mojaloop Testing Toolkit",
+  "UI_THEME": {
+    "HEADER_COLOR": "rgb(41, 62, 93)",
+    "TITLE_COLOR": "#fff"
+  }
 }

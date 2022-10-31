@@ -93,7 +93,7 @@ const consoleWrapperFn = (consoleOutObj) => {
   }
 }
 
-const customWrapperFn = (requestVariables) => {
+const customWrapperFn = (requestVariables, consoleFn) => {
   return {
     jws: {
       signRequest: function (key) {
@@ -125,6 +125,19 @@ const customWrapperFn = (requestVariables) => {
     skipRequest: function () {
       requestVariables.SKIP_REQUEST = true
     },
+    appendRequestBody: function (newBody) {
+      consoleFn.log('Mutating request...')
+      requestVariables.OVERRIDE_REQUEST = {
+        appendMode: true,
+        body: newBody
+      }
+    },
+    appendEventBody: function (newBody) {
+      requestVariables.OVERRIDE_EVENT = {
+        appendMode: true,
+        body: newBody
+      }
+    },
     pushMessage: function (message, sessionID = null) {
       customLogger.logMessage('info', 'Sending Push Message to topic pushMessage' + (sessionID ? '/' + sessionID : ''), { additionalData: { message }, notification: false })
       notificationEmitter.sendMessage(message, sessionID)
@@ -155,7 +168,7 @@ const generateContextObj = async (environmentObj = {}) => {
   }
   const requestVariables = {}
   const consoleFn = consoleWrapperFn(consoleOutObj)
-  const customFn = customWrapperFn(requestVariables)
+  const customFn = customWrapperFn(requestVariables, consoleFn)
   const websocket = new WebSocketClientManager(consoleFn)
   await websocket.init()
   const inboundEvent = new InboundEventListener(consoleFn)
