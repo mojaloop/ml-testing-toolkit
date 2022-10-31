@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.2.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.1.0...v15.2.0) (2022-10-31)
+
+
+### Features
+
+* **mojaloop/2997:** dynamic ttk rules and request mutation ([#219](https://github.com/mojaloop/ml-testing-toolkit/issues/219)) ([1374c24](https://github.com/mojaloop/ml-testing-toolkit/commit/1374c24d2b6f6d08b247f349922f42dffc07e999))
+
 ## [15.1.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.0.0...v15.1.0) (2022-08-24)
 
 
