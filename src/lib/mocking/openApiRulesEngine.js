@@ -94,7 +94,6 @@ const executeScripts = async (curEvent, req) => {
         request: req
       })
       _.merge(curEvent.params.body, contextObj.requestVariables.OVERRIDE_EVENT?.body)
-
     }
     contextObj.ctx.dispose()
     contextObj.ctx = null
