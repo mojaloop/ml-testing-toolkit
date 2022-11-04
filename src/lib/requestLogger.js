@@ -43,7 +43,7 @@ const logRequest = (request, user) => {
         uniqueId: request.customInfo ? request.customInfo.uniqueId : null,
         headers: request.headers,
         queryParams: request.query,
-        body: request.payload
+        body: Config.getUserConfig().MONITORING_LOG_INCLUDE_PAYLOAD? request.payload : 'Payload is hidden - enable it in user-config MONITORING_LOG_INCLUDE_PAYLOAD'
       }
     },
     user,
@@ -100,7 +100,7 @@ const logResponse = (request, user) => {
       additionalData: {
         response: {
           uniqueId: request.customInfo.uniqueId || null,
-          body: request.response.source,
+          body: Config.getUserConfig().MONITORING_LOG_INCLUDE_PAYLOAD? request.response.source : 'Payload is hidden - enable it in user-config MONITORING_LOG_INCLUDE_PAYLOAD',
           status: request.response.statusCode
         }
       },

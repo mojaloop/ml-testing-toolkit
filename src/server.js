@@ -90,6 +90,9 @@ const createServer = async (port, user) => {
     server = new Hapi.Server({
       port,
       routes: {
+        payload: {
+          maxBytes: systemConfig.REQUEST_PAYLOAD_MAX_BYTES
+        },
         cors: {
           origin: ['*'],
           credentials: true,
