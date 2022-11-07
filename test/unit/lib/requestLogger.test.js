@@ -35,6 +35,9 @@ describe('requestLogger', () => {
   beforeAll(() => {
     jest.resetAllMocks()
     notificationEmitter.broadcastLog.mockReturnValue()
+    Config.getUserConfig.mockReturnValue({
+      MONITORING_LOG_INCLUDE_PAYLOAD: true
+    })
   })
   afterAll(() => {
     jest.resetAllMocks()
