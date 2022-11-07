@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.2.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.2.0...v15.2.1) (2022-11-07)
+
+
+### Bug Fixes
+
+* parameterized the inbound request size ([#221](https://github.com/mojaloop/ml-testing-toolkit/issues/221)) ([ad8226a](https://github.com/mojaloop/ml-testing-toolkit/commit/ad8226ae048de0ea5e1b51e80fed82fc6d7c91c5))
+
 ## [15.2.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.1.0...v15.2.0) (2022-10-31)
 
 
