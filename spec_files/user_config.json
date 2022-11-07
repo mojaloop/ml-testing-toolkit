@@ -21,7 +21,7 @@
       }
     ]
   },
-  "HUB_ONLY_MODE": true,
+  "HUB_ONLY_MODE": false,
   "ENDPOINTS_DFSP_WISE": {
     "dfsps": {
       "userdfsp": {
