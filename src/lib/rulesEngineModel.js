@@ -350,6 +350,10 @@ const getRulesFiles = async (model, user) => {
 }
 
 const deleteRulesFile = async (model, fileName, user) => {
+  if (fileName === DEFAULT_RULES_FILE_NAME) {
+    throw new Error('Default rules file cannot be deleted')
+  }
+
   try {
     await storageAdapter.remove(model.rulesFilePathPrefix + fileName, user)
     await setActiveRulesFile(model, DEFAULT_RULES_FILE_NAME, user)

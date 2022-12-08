@@ -23,6 +23,7 @@
  ******/
 
 const express = require('express')
+const importExport = require('../importExport')
 const rulesEngineModel = require('../rulesEngineModel')
 
 const router = new express.Router()
@@ -278,6 +279,87 @@ router.put('/files/forward', async (req, res, next) => {
     }
   } catch (err) {
     res.status(500).json({ error: err && err.message })
+  }
+})
+
+router.get('/export/rules_response', async (req, res, next) => {
+  try {
+    if (!req.query || !req.query.rulesFilename) {
+      res.status(400).send('rulesFilename query param is required')
+    } else {
+      const path = `rules_response/${req.query.rulesFilename}`
+      const resp = await importExport.exportSpecFile(path, req.user)
+      res.status(200).json({ status: 'OK', body: resp })
+    }
+  } catch (err) {
+    // next(err)
+    res.status(404).json({ error: err && err.message })
+  }
+})
+
+router.post('/import/rules_response', async (req, res, next) => {
+  try {
+    const path = `rules_response/${req.query.rulesFilename}`
+    await importExport.importSpecFile(req.body.buffer, path, req.user)
+    await rulesEngineModel.reloadResponseRules(req.user)
+    res.status(200).json({ status: 'OK' })
+  } catch (err) {
+    res.status(400).send(err.message)
+    // next(err)
+  }
+})
+
+router.get('/export/rules_callback', async (req, res, next) => {
+  try {
+    if (!req.query || !req.query.rulesFilename) {
+      res.status(400).send('rulesFilename query param is required')
+    } else {
+      const path = `rules_callback/${req.query.rulesFilename}`
+      const resp = await importExport.exportSpecFile(path, req.user)
+      res.status(200).json({ status: 'OK', body: resp })
+    }
+  } catch (err) {
+    // next(err)
+    res.status(404).json({ error: err && err.message })
+  }
+})
+
+router.post('/import/rules_callback', async (req, res, next) => {
+  try {
+    const path = `rules_callback/${req.query.rulesFilename}`
+    await importExport.importSpecFile(req.body.buffer, path, req.user)
+    await rulesEngineModel.reloadCallbackRules(req.user)
+    res.status(200).json({ status: 'OK' })
+  } catch (err) {
+    res.status(400).send(err.message)
+    // next(err)
+  }
+})
+
+router.get('/export/rules_validation', async (req, res, next) => {
+  try {
+    if (!req.query || !req.query.rulesFilename) {
+      res.status(400).send('rulesFilename query param is required')
+    } else {
+      const path = `rules_validation/${req.query.rulesFilename}`
+      const resp = await importExport.exportSpecFile(path, req.user)
+      res.status(200).json({ status: 'OK', body: resp })
+    }
+  } catch (err) {
+    // next(err)
+    res.status(404).json({ error: err && err.message })
+  }
+})
+
+router.post('/import/rules_validation', async (req, res, next) => {
+  try {
+    const path = `rules_validation/${req.query.rulesFilename}`
+    await importExport.importSpecFile(req.body.buffer, path, req.user)
+    await rulesEngineModel.reloadValidationRules(req.user)
+    res.status(200).json({ status: 'OK' })
+  } catch (err) {
+    res.status(400).send(err.message)
+    // next(err)
   }
 })
 
