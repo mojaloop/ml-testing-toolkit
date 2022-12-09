@@ -100,9 +100,11 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
     // Send the total result to client
     if (tracing.outboundID) {
       const runtimeInformation = {
+        testReportId: inputTemplate.name + '_' +completedTimeStamp.toISOString(),
         completedTimeISO: completedTimeStamp.toISOString(),
         startedTime: startedTimeStamp.toUTCString(),
-        completedTime: completedTimeStamp.toUTCString(),
+        completedTime: completedTimeStamp,
+        completedTimeUTC: completedTimeStamp.toUTCString(),
         runDurationMs,
         avgResponseTime: 'NA',
         totalAssertions: 0,
@@ -110,13 +112,23 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
       }
       const totalResult = generateFinalReport(inputTemplate, runtimeInformation)
       if (Config.getSystemConfig().HOSTING_ENABLED) {
-        const totalResultCopy = JSON.parse(JSON.stringify(totalResult))
-        totalResultCopy.runtimeInformation.completedTimeISO = completedTimeStamp
-        dbAdapter.upsert('reports', totalResultCopy, { dfspId })
+        dbAdapter.upsert('reports', totalResult, { dfspId })
+      }
+      const saveReportStatus = {}
+      if (inputTemplate.saveReport) {
+        try {
+          dbAdapter.upsertReport(totalResult)
+          saveReportStatus.isSaved = true
+          saveReportStatus.message = 'OK'
+        } catch(err) {
+          saveReportStatus.isSaved = false
+          saveReportStatus.message = err.message
+        }
       }
       notificationEmitter.broadcastOutboundProgress({
         status: 'FINISHED',
         outboundID: tracing.outboundID,
+        saveReportStatus,
         totalResult
       }, tracing.sessionID)
     }
