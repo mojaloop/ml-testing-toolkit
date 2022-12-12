@@ -123,27 +123,22 @@ describe('API route /api/rules', () => {
         expect(res.statusCode).toEqual(500)
       })
     })
-    describe('GET /export/rules_validation', () => {
+    describe('GET /files/validation/:fileName/export', () => {
       it('Retrieves file from rules validation storage ', async () => {
         ImportExport.exportSpecFile.mockResolvedValueOnce()
-        const res = await request(app).get(`/api/rules/export/rules_validation?rulesFilename=test.json`)
+        const res = await request(app).get(`/api/rules/files/validation/test.json/export`)
         expect(res.statusCode).toEqual(200)
         expect(ImportExport.exportSpecFile).toBeCalledWith(
           'rules_validation/test.json', undefined
         )
       })
-      it('Throws error if query rulesFilename is not defined', async () => {
-        ImportExport.exportSpecFile.mockResolvedValueOnce()
-        const res = await request(app).get(`/api/rules/export/rules_validation`)
-        expect(res.statusCode).toEqual(400)
-      })
     })
-    describe('POST /import/rules_validation', () => {
+    describe('POST /files/validation/import', () => {
       it('Calls function to import file', async () => {
         ImportExport.importSpecFile.mockResolvedValueOnce()
         const rulesFilename = 'test.json'
         const res = await request(app)
-          .post('/api/rules/import/rules_validation')
+          .post('/api/rules/files/validation/import')
           .query({rulesFilename})
           .send({buffer: Buffer.from([])})
         expect(res.statusCode).toEqual(200)
@@ -306,27 +301,22 @@ describe('API route /api/rules', () => {
         expect(res.statusCode).toEqual(500)
       })
     })
-    describe('GET /export/rules_callback', () => {
+    describe('GET /files/callback/:fileName/export', () => {
       it('Retrieves file from rules callback storage ', async () => {
         ImportExport.exportSpecFile.mockResolvedValueOnce()
-        const res = await request(app).get(`/api/rules/export/rules_callback?rulesFilename=test.json`)
+        const res = await request(app).get(`/api/rules/files/callback/test.json/export`)
         expect(res.statusCode).toEqual(200)
         expect(ImportExport.exportSpecFile).toBeCalledWith(
           'rules_callback/test.json', undefined
         )
       })
-      it('Throws error if query rulesFilename is not defined', async () => {
-        ImportExport.exportSpecFile.mockResolvedValueOnce()
-        const res = await request(app).get(`/api/rules/export/rules_callback`)
-        expect(res.statusCode).toEqual(400)
-      })
     })
-    describe('POST /import/rules_callback', () => {
+    describe('POST /files/callback/import', () => {
       it('Calls function to import file', async () => {
         ImportExport.importSpecFile.mockResolvedValueOnce()
         const rulesFilename = 'test.json'
         const res = await request(app)
-          .post('/api/rules/import/rules_callback')
+          .post('/api/rules/files/callback/import')
           .query({rulesFilename})
           .send({buffer: Buffer.from([])})
         expect(res.statusCode).toEqual(200)
@@ -413,27 +403,22 @@ describe('API route /api/rules', () => {
         expect(res.statusCode).toEqual(500)
       })
     })
-    describe('GET /export/rules_response', () => {
+    describe('GET /files/response/:fileName/export', () => {
       it('Retrieves file from rules response storage ', async () => {
         ImportExport.exportSpecFile.mockResolvedValueOnce()
-        const res = await request(app).get(`/api/rules/export/rules_response?rulesFilename=test.json`)
+        const res = await request(app).get(`/api/rules/files/response/test.json/export`)
         expect(res.statusCode).toEqual(200)
         expect(ImportExport.exportSpecFile).toBeCalledWith(
           'rules_response/test.json', undefined
         )
       })
-      it('Throws error if query rulesFilename is not defined', async () => {
-        ImportExport.exportSpecFile.mockResolvedValueOnce()
-        const res = await request(app).get(`/api/rules/export/rules_response`)
-        expect(res.statusCode).toEqual(400)
-      })
     })
-    describe('POST /import/rules_response', () => {
+    describe('POST /files/response/import', () => {
       it('Calls function to import file', async () => {
         ImportExport.importSpecFile.mockResolvedValueOnce()
         const rulesFilename = 'test.json'
         const res = await request(app)
-          .post('/api/rules/import/rules_response')
+          .post('/api/rules/files/response/import')
           .query({rulesFilename})
           .send({buffer: Buffer.from([])})
         expect(res.statusCode).toEqual(200)
