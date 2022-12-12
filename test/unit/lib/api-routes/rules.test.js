@@ -34,9 +34,12 @@ const request = require('supertest')
 const app = require('../../../../src/lib/api-server').getApp()
 const RulesEngineModel = require('../../../../src/lib/rulesEngineModel')
 const requestLogger = require('../../../../src/lib/requestLogger')
+const ImportExport = require('../../../../src/lib/importExport')
 
 jest.mock('../../../../src/lib/requestLogger')
 jest.mock('../../../../src/lib/rulesEngineModel')
+jest.mock('../../../../src/lib/importExport')
+
 
 describe('API route /api/rules', () => {
   beforeAll(() => {
@@ -92,7 +95,7 @@ describe('API route /api/rules', () => {
         RulesEngineModel.setActiveValidationRulesFile.mockRejectedValueOnce({})
         const res = await request(app).put('/api/rules/files/validation').send({
           type: 'activeRulesFile'
-        })        
+        })
         expect(res.statusCode).toEqual(500)
       })
     })
@@ -118,6 +121,32 @@ describe('API route /api/rules', () => {
         RulesEngineModel.deleteValidationRulesFile.mockRejectedValueOnce({})
         const res = await request(app).delete(`/api/rules/files/validation/test1.json`)
         expect(res.statusCode).toEqual(500)
+      })
+    })
+    describe('GET /export/rules_validation', () => {
+      it('Retrieves file from rules validation storage ', async () => {
+        ImportExport.exportSpecFile.mockResolvedValueOnce()
+        const res = await request(app).get(`/api/rules/export/rules_validation?rulesFilename=test.json`)
+        expect(res.statusCode).toEqual(200)
+        expect(ImportExport.exportSpecFile).toBeCalledWith(
+          'rules_validation/test.json', undefined
+        )
+      })
+    })
+    describe('POST /import/rules_validation', () => {
+      it('Calls function to import file', async () => {
+        ImportExport.importSpecFile.mockResolvedValueOnce()
+        const rulesFilename = 'test.json'
+        const res = await request(app)
+          .post('/api/rules/import/rules_validation')
+          .query({rulesFilename})
+          .send({buffer: Buffer.from([])})
+        expect(res.statusCode).toEqual(200)
+        expect(ImportExport.importSpecFile).toBeCalledWith(
+          expect.any(Object),
+          'rules_validation/test.json',
+          undefined
+        )
       })
     })
   })
@@ -168,7 +197,7 @@ describe('API route /api/rules', () => {
         RulesEngineModel.setActiveForwardRulesFile.mockRejectedValueOnce({})
         const res = await request(app).put('/api/rules/files/forward').send({
           type: 'activeRulesFile'
-        })        
+        })
         expect(res.statusCode).toEqual(500)
       })
     })
@@ -244,7 +273,7 @@ describe('API route /api/rules', () => {
         RulesEngineModel.setActiveCallbackRulesFile.mockRejectedValueOnce({})
         const res = await request(app).put('/api/rules/files/callback').send({
           type: 'activeRulesFile'
-        })        
+        })
         expect(res.statusCode).toEqual(500)
       })
     })
@@ -270,6 +299,32 @@ describe('API route /api/rules', () => {
         RulesEngineModel.deleteCallbackRulesFile.mockRejectedValueOnce({})
         const res = await request(app).delete(`/api/rules/files/callback/test1.json`)
         expect(res.statusCode).toEqual(500)
+      })
+    })
+    describe('GET /export/rules_callback', () => {
+      it('Retrieves file from rules callback storage ', async () => {
+        ImportExport.exportSpecFile.mockResolvedValueOnce()
+        const res = await request(app).get(`/api/rules/export/rules_callback?rulesFilename=test.json`)
+        expect(res.statusCode).toEqual(200)
+        expect(ImportExport.exportSpecFile).toBeCalledWith(
+          'rules_callback/test.json', undefined
+        )
+      })
+    })
+    describe('POST /import/rules_callback', () => {
+      it('Calls function to import file', async () => {
+        ImportExport.importSpecFile.mockResolvedValueOnce()
+        const rulesFilename = 'test.json'
+        const res = await request(app)
+          .post('/api/rules/import/rules_callback')
+          .query({rulesFilename})
+          .send({buffer: Buffer.from([])})
+        expect(res.statusCode).toEqual(200)
+        expect(ImportExport.importSpecFile).toBeCalledWith(
+          expect.any(Object),
+          'rules_callback/test.json',
+          undefined
+        )
       })
     })
   })
@@ -320,7 +375,7 @@ describe('API route /api/rules', () => {
         RulesEngineModel.setActiveResponseRulesFile.mockRejectedValueOnce({})
         const res = await request(app).put('/api/rules/files/response').send({
           type: 'activeRulesFile'
-        })        
+        })
         expect(res.statusCode).toEqual(500)
       })
     })
@@ -346,6 +401,32 @@ describe('API route /api/rules', () => {
         RulesEngineModel.deleteResponseRulesFile.mockRejectedValueOnce({})
         const res = await request(app).delete(`/api/rules/files/response/test1.json`)
         expect(res.statusCode).toEqual(500)
+      })
+    })
+    describe('GET /export/rules_response', () => {
+      it('Retrieves file from rules response storage ', async () => {
+        ImportExport.exportSpecFile.mockResolvedValueOnce()
+        const res = await request(app).get(`/api/rules/export/rules_response?rulesFilename=test.json`)
+        expect(res.statusCode).toEqual(200)
+        expect(ImportExport.exportSpecFile).toBeCalledWith(
+          'rules_response/test.json', undefined
+        )
+      })
+    })
+    describe('POST /import/rules_response', () => {
+      it('Calls function to import file', async () => {
+        ImportExport.importSpecFile.mockResolvedValueOnce()
+        const rulesFilename = 'test.json'
+        const res = await request(app)
+          .post('/api/rules/import/rules_response')
+          .query({rulesFilename})
+          .send({buffer: Buffer.from([])})
+        expect(res.statusCode).toEqual(200)
+        expect(ImportExport.importSpecFile).toBeCalledWith(
+          expect.any(Object),
+          'rules_response/test.json',
+          undefined
+        )
       })
     })
   })
