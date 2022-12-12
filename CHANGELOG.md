@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.3.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.2.1...v15.3.0) (2022-12-07)
+
+
+### Features
+
+* **mojaloop/2890:** redesigned ttk definition report ([#223](https://github.com/mojaloop/ml-testing-toolkit/issues/223)) ([eb87fa6](https://github.com/mojaloop/ml-testing-toolkit/commit/eb87fa60476410d063c1ee3b38605514d43e78ce))
+
 ### [15.2.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.2.0...v15.2.1) (2022-11-07)
 
 
