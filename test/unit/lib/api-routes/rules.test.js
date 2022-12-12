@@ -132,6 +132,11 @@ describe('API route /api/rules', () => {
           'rules_validation/test.json', undefined
         )
       })
+      it('Throws error if query rulesFilename is not defined', async () => {
+        ImportExport.exportSpecFile.mockResolvedValueOnce()
+        const res = await request(app).get(`/api/rules/export/rules_validation`)
+        expect(res.statusCode).toEqual(400)
+      })
     })
     describe('POST /import/rules_validation', () => {
       it('Calls function to import file', async () => {
@@ -310,6 +315,11 @@ describe('API route /api/rules', () => {
           'rules_callback/test.json', undefined
         )
       })
+      it('Throws error if query rulesFilename is not defined', async () => {
+        ImportExport.exportSpecFile.mockResolvedValueOnce()
+        const res = await request(app).get(`/api/rules/export/rules_callback`)
+        expect(res.statusCode).toEqual(400)
+      })
     })
     describe('POST /import/rules_callback', () => {
       it('Calls function to import file', async () => {
@@ -411,6 +421,11 @@ describe('API route /api/rules', () => {
         expect(ImportExport.exportSpecFile).toBeCalledWith(
           'rules_response/test.json', undefined
         )
+      })
+      it('Throws error if query rulesFilename is not defined', async () => {
+        ImportExport.exportSpecFile.mockResolvedValueOnce()
+        const res = await request(app).get(`/api/rules/export/rules_response`)
+        expect(res.statusCode).toEqual(400)
       })
     })
     describe('POST /import/rules_response', () => {
