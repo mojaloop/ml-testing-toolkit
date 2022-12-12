@@ -100,7 +100,7 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
     // Send the total result to client
     if (tracing.outboundID) {
       const runtimeInformation = {
-        testReportId: inputTemplate.name + '_' +completedTimeStamp.toISOString(),
+        testReportId: inputTemplate.name + '_' + completedTimeStamp.toISOString(),
         completedTimeISO: completedTimeStamp.toISOString(),
         startedTime: startedTimeStamp.toUTCString(),
         completedTime: completedTimeStamp,
@@ -117,10 +117,10 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
       const saveReportStatus = {}
       if (inputTemplate.saveReport) {
         try {
-          dbAdapter.upsertReport(totalResult)
+          await dbAdapter.upsertReport(totalResult)
           saveReportStatus.isSaved = true
           saveReportStatus.message = 'OK'
-        } catch(err) {
+        } catch (err) {
           saveReportStatus.isSaved = false
           saveReportStatus.message = err.message
         }

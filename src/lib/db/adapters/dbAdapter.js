@@ -31,7 +31,7 @@ const getConnection = async () => {
     const Config = require('../../config')
     conn = await mongoDBWrapper.connect(Config.getSystemConfig().DB.URI, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
+      useUnifiedTopology: true
     })
   }
   return conn
@@ -141,5 +141,5 @@ module.exports = {
   remove,
   upsertReport,
   listReports,
-  getReport,
+  getReport
 }

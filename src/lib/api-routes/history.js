@@ -94,7 +94,7 @@ router.delete('/callbacks', async (req, res, next) => {
 
 router.get('/test-reports', async (req, res, next) => {
   try {
-    const reports =  await dbAdapter.listReports(req.query)
+    const reports = await dbAdapter.listReports(req.query)
     res.status(200).send(reports)
   } catch (err) {
     res.status(500).json({ error: err && err.message })
@@ -105,13 +105,13 @@ router.get('/test-reports/:reportId', async (req, res, next) => {
   try {
     let finalReport
     const dbResult = await dbAdapter.getReport(req.params.reportId)
-    if(!dbResult) {
-      res.status(404).json({ error: 'Report Not Found' })
+    if (!dbResult) {
+      return res.status(404).json({ error: 'Report Not Found' })
     }
     const jsonReport = dbResult._doc
     if (req.query.format === 'html') {
       finalReport = await reportGenerator.generateReport(jsonReport, 'html')
-      if(req.query.download) {
+      if (req.query.download) {
         const downloadFileSuffix = '-' + req.params.reportId + '.html'
         res.setHeader('Content-disposition', 'attachment; filename=TTK-Assertion-Report' + downloadFileSuffix)
         res.setHeader('TTK-FileName', 'TTK-Assertion-Report' + downloadFileSuffix)

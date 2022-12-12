@@ -45,4 +45,6 @@ networks:
   default:
     name: mojaloop-testing-toolkit
 
-
+volumes:
+  ttk-db-data:
+    driver: local

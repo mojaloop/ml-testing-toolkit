@@ -32,6 +32,7 @@ const ConnectionProvider = require('../../../../src/lib/configuration-providers/
 const Config = require('../../../../src/lib/config')
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
 const notificationEmitter = require('../../../../src/lib/notificationEmitter.js')
+const dbAdapter = require('../../../../src/lib/db/adapters/dbAdapter')
 const OpenApiDefinitionsModel = require('../../../../src/lib/mocking/openApiDefinitionsModel')
 const Utils = require('../../../../src/lib/utils')
 jest.mock('../../../../src/lib/webSocketClient/WebSocketClientManager')
@@ -45,6 +46,7 @@ const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 const SpySign = jest.spyOn(JwsSigning, 'sign')
 const SpyJwsSignWithKey = jest.spyOn(JwsSigning, 'signWithKey')
 const SpyGetApiDefinitions = jest.spyOn(OpenApiDefinitionsModel, 'getApiDefinitions')
+const spyDbAdapterUpsertReport = jest.spyOn(dbAdapter, 'upsertReport')
 
 jest.mock('../../../../src/lib/notificationEmitter.js')
 jest.mock('axios')
@@ -1606,6 +1608,48 @@ describe('Outbound Initiator Functions', () => {
       const sampleTemplateModified3 = JSON.parse(JSON.stringify(sampleTemplate))
       sampleTemplateModified3.test_cases[0].requests[0].apiVersion.asynchronous = true      
       await expect(OutboundInitiator.OutboundSend(sampleTemplateModified3, '123')).resolves.not.toBeNull
+    })
+
+    it('OutboundSend with saveReport enabled', async () => {
+      SpyGetApiDefinitions.mockResolvedValueOnce([{
+        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+        type: 'fspiop'
+      }])
+      axios.create.mockReturnValue({
+        interceptors: {
+          request: {
+            use: jest.fn()
+          },
+          response: {
+            use: jest.fn()
+          }
+        }
+      })
+      const sampleTemplateModified4 = JSON.parse(JSON.stringify(sampleTemplate))
+      sampleTemplateModified4.saveReport = true
+      await OutboundInitiator.OutboundSend(sampleTemplateModified4, '123')
+      expect(spyDbAdapterUpsertReport).toBeCalled()
+    })
+    it('OutboundSend with saveReport enabled - error case', async () => {
+      SpyGetApiDefinitions.mockResolvedValueOnce([{
+        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+        type: 'fspiop'
+      }])
+      axios.create.mockReturnValue({
+        interceptors: {
+          request: {
+            use: jest.fn()
+          },
+          response: {
+            use: jest.fn()
+          }
+        }
+      })
+      spyDbAdapterUpsertReport.mockRejectedValueOnce()
+      const sampleTemplateModified4 = JSON.parse(JSON.stringify(sampleTemplate))
+      sampleTemplateModified4.saveReport = true
+      await OutboundInitiator.OutboundSend(sampleTemplateModified4, '123')
+      expect(spyDbAdapterUpsertReport).toBeCalled()
     })
 
   })
