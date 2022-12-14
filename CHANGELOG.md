@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.4.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.3.0...v15.4.0) (2022-12-14)
+
+
+### Features
+
+* **mojaloop/#3033:** add rule import and export ([#225](https://github.com/mojaloop/ml-testing-toolkit/issues/225)) ([4cb58be](https://github.com/mojaloop/ml-testing-toolkit/commit/4cb58bea628a74e3741ea89d3fa906eef352a45d)), closes [mojaloop/#3033](https://github.com/mojaloop/project/issues/3033)
+
 ## [15.3.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.2.1...v15.3.0) (2022-12-07)
 
 
