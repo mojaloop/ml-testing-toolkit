@@ -159,7 +159,23 @@ const importSpecFiles = async (data, options, user) => {
   await extractData(zip, options, entries, user)
 }
 
+const exportSpecFile = async (filepath, user) => {
+  const filename = `spec_files/${filepath}`
+  const document = await storageAdapter.read(filename, user)
+  const documentBuffer = Buffer.from(JSON.stringify(document.data))
+  return {
+    buffer: documentBuffer
+  }
+}
+
+const importSpecFile = async (data, filePath, user) => {
+  const dataBuffer = JSON.parse(Buffer.from(data).toString())
+  await storageAdapter.upsert(`spec_files/${filePath}`, dataBuffer, user)
+}
+
 module.exports = {
   exportSpecFiles,
-  importSpecFiles
+  importSpecFiles,
+  exportSpecFile,
+  importSpecFile
 }
