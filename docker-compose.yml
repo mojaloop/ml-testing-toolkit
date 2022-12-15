@@ -28,8 +28,23 @@ services:
       - sh
       - /usr/share/nginx/start.sh
 
+  ttk-mongodb:
+    image: 'bitnami/mongodb:6.0.3'
+    restart: always
+    environment:
+      MONGODB_USERNAME: ttk
+      MONGODB_PASSWORD: ttk
+      MONGODB_DATABASE: ttk
+      ALLOW_EMPTY_PASSWORD: "true"
+    ports:
+      - 27017:27017
+    volumes:
+      - ttk-db-data:/data/db
+
 networks:
   default:
     name: mojaloop-testing-toolkit
 
-
+volumes:
+  ttk-db-data:
+    driver: local

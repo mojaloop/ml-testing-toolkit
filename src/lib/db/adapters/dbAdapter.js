@@ -31,8 +31,7 @@ const getConnection = async () => {
     const Config = require('../../config')
     conn = await mongoDBWrapper.connect(Config.getSystemConfig().DB.URI, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false
+      useUnifiedTopology: true
     })
   }
   return conn
@@ -92,7 +91,7 @@ const upsert = async (id, data, user) => {
   } else if (id === 'reports') {
     const collectionId = `${user.dfspId}_${id}`
     const MyModel = conn.model(collectionId, mongoDBWrapper.models.reports)
-    data._id = `${data.name}_${data.runtimeInformation.completedTimeISO.toISOString()}`
+    data._id = `${data.name}_${data.runtimeInformation.completedTimeISO}`
     await MyModel.create(data)
   } else {
     const MyModel = conn.model(user.dfspId, mongoDBWrapper.models.common)
@@ -107,9 +106,40 @@ const remove = async (id, user) => {
   await MyModel.findOneAndRemove({ _id: id })
 }
 
+// The following are the functions added for saving test reports in non HOSTED mode
+const upsertReport = async (reportData) => {
+  const conn = await getConnection()
+  const MyModel = conn.model('reports', mongoDBWrapper.models.reports)
+  reportData._id = `${reportData.runtimeInformation.testReportId}`
+  await MyModel.create(reportData)
+}
+
+const listReports = async (queryParams) => {
+  const conn = await getConnection()
+  const MyModel = conn.model('reports', mongoDBWrapper.models.reports)
+  // by default is taking the reports from the last 30 days
+  const query = {
+    'runtimeInformation.completedTime': {
+      $gte: queryParams?.gte ? new Date(queryParams.gte) : new Date(Date.now() - (30 * 24 * 60 * 60 * 1000)),
+      $lt: queryParams?.lt ? new Date(queryParams.lt) : new Date()
+    }
+  }
+  const documents = await MyModel.find(query).sort('-runtimeInformation.completedTime').select('_id')
+  return documents.map(rec => rec._id)
+}
+
+const getReport = async (reportId) => {
+  const conn = await getConnection()
+  const MyModel = conn.model('reports', mongoDBWrapper.models.reports)
+  return await MyModel.findById(reportId)
+}
+
 module.exports = {
   read,
   find,
   upsert,
-  remove
+  remove,
+  upsertReport,
+  listReports,
+  getReport
 }

@@ -24,6 +24,8 @@
 
 const Config = require('../../../../src/lib/config')
 jest.mock('../../../../src/lib/config')
+jest.mock('../../../../src/lib/report-generator/generator')
+
 Config.getSystemConfig.mockReturnValue({
   OAUTH: {
     AUTH_ENABLED: false
@@ -168,6 +170,47 @@ describe('API route /api/hisotry for requests and callbacks', () => {
       SpyArrayStoreReset.mockReturnValue()
       const res = await request(app).delete(`/api/history/callbacks`).send()
       expect(res.statusCode).toEqual(200)
+    })
+  })
+  describe('GET /api/history/test-reports', () => {
+    it('Send a proper request', async () => {
+      dbAdapter.listReports.mockResolvedValueOnce([])
+      const res = await request(app).get(`/api/history/test-reports`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('If dbAdapter throws error', async () => {
+      dbAdapter.listReports.mockRejectedValueOnce({message: ''})
+      const res = await request(app).get(`/api/history/test-reports`).send()
+      expect(res.statusCode).toEqual(500)
+    })
+  })
+  describe('GET /api/history/test-reports/reportId', () => {
+    it('Send a proper request', async () => {
+      dbAdapter.getReport.mockResolvedValueOnce({})
+      const res = await request(app).get(`/api/history/test-reports/1`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Send a proper request with format html', async () => {
+      dbAdapter.getReport.mockResolvedValueOnce({
+        testCases: []
+      })
+      const res = await request(app).get(`/api/history/test-reports/1?format=html`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('Send a proper request with format html and download enabled', async () => {
+      dbAdapter.getReport.mockResolvedValueOnce({})
+      const res = await request(app).get(`/api/history/test-reports/1?format=html&download=true`).send()
+      expect(res.statusCode).toEqual(200)
+    })
+    it('If dbAdapter.getReport throws error', async () => {
+      dbAdapter.getReport.mockRejectedValueOnce({message: ''})
+      const res = await request(app).get(`/api/history/test-reports/1`).send()
+      expect(res.statusCode).toEqual(500)
+    })
+    it('If dbAdapter.getReport returns null', async () => {
+      dbAdapter.getReport.mockResolvedValueOnce(null)
+      const res = await request(app).get(`/api/history/test-reports/1`).send()
+      expect(res.statusCode).toEqual(404)
     })
   })
 })

@@ -26,6 +26,7 @@ const express = require('express')
 const router = new express.Router()
 const dbAdapter = require('../db/adapters/dbAdapter')
 const arrayStore = require('../arrayStore')
+const reportGenerator = require('../report-generator/generator')
 
 router.get('/reports', async (req, res, next) => {
   try {
@@ -86,6 +87,40 @@ router.delete('/callbacks', async (req, res, next) => {
   try {
     arrayStore.reset('callbacksHistory', req.user)
     res.status(200).send()
+  } catch (err) {
+    res.status(500).json({ error: err && err.message })
+  }
+})
+
+router.get('/test-reports', async (req, res, next) => {
+  try {
+    const reports = await dbAdapter.listReports(req.query)
+    res.status(200).send(reports)
+  } catch (err) {
+    res.status(500).json({ error: err && err.message })
+  }
+})
+
+router.get('/test-reports/:reportId', async (req, res, next) => {
+  try {
+    let finalReport
+    const dbResult = await dbAdapter.getReport(req.params.reportId)
+    if (!dbResult) {
+      return res.status(404).json({ error: 'Report Not Found' })
+    }
+    const jsonReport = dbResult._doc
+    if (req.query.format === 'html') {
+      finalReport = await reportGenerator.generateReport(jsonReport, 'html')
+      if (req.query.download) {
+        const downloadFileSuffix = '-' + req.params.reportId + '.html'
+        res.setHeader('Content-disposition', 'attachment; filename=TTK-Assertion-Report' + downloadFileSuffix)
+        res.setHeader('TTK-FileName', 'TTK-Assertion-Report' + downloadFileSuffix)
+      }
+    } else {
+      finalReport = jsonReport
+    }
+
+    res.status(200).send(finalReport)
   } catch (err) {
     res.status(500).json({ error: err && err.message })
   }

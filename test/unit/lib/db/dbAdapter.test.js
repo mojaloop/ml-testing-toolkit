@@ -28,6 +28,7 @@ const Config = require('../../../../src/lib/config')
 jest.mock('../../../../src/lib/config')
 jest.mock('mongoose')
 
+const spyMongooseConnect = jest.spyOn(mongoose, 'connect')
 
 mongoose.connect.mockReturnValueOnce({
   model: () => {
@@ -53,6 +54,15 @@ mongoose.connect.mockReturnValueOnce({
           }
         } else {
           return {
+            sort: () => {
+              return {
+                select: () => {
+                  return [{
+                    _id: 'id4'
+                  }]
+                }
+              }
+            },
             select: () => {
               return {
                 sort: () => {
@@ -157,6 +167,36 @@ describe('dbAdapter', () => {
     it('should remove existing object', async () => {
       const result = await dbAdapter.remove('id1', user)
       expect(result).toBeUndefined()
+    })
+  })
+  describe('upsertReport', () => {
+    it('should create new object if not exists', async () => {
+      const result = await dbAdapter.upsertReport({
+        runtimeInformation: {
+          testReportId: 'id1'
+        }
+      })
+      expect(spyMongooseConnect).toBeCalled()
+    })
+    it('should create new object if not exists', async () => {
+      const result = await dbAdapter.upsertReport({
+        runtimeInformation: {
+          testReportId: 'id2'
+        }
+      })
+      expect(spyMongooseConnect).toBeCalled()
+    })
+  })
+  describe('listReports', () => {
+    it('should create new object if not exists', async () => {
+      const result = await dbAdapter.listReports({})
+      expect(spyMongooseConnect).toBeCalled()
+    })
+  })
+  describe('getReport', () => {
+    it('should create new object if not exists', async () => {
+      const result = await dbAdapter.getReport('id1')
+      expect(spyMongooseConnect).toBeCalled()
     })
   })
 })
