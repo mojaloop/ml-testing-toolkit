@@ -43,6 +43,7 @@ mongoose.connect.mockReturnValueOnce({
         }
       },
       create: (data) => data,
+      countDocuments: () => 1,
       find: (query) => {
         if (query._id) {
           return {
