@@ -23,6 +23,7 @@
  ******/
 
 const express = require('express')
+const importExport = require('../importExport')
 const rulesEngineModel = require('../rulesEngineModel')
 
 const router = new express.Router()
@@ -278,6 +279,72 @@ router.put('/files/forward', async (req, res, next) => {
     }
   } catch (err) {
     res.status(500).json({ error: err && err.message })
+  }
+})
+
+router.get('/files/response/:fileName/export', async (req, res, next) => {
+  try {
+    const fileName = req.params.fileName
+    const path = `rules_response/${fileName}`
+    const resp = await importExport.exportSpecFile(path, req.user)
+    res.status(200).json({ status: 'OK', body: resp })
+  } catch (err) {
+    res.status(404).json({ error: err && err.message })
+  }
+})
+
+router.post('/files/response/import', async (req, res, next) => {
+  try {
+    const path = `rules_response/${req.query.rulesFilename}`
+    await importExport.importSpecFile(req.body.buffer, path, req.user)
+    await rulesEngineModel.reloadResponseRules(req.user)
+    res.status(200).json({ status: 'OK' })
+  } catch (err) {
+    res.status(400).send(err.message)
+  }
+})
+
+router.get('/files/callback/:fileName/export', async (req, res, next) => {
+  try {
+    const fileName = req.params.fileName
+    const path = `rules_callback/${fileName}`
+    const resp = await importExport.exportSpecFile(path, req.user)
+    res.status(200).json({ status: 'OK', body: resp })
+  } catch (err) {
+    res.status(404).json({ error: err && err.message })
+  }
+})
+
+router.post('/files/callback/import', async (req, res, next) => {
+  try {
+    const path = `rules_callback/${req.query.rulesFilename}`
+    await importExport.importSpecFile(req.body.buffer, path, req.user)
+    await rulesEngineModel.reloadCallbackRules(req.user)
+    res.status(200).json({ status: 'OK' })
+  } catch (err) {
+    res.status(400).send(err.message)
+  }
+})
+
+router.get('/files/validation/:fileName/export', async (req, res, next) => {
+  try {
+    const fileName = req.params.fileName
+    const path = `rules_validation/${fileName}`
+    const resp = await importExport.exportSpecFile(path, req.user)
+    res.status(200).json({ status: 'OK', body: resp })
+  } catch (err) {
+    res.status(404).json({ error: err && err.message })
+  }
+})
+
+router.post('/files/validation/import', async (req, res, next) => {
+  try {
+    const path = `rules_validation/${req.query.rulesFilename}`
+    await importExport.importSpecFile(req.body.buffer, path, req.user)
+    await rulesEngineModel.reloadValidationRules(req.user)
+    res.status(200).json({ status: 'OK' })
+  } catch (err) {
+    res.status(400).send(err.message)
   }
 })
 

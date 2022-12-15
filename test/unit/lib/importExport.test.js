@@ -39,6 +39,11 @@ const importExport = require('../../../src/lib/importExport')
 
 
 describe('importExport', () => {
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('exportSpecFiles when user is undefined', () => {
     it('export 1 file', async () => {
       AdmZip.mockImplementationOnce(() => {
@@ -365,6 +370,24 @@ describe('importExport', () => {
       })
       spyUpsert.mockResolvedValueOnce({})
       await expect(importExport.importSpecFiles([],['rules_response'], user)).resolves.toBe(undefined)
+    })
+  })
+
+  describe('exportSpecFile', () => {
+    it('should export file from storage', async () => {
+      spyRead.mockResolvedValueOnce({
+        data: []
+      })
+      const exportSpecFile = await importExport.exportSpecFile('/path.json', user)
+      expect(exportSpecFile.buffer).toBeDefined()
+    })
+  })
+
+  describe('importSpecFile', () => {
+    it('should resolve importing file', async () => {
+      spyUpsert.mockResolvedValueOnce({})
+      await expect(importExport.importSpecFile(JSON.stringify(''),['rules_response'], user)).resolves.toBe(undefined)
+      expect(spyUpsert).toBeCalled()
     })
   })
 })
