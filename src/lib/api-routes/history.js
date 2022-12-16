@@ -94,8 +94,8 @@ router.delete('/callbacks', async (req, res, next) => {
 
 router.get('/test-reports', async (req, res, next) => {
   try {
-    const reports = await dbAdapter.listReports(req.query)
-    res.status(200).send(reports)
+    const result = await dbAdapter.listReports(req.query)
+    res.status(200).send(result)
   } catch (err) {
     res.status(500).json({ error: err && err.message })
   }
@@ -109,8 +109,8 @@ router.get('/test-reports/:reportId', async (req, res, next) => {
       return res.status(404).json({ error: 'Report Not Found' })
     }
     const jsonReport = dbResult._doc
-    if (req.query.format === 'html') {
-      finalReport = await reportGenerator.generateReport(jsonReport, 'html')
+    if (req.query.format === 'html' || req.query.format === 'printhtml') {
+      finalReport = await reportGenerator.generateReport(jsonReport, req.query.format)
       if (req.query.download) {
         const downloadFileSuffix = '-' + req.params.reportId + '.html'
         res.setHeader('Content-disposition', 'attachment; filename=TTK-Assertion-Report' + downloadFileSuffix)
@@ -118,6 +118,11 @@ router.get('/test-reports/:reportId', async (req, res, next) => {
       }
     } else {
       finalReport = jsonReport
+      if (req.query.download) {
+        const downloadFileSuffix = '-' + req.params.reportId + '.json'
+        res.setHeader('Content-disposition', 'attachment; filename=TTK-Assertion-Report' + downloadFileSuffix)
+        res.setHeader('TTK-FileName', 'TTK-Assertion-Report' + downloadFileSuffix)
+      }
     }
 
     res.status(200).send(finalReport)

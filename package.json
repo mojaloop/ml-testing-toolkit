@@ -116,7 +116,7 @@
   },
   "devDependencies": {
     "@types/jest": "^29.2.4",
-    "audit-ci": "^6.4.0",
+    "audit-ci": "^6.4.1",
     "get-port": "6.1.2",
     "jest": "^28.1.3",
     "jest-junit": "^15.0.0",

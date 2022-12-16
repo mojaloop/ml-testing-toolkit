@@ -117,15 +117,39 @@ const upsertReport = async (reportData) => {
 const listReports = async (queryParams) => {
   const conn = await getConnection()
   const MyModel = conn.model('reports', mongoDBWrapper.models.reports)
-  // by default is taking the reports from the last 30 days
-  const query = {
-    'runtimeInformation.completedTime': {
-      $gte: queryParams?.gte ? new Date(queryParams.gte) : new Date(Date.now() - (30 * 24 * 60 * 60 * 1000)),
-      $lt: queryParams?.lt ? new Date(queryParams.lt) : new Date()
+  const query = {}
+  if (queryParams?.filterDateRangeStart || queryParams?.filterDateRangeEnd) {
+    query['runtimeInformation.completedTime'] = {}
+    if (queryParams?.filterDateRangeStart) {
+      query['runtimeInformation.completedTime'].$gte = new Date(queryParams?.filterDateRangeStart)
+    }
+    if (queryParams?.filterDateRangeEnd) {
+      query['runtimeInformation.completedTime'].$lte = new Date(queryParams?.filterDateRangeEnd)
     }
   }
-  const documents = await MyModel.find(query).sort('-runtimeInformation.completedTime').select('_id')
-  return documents.map(rec => rec._id)
+
+  if (queryParams?.filterStatus === 'passed') {
+    query.$expr = { $eq: ['$runtimeInformation.totalPassedAssertions', '$runtimeInformation.totalAssertions'] }
+  } else if (queryParams?.filterStatus === 'failed') {
+    query.$expr = { $ne: ['$runtimeInformation.totalPassedAssertions', '$runtimeInformation.totalAssertions'] }
+  }
+
+  // General Query Options like skip and limit
+  const generalQueryOptions = {}
+  if (queryParams?.skip) {
+    generalQueryOptions.skip = queryParams.skip
+  }
+  if (queryParams?.limit) {
+    generalQueryOptions.limit = queryParams.limit
+  }
+
+  const documents = await MyModel.find(query, {}, generalQueryOptions).sort('-runtimeInformation.completedTime').select('_id name runtimeInformation')
+  const count = await MyModel.countDocuments(query)
+
+  return {
+    count,
+    documents
+  }
 }
 
 const getReport = async (reportId) => {

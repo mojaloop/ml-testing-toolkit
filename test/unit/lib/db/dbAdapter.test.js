@@ -43,6 +43,7 @@ mongoose.connect.mockReturnValueOnce({
         }
       },
       create: (data) => data,
+      countDocuments: () => 1,
       find: (query) => {
         if (query._id) {
           return {
@@ -190,6 +191,30 @@ describe('dbAdapter', () => {
   describe('listReports', () => {
     it('should create new object if not exists', async () => {
       const result = await dbAdapter.listReports({})
+      expect(spyMongooseConnect).toBeCalled()
+    })
+  })
+  describe('listReports with filters scenario1', () => {
+    it('should create new object if not exists', async () => {
+      const result = await dbAdapter.listReports({
+        filterDateRangeStart: '2022-01-01T01:00:00.000Z',
+        filterDateRangeEnd: '2022-12-31T23:59:59.999Z',
+        filterStatus: 'passed',
+        skip: 1,
+        limit: 1,
+      })
+      expect(spyMongooseConnect).toBeCalled()
+    })
+  })
+  describe('listReports with filters scenario2', () => {
+    it('should create new object if not exists', async () => {
+      const result = await dbAdapter.listReports({
+        filterDateRangeStart: '2022-01-01T01:00:00.000Z',
+        filterDateRangeEnd: '2022-12-31T23:59:59.999Z',
+        filterStatus: 'failed',
+        skip: 1,
+        limit: 1,
+      })
       expect(spyMongooseConnect).toBeCalled()
     })
   })
