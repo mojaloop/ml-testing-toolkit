@@ -128,12 +128,10 @@ const listReports = async (queryParams) => {
     }
   }
 
-  if (queryParams?.filterStatus) {
-    if (queryParams?.filterStatus === 'passed') {
-      query.$expr = { $eq: ['$runtimeInformation.totalPassedAssertions', '$runtimeInformation.totalAssertions'] }
-    } else if (queryParams?.filterStatus === 'failed') {
-      query.$expr = { $ne: ['$runtimeInformation.totalPassedAssertions', '$runtimeInformation.totalAssertions'] }
-    }
+  if (queryParams?.filterStatus === 'passed') {
+    query.$expr = { $eq: ['$runtimeInformation.totalPassedAssertions', '$runtimeInformation.totalAssertions'] }
+  } else if (queryParams?.filterStatus === 'failed') {
+    query.$expr = { $ne: ['$runtimeInformation.totalPassedAssertions', '$runtimeInformation.totalAssertions'] }
   }
 
   // General Query Options like skip and limit
