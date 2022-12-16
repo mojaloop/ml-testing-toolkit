@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.6.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.5.0...v15.6.0) (2022-12-16)
+
+
+### Features
+
+* **mojaloop/3060:** add list reports endpoint ([#226](https://github.com/mojaloop/ml-testing-toolkit/issues/226)) ([9495f98](https://github.com/mojaloop/ml-testing-toolkit/commit/9495f989d333b9334b9bf325324d048209e245e8))
+
 ## [15.5.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.4.0...v15.5.0) (2022-12-15)
 
 
