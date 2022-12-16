@@ -118,26 +118,26 @@ const listReports = async (queryParams) => {
   const conn = await getConnection()
   const MyModel = conn.model('reports', mongoDBWrapper.models.reports)
   const query = {}
-  if(queryParams?.filterDateRangeStart || queryParams?.filterDateRangeEnd) {
+  if (queryParams?.filterDateRangeStart || queryParams?.filterDateRangeEnd) {
     query['runtimeInformation.completedTime'] = {}
-    if(queryParams?.filterDateRangeStart) {
-      query['runtimeInformation.completedTime']['$gte'] = new Date(queryParams?.filterDateRangeStart)
+    if (queryParams?.filterDateRangeStart) {
+      query['runtimeInformation.completedTime'].$gte = new Date(queryParams?.filterDateRangeStart)
     }
-    if(queryParams?.filterDateRangeEnd) {
-      query['runtimeInformation.completedTime']['$lte'] = new Date(queryParams?.filterDateRangeEnd)
+    if (queryParams?.filterDateRangeEnd) {
+      query['runtimeInformation.completedTime'].$lte = new Date(queryParams?.filterDateRangeEnd)
     }
   }
 
-  if(queryParams?.filterStatus) {
+  if (queryParams?.filterStatus) {
     if (queryParams?.filterStatus === 'passed') {
-      query['$expr'] = { $eq: [ "$runtimeInformation.totalPassedAssertions" , "$runtimeInformation.totalAssertions" ] }
+      query.$expr = { $eq: ['$runtimeInformation.totalPassedAssertions', '$runtimeInformation.totalAssertions'] }
     } else if (queryParams?.filterStatus === 'failed') {
-      query['$expr'] = { $ne: [ "$runtimeInformation.totalPassedAssertions" , "$runtimeInformation.totalAssertions" ] }
+      query.$expr = { $ne: ['$runtimeInformation.totalPassedAssertions', '$runtimeInformation.totalAssertions'] }
     }
   }
-  
+
   // General Query Options like skip and limit
-  const  generalQueryOptions = {}
+  const generalQueryOptions = {}
   if (queryParams?.skip) {
     generalQueryOptions.skip = queryParams.skip
   }
@@ -146,7 +146,7 @@ const listReports = async (queryParams) => {
   }
 
   const documents = await MyModel.find(query, {}, generalQueryOptions).sort('-runtimeInformation.completedTime').select('_id name runtimeInformation')
-  const count = await MyModel.countDocuments(query);
+  const count = await MyModel.countDocuments(query)
 
   return {
     count,
