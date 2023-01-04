@@ -336,7 +336,8 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       if (request.appended?.testResult?.isFailed) {
         if (templateOptions.breakOnError) {
           // Terminate the test run if assertion failed
-          terminateOutbound(traceID)
+          // eslint-disable-next-line
+          throw new Error('Terminated')
         } else if (testCase.breakOnError) {
           // Disable the following requests if assertion failed
           for (let j = i + 1; j < templateIDArr.length; j++) {
