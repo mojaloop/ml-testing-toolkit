@@ -333,7 +333,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       status = 'ERROR'
       await setResponse(convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig)
     } finally {
-      if(request.appended?.testResult?.isFailed) {
+      if (request.appended?.testResult?.isFailed) {
         if (templateOptions.breakOnError) {
           // Terminate the test run if assertion failed
           terminateOutbound(traceID)
@@ -342,7 +342,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
           for (let j = i + 1; j < templateIDArr.length; j++) {
             requestsObj[templateIDArr[j]].disabled = true
           }
-        }  
+        }
       }
       if (contextObj) {
         contextObj.ctx.dispose()
