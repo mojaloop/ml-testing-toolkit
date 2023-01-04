@@ -92,7 +92,7 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
   try {
     for (const i in inputTemplate.test_cases) {
       globalConfig.totalProgress.testCasesProcessed++
-      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, variableData, dfspId, globalConfig)
+      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, variableData, dfspId, globalConfig, inputTemplate.options)
     }
 
     const completedTimeStamp = new Date()
@@ -173,7 +173,7 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
       const tmpTemplate = JSON.parse(JSON.stringify(inputTemplate))
       // Execute all the test cases in the template
       for (const i in tmpTemplate.test_cases) {
-        await processTestCase(tmpTemplate.test_cases[i], traceID, tmpTemplate.inputValues, environmentVariables, dfspId, globalConfig)
+        await processTestCase(tmpTemplate.test_cases[i], traceID, tmpTemplate.inputValues, environmentVariables, dfspId, globalConfig, tmpTemplate.options)
       }
       const completedTimeStamp = new Date()
       const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
@@ -219,7 +219,7 @@ const terminateOutbound = (traceID) => {
   terminateTraceIds[traceID] = true
 }
 
-const processTestCase = async (testCase, traceID, inputValues, variableData, dfspId, globalConfig) => {
+const processTestCase = async (testCase, traceID, inputValues, variableData, dfspId, globalConfig, templateOptions = {}) => {
   const tracing = getTracing(traceID)
 
   // Load the requests array into an object by the request id to access a particular object faster
@@ -237,7 +237,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
 
   const apiDefinitions = await openApiDefinitionsModel.getApiDefinitions()
   // Iterate the request ID array
-  for (const i in templateIDArr) {
+  for (let i = 0; i < templateIDArr.length; i++) {
     if (terminateTraceIds[traceID]) {
       delete terminateTraceIds[traceID]
       throw new Error('Terminated')
@@ -333,13 +333,21 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       status = 'ERROR'
       await setResponse(convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig)
     } finally {
+      if(request.appended?.testResult?.isFailed) {
+        if (templateOptions.breakOnError) {
+          // Terminate the test run if assertion failed
+          terminateOutbound(traceID)
+        } else if (testCase.breakOnError) {
+          // Disable the following requests if assertion failed
+          for (let j = i + 1; j < templateIDArr.length; j++) {
+            requestsObj[templateIDArr[j]].disabled = true
+          }
+        }  
+      }
       if (contextObj) {
         contextObj.ctx.dispose()
         contextObj.ctx = null
       }
-    }
-    if (status === 'ERROR' && (testCase.breakOnError)) {
-      terminateOutbound(traceID)
     }
   }
 
@@ -505,6 +513,7 @@ const handleTests = async (request, response = null, callback = null, environmen
   try {
     const results = {}
     let passedCount = 0
+    let isFailed = false
     if (request.tests && request.tests.assertions.length > 0) {
       for (const k in request.tests.assertions) {
         const testCase = request.tests.assertions[k]
@@ -523,6 +532,7 @@ const handleTests = async (request, response = null, callback = null, environmen
           passedCount++
         } catch (err) {
           console.log(err)
+          isFailed = true
           results[testCase.id] = {
             status: 'FAILED',
             message: err.message
@@ -530,7 +540,7 @@ const handleTests = async (request, response = null, callback = null, environmen
         }
       }
     }
-    return { results, passedCount }
+    return { results, passedCount, isFailed }
   } catch (err) {
     console.log(err)
     return null
