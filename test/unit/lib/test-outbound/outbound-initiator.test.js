@@ -1610,6 +1610,63 @@ describe('Outbound Initiator Functions', () => {
       await expect(OutboundInitiator.OutboundSend(sampleTemplateModified3, '123')).resolves.not.toBeNull
     })
 
+    it('OutboundSend with breakOnError in a testCase', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpyGetApiDefinitions.mockResolvedValue([{
+        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+        type: 'fspiop'
+      }])
+      const sampleTemplateModified11 = JSON.parse(JSON.stringify(sampleTemplate))
+      sampleTemplateModified11.test_cases[0].breakOnError = true
+      sampleTemplateModified11.test_cases[0].requests[0].tests = {
+        assertions: [
+          {
+            id: 1,
+            exec: [
+              "expect(request.body.transactionId).to.equal('321')",
+            ]
+          }
+        ]
+      }
+      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified11, '123')).resolves.not.toBeNull
+    })
+    it('OutboundSend with breakOnError in template', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpyGetApiDefinitions.mockResolvedValue([{
+        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+        type: 'fspiop'
+      }])
+      const sampleTemplateModified12 = JSON.parse(JSON.stringify(sampleTemplate))
+      sampleTemplateModified12.options = {
+        breakOnError: true
+      }
+      sampleTemplateModified12.test_cases[0].requests[0].tests = {
+        assertions: [
+          {
+            id: 1,
+            exec: [
+              "expect(request.body.transactionId).to.equal('321')",
+            ]
+          }
+        ]
+      }
+      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified12, '123')).resolves.not.toBeNull
+    })
+
     it('OutboundSend with saveReport enabled', async () => {
       SpyGetApiDefinitions.mockResolvedValueOnce([{
         specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
