@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.6.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.6.0...v15.6.1) (2023-01-05)
+
+
+### Bug Fixes
+
+* **mojaloop/3076:** refactor break on error ([#227](https://github.com/mojaloop/ml-testing-toolkit/issues/227)) ([5d8ef19](https://github.com/mojaloop/ml-testing-toolkit/commit/5d8ef19b5782507f7af691154d4b7587ee60a082))
+
 ## [15.6.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.5.0...v15.6.0) (2022-12-16)
 
 
