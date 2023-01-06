@@ -75,8 +75,9 @@ router.post('/template/:traceID', [
     }
     const traceID = req.params.traceID
     const inputJson = JSON.parse(JSON.stringify(req.body))
+    const userConfig = await Config.getUserConfig()
     // TODO: Change the following value to the dfspId based ont he login incase HOSTING_ENABLED
-    const dfspId = req.user ? req.user.dfspId : Config.getUserConfig().DEFAULT_USER_FSPID
+    const dfspId = req.user ? req.user.dfspId : userConfig.DEFAULT_USER_FSPID
     outbound.OutboundSend(inputJson, traceID, dfspId)
 
     return res.status(200).json({ status: 'OK' })
@@ -100,8 +101,9 @@ router.post('/template_iterations/:traceID', [
     }
     const traceID = req.params.traceID
     const inputJson = JSON.parse(JSON.stringify(req.body))
+    const userConfig = await Config.getUserConfig()
     // TODO: Change the following value to the dfspId based ont he login incase HOSTING_ENABLED
-    const dfspId = req.user ? req.user.dfspId : Config.getUserConfig().DEFAULT_USER_FSPID
+    const dfspId = req.user ? req.user.dfspId : userConfig.DEFAULT_USER_FSPID
     outbound.OutboundSendLoop(inputJson, traceID, dfspId, req.query.iterationCount)
 
     return res.status(200).json({ status: 'OK' })
