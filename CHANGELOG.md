@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.6.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.6.1...v15.6.2) (2023-01-06)
+
+
+### Bug Fixes
+
+* fix config fetching for monitoring payload condition ([#228](https://github.com/mojaloop/ml-testing-toolkit/issues/228)) ([f18b081](https://github.com/mojaloop/ml-testing-toolkit/commit/f18b08194ed5fe49d58cec8cd76f618482a20eb9))
+
 ### [15.6.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.6.0...v15.6.1) (2023-01-05)
 
 
