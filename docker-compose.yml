@@ -2,11 +2,11 @@ version: "3.7"
 
 services:
   mojaloop-testing-toolkit:
-    image: mojaloop/ml-testing-toolkit:v15.3.0
-    #image: mojaloop/ml-testing-toolkit:local
-    #build:
-    #  context: .
-    #  target: builder
+    #image: mojaloop/ml-testing-toolkit:v15.6.1
+    image: mojaloop/ml-testing-toolkit:local
+    build:
+      context: .
+      target: builder
     volumes:
       - "./spec_files:/opt/app/spec_files"
       - "./secrets:/opt/app/secrets"
@@ -18,7 +18,7 @@ services:
       - -c
       - "npm start"
   mojaloop-testing-toolkit-ui:
-    image: mojaloop/ml-testing-toolkit-ui:v15.0.3
+    image: mojaloop/ml-testing-toolkit-ui:v15.1.1
     ports:
       - "6060:6060"
     environment:

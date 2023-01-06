@@ -32,18 +32,19 @@ const NotificationEmitter = require('./notificationEmitter')
 const DBAdapter = require('./db/adapters/dbAdapter')
 const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 
-const logRequest = (request, user) => {
+const logRequest = async (request, user) => {
   let message = `Request: ${request.method} ${request.path}`
   if (request.body) {
     message += ` Body: ${request.body}`
   }
+  const userConfig = await Config.getUserConfig()
   logMessage('info', message, {
     additionalData: {
       request: {
         uniqueId: request.customInfo ? request.customInfo.uniqueId : null,
         headers: request.headers,
         queryParams: request.query,
-        body: Config.getUserConfig().MONITORING_LOG_INCLUDE_PAYLOAD ? request.payload : 'Payload is hidden - enable it in user-config MONITORING_LOG_INCLUDE_PAYLOAD'
+        body: userConfig.MONITORING_LOG_INCLUDE_PAYLOAD ? request.payload : 'Payload is hidden - enable it in user-config MONITORING_LOG_INCLUDE_PAYLOAD'
       }
     },
     user,
@@ -93,14 +94,15 @@ const logOutboundRequest = (verbosity, message, externalData = {}) => {
   logMessage(verbosity, message, externalData)
 }
 
-const logResponse = (request, user) => {
+const logResponse = async (request, user) => {
   if (request.response) {
     const message = `Response: ${request.method} ${request.path} Status: ${request.response.statusCode}`
+    const userConfig = await Config.getUserConfig()
     logMessage('info', message, {
       additionalData: {
         response: {
           uniqueId: request.customInfo.uniqueId || null,
-          body: Config.getUserConfig().MONITORING_LOG_INCLUDE_PAYLOAD ? request.response.source : 'Payload is hidden - enable it in user-config MONITORING_LOG_INCLUDE_PAYLOAD',
+          body: userConfig.MONITORING_LOG_INCLUDE_PAYLOAD ? request.response.source : 'Payload is hidden - enable it in user-config MONITORING_LOG_INCLUDE_PAYLOAD',
           status: request.response.statusCode
         }
       },
