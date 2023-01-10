@@ -12,6 +12,8 @@
     "GHSA-8qr4-xgw6-wmr3",
     // json web token, no fix available
     "GHSA-8cf7-32gw-wr33",
-    "GHSA-8cf7-32gw-wr33"
+    "GHSA-8cf7-32gw-wr33",
+    "GHSA-27h2-hvpr-p74q",
+    "GHSA-qwph-4952-7xr6"
   ]
 }
