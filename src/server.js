@@ -168,7 +168,7 @@ const onPreHandler = async (request, h) => {
   return h.continue
 }
 
-const onPreResponse = async (request, h) => {
+const onPreResponse = (request, h) => {
   RequestLogger.logResponse(request, request.customInfo.user)
   if (request.customInfo && request.customInfo.negotiatedContentType) {
     if (request.response.isBoom) {
