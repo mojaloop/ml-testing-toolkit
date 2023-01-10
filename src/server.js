@@ -164,12 +164,12 @@ const onPreHandler = async (request, h) => {
 
     RequestLogger.logMessage('info', 'Traceparent header not found. Generated a random traceID.', { additionalData: { traceID: request.customInfo.traceID }, request })
   }
-  RequestLogger.logRequest(request, request.customInfo.user)
+  await RequestLogger.logRequest(request, request.customInfo.user)
   return h.continue
 }
 
-const onPreResponse = (request, h) => {
-  RequestLogger.logResponse(request, request.customInfo.user)
+const onPreResponse = async (request, h) => {
+  await RequestLogger.logResponse(request, request.customInfo.user)
   if (request.customInfo && request.customInfo.negotiatedContentType) {
     if (request.response.isBoom) {
       request.response.output.headers['content-type'] = request.customInfo.negotiatedContentType
