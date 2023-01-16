@@ -381,7 +381,42 @@ const generateAsyncCallback = async (item, context, req) => {
       require('./middleware-functions/quotesAssociation').handleQuotes(context, req, fulfilment)
     }
     // TODO: Handle method and path verifications against the generated ones
-    CallbackHandler.handleCallback(generatedCallback, context, req)
+
+    // Switch to deal with bulkRequest cases (bulkQuotes for now, bulkTransfers next, where we can optimize this)
+    switch (context.request.path) {
+      case '/bulkQuotes': {
+        const individualQuotes = Object.assign(generatedCallback.body.individualQuoteResults)
+
+        for (let i = 0; i < individualQuotes.length; i += 1) {
+          individualQuotes[i].quoteId = context.request.requestBody.individualQuotes[i].quoteId
+        }
+
+        const results = []
+
+        const randomlySplitList = (list) => {
+          if (list.length === 0) {
+            return
+          }
+          const pieceSize = Math.floor(Math.random() * list.length) + 1
+          const result = list.splice(0, pieceSize)
+
+          results.push(result)
+          randomlySplitList(list)
+        }
+
+        randomlySplitList(individualQuotes)
+
+        for (let i = 0; i < results.length; i += 1) {
+          const bulkQuoteCallback = Object.assign({}, generatedCallback)
+          bulkQuoteCallback.body.individualQuoteResults = results[i]
+          await CallbackHandler.handleCallback(bulkQuoteCallback, context, req)
+        }
+        break
+      }
+      default:
+        CallbackHandler.handleCallback(generatedCallback, context, req)
+    }
+
     // Handle triggers for a transaction request
     require('./middleware-functions/transactionRequestsService').handleRequest(context, req, generatedCallback, item.triggerTemplatesFolder)
   }
