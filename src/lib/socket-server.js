@@ -23,6 +23,7 @@
  ******/
 
 const socketIO = require('socket.io')
+const Config = require('./lib/config')
 let socketIOObj = null
 
 const initServer = (http) => {
@@ -33,7 +34,8 @@ const initServer = (http) => {
       methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
       origin: true,
       credentials: true
-    }
+    },
+    ...Config.getSystemConfig().SOCKET_IO_OPTIONS
   })
 }
 

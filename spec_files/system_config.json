@@ -135,5 +135,12 @@
       "version": "0.1",
       "folderPath": "thirdparty_sdk_outbound_0.1"
     }
-  ]
+  ],
+  "SOCKET_IO_OPTIONS": {
+    "pingInterval": 25000,
+    "pingTimeout": 20000,
+    "upgradeTimeout": 10000,
+    "maxHttpBufferSize": 1e6,
+    "transports": ["polling", "websocket"]
+  }
 }
