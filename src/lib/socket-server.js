@@ -23,7 +23,7 @@
  ******/
 
 const socketIO = require('socket.io')
-const Config = require('./lib/config')
+const Config = require('./config')
 let socketIOObj = null
 
 const initServer = (http) => {
