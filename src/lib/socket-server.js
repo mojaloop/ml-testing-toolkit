@@ -35,7 +35,8 @@ const initServer = (http) => {
       origin: true,
       credentials: true
     },
-    ...Config.getSystemConfig().SOCKET_IO_OPTIONS
+    // https://socket.io/docs/v4/server-options/#low-level-engine-options
+    ...Config.getSystemConfig().SOCKET_IO_ENGINE_OPTIONS
   })
 }
 
