@@ -135,5 +135,9 @@
       "version": "0.1",
       "folderPath": "thirdparty_sdk_outbound_0.1"
     }
-  ]
+  ],
+  "SOCKET_IO_ENGINE_OPTIONS": {
+    "pingInterval": 25000,
+    "pingTimeout": 300000
+  }
 }
