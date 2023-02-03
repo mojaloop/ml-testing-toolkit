@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.7.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.6.3...v15.7.0) (2023-02-03)
+
+
+### Features
+
+* **mojaloop/#3075:** add config option to configure socket io ([#232](https://github.com/mojaloop/ml-testing-toolkit/issues/232)) ([8252111](https://github.com/mojaloop/ml-testing-toolkit/commit/8252111ae483d189be34e21859937f37466f0124)), closes [mojaloop/#3075](https://github.com/mojaloop/project/issues/3075)
+
 ### [15.6.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.6.2...v15.6.3) (2023-01-10)
 
 
