@@ -75,5 +75,65 @@
   {
     "id": "errorInformation.errorDescription",
     "pattern": "This is a mock error description"
+  },
+  {
+    "id": "individualQuoteResults.items.condition",
+    "pattern": "[A-Fa-f0-9]{64}"
+  },
+  {
+    "id": "individualQuoteResults.items.ilpPacket",
+    "pattern": "[A-Fa-f0-9]{256}"
+  },
+  {
+    "id": "individualQuoteResults.items.payee.name",
+    "pattern": "123"
+  },
+  {
+    "id": "individualQuoteResults.items.payee.personalInfo.complexName.firstName",
+    "pattern": "John|David|Michael|Chris|Mike|Mark|Paul|Daniel|James|Maria"
+  },
+  {
+    "id": "individualQuoteResults.items.payee.personalInfo.complexName.middleName",
+    "pattern": "G|P|N|S"
+  },
+  {
+    "id": "individualQuoteResults.items.payee.personalInfo.complexName.lastName",
+    "pattern": "Smith|Jones|Johnson|Lee|Brown|Williams|Rodriguez|Garcia|Gonzalez|Lopez"
+  },
+  {
+    "id": "individualQuoteResults.items.payee.personalInfo.dateOfBirth",
+    "pattern": "^(19)\\d\\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|2[0-8])$"
+  },
+  {
+    "id": "individualQuoteResults.items.transferAmount.currency",
+    "pattern": "USD"
+  },
+  {
+    "id": "individualQuoteResults.items.transferAmount.amount",
+    "pattern": "123"
+  },
+  {
+    "id": "individualQuoteResults.items.payeeFspCommission.currency",
+    "pattern": "USD"
+  },
+  {
+    "id": "individualQuoteResults.items.payeeFspCommission.amount",
+    "pattern": "3"
+  },
+  {
+    "id": "individualQuoteResults.items.payeeFspFee.currency",
+    "pattern": "USD"
+  },
+  {
+    "id": "individualQuoteResults.items.payeeFspFee.amount",
+    "pattern": "2"
+  },
+  {
+    "id": "individualQuoteResults.items.payeeReceiveAmount.currency",
+    "pattern": "USD"
+  },
+  {
+    "id": "individualQuoteResults.items.payeeReceiveAmount.amount",
+    "pattern": "123"
   }
 ]

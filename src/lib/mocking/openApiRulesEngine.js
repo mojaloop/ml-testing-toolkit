@@ -275,7 +275,7 @@ const callbackRules = async (context, req) => {
         }
         generatedCallback.callbackInfo = await replaceVariablesFromRequest(req.customInfo.callbackInfo, context, req)
         generatedCallback.method = req.customInfo.callbackInfo.successCallback.method
-        generatedCallback.body = await callbackGenerator.generateRequestBody(operationCallback, generatedCallback.method, jsfRefs1)
+        generatedCallback.body = await callbackGenerator.generateRequestBody(operationCallback, generatedCallback.method, jsfRefs1, context.request.body)
         generatedCallback.headers = await callbackGenerator.generateRequestHeaders(operationCallback, generatedCallback.method, jsfRefs1)
 
         // Override the values in generated callback with the values from callback map file
