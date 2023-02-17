@@ -28,6 +28,7 @@ const utils = require('../utils')
 const multer = require('multer')
 const upload = multer({ dest: 'uploads/' })
 const APIManagement = require('../api-management')
+const storageAdapter = require('./../storageAdapter')
 
 router.get('/api_versions', async (req, res, next) => {
   try {
@@ -46,13 +47,18 @@ router.get('/api_versions', async (req, res, next) => {
   }
 })
 
+const getAPIFileContent = async (fileName, user) => {
+  const userRules = await storageAdapter.read(fileName, user)
+  return userRules.data
+}
+
 router.get('/definition/:type/:version', async (req, res, next) => {
   try {
     const openApiObjects = require('../mocking/openApiMockHandler').getOpenApiObjects()
     const reqVersionArr = req.params.version.split('.')
     const apiType = req.params.type
 
-    const reqOpenApiObject = openApiObjects.find((item) => {
+    const reqOpenApiObject = await openApiObjects.find((item) => {
       if (item.majorVersion === +reqVersionArr[0] && item.minorVersion === +reqVersionArr[1] && item.type === apiType) {
         return true
       } else {
@@ -60,7 +66,8 @@ router.get('/definition/:type/:version', async (req, res, next) => {
       }
     })
     if (reqOpenApiObject) {
-      res.status(200).json(reqOpenApiObject.openApiBackendObject.definition)
+      const result = await getAPIFileContent(reqOpenApiObject.jsonFile, req.user)
+      await res.status(200).json(result)
     } else {
       res.status(404).json({ error: 'Unknown Version' })
     }

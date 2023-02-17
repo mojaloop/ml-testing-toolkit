@@ -48,7 +48,8 @@ const refreshApiDefinitions = async () => {
       callbackMapFile: specFilePrefix + item.folderPath + '/callback_map.json',
       responseMapFile: specFilePrefix + item.folderPath + '/response_map.json',
       jsfRefFile: specFilePrefix + item.folderPath + '/mockRef.json',
-      triggerTemplatesFolder: specFilePrefix + item.folderPath + '/trigger_templates'
+      triggerTemplatesFolder: specFilePrefix + item.folderPath + '/trigger_templates',
+      jsonFile: specFilePrefix + item.folderPath + '/api_spec.json'
     }
   })
 }

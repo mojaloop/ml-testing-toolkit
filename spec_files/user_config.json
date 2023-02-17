@@ -1,6 +1,6 @@
 {
   "VERSION": 1,
-  "CALLBACK_ENDPOINT": "http://scheme-adapter:4000",
+  "CALLBACK_ENDPOINT": "",
   "CALLBACK_RESOURCE_ENDPOINTS": {
     "enabled": false,
     "endpoints": [

@@ -38,6 +38,8 @@ const Config = require('../config')
 const objectStore = require('../objectStore')
 const arrayStore = require('../arrayStore')
 const JwsSigning = require('../jws/JwsSigning')
+const yaml = require('js-yaml')
+const fs = require('fs')
 
 const path = require('path')
 
@@ -58,6 +60,8 @@ module.exports.initilizeMockHandler = async () => {
   const apiDefinitions = await OpenApiDefinitionsModel.getApiDefinitions()
   // Create create openApiBackend objects for all the api definitions
   apis = apiDefinitions.map(item => {
+    const obj = yaml.load(fs.readFileSync(item.specFile, { encoding: 'utf-8' }))
+    fs.writeFileSync(item.jsonFile, JSON.stringify(obj, null, 2))
     const tempObj = new OpenApiBackend({
       definition: path.join(item.specFile),
       strict: true,

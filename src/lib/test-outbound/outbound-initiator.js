@@ -269,7 +269,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
     convertedRequest = replaceRequestVariables(convertedRequest)
 
     // Form the path from params and operationPath
-    convertedRequest.path = replacePathVariables(request.operationPath, convertedRequest.params)
+    convertedRequest.path = replacePathVariables(request.operationPath, inputValues)
 
     // Insert traceparent header if sessionID passed
     if (tracing.sessionID) {
@@ -624,12 +624,17 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         }
       }
 
+      const agent = new https.Agent({
+        rejectUnauthorized: false
+      })
+
       const reqOpts = {
         method,
         url: urlGenerated,
         path,
         params: queryParams,
         headers,
+        httpsAgent: agent,
         data: body,
         timeout: (contextObj.requestVariables && contextObj.requestVariables.REQUEST_TIMEOUT) || userConfig.DEFAULT_REQUEST_TIMEOUT,
         validateStatus: function (status) {

@@ -33,7 +33,7 @@ const reportGenerator = require('./lib/report-generator/generator')
 
 const welcomeMessage = `
 -------------------------------------------------------------------------------------
-                  Welcome to Mojaloop Testing Toolkit
+                  Welcome to Fynarfin Testing Toolkit
 -------------------------------------------------------------------------------------
 You can start using the testing toolkit by opening the following URL in your browser
 

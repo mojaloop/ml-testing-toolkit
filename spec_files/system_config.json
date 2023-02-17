@@ -61,83 +61,11 @@
   },
   "API_DEFINITIONS": [
     {
-      "type": "fspiop",
+      "type": "GSMA-Stub APIs",
       "version": "1.0",
-      "folderPath": "fspiop_1.0",
-      "asynchronous": true
-    },
-    {
-      "type": "fspiop",
-      "version": "1.1",
-      "folderPath": "fspiop_1.1",
-      "asynchronous": true
-    },
-    {
-      "type": "settlements",
-      "version": "1.0",
-      "folderPath": "settlements_1.0"
-    },
-    {
-      "type": "settlements",
-      "version": "2.0",
-      "folderPath": "settlements_2.0",
-      "prefix": "v2"
-    },
-    {
-      "type": "central_admin",
-      "caption": "(old)",
-      "version": "9.3",
-      "folderPath": "central_admin_old_9.3"
-    },
-    {
-      "type": "central_admin",
-      "version": "1.0",
-      "folderPath": "central_admin_1.0"
-    },
-    {
-      "type": "als_admin",
-      "version": "1.1",
-      "folderPath": "als_admin_1.1"
-    },
-    {
-      "type": "mojaloop_simulator",
-      "version": "0.1",
-      "folderPath": "mojaloop_simulator_0.1"
-    },
-    {
-      "type": "mojaloop_simulator_inbound",
-      "version": "1.4",
-      "folderPath": "mojaloop_simulator_sim_1.4"
-    },
-    {
-      "type": "mojaloop_sdk_outbound_scheme_adapter",
-      "version": "1.0",
-      "folderPath": "mojaloop_sdk_outbound_scheme_adapter_1.0",
-      "hostnames": [],
-      "prefix": "/sdk-out"
-    },
-    {
-      "type": "payment_manager",
-      "version": "1.4",
-      "folderPath": "payment_manager_1.4",
-      "hostnames": [
-        "pm4ml.hostname.here"
-      ]
-    },
-    {
-      "type": "fx-api",
-      "version": "2.0",
-      "folderPath": "fx-api_2.0",
-      "asynchronous": true
-    },
-    {
-      "type": "thirdparty_sdk_outbound",
-      "version": "0.1",
-      "folderPath": "thirdparty_sdk_outbound_0.1"
+      "folderPath": "GSMA-Stub APIs_1.0",
+      "asynchronous": false,
+      "additionalApi": true
     }
-  ],
-  "SOCKET_IO_ENGINE_OPTIONS": {
-    "pingInterval": 25000,
-    "pingTimeout": 300000
-  }
+  ]
 }
