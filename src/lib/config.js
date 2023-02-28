@@ -104,7 +104,7 @@ const _getSecretsFromEnvironment = () => {
       console.log(`Secrets retrieved from environment to be merged into system config ${secretsFromEnvironment}`)
     } catch (err) {
       console.log(err)
-      console.log(`Failed to retrieve reporting database password in environment ${process.env.REPORTING_DB_CONNECTION_PASSWORD}`)
+      console.log('Failed to retrieve reporting database password in environment')
     }
   }
   return secretsFromEnvironment
