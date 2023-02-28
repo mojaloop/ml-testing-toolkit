@@ -161,4 +161,24 @@ describe('Config', () => {
       expect(objectStoreInit).toHaveProperty('test1')
     })
   })
+  describe('Config secrets', () => {
+    it('should load reporting database password from env if set ', async () => {
+      storageAdapter.read.mockResolvedValueOnce({
+        data: {
+          INIT_CONFIG: {
+            objectStore: {
+              test1: 'value1'
+            }
+          }
+        }
+      })
+      process.env.REPORTING_DB_CONNECTION_PASSWORD = 'password123'
+      await Config.loadSystemConfig()
+      await expect(Config.getSystemConfig()).toEqual(expect.objectContaining({
+        DB: {
+          PASSWORD: 'password123'
+        }
+      }))
+    })
+  })
 })

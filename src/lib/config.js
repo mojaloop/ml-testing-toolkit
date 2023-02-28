@@ -81,24 +81,45 @@ const loadUserConfigDFSPWise = async (user) => {
 const loadSystemConfig = async () => {
   try {
     SYSTEM_CONFIG = (await storageAdapter.read(SYSTEM_CONFIG_FILE)).data
-    const systemConfigFromEnvironemnt = _getSystemConfigFromEnvironment()
-    _.merge(SYSTEM_CONFIG, systemConfigFromEnvironemnt)
+    const systemConfigFromEnvironment = _getSystemConfigFromEnvironment()
+    _.merge(SYSTEM_CONFIG, systemConfigFromEnvironment)
+    const secretsFromEnvironment = _getSecretsFromEnvironment()
+    console.log(secretsFromEnvironment)
+    _.merge(SYSTEM_CONFIG, secretsFromEnvironment)
   } catch (err) {
     console.log(`Can not read the file ${SYSTEM_CONFIG_FILE}`, err)
   }
   return true
 }
 
+const _getSecretsFromEnvironment = () => {
+  const secretsFromEnvironment = {}
+  if (process.env.REPORTING_DB_CONNECTION_PASSWORD) {
+    try {
+      const reportingDbConnectionPassword = process.env.REPORTING_DB_CONNECTION_PASSWORD
+      console.log(`Retrieved reporting database password in environment ${process.env.REPORTING_DB_CONNECTION_PASSWORD}`)
+      secretsFromEnvironment.DB = {
+        PASSWORD: reportingDbConnectionPassword
+      }
+      console.log(`Secrets retrieved from environment to be merged into system config ${secretsFromEnvironment}`)
+    } catch (err) {
+      console.log(err)
+      console.log(`Failed to retrieve reporting database password in environment ${process.env.REPORTING_DB_CONNECTION_PASSWORD}`)
+    }
+  }
+  return secretsFromEnvironment
+}
+
 const _getSystemConfigFromEnvironment = () => {
-  let systemConfigFromEnvironemnt = {}
+  let systemConfigFromEnvironment = {}
   if (process.env.TTK_SYSTEM_CONFIG) {
     try {
-      systemConfigFromEnvironemnt = JSON.parse(process.env.TTK_SYSTEM_CONFIG)
+      systemConfigFromEnvironment = JSON.parse(process.env.TTK_SYSTEM_CONFIG)
     } catch (err) {
       console.log(`Failed to parse system config passed in environment ${process.env.TTK_SYSTEM_CONFIG}`)
     }
   }
-  return systemConfigFromEnvironemnt
+  return systemConfigFromEnvironment
 }
 
 const setSystemConfig = async (newConfig) => {
