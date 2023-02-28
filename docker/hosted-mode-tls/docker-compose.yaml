@@ -26,7 +26,11 @@ services:
           "INBOUND_MUTUAL_TLS_ENABLED": true,
           "OUTBOUND_MUTUAL_TLS_ENABLED": true,
           "DB": {
-            "URI": "mongodb://ttk:ttk@ttk-mongodb:27017/ttk"
+            "HOST": "ttk-mongodb",
+            "PORT": 27017,
+            "USER": "ttk",
+            "PASSWORD": "ttk",
+            "DATABASE": "ttk"
           },
           "OAUTH": {
             "AUTH_ENABLED": true,
@@ -156,7 +160,7 @@ services:
       - API_BASE_URL=http://localhost:9091
       - AUTH_ENABLED="TRUE"
     tty: true
-    stdin_open: true  
+    stdin_open: true
     ports:
      - "9090:8080"
     restart: always
