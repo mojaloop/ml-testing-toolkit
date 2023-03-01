@@ -82,16 +82,6 @@ mongoose.connect.mockReturnValueOnce({
   }
 })
 
-Config.getSystemConfig.mockReturnValue({
-  DB: {
-    HOST: "",
-    PORT: 27017,
-    USER: "",
-    PASSWORD: "",
-    DATABASE: ""
-  }
-})
-
 describe('dbAdapter', () => {
   beforeAll(() => {
     Config.getSystemConfig.mockReturnValue({
