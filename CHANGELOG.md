@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.0.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.7.0...v16.0.0) (2023-03-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mojaloop/#3130:** alter db config and allow password env setting (#237)
+
+### Features
+
+* **mojaloop/#3130:** alter db config and allow password env setting ([#237](https://github.com/mojaloop/ml-testing-toolkit/issues/237)) ([578c714](https://github.com/mojaloop/ml-testing-toolkit/commit/578c7146b837ef4566a75401775c16d1e8a55221)), closes [mojaloop/#3130](https://github.com/mojaloop/project/issues/3130)
+
 ## [15.7.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.6.3...v15.7.0) (2023-02-03)
 
 
