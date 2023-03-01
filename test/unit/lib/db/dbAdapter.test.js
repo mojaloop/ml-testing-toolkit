@@ -82,17 +82,15 @@ mongoose.connect.mockReturnValueOnce({
   }
 })
 
-Config.getSystemConfig.mockReturnValue({
-  DB: {
-    URI: ''
-  }
-})
-
 describe('dbAdapter', () => {
   beforeAll(() => {
     Config.getSystemConfig.mockReturnValue({
       DB: {
-        URI: ''
+        HOST: "localhost",
+        PORT: 27017,
+        USER: "ttk",
+        PASSWORD: "ttk",
+        DATABASE: "ttk"
       }
     })
   })
@@ -177,7 +175,7 @@ describe('dbAdapter', () => {
           testReportId: 'id1'
         }
       })
-      expect(spyMongooseConnect).toBeCalled()
+      expect(spyMongooseConnect).toHaveBeenCalledWith("mongodb://ttk:ttk@localhost:27017/ttk", {"useNewUrlParser": true, "useUnifiedTopology": true})
     })
     it('should create new object if not exists', async () => {
       const result = await dbAdapter.upsertReport({
@@ -185,13 +183,13 @@ describe('dbAdapter', () => {
           testReportId: 'id2'
         }
       })
-      expect(spyMongooseConnect).toBeCalled()
+      expect(spyMongooseConnect).toHaveBeenCalledWith("mongodb://ttk:ttk@localhost:27017/ttk", {"useNewUrlParser": true, "useUnifiedTopology": true})
     })
   })
   describe('listReports', () => {
     it('should create new object if not exists', async () => {
       const result = await dbAdapter.listReports({})
-      expect(spyMongooseConnect).toBeCalled()
+      expect(spyMongooseConnect).toHaveBeenCalledWith("mongodb://ttk:ttk@localhost:27017/ttk", {"useNewUrlParser": true, "useUnifiedTopology": true})
     })
   })
   describe('listReports with filters scenario1', () => {
@@ -203,7 +201,7 @@ describe('dbAdapter', () => {
         skip: 1,
         limit: 1,
       })
-      expect(spyMongooseConnect).toBeCalled()
+      expect(spyMongooseConnect).toHaveBeenCalledWith("mongodb://ttk:ttk@localhost:27017/ttk", {"useNewUrlParser": true, "useUnifiedTopology": true})
     })
   })
   describe('listReports with filters scenario2', () => {
@@ -215,13 +213,13 @@ describe('dbAdapter', () => {
         skip: 1,
         limit: 1,
       })
-      expect(spyMongooseConnect).toBeCalled()
+      expect(spyMongooseConnect).toHaveBeenCalledWith("mongodb://ttk:ttk@localhost:27017/ttk", {"useNewUrlParser": true, "useUnifiedTopology": true})
     })
   })
   describe('getReport', () => {
     it('should create new object if not exists', async () => {
       const result = await dbAdapter.getReport('id1')
-      expect(spyMongooseConnect).toBeCalled()
+      expect(spyMongooseConnect).toHaveBeenCalledWith("mongodb://ttk:ttk@localhost:27017/ttk", {"useNewUrlParser": true, "useUnifiedTopology": true})
     })
   })
 })

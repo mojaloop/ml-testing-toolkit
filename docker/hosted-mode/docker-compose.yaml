@@ -23,7 +23,11 @@ services:
         {
           "HOSTING_ENABLED": true,
           "DB": {
-            "URI": "mongodb://ttk:ttk@ttk-mongodb:27017/ttk"
+            "HOST": "ttk-mongodb",
+            "PORT": 27017,
+            "USER": "ttk",
+            "PASSWORD": "ttk",
+            "DATABASE": "ttk"
           },
           "OAUTH": {
             "AUTH_ENABLED": true,

@@ -12,7 +12,11 @@
     "userSettings": 1
   },
   "DB": {
-    "URI": "mongodb://ttk:ttk@localhost:27017/ttk"
+    "HOST": "localhost",
+    "PORT": 27017,
+    "USER": "ttk",
+    "PASSWORD": "ttk",
+    "DATABASE": "ttk"
   },
   "OAUTH": {
     "AUTH_ENABLED": false,
