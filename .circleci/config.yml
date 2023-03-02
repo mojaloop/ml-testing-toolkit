@@ -329,21 +329,18 @@ jobs:
             qemu-aarch64-static --version
             update-binfmts --version
       - run:
-          name: Create builder
+          name: Create builder and build Multi Arch Docker local image
           command: |
             export DOCKER_CLI_EXPERIMENTAL=enabled
             docker buildx create --name multi-arch-builder
             docker buildx use multi-arch-builder
             docker buildx inspect --bootstrap
+            docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 --load -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:local .
       # - run:
       #     name: Build Docker local image
       #     command: |
       #       echo "Building Docker image: local"
       #       docker build -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:local .
-      - run:
-          name: Build Multi Arch Docker local image
-          command: | 
-            DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --platform linux/amd64,linux/arm64/v8,linux/arm/v7 --load -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:local .
       - run:
           name: Save docker image to workspace
           command: docker save -o /tmp/docker-image-local.tar $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:local
@@ -634,22 +631,23 @@ jobs:
             docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG
             echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG"
             docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
-      - run:
-          name: Set Image Digest
-          command: |
-            IMAGE_DIGEST=$(docker inspect $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:v${CIRCLE_TAG:1} | jq '.[0].RepoDigests | .[]')
-            echo "IMAGE_DIGEST=${IMAGE_DIGEST}"
-            echo "export IMAGE_DIGEST=${IMAGE_DIGEST}" >> $BASH_ENV
-      - run:
-          name: Update Slack config
-          command: |
-            echo "export SLACK_RELEASE_URL='https://hub.docker.com/layers/${CIRCLE_PROJECT_REPONAME}/${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}/v${CIRCLE_TAG:1}/images/${IMAGE_DIGEST}?context=explore'" | sed -r "s/${DOCKER_ORG}\/${CIRCLE_PROJECT_REPONAME}@sha256:/sha256-/g" >> $BASH_ENV
-      - slack/notify:
-          event: pass
-          template: SLACK_TEMP_RELEASE_SUCCESS
-      - slack/notify:
-          event: fail
-          template: SLACK_TEMP_RELEASE_FAILURE
+      
+      # - run:
+      #     name: Set Image Digest
+      #     command: |
+      #       IMAGE_DIGEST=$(docker inspect $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:v${CIRCLE_TAG:1} | jq '.[0].RepoDigests | .[]')
+      #       echo "IMAGE_DIGEST=${IMAGE_DIGEST}"
+      #       echo "export IMAGE_DIGEST=${IMAGE_DIGEST}" >> $BASH_ENV
+      # - run:
+      #     name: Update Slack config
+      #     command: |
+      #       echo "export SLACK_RELEASE_URL='https://hub.docker.com/layers/${CIRCLE_PROJECT_REPONAME}/${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}/v${CIRCLE_TAG:1}/images/${IMAGE_DIGEST}?context=explore'" | sed -r "s/${DOCKER_ORG}\/${CIRCLE_PROJECT_REPONAME}@sha256:/sha256-/g" >> $BASH_ENV
+      # - slack/notify:
+      #     event: pass
+      #     template: SLACK_TEMP_RELEASE_SUCCESS
+      # - slack/notify:
+      #     event: fail
+      #     template: SLACK_TEMP_RELEASE_FAILURE
 
 ##
 # Workflows
