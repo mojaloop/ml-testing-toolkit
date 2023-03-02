@@ -613,7 +613,7 @@ jobs:
             docker buildx create --name multi-arch-builder
             docker buildx use multi-arch-builder
             docker buildx inspect --bootstrap
-            docker buildx build --platform linux/amd64,linux/arm64 --load -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG .
+            docker buildx build --platform linux/amd64,linux/arm64 --push -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG .
       # - run:
       #     name: Set Image Digest
       #     command: |
