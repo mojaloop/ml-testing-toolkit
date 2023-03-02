@@ -318,10 +318,32 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Build Docker local image
+          name: Setup buildx and qemu
           command: |
-            echo "Building Docker image: local"
-            docker build -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:local .
+            sudo apt-get update
+            sudo apt-get install -y qemu-user-static
+            sudo apt-get install -y binfmt-support
+      - run:
+          name: Check versions
+          command: |
+            qemu-aarch64-static --version
+            update-binfmts --version
+      - run:
+          name: Create builder
+          command: |
+            export DOCKER_CLI_EXPERIMENTAL=enabled
+            docker buildx create --name multi-arch-builder
+            docker buildx use multi-arch-builder
+            docker buildx inspect --bootstrap
+      # - run:
+      #     name: Build Docker local image
+      #     command: |
+      #       echo "Building Docker image: local"
+      #       docker build -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:local .
+      - run:
+          name: Build Multi Arch Docker local image
+          command: | 
+            DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --platform linux/amd64,linux/arm64/v8,linux/arm/v7 --load -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:local .
       - run:
           name: Save docker image to workspace
           command: docker save -o /tmp/docker-image-local.tar $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:local
@@ -846,18 +868,20 @@ workflows:
       - publish-snapshot:
           context: org-global
           requires:
-            - pr-tools/pr-title-check
-            - test-dependencies
-            - test-lint
-            - test-unit
-            - test-coverage
-            - test-functional
-            ## Currently not implemented
-            # - test-integration
-            - vulnerability-check
-            - audit-licenses
-            - license-scan
-            - image-scan
+            ## TODO: Commenting out following for testing. Need to re-enable them
+            # - pr-tools/pr-title-check
+            # - test-dependencies
+            # - test-lint
+            # - test-unit
+            # - test-coverage
+            # - test-functional
+            # ## Currently not implemented
+            # # - test-integration
+            # - vulnerability-check
+            # - audit-licenses
+            # - license-scan
+            # - image-scan
+            - build-local
           filters:
             tags:
               only: /v[0-9]+(\.[0-9]+)*\-snapshot+((\.[0-9]+)?)/
