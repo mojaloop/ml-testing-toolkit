@@ -318,29 +318,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Setup buildx and qemu
+          name: Build Docker local image
           command: |
-            sudo apt-get update
-            sudo apt-get install -y qemu-user-static
-            sudo apt-get install -y binfmt-support
-      - run:
-          name: Check versions
-          command: |
-            qemu-aarch64-static --version
-            update-binfmts --version
-      - run:
-          name: Create builder and build Multi Arch Docker local image
-          command: |
-            export DOCKER_CLI_EXPERIMENTAL=enabled
-            docker buildx create --name multi-arch-builder
-            docker buildx use multi-arch-builder
-            docker buildx inspect --bootstrap
-            docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 --load -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:local .
-      # - run:
-      #     name: Build Docker local image
-      #     command: |
-      #       echo "Building Docker image: local"
-      #       docker build -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:local .
+            echo "Building Docker image: local"
+            docker build -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:local .
       - run:
           name: Save docker image to workspace
           command: docker save -o /tmp/docker-image-local.tar $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:local
@@ -611,27 +592,28 @@ jobs:
             echo "export SLACK_RELEASE_TAG=v${CIRCLE_TAG:1}" >> $BASH_ENV
             echo "export SLACK_BUILD_ID=${CIRCLE_BUILD_NUM}" >> $BASH_ENV
             echo "export SLACK_CI_URL=${CIRCLE_BUILD_URL}" >> $BASH_ENV
-      - attach_workspace:
-          at: /tmp
       - run:
-          name: Load the pre-built docker image from workspace
-          command: | 
-            docker load -i /tmp/docker-image.tar
+          name: Setup buildx and qemu
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y qemu-user-static
+            sudo apt-get install -y binfmt-support
+      - run:
+          name: Check versions
+          command: |
+            qemu-aarch64-static --version
+            update-binfmts --version
       - run:
           name: Login to Docker Hub
           command: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run:
-          name: Re-tag pre built image
+          name: Build Multi Arch Docker image and push
           command: |
-            docker tag $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
-      - run:
-          name: Publish Docker image $CIRCLE_TAG & Latest tag to Docker Hub
-          command: |
-            echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG"
-            docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG
-            echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG"
-            docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
-      
+            export DOCKER_CLI_EXPERIMENTAL=enabled
+            docker buildx create --name multi-arch-builder
+            docker buildx use multi-arch-builder
+            docker buildx inspect --bootstrap
+            docker buildx build --platform linux/amd64,linux/arm64 --load -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG -t $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG .
       # - run:
       #     name: Set Image Digest
       #     command: |
@@ -866,6 +848,7 @@ workflows:
       - publish-snapshot:
           context: org-global
           requires:
+            - setup
             ## TODO: Commenting out following for testing. Need to re-enable them
             # - pr-tools/pr-title-check
             # - test-dependencies
@@ -879,7 +862,6 @@ workflows:
             # - audit-licenses
             # - license-scan
             # - image-scan
-            - build-local
           filters:
             tags:
               only: /v[0-9]+(\.[0-9]+)*\-snapshot+((\.[0-9]+)?)/
