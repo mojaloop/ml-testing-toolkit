@@ -33,7 +33,7 @@ const getConnection = async () => {
     const Config = require('../../config')
     const systemConfig = Config.getSystemConfig()
     const connectionString = MongoUriBuilder({
-      username: systemConfig.DB.USER,
+      username: encodeURIComponent(systemConfig.DB.USER),
       password: encodeURIComponent(systemConfig.DB.PASSWORD),
       host: systemConfig.DB.HOST,
       port: systemConfig.DB.PORT,
