@@ -2,9 +2,11 @@
 reject: [
   # TODO: Upgrading ws is causing some incompatibility issues connecting to sdk-scheme-adapter ws server and causing some test failures
   "ws",
-  # TODO: Upgrading axios is breaking lot of unit tests. It might be because of breaking changes in axios. 
+  # TODO: Upgrading axios is breaking lot of unit tests. It might be because of breaking changes in axios.
   "axios",
   # TODO: Upgrading jest is causing test failures
-  "jest"
-
+  "jest",
+  # Upgrading `npm-check-updates` introduces glob as a dependency that is under the BlueOak-1.0.0 licensing
+  # which is still being investigated if it aligns with Mojaloop's policies.
+  "npm-check-updates"
 ]

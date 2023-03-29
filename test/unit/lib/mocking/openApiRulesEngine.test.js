@@ -221,7 +221,6 @@ const mapping = {
 const getRulesEngineHelper = (type) => {
   const evaluateFn = async (facts) => {
     if (mapping[type][facts.method] !== undefined) {
-      console.log(mapping[type][facts.method])
       return mapping[type][facts.method]
     }
     return mapping[type].default
