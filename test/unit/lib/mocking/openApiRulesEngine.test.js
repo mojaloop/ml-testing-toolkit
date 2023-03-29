@@ -39,7 +39,7 @@ const mapping = {
         type: 'MOCK_ERROR_CALLBACK',
         params: {
           body: {
-  
+
           },
           delay: 100,
           scripts: {
@@ -84,7 +84,7 @@ const mapping = {
           delay: 100
         }
       }
-    ]  
+    ]
   },
   callback: {
     get: [
@@ -137,7 +137,7 @@ const mapping = {
           delay: 100
         }
       }
-    ]    
+    ]
   },
   forward: {
     get: [
@@ -221,9 +221,10 @@ const mapping = {
 const getRulesEngineHelper = (type) => {
   const evaluateFn = async (facts) => {
     if (mapping[type][facts.method] !== undefined) {
+      console.log(mapping[type][facts.method])
       return mapping[type][facts.method]
     }
-    return mapping[type].default   
+    return mapping[type].default
   }
   return Promise.resolve({
     evaluate: evaluateFn
@@ -236,14 +237,14 @@ rulesEngineModel.getValidationRulesEngine.mockImplementation(() => {
 
 rulesEngineModel.getCallbackRulesEngine.mockImplementation(() => {
   return getRulesEngineHelper('callback')
-}) 
+})
 rulesEngineModel.getResponseRulesEngine.mockImplementation(() => {
   return getRulesEngineHelper('response')
-}) 
+})
 
 rulesEngineModel.getForwardRulesEngine.mockImplementation(() => {
   return getRulesEngineHelper('forward')
-}) 
+})
 const specFilePrefix = 'spec_files/api_definitions/'
 const specFileAsync = specFilePrefix + 'fspiop_1.0/api_spec.yaml'
 const jsfRefFile = specFilePrefix + 'fspiop_1.0/mockRef.json'
@@ -255,6 +256,7 @@ const sampleContext = {
   request: {
     path: '/parties/MSISDN/123',
     method: 'get',
+    headers: {},
     body: {
       payee: {
         partyIdInfo: {
@@ -424,14 +426,14 @@ describe('OpenApiRulesEngine', () => {
     })
     it('Mock Callback', async () => {
       sampleContext.request.method = 'get'
-      
+
       const bodyOverride = {...sampleRequest.customInfo.callbackInfo.successCallback.bodyOverride}
       const headerOverride = {...sampleRequest.customInfo.callbackInfo.successCallback.headerOverride}
       const jsfRefFile = sampleRequest.customInfo.jsfRefFile
       sampleRequest.customInfo.callbackInfo.successCallback.bodyOverride = null
       sampleRequest.customInfo.callbackInfo.successCallback.headerOverride = null
       sampleRequest.customInfo.jsfRefFile = null
-      
+
       const body = {...sampleContext.request.body}
       const query = {...sampleContext.request.query}
       sampleContext.request.body = null
@@ -465,7 +467,7 @@ describe('OpenApiRulesEngine', () => {
       const temp = sampleRequest.customInfo.callbackInfo.successCallback.pathPattern
       delete sampleRequest.customInfo.callbackInfo.successCallback.pathPattern
       const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
-      sampleRequest.customInfo.callbackInfo.successCallback.pathPattern = temp 
+      sampleRequest.customInfo.callbackInfo.successCallback.pathPattern = temp
       expect(result).toHaveProperty('path')
       expect(result).toHaveProperty('method')
       expect(result).toHaveProperty('body')
@@ -476,7 +478,7 @@ describe('OpenApiRulesEngine', () => {
       const temp = sampleRequest.customInfo.specFile
       delete sampleRequest.customInfo.specFile
       const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
-      sampleRequest.customInfo.specFile = temp 
+      sampleRequest.customInfo.specFile = temp
       expect(result).toHaveProperty('delay')
       expect(result.delay).toEqual(100)
     })
@@ -501,11 +503,28 @@ describe('OpenApiRulesEngine', () => {
       const temp = sampleRequest.customInfo.callbackInfo.successCallback.pathPattern
       delete sampleRequest.customInfo.callbackInfo.successCallback.pathPattern
       const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
-      sampleRequest.customInfo.callbackInfo.successCallback.pathPattern = temp 
+      sampleRequest.customInfo.callbackInfo.successCallback.pathPattern = temp
       expect(result).toHaveProperty('path')
       expect(result).toHaveProperty('method')
       expect(result).toHaveProperty('body')
       expect(result).toHaveProperty('headers')
+    })
+    it('No Callback', async () => {
+      const tempMapping = mapping.callback.get[0]
+      mapping.callback.get[0] = {
+        type: 'NO_CALLBACK',
+        params: {
+          method: 'get',
+          path: '/parties/{ID}/{Type}',
+          body: {},
+          headers: {}
+        }
+      }
+
+      sampleContext.request.method = 'get'
+      const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
+      expect(result).toEqual(null)
+      mapping.callback.get[0] = tempMapping
     })
   })
   describe('responseRules', () => {
