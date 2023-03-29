@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.0.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v16.0.0...v16.0.1) (2023-03-29)
+
+
+### Bug Fixes
+
+* **mojaloop/3256:** mongodb password spl chars ([#239](https://github.com/mojaloop/ml-testing-toolkit/issues/239)) ([c4a56ad](https://github.com/mojaloop/ml-testing-toolkit/commit/c4a56adedb067f7298eb2061bb0d46e0766c2b8b))
+
 ## [16.0.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v15.7.0...v16.0.0) (2023-03-01)
 
 
