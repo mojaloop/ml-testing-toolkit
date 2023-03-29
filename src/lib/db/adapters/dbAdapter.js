@@ -26,6 +26,7 @@
 
 const mongoDBWrapper = require('../models/mongoDBWrapper')
 const MongoUriBuilder = require('mongo-uri-builder')
+const Logger = require('@mojaloop/central-services-logger')
 
 let conn
 const getConnection = async () => {
@@ -39,6 +40,7 @@ const getConnection = async () => {
       port: systemConfig.DB.PORT,
       database: systemConfig.DB.DATABASE
     })
+    Logger.info(`Connecting to database at ${connectionString}`)
     conn = await mongoDBWrapper.connect(connectionString, {
       useNewUrlParser: true,
       useUnifiedTopology: true

@@ -294,6 +294,9 @@ const callbackRules = async (context, req) => {
       } else {
         customLogger.logMessage('error', 'No Specification file provided for validateRules function', { request: req })
       }
+    } else if (curEvent.type === 'NO_CALLBACK') {
+      customLogger.logMessage('info', 'Skipping callback', { additionalData: curEvent, request: req })
+      return null
     }
   } else {
     customLogger.logMessage('error', 'No callback rules are matched', { request: req })

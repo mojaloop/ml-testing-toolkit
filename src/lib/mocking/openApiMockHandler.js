@@ -373,7 +373,7 @@ const generateAsyncCallback = async (item, context, req) => {
 
   // Callback Rules engine - match the rules and generate the specified callback
   const generatedCallback = await OpenApiRulesEngine.callbackRules(context, req)
-  if (generatedCallback.body) {
+  if (generatedCallback && generatedCallback.body) {
     // Append ILP properties to callback
     const fulfilment = IlpModel.handleQuoteIlp(context, generatedCallback)
     IlpModel.handleTransferIlp(context, generatedCallback)

@@ -13,12 +13,23 @@ services:
     ports:
       - "4040:4040"
       - "5050:5050"
+    environment:
+      TTK_SYSTEM_CONFIG: |-
+        {
+          "DB": {
+            "HOST": "ttk-mongodb",
+            "PORT": 27017,
+            "USER": "ttk",
+            "PASSWORD": "ttk",
+            "DATABASE": "ttk"
+          }
+        }
     command:
       - sh
       - -c
       - "npm start"
   mojaloop-testing-toolkit-ui:
-    image: mojaloop/ml-testing-toolkit-ui:v15.1.1
+    image: mojaloop/ml-testing-toolkit-ui:v15.3.0
     ports:
       - "6060:6060"
     environment:
