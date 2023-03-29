@@ -13,5 +13,5 @@ reject: [
   # delete BOTH node_modules/ and package-lock.json. Might be due to
   # https://github.com/npm/cli/issues/4232
   # This is a temporary fix until Mojaloop decides on Blue Oak licensing.
-  "npm-check-updates"
+  "npm-check-updates",
 ]
