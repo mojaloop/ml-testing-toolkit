@@ -6,7 +6,12 @@ reject: [
   "axios",
   # TODO: Upgrading jest is causing test failures
   "jest",
-  # Upgrading `npm-check-updates` introduces glob as a dependency that is under the BlueOak-1.0.0 licensing
+  # Upgrading `npm-check-updates` introduces rimraf>glob as a dependency that is under the BlueOak-1.0.0 licensing
   # which is still being investigated if it aligns with Mojaloop's policies.
+  # An override is also in place for npm-check-updates>rimraf in package.json.
+  # If you have trouble with package-lock.json not containing the override
+  # delete BOTH node_modules/ and package-lock.json. Might be due to
+  # https://github.com/npm/cli/issues/4232
+  # This is a temporary fix until Mojaloop decides on Blue Oak licensing.
   "npm-check-updates"
 ]
