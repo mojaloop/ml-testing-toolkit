@@ -11,14 +11,14 @@ services:
       - "./spec_files:/opt/app/spec_files"
       - "./secrets:/opt/app/secrets"
     environment:
-      # REPORTING_DB_CONNECTION_PASSWORD: ttk
+      REPORTING_DB_CONNECTION_PASSWORD: ttk@123$asdf
       TTK_SYSTEM_CONFIG: |-
         {
           "DB": {
             "HOST": "ttk-mongodb",
             "PORT": 27017,
             "USER": "ttk",
-            "PASSWORD": "ttk",
+            "PASSWORD": "",
             "DATABASE": "admin"
           }
         }
@@ -45,7 +45,7 @@ services:
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: ttk
-      MONGO_INITDB_ROOT_PASSWORD: ttk
+      MONGO_INITDB_ROOT_PASSWORD: ttk@123$asdf
       ALLOW_EMPTY_PASSWORD: "true"
     ports:
       - 27017:27017
