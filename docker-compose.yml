@@ -25,17 +25,6 @@ services:
     ports:
       - "4040:4040"
       - "5050:5050"
-    environment:
-      TTK_SYSTEM_CONFIG: |-
-        {
-          "DB": {
-            "HOST": "ttk-mongodb",
-            "PORT": 27017,
-            "USER": "ttk",
-            "PASSWORD": "ttk",
-            "DATABASE": "ttk"
-          }
-        }
     command:
       - sh
       - -c
