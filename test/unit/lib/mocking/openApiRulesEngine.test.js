@@ -408,6 +408,23 @@ describe('OpenApiRulesEngine', () => {
       expect(result).toHaveProperty('body')
       expect(result).toHaveProperty('headers')
     })
+    it('No Callback', async () => {
+      const tempMapping = mapping.validation.get[0]
+      mapping.validation.get[0] = {
+        type: 'NO_CALLBACK',
+        params: {
+          method: 'get',
+          path: '/parties/{ID}/{Type}',
+          body: {},
+          headers: {}
+        }
+      }
+
+      sampleContext.request.method = 'get'
+      const result = await OpenApiRulesEngine.validateRules(sampleContext, sampleRequest)
+      expect(result).toEqual({"skipCallback": true})
+      mapping.validation.get[0] = tempMapping
+    })
   })
   describe('callbackRules', () => {
     it('no facts', async () => {
@@ -522,7 +539,7 @@ describe('OpenApiRulesEngine', () => {
 
       sampleContext.request.method = 'get'
       const result = await OpenApiRulesEngine.callbackRules(sampleContext, sampleRequest)
-      expect(result).toEqual(null)
+      expect(result).toEqual({"skipCallback": true})
       mapping.callback.get[0] = tempMapping
     })
   })

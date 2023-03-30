@@ -304,6 +304,9 @@ const generateAsyncCallback = async (item, context, req) => {
     }
     // Additional validation based on the Json Rules Engine, send error callback on failure
     const generatedErrorCallback = await OpenApiRulesEngine.validateRules(context, req)
+    if (generatedErrorCallback.skipCallback) {
+      return
+    }
     if (generatedErrorCallback.body) {
       // TODO: Handle method and path verifications against the generated ones
       customLogger.logMessage('error', 'Sending error callback', { request: req })
@@ -373,7 +376,10 @@ const generateAsyncCallback = async (item, context, req) => {
 
   // Callback Rules engine - match the rules and generate the specified callback
   const generatedCallback = await OpenApiRulesEngine.callbackRules(context, req)
-  if (generatedCallback && generatedCallback.body) {
+  if (generatedCallback.skipCallback) {
+    return
+  }
+  if (generatedCallback.body) {
     // Append ILP properties to callback
     const fulfilment = IlpModel.handleQuoteIlp(context, generatedCallback)
     IlpModel.handleTransferIlp(context, generatedCallback)
