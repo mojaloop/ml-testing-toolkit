@@ -1,47 +1,5 @@
 [
   {
-    "ruleId": 31,
-    "priority": 1,
-    "description": "get /parties/{Type}/{ID}",
-    "apiVersion": {
-      "minorVersion": 0,
-      "majorVersion": 1,
-      "type": "fspiop",
-      "asynchronous": true,
-      "specFile": "spec_files/api_definitions/fspiop_1.0/api_spec.yaml",
-      "callbackMapFile": "spec_files/api_definitions/fspiop_1.0/callback_map.json",
-      "responseMapFile": "spec_files/api_definitions/fspiop_1.0/response_map.json",
-      "jsfRefFile": "spec_files/api_definitions/fspiop_1.0/mockRef.json",
-      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_1.0/trigger_templates"
-    },
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/parties/{Type}/{ID}"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "get"
-        }
-      ]
-    },
-    "event": {
-      "method": "put",
-      "path": "/parties/{Type}/{ID}",
-      "params": {
-        "scripts": {
-          "scriptingEngine": "postman"
-        }
-      },
-      "type": "NO_CALLBACK"
-    },
-    "type": "callback",
-    "version": 1
-  },
-  {
     "ruleId": 30,
     "priority": 1,
     "description": "ttkpayeefsp PUT Notifications Failure Test-case due to invalid FSPIOP-Destination",
