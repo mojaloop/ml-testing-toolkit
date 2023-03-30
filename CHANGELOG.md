@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.1.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v16.0.1...v16.1.0) (2023-03-30)
+
+
+### Features
+
+* **mojaloop/#3176:** add no response callback option ([#240](https://github.com/mojaloop/ml-testing-toolkit/issues/240)) ([a709608](https://github.com/mojaloop/ml-testing-toolkit/commit/a70960878fcd00ec6efb5574d9e20e4cf58f4b2f)), closes [mojaloop/#3176](https://github.com/mojaloop/project/issues/3176)
+
 ### [16.0.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v16.0.0...v16.0.1) (2023-03-29)
 
 
