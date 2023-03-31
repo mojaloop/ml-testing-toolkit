@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.1.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v16.1.0...v16.1.1) (2023-03-31)
+
+
+### Bug Fixes
+
+* **mojaloop/#3176:** add short for skipping cb before validation ([#242](https://github.com/mojaloop/ml-testing-toolkit/issues/242)) ([8c8dd99](https://github.com/mojaloop/ml-testing-toolkit/commit/8c8dd9944bac86cbb9c08532a359320ce97f7eba)), closes [mojaloop/#3176](https://github.com/mojaloop/project/issues/3176)
+
 ## [16.1.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v16.0.1...v16.1.0) (2023-03-30)
 
 
