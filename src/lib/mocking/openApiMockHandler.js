@@ -278,6 +278,12 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
 }
 
 const generateAsyncCallback = async (item, context, req) => {
+  // Callback Rules engine - match the rules and generate the specified callback
+  const generatedCallback = await OpenApiRulesEngine.callbackRules(context, req)
+  if (generatedCallback.skipCallback) {
+    return
+  }
+
   const userConfig = await Config.getUserConfig(req.customInfo.user)
   if (req.method === 'put') {
     if (!userConfig.HUB_ONLY_MODE) {
@@ -374,11 +380,6 @@ const generateAsyncCallback = async (item, context, req) => {
     }
   }
 
-  // Callback Rules engine - match the rules and generate the specified callback
-  const generatedCallback = await OpenApiRulesEngine.callbackRules(context, req)
-  if (generatedCallback.skipCallback) {
-    return
-  }
   if (generatedCallback.body) {
     // Append ILP properties to callback
     const fulfilment = IlpModel.handleQuoteIlp(context, generatedCallback)
