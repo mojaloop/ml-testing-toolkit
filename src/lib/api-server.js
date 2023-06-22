@@ -41,8 +41,8 @@ const initServer = () => {
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
     exposedHeaders: ['Content-Disposition'],
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    origin: Config.getSystemConfig().CORS_WHITELIST,
-    credentials: Config.getSystemConfig().ALLOW_CREDENTIALS
+    origin: Config.getSystemConfig().CORS_WHITELIST || true,
+    credentials: Config.getSystemConfig().ALLOW_CREDENTIALS || true
   }))
 
   // For parsing incoming JSON requests
