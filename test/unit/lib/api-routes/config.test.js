@@ -112,7 +112,7 @@ describe('API route /config', () => {
       }
       const res = await request(app).put(`/api/config/user`).send(newConfig)
       expect(res.statusCode).toEqual(422)
-      expect(res.body.errors).toStrictEqual([{"location": "body", "msg": "Invalid value", "param": "CALLBACK_ENDPOINT", "value": ""}])
+      expect(res.body.errors).toStrictEqual([{"location": "body", "msg": "Invalid value", "path": "CALLBACK_ENDPOINT", "type": "field", "value": ""}])
     })
     it('Editting config should throw 404 if setStoredUserConfig fails', async () => {
       const newConfig = {
