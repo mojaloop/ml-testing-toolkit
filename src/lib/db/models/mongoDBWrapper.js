@@ -60,10 +60,9 @@ const models = {
   })
 }
 
-process.on('SIGINT', () => {
-  mongoose.connection.close(() => {
-    process.exit(0)
-  })
+process.on('SIGINT', async () => {
+  await mongoose.connection.close()
+  process.exit(0)
 })
 
 module.exports = {
