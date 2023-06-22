@@ -37,13 +37,14 @@ const OAuthHelper = require('./oauth/OAuthHelper')
 
 const initServer = () => {
   // For CORS policy
-  app.use(cors({
+  const corsOptions = {
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
     exposedHeaders: ['Content-Disposition'],
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    origin: Config.getSystemConfig().CORS_WHITELIST || true,
-    credentials: Config.getSystemConfig().ALLOW_CREDENTIALS || true
-  }))
+    origin: (Config.getSystemConfig().CORS_WHITELIST === undefined) ? true : Config.getSystemConfig().CORS_WHITELIST,
+    credentials: (Config.getSystemConfig().ALLOW_CREDENTIALS === undefined) ? true : Config.getSystemConfig().ALLOW_CREDENTIALS
+  }
+  app.use(cors(corsOptions))
 
   // For parsing incoming JSON requests
   app.use(express.json({ limit: '50mb' }))
