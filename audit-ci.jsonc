@@ -5,18 +5,13 @@
   "moderate": true,
   "allowlist": [
     // TODO: multer lib is using some vulnerable dependency
-    "GHSA-wm7h-9275-46v2",
-    // postman-collection: no fix available
-    "GHSA-mhxj-85r3-2x55",
-    // multer: no fix available
-    "GHSA-8qr4-xgw6-wmr3",
+    "GHSA-wm7h-9275-46v2", // https://github.com/advisories/GHSA-wm7h-9275-46v2
     // json web token, no fix available
-    "GHSA-8cf7-32gw-wr33",
-    "GHSA-8cf7-32gw-wr33",
-    "GHSA-27h2-hvpr-p74q",
-    "GHSA-qwph-4952-7xr6",
-    "GHSA-hjrf-2m68-5959",
+    "GHSA-8cf7-32gw-wr33", // https://github.com/advisories/GHSA-8cf7-32gw-wr33
+    "GHSA-hjrf-2m68-5959", // https://github.com/advisories/GHSA-hjrf-2m68-5959
+    "GHSA-qwph-4952-7xr6", // https://github.com/advisories/GHSA-qwph-4952-7xr6
     // request-provise-native, no fix available
-    "GHSA-p8p7-x288-28g6"
+    "GHSA-p8p7-x288-28g6", // https://github.com/advisories/GHSA-p8p7-x288-28g6
+    "GHSA-72xf-g2v4-qvf3"  // https://github.com/advisories/GHSA-72xf-g2v4-qvf3
   ]
 }
