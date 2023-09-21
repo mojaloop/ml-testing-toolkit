@@ -9,7 +9,7 @@ info:
     **Note:** The API supports a maximum size of 65536 bytes (64 Kilobytes) in the HTTP header.
   license:
     name: CC BY-ND 4.0
-    url: https://github.com/mojaloop/mojaloop-specification/blob/master/LICENSE.md
+    url: https://github.com/mojaloop/mojaloop-specification/blob/main/LICENSE.md
   contact:
     name: "SK or MR"
     url: https://github.com/mojaloop/mojaloop-specification/issues
@@ -1733,14 +1733,14 @@ components:
       schema:
         type: string
       required: false
-      description: The `FSPIOP-URI` header field is a non-HTTP standard field used by the API for signature verification, should contain the service URI. Required if signature verification is used, for more information, see [the API Signature document](https://github.com/mojaloop/docs/tree/master/Specification%20Document%20Set).
+      description: The `FSPIOP-URI` header field is a non-HTTP standard field used by the API for signature verification, should contain the service URI. Required if signature verification is used, for more information, see [the API Signature document](https://github.com/mojaloop/docs/tree/main/Specification%20Document%20Set).
     FSPIOP-HTTP-Method:
       name: FSPIOP-HTTP-Method
       in: header
       schema:
         type: string
       required: false
-      description: The `FSPIOP-HTTP-Method` header field is a non-HTTP standard field used by the API for signature verification, should contain the service HTTP method. Required if signature verification is used, for more information, see [the API Signature document](https://github.com/mojaloop/docs/tree/master/Specification%20Document%20Set).
+      description: The `FSPIOP-HTTP-Method` header field is a non-HTTP standard field used by the API for signature verification, should contain the service HTTP method. Required if signature verification is used, for more information, see [the API Signature document](https://github.com/mojaloop/docs/tree/main/Specification%20Document%20Set).
     #Path parameters
     ID:
       name: ID
