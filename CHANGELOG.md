@@ -1,6 +1,10 @@
-# Changelog
+# Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [16.1.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v16.1.1...v16.1.2) (2023-10-02)
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### Chore
+
+* **mojaloop/#3458:** nodejs upgrade ([#244](https://github.com/mojaloop/ml-testing-toolkit/issues/244)) ([6f45c21](https://github.com/mojaloop/ml-testing-toolkit/commit/6f45c21819804389de82a58ece103c701f1e8d7c)), closes [mojaloop/#3458](https://github.com/mojaloop/project/issues/3458)
 
 ### [16.1.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v16.1.0...v16.1.1) (2023-03-31)
 
