@@ -1,17 +1,4 @@
 ## Add a TODO comment indicating the reason for each rejected dependency upgrade added to this list, and what should be done to resolve it (i.e. handle it through a story, etc).
 reject: [
-  # TODO: Upgrading ws is causing some incompatibility issues connecting to sdk-scheme-adapter ws server and causing some test failures
-  "ws",
-  # TODO: Upgrading axios is breaking lot of unit tests. It might be because of breaking changes in axios.
-  "axios",
-  # TODO: Upgrading jest is causing test failures
-  "jest",
-  # Upgrading `npm-check-updates` introduces rimraf>glob as a dependency that is under the BlueOak-1.0.0 licensing
-  # which is still being investigated if it aligns with Mojaloop's policies.
-  # An override is also in place for npm-check-updates>rimraf in package.json.
-  # If you have trouble with package-lock.json not containing the override
-  # delete BOTH node_modules/ and package-lock.json. Might be due to
-  # https://github.com/npm/cli/issues/4232
-  # This is a temporary fix until Mojaloop decides on Blue Oak licensing.
-  "npm-check-updates",
 ]
+
