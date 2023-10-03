@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+## [17.0.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v16.1.2...v17.0.0) (2023-10-03)
+
+
+### CI
+
+* **mojaloop/#3458:** fix license scan ([#247](https://github.com/mojaloop/ml-testing-toolkit/issues/247)) ([651cca6](https://github.com/mojaloop/ml-testing-toolkit/commit/651cca6ac5043dc589d390f1eacd26f7cba7b417))
+
 ### [16.1.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v16.1.1...v16.1.2) (2023-10-02)
 
 
