@@ -7,9 +7,11 @@ services:
     build:
       context: .
       target: builder
+    user: root
     volumes:
       - "./spec_files:/opt/app/spec_files"
       - "./secrets:/opt/app/secrets"
+      - "./examples:/opt/app/examples"
     environment:
       REPORTING_DB_CONNECTION_PASSWORD: ttk@123$asdf
       TTK_SYSTEM_CONFIG: |-

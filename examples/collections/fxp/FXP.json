@@ -1,0 +1,264 @@
+{
+  "options": {},
+  "name": "multi",
+  "test_cases": [
+    {
+      "id": 1,
+      "name": "fxQuotes",
+      "fileInfo": {
+        "path": "fxp/FXP.json"
+      },
+      "meta": {
+        "info": "fxQuotes"
+      },
+      "requests": [
+        {
+          "id": 1,
+          "description": "POST /fxQuotes",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 2,
+            "type": "fspiop_fxp",
+            "asynchronous": true,
+            "additionalApi": true,
+            "specFile": "spec_files/api_definitions/fspiop_fxp_2.0/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/fspiop_fxp_2.0/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_fxp_2.0/trigger_templates"
+          },
+          "operationPath": "/fxQuotes",
+          "path": "/fxQuotes",
+          "method": "post",
+          "url": null,
+          "body": {
+            "conversionRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+            "conversionTerms": {
+              "conversionId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+              "determiningTransferId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+              "initiatingFsp": "{$inputs.fromFspId}",
+              "counterPartyFsp": "{$inputs.fxpId}",
+              "amountType": "RECEIVE",
+              "sourceAmount": {
+                "currency": "{$inputs.currency}"
+              },
+              "targetAmount": {
+                "currency": "EUR",
+                "amount": "100"
+              },
+              "expiration": "2024-05-24T08:38:08.699-04:00"
+            }
+          },
+          "headers": {
+            "Accept": "{$inputs.acceptFxQuotes}",
+            "Content-Type": "{$inputs.contentTypeFxQuotes}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "disabled": false
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "GET /fxQuotes",
+      "requests": [
+        {
+          "id": 1,
+          "description": "GET /fxQuotes",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 2,
+            "type": "fspiop_fxp",
+            "asynchronous": true,
+            "additionalApi": true,
+            "specFile": "spec_files/api_definitions/fspiop_fxp_2.0/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/fspiop_fxp_2.0/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_fxp_2.0/trigger_templates"
+          },
+          "operationPath": "/fxQuotes/{ID}",
+          "path": "/fxQuotes/{$function.generic.generateUUID}",
+          "method": "get",
+          "params": {
+            "ID": "{$function.generic.generateUUID}"
+          },
+          "url": null,
+          "headers": {
+            "Content-Type": "{$inputs.contentTypeFxQuotes}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.acceptFxQuotes}"
+          }
+        }
+      ],
+      "fileInfo": {
+        "path": "fxp/FXP.json"
+      }
+    },
+    {
+      "id": 3,
+      "name": "FX Transfers",
+      "requests": [
+        {
+          "id": 1,
+          "description": "POST /fxTransfers",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 2,
+            "type": "fspiop_fxp",
+            "asynchronous": true,
+            "additionalApi": true,
+            "specFile": "spec_files/api_definitions/fspiop_fxp_2.0/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/fspiop_fxp_2.0/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_fxp_2.0/trigger_templates"
+          },
+          "operationPath": "/fxTransfers",
+          "path": "/fxTransfers",
+          "method": "post",
+          "url": null,
+          "body": {
+            "commitRequestId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+            "determiningTransferId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+            "initiatingFsp": "{$inputs.fromFspId}",
+            "counterPartyFsp": "{$inputs.fxpId}",
+            "sourceAmount": {
+              "currency": "USD",
+              "amount": "105.23"
+            },
+            "targetAmount": {
+              "currency": "EUR",
+              "amount": "100"
+            },
+            "condition": "HOr33-H3AfTDHrSkPjJtVPRdKouuMkDXTR4ejlQa8Ks",
+            "expiration": "2016-05-24T08:38:08.699-04:00"
+          },
+          "headers": {
+            "Accept": "{$inputs.acceptFxTransfers}",
+            "Content-Type": "{$inputs.contentTypeFxTransfers}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          }
+        }
+      ],
+      "fileInfo": {
+        "path": "fxp/FXP.json"
+      }
+    },
+    {
+      "id": 4,
+      "name": "GET /fxTransfers/{ID}",
+      "requests": [
+        {
+          "id": 1,
+          "description": "GET /fxTransfers/{ID}",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 2,
+            "type": "fspiop_fxp",
+            "asynchronous": true,
+            "additionalApi": true,
+            "specFile": "spec_files/api_definitions/fspiop_fxp_2.0/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/fspiop_fxp_2.0/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_fxp_2.0/trigger_templates"
+          },
+          "operationPath": "/fxTransfers/{ID}",
+          "path": "/fxTransfers/{$function.generic.generateUUID}",
+          "method": "get",
+          "params": {
+            "ID": "{$function.generic.generateUUID}"
+          },
+          "url": null,
+          "headers": {
+            "Content-Type": "{$inputs.contentTypeFxTransfers}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.acceptFxTransfers}"
+          }
+        }
+      ],
+      "fileInfo": {
+        "path": "fxp/FXP.json"
+      }
+    },
+    {
+      "id": 5,
+      "name": "GET /services/FXP",
+      "requests": [
+        {
+          "id": 1,
+          "description": "GET /services/FXP",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 2,
+            "type": "fspiop_fxp",
+            "asynchronous": true,
+            "additionalApi": true,
+            "specFile": "spec_files/api_definitions/fspiop_fxp_2.0/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/fspiop_fxp_2.0/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_fxp_2.0/trigger_templates"
+          },
+          "operationPath": "/services/FXP",
+          "path": "/services/FXP",
+          "method": "get",
+          "url": null,
+          "headers": {
+            "Content-Type": "{$inputs.contentTypeServicesFxp}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.acceptServicesFxp}"
+          }
+        }
+      ],
+      "fileInfo": {
+        "path": "fxp/FXP.json"
+      }
+    },
+    {
+      "id": 6,
+      "name": "GET /services/FXP/{SourceCurrency}/{TargetCurrency}",
+      "requests": [
+        {
+          "id": 1,
+          "description": "/services/FXP/{SourceCurrency}/{TargetCurrency}",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 2,
+            "type": "fspiop_fxp",
+            "asynchronous": true,
+            "additionalApi": true,
+            "specFile": "spec_files/api_definitions/fspiop_fxp_2.0/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/fspiop_fxp_2.0/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_fxp_2.0/trigger_templates"
+          },
+          "operationPath": "/services/FXP/{SourceCurrency}/{TargetCurrency}",
+          "path": "/services/FXP/USD/EUR",
+          "method": "get",
+          "params": {
+            "SourceCurrency": "USD",
+            "TargetCurrency": "EUR"
+          },
+          "url": null,
+          "headers": {
+            "Content-Type": "{$inputs.contentTypeServicesFxp}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "{$inputs.acceptServicesFxp}"
+          }
+        }
+      ],
+      "fileInfo": {
+        "path": "fxp/FXP.json"
+      }
+    }
+  ]
+}
