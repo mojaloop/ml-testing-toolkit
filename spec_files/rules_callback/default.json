@@ -1023,125 +1023,20 @@
     }
   },
   {
-    "ruleId": 21,
-    "priority": 1,
-    "description": "get /fxParties/{Type}/{ID}",
-    "apiVersion": {
-      "minorVersion": 0,
-      "majorVersion": 2,
-      "type": "fx-api",
-      "asynchronous": true
-    },
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/fxParties/{Type}/{ID}"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "get"
-        }
-      ]
-    },
-    "event": {
-      "method": "put",
-      "path": "/fxParties/{Type}/{ID}",
-      "params": {
-        "scripts": {
-          "scriptingEngine": "postman"
-        }
-      },
-      "type": "MOCK_CALLBACK"
-    },
-    "type": "callback",
-    "version": 1
-  },
-  {
-    "ruleId": 22,
-    "priority": 1,
-    "description": "get /fxParties/{Type}/{ID}/{SubId}",
-    "apiVersion": {
-      "minorVersion": 0,
-      "majorVersion": 2,
-      "type": "fx-api",
-      "asynchronous": true
-    },
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/fxParties/{Type}/{ID}/{SubId}"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "get"
-        }
-      ]
-    },
-    "event": {
-      "method": "put",
-      "path": "/fxParties/{Type}/{ID}/{SubId}",
-      "params": {
-        "scripts": {
-          "scriptingEngine": "postman"
-        }
-      },
-      "type": "MOCK_CALLBACK"
-    },
-    "type": "callback",
-    "version": 1
-  },
-  {
-    "ruleId": 23,
-    "priority": 1,
-    "description": "post /fxQuotes",
-    "apiVersion": {
-      "minorVersion": 0,
-      "majorVersion": 2,
-      "type": "fx-api",
-      "asynchronous": true
-    },
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/fxQuotes"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "post"
-        }
-      ]
-    },
-    "event": {
-      "method": "put",
-      "path": "/fxQuotes/{ID}",
-      "params": {
-        "scripts": {
-          "scriptingEngine": "postman"
-        }
-      },
-      "type": "MOCK_CALLBACK"
-    },
-    "type": "callback",
-    "version": 1
-  },
-  {
-    "ruleId": 24,
+    "ruleId": 32,
     "priority": 1,
     "description": "get /fxQuotes/{ID}",
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
-      "type": "fx-api",
-      "asynchronous": true
+      "type": "fspiop_fxp",
+      "asynchronous": true,
+      "additionalApi": true,
+      "specFile": "spec_files/api_definitions/fspiop_fxp_2.0/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_fxp_2.0/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_fxp_2.0/trigger_templates"
     },
     "conditions": {
       "all": [
@@ -1162,7 +1057,44 @@
       "path": "/fxQuotes/{ID}",
       "params": {
         "scripts": {
-          "scriptingEngine": "postman"
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+          "Content-Type": "{$request.headers.content-type}",
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Source": "{$request.headers.fspiop-destination}"
+        },
+        "body": {
+          "condition": "HOr33-H3AfTDHrSkPjJtVPRdKouuMkDXTR4ejlQa8Ks",
+          "conversionTerms": {
+            "conversionId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+            "initiatingFsp": "testingtoolkitdfsp",
+            "counterPartyFsp": "fxp_123",
+            "amountType": "RECEIVE",
+            "sourceAmount": {
+              "currency": "USD",
+              "amount": "105.23"
+            },
+            "targetAmount": {
+              "currency": "EUR",
+              "amount": "100"
+            },
+            "expiration": "2016-05-24T08:38:08.699-04:00",
+            "charges": [
+              {
+                "chargeType": "Conversion fee",
+                "sourceAmount": {
+                  "currency": "USD",
+                  "amount": "10"
+                },
+                "targetAmount": {
+                  "currency": "AED",
+                  "amount": "9.5"
+                }
+              }
+            ],
+            "determiningTransferId": "b51ec534-ee48-4575-b6a9-ead2955b8069"
+          }
         }
       },
       "type": "MOCK_CALLBACK"
@@ -1171,14 +1103,20 @@
     "version": 1
   },
   {
-    "ruleId": 25,
+    "ruleId": 33,
     "priority": 1,
     "description": "post /fxTransfers",
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
-      "type": "fx-api",
-      "asynchronous": true
+      "type": "fspiop_fxp",
+      "asynchronous": true,
+      "additionalApi": true,
+      "specFile": "spec_files/api_definitions/fspiop_fxp_2.0/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_fxp_2.0/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_fxp_2.0/trigger_templates"
     },
     "conditions": {
       "all": [
@@ -1200,6 +1138,16 @@
       "params": {
         "scripts": {
           "scriptingEngine": "postman"
+        },
+        "headers": {
+          "Content-Type": "{$request.headers.content-type}",
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Source": "{$request.body.counterPartyFsp}"
+        },
+        "body": {
+          "fulfilment": "WLctttbu2HvTsa1XWvUoGRcQozHsqeu9Ahl2JW9Bsu8",
+          "completedTimestamp": "2016-05-24T08:38:08.699-04:00",
+          "conversionState": "RESERVED"
         }
       },
       "type": "MOCK_CALLBACK"
@@ -1208,14 +1156,20 @@
     "version": 1
   },
   {
-    "ruleId": 26,
+    "ruleId": 34,
     "priority": 1,
     "description": "get /fxTransfers/{ID}",
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
-      "type": "fx-api",
-      "asynchronous": true
+      "type": "fspiop_fxp",
+      "asynchronous": true,
+      "additionalApi": true,
+      "specFile": "spec_files/api_definitions/fspiop_fxp_2.0/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_fxp_2.0/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_fxp_2.0/trigger_templates"
     },
     "conditions": {
       "all": [
@@ -1237,6 +1191,202 @@
       "params": {
         "scripts": {
           "scriptingEngine": "postman"
+        },
+        "headers": {
+          "Content-Type": "{$request.headers.content-type}",
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Source": "{$request.headers.fspiop-destination}"
+        },
+        "body": {
+          "fulfilment": "WLctttbu2HvTsa1XWvUoGRcQozHsqeu9Ahl2JW9Bsu8",
+          "completedTimestamp": "2016-05-24T08:38:08.699-04:00",
+          "conversionState": "RESERVED"
+        }
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 35,
+    "priority": 1,
+    "description": "get /services/FXP",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_fxp",
+      "asynchronous": true,
+      "additionalApi": true,
+      "specFile": "spec_files/api_definitions/fspiop_fxp_2.0/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_fxp_2.0/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_fxp_2.0/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/services/FXP"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/services/FXP",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "postman"
+        },
+        "headers": {
+          "Content-Type": "{$request.headers.content-type}",
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Source": "{$request.headers.fspiop-destination}"
+        },
+        "body": {
+          "providers": [
+            "fxp_123"
+          ]
+        }
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 36,
+    "priority": 1,
+    "description": "get /services/FXP/{SourceCurrency}/{TargetCurrency}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_fxp",
+      "asynchronous": true,
+      "additionalApi": true,
+      "specFile": "spec_files/api_definitions/fspiop_fxp_2.0/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_fxp_2.0/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_fxp_2.0/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/services/FXP/{SourceCurrency}/{TargetCurrency}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/services/FXP/{SourceCurrency}/{TargetCurrency}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "postman"
+        },
+        "body": {
+          "providers": [
+            "fxp_123"
+          ]
+        },
+        "headers": {
+          "Content-Type": "{$request.headers.content-type}",
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Source": "hub_1"
+        }
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 37,
+    "priority": 1,
+    "description": "post /fxQuotes",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_fxp",
+      "asynchronous": true,
+      "additionalApi": true,
+      "specFile": "spec_files/api_definitions/fspiop_fxp_2.0/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_fxp_2.0/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_fxp_2.0/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_fxp_2.0/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/fxQuotes"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/fxQuotes/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+          "Content-Type": "{$request.headers.content-type}",
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Source": "{$request.headers.fspiop-destination}"
+        },
+        "body": {
+          "condition": "HOr33-H3AfTDHrSkPjJtVPRdKouuMkDXTR4ejlQa8Ks",
+          "conversionTerms": {
+            "conversionId": "b51ec534-ee48-4575-b6a9-ead2955b8069",
+            "initiatingFsp": "testingtoolkitdfsp",
+            "counterPartyFsp": "fxp_123",
+            "amountType": "RECEIVE",
+            "sourceAmount": {
+              "currency": "USD",
+              "amount": "105.23"
+            },
+            "targetAmount": {
+              "currency": "EUR",
+              "amount": "100"
+            },
+            "expiration": "2016-05-24T08:38:08.699-04:00",
+            "charges": [
+              {
+                "chargeType": "Conversion fee",
+                "sourceAmount": {
+                  "currency": "USD",
+                  "amount": "10"
+                },
+                "targetAmount": {
+                  "currency": "AED",
+                  "amount": "9.5"
+                }
+              }
+            ],
+            "determiningTransferId": "b51ec534-ee48-4575-b6a9-ead2955b8069"
+          }
         }
       },
       "type": "MOCK_CALLBACK"
