@@ -1,0 +1,163 @@
+{
+  "test_cases": [
+    {
+      "id": 1,
+      "name": "POST /fxQuotes",
+      "requests": [
+        {
+          "id": 1,
+          "description": "POST fx/Quotes",
+          "apiVersion": {
+            "minorVersion": 1,
+            "majorVersion": 2,
+            "type": "sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets",
+            "asynchronous": false,
+            "prefix": "/sdk-out-v2-1",
+            "additionalApi": true,
+            "specFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/trigger_templates"
+          },
+          "operationPath": "/fxQuotes",
+          "path": "/fxQuotes",
+          "method": "post",
+          "url": "http://localhost:4040/sdk-out-v2-1",
+          "body": {
+            "conversionRequestId": "828cc75f-1654-415e-8fcd-df76cc9329b9",
+            "conversionTerms": {
+              "conversionId": "581f68ef-b54f-416f-9161-ac34e889a84b",
+              "initiatingFsp": "PayerFSP",
+              "counterPartyFsp": "FDH_FX",
+              "amountType": "SEND",
+              "sourceAmount": {
+                "currency": "BWP",
+                "amount": "300"
+              },
+              "targetAmount": {
+                "currency": "TZS"
+              },
+              "expiration": "2021-08-25T14:17:09.663+01:00"
+            }
+          }
+        }
+      ],
+      "fileInfo": {
+        "path": "fxp/SDK_outbound.json"
+      }
+    },
+    {
+      "id": 2,
+      "name": "POST /fxTransfers",
+      "requests": [
+        {
+          "id": 1,
+          "description": "POST /fxTransfers",
+          "apiVersion": {
+            "minorVersion": 1,
+            "majorVersion": 2,
+            "type": "sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets",
+            "asynchronous": false,
+            "prefix": "/sdk-out-v2-1",
+            "additionalApi": true,
+            "specFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/trigger_templates"
+          },
+          "operationPath": "/fxTransfers",
+          "path": "/fxTransfers",
+          "method": "post",
+          "url": "http://localhost:4040/sdk-out-v2-1",
+          "body": {
+            "commitRequestId": "77c9d78d-c26a-4474-8b3c-99b96a814bfc",
+            "determiningTransferId": "d9ce59d4-3598-4396-8630-581bb0551451",
+            "initiatingFsp": "PayerFSP",
+            "counterPartyFsp": "FDH_FX",
+            "amountType": "SEND",
+            "sourceAmount": {
+              "currency": "BWP",
+              "amount": "300"
+            },
+            "targetAmount": {
+              "currency": "TZS",
+              "amount": "48000"
+            },
+            "condition": "GRzLaTP7DJ9t4P-a_BA0WA9wzzlsugf00-Tn6kESAfM"
+          }
+        }
+      ],
+      "fileInfo": {
+        "path": "fxp/SDK_outbound.json"
+      }
+    },
+    {
+      "id": 3,
+      "name": "GET /services/FXP",
+      "requests": [
+        {
+          "id": 1,
+          "description": "GET /services/FXP",
+          "apiVersion": {
+            "minorVersion": 1,
+            "majorVersion": 2,
+            "type": "sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets",
+            "asynchronous": false,
+            "prefix": "/sdk-out-v2-1",
+            "additionalApi": true,
+            "specFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/trigger_templates"
+          },
+          "operationPath": "/services/FXP",
+          "path": "/services/FXP",
+          "method": "get",
+          "url": "http://localhost:4040/sdk-out-v2-1",
+          "ignoreCallbacks": true
+        }
+      ],
+      "fileInfo": {
+        "path": "fxp/SDK_outbound.json"
+      }
+    },
+    {
+      "id": 4,
+      "name": "GET /services/FXP/{SourceCurrency}/{TargetCurrency}",
+      "requests": [
+        {
+          "id": 1,
+          "description": "GET /services/FXP/{SourceCurrency}/{TargetCurrency}",
+          "apiVersion": {
+            "minorVersion": 1,
+            "majorVersion": 2,
+            "type": "sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets",
+            "asynchronous": false,
+            "prefix": "/sdk-out-v2-1",
+            "additionalApi": true,
+            "specFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1/trigger_templates"
+          },
+          "operationPath": "/services/FXP/{SourceCurrency}/{TargetCurrency}",
+          "path": "/services/FXP/BWP/TZS",
+          "method": "get",
+          "params": {
+            "SourceCurrency": "BWP",
+            "TargetCurrency": "TZS"
+          },
+          "url": "http://localhost:4040/sdk-out-v2-1",
+          "ignoreCallbacks": true
+        }
+      ],
+      "fileInfo": {
+        "path": "fxp/SDK_outbound.json"
+      }
+    }
+  ]
+}
