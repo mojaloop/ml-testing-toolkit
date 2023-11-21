@@ -25,10 +25,12 @@
 const APIManagement = require('../../../src/lib/api-management')
 const Utils = require('../../../src/lib/utils')
 const Config = require('../../../src/lib/config')
+const OpenApiBackend = require('openapi-backend').default
 const fs = require('fs')
 
 jest.mock('../../../src/lib/utils')
 jest.mock('../../../src/lib/config')
+jest.mock('openapi-backend')
 
 const specFilePrefix = 'test/'
 const apiSpecSyncFile = fs.readFileSync(specFilePrefix + 'api_spec_sync.yaml')
@@ -42,11 +44,8 @@ const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 describe('API Management', () => { 
   describe('validateDefinition', () => {
     it('should not throw an error', async () => {
-      await expect(APIManagement.validateDefinition(specFilePrefix + 'api_spec_sync.yaml')).resolves.not.toBeUndefined()
-    })
-    it('should return proper parsed swagger definition', async () => {
-      const document = await APIManagement.validateDefinition(specFilePrefix + 'api_spec_sync.yaml')
-      expect(document).toHaveProperty('openapi')
+      await expect(APIManagement.validateDefinition(specFilePrefix + 'api_spec_sync.yaml')).resolves.not.toThrowError()
+      expect(OpenApiBackend).toHaveBeenCalledTimes(1);
     })
   })
   describe('addDefinition', () => {

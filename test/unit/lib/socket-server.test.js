@@ -18,28 +18,41 @@
  * Gates Foundation
 
  * ModusBox
- * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
+ * Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
 
-const storedObject = {
-  transactions: {}
-}
+'use strict'
 
-const set = async (key, value) => {
-  storedObject[key] = { ...value }
-}
+const socketIO = require('socket.io')
+const SocketServer = require('../../../src/lib/socket-server')
+const Config = require('../../../src/lib/config')
+const storageAdapter = require('../../../src/lib/storageAdapter')
 
-const get = async (key) => {
-  return { ...storedObject[key] }
-}
+jest.mock('socket.io')
+jest.mock('../../../src/lib/storageAdapter')
 
-const init = async () => {
-  return null
-}
-
-module.exports = {
-  set,
-  get,
-  init
-}
+describe('Socket Server', () => {
+  describe('Init server', () => {
+    it('Passes config options to library', async () => {
+      storageAdapter.read.mockResolvedValueOnce({
+        data: {
+          SOCKET_IO_ENGINE_OPTIONS: {
+            pingInterval: 1,
+          }
+        }
+      })
+      Config.loadSystemConfig()
+      await expect(Config.getObjectStoreInitConfig()).resolves.toBeTruthy()
+      await Config.getObjectStoreInitConfig()
+      const httpMock = jest.mock()
+      SocketServer.initServer(httpMock)
+      expect(socketIO).toBeCalledWith(
+        httpMock, {
+          cors: expect.any(Object),
+          pingInterval: 1,
+        }
+      )
+    })
+  })
+})

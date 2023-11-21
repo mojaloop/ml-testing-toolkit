@@ -121,6 +121,7 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
           saveReportStatus.isSaved = true
           saveReportStatus.message = 'OK'
         } catch (err) {
+          customLogger.logMessage('error', 'Error while saving report: ' + err.message)
           saveReportStatus.isSaved = false
           saveReportStatus.message = err.message
         }
