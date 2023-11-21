@@ -417,6 +417,8 @@ jobs:
             export DOCKER_NODE_VERSION="$NVMRC_VERSION-alpine"
             echo "export DOCKER_NODE_VERSION=$NVMRC_VERSION-alpine" >> $BASH_ENV
             echo "Building Docker image: ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local --build-arg NODE_VERSION=$DOCKER_NODE_VERSION"
+            docker buildx create --use --platform=linux/arm64,linux/amd64 --name multi-platform-builder
+            docker buildx inspect --bootstrap
             docker buildx build --progress plain --platform linux/amd64,linux/arm64 -t ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local --build-arg NODE_VERSION=$DOCKER_NODE_VERSION .
       - run:
           name: Save docker image to workspace
