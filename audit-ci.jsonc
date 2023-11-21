@@ -12,6 +12,9 @@
     "GHSA-qwph-4952-7xr6", // https://github.com/advisories/GHSA-qwph-4952-7xr6
     // request-provise-native, no fix available
     "GHSA-p8p7-x288-28g6", // https://github.com/advisories/GHSA-p8p7-x288-28g6
-    "GHSA-72xf-g2v4-qvf3"  // https://github.com/advisories/GHSA-72xf-g2v4-qvf3
+    "GHSA-72xf-g2v4-qvf3",  // https://github.com/advisories/GHSA-72xf-g2v4-qvf3
+    // babel vulnerable to arbitrary code execution - dev dependency
+    "GHSA-67hx-6x53-jw92"   // https://github.com/advisories/GHSA-67hx-6x53-jw92
+  
   ]
 }
