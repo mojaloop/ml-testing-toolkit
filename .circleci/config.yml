@@ -419,8 +419,8 @@ jobs:
             echo "Building Docker image: ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local --build-arg NODE_VERSION=$DOCKER_NODE_VERSION"
             docker buildx create --use --platform=linux/arm64,linux/amd64 --name multi-platform-builder
             docker buildx inspect --bootstrap
-            docker buildx build --progress plain --platform linux/amd64,linux/arm64 -t ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local --build-arg NODE_VERSION=$DOCKER_NODE_VERSION .
-            docker image list
+            docker buildx build --progress plain --platform linux/amd64,linux/arm64 --output . -t ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local --build-arg NODE_VERSION=$DOCKER_NODE_VERSION .
+            ls -la
       - run:
           name: Save docker image to workspace
           command: docker save -o /tmp/docker-image.tar ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local
