@@ -420,15 +420,17 @@ jobs:
             docker buildx create --use --platform=linux/arm64,linux/amd64 --name multi-platform-builder
             docker buildx inspect --bootstrap
             docker buildx build --progress plain --platform linux/arm64 --load -t ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:arm64 --build-arg NODE_VERSION=$DOCKER_NODE_VERSION .
-            docker buildx build --progress plain --platform linux/amd64 --load -t ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:amd64 --build-arg NODE_VERSION=$DOCKER_NODE_VERSION .
-            docker manifest create ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:arm64 ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:amd64
+            docker buildx build --progress plain --platform linux/amd64 --load -t ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local --build-arg NODE_VERSION=$DOCKER_NODE_VERSION .
       - run:
           name: Save docker image to workspace
-          command: docker save -o /tmp/docker-image.tar ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local
+          command: |
+            docker save -o /tmp/docker-image.tar ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local
+            docker save -o /tmp/docker-image-arm.tar ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:arm
       - persist_to_workspace:
           root: /tmp
           paths:
             - ./docker-image.tar
+            - ./docker-image-arm.tar
 
   license-scan:
     executor: default-machine
