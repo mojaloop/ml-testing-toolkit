@@ -425,7 +425,7 @@ jobs:
           name: Save docker image to workspace
           command: |
             docker save -o /tmp/docker-image.tar ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local
-            docker save -o /tmp/docker-image-arm.tar ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:arm
+            docker save -o /tmp/docker-image-arm.tar ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:arm64
       - persist_to_workspace:
           root: /tmp
           paths:
