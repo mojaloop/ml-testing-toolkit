@@ -400,25 +400,10 @@ const generateAsyncCallback = async (item, context, req) => {
 
         const results = individualQuotes
 
-        const randomlySplitList = (list) => {
-          if (list.length === 0) {
-            return
-          }
-          const pieceSize = Math.floor(Math.random() * list.length) + 1
-          const result = list.splice(0, pieceSize)
-
-          results.push(result)
-          randomlySplitList(list)
-        }
-
-        randomlySplitList(individualQuotes)
-
-        for (let i = 0; i < results.length; i += 1) {
-          const bulkQuoteCallback = Object.assign({}, generatedCallback)
-          bulkQuoteCallback.body.individualQuoteResults = results
-          bulkQuoteCallback.headers['FSPIOP-Destination'] = context.request.body.payer.partyIdInfo.fspId
-          await CallbackHandler.handleCallback(bulkQuoteCallback, context, req)
-        }
+        const bulkQuoteCallback = Object.assign({}, generatedCallback)
+        bulkQuoteCallback.body.individualQuoteResults = results
+        bulkQuoteCallback.headers['FSPIOP-Destination'] = context.request.body.payer.partyIdInfo.fspId
+        await CallbackHandler.handleCallback(bulkQuoteCallback, context, req)
         break
       }
       case '/transfers': {
