@@ -646,17 +646,22 @@ jobs:
           name: Re-tag pre built image
           command: |
             docker tag ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG
-            docker tag ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
+            docker tag ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:amd64-$RELEASE_TAG
             docker tag ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:arm-$RELEASE_TAG
       - run:
-          name: Publish Docker image $CIRCLE_TAG & Latest tag to Docker Hub
+          name: Publish Docker images $CIRCLE_TAG & Latest image tags to Docker Hub
           command: |
             echo "Publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG"
             docker push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG
-            echo "Publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG"
-            docker push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
+            echo "Publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:amd64-$RELEASE_TAG"
+            docker push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:amd64-$RELEASE_TAG
             echo "Publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:arm-$RELEASE_TAG"
             docker push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:arm-$RELEASE_TAG
+      - run:
+          name: Build manifest and push combined image tags to Docker Hub
+          command: |
+            docker manifest create ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:amd64-$RELEASE_TAG ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:arm-$RELEASE_TAG
+            docker manifest push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
       - run:
           name: Set Image Digest
           command: |
@@ -712,17 +717,22 @@ jobs:
           name: Re-tag pre built image
           command: |
             docker tag ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG
-            docker tag ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
+            docker tag ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:amd64-$RELEASE_TAG
             docker tag ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:local ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:arm-$RELEASE_TAG
       - run:
-          name: Publish Docker image $CIRCLE_TAG & Latest tag to Docker Hub
+          name: Publish Docker image $CIRCLE_TAG & Latest tags to Docker Hub
           command: |
             echo "Publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG"
             docker push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG
-            echo "Publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG"
-            docker push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
+            echo "Publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:amd64-$RELEASE_TAG"
+            docker push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:amd64-$RELEASE_TAG
             echo "Publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:arm-$RELEASE_TAG"
             docker push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:arm-$RELEASE_TAG
+      - run:
+          name: Build manifest and push combined image tags to Docker Hub
+          command: |
+            docker manifest create ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:amd64-$RELEASE_TAG ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:arm-$RELEASE_TAG
+            docker manifest push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
       - run:
           name: Set Image Digest
           command: |
