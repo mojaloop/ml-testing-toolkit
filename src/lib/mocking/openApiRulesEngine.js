@@ -157,6 +157,9 @@ const validateRules = async (context, req) => {
       } else {
         customLogger.logMessage('error', 'No Specification file provided for validateRules function', { request: req })
       }
+    } else if (curEvent.type === 'NO_CALLBACK') {
+      customLogger.logMessage('info', 'Skipping validation callback', { additionalData: curEvent, request: req })
+      generatedErrorCallback.skipCallback = true
     }
   }
   return generatedErrorCallback
@@ -294,6 +297,9 @@ const callbackRules = async (context, req) => {
       } else {
         customLogger.logMessage('error', 'No Specification file provided for validateRules function', { request: req })
       }
+    } else if (curEvent.type === 'NO_CALLBACK') {
+      customLogger.logMessage('info', 'Skipping callback', { additionalData: curEvent, request: req })
+      generatedCallback.skipCallback = true
     }
   } else {
     customLogger.logMessage('error', 'No callback rules are matched', { request: req })

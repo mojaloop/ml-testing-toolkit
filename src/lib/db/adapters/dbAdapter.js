@@ -25,11 +25,21 @@
 'use strict'
 
 const mongoDBWrapper = require('../models/mongoDBWrapper')
+const MongoUriBuilder = require('mongo-uri-builder')
+
 let conn
 const getConnection = async () => {
   if (!conn) {
     const Config = require('../../config')
-    conn = await mongoDBWrapper.connect(Config.getSystemConfig().DB.URI, {
+    const systemConfig = Config.getSystemConfig()
+    const connectionString = MongoUriBuilder({
+      username: encodeURIComponent(systemConfig.DB.USER),
+      password: encodeURIComponent(systemConfig.DB.PASSWORD),
+      host: systemConfig.DB.HOST,
+      port: systemConfig.DB.PORT,
+      database: systemConfig.DB.DATABASE
+    })
+    conn = await mongoDBWrapper.connect(connectionString, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     })

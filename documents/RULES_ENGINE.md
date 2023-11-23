@@ -13,7 +13,7 @@ Table of Contents
       - [Configurable parameters](#configurable-parameters)
       - [MOCK_ERROR_CALLBACK and MOCK_CALLBACK](#mock_error_callback-and-mock_callback)
     - [Priority of rules](#priority-of-rules)
-  
+
 This Self Testing Toolkit implemented "Rules Engine" by taking advantage of ***Json Rules Engine***.
 
 ## Json Rules Engine:
@@ -85,15 +85,15 @@ Conditions can be defined with either "all" or "any" type of arrays. In each arr
 
   * Fact - facts are the variable names that can be one of the following
     * path - The request path
-  
+
       Example: /transfers, /parties/MSISDN/9876543210 ... etc
 
     * method - The http method of the request in lowercase
-  
+
       Example: get, post ... etc
 
     * body - The request body object. The properties of the body can be specified using a *condition helper* called **"path"**.
-      
+
       Example: amount.amount from the body '{ "amount": { "amount": 20, "type": "USD" } }' can be compared with the following condition
       ```
       {
@@ -103,15 +103,15 @@ Conditions can be defined with either "all" or "any" type of arrays. In each arr
         "path": "amount.amount"
       }
       ```
-  
+
     * pathParams - By using this the path parameter values from the request can be compared.
-      
+
       Example: Type & ID of pathParams from the get request /parties/{Type}/{ID}
-  
+
     * queryParams - By using this the query parameter values from the request can be compared.
-      
+
       Example: 'state' of queryParams from the get request /settlementWindows?state=OPEN
-  
+
     * operationPath - This is used for matching the path syntax from open API file
 
       Example: operationPath contains the value /parties/{Type}/{ID} instead of /parties/MSISDN/9876543210 which can actually be found in the fact 'path'.
@@ -138,7 +138,7 @@ Conditions can be defined with either "all" or "any" type of arrays. In each arr
       ```greaterThanInclusive```- _fact_ must be greater than or equal to _value_
 
     * String Numeric operators:
-  
+
       *(These operators can be used if the type fo the property is string, but we want to parse it to integer and compare)*
 
       ```numericEqual``` - _fact_ must equal _value_
@@ -161,7 +161,7 @@ Conditions can be defined with either "all" or "any" type of arrays. In each arr
 
       ```doesNotContain```  - _fact_ (an array) must not include _value_
   * Value - The actual value to compare
-    
+
   Following are the examples of conditions
 
   ```
@@ -205,9 +205,11 @@ There are different type of events based on the rules engine level.
 * Validation Rules Engine
   * FIXED_ERROR_CALLBACK
   * MOCK_ERROR_CALLBACK
+  * NO_CALLBACK
 * Callbacks Rules Engine
   * FIXED_CALLBACK
   * MOCK_CALLBACK
+  * NO_CALLBACK
 * Synchronous Response Rules Engine
   * FIXED_RESPONSE
   * MOCK_RESPONSE
@@ -273,7 +275,7 @@ Let's look at an example of an event type *MOCK_ERROR_CALLBACK*
 }
 ```
 
-That's it, the self testing toolkit can be able to generate a mock callback based on the open API file with random values. 
+That's it, the self testing toolkit can be able to generate a mock callback based on the open API file with random values.
 
 **Also you can define the params like in fixed callbacks to override a particular value.**
 
@@ -298,10 +300,19 @@ See the following example in which the generated values of the firstName & name 
 
 ```
 
+#### NO_CALLBACK
+
+For NO_CALLBACK, there are some test cases where the requirements dictate that there is no follow up callback.
+
+```
+"event": {
+  "type": "NO_CALLBACK",
+}
+```
 
 #### MOCK_RESPONSE and FIXED_RESPONSE
 
-These event types are used for defining events for synchronous reponse rules.
+These event types are used for defining events for synchronous response rules.
 
 These are same like callback event types, but the only difference is we need to provide the statusCode for FIXED_RESPONSE type. MOCK_RESPONSE automatically picks up the success response code from api specification file.
 

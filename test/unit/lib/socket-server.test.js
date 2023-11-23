@@ -18,33 +18,41 @@
  * Gates Foundation
 
  * ModusBox
- * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
+ * Kevin Leyow <kevin.leyow@modusbox.com>
  --------------
  ******/
 
+'use strict'
+
 const socketIO = require('socket.io')
-const Config = require('./config')
-let socketIOObj = null
+const SocketServer = require('../../../src/lib/socket-server')
+const Config = require('../../../src/lib/config')
+const storageAdapter = require('../../../src/lib/storageAdapter')
 
-const initServer = (http) => {
-  socketIOObj = socketIO(http, {
-    cors: {
-      allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
-      exposedHeaders: ['Content-Disposition'],
-      methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-      origin: true,
-      credentials: true
-    },
-    // https://socket.io/docs/v4/server-options/#low-level-engine-options
-    ...Config.getSystemConfig().SOCKET_IO_ENGINE_OPTIONS
+jest.mock('socket.io')
+jest.mock('../../../src/lib/storageAdapter')
+
+describe('Socket Server', () => {
+  describe('Init server', () => {
+    it('Passes config options to library', async () => {
+      storageAdapter.read.mockResolvedValueOnce({
+        data: {
+          SOCKET_IO_ENGINE_OPTIONS: {
+            pingInterval: 1,
+          }
+        }
+      })
+      Config.loadSystemConfig()
+      await expect(Config.getObjectStoreInitConfig()).resolves.toBeTruthy()
+      await Config.getObjectStoreInitConfig()
+      const httpMock = jest.mock()
+      SocketServer.initServer(httpMock)
+      expect(socketIO).toBeCalledWith(
+        httpMock, {
+          cors: expect.any(Object),
+          pingInterval: 1,
+        }
+      )
+    })
   })
-}
-
-const getIO = () => {
-  return socketIOObj
-}
-
-module.exports = {
-  initServer,
-  getIO
-}
+})
