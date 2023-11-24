@@ -615,6 +615,8 @@ jobs:
     steps:
       - checkout
       - run:
+          <<: *defaults_configure_nvmrc
+      - run:
           name: Setup for LATEST release
           command: |
             echo "export RELEASE_TAG=$RELEASE_TAG_PROD" >> $BASH_ENV
@@ -679,6 +681,8 @@ jobs:
       <<: *defaults_environment
     steps:
       - checkout
+      - run:
+          <<: *defaults_configure_nvmrc
       - run:
           name: Setup for SNAPSHOT release
           command: |
