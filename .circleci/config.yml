@@ -622,6 +622,7 @@ jobs:
 
             PACKAGE_VERSION=$(cat package-lock.json | jq -r .version)
             echo "export PACKAGE_VERSION=${PACKAGE_VERSION}" >> $BASH_ENV
+            echo "export DOCKER_NODE_VERSION="$NVMRC_VERSION-alpine" >> $BASH_ENV
             echo "PACKAGE_VERSION=${PACKAGE_VERSION}"
       - run:
           name: Setup Slack config
@@ -685,6 +686,7 @@ jobs:
             echo "RELEASE_TAG=$RELEASE_TAG_SNAPSHOT"
 
             PACKAGE_VERSION=$(cat package-lock.json | jq -r .version)
+            echo "export DOCKER_NODE_VERSION="$NVMRC_VERSION-alpine" >> $BASH_ENV
             echo "export PACKAGE_VERSION=${PACKAGE_VERSION}" >> $BASH_ENV
             echo "PACKAGE_VERSION=${PACKAGE_VERSION}"
       - run:
