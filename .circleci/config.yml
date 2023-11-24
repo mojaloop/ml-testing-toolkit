@@ -650,6 +650,9 @@ jobs:
       - run:
           name: Build Docker image for multiple platforms architectures and push to registry
           command: |
+            source ~/.profile
+            export DOCKER_NODE_VERSION="$NVMRC_VERSION-alpine"
+            echo "export DOCKER_NODE_VERSION=$NVMRC_VERSION-alpine" >> $BASH_ENV
             echo "Publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG"
             docker push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG
             echo "Setting up docker buildx environment"
@@ -690,7 +693,6 @@ jobs:
             echo "RELEASE_TAG=$RELEASE_TAG_SNAPSHOT"
 
             PACKAGE_VERSION=$(cat package-lock.json | jq -r .version)
-            echo "export DOCKER_NODE_VERSION=$NVMRC_VERSION-alpine" >> $BASH_ENV
             echo "export PACKAGE_VERSION=${PACKAGE_VERSION}" >> $BASH_ENV
             echo "PACKAGE_VERSION=${PACKAGE_VERSION}"
       - run:
@@ -717,6 +719,9 @@ jobs:
       - run:
           name: Build Docker image for multiple platforms architectures and push to registry
           command: |
+            source ~/.profile
+            export DOCKER_NODE_VERSION="$NVMRC_VERSION-alpine"
+            echo "export DOCKER_NODE_VERSION=$NVMRC_VERSION-alpine" >> $BASH_ENV
             echo "Publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG"
             docker push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG
             echo "Setting up docker buildx environment"
