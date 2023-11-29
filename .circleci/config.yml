@@ -653,13 +653,11 @@ jobs:
             source ~/.profile
             export DOCKER_NODE_VERSION="$NVMRC_VERSION-alpine"
             echo "export DOCKER_NODE_VERSION=$NVMRC_VERSION-alpine" >> $BASH_ENV
-            echo "Publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG"
-            docker push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG
             echo "Setting up docker buildx environment"
             docker buildx create --use --platform=linux/arm64,linux/amd64 --name multi-platform-builder
             docker buildx inspect --bootstrap
             echo "Building and ublishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG"
-            docker buildx build --progress plain --platform linux/amd64,linux/arm64 --push -t ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG --build-arg NODE_VERSION=$DOCKER_NODE_VERSION .
+            docker buildx build --progress plain --platform linux/amd64,linux/arm64 --push -t ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:v${CIRCLE_TAG:1} --build-arg NODE_VERSION=$DOCKER_NODE_VERSION .
       - run:
           name: Set Image Digest
           command: |
@@ -722,13 +720,11 @@ jobs:
             source ~/.profile
             export DOCKER_NODE_VERSION="$NVMRC_VERSION-alpine"
             echo "export DOCKER_NODE_VERSION=$NVMRC_VERSION-alpine" >> $BASH_ENV
-            echo "Publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG"
-            docker push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG
             echo "Setting up docker buildx environment"
             docker buildx create --use --platform=linux/arm64,linux/amd64 --name multi-platform-builder
             docker buildx inspect --bootstrap
             echo "Building and ublishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG"
-            docker buildx build --progress plain --platform linux/amd64,linux/arm64 --push -t ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG --build-arg NODE_VERSION=$DOCKER_NODE_VERSION .
+            docker buildx build --progress plain --platform linux/amd64,linux/arm64 --push -t ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME: --build-arg NODE_VERSION=$DOCKER_NODE_VERSION .
       - run:
           name: Set Image Digest
           command: |
