@@ -656,8 +656,11 @@ jobs:
             echo "Setting up docker buildx environment"
             docker buildx create --use --platform=linux/arm64,linux/amd64 --name multi-platform-builder
             docker buildx inspect --bootstrap
-            echo "Building and ublishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG"
-            docker buildx build --progress plain --platform linux/amd64,linux/arm64 --push -t ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:v${CIRCLE_TAG:1} --build-arg NODE_VERSION=$DOCKER_NODE_VERSION .
+            echo "Building and publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG"
+            docker buildx build --progress plain --platform linux/amd64,linux/arm64 --push -t ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG --build-arg NODE_VERSION=$DOCKER_NODE_VERSION .
+            echo "Publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG"
+            docker tag ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
+            docker push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
       - run:
           name: Set Image Digest
           command: |
@@ -723,8 +726,11 @@ jobs:
             echo "Setting up docker buildx environment"
             docker buildx create --use --platform=linux/arm64,linux/amd64 --name multi-platform-builder
             docker buildx inspect --bootstrap
-            echo "Building and ublishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG"
-            docker buildx build --progress plain --platform linux/amd64,linux/arm64 --push -t ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME: --build-arg NODE_VERSION=$DOCKER_NODE_VERSION .
+            echo "Building and publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG"
+            docker buildx build --progress plain --platform linux/amd64,linux/arm64 --push -t ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG --build-arg NODE_VERSION=$DOCKER_NODE_VERSION .
+            echo "Publishing ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG"
+            docker tag ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$CIRCLE_TAG ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
+            docker push ${DOCKER_ORG:-mojaloop}/$CIRCLE_PROJECT_REPONAME:$RELEASE_TAG
       - run:
           name: Set Image Digest
           command: |
