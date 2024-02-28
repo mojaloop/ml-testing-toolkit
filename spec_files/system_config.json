@@ -80,8 +80,7 @@
       "type": "fspiop",
       "version": "2.0",
       "folderPath": "fspiop_2.0",
-      "asynchronous": true,
-      "additionalApi": true
+      "asynchronous": true
     },
     {
       "type": "settlements",
@@ -145,7 +144,6 @@
       "version": "2.1",
       "folderPath": "sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets_2.1",
       "asynchronous": false,
-      "additionalApi": true,
       "prefix": "/sdk-backend"
     },
     {
@@ -153,7 +151,6 @@
       "version": "2.1",
       "folderPath": "sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1",
       "asynchronous": false,
-      "additionalApi": true,
       "prefix": "/sdk-out-v2-1"
     }
   ],
