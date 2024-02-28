@@ -77,9 +77,9 @@
       "asynchronous": true
     },
     {
-      "type": "fspiop_fxp",
+      "type": "fspiop",
       "version": "2.0",
-      "folderPath": "fspiop_fxp_2.0",
+      "folderPath": "fspiop_2.0",
       "asynchronous": true,
       "additionalApi": true
     },
