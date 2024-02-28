@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+## [17.1.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v17.0.0...v17.1.0) (2024-02-28)
+
+
+### Features
+
+* **3953:** added FSPIOP FX APIs v.2, SDK backend/outbound v2.1 to TTK; removed outdated fx-api_2.0 ([#248](https://github.com/mojaloop/ml-testing-toolkit/issues/248)) ([6edbade](https://github.com/mojaloop/ml-testing-toolkit/commit/6edbade2215f291d13c7249a5d69fba26e7e7662))
+
 ## [17.0.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v16.1.2...v17.0.0) (2023-10-03)
 
 
