@@ -77,6 +77,12 @@
       "asynchronous": true
     },
     {
+      "type": "fspiop",
+      "version": "2.0",
+      "folderPath": "fspiop_2.0",
+      "asynchronous": true
+    },
+    {
       "type": "settlements",
       "version": "1.0",
       "folderPath": "settlements_1.0"
@@ -129,15 +135,23 @@
       ]
     },
     {
-      "type": "fx-api",
-      "version": "2.0",
-      "folderPath": "fx-api_2.0",
-      "asynchronous": true
-    },
-    {
       "type": "thirdparty_sdk_outbound",
       "version": "0.1",
       "folderPath": "thirdparty_sdk_outbound_0.1"
+    },
+    {
+      "type": "sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets",
+      "version": "2.1",
+      "folderPath": "sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets_2.1",
+      "asynchronous": false,
+      "prefix": "/sdk-backend"
+    },
+    {
+      "type": "sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets",
+      "version": "2.1",
+      "folderPath": "sdk-scheme-adapter-outbound-v2_1_0-openapi3-snippets_2.1",
+      "asynchronous": false,
+      "prefix": "/sdk-out-v2-1"
     }
   ],
   "SOCKET_IO_ENGINE_OPTIONS": {

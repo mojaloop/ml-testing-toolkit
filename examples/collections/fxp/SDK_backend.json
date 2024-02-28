@@ -1,0 +1,98 @@
+{
+  "test_cases": [
+    {
+      "id": 1,
+      "name": "POST /fxQuotes",
+      "requests": [
+        {
+          "id": 1,
+          "description": "post /fxQuotes",
+          "apiVersion": {
+            "minorVersion": 1,
+            "majorVersion": 2,
+            "type": "sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets",
+            "asynchronous": false,
+            "additionalApi": true,
+            "specFile": "spec_files/api_definitions/sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets_2.1/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets_2.1/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets_2.1/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets_2.1/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets_2.1/trigger_templates"
+          },
+          "operationPath": "/fxQuotes",
+          "path": "/fxQuotes",
+          "method": "post",
+          "url": "http://localhost:4040/sdk-backend",
+          "body": {
+            "conversionRequestId": "828cc75f-1654-415e-8fcd-df76cc9329b9",
+            "conversionTerms": {
+              "conversionId": "581f68ef-b54f-416f-9161-ac34e889a84b",
+              "initiatingFsp": "PayerFSP",
+              "counterPartyFsp": "FDH_FX",
+              "amountType": "SEND",
+              "sourceAmount": {
+                "currency": "BWP",
+                "amount": "300"
+              },
+              "targetAmount": {
+                "currency": "TZS"
+              },
+              "expiration": "2021-08-25T14:17:09.663+01:00"
+            }
+          },
+          "headers": {},
+          "ignoreCallbacks": true
+        }
+      ],
+      "fileInfo": {
+        "path": "fxp/SDK_backend.json"
+      }
+    },
+    {
+      "id": 2,
+      "name": "POST /fxTransfers",
+      "requests": [
+        {
+          "id": 1,
+          "description": "post /fxTransfers (backend)",
+          "apiVersion": {
+            "minorVersion": 1,
+            "majorVersion": 2,
+            "type": "sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets",
+            "asynchronous": false,
+            "prefix": "/sdk-backend",
+            "additionalApi": true,
+            "specFile": "spec_files/api_definitions/sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets_2.1/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets_2.1/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets_2.1/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets_2.1/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/sdk-scheme-adapter-backend-v2_1_0-openapi3-snippets_2.1/trigger_templates"
+          },
+          "operationPath": "/fxTransfers",
+          "path": "/fxTransfers",
+          "method": "post",
+          "url": "http://localhost:4040/sdk-backend",
+          "body": {
+            "commitRequestId": "77c9d78d-c26a-4474-8b3c-99b96a814bfc",
+            "determiningTransferId": "d9ce59d4-3598-4396-8630-581bb0551451",
+            "initiatingFsp": "PayerFSP",
+            "counterPartyFsp": "FDH_FX",
+            "amountType": "SEND",
+            "sourceAmount": {
+              "currency": "BWP",
+              "amount": "300"
+            },
+            "targetAmount": {
+              "currency": "TZS",
+              "amount": "48000"
+            },
+            "condition": "{$inputs.condition}"
+          }
+        }
+      ],
+      "fileInfo": {
+        "path": "fxp/SDK_backend.json"
+      }
+    }
+  ]
+}
