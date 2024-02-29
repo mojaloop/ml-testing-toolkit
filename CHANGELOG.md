@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [17.1.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v17.1.0...v17.1.1) (2024-02-29)
+
+
+### Chore
+
+* **mojaloop/#3759:** fix participant subid callback maps in fspiop ([#251](https://github.com/mojaloop/ml-testing-toolkit/issues/251)) ([e1e6b6c](https://github.com/mojaloop/ml-testing-toolkit/commit/e1e6b6ca31ba665fcbefe7dfc7e27ee41e69cf26))
+
 ## [17.1.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v17.0.0...v17.1.0) (2024-02-28)
 
 
