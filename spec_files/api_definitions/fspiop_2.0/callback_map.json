@@ -357,7 +357,7 @@
       "successCallback": {
         "method": "put",
         "path": "/participants/{Type}/{ID}/{SubId}",
-        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}/{$request.params.SubId}",
         "headerOverride": {
           "FSPIOP-Source": "{$config.FSPID}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
@@ -368,7 +368,7 @@
       "errorCallback": {
         "method": "put",
         "path": "/participants/{Type}/{ID}/{SubId}/error",
-        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}/error",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}/{$request.params.SubId}/error",
         "headerOverride": {
           "FSPIOP-Source": "{$config.FSPID}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
@@ -382,7 +382,7 @@
       "successCallback": {
         "method": "put",
         "path": "/participants/{Type}/{ID}/{SubId}",
-        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}/{$request.params.SubId}",
         "headerOverride": {
           "FSPIOP-Source": "{$config.FSPID}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
@@ -393,7 +393,7 @@
       "errorCallback": {
         "method": "put",
         "path": "/participants/{Type}/{ID}/{SubId}/error",
-        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}/error",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}/{$request.params.SubId}/error",
         "headerOverride": {
           "FSPIOP-Source": "{$config.FSPID}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
