@@ -51,5 +51,14 @@
         }
       }
     }
+  },
+  "/transactionrequests": {
+    "post": {
+      "response": {
+        "bodyOverride": {
+          "transactionId": "{$request.body.transactionRequestId}"
+        }
+      }
+    }
   }
 }
