@@ -1708,7 +1708,24 @@ describe('Outbound Initiator Functions', () => {
       await OutboundInitiator.OutboundSend(sampleTemplateModified4, '123')
       expect(spyDbAdapterUpsertReport).toBeCalled()
     })
-
+    it('OutboundSend with sync option enabled', async () => {
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpyGetApiDefinitions.mockResolvedValue([{
+        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+        type: 'fspiop'
+      }])
+      const syncResp = await OutboundInitiator.OutboundSend(sampleTemplate, 'aabb123aabb', null, true)
+      expect(syncResp).not.toBeNull
+      expect(syncResp.test_cases[0]?.requests[0]).toHaveProperty('status')
+      expect(syncResp.test_cases[0]?.requests[0]).toHaveProperty('response')
+    })
   })
   
   describe('terminateOutbound', () => {
