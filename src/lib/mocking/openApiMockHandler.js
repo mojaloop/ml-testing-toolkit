@@ -164,17 +164,22 @@ module.exports.handleRequest = async (req, h) => {
     req.customInfo.negotiatedContentType = versionNegotiationResult.responseContentTypeHeader
     selectedApi = apis[versionNegotiationResult.negotiatedIndex]
   }
-  return selectedApi.openApiBackendObject.handleRequest(
-    {
-      method: req.method,
-      path: req.path,
-      body: req.payload,
-      query: req.query,
-      headers: req.headers
-    },
-    req,
-    h
-  )
+  try {
+    return await selectedApi.openApiBackendObject.handleRequest(
+      {
+        method: req.method,
+        path: req.path,
+        body: req.payload,
+        query: req.query,
+        headers: req.headers
+      },
+      req,
+      h
+    )
+  } catch(err) {
+    customLogger.logMessage('error', err.message, { request: req })
+    return h.response({ error: 'Not Found' }).code(404)
+  }
 }
 
 const pickApiByMethodPathHostnameAndPrefix = (req) => {

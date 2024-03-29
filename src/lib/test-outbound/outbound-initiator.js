@@ -65,7 +65,7 @@ const getTracing = (traceID, dfspId) => {
   return tracing
 }
 
-const OutboundSend = async (inputTemplate, traceID, dfspId) => {
+const OutboundSend = async (inputTemplate, traceID, dfspId, sync = false) => {
   const totalCounts = getTotalCounts(inputTemplate)
   const globalConfig = {
     broadcastOutboundProgressEnabled: true,
@@ -98,18 +98,21 @@ const OutboundSend = async (inputTemplate, traceID, dfspId) => {
     const completedTimeStamp = new Date()
     const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
     // Send the total result to client
+    const runtimeInformation = {
+      testReportId: inputTemplate.name + '_' + completedTimeStamp.toISOString(),
+      completedTimeISO: completedTimeStamp.toISOString(),
+      startedTime: startedTimeStamp.toUTCString(),
+      completedTime: completedTimeStamp,
+      completedTimeUTC: completedTimeStamp.toUTCString(),
+      runDurationMs,
+      avgResponseTime: 'NA',
+      totalAssertions: 0,
+      totalPassedAssertions: 0
+    }
+    if (sync) {
+      return generateFinalReport(inputTemplate, runtimeInformation)
+    }
     if (tracing.outboundID) {
-      const runtimeInformation = {
-        testReportId: inputTemplate.name + '_' + completedTimeStamp.toISOString(),
-        completedTimeISO: completedTimeStamp.toISOString(),
-        startedTime: startedTimeStamp.toUTCString(),
-        completedTime: completedTimeStamp,
-        completedTimeUTC: completedTimeStamp.toUTCString(),
-        runDurationMs,
-        avgResponseTime: 'NA',
-        totalAssertions: 0,
-        totalPassedAssertions: 0
-      }
       const totalResult = generateFinalReport(inputTemplate, runtimeInformation)
       if (Config.getSystemConfig().HOSTING_ENABLED) {
         dbAdapter.upsert('reports', totalResult, { dfspId })
