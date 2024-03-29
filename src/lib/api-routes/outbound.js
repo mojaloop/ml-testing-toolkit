@@ -84,7 +84,6 @@ router.post('/template/:traceID', [
       outbound.OutboundSend(inputJson, traceID, dfspId)
       return res.status(200).json({ status: 'OK' })
     }
-    
   } catch (err) {
     res.status(500).json({ error: err && err.message })
   }

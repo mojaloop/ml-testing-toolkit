@@ -176,7 +176,7 @@ module.exports.handleRequest = async (req, h) => {
       req,
       h
     )
-  } catch(err) {
+  } catch (err) {
     customLogger.logMessage('error', err.message, { request: req })
     return h.response({ error: 'Not Found' }).code(404)
   }
