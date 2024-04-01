@@ -73,6 +73,7 @@ paths:
         backend logic such as party verification, quoted fees assessments etc...
       tags:
         - Transfers
+      operationId: TransfersPost
       requestBody:
         description: Transfer request body
         content:
@@ -109,6 +110,7 @@ paths:
         information on modes of transfer.
       tags:
         - Transfers
+      operationId: TransfersPut
       requestBody:
         content:
           application/json:
@@ -134,6 +136,7 @@ paths:
         for the creation of the transfer.
       tags:
         - Transfers
+      operationId: TransfersGet
       parameters:
         - $ref: '#/components/parameters/transferId'
       responses:
@@ -157,6 +160,7 @@ paths:
         of funds from payer DFSP to payees' DFSP.
       tags:
         - BulkTransfers
+      operationId: BulkTransfersPost
       requestBody:
         description: Bulk transfer request body
         content:
@@ -183,6 +187,7 @@ paths:
         was used for the creation of the bulk transfer.
       tags:
         - BulkTransfers
+      operationId: BulkTransfersGet
       parameters:
         - $ref: '#/components/parameters/bulkTransferId'
       responses:
@@ -206,6 +211,7 @@ paths:
         fascilitate funds transfer from payer DFSP to payees' DFSP.
       tags:
         - BulkQuotes
+      operationId: BulkQuotesPost
       requestBody:
         description: Bulk quote request body
         content:
@@ -232,6 +238,7 @@ paths:
         used for the creation of the bulk quote.
       tags:
         - BulkQuotes
+      operationId: BulkQuotesGet
       parameters:
         - $ref: '#/components/parameters/bulkQuoteId'
       responses:
@@ -260,6 +267,7 @@ paths:
           2. Transaction Request. This request enables a Payee to request Payer to send electronic funds to the Payee.
       tags:
         - RequestToPay
+      operationId: RequestToPayPost
       requestBody:
         description: RequestToPay request body
         content:
@@ -312,6 +320,7 @@ paths:
         backend logic such as party verification, quoted fees assessments etc...
       tags:
         - RequestToPayTransfer
+      operationId: RequestToPayTransferPost
       requestBody:
         description: Request To Pay Transfer request body
         content:
@@ -347,6 +356,7 @@ paths:
         more information on modes of transfer.
       tags:
         - RequestToPayTransferID
+      operationId: RequestToPayTransferPut
       requestBody:
         content:
           application/json:
@@ -375,6 +385,7 @@ paths:
         Caller DFSP is used as the account source FSP information
       tags:
         - Accounts
+      operationId: AccountsPost
       requestBody:
         description: Identities list request body
         content:
