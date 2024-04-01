@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+## [17.2.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v17.1.1...v17.2.0) (2024-04-01)
+
+
+### Features
+
+* implement sync test case execution ([#252](https://github.com/mojaloop/ml-testing-toolkit/issues/252)) ([52310c9](https://github.com/mojaloop/ml-testing-toolkit/commit/52310c9866e48a4056534620cb6a4c8727ff6f2a))
+
 ### [17.1.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v17.1.0...v17.1.1) (2024-02-29)
 
 
