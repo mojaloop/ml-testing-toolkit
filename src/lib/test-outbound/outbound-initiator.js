@@ -263,14 +263,14 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       )
     })
 
-    if (request.delay) {
-      await new Promise(resolve => setTimeout(resolve, request.delay))
-    }
-
     // Form the actual http request headers, body, path and method by replacing configurable parameters
     // Replace the parameters
     convertedRequest = replaceVariables(request, inputValues, request, requestsObj)
     convertedRequest = replaceRequestVariables(convertedRequest)
+
+    if (convertedRequest.delay) {
+      await new Promise(resolve => setTimeout(resolve, convertedRequest.delay))
+    }
 
     // Form the path from params and operationPath
     convertedRequest.path = replacePathVariables(request.operationPath, convertedRequest.params)

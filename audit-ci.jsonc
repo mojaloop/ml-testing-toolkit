@@ -13,6 +13,7 @@
     // request-provise-native, no fix available
     "GHSA-p8p7-x288-28g6", // https://github.com/advisories/GHSA-p8p7-x288-28g6
     "GHSA-72xf-g2v4-qvf3", // https://github.com/advisories/GHSA-72xf-g2v4-qvf3,
-    "GHSA-78xj-cgh5-2h22"  // https://github.com/advisories/GHSA-78xj-cgh5-2h22
+    "GHSA-78xj-cgh5-2h22",  // https://github.com/advisories/GHSA-78xj-cgh5-2h22
+    "GHSA-2p57-rm9w-gvfp" //https://github.com/advisories/GHSA-2p57-rm9w-gvfp
   ]
 }
