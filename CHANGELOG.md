@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [17.2.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v17.2.0...v17.2.1) (2024-06-11)
+
+
+### Bug Fixes
+
+* env vars in delay ([#253](https://github.com/mojaloop/ml-testing-toolkit/issues/253)) ([c994b4e](https://github.com/mojaloop/ml-testing-toolkit/commit/c994b4e7f4d2ccdecff42f565cbde805eae276b5))
+
 ## [17.2.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v17.1.1...v17.2.0) (2024-04-01)
 
 
