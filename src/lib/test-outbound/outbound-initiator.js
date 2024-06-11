@@ -267,7 +267,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
     // Replace the parameters
     convertedRequest = replaceVariables(request, inputValues, request, requestsObj)
     convertedRequest = replaceRequestVariables(convertedRequest)
- 
+
     if (convertedRequest.delay) {
       await new Promise(resolve => setTimeout(resolve, convertedRequest.delay))
     }
