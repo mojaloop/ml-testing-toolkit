@@ -104,7 +104,7 @@ Go back to the **Mojaloop Testing Toolkit UI** in your browser and select from t
 
 To view detailed information on any one of the Callbacks, click on the operation - in this example _**GET /parties/MSISDN/0001**_ presented as a _blue button_. 
 
-If you recall the [Architecture Diagram](/documents/Mojaloop-Self-Testing-Toolkit.md#7-architecture) mentioned earlier, under messages, you'll notice, Version negotiation, Schema Validation and Additional validations;
+If you recall the [Architecture Diagram](/documents/Mojaloop-Testing-Toolkit.md#7-architecture) mentioned earlier, under messages, you'll notice, Version negotiation, Schema Validation and Additional validations;
 
 Clicking on the _+_ to the left of the expanded list on the main window to view detail related to that specific timeline message.
 
