@@ -91,7 +91,7 @@
     "json-rules-engine": "6.5.0",
     "lodash": "4.17.21",
     "mongo-uri-builder": "4.0.0",
-    "mongoose": "8.4.3",
+    "mongoose": "8.4.4",
     "multer": "1.4.3",
     "mustache": "4.2.0",
     "mv": "2.1.1",
