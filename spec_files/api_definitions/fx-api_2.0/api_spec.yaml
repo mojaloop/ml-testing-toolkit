@@ -526,7 +526,7 @@ paths:
           $ref: "#/components/responses/503"
   /fxQuotes/{ID}/error:
     put:
-      description: If the FXP is unable to find or create a currency conversion execution, or another processing error occurs, the error callback PUT /fxQuotes/<ID>/error is used. The <ID> in the URI should contain the conversionRequestId that was used for the creation of the quotation request, or the <ID> that was used in the GET /fxQuotes/<ID>. 
+      description: If the FXP is unable to find or create a currency conversion execution, or another processing error occurs, the error callback PUT /fxQuotes/<ID>/error is used. The <ID> in the URI should contain the conversionRequestId that was used for the creation of the quotation request, or the <ID> that was used in the GET /fxQuotes/<ID>.
       summary: Return fxQuote information error
       tags:
         - fxQuotes
@@ -733,7 +733,7 @@ paths:
           $ref: "#/components/responses/503"
   /fxTransfers/{ID}/error:
     put:
-      description: If the FXP is unable to find or create a currency conversion execution, or another processing error occurs, the error callback PUT /fxTransfers/<ID>/error is used. The <ID> in the URI should contain the commitRequestId that was used for the creation of the execution request, or the <ID> that was used in the GET /fxTransfers/<ID>. 
+      description: If the FXP is unable to find or create a currency conversion execution, or another processing error occurs, the error callback PUT /fxTransfers/<ID>/error is used. The <ID> in the URI should contain the commitRequestId that was used for the creation of the execution request, or the <ID> that was used in the GET /fxTransfers/<ID>.
       summary: Return fxtransfer information error
       tags:
         - fxTransfers
@@ -801,8 +801,11 @@ components:
     CorrelationId:
       title: CorrelationId
       type: string
-      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
-      description: Identifier that correlates all messages of the same sequence. The API data type UUID (Universally Unique Identifier) is a JSON String in canonical format, conforming to [RFC 4122](https://tools.ietf.org/html/rfc4122), that is restricted by a regular expression for interoperability reasons. A UUID is always 36 characters long, 32 hexadecimal symbols and 4 dashes (‘-‘).
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
+      description: Identifier that correlates all messages of the same sequence.
+        The supported identifiers formats are for
+        lowercase [UUID](https://datatracker.ietf.org/doc/html/rfc9562) and
+        uppercase [ULID](https://github.com/ulid/spec)
     Currency:
       title: Currency
       description: The currency codes defined in [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) as three-letter alphabetic codes are used as the standard naming representation for currencies.
