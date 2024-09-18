@@ -25,7 +25,7 @@
             "Content-Type": "application/json"
           },
           "body": {
-            "transferId": "{$function.generic.generateUUID}",
+            "transferId": "{$function.generic.generateULID}",
             "externalReference": "string",
             "action": "recordFundsOutPrepareReserve",
             "reason": "string",
@@ -412,7 +412,7 @@
             "Content-Type": "application/json"
           },
           "body": {
-            "transferId": "{$function.generic.generateUUID}",
+            "transferId": "{$function.generic.generateULID}",
             "externalReference": "string",
             "action": "recordFundsOutPrepareReserve",
             "reason": "string",

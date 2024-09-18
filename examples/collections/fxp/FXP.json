@@ -79,10 +79,10 @@
             "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0/trigger_templates"
           },
           "operationPath": "/fxQuotes/{ID}",
-          "path": "/fxQuotes/{$function.generic.generateUUID}",
+          "path": "/fxQuotes/{$function.generic.generateULID}",
           "method": "get",
           "params": {
-            "ID": "{$function.generic.generateUUID}"
+            "ID": "{$function.generic.generateULID}"
           },
           "url": null,
           "headers": {
@@ -168,10 +168,10 @@
             "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0/trigger_templates"
           },
           "operationPath": "/fxTransfers/{ID}",
-          "path": "/fxTransfers/{$function.generic.generateUUID}",
+          "path": "/fxTransfers/{$function.generic.generateULID}",
           "method": "get",
           "params": {
-            "ID": "{$function.generic.generateUUID}"
+            "ID": "{$function.generic.generateULID}"
           },
           "url": null,
           "headers": {

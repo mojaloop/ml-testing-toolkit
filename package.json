@@ -112,6 +112,7 @@
     "selectn": "1.1.2",
     "socket.io": "4.7.5",
     "socket.io-client": "4.7.5",
+    "ulidx": "2.4.1",
     "uuid": "10.0.0",
     "uuid4": "2.0.3",
     "ws": "8.18.0"

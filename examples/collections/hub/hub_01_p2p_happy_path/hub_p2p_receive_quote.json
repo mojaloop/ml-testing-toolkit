@@ -171,8 +171,8 @@
             "FSPIOP-Destination": "{$inputs.toFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateULID}",
+            "transactionId": "{$function.generic.generateULID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",

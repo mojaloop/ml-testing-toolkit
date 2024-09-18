@@ -190,8 +190,8 @@
             "FSPIOP-Destination": "{$inputs.toFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateULID}",
+            "transactionId": "{$function.generic.generateULID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -268,7 +268,7 @@
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "transferId": "{$function.generic.generateUUID}",
+            "transferId": "{$function.generic.generateULID}",
             "payerFsp": "{$inputs.fromFspId}",
             "payeeFsp": "{$inputs.toFspId}",
             "amount": {

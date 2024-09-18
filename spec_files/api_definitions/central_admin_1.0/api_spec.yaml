@@ -1463,25 +1463,21 @@ components:
     QuoteId:
       title: QuoteId
       minLength: 1
-      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
       type: string
-      description: Quote Identifier. The API data type UUID (Universally Unique Identifier)
-        is a JSON String in canonical format, conforming to RFC 4122, that is restricted
-        by a regular expression for interoperability reasons. An UUID is always 36
-        characters long, 32 hexadecimal symbols and 4 dashes (‘-‘). A minLength of
-        1 has been specified due to the regex not being validated on empty strings,
-        this should be removed once the enjoi module has been fixed.
+      description: Quote Identifier.
+        The supported identifiers formats are for
+        lowercase [UUID](https://datatracker.ietf.org/doc/html/rfc9562) and
+        uppercase [ULID](https://github.com/ulid/spec)
     TransactionId:
       title: TransactionId
       minLength: 1
-      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
       type: string
-      description: Transaction Identifier. The API data type UUID (Universally Unique
-        Identifier) is a JSON String in canonical format, conforming to RFC 4122,
-        that is restricted by a regular expression for interoperability reasons. An
-        UUID is always 36 characters long, 32 hexadecimal symbols and 4 dashes (‘-‘).
-        A minLength of 1 has been specified due to the regex not being validated on
-        empty strings, this should be removed once the enjoi module has been fixed.
+      description: Transaction Identifier.
+        The supported identifiers formats are for
+        lowercase [UUID](https://datatracker.ietf.org/doc/html/rfc9562) and
+        uppercase [ULID](https://github.com/ulid/spec)
     Party:
       title: Party
       required:

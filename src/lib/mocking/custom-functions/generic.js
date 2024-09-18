@@ -22,6 +22,8 @@
  --------------
  ******/
 
+const { monotonicFactory } = require('ulidx')
+
 const generateUUID = () => {
   const uuid = require('uuid')
   return uuid.v4()
@@ -37,6 +39,7 @@ const curDateISO = () => {
 
 module.exports = {
   generateUUID,
+  generateULID: monotonicFactory(),
   curDate,
   curDateISO
 }

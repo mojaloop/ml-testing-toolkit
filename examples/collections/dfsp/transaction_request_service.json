@@ -121,7 +121,7 @@
           "path": "/transactionRequests",
           "method": "post",
           "body": {
-            "transactionRequestId": "{$function.generic.generateUUID}",
+            "transactionRequestId": "{$function.generic.generateULID}",
             "payee": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.payeeIdType}",
@@ -153,7 +153,7 @@
               "initiator": "{$inputs.initiator}",
               "initiatorType": "{$inputs.initiatorType}",
               "refundInfo": {
-                "originalTransactionId": "{$function.generic.generateUUID}",
+                "originalTransactionId": "{$function.generic.generateULID}",
                 "refundReason": "{$inputs.refundReason}"
               },
               "balanceOfPayments": "968"
