@@ -37,9 +37,16 @@ const curDateISO = () => {
   return (new Date()).toISOString()
 }
 
+const generateULID = monotonicFactory()
+
+const generateID = (inputValues) => {
+  return inputValues.generateID === 'uuid' ? generateUUID() : generateULID()
+}
+
 module.exports = {
   generateUUID,
-  generateULID: monotonicFactory(),
+  generateULID,
+  generateID,
   curDate,
   curDateISO
 }
