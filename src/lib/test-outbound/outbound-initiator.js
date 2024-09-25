@@ -375,7 +375,6 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
   }
 
   let testResult = null
-  console.log('GVK', resp)
   if (globalConfig.testsExecution) {
     testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
   }
@@ -385,6 +384,7 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
     response: resp.syncResponse,
     callback: resp.callback,
     request: convertedRequest,
+    transformedRequest: resp.transformedRequest,
     additionalInfo: {
       curlRequest: resp.curlRequest
     }
@@ -405,6 +405,7 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
       requestId: request.id,
       response: resp.syncResponse,
       callback: resp.callback,
+      transformedRequest: resp.transformedRequest,
       requestSent: convertedRequest,
       additionalInfo: {
         curlRequest: resp.curlRequest,
@@ -628,13 +629,19 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         }
       }
 
+      let transformedRequest = {}
+      if (contextObj.requestVariables && contextObj.requestVariables.TRANSFORM && contextObj.requestVariables.TRANSFORM.transformer && contextObj.requestVariables.TRANSFORM.transformer.requestTransform) {
+        const result = contextObj.requestVariables.TRANSFORM.transformer.requestTransform({ method, path, headers, body})
+        transformedRequest.body = result.body
+      }
+
       const reqOpts = {
         method,
         url: urlGenerated,
         path,
         params: queryParams,
         headers,
-        data: body,
+        data: transformedRequest.body || body,
         timeout: (contextObj.requestVariables && contextObj.requestVariables.REQUEST_TIMEOUT) || userConfig.DEFAULT_REQUEST_TIMEOUT,
         validateStatus: function (status) {
           return status < 900 // Reject only if the status code is greater than or equal to 900
@@ -667,11 +674,21 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           return reject(new Error(JSON.stringify({ curlRequest, syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
         }, userConfig.CALLBACK_TIMEOUT)
         // Listen for success callback
-        MyEventEmitter.getEmitter('testOutbound', user).once(successCallbackUrl, (callbackHeaders, callbackBody) => {
+        MyEventEmitter.getEmitter('testOutbound', user).once(successCallbackUrl, (_callbackHeaders, _callbackBody) => {
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
+          let callbackHeaders = _callbackHeaders
+          let callbackBody = _callbackBody
+          let originalBody
+          if (contextObj.requestVariables && contextObj.requestVariables.TRANSFORM && contextObj.requestVariables.TRANSFORM.transformer && contextObj.requestVariables.TRANSFORM.transformer.callbackTransform) {
+            const result = contextObj.requestVariables.TRANSFORM.transformer.callbackTransform({ headers: _callbackHeaders, body: _callbackBody })
+            originalBody = _callbackBody
+            callbackBody = result.body
+            // originalHeaders = _callbackHeaders // Not using the transformed headers for now
+            // callbackHeaders = result.headers // Not using the transformed headers for now
+          }
           customLogger.logMessage('info', 'Received success callback ' + successCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          return resolve({ curlRequest, syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
+          return resolve({ curlRequest, transformedRequest, syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody, originalBody } })
         })
         // Listen for error callback
         MyEventEmitter.getEmitter('testOutbound', user).once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
@@ -706,7 +723,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         }
 
         if (!successCallbackUrl || !errorCallbackUrl || ignoreCallbacks) {
-          return resolve({ curlRequest, syncResponse })
+          return resolve({ curlRequest, syncResponse, transformedRequest })
         }
         customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user })
       }, (err) => {
