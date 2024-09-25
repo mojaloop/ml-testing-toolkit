@@ -1,6 +1,648 @@
 [
   {
-    "ruleId": 30,
+    "ruleId": 1,
+    "priority": 1,
+    "description": "post /fxQuotes",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/fxQuotes"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/fxQuotes/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+        },
+        "body": {
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 2,
+    "priority": 1,
+    "description": "get /fxQuotes/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/fxQuotes/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/fxQuotes/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+        },
+        "body": {
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 3,
+    "priority": 1,
+    "description": "post /fxTransfers",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/fxTransfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/fxTransfers/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+        },
+        "body": {
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 4,
+    "priority": 1,
+    "description": "get /fxTransfers/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/fxTransfers/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/fxTransfers/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+        },
+        "body": {
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "type": "callback",
+    "ruleId": 5,
+    "priority": 1,
+    "description": "get /transfers/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transfers/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+        },
+        "body": {
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    }
+  },
+  {
+    "type": "callback",
+    "version": 1,
+    "ruleId": 6,
+    "priority": 1,
+    "description": "get /parties/{Type}/{ID}/{SubId}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}/{SubId}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}/{SubId}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.parties+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        },
+        "body": {
+          "Assgnmt": {
+            "MsgId": "/parties/{$request.params.Type}/{$request.params.ID}",
+            "CreDtTm": "{$function.generic.curDateISO}",
+            "Assgnr": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers.fspiop-source}"
+                  }
+                }
+              }
+            },
+            "Assgne": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              }
+            }
+          },
+          "Rpt":{
+            "OrgnlId": "/parties/{$request.params.Type}/{$request.params.ID}",
+            "Vrfctn": true,
+            "UpdtdPtyAndAcctId": {
+              "Pty": {
+                "Id": {
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "{$request.params.ID}",
+                      "SchmeNm": {
+                        "Prtry": "{$request.params.Type}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "scripts": {
+          "scriptingEngine": "postman"
+        }
+      },
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
+    }
+  },
+  {
+    "type": "callback",
+    "version": 1,
+    "ruleId": 7,
+    "priority": 1,
+    "description": "get /quotes/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/quotes/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/quotes/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+        },
+        "body": {
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    }
+  },
+  {
+    "ruleId": 8,
+    "priority": 1,
+    "description": "get /parties/{Type}/{ID} for pinkbank",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "equal",
+          "value": "pinkbankfsp",
+          "path": "FSPIOP-Source"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.parties+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        },
+        "body": {
+          "Assgnmt": {
+            "MsgId": "/parties/{$request.params.Type}/{$request.params.ID}",
+            "CreDtTm": "{$function.generic.curDateISO}",
+            "Assgnr": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers.fspiop-source}"
+                  }
+                }
+              }
+            },
+            "Assgne": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              }
+            }
+          },
+          "Rpt":{
+            "OrgnlId": "/parties/{$request.params.Type}/{$request.params.ID}",
+            "Vrfctn": true,
+            "UpdtdPtyAndAcctId": {
+              "Pty": {
+                "Id": {
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "{$request.params.ID}",
+                      "SchmeNm": {
+                        "Prtry": "{$request.params.Type}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "scripts": {
+          "scriptingEngine": "postman"
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 9,
+    "priority": 1,
+    "description": "get /parties/{Type}/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        },
+        {
+          "fact": "pathParams",
+          "operator": "equal",
+          "path": "Type",
+          "value": "ACCOUNT_ID"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.parties+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        },
+        "body": {
+          "Assgnmt": {
+            "MsgId": "/parties/{$request.params.Type}/{$request.params.ID}",
+            "CreDtTm": "{$function.generic.curDateISO}",
+            "Assgnr": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers.fspiop-source}"
+                  }
+                }
+              }
+            },
+            "Assgne": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              }
+            }
+          },
+          "Rpt":{
+            "OrgnlId": "/parties/{$request.params.Type}/{$request.params.ID}",
+            "Vrfctn": true,
+            "UpdtdPtyAndAcctId": {
+              "Pty": {
+                "Id": {
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "{$request.params.ID}",
+                      "SchmeNm": {
+                        "Prtry": "{$request.params.Type}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "scripts": {
+          "scriptingEngine": "postman"
+        }
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "type": "callback",
+    "version": 1,
+    "ruleId": 10,
+    "priority": 1,
+    "description": "post /quotes",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/quotes"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/quotes/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+        },
+        "body": {
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    }
+  },
+  {
+    "type": "callback",
+    "version": 1,
+    "ruleId": 11,
+    "priority": 1,
+    "description": "post /transfers",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop",
+      "asynchronous": true
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transfers/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+        },
+        "body": {
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    }
+  },
+  {
+    "ruleId": 12,
     "priority": 1,
     "description": "ttkpayeefsp PUT Notifications Failure Test-case due to invalid FSPIOP-Destination",
     "apiVersion": {
@@ -58,7 +700,7 @@
     "version": 1
   },
   {
-    "ruleId": 29,
+    "ruleId": 13,
     "priority": 1,
     "description": "ttkpayeefsp PATCH Notifications Failure Test-case due to invalid fulfilment",
     "apiVersion": {
@@ -125,7 +767,7 @@
     "version": 1
   },
   {
-    "ruleId": 28,
+    "ruleId": 14,
     "priority": 1,
     "description": "ttkpayeefsp PATCH Notifications Failure Test-case due to invalid FSPIOP-Destination",
     "apiVersion": {
@@ -192,7 +834,7 @@
     "version": 1
   },
   {
-    "ruleId": 27,
+    "ruleId": 15,
     "priority": 1,
     "description": "ttkpayeefsp PATCH Notifications Success Test-case",
     "apiVersion": {
@@ -256,7 +898,7 @@
     "version": 1
   },
   {
-    "ruleId": 20,
+    "ruleId": 16,
     "priority": 1,
     "description": "get /parties/{Type}/{ID} for pinkbank",
     "apiVersion": {
@@ -320,7 +962,7 @@
     "version": 1
   },
   {
-    "ruleId": 1,
+    "ruleId": 17,
     "priority": 1,
     "description": "get /parties/{Type}/{ID}",
     "apiVersion": {
@@ -367,7 +1009,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 2,
+    "ruleId": 18,
     "priority": 1,
     "description": "post /quotes",
     "apiVersion": {
@@ -435,7 +1077,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 3,
+    "ruleId": 19,
     "priority": 1,
     "description": "post /transfers",
     "apiVersion": {
@@ -469,7 +1111,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 4,
+    "ruleId": 20,
     "priority": 1,
     "description": "post /transactionRequests",
     "apiVersion": {
@@ -507,7 +1149,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 5,
+    "ruleId": 21,
     "priority": 1,
     "description": "get /quotes/{ID}",
     "apiVersion": {
@@ -541,7 +1183,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 6,
+    "ruleId": 22,
     "priority": 1,
     "description": "get /participants/{Type}/{ID}/{SubId}",
     "apiVersion": {
@@ -575,7 +1217,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 7,
+    "ruleId": 23,
     "priority": 1,
     "description": "post /participants/{Type}/{ID}/{SubId}",
     "apiVersion": {
@@ -609,7 +1251,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 8,
+    "ruleId": 24,
     "priority": 1,
     "description": "get /participants/{Type}/{ID}",
     "apiVersion": {
@@ -643,7 +1285,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 9,
+    "ruleId": 25,
     "priority": 1,
     "description": "post /participants/{Type}/{ID}",
     "apiVersion": {
@@ -677,7 +1319,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 10,
+    "ruleId": 26,
     "priority": 1,
     "description": "post /participants",
     "apiVersion": {
@@ -711,7 +1353,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 11,
+    "ruleId": 27,
     "priority": 1,
     "description": "get /parties/{Type}/{ID}/{SubId}",
     "apiVersion": {
@@ -745,7 +1387,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 12,
+    "ruleId": 28,
     "priority": 1,
     "description": "get /transactionRequests/{ID}",
     "apiVersion": {
@@ -779,7 +1421,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 13,
+    "ruleId": 29,
     "priority": 1,
     "description": "get /authorizations/{ID}",
     "apiVersion": {
@@ -817,7 +1459,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 14,
+    "ruleId": 30,
     "priority": 1,
     "description": "get /transfers/{ID}",
     "apiVersion": {
@@ -851,7 +1493,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 15,
+    "ruleId": 31,
     "priority": 1,
     "description": "get /transactions/{ID}",
     "apiVersion": {
@@ -889,7 +1531,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 16,
+    "ruleId": 32,
     "priority": 1,
     "description": "get /bulkQuotes/{ID}",
     "apiVersion": {
@@ -923,7 +1565,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 17,
+    "ruleId": 33,
     "priority": 1,
     "description": "post /bulkQuotes",
     "apiVersion": {
@@ -957,7 +1599,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 18,
+    "ruleId": 34,
     "priority": 1,
     "description": "get /bulkTransfers/{ID}",
     "apiVersion": {
@@ -991,7 +1633,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 19,
+    "ruleId": 35,
     "priority": 1,
     "description": "post /bulkTransfers",
     "apiVersion": {
@@ -1023,7 +1665,7 @@
     }
   },
   {
-    "ruleId": 32,
+    "ruleId": 36,
     "priority": 1,
     "description": "get /fxQuotes/{ID}",
     "apiVersion": {
@@ -1103,7 +1745,7 @@
     "version": 1
   },
   {
-    "ruleId": 33,
+    "ruleId": 37,
     "priority": 1,
     "description": "post /fxTransfers",
     "apiVersion": {
@@ -1156,7 +1798,7 @@
     "version": 1
   },
   {
-    "ruleId": 34,
+    "ruleId": 38,
     "priority": 1,
     "description": "get /fxTransfers/{ID}",
     "apiVersion": {
@@ -1209,7 +1851,7 @@
     "version": 1
   },
   {
-    "ruleId": 35,
+    "ruleId": 39,
     "priority": 1,
     "description": "get /services/FXP",
     "apiVersion": {
@@ -1262,7 +1904,7 @@
     "version": 1
   },
   {
-    "ruleId": 36,
+    "ruleId": 40,
     "priority": 1,
     "description": "get /services/FXP/{SourceCurrency}/{TargetCurrency}",
     "apiVersion": {
@@ -1315,7 +1957,7 @@
     "version": 1
   },
   {
-    "ruleId": 37,
+    "ruleId": 41,
     "priority": 1,
     "description": "post /fxQuotes",
     "apiVersion": {
