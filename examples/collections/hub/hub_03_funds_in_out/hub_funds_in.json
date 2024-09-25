@@ -25,7 +25,7 @@
             "Content-Type": "application/json"
           },
           "body": {
-            "transferId": "{$function.generic.generateULID}",
+            "transferId": "{$function.generic.generateID}",
             "externalReference": "string",
             "action": "recordFundsIn",
             "reason": "string",

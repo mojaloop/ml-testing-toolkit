@@ -45,7 +45,7 @@
             "FSPIOP-Destination": "{$inputs.TrsPayeeFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateULID}",
+            "quoteId": "{$function.generic.generateID}",
             "transactionId": "{$inputs.transactionId}",
             "payer": {
               "partyIdInfo": {

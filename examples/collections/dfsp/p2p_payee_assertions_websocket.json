@@ -137,8 +137,8 @@
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateULID}",
-            "transactionId": "{$function.generic.generateULID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",

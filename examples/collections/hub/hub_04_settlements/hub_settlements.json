@@ -285,8 +285,8 @@
             "FSPIOP-Destination": "testfsp2"
           },
           "body": {
-            "quoteId": "{$function.generic.generateULID}",
-            "transactionId": "{$function.generic.generateULID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
@@ -440,8 +440,8 @@
             "FSPIOP-Destination": "testfsp4"
           },
           "body": {
-            "quoteId": "{$function.generic.generateULID}",
-            "transactionId": "{$function.generic.generateULID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
@@ -596,8 +596,8 @@
             "FSPIOP-Destination": "testfsp1"
           },
           "body": {
-            "quoteId": "{$function.generic.generateULID}",
-            "transactionId": "{$function.generic.generateULID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
@@ -752,8 +752,8 @@
             "FSPIOP-Destination": "testfsp3"
           },
           "body": {
-            "quoteId": "{$function.generic.generateULID}",
-            "transactionId": "{$function.generic.generateULID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
@@ -908,8 +908,8 @@
             "FSPIOP-Destination": "testfsp2"
           },
           "body": {
-            "quoteId": "{$function.generic.generateULID}",
-            "transactionId": "{$function.generic.generateULID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
@@ -1062,8 +1062,8 @@
             "FSPIOP-Destination": "testfsp3"
           },
           "body": {
-            "quoteId": "{$function.generic.generateULID}",
-            "transactionId": "{$function.generic.generateULID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
