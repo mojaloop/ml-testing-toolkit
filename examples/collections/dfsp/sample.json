@@ -81,8 +81,8 @@
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -3090,7 +3090,7 @@
           "path": "/bulkQuotes",
           "method": "post",
           "body": {
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
@@ -3116,8 +3116,8 @@
             "expiration": "2020-01-01T10:10:10.000Z",
             "individualQuotes": [
               {
-                "quoteId": "{$function.generic.generateUUID}",
-                "transactionId": "{$function.generic.generateUUID}",
+                "quoteId": "{$function.generic.generateID}",
+                "transactionId": "{$function.generic.generateID}",
                 "payee": {
                   "partyIdInfo": {
                     "partyIdType": "MSISDN",
@@ -3151,7 +3151,7 @@
                   "initiator": "PAYER",
                   "initiatorType": "CONSUMER",
                   "refundInfo": {
-                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "originalTransactionId": "{$function.generic.generateID}",
                     "refundReason": "string"
                   },
                   "balanceOfPayments": "100"
@@ -3229,7 +3229,7 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
@@ -3255,8 +3255,8 @@
             "expiration": "2020-01-01T10:10:10.000Z",
             "individualQuotes": [
               {
-                "quoteId": "{$function.generic.generateUUID}",
-                "transactionId": "{$function.generic.generateUUID}",
+                "quoteId": "{$function.generic.generateID}",
+                "transactionId": "{$function.generic.generateID}",
                 "payee": {
                   "partyIdInfo": {
                     "partyIdType": "MSISDN",
@@ -3290,7 +3290,7 @@
                   "initiator": "PAYER",
                   "initiatorType": "CONSUMER",
                   "refundInfo": {
-                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "originalTransactionId": "{$function.generic.generateID}",
                     "refundReason": "string"
                   },
                   "balanceOfPayments": "100"
@@ -3353,7 +3353,7 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
@@ -3379,8 +3379,8 @@
             "expiration": "2020-01-01T10:10:10.000Z",
             "individualQuotes": [
               {
-                "quoteId": "{$function.generic.generateUUID}",
-                "transactionId": "{$function.generic.generateUUID}",
+                "quoteId": "{$function.generic.generateID}",
+                "transactionId": "{$function.generic.generateID}",
                 "payee": {
                   "partyIdInfo": {
                     "partyIdType": "MSISDN",
@@ -3414,7 +3414,7 @@
                   "initiator": "PAYER",
                   "initiatorType": "CONSUMER",
                   "refundInfo": {
-                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "originalTransactionId": "{$function.generic.generateID}",
                     "refundReason": "string"
                   },
                   "balanceOfPayments": "100"
@@ -3477,7 +3477,7 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
@@ -3503,8 +3503,8 @@
             "expiration": "2020-01-01T10:10:10.000Z",
             "individualQuotes": [
               {
-                "quoteId": "{$function.generic.generateUUID}",
-                "transactionId": "{$function.generic.generateUUID}",
+                "quoteId": "{$function.generic.generateID}",
+                "transactionId": "{$function.generic.generateID}",
                 "payee": {
                   "partyIdInfo": {
                     "partyIdType": "MSISDN",
@@ -3538,7 +3538,7 @@
                   "initiator": "PAYER",
                   "initiatorType": "CONSUMER",
                   "refundInfo": {
-                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "originalTransactionId": "{$function.generic.generateID}",
                     "refundReason": "string"
                   },
                   "balanceOfPayments": "100"
@@ -3601,7 +3601,7 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
@@ -3627,8 +3627,8 @@
             "expiration": "2020-01-01T10:10:10.000Z",
             "individualQuotes": [
               {
-                "quoteId": "{$function.generic.generateUUID}",
-                "transactionId": "{$function.generic.generateUUID}",
+                "quoteId": "{$function.generic.generateID}",
+                "transactionId": "{$function.generic.generateID}",
                 "payee": {
                   "partyIdInfo": {
                     "partyIdType": "MSISDN",
@@ -3662,7 +3662,7 @@
                   "initiator": "PAYER",
                   "initiatorType": "CONSUMER",
                   "refundInfo": {
-                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "originalTransactionId": "{$function.generic.generateID}",
                     "refundReason": "string"
                   },
                   "balanceOfPayments": "100"
@@ -3751,8 +3751,8 @@
             "expiration": "2020-01-01T10:10:10.000Z",
             "individualQuotes": [
               {
-                "quoteId": "{$function.generic.generateUUID}",
-                "transactionId": "{$function.generic.generateUUID}",
+                "quoteId": "{$function.generic.generateID}",
+                "transactionId": "{$function.generic.generateID}",
                 "payee": {
                   "partyIdInfo": {
                     "partyIdType": "MSISDN",
@@ -3786,7 +3786,7 @@
                   "initiator": "PAYER",
                   "initiatorType": "CONSUMER",
                   "refundInfo": {
-                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "originalTransactionId": "{$function.generic.generateID}",
                     "refundReason": "string"
                   },
                   "balanceOfPayments": "100"
@@ -3875,8 +3875,8 @@
             "expiration": "2020-01-01T10:10:10.000Z",
             "individualQuotes": [
               {
-                "quoteId": "{$function.generic.generateUUID}",
-                "transactionId": "{$function.generic.generateUUID}",
+                "quoteId": "{$function.generic.generateID}",
+                "transactionId": "{$function.generic.generateID}",
                 "payee": {
                   "partyIdInfo": {
                     "partyIdType": "MSISDN",
@@ -3910,7 +3910,7 @@
                   "initiator": "PAYER",
                   "initiatorType": "CONSUMER",
                   "refundInfo": {
-                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "originalTransactionId": "{$function.generic.generateID}",
                     "refundReason": "string"
                   },
                   "balanceOfPayments": "100"
@@ -3974,7 +3974,7 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "geoCode": {
               "latitude": "-90",
               "longitude": "90"
@@ -3982,8 +3982,8 @@
             "expiration": "2020-01-01T10:10:10.000Z",
             "individualQuotes": [
               {
-                "quoteId": "{$function.generic.generateUUID}",
-                "transactionId": "{$function.generic.generateUUID}",
+                "quoteId": "{$function.generic.generateID}",
+                "transactionId": "{$function.generic.generateID}",
                 "payee": {
                   "partyIdInfo": {
                     "partyIdType": "MSISDN",
@@ -4017,7 +4017,7 @@
                   "initiator": "PAYER",
                   "initiatorType": "CONSUMER",
                   "refundInfo": {
-                    "originalTransactionId": "{$function.generic.generateUUID}",
+                    "originalTransactionId": "{$function.generic.generateID}",
                     "refundReason": "string"
                   },
                   "balanceOfPayments": "100"
@@ -4081,7 +4081,7 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "MSISDN",
@@ -4158,13 +4158,13 @@
           "path": "/bulkTransfers",
           "method": "post",
           "body": {
-            "bulkTransferId": "{$function.generic.generateUUID}",
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkTransferId": "{$function.generic.generateID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payerFsp": "string",
             "payeeFsp": "string",
             "individualTransfers": [
               {
-                "transferId": "{$function.generic.generateUUID}",
+                "transferId": "{$function.generic.generateID}",
                 "transferAmount": {
                   "currency": "AED",
                   "amount": "100"
@@ -4244,13 +4244,13 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkTransferId": "{$function.generic.generateUUID}",
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkTransferId": "{$function.generic.generateID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payerFsp": "string",
             "payeeFsp": "string",
             "individualTransfers": [
               {
-                "transferId": "{$function.generic.generateUUID}",
+                "transferId": "{$function.generic.generateID}",
                 "transferAmount": {
                   "currency": "AED",
                   "amount": "100"
@@ -4315,13 +4315,13 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkTransferId": "{$function.generic.generateUUID}",
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkTransferId": "{$function.generic.generateID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payerFsp": "string",
             "payeeFsp": "string",
             "individualTransfers": [
               {
-                "transferId": "{$function.generic.generateUUID}",
+                "transferId": "{$function.generic.generateID}",
                 "transferAmount": {
                   "currency": "AED",
                   "amount": "100"
@@ -4386,13 +4386,13 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkTransferId": "{$function.generic.generateUUID}",
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkTransferId": "{$function.generic.generateID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payerFsp": "string",
             "payeeFsp": "string",
             "individualTransfers": [
               {
-                "transferId": "{$function.generic.generateUUID}",
+                "transferId": "{$function.generic.generateID}",
                 "transferAmount": {
                   "currency": "AED",
                   "amount": "100"
@@ -4457,13 +4457,13 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkTransferId": "{$function.generic.generateUUID}",
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkTransferId": "{$function.generic.generateID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payerFsp": "string",
             "payeeFsp": "string",
             "individualTransfers": [
               {
-                "transferId": "{$function.generic.generateUUID}",
+                "transferId": "{$function.generic.generateID}",
                 "transferAmount": {
                   "currency": "AED",
                   "amount": "100"
@@ -4529,12 +4529,12 @@
           "params": {},
           "body": {
             "bulkTransferId": "wrong-pattern",
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payerFsp": "string",
             "payeeFsp": "string",
             "individualTransfers": [
               {
-                "transferId": "{$function.generic.generateUUID}",
+                "transferId": "{$function.generic.generateID}",
                 "transferAmount": {
                   "currency": "AED",
                   "amount": "100"
@@ -4600,12 +4600,12 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payerFsp": "string",
             "payeeFsp": "string",
             "individualTransfers": [
               {
-                "transferId": "{$function.generic.generateUUID}",
+                "transferId": "{$function.generic.generateID}",
                 "transferAmount": {
                   "currency": "AED",
                   "amount": "100"
@@ -4671,12 +4671,12 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkTransferId": "{$function.generic.generateUUID}",
+            "bulkTransferId": "{$function.generic.generateID}",
             "payerFsp": "string",
             "payeeFsp": "string",
             "individualTransfers": [
               {
-                "transferId": "{$function.generic.generateUUID}",
+                "transferId": "{$function.generic.generateID}",
                 "transferAmount": {
                   "currency": "AED",
                   "amount": "100"
@@ -4742,12 +4742,12 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkTransferId": "{$function.generic.generateUUID}",
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkTransferId": "{$function.generic.generateID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payeeFsp": "string",
             "individualTransfers": [
               {
-                "transferId": "{$function.generic.generateUUID}",
+                "transferId": "{$function.generic.generateID}",
                 "transferAmount": {
                   "currency": "AED",
                   "amount": "100"
@@ -4813,12 +4813,12 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkTransferId": "{$function.generic.generateUUID}",
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkTransferId": "{$function.generic.generateID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payerFsp": "string",
             "individualTransfers": [
               {
-                "transferId": "{$function.generic.generateUUID}",
+                "transferId": "{$function.generic.generateID}",
                 "transferAmount": {
                   "currency": "AED",
                   "amount": "100"
@@ -4884,8 +4884,8 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkTransferId": "{$function.generic.generateUUID}",
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkTransferId": "{$function.generic.generateID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payerFsp": "string",
             "payeeFsp": "string",
             "expiration": "2020-01-01T10:10:10.000Z",
@@ -4937,13 +4937,13 @@
           "method": "post",
           "params": {},
           "body": {
-            "bulkTransferId": "{$function.generic.generateUUID}",
-            "bulkQuoteId": "{$function.generic.generateUUID}",
+            "bulkTransferId": "{$function.generic.generateID}",
+            "bulkQuoteId": "{$function.generic.generateID}",
             "payerFsp": "string",
             "payeeFsp": "string",
             "individualTransfers": [
               {
-                "transferId": "{$function.generic.generateUUID}",
+                "transferId": "{$function.generic.generateID}",
                 "transferAmount": {
                   "currency": "AED",
                   "amount": "100"
