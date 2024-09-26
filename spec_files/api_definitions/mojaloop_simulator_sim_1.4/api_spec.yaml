@@ -309,7 +309,7 @@ paths:
 
   /otp/{requestToPayId}:
     get:
-      summary: Requests OTP 
+      summary: Requests OTP
       tags:
         - OTP
       operationId: OtpGet
@@ -340,7 +340,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/errorResponse'
-  
+
   /bulkQuotes:
     post:
       summary: Requests a bulk quote
@@ -567,18 +567,18 @@ components:
       type: string
       description: An ISO-8601 formatted timestamp
       pattern: ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:(\.\d{3}))(?:Z|[+-][01]\d:[0-5]\d)$
-   
+
     dateOfBirth:
       type: string
       description: Date of birth in the form YYYY-MM-DD
       pattern: ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)$
- 
+
     initiator:
       type: string
       enum:
         - PAYER
         - PAYEE
-        
+
     initiatorType:
       type: string
       enum:
@@ -586,7 +586,7 @@ components:
         - AGENT
         - BUSINESS
         - DEVICE
-      
+
     quoteResponse:
       type: object
       description: A response to a request for a quote
@@ -604,18 +604,18 @@ components:
           $ref: '#/components/schemas/money'
         transferAmountCurrency:
           $ref: '#/components/schemas/currency'
-        payeeReceiveAmount:  
+        payeeReceiveAmount:
           $ref: '#/components/schemas/money'
         payeeReceiveAmountCurrency:
           $ref: '#/components/schemas/currency'
         payeeFspFeeAmount:
           $ref: '#/components/schemas/money'
         payeeFspFeeAmountCurrency:
-          $ref: '#/components/schemas/currency'      
+          $ref: '#/components/schemas/currency'
         payeeFspCommissionAmount:
           $ref: '#/components/schemas/money'
         payeeFspCommissionAmountCurrency:
-          $ref: '#/components/schemas/currency'  
+          $ref: '#/components/schemas/currency'
         expiration:
           $ref: '#/components/schemas/timestamp'
         geoCode:
@@ -640,12 +640,12 @@ components:
       properties:
         fspId:
           $ref: '#/components/schemas/fspId'
-  
+
     fspId:
       type: string
       minLength: 1
       maxLength: 32
-  
+
     payerType:
       type: string
       enum:
@@ -653,13 +653,13 @@ components:
       - AGENT
       - BUSINESS
       - DEVICE
-      
+
     amountType:
       type: string
       enum:
       - SEND
       - RECEIVE
-      
+
     transactionType:
       type: string
       enum:
@@ -674,7 +674,7 @@ components:
       - PENDING
       - ACCEPTED
       - REJECTED
-      
+
     transferRequest:
       type: object
       required:
@@ -710,7 +710,7 @@ components:
         otpValue:
           type: string
           description: OTP value
-      
+
     idType:
       type: string
       enum:
@@ -723,21 +723,21 @@ components:
       - ACCOUNT_ID
       - IBAN
       - ALIAS
-      
+
     idValue:
       type: string
       minLength: 1
       maxLength: 128
-      
+
     subIdValue:
       type: string
       minLength: 1
       maxLength: 128
-      
+
     money:
       pattern: ^([0]|([1-9][0-9]{0,17}))([.][0-9]{0,3}[1-9])?$
       type: string
-      
+
     transferResponse:
       type: object
       required:
@@ -746,32 +746,32 @@ components:
         homeTransactionId:
           type: string
           description: Transaction ID from the DFSP backend, used to reconcile transactions between the switch and DFSP backend systems
-          
+
     currency:
       maxLength: 3
       minLength: 3
       type: string
-      
+
     transferId:
-      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
       type: string
-      description: A Mojaloop API transfer identifier (UUID)
-      
+      description: A Mojaloop API transfer identifier (UUID/ULID)
+
     quoteId:
-      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
       type: string
-      description: A Mojaloop API quote identifier (UUID)
-    
+      description: A Mojaloop API quote identifier (UUID/ULID)
+
     transactionRequestId:
-      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
       type: string
-      description: A Mojaloop API transaction request identifier (UUID)
-      
+      description: A Mojaloop API transaction request identifier (UUID/ULID)
+
     transactionId:
-      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
       type: string
       description: ID of the transaction, the ID is decided by the Payer FSP during the creation of the quote
-      
+
     transferParty:
       type: object
       required:
@@ -805,7 +805,7 @@ components:
         merchantClassificationCode:
           type: string
           description: Up to 4 digits specifying the senders merchant classification, if known and applicable
-    
+
     bulkQuoteRequest:
       type: object
       description: A request for a bulk quote
@@ -848,7 +848,7 @@ components:
             $ref: '#/components/schemas/IndividualQuoteResult'
           description: Fees for each individual transaction, if any of them are charged per
             transaction.
-    
+
     IndividualQuote:
       type: object
       description: Data model for individual quote in a bulk quote request
@@ -890,7 +890,7 @@ components:
           minLength: 1
           maxLength: 128
           description: An optional note associated with the quote
-        
+
     IndividualQuoteResult:
       type: object
       description: Data model for individual quote in a bulk quote response
@@ -901,24 +901,24 @@ components:
           $ref: '#/components/schemas/money'
         transferAmountCurrency:
           $ref: '#/components/schemas/currency'
-        payeeReceiveAmount:  
+        payeeReceiveAmount:
           $ref: '#/components/schemas/money'
         payeeReceiveAmountCurrency:
           $ref: '#/components/schemas/currency'
         payeeFspFeeAmount:
           $ref: '#/components/schemas/money'
         payeeFspFeeAmountCurrency:
-          $ref: '#/components/schemas/currency'      
+          $ref: '#/components/schemas/currency'
         payeeFspCommissionAmount:
           $ref: '#/components/schemas/money'
         payeeFspCommissionAmountCurrency:
-          $ref: '#/components/schemas/currency'  
+          $ref: '#/components/schemas/currency'
 
     bulkQuoteId:
-      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
       type: string
-      description: A Mojaloop API bulk quote identifier (UUID)
-    
+      description: A Mojaloop API bulk quote identifier (UUID/ULID)
+
     bulkTransferRequest:
       type: object
       required:
@@ -937,7 +937,7 @@ components:
           maxItems: 1000
           items:
             $ref: '#/components/schemas/IndividualTransfer'
-    
+
     IndividualTransfer:
       type: object
       description: Data model for individual transfer in a bulk transfer request
@@ -971,7 +971,7 @@ components:
           minLength: 1
           maxLength: 128
           description: An optional note associated with the quote
-  
+
     IndividualTransferResult:
       type: object
       description: Data model for individual transfer in a bulk transfer response
@@ -982,7 +982,7 @@ components:
           $ref: '#/components/schemas/transferId'
         extensionList:
           $ref: '#/components/schemas/extensionList'
-  
+
     bulkTransferResponse:
       type: object
       required:
@@ -1001,10 +1001,10 @@ components:
             $ref: '#/components/schemas/IndividualTransferResult'
 
     bulkTransferId:
-      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
       type: string
-      description: A Mojaloop API transfer identifier (UUID)
-          
+      description: A Mojaloop API transfer identifier (UUID/ULID)
+
     geoCode:
       type: object
       description: Indicates the geographic location from where the transaction was initiated.
@@ -1016,17 +1016,17 @@ components:
       required:
         - latitude
         - longitude
-        
+
     latitude:
       type: string
       pattern: ^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$
       description: The API data type Latitude is a JSON String in a lexical format that is restricted by a regular expression for interoperability reasons.
-    
+
     longitude:
       type: string
       pattern: ^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$
       description: The API data type Longitude is a JSON String in a lexical format that is restricted by a regular expression for interoperability reasons.
-          
+
     errorResponse:
       type: object
       properties:
@@ -1036,7 +1036,7 @@ components:
         message:
           type: string
           description: Error message text
-    
+
     extensionList:
       type: array
       items:
