@@ -67,29 +67,18 @@
       "successCallback": {
         "method": "put",
         "path": "/quotes/{ID}",
-        "pathPattern": "/quotes/{$request.body.quoteId}",
+        "pathPattern": "/quotes/{$request.body.GrpHdr.CdtTrfTxInf.PmtId.TxId}",
         "headerOverride": {
-          "FSPIOP-Source": "{$request.body.payee.partyIdInfo.fspId}",
+          "FSPIOP-Source": "{$request.headers.fspiop-destination}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
           "Content-Type": "{$session.negotiatedContentType}",
           "Date": "{$request.headers.date}"
-        },
-        "bodyOverride": {
-          "CdtTrfTxInf": {
-            "InstdAmt": {
-              "Ccy": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}",
-              "ActiveCurrencyAndAmount": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount}"
-            }
-          },
-          "GrpHdr": {
-            "PmtInstrXpryDtTm": "2040-01-01T01:01:01.001Z"
-          }
         }
       },
       "errorCallback": {
         "method": "put",
         "path": "/quotes/{ID}/error",
-        "pathPattern": "/quotes/{$request.body.quoteId}/error",
+        "pathPattern": "/quotes/{$request.body.GrpHdr.CdtTrfTxInf.PmtId.TxId}/error",
         "headerOverride": {
           "FSPIOP-Source": "{$config.FSPID}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",

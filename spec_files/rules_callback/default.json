@@ -1,237 +1,8 @@
 [
   {
-    "ruleId": 1,
-    "priority": 1,
-    "description": "post /fxQuotes",
-    "apiVersion": {
-      "minorVersion": 0,
-      "majorVersion": 2,
-      "type": "fspiop_iso20022",
-      "asynchronous": true,
-      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
-      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
-      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
-      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
-      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
-    },
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/fxQuotes"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "post"
-        }
-      ]
-    },
-    "event": {
-      "method": "put",
-      "path": "/fxQuotes/{ID}",
-      "params": {
-        "scripts": {
-          "scriptingEngine": "javascript"
-        },
-        "headers": {
-        },
-        "body": {
-        }
-      },
-      "type": "FIXED_CALLBACK"
-    },
-    "type": "callback",
-    "version": 1
-  },
-  {
-    "ruleId": 2,
-    "priority": 1,
-    "description": "get /fxQuotes/{ID}",
-    "apiVersion": {
-      "minorVersion": 0,
-      "majorVersion": 2,
-      "type": "fspiop_iso20022",
-      "asynchronous": true,
-      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
-      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
-      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
-      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
-      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
-    },
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/fxQuotes/{ID}"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "get"
-        }
-      ]
-    },
-    "event": {
-      "method": "put",
-      "path": "/fxQuotes/{ID}",
-      "params": {
-        "scripts": {
-          "scriptingEngine": "javascript"
-        },
-        "headers": {
-        },
-        "body": {
-        }
-      },
-      "type": "FIXED_CALLBACK"
-    },
-    "type": "callback",
-    "version": 1
-  },
-  {
-    "ruleId": 3,
-    "priority": 1,
-    "description": "post /fxTransfers",
-    "apiVersion": {
-      "minorVersion": 0,
-      "majorVersion": 2,
-      "type": "fspiop_iso20022",
-      "asynchronous": true,
-      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
-      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
-      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
-      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
-      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
-    },
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/fxTransfers"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "post"
-        }
-      ]
-    },
-    "event": {
-      "method": "put",
-      "path": "/fxTransfers/{ID}",
-      "params": {
-        "scripts": {
-          "scriptingEngine": "javascript"
-        },
-        "headers": {
-        },
-        "body": {
-        }
-      },
-      "type": "FIXED_CALLBACK"
-    },
-    "type": "callback",
-    "version": 1
-  },
-  {
-    "ruleId": 4,
-    "priority": 1,
-    "description": "get /fxTransfers/{ID}",
-    "apiVersion": {
-      "minorVersion": 0,
-      "majorVersion": 2,
-      "type": "fspiop_iso20022",
-      "asynchronous": true,
-      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
-      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
-      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
-      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
-      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
-    },
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/fxTransfers/{ID}"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "get"
-        }
-      ]
-    },
-    "event": {
-      "method": "put",
-      "path": "/fxTransfers/{ID}",
-      "params": {
-        "scripts": {
-          "scriptingEngine": "javascript"
-        },
-        "headers": {
-        },
-        "body": {
-        }
-      },
-      "type": "FIXED_CALLBACK"
-    },
-    "type": "callback",
-    "version": 1
-  },
-  {
-    "type": "callback",
-    "ruleId": 5,
-    "priority": 1,
-    "description": "get /transfers/{ID}",
-    "apiVersion": {
-      "minorVersion": 0,
-      "majorVersion": 2,
-      "type": "fspiop_iso20022",
-      "asynchronous": true,
-      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
-      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
-      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
-      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
-      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
-    },
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/transfers/{ID}"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "get"
-        }
-      ]
-    },
-    "event": {
-      "method": "put",
-      "path": "/transfers/{ID}",
-      "params": {
-        "scripts": {
-          "scriptingEngine": "javascript"
-        },
-        "headers": {
-        },
-        "body": {
-        }
-      },
-      "type": "FIXED_CALLBACK"
-    }
-  },
-  {
     "type": "callback",
     "version": 1,
-    "ruleId": 6,
+    "ruleId": 1,
     "priority": 1,
     "description": "get /parties/{Type}/{ID}/{SubId}",
     "apiVersion": {
@@ -264,7 +35,7 @@
       "path": "/parties/{Type}/{ID}/{SubId}",
       "params": {
         "headers": {
-          "Content-Type": "application/vnd.interoperability.parties+json;version=2.0",
+          "Content-Type": "application/vnd.interoperability.iso20022.parties+json;version=2.0",
           "FSPIOP-Source": "{$config.FSPID}",
           "Date": "{$request.headers.date}"
         },
@@ -319,53 +90,7 @@
     }
   },
   {
-    "type": "callback",
-    "version": 1,
-    "ruleId": 7,
-    "priority": 1,
-    "description": "get /quotes/{ID}",
-    "apiVersion": {
-      "minorVersion": 0,
-      "majorVersion": 2,
-      "type": "fspiop_iso20022",
-      "asynchronous": true,
-      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
-      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
-      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
-      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
-      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
-    },
-    "conditions": {
-      "all": [
-        {
-          "fact": "operationPath",
-          "operator": "equal",
-          "value": "/quotes/{ID}"
-        },
-        {
-          "fact": "method",
-          "operator": "equal",
-          "value": "get"
-        }
-      ]
-    },
-    "event": {
-      "method": "put",
-      "path": "/quotes/{ID}",
-      "params": {
-        "scripts": {
-          "scriptingEngine": "javascript"
-        },
-        "headers": {
-        },
-        "body": {
-        }
-      },
-      "type": "FIXED_CALLBACK"
-    }
-  },
-  {
-    "ruleId": 8,
+    "ruleId": 2,
     "priority": 1,
     "description": "get /parties/{Type}/{ID} for pinkbank",
     "apiVersion": {
@@ -460,7 +185,7 @@
     "version": 1
   },
   {
-    "ruleId": 9,
+    "ruleId": 3,
     "priority": 1,
     "description": "get /parties/{Type}/{ID}",
     "apiVersion": {
@@ -499,7 +224,7 @@
       "path": "/parties/{Type}/{ID}",
       "params": {
         "headers": {
-          "Content-Type": "application/vnd.interoperability.parties+json;version=2.0",
+          "Content-Type": "application/vnd.interoperability.iso20022.parties+json;version=2.0",
           "FSPIOP-Source": "{$config.FSPID}",
           "Date": "{$request.headers.date}"
         },
@@ -557,7 +282,46 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 10,
+    "ruleId": 4,
+    "priority": 1,
+    "description": "get /quotes/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/quotes/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/quotes/{ID}",
+      "params": {},
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
+    }
+  },
+  {
+    "type": "callback",
+    "version": 1,
+    "ruleId": 5,
     "priority": 1,
     "description": "post /quotes",
     "apiVersion": {
@@ -593,8 +357,432 @@
           "scriptingEngine": "javascript"
         },
         "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.quotes+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
         },
         "body": {
+          "GrpHdr": {
+            "MsgId": "{$request.params.ID}",
+            "PmtInstrXpryDtTm": "{$function.generic.curDateISO}",
+            "CreDtTm": "{$function.generic.curDateISO}",
+            "NbOfTxs": "1",
+            "SttlmInf": {
+              "SttlmMtd": "CLRG"
+            },
+            "CtrlSum": "100",
+            "InitgPty": {
+              "Nm": "Initiating Party Name",
+              "Id": {
+                "OrgId": {
+                  "Othr": [
+                    {
+                      "Id": "123456789",
+                      "SchmeNm": {
+                        "Cd": "BBA",
+                        "Prtry": "Party Identification Scheme Name"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "FwdgAgt": {
+              "FinInstnId": {
+                "BICFI": "BBBBBBBB"
+              }
+            },
+            "CdtTrfTxInf": {
+              "VrfctnOfTerms": {
+                "IlpV4PrepPacket": "AYIDBQAAAAAAACcQJGcucGF5ZWVmc3AubXNpc2RuLnt7cmVjZWl2ZXJtc2lzZG59fYIC1GV5SjBjbUZ1YzJGamRHbHZia2xrSWpvaVptVXhNREU0Wm1NdE1EaGxZeTAwWWpJM0xUbGpZalF0TnpjMk9URTFNR00zT1dKaklpd2ljWFZ2ZEdWSlpDSTZJbVpsTVRBeE9HWmpMVEE0WldNdE5HSXlOeTA1WTJJMExUYzNOamt4TlRCak56bGlZeUlzSW5CaGVXVmxJanA3SW5CaGNuUjVTV1JKYm1adklqcDdJbkJoY25SNVNXUlVlWEJsSWpvaVRWTkpVMFJPSWl3aWNHRnlkSGxKWkdWdWRHbG1hV1Z5SWpvaWUzdHlaV05sYVhabGNrMVRTVk5FVG4xOUlpd2labk53U1dRaU9pSndZWGxsWldaemNDSjlmU3dpY0dGNVpYSWlPbnNpY0dGeWRIbEpaRWx1Wm04aU9uc2ljR0Z5ZEhsSlpGUjVjR1VpT2lKTlUwbFRSRTRpTENKd1lYSjBlVWxrWlc1MGFXWnBaWElpT2lJeU56Y3hNemd3TXprd05TSXNJbVp6Y0Vsa0lqb2ljR0Y1WlhKbWMzQWlmU3dpY0dWeWMyOXVZV3hKYm1adklqcDdJbU52YlhCc1pYaE9ZVzFsSWpwN0ltWnBjbk4wVG1GdFpTSTZJazFoZEhNaUxDSnNZWE4wVG1GdFpTSTZJa2hoWjIxaGJpSjlMQ0prWVhSbFQyWkNhWEowYUNJNklqRTVPRE10TVRBdE1qVWlmWDBzSW1GdGIzVnVkQ0k2ZXlKaGJXOTFiblFpT2lJeE1EQWlMQ0pqZFhKeVpXNWplU0k2SWxWVFJDSjlMQ0owY21GdWMyRmpkR2x2YmxSNWNHVWlPbnNpYzJObGJtRnlhVzhpT2lKVVVrRk9VMFpGVWlJc0ltbHVhWFJwWVhSdmNpSTZJbEJCV1VWU0lpd2lhVzVwZEdsaGRHOXlWSGx3WlNJNklrTlBUbE5WVFVWU0luMTkA"
+              },
+              "PmtId": {
+                "TxId": "123456789",
+                "InstrId": "123456789",
+                "EndToEndId": "123456789"
+              },
+              "PmtTpInf": {
+                "InstrPrty": "NORM",
+                "SvcLvl": {
+                  "Cd": "SEPA"
+                },
+                "LclInstrm": {
+                  "Cd": "CH03"
+                },
+                "CtgyPurp": {
+                  "Cd": "SUPP"
+                }
+              },
+              "IntrBkSttlmAmt": {
+                "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}",
+                "ActiveCurrencyAndAmount": "{$request.body.GrpHdr.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount}"
+              },
+              "InstdAmt": {
+                "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.InstdAmt.Ccy}",
+                "ActiveOrHistoricCurrencyAndAmount": "{$request.body.GrpHdr.CdtTrfTxInf.InstdAmt.ActiveCurrencyAndAmount}"
+              },
+              "ChrgBr": "SLEV",
+              "ChrgsInf": {
+                "Amt": {
+                  "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.ChrgsInf.Amt.Ccy}",
+                  "ActiveOrHistoricCurrencyAndAmount": "{$request.body.GrpHdr.CdtTrfTxInf.ChrgsInf.Amt.ActiveCurrencyAndAmount}"
+                },
+                "Agt": {
+                  "FinInstnId": {
+                    "Othr": {
+                      "Id": "123456789",
+                      "SchmeNm": {
+                        "Cd": "BBA",
+                        "Prtry": "Party Identification Scheme Name"
+                      }
+                    }
+                  }
+                }
+              },
+              "Cdtr": {
+                "Nm": "Creditor Name",
+                "PstlAdr": {
+                  "AdrTp": {
+                    "Cd": "ADDR"
+                  },
+                  "Dept": "Department",
+                  "SubDept": "SubDepartment",
+                  "StrtNm": "StreetName",
+                  "BldgNb": "BuildingNumber",
+                  "PstCd": "PostCode",
+                  "TwnNm": "TownName",
+                  "CtrySubDvsn": "CountrySubDivision",
+                  "Ctry": "AZ"
+                },
+                "Id": {
+                  "OrgId": {
+                    "AnyBIC": "BBBBBBBB",
+                    "Othr": {
+                      "Id": "123456789",
+                      "SchmeNm": {
+                        "Cd": "IBAN",
+                        "Prtry": "Party Identification Scheme Name"
+                      }
+                    }
+                  }
+                }
+              },
+              "Dbtr": {
+                "Nm": "Creditor Name",
+                "PstlAdr": {
+                  "AdrTp": {
+                    "Cd": "ADDR"
+                  },
+                  "Dept": "Department",
+                  "SubDept": "SubDepartment",
+                  "StrtNm": "StreetName",
+                  "BldgNb": "BuildingNumber",
+                  "PstCd": "PostCode",
+                  "TwnNm": "TownName",
+                  "CtrySubDvsn": "CountrySubDivision",
+                  "Ctry": "AZ"
+                },
+                "Id": {
+                  "OrgId": {
+                    "AnyBIC": "BBBBBBBB",
+                    "Othr": {
+                      "Id": "123456789",
+                      "SchmeNm": {
+                        "Cd": "IBAN",
+                        "Prtry": "Party Identification Scheme Name"
+                      }
+                    }
+                  }
+                }
+              },
+              "DbtrAgt": {
+                "FinInstnId": {
+                  "BICFI": "BBBBBBBB"
+                }
+              },
+              "CdtrAcct": {
+                "Id": {
+                  "IBAN": "IBAN"
+                }
+              },
+              "CdtrAgt": {
+                "FinInstnId": {
+                  "BICFI": "BBBBBBBB"
+                }
+              },
+              "CdtrAgtAcct": {
+                "Id": {
+                  "IBAN": "IBAN"
+                }
+              },
+              "UltmtCdtr": {
+                "Nm": "Ultimate Creditor Name",
+                "PstlAdr": {
+                  "AdrTp": {
+                    "Cd": "ADDR"
+                  },
+                  "Dept": "Department",
+                  "SubDept": "SubDepartment",
+                  "StrtNm": "StreetName",
+                  "BldgNb": "BuildingNumber",
+                  "PstCd": "PostCode",
+                  "TwnNm": "TownName",
+                  "CtrySubDvsn": "CountrySubDivision",
+                  "Ctry": "AZ"
+                },
+                "Id": {
+                  "OrgId": {
+                    "AnyBIC": "BBBBBBBB",
+                    "Othr": {
+                      "Id": "123456789",
+                      "SchmeNm": {
+                        "Cd": "IBAN",
+                        "Prtry": "Party Identification Scheme Name"
+                      }
+                    }
+                  }
+                }
+              },
+              "RgltryRptg": {
+                "DbtCdtRptgInd": "CRED",
+                "Authrty": {
+                  "Nm": "Swiss National Bank",
+                  "Ctry": "CH"
+                }
+              }
+            }
+          },
+          "CdtTrfTxInf": {
+            "VrfctnOfTerms": {
+              "IlpV4PrepPacket": "AYIDBQAAAAAAACcQJGcucGF5ZWVmc3AubXNpc2RuLnt7cmVjZWl2ZXJtc2lzZG59fYIC1GV5SjBjbUZ1YzJGamRHbHZia2xrSWpvaVptVXhNREU0Wm1NdE1EaGxZeTAwWWpJM0xUbGpZalF0TnpjMk9URTFNR00zT1dKaklpd2ljWFZ2ZEdWSlpDSTZJbVpsTVRBeE9HWmpMVEE0WldNdE5HSXlOeTA1WTJJMExUYzNOamt4TlRCak56bGlZeUlzSW5CaGVXVmxJanA3SW5CaGNuUjVTV1JKYm1adklqcDdJbkJoY25SNVNXUlVlWEJsSWpvaVRWTkpVMFJPSWl3aWNHRnlkSGxKWkdWdWRHbG1hV1Z5SWpvaWUzdHlaV05sYVhabGNrMVRTVk5FVG4xOUlpd2labk53U1dRaU9pSndZWGxsWldaemNDSjlmU3dpY0dGNVpYSWlPbnNpY0dGeWRIbEpaRWx1Wm04aU9uc2ljR0Z5ZEhsSlpGUjVjR1VpT2lKTlUwbFRSRTRpTENKd1lYSjBlVWxrWlc1MGFXWnBaWElpT2lJeU56Y3hNemd3TXprd05TSXNJbVp6Y0Vsa0lqb2ljR0Y1WlhKbWMzQWlmU3dpY0dWeWMyOXVZV3hKYm1adklqcDdJbU52YlhCc1pYaE9ZVzFsSWpwN0ltWnBjbk4wVG1GdFpTSTZJazFoZEhNaUxDSnNZWE4wVG1GdFpTSTZJa2hoWjIxaGJpSjlMQ0prWVhSbFQyWkNhWEowYUNJNklqRTVPRE10TVRBdE1qVWlmWDBzSW1GdGIzVnVkQ0k2ZXlKaGJXOTFiblFpT2lJeE1EQWlMQ0pqZFhKeVpXNWplU0k2SWxWVFJDSjlMQ0owY21GdWMyRmpkR2x2YmxSNWNHVWlPbnNpYzJObGJtRnlhVzhpT2lKVVVrRk9VMFpGVWlJc0ltbHVhWFJwWVhSdmNpSTZJbEJCV1VWU0lpd2lhVzVwZEdsaGRHOXlWSGx3WlNJNklrTlBUbE5WVFVWU0luMTkA"
+            },
+            "PmtId": {
+              "TxId": "123456789",
+              "InstrId": "123456789",
+              "EndToEndId": "123456789"
+            },
+            "PmtTpInf": {
+              "InstrPrty": "NORM",
+              "SvcLvl": {
+                "Cd": "SEPA"
+              },
+              "LclInstrm": {
+                "Cd": "CH03"
+              },
+              "CtgyPurp": {
+                "Cd": "SUPP"
+              }
+            },
+            "IntrBkSttlmAmt": {
+              "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}",
+              "ActiveCurrencyAndAmount": "{$request.body.GrpHdr.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount}"
+            },
+            "InstdAmt": {
+              "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.InstdAmt.Ccy}",
+              "ActiveOrHistoricCurrencyAndAmount": "{$request.body.GrpHdr.CdtTrfTxInf.InstdAmt.ActiveCurrencyAndAmount}"
+            },
+            "ChrgBr": "SLEV",
+            "ChrgsInf": {
+              "Amt": {
+                "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.ChrgsInf.Amt.Ccy}",
+                "ActiveOrHistoricCurrencyAndAmount": "{$request.body.GrpHdr.CdtTrfTxInf.ChrgsInf.Amt.ActiveCurrencyAndAmount}"
+              },
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "123456789",
+                    "SchmeNm": {
+                      "Cd": "BBA",
+                      "Prtry": "Party Identification Scheme Name"
+                    }
+                  }
+                }
+              }
+            },
+            "Cdtr": {
+              "Nm": "Creditor Name",
+              "PstlAdr": {
+                "AdrTp": {
+                  "Cd": "ADDR"
+                },
+                "Dept": "Department",
+                "SubDept": "SubDepartment",
+                "StrtNm": "StreetName",
+                "BldgNb": "BuildingNumber",
+                "PstCd": "PostCode",
+                "TwnNm": "TownName",
+                "CtrySubDvsn": "CountrySubDivision",
+                "Ctry": "AZ"
+              },
+              "Id": {
+                "OrgId": {
+                  "AnyBIC": "BBBBBBBB",
+                  "Othr": {
+                    "Id": "123456789",
+                    "SchmeNm": {
+                      "Cd": "IBAN",
+                      "Prtry": "Party Identification Scheme Name"
+                    }
+                  }
+                }
+              }
+            },
+            "Dbtr": {
+              "Nm": "Creditor Name",
+              "PstlAdr": {
+                "AdrTp": {
+                  "Cd": "ADDR"
+                },
+                "Dept": "Department",
+                "SubDept": "SubDepartment",
+                "StrtNm": "StreetName",
+                "BldgNb": "BuildingNumber",
+                "PstCd": "PostCode",
+                "TwnNm": "TownName",
+                "CtrySubDvsn": "CountrySubDivision",
+                "Ctry": "AZ"
+              },
+              "Id": {
+                "OrgId": {
+                  "AnyBIC": "BBBBBBBB",
+                  "Othr": {
+                    "Id": "123456789",
+                    "SchmeNm": {
+                      "Cd": "IBAN",
+                      "Prtry": "Party Identification Scheme Name"
+                    }
+                  }
+                }
+              }
+            },
+            "DbtrAgt": {
+              "FinInstnId": {
+                "BICFI": "BBBBBBBB"
+              }
+            },
+            "CdtrAcct": {
+              "Id": {
+                "IBAN": "IBAN"
+              }
+            },
+            "CdtrAgt": {
+              "FinInstnId": {
+                "BICFI": "BBBBBBBB"
+              }
+            },
+            "CdtrAgtAcct": {
+              "Id": {
+                "IBAN": "IBAN"
+              }
+            },
+            "UltmtCdtr": {
+              "Nm": "Ultimate Creditor Name",
+              "PstlAdr": {
+                "AdrTp": {
+                  "Cd": "ADDR"
+                },
+                "Dept": "Department",
+                "SubDept": "SubDepartment",
+                "StrtNm": "StreetName",
+                "BldgNb": "BuildingNumber",
+                "PstCd": "PostCode",
+                "TwnNm": "TownName",
+                "CtrySubDvsn": "CountrySubDivision",
+                "Ctry": "AZ"
+              },
+              "Id": {
+                "OrgId": {
+                  "AnyBIC": "BBBBBBBB",
+                  "Othr": {
+                    "Id": "123456789",
+                    "SchmeNm": {
+                      "Cd": "IBAN",
+                      "Prtry": "Party Identification Scheme Name"
+                    }
+                  }
+                }
+              }
+            },
+            "RgltryRptg": {
+              "DbtCdtRptgInd": "CRED",
+              "Authrty": {
+                "Nm": "Swiss National Bank",
+                "Ctry": "CH"
+              }
+            }
+          }
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    }
+  },
+  {
+    "type": "callback",
+    "ruleId": 6,
+    "priority": 1,
+    "description": "get /transfers/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transfers/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.transfers+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        },
+        "body": {
+          "GrpHdr": {
+            "MsgId": 12345,
+            "CreDtTm": "2020-01-01T00:00:00Z",
+            "TxInfAndSts": {
+              "StsId": 12345,
+              "OrgnlInstrId": 12345,
+              "OrgnlEndToEndId": 12345,
+              "OrgnlTxId": 12345,
+              "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
+              "TxSts": "RJCT",
+              "StsRsnInf": {
+                "Rsn": "RSN",
+                "AddtlInf": "ADDITIONAL"
+              },
+              "AccptncDtTm": "2020-01-01T00:00:00Z",
+              "AcctSvcrRef": "ACCTSVCRREF",
+              "ClrSysRef": "CLRSYSREF",
+              "ExctnConf": "1234567890ABCDEF",
+              "SplmtryData": {
+                "PlcAndNm": "PLACE",
+                "Envlp": "ENVELOPE"
+              }
+            }
+          }
         }
       },
       "type": "FIXED_CALLBACK"
@@ -603,7 +791,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 11,
+    "ruleId": 7,
     "priority": 1,
     "description": "post /transfers",
     "apiVersion": {
@@ -634,13 +822,487 @@
           "scriptingEngine": "javascript"
         },
         "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.transfers+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
         },
         "body": {
+          "GrpHdr": {
+            "MsgId": 12345,
+            "CreDtTm": "2020-01-01T00:00:00Z",
+            "TxInfAndSts": {
+              "StsId": 12345,
+              "OrgnlInstrId": 12345,
+              "OrgnlEndToEndId": 12345,
+              "OrgnlTxId": 12345,
+              "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
+              "TxSts": "RJCT",
+              "StsRsnInf": {
+                "Rsn": "RSN",
+                "AddtlInf": "ADDITIONAL"
+              },
+              "AccptncDtTm": "2020-01-01T00:00:00Z",
+              "AcctSvcrRef": "ACCTSVCRREF",
+              "ClrSysRef": "CLRSYSREF",
+              "ExctnConf": "1234567890ABCDEF",
+              "SplmtryData": {
+                "PlcAndNm": "PLACE",
+                "Envlp": "ENVELOPE"
+              }
+            }
+          }
         }
       },
       "type": "FIXED_CALLBACK"
     }
   },
+  {
+    "ruleId": 8,
+    "priority": 1,
+    "description": "get /fxQuotes/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/fxQuotes/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/fxQuotes/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.fxQuotes+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        },
+        "body": {
+          "GrpHdr": {
+            "MsgId": "20191122-123456",
+            "CreDtTm": "2019-11-22T12:34:56",
+            "NbOfTxs": 1,
+            "CtrlSum": 100,
+            "InitgPty": {
+              "Nm": "Initiating Party Name"
+            },
+            "MsgRcpt": {
+              "Nm": "Message Recipient Name"
+            }
+          },
+          "CdtTrfTxInf": {
+            "PmtId": {
+              "InstrId": "20191122-123456",
+              "EndToEndId": "20191122-123456"
+            },
+            "PmtTpInf": {
+              "InstrPrty": "NORM",
+              "CtgyPurp": "SUPP"
+            },
+            "IntrBkSttlmAmt": {
+              "Amt": 100,
+              "Ccy": "EUR"
+            },
+            "ChrgBr": "SLEV",
+            "Cdtr": {
+              "Nm": "Creditor Name"
+            },
+            "CdtrAcct": {
+              "Id": {
+                "IBAN": "BE71096123456769"
+              },
+              "Tp": {
+                "Cd": "CACC"
+              },
+              "Ccy": "EUR",
+              "Nm": "My account"
+            },
+            "CdtrAgt": {
+              "FinInstnId": {
+                "BICFI": "BNBABEBB"
+              }
+            },
+            "CdtrAgtAcct": {
+              "Id": {
+                "IBAN": "BE71096123456769"
+              },
+              "Tp": {
+                "Cd": "CACC"
+              },
+              "Ccy": "EUR",
+              "Nm": "My account"
+            },
+            "Dbtr": {
+              "Nm": "Debtor Name"
+            },
+            "DbtrAcct": {
+              "Id": {
+                "IBAN": "BE71096123456769"
+              },
+              "Tp": {
+                "Cd": "CACC"
+              },
+              "Ccy": "EUR",
+              "Nm": "My account"
+            },
+            "DbtrAgt": {
+              "FinInstnId": {
+                "BICFI": "BNBABEBB"
+              }
+            },
+            "DbtrAgtAcct": {
+              "Id": {
+                "IBAN": "BE71096123456769"
+              },
+              "Tp": {
+                "Cd": "CACC"
+              },
+              "Ccy": "EUR",
+              "Nm": "My account"
+            },
+            "RmtInf": {
+              "Ustrd": "Remittance Information"
+            },
+            "RgltryRptg": {
+              "Dbtr": {
+                "Nm": "Debtor Name"
+              },
+              "DbtrAcct": {
+                "Id": {
+                  "IBAN": "BE71096123456769"
+                },
+                "Tp": {
+                  "Cd": "CACC"
+                },
+                "Ccy": "EUR",
+                "Nm": "My account"
+              }
+            }
+          }
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 9,
+    "priority": 1,
+    "description": "post /fxQuotes",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/fxQuotes"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/fxQuotes/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.fxQuotes+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        },
+        "body": {
+          "GrpHdr": {
+            "MsgId": "20191122-123456",
+            "CreDtTm": "2019-11-22T12:34:56",
+            "NbOfTxs": 1,
+            "CtrlSum": 100,
+            "InitgPty": {
+              "Nm": "Initiating Party Name"
+            },
+            "MsgRcpt": {
+              "Nm": "Message Recipient Name"
+            }
+          },
+          "CdtTrfTxInf": {
+            "PmtId": {
+              "InstrId": "20191122-123456",
+              "EndToEndId": "20191122-123456"
+            },
+            "PmtTpInf": {
+              "InstrPrty": "NORM",
+              "CtgyPurp": "SUPP"
+            },
+            "IntrBkSttlmAmt": {
+              "Amt": 100,
+              "Ccy": "EUR"
+            },
+            "ChrgBr": "SLEV",
+            "Cdtr": {
+              "Nm": "Creditor Name"
+            },
+            "CdtrAcct": {
+              "Id": {
+                "IBAN": "BE71096123456769"
+              },
+              "Tp": {
+                "Cd": "CACC"
+              },
+              "Ccy": "EUR",
+              "Nm": "My account"
+            },
+            "CdtrAgt": {
+              "FinInstnId": {
+                "BICFI": "BNBABEBB"
+              }
+            },
+            "CdtrAgtAcct": {
+              "Id": {
+                "IBAN": "BE71096123456769"
+              },
+              "Tp": {
+                "Cd": "CACC"
+              },
+              "Ccy": "EUR",
+              "Nm": "My account"
+            },
+            "Dbtr": {
+              "Nm": "Debtor Name"
+            },
+            "DbtrAcct": {
+              "Id": {
+                "IBAN": "BE71096123456769"
+              },
+              "Tp": {
+                "Cd": "CACC"
+              },
+              "Ccy": "EUR",
+              "Nm": "My account"
+            },
+            "DbtrAgt": {
+              "FinInstnId": {
+                "BICFI": "BNBABEBB"
+              }
+            },
+            "DbtrAgtAcct": {
+              "Id": {
+                "IBAN": "BE71096123456769"
+              },
+              "Tp": {
+                "Cd": "CACC"
+              },
+              "Ccy": "EUR",
+              "Nm": "My account"
+            },
+            "RmtInf": {
+              "Ustrd": "Remittance Information"
+            },
+            "RgltryRptg": {
+              "Dbtr": {
+                "Nm": "Debtor Name"
+              },
+              "DbtrAcct": {
+                "Id": {
+                  "IBAN": "BE71096123456769"
+                },
+                "Tp": {
+                  "Cd": "CACC"
+                },
+                "Ccy": "EUR",
+                "Nm": "My account"
+              }
+            }
+          }
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 10,
+    "priority": 1,
+    "description": "get /fxTransfers/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/fxTransfers/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/fxTransfers/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        },
+        "body": {
+          "GrpHdr": {
+            "MsgId": 12345,
+            "CreDtTm": "2020-01-01T00:00:00Z",
+            "TxInfAndSts": {
+              "StsId": 12345,
+              "OrgnlInstrId": 12345,
+              "OrgnlEndToEndId": 12345,
+              "OrgnlTxId": 12345,
+              "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
+              "TxSts": "RJCT",
+              "StsRsnInf": {
+                "Rsn": "RSN",
+                "AddtlInf": "ADDITIONAL"
+              },
+              "AccptncDtTm": "2020-01-01T00:00:00Z",
+              "AcctSvcrRef": "ACCTSVCRREF",
+              "ClrSysRef": "CLRSYSREF",
+              "ExctnConf": "1234567890ABCDEF",
+              "SplmtryData": {
+                "PlcAndNm": "PLACE",
+                "Envlp": "ENVELOPE"
+              }
+            }
+          }
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 11,
+    "priority": 1,
+    "description": "post /fxTransfers",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "fspiop_iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/fxTransfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/fxTransfers/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        },
+        "body": {
+          "GrpHdr": {
+            "MsgId": 12345,
+            "CreDtTm": "2020-01-01T00:00:00Z",
+            "TxInfAndSts": {
+              "StsId": 12345,
+              "OrgnlInstrId": 12345,
+              "OrgnlEndToEndId": 12345,
+              "OrgnlTxId": 12345,
+              "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
+              "TxSts": "RJCT",
+              "StsRsnInf": {
+                "Rsn": "RSN",
+                "AddtlInf": "ADDITIONAL"
+              },
+              "AccptncDtTm": "2020-01-01T00:00:00Z",
+              "AcctSvcrRef": "ACCTSVCRREF",
+              "ClrSysRef": "CLRSYSREF",
+              "ExctnConf": "1234567890ABCDEF",
+              "SplmtryData": {
+                "PlcAndNm": "PLACE",
+                "Envlp": "ENVELOPE"
+              }
+            }
+          }
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+
   {
     "ruleId": 12,
     "priority": 1,

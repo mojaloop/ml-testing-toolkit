@@ -46,14 +46,28 @@ const handleQuoteIlp = (context, response) => {
     // const transactionObject = {
     //   mockData: 'This is a test data from self testing toolkit'
     // }
+
     const transactionObject = {
-      transactionId: context.request.body.transactionId,
-      quoteId: context.request.body.quoteId,
-      payee: context.request.body.payee,
-      payer: context.request.body.payer,
-      amount: response.body.transferAmount,
+      transactionId: context.request.body.transactionId || context.request.body.GrpHdr.CdtTrfTxInf.PmtId.EndToEndId,
+      quoteId: context.request.body.quoteId || context.request.body.GrpHdr.CdtTrfTxInf.PmtId.TxId,
+      payee: context.request.body.payee || {
+        partyIdInfo: {
+          partyIdType: context.request.body.GrpHdr.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id,
+          partyIdentifier: context.request.body.GrpHdr.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.SchmeNm.Prtry
+        }
+      },
+      payer: context.request.body.payer || {
+        partyIdInfo: {
+          partyIdType: context.request.body.GrpHdr.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id,
+          partyIdentifier: context.request.body.GrpHdr.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.SchmeNm.Prtry
+        }
+      },
+      amount: response.body.transferAmount || {
+        currency: context.request.body.GrpHdr.CdtTrfTxInf.IntrBkSttlmAmt.Ccy,
+        amount: context.request.body.GrpHdr.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount
+      },
       transactionType: context.request.body.transactionType,
-      note: response.body.note
+      note: response.body.note || context.request.body.GrpHdr.CdtTrfTxInf?.InstrForNxtAgt?.InstrInf || null
     }
     const { ilpPacket, fulfilment, condition } = ilpObj.getResponseIlp(transactionObject)
     response.body.ilpPacket = ilpPacket
