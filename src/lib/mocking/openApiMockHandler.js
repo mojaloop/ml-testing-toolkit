@@ -117,7 +117,10 @@ module.exports.handleRequest = async (req, h) => {
   // Pick a right api definition by searching for the requested resource in the definitions sequentially
   // TODO: This should be optimized by defining a hash table (object) of all the resources in all definition files on startup.
 
-  selectedApi = pickApiByMethodPathHostnameAndPrefix(req)
+  const pickedApis = pickApiByMethodPathHostnameAndPrefix(req)
+
+  // Let's pick the first one for now and swap it with the right version later
+  selectedApi = pickedApis.length > 0 ? pickedApis[0] : null
 
   if (!selectedApi) {
     customLogger.logMessage('error', 'Resource not found', { request: req })
@@ -131,10 +134,7 @@ module.exports.handleRequest = async (req, h) => {
     customLogger.logMessage('info', 'Trimmed prefix from request path: ' + selectedApi.prefix, { request: req })
   }
 
-  if (selectedApi.type === 'fspiop' && (await Config.getUserConfig(req.customInfo.user)).VERSIONING_SUPPORT_ENABLE) {
-    const fspiopApis = apis.filter(item => {
-      return item.type === 'fspiop'
-    })
+  if ((selectedApi.type === 'fspiop' || selectedApi.type === 'iso20022') && (await Config.getUserConfig(req.customInfo.user)).VERSIONING_SUPPORT_ENABLE) {
     // Validate accept header for POST & GET.
     if (req.method === 'post' || req.method === 'get') {
       // Validate the accept header here
@@ -150,10 +150,10 @@ module.exports.handleRequest = async (req, h) => {
       }
     }
     // Pick the right API object based on the major and minor versions (Version negotiation as per the API Definition file)
-    const versionNegotiationResult = OpenApiVersionTools.negotiateVersion(req, fspiopApis)
+    const versionNegotiationResult = OpenApiVersionTools.negotiateVersion(req, pickedApis)
     if (versionNegotiationResult.negotiationFailed) {
       // Create extensionList property as per the API specification document with supported versions
-      const extensionList = fspiopApis.map(item => {
+      const extensionList = pickedApis.map(item => {
         return {
           key: item.majorVersion + '',
           value: item.minorVersion + ''
@@ -183,31 +183,46 @@ module.exports.handleRequest = async (req, h) => {
 }
 
 const pickApiByMethodPathHostnameAndPrefix = (req) => {
-  let pickedApis
+  let potentialApis = apis
+
+  // Match path
   const matchedPrefixApis = apis.filter(item => {
     return item.prefix ? req.path.startsWith(item.prefix) : false
   })
   if (matchedPrefixApis.length > 0) {
-    pickedApis = matchedPrefixApis.filter(item => {
+    return matchedPrefixApis.filter(item => {
       return item.openApiBackendObject.matchOperation({ ...req, path: req.path.slice(item.prefix.length) })
     })
   } else {
-    const apisWithoutPrefix = apis.filter(item => {
+    // apis without prefix
+    potentialApis = potentialApis.filter(item => {
       return !item.prefix
-    })
-    pickedApis = apisWithoutPrefix.filter(item => {
-      return item.openApiBackendObject.matchOperation(req)
     })
   }
 
   // Match hostnames
-  const matchedHostnameApis = pickedApis.filter(item => {
+  const matchedHostnameApis = potentialApis.filter(item => {
     return item.hostnames && req.info && req.info.hostname ? item.hostnames.includes(req.info.hostname) : false
   })
-  pickedApis = matchedHostnameApis.length > 0 ? matchedHostnameApis : pickedApis
+  potentialApis = matchedHostnameApis.length > 0 ? matchedHostnameApis : potentialApis.filter(item => !item.hostnames || item.hostnames.length === 0)
 
-  // Return the first api item if multiple APIs matched
-  return pickedApis[0]
+  // FSPIOP and ISO20022 version negotiation
+  let headerToCompare = req.headers['content-type']
+  if (req.method === 'get') {
+    headerToCompare = req.headers.accept
+  }
+  const headerComparisonResult = OpenApiVersionTools.parseAcceptHeader(headerToCompare)
+  if (headerComparisonResult.apiType === 'fspiop' || headerComparisonResult.apiType === 'iso20022') {
+    potentialApis = potentialApis.filter(item => {
+      return item.type === headerComparisonResult.apiType
+    })
+  }
+
+  const pickedApis = potentialApis.filter(item => {
+    return item.openApiBackendObject.matchOperation(req)
+  })
+
+  return pickedApis
 }
 
 const errorResponseBuilder = (errorCode, errorDescription, additionalProperties = null) => {

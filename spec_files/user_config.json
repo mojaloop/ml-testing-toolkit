@@ -1,6 +1,6 @@
 {
   "VERSION": 1,
-  "CALLBACK_ENDPOINT": "http://mojaloop-testing-toolkit:4040",
+  "CALLBACK_ENDPOINT": "http://localhost:4040",
   "CALLBACK_RESOURCE_ENDPOINTS": {
     "enabled": false,
     "endpoints": [
