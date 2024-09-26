@@ -117,7 +117,10 @@ module.exports.handleRequest = async (req, h) => {
   // Pick a right api definition by searching for the requested resource in the definitions sequentially
   // TODO: This should be optimized by defining a hash table (object) of all the resources in all definition files on startup.
 
-  selectedApi = pickApiByMethodPathHostnameAndPrefix(req)
+  const pickedApis = pickApiByMethodPathHostnameAndPrefix(req)
+
+  // Let's pick the first one for now and swap it with the right version later
+  selectedApi = pickedApis.length > 0 ? pickedApis[0] : null
 
   if (!selectedApi) {
     customLogger.logMessage('error', 'Resource not found', { request: req })
@@ -131,10 +134,7 @@ module.exports.handleRequest = async (req, h) => {
     customLogger.logMessage('info', 'Trimmed prefix from request path: ' + selectedApi.prefix, { request: req })
   }
 
-  if (selectedApi.type === 'fspiop' && (await Config.getUserConfig(req.customInfo.user)).VERSIONING_SUPPORT_ENABLE) {
-    const fspiopApis = apis.filter(item => {
-      return item.type === 'fspiop'
-    })
+  if ((selectedApi.type === 'fspiop' || selectedApi.type === 'iso20022') && (await Config.getUserConfig(req.customInfo.user)).VERSIONING_SUPPORT_ENABLE) {
     // Validate accept header for POST & GET.
     if (req.method === 'post' || req.method === 'get') {
       // Validate the accept header here
@@ -150,10 +150,10 @@ module.exports.handleRequest = async (req, h) => {
       }
     }
     // Pick the right API object based on the major and minor versions (Version negotiation as per the API Definition file)
-    const versionNegotiationResult = OpenApiVersionTools.negotiateVersion(req, fspiopApis)
+    const versionNegotiationResult = OpenApiVersionTools.negotiateVersion(req, pickedApis)
     if (versionNegotiationResult.negotiationFailed) {
       // Create extensionList property as per the API specification document with supported versions
-      const extensionList = fspiopApis.map(item => {
+      const extensionList = pickedApis.map(item => {
         return {
           key: item.majorVersion + '',
           value: item.minorVersion + ''
@@ -222,9 +222,7 @@ const pickApiByMethodPathHostnameAndPrefix = (req) => {
     return item.openApiBackendObject.matchOperation(req)
   })
 
-
-  // Return the first api item if multiple APIs matched
-  return pickedApis[0]
+  return pickedApis
 }
 
 const errorResponseBuilder = (errorCode, errorDescription, additionalProperties = null) => {
