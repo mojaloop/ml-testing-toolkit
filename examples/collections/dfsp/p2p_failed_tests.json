@@ -673,8 +673,8 @@
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -813,8 +813,8 @@
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -917,8 +917,8 @@
             "Content-Type": "{$inputs.contentType}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -1021,8 +1021,8 @@
             "Content-Type": "{$inputs.contentType}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -1125,8 +1125,8 @@
             "Content-Type": "{$inputs.contentType}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -1236,8 +1236,8 @@
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -1377,8 +1377,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+xml;version=5.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -1482,8 +1482,8 @@
             "Accept": "application/vnd.interoperability.quotes+xml;version=1.5"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -1587,8 +1587,8 @@
             "Date": "Th12312412"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -1691,8 +1691,8 @@
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -2228,8 +2228,8 @@
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -2680,7 +2680,7 @@
           },
           "body": {
             "quoteId": "",
-            "transactionId": "{$function.generic.generateUUID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -2784,7 +2784,7 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
             "transactionId": "",
             "payer": {
               "partyIdInfo": {
@@ -2889,8 +2889,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": "",
               "personalInfo": {
@@ -2990,8 +2990,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -3095,8 +3095,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -3200,8 +3200,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -3305,8 +3305,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -3410,8 +3410,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -3515,8 +3515,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -3626,8 +3626,8 @@
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -4478,8 +4478,8 @@
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -5026,8 +5026,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "IOPT",
@@ -5131,7 +5131,7 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
             "transactionId": "12312312",
             "payer": {
               "partyIdInfo": {
@@ -5237,7 +5237,7 @@
           },
           "body": {
             "quoteId": "1231412",
-            "transactionId": "{$function.generic.generateUUID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -5341,8 +5341,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -5446,8 +5446,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -5551,8 +5551,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -5656,8 +5656,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -5761,8 +5761,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -5866,8 +5866,8 @@
             "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -5977,8 +5977,8 @@
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -6117,8 +6117,8 @@
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -6258,8 +6258,8 @@
             "FSPIOP-HTTP-Method": "GET"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -6404,8 +6404,8 @@
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -6643,8 +6643,8 @@
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
           "body": {
-            "quoteId": "{$function.generic.generateUUID}",
-            "transactionId": "{$function.generic.generateUUID}",
+            "quoteId": "{$function.generic.generateID}",
+            "transactionId": "{$function.generic.generateID}",
             "payer": {
               "partyIdInfo": {
                 "partyIdType": "{$inputs.fromIdType}",
@@ -7132,10 +7132,10 @@
             "asynchronous": true
           },
           "operationPath": "/transactionRequests/{ID}",
-          "path": "/transactionRequests/{$function.generic.generateUUID}",
+          "path": "/transactionRequests/{$function.generic.generateID}",
           "method": "get",
           "params": {
-            "ID": "{$function.generic.generateUUID}"
+            "ID": "{$function.generic.generateID}"
           },
           "headers": {
             "Content-Type": "application/vnd.interoperability.transactionRequests+json;version=1",

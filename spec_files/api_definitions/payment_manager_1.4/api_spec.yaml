@@ -204,7 +204,7 @@ components:
         - SEND
         - RECEIVE
       description: SEND for send amount. RECEIVE for receive amount.
-    
+
     currency:
       maxLength: 3
       minLength: 3
@@ -487,54 +487,54 @@ components:
           type: string
           enum:
             - INBOUND
-        quoteRequest: 
+        quoteRequest:
           type: object
-          properties: 
-            headers: 
+          properties:
+            headers:
               type: object
-            body: 
+            body:
               $ref: '#/components/schemas/mojaloopQuoteRequestObject'
-        quoteResponse: 
+        quoteResponse:
           type: object
-          properties: 
-            headers: 
+          properties:
+            headers:
               type: object
-            body: 
+            body:
               type: string
 #              $ref: '#/components/schemas/mojaloopQuoteResponseObject'
 #              type: object
-        prepare: 
+        prepare:
           type: object
-          properties: 
-            body: 
+          properties:
+            body:
               type: object
-              properties: 
-                transferId: 
+              properties:
+                transferId:
                   $ref: '#/components/schemas/transferId'
-                payeeFsp: 
+                payeeFsp:
                   $ref: '#/components/schemas/fspId'
-                payerFsp: 
+                payerFsp:
                   $ref: '#/components/schemas/fspId'
-                amount: 
+                amount:
                   $ref: '#/components/schemas/mojaloopMoney'
-                ilpPacket: 
+                ilpPacket:
                   $ref: '#/components/schemas/ilpPacket'
-                condition: 
+                condition:
                   $ref: '#/components/schemas/ilpCondition'
-                expiration: 
+                expiration:
                   $ref: '#/components/schemas/timestamp'
-                extensionList:  
+                extensionList:
                   $ref: '#/components/schemas/extensionList'
               required:
                 - amount
-            headers: 
+            headers:
               type: object
-        fulfil: 
+        fulfil:
           type: object
-          properties: 
-            headers: 
+          properties:
+            headers:
               type: object
-            body: 
+            body:
               type: string
 #              type: object
 #              properties:
@@ -544,33 +544,33 @@ components:
 #                  $ref: '#/components/schemas/mojaloopTransferState'
 #                fulfilment:
 #                  $ref: '#/components/schemas/ilpFulfilment'
-#                extensionList:  
+#                extensionList:
 #                  $ref: '#/components/schemas/extensionList'
-        quote: 
+        quote:
           type: object
-          properties: 
-            request: 
+          properties:
+            request:
               $ref: '#/components/schemas/mojaloopQuoteRequestObject'
-            internalRequest: 
+            internalRequest:
               $ref: '#/components/schemas/quoteRequest'
-            response: 
+            response:
               $ref: '#/components/schemas/quoteResponse'
-            mojaloopResponse: 
+            mojaloopResponse:
               $ref: '#/components/schemas/mojaloopQuoteResponseObject'
-            fulfilment: 
+            fulfilment:
               $ref: '#/components/schemas/ilpFulfilment'
-        currentState: 
+        currentState:
           $ref: '#/components/schemas/transferStatus'
         lastError:
           $ref: '#/components/schemas/transferError'
-        initiatedTimestamp: 
+        initiatedTimestamp:
           $ref: '#/components/schemas/timestamp'
-        finalNotification: 
+        finalNotification:
           type: object
-          properties: 
-            completedTimestamp: 
+          properties:
+            completedTimestamp:
               $ref: '#/components/schemas/timestamp'
-            transferState: 
+            transferState:
               $ref: '#/components/schemas/transferState'
             extensionList:
               $ref: '#/components/schemas/extensionList'
@@ -681,9 +681,9 @@ components:
           $ref: '#/components/schemas/errorInformation'
 
     mojaloopIdentifier:
-      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
       type: string
-      description: A Mojaloop API identifier (UUID).
+      description: A Mojaloop API identifier (UUID/ULID).
 
     mojaloopMoney:
       title: Money
@@ -698,33 +698,33 @@ components:
         - currency
         - amount
 
-    mojaloopQuoteRequestObject: 
+    mojaloopQuoteRequestObject:
       type: object
-      properties: 
-        quoteId: 
+      properties:
+        quoteId:
           $ref: '#/components/schemas/quoteId'
-        transactionId: 
+        transactionId:
           $ref: '#/components/schemas/transactionId'
-        amountType: 
+        amountType:
           $ref: '#/components/schemas/amountType'
-        amount: 
+        amount:
           $ref: '#/components/schemas/mojaloopMoney'
-        fees: 
+        fees:
           $ref: '#/components/schemas/mojaloopMoney'
-        expiration: 
+        expiration:
           $ref: '#/components/schemas/timestamp'
-        payer: 
+        payer:
           $ref: '#/components/schemas/Party'
-        payee: 
+        payee:
           $ref: '#/components/schemas/Party'
-        transactionType: 
+        transactionType:
           $ref: '#/components/schemas/mojaloopTransactionType'
-        note: 
+        note:
           type: string
           minLength: 1
           maxLength: 128
           description: An optional note associated with the requested transfer.
-        extensionList:  
+        extensionList:
           $ref: '#/components/schemas/extensionList'
       required:
         - quoteId
@@ -735,16 +735,16 @@ components:
         - payer
         - transactionType
 
-    mojaloopQuoteResponseObject: 
+    mojaloopQuoteResponseObject:
       type: object
       properties:
         transferAmount:
           $ref: '#/components/schemas/mojaloopMoney'
         expiration:
           $ref: '#/components/schemas/timestamp'
-        ilpPacket: 
+        ilpPacket:
           $ref: '#/components/schemas/ilpPacket'
-        condition: 
+        condition:
           $ref: '#/components/schemas/ilpCondition'
         payeeReceiveAmount:
           $ref: '#/components/schemas/mojaloopMoney'
@@ -843,7 +843,7 @@ components:
         partySubIdOrType:
           type: string
           minLength: 1
-          maxLength: 128          
+          maxLength: 128
           description: A sub-identifier or sub-type for the Party.
         fspId:
           $ref: '#/components/schemas/fspId'
@@ -911,9 +911,9 @@ components:
         - condition
 
     quoteId:
-      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
       type: string
-      description: A Mojaloop API quote identifier (UUID).
+      description: A Mojaloop API quote identifier (UUID/ULID).
 
     quoteRequest:
       type: object
@@ -997,7 +997,7 @@ components:
           $ref: '#/components/schemas/timestamp'
         geoCode:
           $ref: '#/components/schemas/geoCode'
-        extensionList:  
+        extensionList:
           $ref: '#/components/schemas/extensionList'
 
     timestamp:
@@ -1006,7 +1006,7 @@ components:
       description: An ISO-8601 formatted timestamp.
 
     transactionId:
-      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
       type: string
       description: ID of the transaction, the ID is decided by the Payer FSP during the creation of the quote.
 
@@ -1051,7 +1051,7 @@ components:
     #         - false
     #     amount:
     #       $ref: '#/components/schemas/money'
-    #     to: 
+    #     to:
     #       $ref: '#/components/schemas/transferParty'
 
     # transferContinuationAcceptQuote:
@@ -1066,7 +1066,7 @@ components:
     #         - false
     #     amount:
     #       $ref: '#/components/schemas/money'
-    #     to: 
+    #     to:
     #       $ref: '#/components/schemas/transferParty'
 
     transferContinuationAccept:
@@ -1084,7 +1084,7 @@ components:
             - false
         amount:
           $ref: '#/components/schemas/money'
-        to: 
+        to:
           $ref: '#/components/schemas/transferParty'
 
     transferError:
@@ -1113,9 +1113,9 @@ components:
         - transferState
 
     transferId:
-      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
       type: string
-      description: A Mojaloop API transfer identifier (UUID).
+      description: A Mojaloop API transfer identifier (UUID/ULID).
 
     transferParty:
       type: object
@@ -1384,6 +1384,6 @@ components:
       in: path
       required: true
       schema:
-        pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+        pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
         type: string
       description: Transfer identifier.

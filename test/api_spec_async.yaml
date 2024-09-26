@@ -930,13 +930,12 @@ components:
       title: CorrelationId
       type: string
       pattern: >-
-        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[0-9A-HJKMNP-TV-Z]{26}$
       description: >-
-        Identifier that correlates all messages of the same sequence. The API
-        data type UUID (Universally Unique Identifier) is a JSON String in
-        canonical format, conforming to RFC 4122, that is restricted by a
-        regular expression for interoperability reasons. An UUID is always 36
-        characters long, 32 hexadecimal symbols and 4 dashes (‘-‘).
+        Identifier that correlates all messages of the same sequence.
+        The supported identifiers formats are for
+        lowercase [UUID](https://datatracker.ietf.org/doc/html/rfc9562) and
+        uppercase [ULID](https://github.com/ulid/spec)
     Currency:
       title: CurrencyEnum
       description: >-
@@ -1137,7 +1136,7 @@ components:
         restricted by a regular expression for interoperability reasons. The
         format is according to ISO 8601, expressed in a combined date, time and
         time zone format. A more readable version of the format is
-        yyyy-MM-ddTHH:mm:ss.SSS[-HH:MM]. Examples - 
+        yyyy-MM-ddTHH:mm:ss.SSS[-HH:MM]. Examples -
         "2016-05-24T08:38:08.699-04:00", "2016-05-24T08:38:08.699Z" (where Z
         indicates Zulu time zone, same as UTC).
     ErrorCode:
