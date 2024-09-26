@@ -183,28 +183,45 @@ module.exports.handleRequest = async (req, h) => {
 }
 
 const pickApiByMethodPathHostnameAndPrefix = (req) => {
-  let pickedApis
+  let potentialApis = apis
+
+  // Match path
   const matchedPrefixApis = apis.filter(item => {
     return item.prefix ? req.path.startsWith(item.prefix) : false
   })
   if (matchedPrefixApis.length > 0) {
-    pickedApis = matchedPrefixApis.filter(item => {
+    return matchedPrefixApis.filter(item => {
       return item.openApiBackendObject.matchOperation({ ...req, path: req.path.slice(item.prefix.length) })
     })
   } else {
-    const apisWithoutPrefix = apis.filter(item => {
+    // apis without prefix
+    potentialApis = potentialApis.filter(item => {
       return !item.prefix
-    })
-    pickedApis = apisWithoutPrefix.filter(item => {
-      return item.openApiBackendObject.matchOperation(req)
     })
   }
 
   // Match hostnames
-  const matchedHostnameApis = pickedApis.filter(item => {
+  const matchedHostnameApis = potentialApis.filter(item => {
     return item.hostnames && req.info && req.info.hostname ? item.hostnames.includes(req.info.hostname) : false
   })
-  pickedApis = matchedHostnameApis.length > 0 ? matchedHostnameApis : pickedApis
+  potentialApis = matchedHostnameApis.length > 0 ? matchedHostnameApis : potentialApis.filter(item => !item.hostnames || item.hostnames.length === 0)
+
+  // FSPIOP and ISO20022 version negotiation
+  let headerToCompare = req.headers['content-type']
+  if (req.method === 'get') {
+    headerToCompare = req.headers.accept
+  }
+  const headerComparisonResult = OpenApiVersionTools.parseAcceptHeader(headerToCompare)
+  if(headerComparisonResult.apiType === 'fspiop' || headerComparisonResult.apiType === 'iso20022') {
+    potentialApis = potentialApis.filter(item => {
+      return item.type === headerComparisonResult.apiType
+    })
+  }
+
+  const pickedApis = potentialApis.filter(item => {
+    return item.openApiBackendObject.matchOperation(req)
+  })
+
 
   // Return the first api item if multiple APIs matched
   return pickedApis[0]

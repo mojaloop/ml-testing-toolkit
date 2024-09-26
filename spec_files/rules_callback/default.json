@@ -6,7 +6,7 @@
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
-      "type": "fspiop_iso20022",
+      "type": "iso20022",
       "asynchronous": true,
       "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
       "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
@@ -52,7 +52,7 @@
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
-      "type": "fspiop_iso20022",
+      "type": "iso20022",
       "asynchronous": true,
       "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
       "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
@@ -98,7 +98,7 @@
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
-      "type": "fspiop_iso20022",
+      "type": "iso20022",
       "asynchronous": true,
       "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
       "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
@@ -144,7 +144,7 @@
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
-      "type": "fspiop_iso20022",
+      "type": "iso20022",
       "asynchronous": true,
       "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
       "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
@@ -191,7 +191,7 @@
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
-      "type": "fspiop_iso20022",
+      "type": "iso20022",
       "asynchronous": true,
       "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
       "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
@@ -237,7 +237,7 @@
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
-      "type": "fspiop_iso20022",
+      "type": "iso20022",
       "asynchronous": true,
       "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
       "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
@@ -327,7 +327,7 @@
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
-      "type": "fspiop_iso20022",
+      "type": "iso20022",
       "asynchronous": true,
       "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
       "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
@@ -371,7 +371,7 @@
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
-      "type": "fspiop_iso20022",
+      "type": "iso20022",
       "asynchronous": true,
       "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
       "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
@@ -466,7 +466,7 @@
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
-      "type": "fspiop_iso20022",
+      "type": "iso20022",
       "asynchronous": true,
       "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
       "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
@@ -563,7 +563,7 @@
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
-      "type": "fspiop_iso20022",
+      "type": "iso20022",
       "asynchronous": true,
       "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
       "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",

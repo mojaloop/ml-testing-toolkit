@@ -121,9 +121,10 @@ const parseAcceptHeader = (acceptHeader) => {
     return null
   }
   return {
-    resource: parsedArray[1],
-    majorVersion: +parsedArray[6],
-    minorVersion: +parsedArray[8]
+    apiType: parsedArray[2] ? parsedArray[1] : 'fspiop',
+    resource: parsedArray[2] ? parsedArray[2] : parsedArray[1],
+    majorVersion: +parsedArray[7],
+    minorVersion: +parsedArray[9]
   }
 }
 
