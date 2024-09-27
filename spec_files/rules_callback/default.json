@@ -389,159 +389,6 @@
               "FinInstnId": {
                 "BICFI": "BBBBBBBB"
               }
-            },
-            "CdtTrfTxInf": {
-              "VrfctnOfTerms": {
-                "IlpV4PrepPacket": "AYIDBQAAAAAAACcQJGcucGF5ZWVmc3AubXNpc2RuLnt7cmVjZWl2ZXJtc2lzZG59fYIC1GV5SjBjbUZ1YzJGamRHbHZia2xrSWpvaVptVXhNREU0Wm1NdE1EaGxZeTAwWWpJM0xUbGpZalF0TnpjMk9URTFNR00zT1dKaklpd2ljWFZ2ZEdWSlpDSTZJbVpsTVRBeE9HWmpMVEE0WldNdE5HSXlOeTA1WTJJMExUYzNOamt4TlRCak56bGlZeUlzSW5CaGVXVmxJanA3SW5CaGNuUjVTV1JKYm1adklqcDdJbkJoY25SNVNXUlVlWEJsSWpvaVRWTkpVMFJPSWl3aWNHRnlkSGxKWkdWdWRHbG1hV1Z5SWpvaWUzdHlaV05sYVhabGNrMVRTVk5FVG4xOUlpd2labk53U1dRaU9pSndZWGxsWldaemNDSjlmU3dpY0dGNVpYSWlPbnNpY0dGeWRIbEpaRWx1Wm04aU9uc2ljR0Z5ZEhsSlpGUjVjR1VpT2lKTlUwbFRSRTRpTENKd1lYSjBlVWxrWlc1MGFXWnBaWElpT2lJeU56Y3hNemd3TXprd05TSXNJbVp6Y0Vsa0lqb2ljR0Y1WlhKbWMzQWlmU3dpY0dWeWMyOXVZV3hKYm1adklqcDdJbU52YlhCc1pYaE9ZVzFsSWpwN0ltWnBjbk4wVG1GdFpTSTZJazFoZEhNaUxDSnNZWE4wVG1GdFpTSTZJa2hoWjIxaGJpSjlMQ0prWVhSbFQyWkNhWEowYUNJNklqRTVPRE10TVRBdE1qVWlmWDBzSW1GdGIzVnVkQ0k2ZXlKaGJXOTFiblFpT2lJeE1EQWlMQ0pqZFhKeVpXNWplU0k2SWxWVFJDSjlMQ0owY21GdWMyRmpkR2x2YmxSNWNHVWlPbnNpYzJObGJtRnlhVzhpT2lKVVVrRk9VMFpGVWlJc0ltbHVhWFJwWVhSdmNpSTZJbEJCV1VWU0lpd2lhVzVwZEdsaGRHOXlWSGx3WlNJNklrTlBUbE5WVFVWU0luMTkA"
-              },
-              "PmtId": {
-                "TxId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.TxId}",
-                "InstrId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.InstrId}",
-                "EndToEndId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.EndToEndId}"
-              },
-              "PmtTpInf": {
-                "InstrPrty": "NORM",
-                "SvcLvl": {
-                  "Cd": "SEPA"
-                },
-                "LclInstrm": {
-                  "Cd": "CH03"
-                },
-                "CtgyPurp": {
-                  "Cd": "SUPP"
-                }
-              },
-              "IntrBkSttlmAmt": {
-                "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}",
-                "ActiveCurrencyAndAmount": "{$request.body.GrpHdr.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount}"
-              },
-              "InstdAmt": {
-                "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.InstdAmt.Ccy}",
-                "ActiveOrHistoricCurrencyAndAmount": "{$request.body.GrpHdr.CdtTrfTxInf.InstdAmt.ActiveCurrencyAndAmount}"
-              },
-              "ChrgBr": "SLEV",
-              "ChrgsInf": {
-                "Amt": {
-                  "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.ChrgsInf.Amt.Ccy}",
-                  "ActiveOrHistoricCurrencyAndAmount": "{$request.body.GrpHdr.CdtTrfTxInf.ChrgsInf.Amt.ActiveCurrencyAndAmount}"
-                },
-                "Agt": {
-                  "FinInstnId": {
-                    "Othr": {
-                      "Id": "123456789",
-                      "SchmeNm": {
-                        "Cd": "BBA",
-                        "Prtry": "Party Identification Scheme Name"
-                      }
-                    }
-                  }
-                }
-              },
-              "Cdtr": {
-                "Nm": "{$request.body.GrpHdr.CdtTrfTxInf.Cdtr.Nm}",
-                "Id": {
-                  "OrgId": {
-                    "Othr": {
-                      "Id": "{$request.body.GrpHdr.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id}",
-                      "SchmeNm": {
-                        "Prtry": "{$request.body.GrpHdr.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.SchmeNm.Prtry}"
-                      }
-                    }
-                  }
-                }
-              },
-              "Dbtr": {
-                "Nm": "{$request.body.GrpHdr.CdtTrfTxInf.Dbtr.Nm}",
-                "Id": {
-                  "OrgId": {
-                    "Othr": {
-                      "Id":"{$request.body.GrpHdr.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id}",
-                      "SchmeNm": {
-                        "Prtry": "{$request.body.GrpHdr.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.SchmeNm.Prtry}"
-                      }
-                    }
-                  }
-                }
-              },
-              "DbtrAgt": {
-                "FinInstnId": {
-                  "Othr": {
-                    "Id": "{$request.headers['FSPIOP-Source']}",
-                    "SchmeNm": {
-                      "Cd": "BDID"
-                    }
-                  }
-                }
-              },
-              "CdtrAgt": {
-                "FinInstnId": {
-                 "Othr": {
-                    "Id": "{$request.headers['FSPIOP-Destination']}",
-                    "SchmeNm": {
-                      "Cd": "BDID"
-                    }
-                  }
-                }
-              },
-              "DbtrAcct": {
-                "Id": {
-                  "IBAN": "{$request.body.GrpHdr.CdtTrfTxInf.DbtrAcct.Id.IBAN}",
-                  "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.DbtrAcct.Id.Ccy}"
-                }
-              },
-              "DbtrAgtAcct": {
-                "Id": {
-                  "IBAN": "{$request.body.GrpHdr.CdtTrfTxInf.DbtrAgtAcct.Id.IBAN}",
-                  "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.DbtrAgtAcct.Id.Ccy}"
-                }
-              },
-              "CdtrAcct": {
-                "Id": {
-                  "IBAN": "{$request.body.GrpHdr.CdtTrfTxInf.CdtrAcct.Id.IBAN}",
-                  "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.CdtrAcct.Id.Ccy}"
-                }
-              },
-              "CdtrAgtAcct": {
-                "Id": {
-                  "IBAN": "{$request.body.GrpHdr.CdtTrfTxInf.CdtrAgtAcct.Id.IBAN}",
-                  "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.CdtrAgtAcct.Id.Ccy}"
-                }
-              },
-              "UltmtCdtr": {
-                "Nm": "Ultimate Creditor Name",
-                "PstlAdr": {
-                  "AdrTp": {
-                    "Cd": "ADDR"
-                  },
-                  "Dept": "Department",
-                  "SubDept": "SubDepartment",
-                  "StrtNm": "StreetName",
-                  "BldgNb": "BuildingNumber",
-                  "PstCd": "PostCode",
-                  "TwnNm": "TownName",
-                  "CtrySubDvsn": "CountrySubDivision",
-                  "Ctry": "AZ"
-                },
-                "Id": {
-                  "OrgId": {
-                    "AnyBIC": "BBBBBBBB",
-                    "Othr": {
-                      "Id": "123456789",
-                      "SchmeNm": {
-                        "Cd": "IBAN",
-                        "Prtry": "Party Identification Scheme Name"
-                      }
-                    }
-                  }
-                }
-              },
-              "RgltryRptg": {
-                "DbtCdtRptgInd": "CRED",
-                "Authrty": {
-                  "Nm": "Swiss National Bank",
-                  "Ctry": "CH"
-                }
-              }
             }
           },
           "CdtTrfTxInf": {
@@ -549,9 +396,9 @@
               "IlpV4PrepPacket": "AYIDBQAAAAAAACcQJGcucGF5ZWVmc3AubXNpc2RuLnt7cmVjZWl2ZXJtc2lzZG59fYIC1GV5SjBjbUZ1YzJGamRHbHZia2xrSWpvaVptVXhNREU0Wm1NdE1EaGxZeTAwWWpJM0xUbGpZalF0TnpjMk9URTFNR00zT1dKaklpd2ljWFZ2ZEdWSlpDSTZJbVpsTVRBeE9HWmpMVEE0WldNdE5HSXlOeTA1WTJJMExUYzNOamt4TlRCak56bGlZeUlzSW5CaGVXVmxJanA3SW5CaGNuUjVTV1JKYm1adklqcDdJbkJoY25SNVNXUlVlWEJsSWpvaVRWTkpVMFJPSWl3aWNHRnlkSGxKWkdWdWRHbG1hV1Z5SWpvaWUzdHlaV05sYVhabGNrMVRTVk5FVG4xOUlpd2labk53U1dRaU9pSndZWGxsWldaemNDSjlmU3dpY0dGNVpYSWlPbnNpY0dGeWRIbEpaRWx1Wm04aU9uc2ljR0Z5ZEhsSlpGUjVjR1VpT2lKTlUwbFRSRTRpTENKd1lYSjBlVWxrWlc1MGFXWnBaWElpT2lJeU56Y3hNemd3TXprd05TSXNJbVp6Y0Vsa0lqb2ljR0Y1WlhKbWMzQWlmU3dpY0dWeWMyOXVZV3hKYm1adklqcDdJbU52YlhCc1pYaE9ZVzFsSWpwN0ltWnBjbk4wVG1GdFpTSTZJazFoZEhNaUxDSnNZWE4wVG1GdFpTSTZJa2hoWjIxaGJpSjlMQ0prWVhSbFQyWkNhWEowYUNJNklqRTVPRE10TVRBdE1qVWlmWDBzSW1GdGIzVnVkQ0k2ZXlKaGJXOTFiblFpT2lJeE1EQWlMQ0pqZFhKeVpXNWplU0k2SWxWVFJDSjlMQ0owY21GdWMyRmpkR2x2YmxSNWNHVWlPbnNpYzJObGJtRnlhVzhpT2lKVVVrRk9VMFpGVWlJc0ltbHVhWFJwWVhSdmNpSTZJbEJCV1VWU0lpd2lhVzVwZEdsaGRHOXlWSGx3WlNJNklrTlBUbE5WVFVWU0luMTkA"
             },
             "PmtId": {
-              "TxId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.TxId}",
-              "InstrId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.InstrId}",
-              "EndToEndId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.EndToEndId}"
+              "TxId": "{$request.body.CdtTrfTxInf.PmtId.TxId}",
+              "InstrId": "{$request.body.CdtTrfTxInf.PmtId.InstrId}",
+              "EndToEndId": "{$request.body.CdtTrfTxInf.PmtId.EndToEndId}"
             },
             "PmtTpInf": {
               "InstrPrty": "NORM",
@@ -566,18 +413,18 @@
               }
             },
             "IntrBkSttlmAmt": {
-              "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}",
-              "ActiveCurrencyAndAmount": "{$request.body.GrpHdr.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount}"
+              "Ccy": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}",
+              "ActiveCurrencyAndAmount": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount}"
             },
             "InstdAmt": {
-              "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.InstdAmt.Ccy}",
-              "ActiveOrHistoricCurrencyAndAmount": "{$request.body.GrpHdr.CdtTrfTxInf.InstdAmt.ActiveCurrencyAndAmount}"
+              "Ccy": "{$request.body.CdtTrfTxInf.InstdAmt.Ccy}",
+              "ActiveOrHistoricCurrencyAndAmount": "{$request.body.CdtTrfTxInf.InstdAmt.ActiveOrHistoricCurrencyAndAmount}"
             },
             "ChrgBr": "SLEV",
             "ChrgsInf": {
               "Amt": {
-                "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.ChrgsInf.Amt.Ccy}",
-                "ActiveOrHistoricCurrencyAndAmount": "{$request.body.GrpHdr.CdtTrfTxInf.ChrgsInf.Amt.ActiveCurrencyAndAmount}"
+                "Ccy": "{$request.body.CdtTrfTxInf.ChrgsInf.Amt.Ccy}",
+                "ActiveOrHistoricCurrencyAndAmount": "{$request.body.CdtTrfTxInf.ChrgsInf.Amt.ActiveOrHistoricCurrencyAndAmount}"
               },
               "Agt": {
                 "FinInstnId": {
@@ -592,26 +439,26 @@
               }
             },
             "Cdtr": {
-              "Nm": "{$request.body.GrpHdr.CdtTrfTxInf.Cdtr.Nm}",
+              "Nm": "{$request.body.CdtTrfTxInf.Cdtr.Nm}",
               "Id": {
                 "OrgId": {
                   "Othr": {
-                    "Id": "{$request.body.GrpHdr.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id}",
+                    "Id": "{$request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id}",
                     "SchmeNm": {
-                      "Prtry": "{$request.body.GrpHdr.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.SchmeNm.Prtry}"
+                      "Prtry": "{$request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.SchmeNm.Prtry}"
                     }
                   }
                 }
               }
             },
             "Dbtr": {
-              "Nm": "{$request.body.GrpHdr.CdtTrfTxInf.Dbtr.Nm}",
+              "Nm": "{$request.body.CdtTrfTxInf.Dbtr.Nm}",
               "Id": {
                 "OrgId": {
                   "Othr": {
-                    "Id":"{$request.body.GrpHdr.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id}",
+                    "Id":"{$request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id}",
                     "SchmeNm": {
-                      "Prtry": "{$request.body.GrpHdr.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.SchmeNm.Prtry}"
+                      "Prtry": "{$request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.SchmeNm.Prtry}"
                     }
                   }
                 }
@@ -639,26 +486,26 @@
             },
             "DbtrAcct": {
               "Id": {
-                "IBAN": "{$request.body.GrpHdr.CdtTrfTxInf.DbtrAcct.Id.IBAN}",
-                "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.DbtrAcct.Id.Ccy}"
+                "IBAN": "{$request.body.CdtTrfTxInf.DbtrAcct.Id.IBAN}",
+                "Ccy": "{$request.body.CdtTrfTxInf.DbtrAcct.Id.Ccy}"
               }
             },
             "DbtrAgtAcct": {
               "Id": {
-                "IBAN": "{$request.body.GrpHdr.CdtTrfTxInf.DbtrAgtAcct.Id.IBAN}",
-                "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.DbtrAgtAcct.Id.Ccy}"
+                "IBAN": "{$request.body.CdtTrfTxInf.DbtrAgtAcct.Id.IBAN}",
+                "Ccy": "{$request.body.CdtTrfTxInf.DbtrAgtAcct.Id.Ccy}"
               }
             },
             "CdtrAcct": {
               "Id": {
-                "IBAN": "{$request.body.GrpHdr.CdtTrfTxInf.CdtrAcct.Id.IBAN}",
-                "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.CdtrAcct.Id.Ccy}"
+                "IBAN": "{$request.body.CdtTrfTxInf.CdtrAcct.Id.IBAN}",
+                "Ccy": "{$request.body.CdtTrfTxInf.CdtrAcct.Id.Ccy}"
               }
             },
             "CdtrAgtAcct": {
               "Id": {
-                "IBAN": "{$request.body.GrpHdr.CdtTrfTxInf.CdtrAgtAcct.Id.IBAN}",
-                "Ccy": "{$request.body.GrpHdr.CdtTrfTxInf.CdtrAgtAcct.Id.Ccy}"
+                "IBAN": "{$request.body.CdtTrfTxInf.CdtrAgtAcct.Id.IBAN}",
+                "Ccy": "{$request.body.CdtTrfTxInf.CdtrAgtAcct.Id.Ccy}"
               }
             },
             "UltmtCdtr": {
@@ -792,9 +639,9 @@
             "CreDtTm": "{$function.generic.curDateISO}",
             "TxInfAndSts": {
               "StsId": "{$function.generic.generateULID}",
-              "OrgnlInstrId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.InstrId}",
-              "OrgnlEndToEndId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.EndToEndId}",
-              "OrgnlTxId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.TxId}",
+              "OrgnlInstrId": "{$request.body.CdtTrfTxInf.PmtId.InstrId}",
+              "OrgnlEndToEndId": "{$request.body.CdtTrfTxInf.PmtId.EndToEndId}",
+              "OrgnlTxId": "{$request.body.CdtTrfTxInf.PmtId.TxId}",
               "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
               "TxSts": "ACPT",
               "StsRsnInf": {
@@ -920,147 +767,13 @@
             },
             "SttlmInf": {
               "SttlmMtd": "CLRG"
-            },
-            "CdtTrfTxInf": {
-              "PmtId": {
-                "TxId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.TxId}",
-                "InstrId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.InstrId}",
-                "EndToEndId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.EndToEndId}"
-              },
-              "PmtTpInf": {
-                "InstrPrty": "NORM",
-                "CtgyPurp": {
-                  "Cd": "SUPP"
-                }
-              },
-              "IntrBkSttlmAmt": {
-                "ActiveCurrencyAndAmount": "100",
-                "Ccy": "EUR"
-              },
-              "ChrgBr": "SLEV",
-              "Cdtr": {
-                "Name": "Test Creditor",
-                "FinInstnId": {
-                  "Id": "{$request.body.GrpHdr.CdtTrfTxInf.Cdtr.FinInstnId.Id}",
-                  "SchmeNm": {
-                    "Prtry": "ACCOUNT_ID"
-                  }
-                },
-                "Id": {
-                  "PrvtId": {
-                    "DtAndPlcOfBirth": {
-                      "BirthDt": "{$function.generic.curDate}"
-                    }
-                  },
-                  "OrgId": {
-                    "Othr": {
-                      "Id": "{$request.body.GrpHdr.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id}",
-                      "SchmeNm": {
-                        "Prtry": "ACCOUNT_ID"
-                      }
-                    }
-                  }
-                }
-              },
-              "CdtrAcct": {
-                "Id": {
-                  "IBAN": "BE71096123456769"
-                },
-                "Tp": {
-                  "Cd": "CACC"
-                },
-                "Ccy": "EUR",
-                "Nm": "My account"
-              },
-              "CdtrAgt": {
-                "FinInstnId": {
-                  "BICFI": "BNBABEBB"
-                }
-              },
-              "CdtrAgtAcct": {
-                "Id": {
-                  "IBAN": "BE71096123456769"
-                },
-                "Tp": {
-                  "Cd": "CACC"
-                },
-                "Ccy": "EUR",
-                "Nm": "My account"
-              },
-              "Dbtr": {
-                "Name": "Test Debitor",
-                "FinInstnId": {
-                  "Id": "{$request.body.GrpHdr.CdtTrfTxInf.Dbtr.FinInstnId.Id}",
-                  "SchmeNm": {
-                    "Prtry": "ACCOUNT_ID"
-                  }
-                },
-                "Id": {
-                  "PrvtId": {
-                    "DtAndPlcOfBirth": {
-                      "BirthDt": "{$function.generic.curDate}"
-                    }
-                  },
-                  "OrgId": {
-                    "Othr": {
-                      "Id": "{$request.body.GrpHdr.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id}",
-                      "SchmeNm": {
-                        "Prtry": "ACCOUNT_ID"
-                      }
-                    }
-                  }
-                }
-              },
-              "DbtrAcct": {
-                "Id": {
-                  "IBAN": "BE71096123456769"
-                },
-                "Tp": {
-                  "Cd": "CACC"
-                },
-                "Ccy": "EUR",
-                "Nm": "My account"
-              },
-              "DbtrAgt": {
-                "FinInstnId": {
-                  "BICFI": "BNBABEBB"
-                }
-              },
-              "DbtrAgtAcct": {
-                "Id": {
-                  "IBAN": "BE71096123456769"
-                },
-                "Tp": {
-                  "Cd": "CACC"
-                },
-                "Ccy": "EUR",
-                "Nm": "My account"
-              },
-              "RmtInf": {
-                "Ustrd": "Remittance Information"
-              },
-              "RgltryRptg": {
-                "Dbtr": {
-                  "Nm": "Debtor Name"
-                },
-                "DbtrAcct": {
-                  "Id": {
-                    "IBAN": "BE71096123456769"
-                  },
-                  "Tp": {
-                    "Cd": "CACC"
-                  },
-                  "Ccy": "EUR",
-                  "Nm": "My account"
-                }
-              }
             }
           },
           "CdtTrfTxInf": {
             "PmtId": {
-              "TxId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.TxId}",
-              "InstrId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.InstrId}",
-              "EndToEndId": "{$request.body.GrpHdr.CdtTrfTxInf.PmtId.EndToEndId}"
+              "TxId": "{$request.body.CdtTrfTxInf.PmtId.TxId}",
+              "InstrId": "{$request.body.CdtTrfTxInf.PmtId.InstrId}",
+              "EndToEndId": "{$request.body.CdtTrfTxInf.PmtId.EndToEndId}"
             },
             "PmtTpInf": {
               "InstrPrty": "NORM",
@@ -1076,7 +789,7 @@
             "Cdtr": {
               "Name": "Test Creditor",
               "FinInstnId": {
-                "Id": "{$request.body.GrpHdr.CdtTrfTxInf.Cdtr.FinInstnId.Id}",
+                "Id": "{$request.body.CdtTrfTxInf.Cdtr.FinInstnId.Id}",
                 "SchmeNm": {
                   "Prtry": "ACCOUNT_ID"
                 }
@@ -1089,7 +802,7 @@
                 },
                 "OrgId": {
                   "Othr": {
-                    "Id": "{$request.body.GrpHdr.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id}",
+                    "Id": "{$request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id}",
                     "SchmeNm": {
                       "Prtry": "ACCOUNT_ID"
                     }
@@ -1125,7 +838,7 @@
             "Dbtr": {
               "Name": "Test Debitor",
               "FinInstnId": {
-                "Id": "{$request.body.GrpHdr.CdtTrfTxInf.Dbtr.FinInstnId.Id}",
+                "Id": "{$request.body.CdtTrfTxInf.Dbtr.FinInstnId.Id}",
                 "SchmeNm": {
                   "Prtry": "ACCOUNT_ID"
                 }
@@ -1138,7 +851,7 @@
                 },
                 "OrgId": {
                   "Othr": {
-                    "Id": "{$request.body.GrpHdr.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id}",
+                    "Id": "{$request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id}",
                     "SchmeNm": {
                       "Prtry": "ACCOUNT_ID"
                     }

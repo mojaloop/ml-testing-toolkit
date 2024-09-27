@@ -48,34 +48,33 @@ const handleQuoteIlp = (context, response) => {
     // }
 
     const transactionObject = {
-      transactionId: context.request.body.transactionId || context.request.body.GrpHdr.CdtTrfTxInf.PmtId.EndToEndId,
-      quoteId: context.request.body.quoteId || context.request.body.GrpHdr.CdtTrfTxInf.PmtId.TxId,
+      transactionId: context.request.body.transactionId || context.request.body.CdtTrfTxInf.PmtId.EndToEndId,
+      quoteId: context.request.body.quoteId || context.request.body.CdtTrfTxInf.PmtId.TxId,
       payee: context.request.body.payee || {
         partyIdInfo: {
-          partyIdType: context.request.body.GrpHdr.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id,
-          partyIdentifier: context.request.body.GrpHdr.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.SchmeNm.Prtry
+          partyIdType: context.request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id,
+          partyIdentifier: context.request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.SchmeNm.Prtry
         }
       },
       payer: context.request.body.payer || {
         partyIdInfo: {
-          partyIdType: context.request.body.GrpHdr.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id,
-          partyIdentifier: context.request.body.GrpHdr.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.SchmeNm.Prtry
+          partyIdType: context.request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id,
+          partyIdentifier: context.request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.SchmeNm.Prtry
         }
       },
       amount: response.body.transferAmount || {
-        currency: context.request.body.GrpHdr.CdtTrfTxInf.IntrBkSttlmAmt.Ccy,
-        amount: context.request.body.GrpHdr.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount
+        currency: context.request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy,
+        amount: context.request.body.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount
       },
       transactionType: context.request.body.transactionType,
-      note: response.body.note || context.request.body.GrpHdr.CdtTrfTxInf?.InstrForNxtAgt?.InstrInf || null
+      note: response.body.note || context.request.body.CdtTrfTxInf?.InstrForNxtAgt?.InstrInf || null
     }
     const { ilpPacket, fulfilment, condition } = ilpObj.getResponseIlp(transactionObject)
     if (context.request.body.quoteId) {
       response.body.ilpPacket = ilpPacket
       response.body.condition = condition
     }
-    if (context.request.body.GrpHdr) {
-      response.body.GrpHdr.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket = ilpPacket
+    if (context.request.body.TxInfAndSts) {
       response.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket = ilpPacket
     }
     return fulfilment
@@ -93,13 +92,13 @@ const handleTransferIlp = (context, response) => {
     }
     console.log(JSON.stringify(context.request.body))
     const generatedFulfilment = ilpObj.calculateFulfil(context.request.body.ilpPacket ||
-      context.request.body.GrpHdr.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
+      context.request.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
     // const generatedCondition = ilpObj.calculateConditionFromFulfil(generatedFulfilment).replace('"', '')
     if (context.request.body.ilpPacket) {
       response.body.fulfilment = generatedFulfilment
     }
-    if (context.request.body.GrpHdr) {
-      response.body.GrpHdr.TxInfAndSts.ExctnConf = generatedFulfilment
+    if (context.request.body.TxInfAndSts) {
+      response.body.TxInfAndSts.ExctnConf = generatedFulfilment
     }
   }
   if (context.request.method === 'get' && response.method === 'put' && pathMatch.test(response.path)) {

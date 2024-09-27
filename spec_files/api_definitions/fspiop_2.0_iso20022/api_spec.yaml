@@ -1433,15 +1433,8 @@ components:
     ActiveCurrencyAndAmount_SimpleType:
       title: ActiveCurrencyAndAmount_SimpleType
       type: string
-      description: |
-        NOTE: This regex doesn't seem correct given it's xsd definition.
-        <xs:simpleType name="ActiveCurrencyAndAmount_SimpleType">
-          <xs:restriction base="xs:decimal">
-            <xs:fractionDigits value="5"/>
-            <xs:totalDigits value="18"/>
-            <xs:minInclusive value="0"/>
-          </xs:restriction>
-        </xs:simpleType>
+      pattern: >-
+        ^(?!0\d)(\d{1,18}|\d{1,17}.\d{1}|\d{1,16}.\d{1,2}|\d{1,15}.\d{1,3}|\d{1,14}.\d{1,4}|\d{1,13}.\d{1,5})$
       example: 123.45
     ActiveCurrencyCode:
       title: ActiveCurrencyCode
@@ -1484,6 +1477,8 @@ components:
       title: ActiveOrHistoricCurrencyAndAmount_SimpleType
       type: string
       example: 123.45
+      pattern: >-
+        ^(?!0\d)(\d{1,18}|\d{1,17}.\d{1}|\d{1,16}.\d{1,2}|\d{1,15}.\d{1,3}|\d{1,14}.\d{1,4}|\d{1,13}.\d{1,5})$
     ActiveOrHistoricCurrencyCode:
       title: ActiveOrHistoricCurrencyCode
       type: string
@@ -1573,6 +1568,8 @@ components:
       description: |
         Rate expressed as a decimal, for example, 0.7 is 7/10 and 70%.
       example: 0.7
+      pattern: >-
+        ^(?!0\d)(\d{1,11}|\d{1,10}.\d{1}|\d{1,9}.\d{1,2}|\d{1,8}.\d{1,3}|\d{1,7}.\d{1,4}|\d{1,6}.\d{1,5}|\d{1,5}.\d{1,6}|\d{1,4}.\d{1,7}|\d{1,3}.\d{1,8}|\d{1,2}.\d{1,9}|\d{1}.\d{1,10})$
     BranchAndFinancialInstitutionIdentification6:
       title: BranchAndFinancialInstitutionIdentification6
       type: object
@@ -3176,8 +3173,14 @@ components:
 
                 Set of characteristics shared by all individual transactions
                 included in the message.
+        CdtTrfTxInf:
+          allOf:
+            - $ref: "#/components/schemas/CreditTransferTransaction68"
+            - description: |
+                Credit Transfer Transaction Information
       required:
         - GrpHdr
+        - CdtTrfTxInf
       example:
         GrpHdr:
           MsgId: 12345
@@ -3871,17 +3874,11 @@ components:
             - $ref: "#/components/schemas/PaymentTypeInformation28"
             - description: |
                 Payment Type Information
-        CdtTrfTxInf:
-          allOf:
-            - $ref: "#/components/schemas/CreditTransferTransaction68"
-            - description: |
-                Credit Transfer Transaction Information
       required:
         - MsgId
         - CreDtTm
         - NbOfTxs
         - SttlmInf
-        - CdtTrfTxInf
       example:
         MsgId: 12345
         CreDtTm: "2020-01-01T00:00:00Z"
@@ -3905,29 +3902,6 @@ components:
         PmtTpInf:
           InstrPrty: NORM
           CtgyPurp: CASH
-        CdtTrfTxInf:
-          PmtId:
-            InstrId: 12345
-            EndToEndId: 12345
-          Amt:
-            InstdAmt:
-              Ccy: EUR
-              Value: 100
-          Cdtr:
-            Nm: Name
-          CdtrAcct:
-            Id:
-              IBAN: BE71096123456769
-            Ccy: EUR
-          CdtrAgt:
-            FinInstnId:
-              BICFI: BIC
-          CdtrAgtAcct:
-            Id:
-              IBAN: BE71096123456769
-            Ccy: EUR
-          RmtInf:
-            Ustrd: Test
     GroupHeader120:
       title: GroupHeader120
       description: >
@@ -4021,17 +3995,11 @@ components:
             - $ref: "#/components/schemas/SettlementInstruction15"
             - description: |
                 Settlement Information
-        CdtTrfTxInf:
-          allOf:
-            - $ref: "#/components/schemas/CreditTransferTransaction67"
-            - description: |
-                Credit Transfer Transaction Information
       required:
         - MsgId
         - CreDtTm
         - NbOfTxs
         - SttlmInf
-        - CdtTrfTxInf
       example:
         MsgId: 12345
         CreDtTm: "2020-01-01T00:00:00Z"
@@ -4046,26 +4014,6 @@ components:
             Nm: John Doe
           SttlmAcctSvcr:
             BICFI: 123
-        CdtTrfTxInf:
-          PmtId:
-            InstrId: 123
-            EndToEndId: 123
-          PmtTpInf:
-            InstrPrty: NORM
-          InstdAmt:
-            Amt: 123
-            Ccy: EUR
-          ChrgBr: SLEV
-          CdtrAgt:
-            FinInstnId:
-              BICFI: 123
-          Cdtr:
-            Nm: John Doe
-          CdtrAcct:
-            Id:
-              IBAN: 123
-          RmtInf:
-            Ustrd: Test
     IBAN2007Identifier:
       title: IBAN2007Identifier
       description: >
@@ -4078,6 +4026,7 @@ components:
         recent edition of the standard.
       type: string
       example: FR1420041010050500013M02606
+      pattern: ^[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}$
     ISODate:
       title: ISODate
       description: >
@@ -4488,6 +4437,7 @@ components:
       title: Number
       type: string
       example: 256
+      pattern: ^(?!0\d)\d{1,18}$
     OrganisationIdentification29:
       title: OrganisationIdentification29
       description: |
@@ -5226,6 +5176,8 @@ components:
       title: PercentageRate
       type: string
       example: 1234
+      pattern: >-
+        ^(?!0\d)(\d{1,11}|\d{1,10}.\d{1}|\d{1,9}.\d{1,2}|\d{1,8}.\d{1,3}|\d{1,7}.\d{1,4}|\d{1,6}.\d{1,5}|\d{1,5}.\d{1,6}|\d{1,4}.\d{1,7}|\d{1,3}.\d{1,8}|\d{1,2}.\d{1,9}|\d{1}.\d{1,10})$
     PersonIdentification13:
       title: PersonIdentification13
       description: |
@@ -6478,8 +6430,14 @@ components:
 
                 Set of characteristics shared by all individual transactions
                 included in the message.
+        CdtTrfTxInf:
+          allOf:
+            - $ref: "#/components/schemas/CreditTransferTransaction67"
+            - description: |
+                Credit Transfer Transaction Information
       required:
         - GrpHdr
+        - CdtTrfTxInf
       example:
         GrpHdr:
           MsgId: 123456789
@@ -6547,6 +6505,8 @@ components:
       title: UUIDv4Identifier
       type: string
       example: 8f3a3b2d-3b0a-4b3f-8e4e-1b2f3f4c5d6e
+      pattern: >-
+        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
     VerificationReason1Choice:
       title: VerificationReason1Choice
       type: object
@@ -6673,3 +6633,4 @@ components:
       title: hexBinary
       type: string
       example: 4660
+      pattern: ^[A-Za-z0-9-_]+[=]{0,2}$
