@@ -40,7 +40,19 @@
             "Accept": "application/vnd.interoperability.iso20022.parties+json;version=2.0"
           },
           "disabled": false,
-          "url": null
+          "url": null,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "expect callback",
+                "exec": [
+                  "expect(callback.body).to.have.property('Assgnmt')",
+                  "expect(callback.body).to.have.property('Rpt')"
+                ]
+              }
+            ]
+          }
         },
         {
           "id": 2,
@@ -78,159 +90,159 @@
                 "SttlmAcctSvcr": {
                   "BICFI": "123"
                 }
+              }
+            },
+            "CdtTrfTxInf": {
+              "DbtrAgt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers['FSPIOP-Source']}",
+                    "SchmeNm": {
+                      "Cd": "BDID"
+                    }
+                  }
+                }
               },
-              "CdtTrfTxInf": {
-                "DbtrAgt": {
+              "CdtrAgt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers['FSPIOP-Destination']}",
+                    "SchmeNm": {
+                      "Cd": "BDID"
+                    }
+                  }
+                }
+              },
+              "Dbtr": {
+                "Name": "Test Debitor",
+                "Id": {
+                  "PrvtId": {
+                    "DtAndPlcOfBirth": {
+                      "BirthDt": "{$function.generic.curDate}"
+                    }
+                  },
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "12345",
+                      "SchmeNm": {
+                        "Prtry": "ACCOUNT_ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "Cdtr": {
+                "Name": "Test Creditor",
+                "Id": {
+                  "PrvtId": {
+                    "DtAndPlcOfBirth": {
+                      "BirthDt": "{$function.generic.curDate}"
+                    }
+                  },
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "54321",
+                      "SchmeNm": {
+                        "Prtry": "ACCOUNT_ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "PmtId": {
+                "TxId": "{$function.generic.generateULID}",
+                "InstrId": "{$function.generic.generateULID}",
+                "EndToEndId": "{$function.generic.generateULID}"
+              },
+              "PmtTpInf": {
+                "InstrPrty": "NORM",
+                "SvcLvl": {
+                  "Cd": "SEPA"
+                },
+                "LclInstrm": {
+                  "Cd": "CH03"
+                },
+                "CtgyPurp": {
+                  "Cd": "SUPP"
+                }
+              },
+              "IntrBkSttlmAmt": {
+                "Ccy": "XTS",
+                "ActiveCurrencyAndAmount": "100"
+              },
+              "InstdAmt": {
+                "Ccy": "XTS",
+                "ActiveOrHistoricCurrencyAndAmount": "100"
+              },
+              "ChrgBr": "CRED",
+              "ChrgsInf": {
+                "Amt": {
+                  "Ccy": "XTS",
+                  "ActiveOrHistoricCurrencyAndAmount": "0"
+                },
+                "Agt": {
                   "FinInstnId": {
                     "Othr": {
-                      "Id": "{$request.headers['FSPIOP-Source']}",
-                      "SchmeNm": {
-                        "Cd": "BDID"
-                      }
+                      "Id": "pinkbankfsp"
                     }
                   }
+                }
+              },
+              "DbtrAcct": {
+                "Id": {
+                  "IBAN": "XT1420041010050500013M02606",
+                  "Ccy": "XTS"
+                }
+              },
+              "DbtrAgtAcct": {
+                "Id": {
+                  "IBAN": "XT1420041010050500013M02606",
+                  "Ccy": "XTS"
+                }
+              },
+              "CdtrAcct": {
+                "Id": {
+                  "IBAN": "XT1420041010050500013M02606",
+                  "Ccy": "XTS"
+                }
+              },
+              "CdtrAgtAcct": {
+                "Id": {
+                  "IBAN": "XT1420041010050500013M02606",
+                  "Ccy": "XTS"
+                }
+              },
+              "UltmtCdtr": {
+                "Nm": "Ultimate Creditor Name",
+                "PstlAdr": {
+                  "AdrTp": "ADDR",
+                  "Dept": "Department",
+                  "SubDept": "SubDepartment",
+                  "StrtNm": "StreetName",
+                  "BldgNb": "BuildingNumber",
+                  "PstCd": "PostCode",
+                  "TwnNm": "TownName",
+                  "CtrySubDvsn": "CountrySubDivision",
+                  "Ctry": "Country"
                 },
-                "CdtrAgt": {
-                  "FinInstnId": {
+                "Id": {
+                  "OrgId": {
+                    "AnyBIC": "BBBBBBBB",
                     "Othr": {
-                      "Id": "{$request.headers['FSPIOP-Destination']}",
+                      "Id": "123456789",
                       "SchmeNm": {
-                        "Cd": "BDID"
+                        "Cd": "IBAN",
+                        "Prtry": "Party Identification Scheme Name"
                       }
                     }
                   }
-                },
-                "Dbtr": {
-                  "Name": "Test Debitor",
-                  "Id": {
-                    "PrvtId": {
-                      "DtAndPlcOfBirth": {
-                        "BirthDt": "{$function.generic.curDate}"
-                      }
-                    },
-                    "OrgId": {
-                      "Othr": {
-                        "Id": "12345",
-                        "SchmeNm": {
-                          "Prtry": "ACCOUNT_ID"
-                        }
-                      }
-                    }
-                  }
-                },
-                "Cdtr": {
-                  "Name": "Test Creditor",
-                  "Id": {
-                    "PrvtId": {
-                      "DtAndPlcOfBirth": {
-                        "BirthDt": "{$function.generic.curDate}"
-                      }
-                    },
-                    "OrgId": {
-                      "Othr": {
-                        "Id": "54321",
-                        "SchmeNm": {
-                          "Prtry": "ACCOUNT_ID"
-                        }
-                      }
-                    }
-                  }
-                },
-                "PmtId": {
-                  "TxId": "{$function.generic.generateULID}",
-                  "InstrId": "{$function.generic.generateULID}",
-                  "EndToEndId": "{$function.generic.generateULID}"
-                },
-                "PmtTpInf": {
-                  "InstrPrty": "NORM",
-                  "SvcLvl": {
-                    "Cd": "SEPA"
-                  },
-                  "LclInstrm": {
-                    "Cd": "CH03"
-                  },
-                  "CtgyPurp": {
-                    "Cd": "SUPP"
-                  }
-                },
-                "IntrBkSttlmAmt": {
-                  "Ccy": "EUR",
-                  "ActiveCurrencyAndAmount": "100"
-                },
-                "InstdAmt": {
-                  "Ccy": "EUR",
-                  "ActiveOrHistoricCurrencyAndAmount": "100"
-                },
-                "ChrgBr": "CRED",
-                "ChrgsInf": {
-                  "Amt": {
-                    "Ccy": "EUR",
-                    "ActiveOrHistoricCurrencyAndAmount": "0"
-                  },
-                  "Agt": {
-                    "FinInstnId": {
-                      "Othr": {
-                        "Id": "pinkbankfsp"
-                      }
-                    }
-                  }
-                },
-                "DbtrAcct": {
-                  "Id": {
-                    "IBAN": "IBANID",
-                    "Ccy": "XTS"
-                  }
-                },
-                "DbtrAgtAcct": {
-                  "Id": {
-                    "IBAN": "IBANID",
-                    "Ccy": "XTS"
-                  }
-                },
-                "CdtrAcct": {
-                  "Id": {
-                    "IBAN": "IBANID",
-                    "Ccy": "XTS"
-                  }
-                },
-                "CdtrAgtAcct": {
-                  "Id": {
-                    "IBAN": "IBANID",
-                    "Ccy": "XTS"
-                  }
-                },
-                "UltmtCdtr": {
-                  "Nm": "Ultimate Creditor Name",
-                  "PstlAdr": {
-                    "AdrTp": "ADDR",
-                    "Dept": "Department",
-                    "SubDept": "SubDepartment",
-                    "StrtNm": "StreetName",
-                    "BldgNb": "BuildingNumber",
-                    "PstCd": "PostCode",
-                    "TwnNm": "TownName",
-                    "CtrySubDvsn": "CountrySubDivision",
-                    "Ctry": "Country"
-                  },
-                  "Id": {
-                    "OrgId": {
-                      "AnyBIC": "BBBBBBBB",
-                      "Othr": {
-                        "Id": "123456789",
-                        "SchmeNm": {
-                          "Cd": "IBAN",
-                          "Prtry": "Party Identification Scheme Name"
-                        }
-                      }
-                    }
-                  }
-                },
-                "RgltryRptg": {
-                  "DbtCdtRptgInd": "CRED",
-                  "Authrty": {
-                    "Nm": "Swiss National Bank",
-                    "Ctry": "CH"
-                  }
+                }
+              },
+              "RgltryRptg": {
+                "DbtCdtRptgInd": "CRED",
+                "Authrty": {
+                  "Nm": "Swiss National Bank",
+                  "Ctry": "CH"
                 }
               }
             }
@@ -243,7 +255,19 @@
             "FSPIOP-Destination": "{$inputs.toFspId}"
           },
           "url": null,
-          "disabled": false
+          "disabled": false,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "expect callback",
+                "exec": [
+                  "expect(callback.body).to.have.property('GrpHdr')",
+                  "expect(callback.body).to.have.property('CdtTrfTxInf')"
+                ]
+              }
+            ]
+          }
         },
         {
           "id": 3,
@@ -299,159 +323,6 @@
                 "FinInstnId": {
                   "BICFI": "BBBBBBBB"
                 }
-              },
-              "CdtTrfTxInf": {
-                "VrfctnOfTerms": {
-                  "IlpV4PrepPacket": "AYIBtwAAAAAAACcQHGcudW5kZWZpbmVkLjU0MzIxLmFjY291bnRfaWSCAY5leUowY21GdWMyRmpkR2x2Ymtsa0lqb2lNREZLT0ZKSE56SmFWRFpFVURjelMwdEhUVUZUVWtKR01FY2lMQ0p4ZFc5MFpVbGtJam9pTURGS09GSkhOekphVkRaRVVEY3pTMHRIVFVGVFVrSkdNRVVpTENKd1lYbGxaU0k2ZXlKd1lYSjBlVWxrU1c1bWJ5STZleUp3WVhKMGVVbGtWSGx3WlNJNklqVTBNekl4SWl3aWNHRnlkSGxKWkdWdWRHbG1hV1Z5SWpvaVFVTkRUMVZPVkY5SlJDSjlmU3dpY0dGNVpYSWlPbnNpY0dGeWRIbEpaRWx1Wm04aU9uc2ljR0Z5ZEhsSlpGUjVjR1VpT2lJeE1qTTBOU0lzSW5CaGNuUjVTV1JsYm5ScFptbGxjaUk2SWtGRFEwOVZUbFJmU1VRaWZYMHNJbUZ0YjNWdWRDSTZleUpqZFhKeVpXNWplU0k2SWtWVlVpSXNJbUZ0YjNWdWRDSTZJakV3TUNKOUxDSnViM1JsSWpwdWRXeHNmUQA"
-                },
-                "PmtId": {
-                  "TxId": "01J8RG72ZT6DP73KKGMASRBF0E",
-                  "InstrId": "01J8RG72ZT6DP73KKGMASRBF0F",
-                  "EndToEndId": "01J8RG72ZT6DP73KKGMASRBF0G"
-                },
-                "PmtTpInf": {
-                  "InstrPrty": "NORM",
-                  "SvcLvl": {
-                    "Cd": "SEPA"
-                  },
-                  "LclInstrm": {
-                    "Cd": "CH03"
-                  },
-                  "CtgyPurp": {
-                    "Cd": "SUPP"
-                  }
-                },
-                "IntrBkSttlmAmt": {
-                  "Ccy": "EUR",
-                  "ActiveCurrencyAndAmount": "100"
-                },
-                "InstdAmt": {
-                  "Ccy": "EUR",
-                  "ActiveOrHistoricCurrencyAndAmount": "undefined"
-                },
-                "ChrgBr": "SLEV",
-                "ChrgsInf": {
-                  "Amt": {
-                    "Ccy": "EUR",
-                    "ActiveOrHistoricCurrencyAndAmount": "undefined"
-                  },
-                  "Agt": {
-                    "FinInstnId": {
-                      "Othr": {
-                        "Id": "123456789",
-                        "SchmeNm": {
-                          "Cd": "BBA",
-                          "Prtry": "Party Identification Scheme Name"
-                        }
-                      }
-                    }
-                  }
-                },
-                "Cdtr": {
-                  "Nm": "undefined",
-                  "Id": {
-                    "OrgId": {
-                      "Othr": {
-                        "Id": "54321",
-                        "SchmeNm": {
-                          "Prtry": "ACCOUNT_ID"
-                        }
-                      }
-                    }
-                  }
-                },
-                "Dbtr": {
-                  "Nm": "undefined",
-                  "Id": {
-                    "OrgId": {
-                      "Othr": {
-                        "Id": "12345",
-                        "SchmeNm": {
-                          "Prtry": "ACCOUNT_ID"
-                        }
-                      }
-                    }
-                  }
-                },
-                "DbtrAgt": {
-                  "FinInstnId": {
-                    "Othr": {
-                      "Id": "undefined",
-                      "SchmeNm": {
-                        "Cd": "BDID"
-                      }
-                    }
-                  }
-                },
-                "CdtrAgt": {
-                  "FinInstnId": {
-                    "Othr": {
-                      "Id": "undefined",
-                      "SchmeNm": {
-                        "Cd": "BDID"
-                      }
-                    }
-                  }
-                },
-                "DbtrAcct": {
-                  "Id": {
-                    "IBAN": "IBANID",
-                    "Ccy": "XTS"
-                  }
-                },
-                "DbtrAgtAcct": {
-                  "Id": {
-                    "IBAN": "IBANID",
-                    "Ccy": "XTS"
-                  }
-                },
-                "CdtrAcct": {
-                  "Id": {
-                    "IBAN": "IBANID",
-                    "Ccy": "XTS"
-                  }
-                },
-                "CdtrAgtAcct": {
-                  "Id": {
-                    "IBAN": "IBANID",
-                    "Ccy": "XTS"
-                  }
-                },
-                "UltmtCdtr": {
-                  "Nm": "Ultimate Creditor Name",
-                  "PstlAdr": {
-                    "AdrTp": {
-                      "Cd": "ADDR"
-                    },
-                    "Dept": "Department",
-                    "SubDept": "SubDepartment",
-                    "StrtNm": "StreetName",
-                    "BldgNb": "BuildingNumber",
-                    "PstCd": "PostCode",
-                    "TwnNm": "TownName",
-                    "CtrySubDvsn": "CountrySubDivision",
-                    "Ctry": "AZ"
-                  },
-                  "Id": {
-                    "OrgId": {
-                      "AnyBIC": "BBBBBBBB",
-                      "Othr": {
-                        "Id": "123456789",
-                        "SchmeNm": {
-                          "Cd": "IBAN",
-                          "Prtry": "Party Identification Scheme Name"
-                        }
-                      }
-                    }
-                  }
-                },
-                "RgltryRptg": {
-                  "DbtCdtRptgInd": "CRED",
-                  "Authrty": {
-                    "Nm": "Swiss National Bank",
-                    "Ctry": "CH"
-                  }
-                }
               }
             },
             "CdtTrfTxInf": {
@@ -476,18 +347,18 @@
                 }
               },
               "IntrBkSttlmAmt": {
-                "Ccy": "EUR",
+                "Ccy": "XTS",
                 "ActiveCurrencyAndAmount": "100"
               },
               "InstdAmt": {
-                "Ccy": "EUR",
-                "ActiveOrHistoricCurrencyAndAmount": "undefined"
+                "Ccy": "XTS",
+                "ActiveOrHistoricCurrencyAndAmount": "100"
               },
               "ChrgBr": "SLEV",
               "ChrgsInf": {
                 "Amt": {
-                  "Ccy": "EUR",
-                  "ActiveOrHistoricCurrencyAndAmount": "undefined"
+                  "Ccy": "XTS",
+                  "ActiveOrHistoricCurrencyAndAmount": "100"
                 },
                 "Agt": {
                   "FinInstnId": {
@@ -502,7 +373,7 @@
                 }
               },
               "Cdtr": {
-                "Nm": "undefined",
+                "Name": "Test Creditor",
                 "Id": {
                   "OrgId": {
                     "Othr": {
@@ -515,7 +386,7 @@
                 }
               },
               "Dbtr": {
-                "Nm": "undefined",
+                "Name": "Test Debitor",
                 "Id": {
                   "OrgId": {
                     "Othr": {
@@ -530,7 +401,7 @@
               "DbtrAgt": {
                 "FinInstnId": {
                   "Othr": {
-                    "Id": "undefined",
+                    "Id": "{$request.headers['FSPIOP-Source']}",
                     "SchmeNm": {
                       "Cd": "BDID"
                     }
@@ -540,7 +411,7 @@
               "CdtrAgt": {
                 "FinInstnId": {
                   "Othr": {
-                    "Id": "undefined",
+                    "Id": "{$request.headers['FSPIOP-Destination']}",
                     "SchmeNm": {
                       "Cd": "BDID"
                     }
@@ -549,25 +420,25 @@
               },
               "DbtrAcct": {
                 "Id": {
-                  "IBAN": "IBANID",
+                  "IBAN": "XT1420041010050500013M02606",
                   "Ccy": "XTS"
                 }
               },
               "DbtrAgtAcct": {
                 "Id": {
-                  "IBAN": "IBANID",
+                  "IBAN": "XT1420041010050500013M02606",
                   "Ccy": "XTS"
                 }
               },
               "CdtrAcct": {
                 "Id": {
-                  "IBAN": "IBANID",
+                  "IBAN": "XT1420041010050500013M02606",
                   "Ccy": "XTS"
                 }
               },
               "CdtrAgtAcct": {
                 "Id": {
-                  "IBAN": "IBANID",
+                  "IBAN": "XT1420041010050500013M02606",
                   "Ccy": "XTS"
                 }
               },
@@ -608,7 +479,19 @@
               }
             }
           },
-          "disabled": false
+          "disabled": false,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "expect callback",
+                "exec": [
+                  "expect(callback.body).to.have.property('GrpHdr')",
+                  ""
+                ]
+              }
+            ]
+          }
         },
         {
           "id": 4,
@@ -633,7 +516,7 @@
               "CreDtTm": "{$function.generic.curDate}",
               "NbOfTxs": "1",
               "TtlIntrBkSttlmAmt": {
-                "Ccy": "EUR",
+                "Ccy": "XTS",
                 "ActiveCurrencyAndAmount": "100"
               },
               "SttlmInf": {
@@ -642,7 +525,7 @@
                   "Id": {
                     "IBAN": "BE71096123456769"
                   },
-                  "Ccy": "EUR"
+                  "Ccy": "XTS"
                 },
                 "SttlmAcctOwnr": {
                   "Nm": "Name"
@@ -661,124 +544,124 @@
                 "CtgyPurp": {
                   "Prtry": "CASH"
                 }
+              }
+            },
+            "CdtTrfTxInf": {
+              "PmtId": {
+                "TxId": "{$function.generic.generateULID}",
+                "InstrId": "{$function.generic.generateULID}",
+                "EndToEndId": "{$function.generic.generateULID}"
               },
-              "CdtTrfTxInf": {
-                "PmtId": {
-                  "TxId": "{$function.generic.generateULID}",
-                  "InstrId": "{$function.generic.generateULID}",
-                  "EndToEndId": "{$function.generic.generateULID}"
-                },
-                "Amt": {
-                  "InstdAmt": {
-                    "Ccy": "EUR",
-                    "ActiveCurrencyAndAmount": "100"
+              "Amt": {
+                "InstdAmt": {
+                  "Ccy": "XTS",
+                  "ActiveCurrencyAndAmount": "100"
+                }
+              },
+              "Dbtr": {
+                "Name": "Test Debitor",
+                "FinInstnId": {
+                  "Id": "54321",
+                  "SchmeNm": {
+                    "Prtry": "ACCOUNT_ID"
                   }
                 },
+                "Id": {
+                  "PrvtId": {
+                    "DtAndPlcOfBirth": {
+                      "BirthDt": "{$function.generic.curDate}"
+                    }
+                  },
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "12345",
+                      "SchmeNm": {
+                        "Prtry": "ACCOUNT_ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "Cdtr": {
+                "Name": "Test Creditor",
+                "FinInstnId": {
+                  "Id": "54321",
+                  "SchmeNm": {
+                    "Prtry": "ACCOUNT_ID"
+                  }
+                },
+                "Id": {
+                  "PrvtId": {
+                    "DtAndPlcOfBirth": {
+                      "BirthDt": "{$function.generic.curDate}"
+                    }
+                  },
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "54321",
+                      "SchmeNm": {
+                        "Prtry": "ACCOUNT_ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "CdtrAcct": {
+                "Id": {
+                  "IBAN": "BE71096123456769"
+                },
+                "Ccy": "XTS"
+              },
+              "CdtrAgt": {
+                "FinInstnId": {
+                  "Nm": "Test"
+                }
+              },
+              "DbtrAcct": {
+                "Id": {
+                  "IBAN": "BE71096123456769"
+                },
+                "Ccy": "XTS"
+              },
+              "DbtrAgt": {
+                "FinInstnId": {
+                  "Nm": "Test"
+                }
+              },
+              "IntrBkSttlmAmt": {
+                "Ccy": "XTS",
+                "ActiveCurrencyAndAmount": "100"
+              },
+              "PmtTpInf": {
+                "InstrPrty": "NORM",
+                "ClrChanl": "RTGS",
+                "SvcLvl": {
+                  "Cd": "SEPA"
+                },
+                "LclInstrm": {
+                  "Cd": "CORE"
+                },
+                "CtgyPurp": {
+                  "Cd": "CASH"
+                }
+              },
+              "RgltryRptg": {
                 "Dbtr": {
-                  "Name": "Test Debitor",
-                  "FinInstnId": {
-                    "Id": "54321",
-                    "SchmeNm": {
-                      "Prtry": "ACCOUNT_ID"
-                    }
-                  },
-                  "Id": {
-                    "PrvtId": {
-                      "DtAndPlcOfBirth": {
-                        "BirthDt": "{$function.generic.curDate}"
-                      }
-                    },
-                    "OrgId": {
-                      "Othr": {
-                        "Id": "12345",
-                        "SchmeNm": {
-                          "Prtry": "ACCOUNT_ID"
-                        }
-                      }
-                    }
-                  }
-                },
-                "Cdtr": {
-                  "Name": "Test Creditor",
-                  "FinInstnId": {
-                    "Id": "54321",
-                    "SchmeNm": {
-                      "Prtry": "ACCOUNT_ID"
-                    }
-                  },
-                  "Id": {
-                    "PrvtId": {
-                      "DtAndPlcOfBirth": {
-                        "BirthDt": "{$function.generic.curDate}"
-                      }
-                    },
-                    "OrgId": {
-                      "Othr": {
-                        "Id": "54321",
-                        "SchmeNm": {
-                          "Prtry": "ACCOUNT_ID"
-                        }
-                      }
-                    }
-                  }
-                },
-                "CdtrAcct": {
-                  "Id": {
-                    "IBAN": "BE71096123456769"
-                  },
-                  "Ccy": "EUR"
-                },
-                "CdtrAgt": {
-                  "FinInstnId": {
-                    "Nm": "Test"
-                  }
+                  "Nm": "Name"
                 },
                 "DbtrAcct": {
                   "Id": {
                     "IBAN": "BE71096123456769"
                   },
-                  "Ccy": "EUR"
+                  "Ccy": "XTS"
                 },
                 "DbtrAgt": {
                   "FinInstnId": {
-                    "Nm": "Test"
+                    "BICFI": "BIC"
                   }
                 },
-                "IntrBkSttlmAmt": {
-                  "Ccy": "EUR",
-                  "ActiveCurrencyAndAmount": "100"
-                },
-                "PmtTpInf": {
-                  "InstrPrty": "NORM",
-                  "ClrChanl": "RTGS",
-                  "SvcLvl": {
-                    "Cd": "SEPA"
-                  },
-                  "LclInstrm": {
-                    "Cd": "CORE"
-                  },
-                  "CtgyPurp": {
-                    "Cd": "CASH"
-                  }
-                },
-                "RgltryRptg": {
-                  "Dbtr": {
-                    "Nm": "Name"
-                  },
-                  "DbtrAcct": {
-                    "Id": {
-                      "IBAN": "BE71096123456769"
-                    },
-                    "Ccy": "EUR"
-                  },
-                  "DbtrAgt": {
-                    "FinInstnId": {
-                      "BICFI": "BIC"
-                    }
-                  },
-                  "Cdtr": {
-                    "Nm": "Name"
-                  }
+                "Cdtr": {
+                  "Nm": "Name"
                 }
               }
             }
@@ -790,7 +673,19 @@
             "FSPIOP-Source": "{$inputs.fromFspId}",
             "FSPIOP-Destination": "{$inputs.toFspId}"
           },
-          "disabled": false
+          "disabled": false,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "expect callback",
+                "exec": [
+                  "expect(callback.body).to.have.property('GrpHdr')",
+                  "expect(callback.body).to.have.property('CdtTrfTxInf')"
+                ]
+              }
+            ]
+          }
         },
         {
           "id": 5,
@@ -828,7 +723,7 @@
                   "Id": {
                     "IBAN": "BE71096123456769"
                   },
-                  "Ccy": "EUR"
+                  "Ccy": "XTS"
                 },
                 "SttlmAcctOwnr": {
                   "Nm": "Name"
@@ -869,93 +764,6 @@
                 "FinInstnId": {
                   "BICFI": "CCCCCCCC"
                 }
-              },
-              "CdtTrfTxInf": {
-                "PmtId": {
-                  "TxId": "{$function.generic.generateULID}",
-                  "InstrId": "{$function.generic.generateULID}",
-                  "EndToEndId": "{$function.generic.generateULID}"
-                },
-                "PmtTpInf": {
-                  "InstrPrty": "NORM",
-                  "CtgyPurp": {
-                    "Cd": "SUPP"
-                  }
-                },
-                "InstrForCdtrAgt": {
-                  "Prtry": "/ACC/123456789"
-                },
-                "IntrBkSttlmAmt": {
-                  "ActiveCurrencyAndAmount": "1000",
-                  "Ccy": "EUR"
-                },
-                "ChrgBr": "SLEV",
-                "CdtrAgt": {
-                  "FinInstnId": {
-                    "BICFI": "CCCCCCCC"
-                  }
-                },
-                "Dbtr": {
-                  "Name": "Test Debitor",
-                  "FinInstnId": {
-                    "Id": "54321",
-                    "SchmeNm": {
-                      "Prtry": "ACCOUNT_ID"
-                    }
-                  },
-                  "Id": {
-                    "PrvtId": {
-                      "DtAndPlcOfBirth": {
-                        "BirthDt": "{$function.generic.curDate}"
-                      }
-                    },
-                    "OrgId": {
-                      "Othr": {
-                        "Id": "12345",
-                        "SchmeNm": {
-                          "Prtry": "ACCOUNT_ID"
-                        }
-                      }
-                    }
-                  }
-                },
-                "DbtrAgt": {
-                  "FinInstnId": {
-                    "Nm": "Test"
-                  }
-                },
-                "Cdtr": {
-                  "Name": "Test Creditor",
-                  "FinInstnId": {
-                    "Id": "54321",
-                    "SchmeNm": {
-                      "Prtry": "ACCOUNT_ID"
-                    }
-                  },
-                  "Id": {
-                    "PrvtId": {
-                      "DtAndPlcOfBirth": {
-                        "BirthDt": "{$function.generic.curDate}"
-                      }
-                    },
-                    "OrgId": {
-                      "Othr": {
-                        "Id": "54321",
-                        "SchmeNm": {
-                          "Prtry": "ACCOUNT_ID"
-                        }
-                      }
-                    }
-                  }
-                },
-                "CdtrAcct": {
-                  "Id": {
-                    "IBAN": "BE71096123456769"
-                  }
-                },
-                "RmtInf": {
-                  "Ustrd": "Payment for invoice 12345"
-                }
               }
             },
             "CdtTrfTxInf": {
@@ -975,7 +783,7 @@
               },
               "IntrBkSttlmAmt": {
                 "ActiveCurrencyAndAmount": "1000",
-                "Ccy": "EUR"
+                "Ccy": "XTS"
               },
               "ChrgBr": "SLEV",
               "CdtrAgt": {
@@ -1046,7 +854,19 @@
               }
             }
           },
-          "disabled": false
+          "disabled": false,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "expect callback",
+                "exec": [
+                  "expect(callback.body).to.have.property('GrpHdr')",
+                  ""
+                ]
+              }
+            ]
+          }
         }
       ]
     }

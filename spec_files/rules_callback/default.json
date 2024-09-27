@@ -41,7 +41,7 @@
         },
         "body": {
           "Assgnmt": {
-            "MsgId": "/parties/{$request.params.Type}/{$request.params.ID}",
+            "MsgId": "{$function.generic.generateULID}",
             "CreDtTm": "{$function.generic.curDateISO}",
             "Assgnr": {
               "Agt": {
@@ -66,9 +66,13 @@
             "OrgnlId": "/parties/{$request.params.Type}/{$request.params.ID}",
             "Vrfctn": true,
             "UpdtdPtyAndAcctId": {
+              "Acct": {
+                "Ccy": "XTS"
+              },
               "Pty": {
+                "Name": "Test Party",
                 "Id": {
-                  "OrgId": {
+                  "PrvtId": {
                     "Othr": {
                       "Id": "{$request.params.ID}",
                       "SchmeNm": {
@@ -135,7 +139,7 @@
         },
         "body": {
           "Assgnmt": {
-            "MsgId": "/parties/{$request.params.Type}/{$request.params.ID}",
+            "MsgId": "{$function.generic.generateULID}",
             "CreDtTm": "{$function.generic.curDateISO}",
             "Assgnr": {
               "Agt": {
@@ -160,9 +164,13 @@
             "OrgnlId": "/parties/{$request.params.Type}/{$request.params.ID}",
             "Vrfctn": true,
             "UpdtdPtyAndAcctId": {
+              "Acct": {
+                "Ccy": "XTS"
+              },
               "Pty": {
+                "Name": "Test Party",
                 "Id": {
-                  "OrgId": {
+                  "PrvtId": {
                     "Othr": {
                       "Id": "{$request.params.ID}",
                       "SchmeNm": {
@@ -230,7 +238,7 @@
         },
         "body": {
           "Assgnmt": {
-            "MsgId": "/parties/{$request.params.Type}/{$request.params.ID}",
+            "MsgId": "{$function.generic.generateULID}",
             "CreDtTm": "{$function.generic.curDateISO}",
             "Assgnr": {
               "Agt": {
@@ -255,9 +263,13 @@
             "OrgnlId": "/parties/{$request.params.Type}/{$request.params.ID}",
             "Vrfctn": true,
             "UpdtdPtyAndAcctId": {
+              "Acct": {
+                "Ccy": "XTS"
+              },
               "Pty": {
+                "Name": "Test Party",
                 "Id": {
-                  "OrgId": {
+                  "PrvtId": {
                     "Othr": {
                       "Id": "{$request.params.ID}",
                       "SchmeNm": {
@@ -783,7 +795,7 @@
             },
             "IntrBkSttlmAmt": {
               "ActiveCurrencyAndAmount": "100",
-              "Ccy": "EUR"
+              "Ccy": "XTS"
             },
             "ChrgBr": "SLEV",
             "Cdtr": {
@@ -817,7 +829,7 @@
               "Tp": {
                 "Cd": "CACC"
               },
-              "Ccy": "EUR",
+              "Ccy": "XTS",
               "Nm": "My account"
             },
             "CdtrAgt": {
@@ -832,7 +844,7 @@
               "Tp": {
                 "Cd": "CACC"
               },
-              "Ccy": "EUR",
+              "Ccy": "XTS",
               "Nm": "My account"
             },
             "Dbtr": {
@@ -866,7 +878,7 @@
               "Tp": {
                 "Cd": "CACC"
               },
-              "Ccy": "EUR",
+              "Ccy": "XTS",
               "Nm": "My account"
             },
             "DbtrAgt": {
@@ -881,7 +893,7 @@
               "Tp": {
                 "Cd": "CACC"
               },
-              "Ccy": "EUR",
+              "Ccy": "XTS",
               "Nm": "My account"
             },
             "RmtInf": {
@@ -898,7 +910,7 @@
                 "Tp": {
                   "Cd": "CACC"
                 },
-                "Ccy": "EUR",
+                "Ccy": "XTS",
                 "Nm": "My account"
               }
             }
