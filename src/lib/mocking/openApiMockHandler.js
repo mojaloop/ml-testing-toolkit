@@ -162,7 +162,7 @@ module.exports.handleRequest = async (req, h) => {
       return h.response(errorResponseBuilder('3001', 'The Client requested an unsupported version, see extension list for supported version(s).', { extensionList })).code(406)
     }
     req.customInfo.negotiatedContentType = versionNegotiationResult.responseContentTypeHeader
-    selectedApi = apis[versionNegotiationResult.negotiatedIndex]
+    selectedApi = pickedApis[versionNegotiationResult.negotiatedIndex]
   }
   try {
     return await selectedApi.openApiBackendObject.handleRequest(
