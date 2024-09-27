@@ -1,20 +1,20 @@
 {
   "options": {},
-  "name": "new",
+  "name": "self_referencing_iso20022",
   "test_cases": [
     {
       "id": 1,
       "name": "Self referencing ISO20022 requests",
       "fileInfo": {
-        "path": "new.json"
+        "path": "self_referencing_iso20022.json"
       },
       "meta": {
-        "info": "test"
+        "info": "Self referencing ISO20022 requests"
       },
       "requests": [
         {
           "id": 1,
-          "description": "test",
+          "description": "get/parties/{Type}/{ID}",
           "apiVersion": {
             "minorVersion": 0,
             "majorVersion": 2,
@@ -56,7 +56,7 @@
         },
         {
           "id": 2,
-          "description": "test",
+          "description": "post/quotes",
           "apiVersion": {
             "minorVersion": 0,
             "majorVersion": 2,
@@ -271,7 +271,7 @@
         },
         {
           "id": 3,
-          "description": "test",
+          "description": "post/transfers",
           "apiVersion": {
             "minorVersion": 0,
             "majorVersion": 2,
@@ -327,12 +327,12 @@
             },
             "CdtTrfTxInf": {
               "VrfctnOfTerms": {
-                "IlpV4PrepPacket": "AYIBtwAAAAAAACcQHGcudW5kZWZpbmVkLjU0MzIxLmFjY291bnRfaWSCAY5leUowY21GdWMyRmpkR2x2Ymtsa0lqb2lNREZLT0ZKSE56SmFWRFpFVURjelMwdEhUVUZUVWtKR01FY2lMQ0p4ZFc5MFpVbGtJam9pTURGS09GSkhOekphVkRaRVVEY3pTMHRIVFVGVFVrSkdNRVVpTENKd1lYbGxaU0k2ZXlKd1lYSjBlVWxrU1c1bWJ5STZleUp3WVhKMGVVbGtWSGx3WlNJNklqVTBNekl4SWl3aWNHRnlkSGxKWkdWdWRHbG1hV1Z5SWpvaVFVTkRUMVZPVkY5SlJDSjlmU3dpY0dGNVpYSWlPbnNpY0dGeWRIbEpaRWx1Wm04aU9uc2ljR0Z5ZEhsSlpGUjVjR1VpT2lJeE1qTTBOU0lzSW5CaGNuUjVTV1JsYm5ScFptbGxjaUk2SWtGRFEwOVZUbFJmU1VRaWZYMHNJbUZ0YjNWdWRDSTZleUpqZFhKeVpXNWplU0k2SWtWVlVpSXNJbUZ0YjNWdWRDSTZJakV3TUNKOUxDSnViM1JsSWpwdWRXeHNmUQA"
+                "IlpV4PrepPacket": "{$prev.2.callback.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket}"
               },
               "PmtId": {
                 "TxId": "01J8RG72ZT6DP73KKGMASRBF0E",
                 "InstrId": "01J8RG72ZT6DP73KKGMASRBF0F",
-                "EndToEndId": "01J8RG72ZT6DP73KKGMASRBF0G"
+                "EndToEndId": "{$prev.2.request.body.CdtTrfTxInf.PmtId.EndToEndId}"
               },
               "PmtTpInf": {
                 "InstrPrty": "NORM",
@@ -495,7 +495,7 @@
         },
         {
           "id": 4,
-          "description": "test",
+          "description": "post/fxQuotes",
           "apiVersion": {
             "minorVersion": 0,
             "majorVersion": 2,
@@ -689,7 +689,7 @@
         },
         {
           "id": 5,
-          "description": "test",
+          "description": "post/fxTransfers",
           "apiVersion": {
             "minorVersion": 0,
             "majorVersion": 2,
