@@ -22,37 +22,20 @@
  --------------
  ******/
 
- const fspiopToISO20022 = {
-    requestTransform: (requestOptions) => {
-      // Iterate through requestOptions.body object and remove the prefix 'TEST_' from top level keys
-      const body = {}
-      for (const key in requestOptions.body) {
-        if (key.startsWith('TEST_')) {
-          body[key.substring(5)] = requestOptions.body[key]
-        } else {
-          body[key] = requestOptions.body[key]
-        }
-      }
-      return {
-        ...requestOptions,
-        body
-      }
-    },
+const FSPIOP_ISO20022_Transformer = require('./fspiop_iso20022')
 
-    callbackTransform: (callbackOptions) => {
-      // Iterate through callbackOptions.body object and add the prefix 'TEST_' to top level keys
-      const body = {}
-      for (const key in callbackOptions.body) {
-        body[`TEST_${key}`] = callbackOptions.body[key]
-      }
-      return {
-        ...callbackOptions,
-        body
-      }
-    }
+const allTransformers = {
+  ...FSPIOP_ISO20022_Transformer
+}
+
+const getTransformer = (transformerName) => {
+  if (transformerName === 'none' || transformerName === 'NONE' || transformerName === 'no' || transformerName === 'NO') {
+    return null
+  } else {
+    return allTransformers[transformerName]
   }
+}
   
-  module.exports = {
-    fspiopToISO20022,
-  }
-  
+module.exports = {
+  getTransformer
+}

@@ -55,12 +55,14 @@ const getSample = async (queryParams) => {
   }
   const sample = {
     name: null,
+    options: null,
     inputValues: null,
     test_cases: null
   }
 
   if (queryParams.environment) {
     sample.inputValues = JSON.parse(await readFileAsync(queryParams.environment, 'utf8')).inputValues
+    sample.options = JSON.parse(await readFileAsync(queryParams.environment, 'utf8')).options
   }
 
   if (collections.length > 1) {

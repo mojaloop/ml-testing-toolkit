@@ -33,7 +33,6 @@ const Config = require('../config')
 const httpAgentStore = require('../httpAgentStore')
 const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 const customLogger = require('../requestLogger')
-const TransformerFunctions = require('../mocking/transformer-functions')
 
 const registerAxiosRequestInterceptor = (userConfig, axios) => {
   axios.interceptors.request.use(config => {
@@ -127,8 +126,9 @@ const customWrapperFn = (requestVariables, consoleFn) => {
       requestVariables.SKIP_REQUEST = true
     },
     setTransformer: function (transformerName, options = {}) {
+      consoleFn.log(`Setting transformer '${transformerName}' if exists...`)
       requestVariables.TRANSFORM = {
-        transformer: TransformerFunctions[transformerName],
+        transformerName: transformerName,
         options
       }
     },

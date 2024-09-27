@@ -47,6 +47,7 @@ const dbAdapter = require('../db/adapters/dbAdapter')
 const arrayStore = require('../arrayStore')
 const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 const httpAgentStore = require('../httpAgentStore')
+const Transformers = require('../mocking/transformers')
 
 const terminateTraceIds = {}
 
@@ -323,7 +324,19 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         status = 'SKIPPED'
         await setSkippedResponse(convertedRequest, request, status, tracing, testCase, scriptsExecution, globalConfig)
       } else {
-        const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId, contextObj)
+        // Get transformer if specified
+        let transformerObj = {
+          transformer: null,
+          options: {}
+        }
+        if (contextObj.requestVariables && contextObj.requestVariables.TRANSFORM) {
+          transformerObj.transformer = Transformers.getTransformer(contextObj.requestVariables.TRANSFORM.transformerName)
+          transformerObj.options = contextObj.requestVariables.TRANSFORM.options
+        } else if (templateOptions?.transformerName) {
+          transformerObj.transformer = Transformers.getTransformer(templateOptions.transformerName)
+          // Currently no options are passed to the transformer in template level, we can add it later if needed
+        }
+        const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId, contextObj, transformerObj)
         status = 'SUCCESS'
         await setResponse(convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig)
       }
@@ -579,7 +592,7 @@ const getUrlPrefix = (baseUrl) => {
   return returnUrl
 }
 
-const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId, contextObj = {}) => {
+const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId, contextObj = {}, transformerObj) => {
   return new Promise((resolve, reject) => {
     (async () => {
       const httpAgentProps = {}
@@ -630,9 +643,11 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
       }
 
       let transformedRequest = {}
-      if (contextObj.requestVariables && contextObj.requestVariables.TRANSFORM && contextObj.requestVariables.TRANSFORM.transformer && contextObj.requestVariables.TRANSFORM.transformer.requestTransform) {
-        const result = contextObj.requestVariables.TRANSFORM.transformer.requestTransform({ method, path, headers, body})
+
+      if (transformerObj && transformerObj.transformer && transformerObj.transformer.requestTransform) {
+        const result = await transformerObj.transformer.requestTransform({ method, path, headers, body})
         transformedRequest.body = result.body
+        transformedRequest.headers = result.headers
       }
 
       const reqOpts = {
@@ -640,7 +655,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         url: urlGenerated,
         path,
         params: queryParams,
-        headers,
+        headers: transformedRequest.headers || headers,
         data: transformedRequest.body || body,
         timeout: (contextObj.requestVariables && contextObj.requestVariables.REQUEST_TIMEOUT) || userConfig.DEFAULT_REQUEST_TIMEOUT,
         validateStatus: function (status) {
@@ -674,21 +689,21 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           return reject(new Error(JSON.stringify({ curlRequest, syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
         }, userConfig.CALLBACK_TIMEOUT)
         // Listen for success callback
-        MyEventEmitter.getEmitter('testOutbound', user).once(successCallbackUrl, (_callbackHeaders, _callbackBody) => {
+        MyEventEmitter.getEmitter('testOutbound', user).once(successCallbackUrl, async (_callbackHeaders, _callbackBody, _callbackMethod, _callbackPath) => {
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
           let callbackHeaders = _callbackHeaders
           let callbackBody = _callbackBody
           let originalBody
-          if (contextObj.requestVariables && contextObj.requestVariables.TRANSFORM && contextObj.requestVariables.TRANSFORM.transformer && contextObj.requestVariables.TRANSFORM.transformer.callbackTransform) {
-            const result = contextObj.requestVariables.TRANSFORM.transformer.callbackTransform({ headers: _callbackHeaders, body: _callbackBody })
+          if (transformerObj && transformerObj.transformer && transformerObj.transformer.callbackTransform) {
+            const result = await transformerObj.transformer.callbackTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
             originalBody = _callbackBody
             callbackBody = result.body
-            // originalHeaders = _callbackHeaders // Not using the transformed headers for now
-            // callbackHeaders = result.headers // Not using the transformed headers for now
+            originalHeaders = _callbackHeaders
+            callbackHeaders = result.headers
           }
           customLogger.logMessage('info', 'Received success callback ' + successCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          return resolve({ curlRequest, transformedRequest, syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody, originalBody } })
+          return resolve({ curlRequest, transformedRequest, syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody, originalHeaders, originalBody } })
         })
         // Listen for error callback
         MyEventEmitter.getEmitter('testOutbound', user).once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
