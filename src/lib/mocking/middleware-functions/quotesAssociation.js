@@ -29,7 +29,7 @@ const handleQuotes = (context, request, fulfilment = null) => {
   // Check whether the request is POST /quotes
   if (request.method === 'post' && request.path === '/quotes') {
     // Save the Transaction ID in object store
-    if (request.payload.CdtTrfTxInf.PmtId.EndToEndId) {
+    if (request.payload.CdtTrfTxInf?.PmtId?.EndToEndId) {
       ObjectStore.push('transactions', request.payload.CdtTrfTxInf.PmtId.EndToEndId, { fulfilment })
     }
     if (request.payload.transactionId) {
@@ -45,7 +45,7 @@ const handleTransfers = (context, request) => {
     try {
       ilpTransactionObject = IlpModel.getIlpTransactionObject(
         request.payload.ilpPacket ||
-        request.payload.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket
+        request.payload.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket
       )
     } catch (err) {
       return false

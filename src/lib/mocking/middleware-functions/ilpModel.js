@@ -168,7 +168,7 @@ const validateTransferCondition = (context, request) => {
     }
     let condition
     if (!_isIso20022(request)) {
-      condition = request.payload.condition
+      condition = request.payload?.condition
     } else {
       // Construct the ILP object from the request payload
       // since ISO20022 expect the condition in the ilpPacket
