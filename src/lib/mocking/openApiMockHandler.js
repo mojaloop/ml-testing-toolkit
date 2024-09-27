@@ -42,7 +42,6 @@ const JwsSigning = require('../jws/JwsSigning')
 const path = require('path')
 
 const IlpModel = require('./middleware-functions/ilpModel')
-const Logger = require('@mojaloop/central-services-logger')
 
 let apis = []
 
@@ -405,7 +404,6 @@ const generateAsyncCallback = async (item, context, req) => {
   if (generatedCallback.body) {
     // Append ILP properties to callback
     const fulfilment = IlpModel.handleQuoteIlp(context, generatedCallback)
-    Logger.warn('fulfilment:' + fulfilment)
     IlpModel.handleTransferIlp(context, generatedCallback)
     if (userConfig.TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
       require('./middleware-functions/quotesAssociation').handleQuotes(context, req, fulfilment)
