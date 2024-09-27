@@ -2749,7 +2749,6 @@ components:
       description: |
         Specifies a hexadecimal string with a length of 32 characters.
       type: string
-      pattern: ^([0-9A-F][0-9A-F]){32}$
       example: 1234567890ABCDEF1234567890ABCDEF
     Exact4AlphaNumericText:
       title: Exact4AlphaNumericText
@@ -6483,97 +6482,22 @@ components:
         - GrpHdr
       example:
         GrpHdr:
-          MsgId: 12345
+          MsgId: 123456789
           CreDtTm: "2020-01-01T00:00:00Z"
-          PmtInstrXpryDtTm: "2020-01-01T00:00:00Z"
           NbOfTxs: 1
-          SttlmInf:
-            SttlmMtd: INDA
-            SttlmAcct:
-              Id:
-                IBAN: 123
-            SttlmAcctOwnr:
-              Nm: John Doe
-            SttlmAcctSvcr:
-              BICFI: 123
-          CdtTrfTxInf:
-            PmtId:
-              InstrId: 123
-              EndToEndId: 123
-            PmtTpInf:
-              InstrPrty: NORM
-              SvcLvl:
-                Cd: SEPA
-              LclInstrm:
-                Cd: CH03
-              CtgyPurp:
-                Cd: SUPP
-            IntrBkSttlmAmt:
-              Ccy: EUR
-              Amt: 100
-            InstdAmt:
-              Ccy: EUR
-              Amt: 100
-            ChrgBr: SLEV
-            ChrgsInf:
-              Amt:
-                Ccy: EUR
-                Amt: 0
-            Cdtr:
-              Nm: Creditor Name
-              PstlAdr:
-                AdrTp: ADDR
-                Dept: Department
-                SubDept: SubDepartment
-                StrtNm: StreetName
-                BldgNb: BuildingNumber
-                PstCd: PostCode
-                TwnNm: TownName
-                CtrySubDvsn: CountrySubDivision
-                Ctry: Country
-              Id:
-                OrgId:
-                  AnyBIC: BBBBBBBB
-                  Othr:
-                    Id: 123456789
+          CtrlSum: 100
+          InitgPty:
+            Nm: Initiating Party Name
+            Id:
+              OrgId:
+                Othr:
+                  - Id: 123456789
                     SchmeNm:
-                      Cd: IBAN
+                      Cd: BBA
                       Prtry: Party Identification Scheme Name
-            CdtrAcct:
-              Id:
-                IBAN: IBAN
-            CdtrAgt:
-              FinInstnId:
-                BICFI: BBBBBBBB
-            CdtrAgtAcct:
-              Id:
-                IBAN: IBAN
-            UltmtCdtr:
-              Nm: Ultimate Creditor Name
-              PstlAdr:
-                AdrTp: ADDR
-                Dept: Department
-                SubDept: SubDepartment
-                StrtNm: StreetName
-                BldgNb: BuildingNumber
-                PstCd: PostCode
-                TwnNm: TownName
-                CtrySubDvsn: CountrySubDivision
-                Ctry: Country
-              Id:
-                OrgId:
-                  AnyBIC: BBBBBBBB
-                  Othr:
-                    Id: 123456789
-                    SchmeNm:
-                      Cd: IBAN
-                      Prtry: Party Identification Scheme Name
-            RgltryRptg:
-              DbtCdtRptgInd: CRED
-              Authrty:
-                Nm: Swiss National Bank
-                Ctry: CH
-
+          FwdgAgt:
+            FinInstnId:
+              BICFI: BBBBBBBB
     TermsResponse_FIToFICustomerCreditConfirmation:
       title: TermsResponse_FIToFICustomerCreditConfirmation
       type: object
@@ -6619,84 +6543,9 @@ components:
           FwdgAgt:
             FinInstnId:
               BICFI: BBBBBBBB
-        CdtTrfTxInf:
-          PmtId:
-            InstrId: 123456789
-            EndToEndId: 123456789
-          PmtTpInf:
-            InstrPrty: NORM
-            SvcLvl:
-              Cd: SEPA
-            LclInstrm:
-              Cd: CH03
-            CtgyPurp:
-              Cd: SUPP
-          InstdAmt:
-            Ccy: EUR
-            Amt: 100
-          ChrgBr: SLEV
-          ChrgsInf:
-            Amt:
-              Ccy: EUR
-              Amt: 0
-          Cdtr:
-            Nm: Creditor Name
-            PstlAdr:
-              AdrTp: ADDR
-              Dept: Department
-              SubDept: SubDepartment
-              StrtNm: StreetName
-              BldgNb: BuildingNumber
-              PstCd: PostCode
-              TwnNm: TownName
-              CtrySubDvsn: CountrySubDivision
-              Ctry: Country
-            Id:
-              OrgId:
-                AnyBIC: BBBBBBBB
-                Othr:
-                  Id: 123456789
-                  SchmeNm:
-                    Cd: IBAN
-                    Prtry: Party Identification Scheme Name
-          CdtrAcct:
-            Id:
-              IBAN: IBAN
-          CdtrAgt:
-            FinInstnId:
-              BICFI: BBBBBBBB
-          CdtrAgtAcct:
-            Id:
-              IBAN: IBAN
-          UltmtCdtr:
-            Nm: Ultimate Creditor Name
-            PstlAdr:
-              AdrTp: ADDR
-              Dept: Department
-              SubDept: SubDepartment
-              StrtNm: StreetName
-              BldgNb: BuildingNumber
-              PstCd: PostCode
-              TwnNm: TownName
-              CtrySubDvsn: CountrySubDivision
-              Ctry: Country
-            Id:
-              OrgId:
-                AnyBIC: BBBBBBBB
-                Othr:
-                  Id: 123456789
-                  SchmeNm:
-                    Cd: IBAN
-                    Prtry: Party Identification Scheme Name
-          RgltryRptg:
-            DbtCdtRptgInd: CRED
-            Authrty:
-              Nm: Swiss National Bank
-              Ctry: CH
     UUIDv4Identifier:
       title: UUIDv4Identifier
       type: string
-      pattern: ^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$
       example: 8f3a3b2d-3b0a-4b3f-8e4e-1b2f3f4c5d6e
     VerificationReason1Choice:
       title: VerificationReason1Choice

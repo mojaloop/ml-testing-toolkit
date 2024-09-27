@@ -5,26 +5,18 @@
       "successCallback": {
         "method": "put",
         "path": "/transfers/{ID}",
-        "pathPattern": "/transfers/{$request.body.transferId}",
+        "pathPattern": "/transfers/{$request.body.GrpHdr.CdtTrfTxInf.PmtId.EndToEndId}",
         "headerOverride": {
           "FSPIOP-Source": "{$request.body.payeeFsp}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
           "Content-Type": "{$session.negotiatedContentType}",
           "Date": "{$request.headers.date}"
-        },
-        "bodyOverride": {
-          "TxInfAndSts": {
-            "PrcgDt": {
-              "DtTm": "{$function.generic.curDateISO}"
-            },
-            "TxSts": "COMMITTED"
-          }
         }
       },
       "errorCallback": {
         "method": "put",
         "path": "/transfers/{ID}/error",
-        "pathPattern": "/transfers/{$request.body.transferId}/error",
+        "pathPattern": "/transfers/{$request.body.GrpHdr.CdtTrfTxInf.PmtId.EndToEndId}/error",
         "headerOverride": {
           "FSPIOP-Source": "{$config.FSPID}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
@@ -258,7 +250,7 @@
       "successCallback": {
         "method": "put",
         "path": "/fxQuotes/{ID}",
-        "pathPattern": "/fxQuotes/{$request.body.conversionRequestId}",
+        "pathPattern": "/fxQuotes/{$request.body.GrpHdr.CdtTrfTxInf.PmtId.EndToEndId}",
         "headerOverride": {
           "FSPIOP-Source": "{$request.headers.fspiop-destination}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
@@ -269,7 +261,7 @@
       "errorCallback": {
         "method": "put",
         "path": "/fxQuotes/{ID}/error",
-        "pathPattern": "/fxQuotes/{$request.body.conversionRequestId}/error",
+        "pathPattern": "/fxQuotes/{$request.body.GrpHdr.CdtTrfTxInf.PmtId.EndToEndId}/error",
         "headerOverride": {
           "FSPIOP-Source": "{$config.FSPID}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
@@ -310,7 +302,7 @@
       "successCallback": {
         "method": "put",
         "path": "/fxTransfers/{ID}",
-        "pathPattern": "/fxTransfers/{$request.body.commitRequestId}",
+        "pathPattern": "/fxTransfers/{$request.body.GrpHdr.CdtTrfTxInf.PmtId.EndToEndId}",
         "headerOverride": {
           "FSPIOP-Source": "{$request.body.counterPartyFsp}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",
@@ -321,7 +313,7 @@
       "errorCallback": {
         "method": "put",
         "path": "/fxTransfers/{ID}/error",
-        "pathPattern": "/fxTransfers/{$request.body.commitRequestId}/error",
+        "pathPattern": "/fxTransfers/{$request.body.GrpHdr.CdtTrfTxInf.PmtId.EndToEndId}/error",
         "headerOverride": {
           "FSPIOP-Source": "{$request.body.counterPartyFsp}",
           "FSPIOP-Destination": "{$request.headers.fspiop-source}",

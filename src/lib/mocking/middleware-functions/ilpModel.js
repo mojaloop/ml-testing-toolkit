@@ -70,8 +70,14 @@ const handleQuoteIlp = (context, response) => {
       note: response.body.note || context.request.body.GrpHdr.CdtTrfTxInf?.InstrForNxtAgt?.InstrInf || null
     }
     const { ilpPacket, fulfilment, condition } = ilpObj.getResponseIlp(transactionObject)
-    response.body.ilpPacket = ilpPacket
-    response.body.condition = condition
+    if (context.request.body.quoteId) {
+      response.body.ilpPacket = ilpPacket
+      response.body.condition = condition
+    }
+    if (context.request.body.GrpHdr) {
+      response.body.GrpHdr.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket = ilpPacket
+      response.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket = ilpPacket
+    }
     return fulfilment
   }
   return null
@@ -85,9 +91,16 @@ const handleTransferIlp = (context, response) => {
       response.eventInfo.params.body.fulfilment) {
       return null
     }
-    const generatedFulfilment = ilpObj.calculateFulfil(context.request.body.ilpPacket).replace('"', '')
+    console.log(JSON.stringify(context.request.body))
+    const generatedFulfilment = ilpObj.calculateFulfil(context.request.body.ilpPacket ||
+      context.request.body.GrpHdr.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
     // const generatedCondition = ilpObj.calculateConditionFromFulfil(generatedFulfilment).replace('"', '')
-    response.body.fulfilment = generatedFulfilment
+    if (context.request.body.ilpPacket) {
+      response.body.fulfilment = generatedFulfilment
+    }
+    if (context.request.body.GrpHdr) {
+      response.body.GrpHdr.TxInfAndSts.ExctnConf = generatedFulfilment
+    }
   }
   if (context.request.method === 'get' && response.method === 'put' && pathMatch.test(response.path)) {
     // const generatedCondition = ilpObj.calculateConditionFromFulfil(generatedFulfilment).replace('"', '')
