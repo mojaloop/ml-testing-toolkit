@@ -61,7 +61,7 @@
           "method": "post",
           "body": {
             "GrpHdr": {
-              "MsgId": " ",
+              "MsgId": "{$function.generic.generateULID}",
               "CreDtTm": "{$function.generic.curDate}",
               "PmtInstrXpryDtTm": "2020-01-01T00:00:00Z",
               "NbOfTxs": "1",
@@ -629,8 +629,8 @@
           "method": "post",
           "body": {
             "GrpHdr": {
-              "MsgId": "12345",
-              "CreDtTm": "2020-01-01T00:00:00Z",
+              "MsgId": "{$function.generic.generateULID}",
+              "CreDtTm": "{$function.generic.curDate}",
               "NbOfTxs": "1",
               "TtlIntrBkSttlmAmt": {
                 "Ccy": "EUR",
@@ -789,6 +789,262 @@
             "Date": "{$function.generic.curDate}",
             "FSPIOP-Source": "{$inputs.fromFspId}",
             "FSPIOP-Destination": "{$inputs.toFspId}"
+          },
+          "disabled": false
+        },
+        {
+          "id": 5,
+          "description": "test",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 2,
+            "type": "iso20022",
+            "asynchronous": true,
+            "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+          },
+          "operationPath": "/fxTransfers",
+          "path": "/fxTransfers",
+          "method": "post",
+          "headers": {
+            "Accept": "application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0",
+            "Content-Type": "application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$inputs.toFspId}"
+          },
+          "body": {
+            "GrpHdr": {
+              "MsgId": "{$function.generic.generateULID}",
+              "CreDtTm": "{$function.generic.curDate}",
+              "NbOfTxs": "1",
+              "CtrlSum": "1000",
+              "SttlmInf": {
+                "SttlmMtd": "INDA",
+                "SttlmAcct": {
+                  "Id": {
+                    "IBAN": "BE71096123456769"
+                  },
+                  "Ccy": "EUR"
+                },
+                "SttlmAcctOwnr": {
+                  "Nm": "Name"
+                },
+                "SttlmAcctSvcr": {
+                  "Nm": "Name"
+                },
+                "SttlmAgt": {
+                  "FinInstnId": {
+                    "BICFI": "BIC"
+                  }
+                }
+              },
+              "InitgPty": {
+                "Nm": "Initiating Party Name",
+                "Id": {
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "123456789",
+                      "SchmeNm": {
+                        "Cd": "BBA"
+                      }
+                    }
+                  }
+                }
+              },
+              "FwdgAgt": {
+                "FinInstnId": {
+                  "BICFI": "BBBBBBBB"
+                }
+              },
+              "DbtrAgt": {
+                "FinInstnId": {
+                  "BICFI": "AAAAAAAA"
+                }
+              },
+              "CdtrAgt": {
+                "FinInstnId": {
+                  "BICFI": "CCCCCCCC"
+                }
+              },
+              "CdtTrfTxInf": {
+                "PmtId": {
+                  "TxId": "{$function.generic.generateULID}",
+                  "InstrId": "{$function.generic.generateULID}",
+                  "EndToEndId": "{$function.generic.generateULID}"
+                },
+                "PmtTpInf": {
+                  "InstrPrty": "NORM",
+                  "CtgyPurp": {
+                    "Cd": "SUPP"
+                  }
+                },
+                "InstrForCdtrAgt": {
+                  "Prtry": "/ACC/123456789"
+                },
+                "IntrBkSttlmAmt": {
+                  "ActiveCurrencyAndAmount": "1000",
+                  "Ccy": "EUR"
+                },
+                "ChrgBr": "SLEV",
+                "CdtrAgt": {
+                  "FinInstnId": {
+                    "BICFI": "CCCCCCCC"
+                  }
+                },
+                "Dbtr": {
+                  "Name": "Test Debitor",
+                  "FinInstnId": {
+                    "Id": "54321",
+                    "SchmeNm": {
+                      "Prtry": "ACCOUNT_ID"
+                    }
+                  },
+                  "Id": {
+                    "PrvtId": {
+                      "DtAndPlcOfBirth": {
+                        "BirthDt": "{$function.generic.curDate}"
+                      }
+                    },
+                    "OrgId": {
+                      "Othr": {
+                        "Id": "12345",
+                        "SchmeNm": {
+                          "Prtry": "ACCOUNT_ID"
+                        }
+                      }
+                    }
+                  }
+                },
+                "DbtrAgt": {
+                  "FinInstnId": {
+                    "Nm": "Test"
+                  }
+                },
+                "Cdtr": {
+                  "Name": "Test Creditor",
+                  "FinInstnId": {
+                    "Id": "54321",
+                    "SchmeNm": {
+                      "Prtry": "ACCOUNT_ID"
+                    }
+                  },
+                  "Id": {
+                    "PrvtId": {
+                      "DtAndPlcOfBirth": {
+                        "BirthDt": "{$function.generic.curDate}"
+                      }
+                    },
+                    "OrgId": {
+                      "Othr": {
+                        "Id": "54321",
+                        "SchmeNm": {
+                          "Prtry": "ACCOUNT_ID"
+                        }
+                      }
+                    }
+                  }
+                },
+                "CdtrAcct": {
+                  "Id": {
+                    "IBAN": "BE71096123456769"
+                  }
+                },
+                "RmtInf": {
+                  "Ustrd": "Payment for invoice 12345"
+                }
+              }
+            },
+            "CdtTrfTxInf": {
+              "PmtId": {
+                "TxId": "{$function.generic.generateULID}",
+                "InstrId": "{$function.generic.generateULID}",
+                "EndToEndId": "{$function.generic.generateULID}"
+              },
+              "PmtTpInf": {
+                "InstrPrty": "NORM",
+                "CtgyPurp": {
+                  "Cd": "SUPP"
+                }
+              },
+              "InstrForCdtrAgt": {
+                "Prtry": "/ACC/123456789"
+              },
+              "IntrBkSttlmAmt": {
+                "ActiveCurrencyAndAmount": "1000",
+                "Ccy": "EUR"
+              },
+              "ChrgBr": "SLEV",
+              "CdtrAgt": {
+                "FinInstnId": {
+                  "BICFI": "CCCCCCCC"
+                }
+              },
+              "Dbtr": {
+                "Name": "Test Debitor",
+                "FinInstnId": {
+                  "Id": "54321",
+                  "SchmeNm": {
+                    "Prtry": "ACCOUNT_ID"
+                  }
+                },
+                "Id": {
+                  "PrvtId": {
+                    "DtAndPlcOfBirth": {
+                      "BirthDt": "{$function.generic.curDate}"
+                    }
+                  },
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "12345",
+                      "SchmeNm": {
+                        "Prtry": "ACCOUNT_ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "DbtrAgt": {
+                "FinInstnId": {
+                  "Nm": "Test"
+                }
+              },
+              "Cdtr": {
+                "Name": "Test Creditor",
+                "FinInstnId": {
+                  "Id": "54321",
+                  "SchmeNm": {
+                    "Prtry": "ACCOUNT_ID"
+                  }
+                },
+                "Id": {
+                  "PrvtId": {
+                    "DtAndPlcOfBirth": {
+                      "BirthDt": "{$function.generic.curDate}"
+                    }
+                  },
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "54321",
+                      "SchmeNm": {
+                        "Prtry": "ACCOUNT_ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "CdtrAcct": {
+                "Id": {
+                  "IBAN": "BE71096123456769"
+                }
+              },
+              "RmtInf": {
+                "Ustrd": "Payment for invoice 12345"
+              }
+            }
           },
           "disabled": false
         }

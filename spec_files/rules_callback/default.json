@@ -1287,26 +1287,28 @@
         },
         "body": {
           "GrpHdr": {
-            "MsgId": 12345,
-            "CreDtTm": "2020-01-01T00:00:00Z",
+            "MsgId": "{$function.generic.generateULID}",
+            "CreDtTm": "{$function.generic.curDateISO}",
             "TxInfAndSts": {
-              "StsId": 12345,
-              "OrgnlInstrId": 12345,
-              "OrgnlEndToEndId": 12345,
-              "OrgnlTxId": 12345,
+              "StsId": "12345",
+              "OrgnlInstrId": "12345",
+              "OrgnlEndToEndId": "12345",
+              "OrgnlTxId": "12345",
               "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
-              "TxSts": "RJCT",
+              "TxSts": "APPR",
               "StsRsnInf": {
-                "Rsn": "RSN",
+                "Rsn": {
+                  "Prtry": "ACPT"
+                },
                 "AddtlInf": "ADDITIONAL"
               },
-              "AccptncDtTm": "2020-01-01T00:00:00Z",
+              "AccptncDtTm": "{$function.generic.curDateISO}",
               "AcctSvcrRef": "ACCTSVCRREF",
               "ClrSysRef": "CLRSYSREF",
               "ExctnConf": "1234567890ABCDEF",
               "SplmtryData": {
                 "PlcAndNm": "PLACE",
-                "Envlp": "ENVELOPE"
+                "Envlp": {}
               }
             }
           }
