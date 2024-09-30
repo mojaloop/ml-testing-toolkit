@@ -266,7 +266,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
 
     // Form the actual http request headers, body, path and method by replacing configurable parameters
     // Replace the parameters
-    convertedRequest = replaceVariables(request, inputValues, request, requestsObj)
+    convertedRequest = replaceVariables(request, inputValues, request, requestsObj, templateOptions)
     convertedRequest = replaceRequestVariables(convertedRequest)
 
     if (convertedRequest.delay) {
@@ -695,6 +695,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           let callbackHeaders = _callbackHeaders
           let callbackBody = _callbackBody
           let originalBody
+          let originalHeaders
           if (transformerObj && transformerObj.transformer && transformerObj.transformer.callbackTransform) {
             const result = await transformerObj.transformer.callbackTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
             originalBody = _callbackBody
@@ -762,7 +763,7 @@ const setResultObject = (inputObject) => {
   }
 }
 
-const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
+const replaceVariables = (inputObject, inputValues, request, requestsObj, templateOptions) => {
   let resultObject = setResultObject(inputObject)
   if (!resultObject) {
     return inputObject
@@ -775,7 +776,7 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
       const splitArr = element.split('.')
       switch (splitArr[0]) {
         case '{$function': {
-          resultObject = resultObject.replace(element, getFunctionResult(element, inputValues, request))
+          resultObject = resultObject.replace(element, getFunctionResult(element, templateOptions, request))
           break
         }
         case '{$prev': {
@@ -871,8 +872,8 @@ const replacePathVariables = (operationPath, params) => {
 }
 
 // Execute the function and return the result
-const getFunctionResult = (param, inputValues, request) => {
-  return utilsInternal.getFunctionResult(param, inputValues, request)
+const getFunctionResult = (param, templateOptions, request) => {
+  return utilsInternal.getFunctionResult(param, templateOptions, request)
 }
 
 // Get Total Counts
