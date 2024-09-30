@@ -710,7 +710,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
           customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          return reject(new Error(JSON.stringify({ curlRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
+          return reject(new Error(JSON.stringify({ curlRequest, transformedRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
         })
       }
 
@@ -732,13 +732,13 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
             MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
             MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
           }
-          return reject(new Error(JSON.stringify({ curlRequest, syncResponse })))
+          return reject(new Error(JSON.stringify({ curlRequest, transformedRequest, syncResponse })))
         } else {
           customLogger.logOutboundRequest('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: { response: result }, user, uniqueId, request: reqOpts })
         }
 
         if (!successCallbackUrl || !errorCallbackUrl || ignoreCallbacks) {
-          return resolve({ curlRequest, syncResponse, transformedRequest })
+          return resolve({ curlRequest, transformedRequest, syncResponse, transformedRequest })
         }
         customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user })
       }, (err) => {

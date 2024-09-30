@@ -24,6 +24,18 @@
 
 const { FspiopTransformFacade, Fspiop20022TransformFacade } = require('@mojaloop/ml-schema-transformer-lib')
 
+const _replaceHeaders = (newHeaders, headers) => {
+  // Replace headers considering the case sensitivity
+  const clonedHeaders = {
+    ...headers
+  }
+  Object.keys(newHeaders).forEach((key) => {
+    const newKey = Object.keys(clonedHeaders).find((k) => k.toLowerCase() === key.toLowerCase())
+    clonedHeaders[newKey] = newHeaders[key]
+  })
+  return clonedHeaders
+}
+
 const fspiopToISO20022 = {
   requestTransform: async (requestOptions) => {
     try {
@@ -31,10 +43,9 @@ const fspiopToISO20022 = {
         case 'get':
           // GET /parties
           if (requestOptions.path.startsWith('/parties')) {
-            const headers = {
-              ...requestOptions.headers,
-              'accept': 'application/vnd.interoperability.iso20022.parties+json;version=2.0'
-            }
+            const headers = _replaceHeaders({
+              accept: 'application/vnd.interoperability.iso20022.parties+json;version=2.0'
+            }, requestOptions.headers)
             return {
               ...requestOptions,
               headers
@@ -44,11 +55,10 @@ const fspiopToISO20022 = {
         case 'post':
           // POST /quotes
           if (requestOptions.path.startsWith('/quotes')) {
-            const headers = {
-              ...requestOptions.headers,
+            const headers = _replaceHeaders({
               'accept': 'application/vnd.interoperability.iso20022.quotes+json;version=2.0',
               'content-type': 'application/vnd.interoperability.iso20022.quotes+json;version=2.0'
-            }
+            }, requestOptions.headers)
             const body = await FspiopTransformFacade.quotes.post(requestOptions.body)
             return {
               ...requestOptions,
@@ -70,10 +80,9 @@ const fspiopToISO20022 = {
         case 'put':
           // PUT /parties
           if (callbackOptions.path.startsWith('/parties')) {
-            const headers = {
-              ...callbackOptions.headers,
+            const headers = _replaceHeaders({
               'content-type': 'application/vnd.interoperability.parties+json;version=2.0'
-            }
+            }, callbackOptions.headers)
             const body = await Fspiop20022TransformFacade.parties.put(callbackOptions.body)
             return {
               ...callbackOptions,
