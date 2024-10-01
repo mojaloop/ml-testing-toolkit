@@ -22,17 +22,12 @@
  --------------
  ******/
 
-const FSPIOP_ISO20022_Transformer = require('./fspiop_iso20022')
-
-const allTransformers = {
-  ...FSPIOP_ISO20022_Transformer
-}
-
 const getTransformer = (transformerName) => {
   if (transformerName === 'none' || transformerName === 'NONE' || transformerName === 'no' || transformerName === 'NO') {
     return null
   } else {
-    return allTransformers[transformerName]
+    const transformerModule = require(`./${transformerName}`);
+    return transformerModule
   }
 }
   
