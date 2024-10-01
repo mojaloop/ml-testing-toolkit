@@ -103,7 +103,7 @@ module.exports.negotiateVersion = (req, apis) => {
       }
     }
     if (!negotiationFailed) {
-      responseContentTypeHeader = `application/vnd.interoperability.${parsedAcceptHeader.resource}+json;version=${apis[negotiatedIndex].majorVersion}.${apis[negotiatedIndex].minorVersion}`
+      responseContentTypeHeader = `application/vnd.interoperability.${parsedAcceptHeader.resource}${parsedAcceptHeader.apiType !== 'fspiop' ? '.' + parsedAcceptHeader.apiType : ''}+json;version=${apis[negotiatedIndex].majorVersion}.${apis[negotiatedIndex].minorVersion}`
     }
   }
   customLogger.logMessage('debug', negotiationFailed ? 'Version negotiation failed for the Accept / Content-Type header ' + acceptHeader : 'Version negotiation succeeded, picked up the version ' + apis[negotiatedIndex].majorVersion + '.' + apis[negotiatedIndex].minorVersion, { request: req })
