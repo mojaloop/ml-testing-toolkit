@@ -333,9 +333,9 @@
                 "IlpV4PrepPacket": "{$prev.2.callback.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket}"
               },
               "PmtId": {
-                "TxId": "01J8RG72ZT6DP73KKGMASRBF0E",
+                "TxId": "{$prev.2.request.body.CdtTrfTxInf.PmtId.EndToEndId}",
                 "InstrId": "01J8RG72ZT6DP73KKGMASRBF0F",
-                "EndToEndId": "{$prev.2.request.body.CdtTrfTxInf.PmtId.EndToEndId}"
+                "EndToEndId": "01J8RG72ZT6DP73KKGMASRBF0F"
               },
               "PmtTpInf": {
                 "InstrPrty": "NORM",
