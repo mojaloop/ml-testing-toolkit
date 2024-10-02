@@ -1,7 +1,7 @@
 {
   "name": "ml-testing-toolkit",
   "description": "Testing Toolkit for Mojaloop implementations",
-  "version": "17.4.0-snapshot.0",
+  "version": "18.0.0-snapshot.0",
   "license": "Apache-2.0",
   "author": "Vijaya Kumar Guthi, ModusBox Inc. ",
   "contributors": [
