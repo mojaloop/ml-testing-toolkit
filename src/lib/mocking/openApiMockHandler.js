@@ -42,6 +42,7 @@ const JwsSigning = require('../jws/JwsSigning')
 const path = require('path')
 
 const IlpModel = require('./middleware-functions/ilpModel')
+const { generateULID } = require('./custom-functions/generic')
 
 let apis = []
 
@@ -117,7 +118,10 @@ module.exports.handleRequest = async (req, h) => {
   // Pick a right api definition by searching for the requested resource in the definitions sequentially
   // TODO: This should be optimized by defining a hash table (object) of all the resources in all definition files on startup.
 
-  selectedApi = pickApiByMethodPathHostnameAndPrefix(req)
+  const pickedApis = pickApiByMethodPathHostnameAndPrefix(req)
+
+  // Let's pick the first one for now and swap it with the right version later
+  selectedApi = pickedApis.length > 0 ? pickedApis[0] : null
 
   if (!selectedApi) {
     customLogger.logMessage('error', 'Resource not found', { request: req })
@@ -131,10 +135,7 @@ module.exports.handleRequest = async (req, h) => {
     customLogger.logMessage('info', 'Trimmed prefix from request path: ' + selectedApi.prefix, { request: req })
   }
 
-  if (selectedApi.type === 'fspiop' && (await Config.getUserConfig(req.customInfo.user)).VERSIONING_SUPPORT_ENABLE) {
-    const fspiopApis = apis.filter(item => {
-      return item.type === 'fspiop'
-    })
+  if ((selectedApi.type === 'fspiop' || selectedApi.type === 'iso20022') && (await Config.getUserConfig(req.customInfo.user)).VERSIONING_SUPPORT_ENABLE) {
     // Validate accept header for POST & GET.
     if (req.method === 'post' || req.method === 'get') {
       // Validate the accept header here
@@ -150,10 +151,10 @@ module.exports.handleRequest = async (req, h) => {
       }
     }
     // Pick the right API object based on the major and minor versions (Version negotiation as per the API Definition file)
-    const versionNegotiationResult = OpenApiVersionTools.negotiateVersion(req, fspiopApis)
+    const versionNegotiationResult = OpenApiVersionTools.negotiateVersion(req, pickedApis)
     if (versionNegotiationResult.negotiationFailed) {
       // Create extensionList property as per the API specification document with supported versions
-      const extensionList = fspiopApis.map(item => {
+      const extensionList = pickedApis.map(item => {
         return {
           key: item.majorVersion + '',
           value: item.minorVersion + ''
@@ -162,7 +163,7 @@ module.exports.handleRequest = async (req, h) => {
       return h.response(errorResponseBuilder('3001', 'The Client requested an unsupported version, see extension list for supported version(s).', { extensionList })).code(406)
     }
     req.customInfo.negotiatedContentType = versionNegotiationResult.responseContentTypeHeader
-    selectedApi = apis[versionNegotiationResult.negotiatedIndex]
+    selectedApi = pickedApis[versionNegotiationResult.negotiatedIndex]
   }
   try {
     return await selectedApi.openApiBackendObject.handleRequest(
@@ -183,31 +184,46 @@ module.exports.handleRequest = async (req, h) => {
 }
 
 const pickApiByMethodPathHostnameAndPrefix = (req) => {
-  let pickedApis
+  let potentialApis = apis
+
+  // Match path
   const matchedPrefixApis = apis.filter(item => {
     return item.prefix ? req.path.startsWith(item.prefix) : false
   })
   if (matchedPrefixApis.length > 0) {
-    pickedApis = matchedPrefixApis.filter(item => {
+    return matchedPrefixApis.filter(item => {
       return item.openApiBackendObject.matchOperation({ ...req, path: req.path.slice(item.prefix.length) })
     })
   } else {
-    const apisWithoutPrefix = apis.filter(item => {
+    // apis without prefix
+    potentialApis = potentialApis.filter(item => {
       return !item.prefix
-    })
-    pickedApis = apisWithoutPrefix.filter(item => {
-      return item.openApiBackendObject.matchOperation(req)
     })
   }
 
   // Match hostnames
-  const matchedHostnameApis = pickedApis.filter(item => {
+  const matchedHostnameApis = potentialApis.filter(item => {
     return item.hostnames && req.info && req.info.hostname ? item.hostnames.includes(req.info.hostname) : false
   })
-  pickedApis = matchedHostnameApis.length > 0 ? matchedHostnameApis : pickedApis
+  potentialApis = matchedHostnameApis.length > 0 ? matchedHostnameApis : potentialApis.filter(item => !item.hostnames || item.hostnames.length === 0)
 
-  // Return the first api item if multiple APIs matched
-  return pickedApis[0]
+  // FSPIOP and ISO20022 version negotiation
+  let headerToCompare = req.headers['content-type']
+  if (req.method === 'get') {
+    headerToCompare = req.headers.accept
+  }
+  const headerComparisonResult = OpenApiVersionTools.parseAcceptHeader(headerToCompare)
+  if (headerComparisonResult.apiType === 'fspiop' || headerComparisonResult.apiType === 'iso20022') {
+    potentialApis = potentialApis.filter(item => {
+      return item.type === headerComparisonResult.apiType
+    })
+  }
+
+  const pickedApis = potentialApis.filter(item => {
+    return item.openApiBackendObject.matchOperation(req)
+  })
+
+  return pickedApis
 }
 
 const errorResponseBuilder = (errorCode, errorDescription, additionalProperties = null) => {
@@ -334,16 +350,21 @@ const generateAsyncCallback = async (item, context, req) => {
     }
     return
   }
+  // TODO: Need to handle iso20022 error payloads.
   // Handle quotes and transfer association - should do this first to get the associated quote
   if (userConfig.TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES) {
     const matchFound = require('./middleware-functions/quotesAssociation').handleTransfers(context, req)
     if (!matchFound) {
       customLogger.logMessage('error', 'Matching Quote Not Found', { request: req })
       const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
-      generatedErrorCallback.body = {
-        errorInformation: {
-          errorCode: '3208',
-          errorDescription: 'Provided Transfer ID was not found on the server.'
+      if (req.payload.CdtTrfTxInf) {
+        _handleISO20022ErrorCallback(generatedErrorCallback, '3208')
+      } else {
+        generatedErrorCallback.body = {
+          errorInformation: {
+            errorCode: '3208',
+            errorDescription: 'Provided Transfer ID was not found on the server.'
+          }
         }
       }
       CallbackHandler.handleCallback(generatedErrorCallback, context, req)
@@ -357,10 +378,14 @@ const generateAsyncCallback = async (item, context, req) => {
     if (!validated) {
       customLogger.logMessage('error', 'ILP Packet is not matching with the content', { request: req })
       const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
-      generatedErrorCallback.body = {
-        errorInformation: {
-          errorCode: '3106',
-          errorDescription: 'ILP Packet is not matching with the content.'
+      if (req.payload.CdtTrfTxInf) {
+        _handleISO20022ErrorCallback(generatedErrorCallback, '3106')
+      } else {
+        generatedErrorCallback.body = {
+          errorInformation: {
+            errorCode: '3106',
+            errorDescription: 'ILP Packet is not matching with the content.'
+          }
         }
       }
       CallbackHandler.handleCallback(generatedErrorCallback, context, req)
@@ -374,10 +399,14 @@ const generateAsyncCallback = async (item, context, req) => {
     if (!validated) {
       customLogger.logMessage('error', 'Condition can not be validated', { request: req })
       const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
-      generatedErrorCallback.body = {
-        errorInformation: {
-          errorCode: '3106',
-          errorDescription: 'Condition can not be validated.'
+      if (req.payload.CdtTrfTxInf) {
+        _handleISO20022ErrorCallback(generatedErrorCallback, '3106')
+      } else {
+        generatedErrorCallback.body = {
+          errorInformation: {
+            errorCode: '3106',
+            errorDescription: 'Condition can not be validated.'
+          }
         }
       }
       CallbackHandler.handleCallback(generatedErrorCallback, context, req)
@@ -397,6 +426,27 @@ const generateAsyncCallback = async (item, context, req) => {
     // Handle triggers for a transaction request
     require('./middleware-functions/transactionRequestsService').handleRequest(context, req, generatedCallback, item.triggerTemplatesFolder)
   }
+}
+
+const _handleISO20022ErrorCallback = (generatedErrorCallback, errorCode) => {
+  generatedErrorCallback.headers = {
+    ...generatedErrorCallback.headers,
+    'content-type': 'application/vnd.interoperability.iso20022.transfers+json;version=2.0'
+  }
+  generatedErrorCallback.body = {
+    GrpHdr: {
+      MsgId: generateULID(),
+      CreDtTm: new Date().toISOString()
+    },
+    TxInfAndSts: {
+      StsRsnInf: {
+        Rsn: {
+          Cd: errorCode
+        }
+      }
+    }
+  }
+  return generatedErrorCallback
 }
 
 module.exports.openApiBackendNotImplementedHandler = openApiBackendNotImplementedHandler

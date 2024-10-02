@@ -46,18 +46,51 @@ const handleQuoteIlp = (context, response) => {
     // const transactionObject = {
     //   mockData: 'This is a test data from self testing toolkit'
     // }
-    const transactionObject = {
-      transactionId: context.request.body.transactionId,
-      quoteId: context.request.body.quoteId,
-      payee: context.request.body.payee,
-      payer: context.request.body.payer,
-      amount: response.body.transferAmount,
-      transactionType: context.request.body.transactionType,
-      note: response.body.note
+    let transactionObject
+    if (!_isIso20022(context.request)) {
+      transactionObject = {
+        transactionId: context.request.body.transactionId,
+        quoteId: context.request.body.quoteId,
+        payee: context.request.body.payee,
+        payer: context.request.body.payer,
+        amount: response.body.transferAmount,
+        transactionType: context.request.body.transactionType,
+        note: response.body.note
+      }
+    } else {
+      transactionObject = {
+        transactionId: context.request.body.CdtTrfTxInf.PmtId.EndToEndId,
+        quoteId: context.request.body.CdtTrfTxInf.PmtId.TxId,
+        payee: {
+          partyIdInfo: {
+            partyIdType: context.request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id,
+            partyIdentifier: context.request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.SchmeNm.Prtry,
+            fspId: context.request.body.CdtTrfTxInf.CdtrAgt.FinInstnId.Othr.Id
+          }
+        },
+        payer: {
+          partyIdInfo: {
+            partyIdType: context.request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id,
+            partyIdentifier: context.request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.SchmeNm.Prtry,
+            fspId: context.request.body.CdtTrfTxInf.DbtrAgt.FinInstnId.Othr.Id
+          }
+        },
+        amount: {
+          currency: context.request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy,
+          amount: context.request.body.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount
+        },
+        transactionType: context.request.body.transactionType,
+        note: context.request.body.CdtTrfTxInf?.InstrForNxtAgt?.InstrInf || null
+      }
     }
+
     const { ilpPacket, fulfilment, condition } = ilpObj.getResponseIlp(transactionObject)
-    response.body.ilpPacket = ilpPacket
-    response.body.condition = condition
+    if (!_isIso20022(response)) {
+      response.body.ilpPacket = ilpPacket
+      response.body.condition = condition
+    } else {
+      response.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket = ilpPacket
+    }
     return fulfilment
   }
   return null
@@ -71,9 +104,15 @@ const handleTransferIlp = (context, response) => {
       response.eventInfo.params.body.fulfilment) {
       return null
     }
-    const generatedFulfilment = ilpObj.calculateFulfil(context.request.body.ilpPacket).replace('"', '')
+    const generatedFulfilment = ilpObj.calculateFulfil(context.request.body.ilpPacket ||
+      context.request.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
     // const generatedCondition = ilpObj.calculateConditionFromFulfil(generatedFulfilment).replace('"', '')
-    response.body.fulfilment = generatedFulfilment
+    if (context.request.body.ilpPacket) {
+      response.body.fulfilment = generatedFulfilment
+    }
+    if (context.request.body.TxInfAndSts) {
+      response.body.TxInfAndSts.ExctnConf = generatedFulfilment
+    }
   }
   if (context.request.method === 'get' && response.method === 'put' && pathMatch.test(response.path)) {
     // const generatedCondition = ilpObj.calculateConditionFromFulfil(generatedFulfilment).replace('"', '')
@@ -88,7 +127,21 @@ const validateTransferIlpPacket = (context, request) => {
   if (request.method === 'post' && request.path === '/transfers') {
     customLogger.logMessage('info', 'Validating Ilp packet against the transfer request', { request })
     try {
-      return ilpObj.validateIlpAgainstTransferRequest(request.payload)
+      let validationBody
+      if (!_isIso20022(request)) {
+        validationBody = request.payload
+      } else {
+        validationBody = {
+          payeeFsp: request.payload.CdtTrfTxInf.CdtrAgt.FinInstnId.Othr.Id,
+          payerFsp: request.payload.CdtTrfTxInf.DbtrAgt.FinInstnId.Othr.Id,
+          amount: {
+            currency: request.payload.CdtTrfTxInf.IntrBkSttlmAmt.Ccy,
+            amount: request.payload.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount
+          },
+          ilpPacket: request.payload.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket
+        }
+      }
+      return ilpObj.validateIlpAgainstTransferRequest(validationBody)
     } catch (err) {
       customLogger.logMessage('error', 'Failed to validate the Ilp packet. Error: ' + err.message, { request })
       return false
@@ -113,8 +166,16 @@ const validateTransferCondition = (context, request) => {
         return false
       }
     }
+    let condition
+    if (!_isIso20022(request)) {
+      condition = request.payload?.condition
+    } else {
+      // Construct the ILP object from the request payload
+      // since ISO20022 expect the condition in the ilpPacket
+      condition = ilpObj.getResponseIlp(ilpObj.getTransactionObject(request.payload.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket)).condition
+    }
     try {
-      return ilpObj.validateFulfil(fulfilment, request.payload.condition)
+      return ilpObj.validateFulfil(fulfilment, condition)
     } catch (err) {
       customLogger.logMessage('error', 'Failed to validate the fulfilment. Error: ' + err.message, { request })
       return false
@@ -127,6 +188,10 @@ const validateTransferCondition = (context, request) => {
 
 const getIlpTransactionObject = (ilpPacket) => {
   return ilpObj.getTransactionObject(ilpPacket)
+}
+
+const _isIso20022 = (requestOrResponse) => {
+  return requestOrResponse.body?.CdtTrfTxInf || requestOrResponse.payload?.CdtTrfTxInf
 }
 
 module.exports = {

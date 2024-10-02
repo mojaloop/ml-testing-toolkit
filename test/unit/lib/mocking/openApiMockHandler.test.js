@@ -69,6 +69,7 @@ const SpyValidate = jest.spyOn(JwsSigning, 'validate')
 const SpyValidateAcceptHeader = jest.spyOn(OpenApiVersionTools, 'validateAcceptHeader')
 const SpyNegotiateVersion = jest.spyOn(OpenApiVersionTools, 'negotiateVersion')
 const SpyValidateContentTypeHeader = jest.spyOn(OpenApiVersionTools, 'validateContentTypeHeader')
+const SpyParseAcceptHeader = jest.spyOn(OpenApiVersionTools, 'parseAcceptHeader')
 
 jest.mock('../../../../src/lib/objectStore')
 jest.mock('../../../../src/lib/arrayStore')
@@ -118,7 +119,7 @@ const sampleRequest = {
   method: 'post',
   path: '/quotes',
   headers: {
-    'Accept': 'asdf'
+    'Accept': 'asdf',
   },
   majorVersion: 1,
   minorVersion: 0,
@@ -172,7 +173,7 @@ describe('OpenApiMockHandler', () => {
         }
       }
       await openApiBackendObject.handlers.validationFail(contextValidationFail, {}, h)
-      
+
       SpyRequestLogger.mockReturnValue()
       await openApiBackendObject.handlers.notFound(null, {}, h)
 
@@ -205,7 +206,7 @@ describe('OpenApiMockHandler', () => {
               }
             }
           }
-        } 
+        }
       }
       ObjectStore.push.mockReturnValueOnce()
       ArrayStore.push.mockReturnValueOnce()
@@ -219,7 +220,7 @@ describe('OpenApiMockHandler', () => {
         delay: 100
       })
       await openApiBackendObject.handlers.notImplemented(context, req, h)
-      
+
       req.path = '/quotes/{ID}/error'
       ObjectStore.push.mockReturnValueOnce()
       ArrayStore.push.mockReturnValueOnce()
@@ -229,7 +230,7 @@ describe('OpenApiMockHandler', () => {
         }
       }))
       await openApiBackendObject.handlers.notImplemented(context, req, h)
-      
+
       req.path = '/quotes'
       req.method = 'post'
 
@@ -248,6 +249,9 @@ describe('OpenApiMockHandler', () => {
       expect(result).toBeDefined()
     })
     it('Check for the returned value when validation passed', async () => {
+      SpyParseAcceptHeader.mockReturnValueOnce({
+        apiType: 'fspiop',
+      })
       SpyValidate.mockReturnValueOnce(true)
       sampleRequest.method = 'put'
       sampleRequest.path = '/test'
@@ -265,6 +269,9 @@ describe('OpenApiMockHandler', () => {
     })
     it('Check for the returned value when validation failed, negotiate version failed and versioning is supported', async () => {
       SpyValidate.mockReturnValueOnce(false)
+      SpyParseAcceptHeader.mockReturnValueOnce({
+        apiType: 'fspiop',
+      })
       SpyValidateAcceptHeader.mockReturnValueOnce({
         validationFailed: false
       })
@@ -280,6 +287,9 @@ describe('OpenApiMockHandler', () => {
     })
     it('Check for the returned value when validation failed, acceptHeader validation not failed, negotiate version not failed and versioning is supported', async () => {
       SpyValidate.mockReturnValueOnce(true)
+      SpyParseAcceptHeader.mockReturnValueOnce({
+        apiType: 'fspiop',
+      })
       SpyValidateAcceptHeader.mockReturnValueOnce({
         validationFailed: false
       })
@@ -295,6 +305,9 @@ describe('OpenApiMockHandler', () => {
     })
     it('Check for the returned value when validation failed, acceptHeader validation failed and versioning is supported', async () => {
       SpyValidate.mockReturnValueOnce(true)
+      SpyParseAcceptHeader.mockReturnValueOnce({
+        apiType: 'fspiop',
+      })
       SpyValidateAcceptHeader.mockReturnValueOnce({
         validationFailed: true
       })
@@ -306,6 +319,9 @@ describe('OpenApiMockHandler', () => {
     })
     it('Check for the returned value when validation failed, acceptHeader validation failed and versioning is supported and method is put', async () => {
       SpyValidate.mockReturnValueOnce(true)
+      SpyParseAcceptHeader.mockReturnValueOnce({
+        apiType: 'fspiop',
+      })
       SpyValidateContentTypeHeader.mockReturnValueOnce({
         validationFailed: true
       })
@@ -321,6 +337,9 @@ describe('OpenApiMockHandler', () => {
     })
     it('Check for the returned value when validation failed, acceptHeader validation not failed and versioning is supported and method is put', async () => {
       SpyValidate.mockReturnValueOnce(true)
+      SpyParseAcceptHeader.mockReturnValueOnce({
+        apiType: 'fspiop',
+      })
       SpyValidateContentTypeHeader.mockReturnValueOnce({
         validationFailed: false
       })
@@ -338,6 +357,9 @@ describe('OpenApiMockHandler', () => {
       SpyValidate.mockReturnValueOnce(false)
       SpyGetUserConfig.mockReturnValueOnce({
         VERSIONING_SUPPORT_ENABLE: false
+      })
+      SpyParseAcceptHeader.mockReturnValueOnce({
+        apiType: 'fspiop',
       })
       const result = await OpenApiMockHandler.handleRequest(sampleRequest, h)
       expect(result).toBeDefined()
