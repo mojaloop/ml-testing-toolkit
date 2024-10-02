@@ -128,7 +128,7 @@ const customWrapperFn = (requestVariables, consoleFn) => {
     setTransformer: function (transformerName, options = {}) {
       consoleFn.log(`Setting transformer '${transformerName}' if exists...`)
       requestVariables.TRANSFORM = {
-        transformerName: transformerName,
+        transformerName,
         options
       }
     },

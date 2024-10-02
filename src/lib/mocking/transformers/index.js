@@ -26,11 +26,11 @@ const getTransformer = (transformerName) => {
   if (transformerName === 'none' || transformerName === 'NONE' || transformerName === 'no' || transformerName === 'NO') {
     return null
   } else {
-    const transformerModule = require(`./${transformerName}`);
+    const transformerModule = require(`./${transformerName}`)
     return transformerModule
   }
 }
-  
+
 module.exports = {
   getTransformer
 }

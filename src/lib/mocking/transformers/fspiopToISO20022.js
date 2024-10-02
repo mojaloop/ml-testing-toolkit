@@ -38,7 +38,7 @@ const _replaceHeaders = (newHeaders, headers) => {
 
 const requestTransform = async (requestOptions) => {
   try {
-    switch(requestOptions.method) {
+    switch (requestOptions.method) {
       case 'get':
         // GET /parties
         if (requestOptions.path.startsWith('/parties')) {
@@ -55,7 +55,7 @@ const requestTransform = async (requestOptions) => {
         // POST /quotes
         if (requestOptions.path.startsWith('/quotes')) {
           const headers = _replaceHeaders({
-            'accept': 'application/vnd.interoperability.iso20022.quotes+json;version=2.0',
+            accept: 'application/vnd.interoperability.iso20022.quotes+json;version=2.0',
             'content-type': 'application/vnd.interoperability.iso20022.quotes+json;version=2.0'
           }, requestOptions.headers)
           const body = await TransformFacades.FSPIOP.quotes.post(requestOptions.body)
@@ -67,7 +67,7 @@ const requestTransform = async (requestOptions) => {
         }
         break
     }
-  } catch(err) {
+  } catch (err) {
     console.log('Error transforming request', err)
   }
   return requestOptions
@@ -75,7 +75,7 @@ const requestTransform = async (requestOptions) => {
 
 const callbackTransform = async (callbackOptions) => {
   try {
-    switch(callbackOptions.method) {
+    switch (callbackOptions.method) {
       case 'put':
         // PUT /parties
         if (callbackOptions.path.startsWith('/parties')) {
@@ -91,7 +91,7 @@ const callbackTransform = async (callbackOptions) => {
         }
         break
     }
-  } catch(err) {
+  } catch (err) {
     console.log('Error transforming callback', err)
   }
   return callbackOptions

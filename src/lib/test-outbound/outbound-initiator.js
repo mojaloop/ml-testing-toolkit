@@ -325,7 +325,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         await setSkippedResponse(convertedRequest, request, status, tracing, testCase, scriptsExecution, globalConfig)
       } else {
         // Get transformer if specified
-        let transformerObj = {
+        const transformerObj = {
           transformer: null,
           options: {}
         }
@@ -642,10 +642,10 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         }
       }
 
-      let transformedRequest = {}
+      const transformedRequest = {}
 
       if (transformerObj && transformerObj.transformer && transformerObj.transformer.requestTransform) {
-        const result = await transformerObj.transformer.requestTransform({ method, path, headers, body})
+        const result = await transformerObj.transformer.requestTransform({ method, path, headers, body })
         transformedRequest.body = result.body
         transformedRequest.headers = result.headers
       }
@@ -739,7 +739,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         }
 
         if (!successCallbackUrl || !errorCallbackUrl || ignoreCallbacks) {
-          return resolve({ curlRequest, transformedRequest, syncResponse, transformedRequest })
+          return resolve({ curlRequest, transformedRequest, syncResponse })
         }
         customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user })
       }, (err) => {
