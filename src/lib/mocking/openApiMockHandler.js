@@ -214,9 +214,14 @@ const pickApiByMethodPathHostnameAndPrefix = (req) => {
     headerToCompare = req.headers.accept
   }
   const headerComparisonResult = OpenApiVersionTools.parseAcceptHeader(headerToCompare)
-  if (headerComparisonResult.apiType === 'fspiop' || headerComparisonResult.apiType === 'iso20022') {
+  if (headerComparisonResult && (headerComparisonResult.apiType === 'fspiop' || headerComparisonResult.apiType === 'iso20022')) {
     potentialApis = potentialApis.filter(item => {
       return item.type === headerComparisonResult.apiType
+    })
+  } else {
+    // Filter out the apis fspiop or iso20022
+    potentialApis = potentialApis.filter(item => {
+      return item.type !== 'fspiop' && item.type !== 'iso20022'
     })
   }
 
