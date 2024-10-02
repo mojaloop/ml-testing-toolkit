@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [17.3.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v17.3.0...v17.3.1) (2024-09-30)
+
+
+### Bug Fixes
+
+* uuid/ulid regex ([#264](https://github.com/mojaloop/ml-testing-toolkit/issues/264)) ([6b143dd](https://github.com/mojaloop/ml-testing-toolkit/commit/6b143dd178bccaa5e211a5bb537e3deb4a42c3af))
+
 ## [17.3.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v17.2.3...v17.3.0) (2024-09-26)
 
 
