@@ -164,6 +164,7 @@ module.exports.handleRequest = async (req, h) => {
     }
     req.customInfo.negotiatedContentType = versionNegotiationResult.responseContentTypeHeader
     selectedApi = pickedApis[versionNegotiationResult.negotiatedIndex]
+    req.customInfo.selectedApi = selectedApi
   }
   try {
     return await selectedApi.openApiBackendObject.handleRequest(
@@ -357,7 +358,7 @@ const generateAsyncCallback = async (item, context, req) => {
     if (!matchFound) {
       customLogger.logMessage('error', 'Matching Quote Not Found', { request: req })
       const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
-      if (req.payload.CdtTrfTxInf) {
+      if (req.customInfo.selectedApi?.type === 'iso20022') {
         _handleISO20022ErrorCallback(generatedErrorCallback, '3208')
       } else {
         generatedErrorCallback.body = {
@@ -378,7 +379,7 @@ const generateAsyncCallback = async (item, context, req) => {
     if (!validated) {
       customLogger.logMessage('error', 'ILP Packet is not matching with the content', { request: req })
       const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
-      if (req.payload.CdtTrfTxInf) {
+      if (req.customInfo.selectedApi?.type === 'iso20022') {
         _handleISO20022ErrorCallback(generatedErrorCallback, '3106')
       } else {
         generatedErrorCallback.body = {
@@ -399,7 +400,7 @@ const generateAsyncCallback = async (item, context, req) => {
     if (!validated) {
       customLogger.logMessage('error', 'Condition can not be validated', { request: req })
       const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
-      if (req.payload.CdtTrfTxInf) {
+      if (req.customInfo.selectedApi?.type === 'iso20022') {
         _handleISO20022ErrorCallback(generatedErrorCallback, '3106')
       } else {
         generatedErrorCallback.body = {

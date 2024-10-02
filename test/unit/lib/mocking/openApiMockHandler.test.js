@@ -478,7 +478,9 @@ describe('OpenApiMockHandler', () => {
         }
       }
       const sampleRequest = {
-        customInfo: {}
+        customInfo: {
+          
+        }
       }
       SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
         '/transfers': {
@@ -507,7 +509,11 @@ describe('OpenApiMockHandler', () => {
         }
       }
       const sampleRequest = {
-        customInfo: {}
+        customInfo: {
+          selectedApi: {
+            type: 'fspiop'
+          }
+        }
       }
       SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
         '/transfers': {
