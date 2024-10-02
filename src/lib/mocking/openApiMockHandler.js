@@ -42,6 +42,7 @@ const JwsSigning = require('../jws/JwsSigning')
 const path = require('path')
 
 const IlpModel = require('./middleware-functions/ilpModel')
+const { generateULID } = require('./custom-functions/generic')
 
 let apis = []
 
@@ -356,10 +357,14 @@ const generateAsyncCallback = async (item, context, req) => {
     if (!matchFound) {
       customLogger.logMessage('error', 'Matching Quote Not Found', { request: req })
       const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
-      generatedErrorCallback.body = {
-        errorInformation: {
-          errorCode: '3208',
-          errorDescription: 'Provided Transfer ID was not found on the server.'
+      if (req.payload.CdtTrfTxInf) {
+        _handleISO20022ErrorCallback(generatedErrorCallback, '3208')
+      } else {
+        generatedErrorCallback.body = {
+          errorInformation: {
+            errorCode: '3208',
+            errorDescription: 'Provided Transfer ID was not found on the server.'
+          }
         }
       }
       CallbackHandler.handleCallback(generatedErrorCallback, context, req)
@@ -373,10 +378,14 @@ const generateAsyncCallback = async (item, context, req) => {
     if (!validated) {
       customLogger.logMessage('error', 'ILP Packet is not matching with the content', { request: req })
       const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
-      generatedErrorCallback.body = {
-        errorInformation: {
-          errorCode: '3106',
-          errorDescription: 'ILP Packet is not matching with the content.'
+      if (req.payload.CdtTrfTxInf) {
+        _handleISO20022ErrorCallback(generatedErrorCallback, '3106')
+      } else {
+        generatedErrorCallback.body = {
+          errorInformation: {
+            errorCode: '3106',
+            errorDescription: 'ILP Packet is not matching with the content.'
+          }
         }
       }
       CallbackHandler.handleCallback(generatedErrorCallback, context, req)
@@ -390,10 +399,14 @@ const generateAsyncCallback = async (item, context, req) => {
     if (!validated) {
       customLogger.logMessage('error', 'Condition can not be validated', { request: req })
       const generatedErrorCallback = await OpenApiRulesEngine.generateMockErrorCallback(context, req)
-      generatedErrorCallback.body = {
-        errorInformation: {
-          errorCode: '3106',
-          errorDescription: 'Condition can not be validated.'
+      if (req.payload.CdtTrfTxInf) {
+        _handleISO20022ErrorCallback(generatedErrorCallback, '3106')
+      } else {
+        generatedErrorCallback.body = {
+          errorInformation: {
+            errorCode: '3106',
+            errorDescription: 'Condition can not be validated.'
+          }
         }
       }
       CallbackHandler.handleCallback(generatedErrorCallback, context, req)
@@ -413,6 +426,27 @@ const generateAsyncCallback = async (item, context, req) => {
     // Handle triggers for a transaction request
     require('./middleware-functions/transactionRequestsService').handleRequest(context, req, generatedCallback, item.triggerTemplatesFolder)
   }
+}
+
+const _handleISO20022ErrorCallback = (generatedErrorCallback, errorCode) => {
+  generatedErrorCallback.headers = {
+    ...generatedErrorCallback.headers,
+    'content-type': 'application/vnd.interoperability.iso20022.transfers+json;version=2.0'
+  }
+  generatedErrorCallback.body = {
+    GrpHdr: {
+      MsgId: generateULID(),
+      CreDtTm: new Date().toISOString()
+    },
+    TxInfAndSts: {
+      StsRsnInf: {
+        Rsn: {
+          Cd: errorCode
+        }
+      }
+    }
+  }
+  return generatedErrorCallback
 }
 
 module.exports.openApiBackendNotImplementedHandler = openApiBackendNotImplementedHandler
