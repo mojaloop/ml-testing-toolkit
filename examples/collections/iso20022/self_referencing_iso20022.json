@@ -50,8 +50,22 @@
                   "expect(callback.body).to.have.property('Assgnmt')",
                   "expect(callback.body).to.have.property('Rpt')"
                 ]
+              },
+              {
+                "id": 2,
+                "description": "expect PrvtId",
+                "exec": [
+                  "expect(callback.body.Rpt.UpdtdPtyAndAcctId.Pty.Id).to.have.property('PrvtId')"
+                ]
               }
             ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                ""
+              ]
+            }
           }
         },
         {
@@ -74,22 +88,11 @@
           "body": {
             "GrpHdr": {
               "MsgId": "{$function.generic.generateULID}",
-              "CreDtTm": "{$function.generic.curDate}",
-              "PmtInstrXpryDtTm": "2020-01-01T00:00:00Z",
+              "CreDtTm": "{$function.generic.curDateISO}",
+              "PmtInstrXpryDtTm": "{$function.generic.curDateISO}",
               "NbOfTxs": "1",
               "SttlmInf": {
-                "SttlmMtd": "INDA",
-                "SttlmAcct": {
-                  "Id": {
-                    "IBAN": "123"
-                  }
-                },
-                "SttlmAcctOwnr": {
-                  "Nm": "John Doe"
-                },
-                "SttlmAcctSvcr": {
-                  "BICFI": "123"
-                }
+                "SttlmMtd": "CLRG"
               }
             },
             "CdtTrfTxInf": {
@@ -118,7 +121,7 @@
                 "Id": {
                   "PrvtId": {
                     "DtAndPlcOfBirth": {
-                      "BirthDt": "{$function.generic.curDate}"
+                      "BirthDt": "{$function.generic.curDateISO}"
                     }
                   },
                   "OrgId": {
@@ -136,7 +139,7 @@
                 "Id": {
                   "PrvtId": {
                     "DtAndPlcOfBirth": {
-                      "BirthDt": "{$function.generic.curDate}"
+                      "BirthDt": "{$function.generic.curDateISO}"
                     }
                   },
                   "OrgId": {
@@ -296,8 +299,8 @@
           "body": {
             "GrpHdr": {
               "MsgId": "01J8RG734N56MEF6DVWNZYB8KP",
-              "PmtInstrXpryDtTm": "2024-09-27T01:06:09.173Z",
-              "CreDtTm": "2024-09-27T01:06:09.173Z",
+              "PmtInstrXpryDtTm": "{$function.generic.curDateISO}",
+              "CreDtTm": "{$function.generic.curDateISO}",
               "NbOfTxs": "1",
               "SttlmInf": {
                 "SttlmMtd": "CLRG"
@@ -513,7 +516,7 @@
           "body": {
             "GrpHdr": {
               "MsgId": "{$function.generic.generateULID}",
-              "CreDtTm": "{$function.generic.curDate}",
+              "CreDtTm": "{$function.generic.curDateISO}",
               "NbOfTxs": "1",
               "TtlIntrBkSttlmAmt": {
                 "Ccy": "XTS",
@@ -569,7 +572,7 @@
                 "Id": {
                   "PrvtId": {
                     "DtAndPlcOfBirth": {
-                      "BirthDt": "{$function.generic.curDate}"
+                      "BirthDt": "{$function.generic.curDateISO}"
                     }
                   },
                   "OrgId": {
@@ -593,7 +596,7 @@
                 "Id": {
                   "PrvtId": {
                     "DtAndPlcOfBirth": {
-                      "BirthDt": "{$function.generic.curDate}"
+                      "BirthDt": "{$function.generic.curDateISO}"
                     }
                   },
                   "OrgId": {
@@ -714,7 +717,7 @@
           "body": {
             "GrpHdr": {
               "MsgId": "{$function.generic.generateULID}",
-              "CreDtTm": "{$function.generic.curDate}",
+              "CreDtTm": "{$function.generic.curDateISO}",
               "NbOfTxs": "1",
               "CtrlSum": "1000",
               "SttlmInf": {
@@ -802,7 +805,7 @@
                 "Id": {
                   "PrvtId": {
                     "DtAndPlcOfBirth": {
-                      "BirthDt": "{$function.generic.curDate}"
+                      "BirthDt": "{$function.generic.curDateISO}"
                     }
                   },
                   "OrgId": {
@@ -863,6 +866,55 @@
                 "exec": [
                   "expect(callback.body).to.have.property('GrpHdr')",
                   ""
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 6,
+          "description": "get/parties/{Type}/{ID} BUSINESS",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 2,
+            "type": "iso20022",
+            "asynchronous": true,
+            "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+          },
+          "operationPath": "/parties/{Type}/{ID}",
+          "path": "/parties/BUSINESS/1234",
+          "method": "get",
+          "params": {
+            "Type": "BUSINESS",
+            "ID": "1234"
+          },
+          "headers": {
+            "Content-Type": "application/vnd.interoperability.iso20022.parties+json;version=2.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "application/vnd.interoperability.iso20022.parties+json;version=2.0"
+          },
+          "disabled": false,
+          "url": null,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "expect callback",
+                "exec": [
+                  "expect(callback.body).to.have.property('Assgnmt')",
+                  "expect(callback.body).to.have.property('Rpt')"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "expect OrgId",
+                "exec": [
+                  "expect(callback.body.Rpt.UpdtdPtyAndAcctId.Pty.Id).to.have.property('OrgId')"
                 ]
               }
             ]

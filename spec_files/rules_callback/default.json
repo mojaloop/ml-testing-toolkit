@@ -1,7 +1,5 @@
 [
   {
-    "type": "callback",
-    "version": 1,
     "ruleId": 1,
     "priority": 1,
     "description": "get /parties/{Type}/{ID}/{SubId}",
@@ -42,7 +40,7 @@
         "body": {
           "Assgnmt": {
             "MsgId": "{$function.generic.generateULID}",
-            "CreDtTm": "{$function.generic.curDateISO}",
+            "CreDtTm": "{$environment.CreDtTm}",
             "Assgnr": {
               "Agt": {
                 "FinInstnId": {
@@ -63,7 +61,7 @@
             }
           },
           "Rpt": {
-            "OrgnlId": "/parties/{$request.params.Type}/{$request.params.ID}",
+            "OrgnlId": "{$request.params.Type}/{$request.params.ID}/{$request.params.SubId}",
             "Vrfctn": true,
             "UpdtdPtyAndAcctId": {
               "Acct": {
@@ -86,17 +84,22 @@
           }
         },
         "scripts": {
-          "scriptingEngine": "postman"
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()"
+          ],
+          "scriptingEngine": "javascript"
         }
       },
       "delay": 0,
       "type": "MOCK_CALLBACK"
-    }
+    },
+    "type": "callback",
+    "version": 1
   },
   {
-    "ruleId": 2,
+    "ruleId": 1,
     "priority": 1,
-    "description": "get /parties/{Type}/{ID} for pinkbank",
+    "description": "get /parties/{Type}/{ID}/{SubId}  for BUSINESS/ALIAS/DEVICE Types",
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
@@ -111,10 +114,113 @@
     "conditions": {
       "all": [
         {
-          "fact": "headers",
+          "fact": "pathParams",
+          "operator": "in",
+          "value": "BUSINESS,ALIAS,DEVICE",
+          "path": "Type"
+        },
+        {
+          "fact": "operationPath",
           "operator": "equal",
-          "value": "pinkbankfsp",
-          "path": "FSPIOP-Source"
+          "value": "/parties/{Type}/{ID}/{SubId}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}/{SubId}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.parties+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        },
+        "body": {
+          "Assgnmt": {
+            "MsgId": "{$function.generic.generateULID}",
+            "CreDtTm": "{$environment.CreDtTm}",
+            "Assgnr": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers.fspiop-source}"
+                  }
+                }
+              }
+            },
+            "Assgne": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              }
+            }
+          },
+          "Rpt": {
+            "OrgnlId": "{$request.params.Type}/{$request.params.ID}/{$request.params.SubId}",
+            "Vrfctn": true,
+            "UpdtdPtyAndAcctId": {
+              "Acct": {
+                "Ccy": "XTS"
+              },
+              "Pty": {
+                "Name": "Test Party",
+                "Id": {
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "{$request.params.ID}",
+                      "SchmeNm": {
+                        "Prtry": "{$request.params.Type}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()"
+          ],
+          "scriptingEngine": "javascript"
+        }
+      },
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 42,
+    "priority": 1,
+    "description": "get /parties/{Type}/{ID} for BUSINESS/ALIAS/DEVICE Types",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "pathParams",
+          "operator": "in",
+          "value": "BUSINESS,ALIAS,DEVICE",
+          "path": "Type"
         },
         {
           "fact": "operationPath",
@@ -140,7 +246,7 @@
         "body": {
           "Assgnmt": {
             "MsgId": "{$function.generic.generateULID}",
-            "CreDtTm": "{$function.generic.curDateISO}",
+            "CreDtTm": "{$environment.CreDtTm}",
             "Assgnr": {
               "Agt": {
                 "FinInstnId": {
@@ -161,16 +267,23 @@
             }
           },
           "Rpt": {
-            "OrgnlId": "/parties/{$request.params.Type}/{$request.params.ID}",
+            "OrgnlId": "{$request.params.Type}/{$request.params.ID}",
             "Vrfctn": true,
             "UpdtdPtyAndAcctId": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              },
               "Acct": {
                 "Ccy": "XTS"
               },
               "Pty": {
                 "Name": "Test Party",
                 "Id": {
-                  "PrvtId": {
+                  "OrgId": {
                     "Othr": {
                       "Id": "{$request.params.ID}",
                       "SchmeNm": {
@@ -184,7 +297,10 @@
           }
         },
         "scripts": {
-          "scriptingEngine": "postman"
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()"
+          ],
+          "scriptingEngine": "javascript"
         }
       },
       "type": "FIXED_CALLBACK"
@@ -210,6 +326,12 @@
     "conditions": {
       "all": [
         {
+          "fact": "pathParams",
+          "operator": "equal",
+          "path": "Type",
+          "value": "ACCOUNT_ID"
+        },
+        {
           "fact": "operationPath",
           "operator": "equal",
           "value": "/parties/{Type}/{ID}"
@@ -218,12 +340,6 @@
           "fact": "method",
           "operator": "equal",
           "value": "get"
-        },
-        {
-          "fact": "pathParams",
-          "operator": "equal",
-          "path": "Type",
-          "value": "ACCOUNT_ID"
         }
       ]
     },
@@ -239,7 +355,7 @@
         "body": {
           "Assgnmt": {
             "MsgId": "{$function.generic.generateULID}",
-            "CreDtTm": "{$function.generic.curDateISO}",
+            "CreDtTm": "{$environment.CreDtTm}",
             "Assgnr": {
               "Agt": {
                 "FinInstnId": {
@@ -260,9 +376,16 @@
             }
           },
           "Rpt": {
-            "OrgnlId": "/parties/{$request.params.Type}/{$request.params.ID}",
+            "OrgnlId": "{$request.params.Type}/{$request.params.ID}",
             "Vrfctn": true,
             "UpdtdPtyAndAcctId": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              },
               "Acct": {
                 "Ccy": "XTS"
               },
@@ -283,10 +406,13 @@
           }
         },
         "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()"
+          ],
           "scriptingEngine": "postman"
         }
       },
-      "type": "MOCK_CALLBACK"
+      "type": "FIXED_CALLBACK"
     },
     "type": "callback",
     "version": 1
@@ -364,6 +490,11 @@
       "path": "/quotes/{ID}",
       "params": {
         "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()",
+            "environment.AccptncDtTm = new Date().toISOString()",
+            "environment.PmtInstrXpryDtTm = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString()"
+          ],
           "scriptingEngine": "javascript"
         },
         "headers": {
@@ -374,33 +505,11 @@
         "body": {
           "GrpHdr": {
             "MsgId": "{$function.generic.generateULID}",
-            "PmtInstrXpryDtTm": "{$function.generic.curDateISO}",
-            "CreDtTm": "{$function.generic.curDateISO}",
+            "PmtInstrXpryDtTm": "{$environment.PmtInstrXpryDtTm}",
+            "CreDtTm": "{$environment.CreDtTm}",
             "NbOfTxs": "1",
             "SttlmInf": {
               "SttlmMtd": "CLRG"
-            },
-            "CtrlSum": "100",
-            "InitgPty": {
-              "Nm": "Initiating Party Name",
-              "Id": {
-                "OrgId": {
-                  "Othr": [
-                    {
-                      "Id": "123456789",
-                      "SchmeNm": {
-                        "Cd": "BBA",
-                        "Prtry": "Party Identification Scheme Name"
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "FwdgAgt": {
-              "FinInstnId": {
-                "BICFI": "BBBBBBBB"
-              }
             }
           },
           "CdtTrfTxInf": {
@@ -411,18 +520,6 @@
               "TxId": "{$request.body.CdtTrfTxInf.PmtId.TxId}",
               "InstrId": "{$request.body.CdtTrfTxInf.PmtId.InstrId}",
               "EndToEndId": "{$request.body.CdtTrfTxInf.PmtId.EndToEndId}"
-            },
-            "PmtTpInf": {
-              "InstrPrty": "NORM",
-              "SvcLvl": {
-                "Cd": "SEPA"
-              },
-              "LclInstrm": {
-                "Cd": "CH03"
-              },
-              "CtgyPurp": {
-                "Cd": "SUPP"
-              }
             },
             "IntrBkSttlmAmt": {
               "Ccy": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}",
@@ -468,7 +565,7 @@
               "Id": {
                 "OrgId": {
                   "Othr": {
-                    "Id":"{$request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id}",
+                    "Id": "{$request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id}",
                     "SchmeNm": {
                       "Prtry": "{$request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.SchmeNm.Prtry}"
                     }
@@ -488,7 +585,7 @@
             },
             "CdtrAgt": {
               "FinInstnId": {
-               "Othr": {
+                "Othr": {
                   "Id": "{$request.headers['FSPIOP-Destination']}",
                   "SchmeNm": {
                     "Cd": "BDID"
@@ -518,41 +615,6 @@
               "Id": {
                 "IBAN": "{$request.body.CdtTrfTxInf.CdtrAgtAcct.Id.IBAN}",
                 "Ccy": "{$request.body.CdtTrfTxInf.CdtrAgtAcct.Id.Ccy}"
-              }
-            },
-            "UltmtCdtr": {
-              "Nm": "Ultimate Creditor Name",
-              "PstlAdr": {
-                "AdrTp": {
-                  "Cd": "ADDR"
-                },
-                "Dept": "Department",
-                "SubDept": "SubDepartment",
-                "StrtNm": "StreetName",
-                "BldgNb": "BuildingNumber",
-                "PstCd": "PostCode",
-                "TwnNm": "TownName",
-                "CtrySubDvsn": "CountrySubDivision",
-                "Ctry": "AZ"
-              },
-              "Id": {
-                "OrgId": {
-                  "AnyBIC": "BBBBBBBB",
-                  "Othr": {
-                    "Id": "123456789",
-                    "SchmeNm": {
-                      "Cd": "IBAN",
-                      "Prtry": "Party Identification Scheme Name"
-                    }
-                  }
-                }
-              }
-            },
-            "RgltryRptg": {
-              "DbtCdtRptgInd": "CRED",
-              "Authrty": {
-                "Nm": "Swiss National Bank",
-                "Ctry": "CH"
               }
             }
           }
@@ -603,8 +665,6 @@
     "version": 1
   },
   {
-    "type": "callback",
-    "version": 1,
     "ruleId": 7,
     "priority": 1,
     "description": "post /transfers",
@@ -638,6 +698,11 @@
       "path": "/transfers/{ID}",
       "params": {
         "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()",
+            "environment.AccptncDtTm = new Date().toISOString()",
+            "environment.PmtInstrXpryDtTm = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString()"
+          ],
           "scriptingEngine": "javascript"
         },
         "headers": {
@@ -648,34 +713,36 @@
         "body": {
           "GrpHdr": {
             "MsgId": "{$function.generic.generateULID}",
-            "CreDtTm": "{$function.generic.curDateISO}",
-            "TxInfAndSts": {
-              "StsId": "{$function.generic.generateULID}",
-              "OrgnlInstrId": "{$request.body.CdtTrfTxInf.PmtId.InstrId}",
-              "OrgnlEndToEndId": "{$request.body.CdtTrfTxInf.PmtId.EndToEndId}",
-              "OrgnlTxId": "{$request.body.CdtTrfTxInf.PmtId.TxId}",
-              "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
-              "TxSts": "ACPT",
-              "StsRsnInf": {
-                "Rsn": {
-                  "Prtry": "ACPT"
-                },
-                "AddtlInf": "ADDITIONAL"
+            "CreDtTm": "{$environment.CreDtTm}"
+          },
+          "TxInfAndSts": {
+            "StsId": "{$function.generic.generateULID}",
+            "OrgnlInstrId": "{$request.body.CdtTrfTxInf.PmtId.InstrId}",
+            "OrgnlEndToEndId": "{$request.body.CdtTrfTxInf.PmtId.EndToEndId}",
+            "OrgnlTxId": "{$request.body.CdtTrfTxInf.PmtId.TxId}",
+            "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
+            "TxSts": "ACPT",
+            "StsRsnInf": {
+              "Rsn": {
+                "Prtry": "ACPT"
               },
-              "AccptncDtTm": "{$function.generic.curDateISO}",
-              "AcctSvcrRef": "ACCTSVCRREF",
-              "ClrSysRef": "CLRSYSREF",
-              "ExctnConf": "",
-              "SplmtryData": {
-                "PlcAndNm": "PLACE",
-                "Envlp": {}
-              }
+              "AddtlInf": "ADDITIONAL"
+            },
+            "AccptncDtTm": "{$environment.AccptncDtTm}",
+            "AcctSvcrRef": "ACCTSVCRREF",
+            "ClrSysRef": "CLRSYSREF",
+            "ExctnConf": "",
+            "SplmtryData": {
+              "PlcAndNm": "PLACE",
+              "Envlp": {}
             }
           }
         }
       },
       "type": "FIXED_CALLBACK"
-    }
+    },
+    "type": "callback",
+    "version": 1
   },
   {
     "ruleId": 8,
@@ -758,6 +825,11 @@
       "path": "/fxQuotes/{ID}",
       "params": {
         "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()",
+            "environment.AccptncDtTm = new Date().toISOString()",
+            "environment.PmtInstrXpryDtTm = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString()"
+          ],
           "scriptingEngine": "javascript"
         },
         "headers": {
@@ -768,15 +840,8 @@
         "body": {
           "GrpHdr": {
             "MsgId": "{$function.generic.generateULID}",
-            "CreDtTm": "{$function.generic.curDateISO}",
+            "CreDtTm": "{$environment.CreDtTm}",
             "NbOfTxs": "1",
-            "CtrlSum": "100",
-            "InitgPty": {
-              "Nm": "Initiating Party Name"
-            },
-            "MsgRcpt": {
-              "Nm": "Message Recipient Name"
-            },
             "SttlmInf": {
               "SttlmMtd": "CLRG"
             }
@@ -895,24 +960,6 @@
               },
               "Ccy": "XTS",
               "Nm": "My account"
-            },
-            "RmtInf": {
-              "Ustrd": "Remittance Information"
-            },
-            "RgltryRptg": {
-              "Dbtr": {
-                "Nm": "Debtor Name"
-              },
-              "DbtrAcct": {
-                "Id": {
-                  "IBAN": "BE71096123456769"
-                },
-                "Tp": {
-                  "Cd": "CACC"
-                },
-                "Ccy": "XTS",
-                "Nm": "My account"
-              }
             }
           }
         }
@@ -1003,6 +1050,11 @@
       "path": "/fxTransfers/{ID}",
       "params": {
         "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()",
+            "environment.AccptncDtTm = new Date().toISOString()",
+            "environment.PmtInstrXpryDtTm = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString()"
+          ],
           "scriptingEngine": "javascript"
         },
         "headers": {
@@ -1013,28 +1065,28 @@
         "body": {
           "GrpHdr": {
             "MsgId": "{$function.generic.generateULID}",
-            "CreDtTm": "{$function.generic.curDateISO}",
-            "TxInfAndSts": {
-              "StsId": "12345",
-              "OrgnlInstrId": "12345",
-              "OrgnlEndToEndId": "12345",
-              "OrgnlTxId": "12345",
-              "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
-              "TxSts": "APPR",
-              "StsRsnInf": {
-                "Rsn": {
-                  "Prtry": "ACPT"
-                },
-                "AddtlInf": "ADDITIONAL"
+            "CreDtTm": "{$environment.CreDtTm}"
+          },
+          "TxInfAndSts": {
+            "StsId": "12345",
+            "OrgnlInstrId": "12345",
+            "OrgnlEndToEndId": "12345",
+            "OrgnlTxId": "12345",
+            "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
+            "TxSts": "APPR",
+            "StsRsnInf": {
+              "Rsn": {
+                "Prtry": "ACPT"
               },
-              "AccptncDtTm": "{$function.generic.curDateISO}",
-              "AcctSvcrRef": "ACCTSVCRREF",
-              "ClrSysRef": "CLRSYSREF",
-              "ExctnConf": "1234567890ABCDEF",
-              "SplmtryData": {
-                "PlcAndNm": "PLACE",
-                "Envlp": {}
-              }
+              "AddtlInf": "ADDITIONAL"
+            },
+            "AccptncDtTm": "{$environment.AccptncDtTm}",
+            "AcctSvcrRef": "ACCTSVCRREF",
+            "ClrSysRef": "CLRSYSREF",
+            "ExctnConf": "1234567890ABCDEF",
+            "SplmtryData": {
+              "PlcAndNm": "PLACE",
+              "Envlp": {}
             }
           }
         }

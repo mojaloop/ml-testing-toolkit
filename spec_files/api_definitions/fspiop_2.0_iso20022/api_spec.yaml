@@ -2288,6 +2288,12 @@ components:
             - description: |
                 PaymentTypeInformation
                 Set of elements used to further specify the type of transaction.
+        UndrlygCstmrCdtTrf:
+          allOf:
+            - $ref: "#/components/schemas/UnderlyingCustomerCreditTransfer"
+            - description: |
+                Underlying Customer Credit Transfer
+                TBD
         IntrBkSttlmAmt:
           allOf:
             - $ref: "#/components/schemas/ActiveCurrencyAndAmount"
@@ -2502,6 +2508,12 @@ components:
             - description: |
                 PaymentTypeInformation
                 Set of elements used to further specify the type of transaction.
+        UndrlygCstmrCdtTrf:
+          allOf:
+            - $ref: "#/components/schemas/UnderlyingCustomerCreditTransfer"
+            - description: |
+                Underlying Customer Credit Transfer
+                TBD
         IntrBkSttlmAmt:
           allOf:
             - $ref: "#/components/schemas/ActiveCurrencyAndAmount"
@@ -2636,6 +2648,32 @@ components:
             - Sh256Sgntr
       example:
         IlpV4PrepPacket: 1234567890ABCDEF
+    DateAndDateTime2Choice:
+      title: StatusReason6Choice
+      description: |
+        Specifies the reason for the status.
+      type: object
+      anyOf:
+        - properties:
+            Dt:
+              allOf:
+                - $ref: "#/components/schemas/ISODate"
+                - description: |
+                    Date
+                    Specified date.
+          required:
+            - Dt
+        - properties:
+            DtTm:
+              allOf:
+                - $ref: "#/components/schemas/ISODateTime"
+                - description: |
+                    DateTime
+                    Specified date and time.
+          required:
+            - DtTm
+      example:
+        DtTm: "2020-01-01T00:00:00Z"
     DateAndPlaceOfBirth1:
       title: DateAndPlaceOfBirth1
       description: |
@@ -2926,11 +2964,21 @@ components:
       example: 1234
     ExternalPaymentTransactionStatus1Code:
       title: ExternalPaymentTransactionStatus1Code
-      description: Specifies the external payment transaction status code.
+      description: |
+        Specifies the external payment transaction status code.
+
+        For FSPIOP transfer state enumeration mappings:
+        {
+          "COMM": "COMMITED",
+          "RESV": "RESERVED",
+          "RECV": "RECEIVED",
+          "ABOR": "ABORTED",
+          "SETT": "SETTLED"
+        }
       type: string
       minLength: 1
       maxLength: 4
-      example: 1234
+      example: SETT
     ExternalPersonIdentification1Code:
       title: ExternalPersonIdentification1Code
       description: Specifies the external person identification code.
@@ -3928,41 +3976,12 @@ components:
             - description: |
                 CreationDateTime
                 Date and time at which the message was created.
-        TxInfAndSts:
-          allOf:
-            - $ref: "#/components/schemas/PaymentTransaction163"
-            - description: >
-                TransactionInformationAndStatus
-
-                Definition: Agent that instructs the next party in the chain to
-                carry out the (set of) instruction(s).
-
-                Usage: The instructing agent is the party sending the status
-                message and not the party that sent the original instruction
-                that is being reported on.
       required:
         - MsgId
         - CreDtTm
       example:
         MsgId: 12345
         CreDtTm: "2020-01-01T00:00:00Z"
-        TxInfAndSts:
-          StsId: 12345
-          OrgnlInstrId: 12345
-          OrgnlEndToEndId: 12345
-          OrgnlTxId: 12345
-          OrgnlUETR: 123e4567-e89b-12d3-a456-426614174000
-          TxSts: RJCT
-          StsRsnInf:
-            Rsn: RSN
-            AddtlInf: ADDITIONAL
-          AccptncDtTm: "2020-01-01T00:00:00Z"
-          AcctSvcrRef: ACCTSVCRREF
-          ClrSysRef: CLRSYSREF
-          ExctnConf: 1234567890ABCDEF
-          SplmtryData:
-            PlcAndNm: PLACE
-            Envlp: ENVELOPE
     GroupHeader129:
       title: GroupHeader129
       description: >
@@ -4071,7 +4090,8 @@ components:
         involved parties shall agree on the maximum number of digits that are
         allowed.
       type: string
-      format: datetime
+      pattern: >-
+        ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:(\.\d{3}))(?:Z|[+-][01]\d:[0-5]\d)$
       example: "2013-03-07T14:44:30.000Z"
     ISOYear:
       title: ISOYear
@@ -4630,6 +4650,18 @@ components:
             - description: >
                 Set of characteristics shared by all individual transactions
                 included in the message.
+        TxInfAndSts:
+          allOf:
+            - $ref: "#/components/schemas/PaymentTransaction163"
+            - description: >
+                Information concerning the original transactions, to which the
+                status report message refers.
+        SplmtryData:
+          allOf:
+            - $ref: "#/components/schemas/SupplementaryData1"
+            - description: >
+                Additional information that cannot be captured in the structured
+                elements and/or any other specific block.
       required:
         - GrpHdr
       example:
@@ -4974,7 +5006,8 @@ components:
           allOf:
             - $ref: "#/components/schemas/Max35Text"
             - description: >
-                TransactionIdentification (FSPIOP equivalent: quoteId)
+                TransactionIdentification (FSPIOP equivalent: quoteId in quote
+                request, transferId in transfer request)
 
 
                 Definition: Unique identification, as assigned by the first
@@ -5109,6 +5142,12 @@ components:
             - description: >
                 Additional information that cannot be captured in the structured
                 elements and/or any other specific block.
+        PrcgDt:
+          allOf:
+            - $ref: "#/components/schemas/DateAndDateTime2Choice"
+            - description: >
+                Date/time at which the instruction was processed by the
+                specified party.
       example:
         StsId: 12345
         OrgnlInstrId: 12345
@@ -6507,6 +6546,19 @@ components:
       example: 8f3a3b2d-3b0a-4b3f-8e4e-1b2f3f4c5d6e
       pattern: >-
         ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+    UnderlyingCustomerCreditTransfer:
+      title: UnderlyingCustomerCreditTransfer
+      type: object
+      properties:
+        InstdAmt:
+          allOf:
+            - $ref: "#/components/schemas/ActiveOrHistoricCurrencyAndAmount"
+            - description: >
+                InstructedAmount
+
+                Amount of money to be moved between the debtor and creditor,
+                before deduction of charges, expressed in the currency as
+                ordered by the initiating party.
     VerificationReason1Choice:
       title: VerificationReason1Choice
       type: object
@@ -6589,7 +6641,6 @@ components:
       required:
         - OrgnlId
         - Vrfctn
-        - UpdtdPtyAndAcctId
       example:
         OrgnlId: 1.2345678901234568e+33
         Vrfctn: true
