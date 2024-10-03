@@ -89,7 +89,9 @@ const handleQuoteIlp = (context, response) => {
       response.body.ilpPacket = ilpPacket
       response.body.condition = condition
     } else {
-      response.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket = ilpPacket
+      response.body.CdtTrfTxInf.VrfctnOfTerms = {
+        IlpV4PrepPacket: ilpPacket
+      }
     }
     return fulfilment
   }
@@ -110,7 +112,7 @@ const handleTransferIlp = (context, response) => {
     if (context.request.body.ilpPacket) {
       response.body.fulfilment = generatedFulfilment
     }
-    if (context.request.body.TxInfAndSts) {
+    if (context.request.body.CdtTrfTxInf) {
       response.body.TxInfAndSts.ExctnConf = generatedFulfilment
     }
   }
@@ -159,7 +161,8 @@ const validateTransferCondition = (context, request) => {
       customLogger.logMessage('info', 'Validating condition with the stored fulfilment', { request })
     } else {
       try {
-        fulfilment = ilpObj.calculateFulfil(request.payload.ilpPacket).replace('"', '')
+        fulfilment = ilpObj.calculateFulfil(request.payload.ilpPacket ||
+          request.payload.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
         customLogger.logMessage('info', 'Validating condition with the generated fulfilment', { request })
       } catch (err) {
         customLogger.logMessage('error', 'Failed to calculate the fulfilment. Error: ' + err.message, { request })

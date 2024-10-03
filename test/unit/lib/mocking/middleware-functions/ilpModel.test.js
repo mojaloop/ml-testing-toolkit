@@ -24,6 +24,7 @@
 
 'use strict'
 
+const path = require('path')
 const IlpModel = require('../../../../../src/lib/mocking/middleware-functions/ilpModel')
 
 const quoteRequestBody = {
@@ -102,6 +103,238 @@ const transferPartResponseBody = {
   completedTimestamp: '3600-02-29T00:01:09.251+13:35'
 }
 
+const quoteISORequestBody = {
+  "CdtTrfTxInf": {
+    "DbtrAgt": {
+      "FinInstnId": {
+        "Othr": {
+          "Id": "pinkbankfsp",
+          "SchmeNm": {
+            "Cd": "BDID"
+          }
+        }
+      }
+    },
+    "CdtrAgt": {
+      "FinInstnId": {
+        "Othr": {
+          "Id": "greenbankfsp",
+          "SchmeNm": {
+            "Cd": "BDID"
+          }
+        }
+      }
+    },
+    "Dbtr": {
+      "Name": "Test Debitor",
+      "Id": {
+        "PrvtId": {
+          "DtAndPlcOfBirth": {
+            "BirthDt": "2024-10-02T17:11:12.437Z"
+          }
+        },
+        "OrgId": {
+          "Othr": {
+            "Id": "12345",
+            "SchmeNm": {
+              "Prtry": "ACCOUNT_ID"
+            }
+          }
+        }
+      }
+    },
+    "Cdtr": {
+      "Name": "Test Creditor",
+      "Id": {
+        "PrvtId": {
+          "DtAndPlcOfBirth": {
+            "BirthDt": "2024-10-02T17:11:12.437Z"
+          }
+        },
+        "OrgId": {
+          "Othr": {
+            "Id": "54321",
+            "SchmeNm": {
+              "Prtry": "ACCOUNT_ID"
+            }
+          }
+        }
+      }
+    },
+    "PmtId": {
+      "TxId": "01J973DR9NR8A13YGCNH95CMPN",
+      "InstrId": "01J973DR9NR8A13YGCNH95CMPP",
+      "EndToEndId": "01J973DR9NR8A13YGCNH95CMPQ"
+    },
+    "IntrBkSttlmAmt": {
+      "Ccy": "XTS",
+      "ActiveCurrencyAndAmount": "100"
+    },
+    "InstdAmt": {
+      "Ccy": "XTS",
+      "ActiveOrHistoricCurrencyAndAmount": "100"
+    }
+  }
+}
+
+const quoteISOResponseBody = {
+  "CdtTrfTxInf": {
+    "PmtId": {
+      "TxId": "01J973DR9NR8A13YGCNH95CMPN",
+      "InstrId": "01J973DR9NR8A13YGCNH95CMPP",
+      "EndToEndId": "01J973DR9NR8A13YGCNH95CMPQ"
+    },
+    "IntrBkSttlmAmt": {
+      "Ccy": "XTS",
+      "ActiveCurrencyAndAmount": "100"
+    },
+    "Cdtr": {
+      "Nm": "Cdtr",
+      "Id": {
+        "OrgId": {
+          "Othr": {
+            "Id": "54321",
+            "SchmeNm": {
+              "Prtry": "ACCOUNT_ID"
+            }
+          }
+        }
+      }
+    },
+    "Dbtr": {
+      "Nm": "Dbtr",
+      "Id": {
+        "OrgId": {
+          "Othr": {
+            "Id": "12345",
+            "SchmeNm": {
+              "Prtry": "ACCOUNT_ID"
+            }
+          }
+        }
+      }
+    },
+    "DbtrAgt": {
+      "FinInstnId": {
+        "Othr": {
+          "Id": "DbtrAgt",
+          "SchmeNm": {
+            "Cd": "BDID"
+          }
+        }
+      }
+    },
+    "CdtrAgt": {
+      "FinInstnId": {
+        "Othr": {
+          "Id": "CdtrAgt",
+          "SchmeNm": {
+            "Cd": "BDID"
+          }
+        }
+      }
+    }
+  }
+}
+
+const transferISORequestBody = {
+  "CdtTrfTxInf": {
+    "DbtrAgt": {
+      "FinInstnId": {
+        "Othr": {
+          "Id": "pinkbankfsp",
+          "SchmeNm": {
+            "Cd": "BDID"
+          }
+        }
+      }
+    },
+    "CdtrAgt": {
+      "FinInstnId": {
+        "Othr": {
+          "Id": "greenbankfsp",
+          "SchmeNm": {
+            "Cd": "BDID"
+          }
+        }
+      }
+    },
+    "Dbtr": {
+      "Name": "Test Debitor",
+      "Id": {
+        "PrvtId": {
+          "DtAndPlcOfBirth": {
+            "BirthDt": "2024-10-02T17:11:12.437Z"
+          }
+        },
+        "OrgId": {
+          "Othr": {
+            "Id": "12345",
+            "SchmeNm": {
+              "Prtry": "ACCOUNT_ID"
+            }
+          }
+        }
+      }
+    },
+    "Cdtr": {
+      "Name": "Test Creditor",
+      "Id": {
+        "PrvtId": {
+          "DtAndPlcOfBirth": {
+            "BirthDt": "2024-10-02T17:11:12.437Z"
+          }
+        },
+        "OrgId": {
+          "Othr": {
+            "Id": "54321",
+            "SchmeNm": {
+              "Prtry": "ACCOUNT_ID"
+            }
+          }
+        }
+      }
+    },
+    "PmtId": {
+      "TxId": "01J973DR9NR8A13YGCNH95CMPN",
+      "InstrId": "01J973DR9NR8A13YGCNH95CMPP",
+      "EndToEndId": "01J973DR9NR8A13YGCNH95CMPQ"
+    },
+    "IntrBkSttlmAmt": {
+      "Ccy": "XTS",
+      "ActiveCurrencyAndAmount": "100"
+    },
+    "InstdAmt": {
+      "Ccy": "XTS",
+      "ActiveOrHistoricCurrencyAndAmount": "100"
+    }
+  }
+}
+
+const transferISOResponseBody = {
+  "TxInfAndSts": {
+    "StsId": "01J973DRJ5PRNDPVNHHN3RE4ZT",
+    "OrgnlInstrId": "01J8RG72ZT6DP73KKGMASRBF0F",
+    "OrgnlEndToEndId": "01J8RG72ZT6DP73KKGMASRBF0F",
+    "OrgnlTxId": "01J973DR9NR8A13YGCNH95CMPQ",
+    "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
+    "TxSts": "ACPT",
+    "StsRsnInf": {
+      "Rsn": {
+        "Prtry": "ACPT"
+      },
+      "AddtlInf": "ADDITIONAL"
+    },
+    "AccptncDtTm": "2024-10-02T17:11:12.708Z",
+    "AcctSvcrRef": "ACCTSVCRREF",
+    "ClrSysRef": "CLRSYSREF",
+    "SplmtryData": {
+      "PlcAndNm": "PLACE",
+      "Envlp": {}
+    }
+  }
+}
+
 const wrongIlpPacket = 'AYIDNQAAAAAAAE4gImcudGVzdGluZ3Rvb2xraXRkZnNwLm1zaXNkbi4wMDAxMTGCAwZleUowY21GdWMyRmpkR2x2Ymtsa0lqb2lOVGcyTjJJM09EVXRZMk14TnkwMFpUVTVMVGs1WWpVdE0yWTFNVFptTkRNNE9USmtJaXdpY1hWdmRHVkpaQ0k2SWpjMk1UWmhNbU14TFRBek1qQXROREpqT0MxaE9USXpMVFJrWTJFNU9XTTJOREF5TkNJc0luQmhlV1ZsSWpwN0luQmhjblI1U1dSSmJtWnZJanA3SW5CaGNuUjVTV1JVZVhCbElqb2lUVk5KVTBST0lpd2ljR0Z5ZEhsSlpHVnVkR2xtYVdWeUlqb2lNREF3TVRFeElpd2labk53U1dRaU9pSjBaWE4wYVc1bmRHOXZiR3RwZEdSbWMzQWlmU3dpY0dWeWMyOXVZV3hKYm1adklqcDdJbU52YlhCc1pYaE9ZVzFsSWpwN0ltWnBjbk4wVG1GdFpTSTZJa1JoYm1sbGJDSXNJbTFwWkdSc1pVNWhiV1VpT2lKVElpd2liR0Z6ZEU1aGJXVWlPaUpTYjJSeWFXZDFaWG9pZlN3aVpHRjBaVTltUW1seWRHZ2lPaUl4T1RneExURXdMVEU0SW4xOUxDSndZWGxsY2lJNmV5SndZWEowZVVsa1NXNW1ieUk2ZXlKd1lYSjBlVWxrVkhsd1pTSTZJazFUU1ZORVRpSXNJbkJoY25SNVNXUmxiblJwWm1sbGNpSTZJakV5TXpRMU5pSXNJbVp6Y0Vsa0lqb2lkWE5sY21SbWMzQWlmU3dpYm1GdFpTSTZJa3B2YUc0Z1NtOW9ibk52YmlKOUxDSmhiVzkxYm5RaU9uc2lZM1Z5Y21WdVkza2lPaUpWVTBRaUxDSmhiVzkxYm5RaU9pSXlNREFpZlN3aWRISmhibk5oWTNScGIyNVVlWEJsSWpwN0luTmpaVzVoY21sdklqb2lWRkpCVGxOR1JWSWlMQ0pwYm1sMGFXRjBiM0lpT2lKUVFWbEZVaUlzSW1sdWFYUnBZWFJ2Y2xSNWNHVWlPaUpEVDA1VFZVMUZVaUo5ZlEA'
 
 describe('ILP Model', () => {
@@ -110,6 +343,8 @@ describe('ILP Model', () => {
     let ilpPacket
     let condition
     let fulfilment
+    let isoFulfilment
+    let IlpV4PrepPacket
     it('handleQuoteIlp should append ip packet and condition', () => {
       const sampleContext = {
         request: {
@@ -130,6 +365,25 @@ describe('ILP Model', () => {
       expect(response.body).toHaveProperty('condition')
       expect(fulfilment.length).toBeGreaterThan(5)
     })
+    it('handleQuoteIlp should append ip packet for ISO20022', () => {
+      const sampleContext = {
+        request: {
+          method: 'post',
+          path: '/quotes',
+          body: {...quoteISORequestBody}
+        }
+      }
+      let response = {
+        method: 'put',
+        path: '/quotes/f27456e9-fffb-47c0-9f28-5c727434873d',
+        body: {...quoteISOResponseBody}
+      }
+      isoFulfilment = IlpModel.handleQuoteIlp(sampleContext, response)
+      IlpV4PrepPacket = response.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket
+      expect(response.body.CdtTrfTxInf.VrfctnOfTerms).toHaveProperty('IlpV4PrepPacket')
+      expect(isoFulfilment.length).toBeGreaterThan(5)
+    })
+
     it('handleQuoteIlp should not append ilpPacket and condition when ilpPacket is provided in rule eventInfo', () => {
       const sampleContext = {
         request: {
@@ -215,6 +469,28 @@ describe('ILP Model', () => {
       expect(response.body).toHaveProperty('fulfilment')
       expect(response.body.fulfilment).toEqual(fulfilment)
     })
+    it('handleTransferIlp should appent fulfilment for ISO20022', () => {
+      const sampleContext = {
+        request: {
+          body: {
+            ...transferISORequestBody,
+          },
+          method: 'post'
+        }
+      }
+      sampleContext.request.body.CdtTrfTxInf.VrfctnOfTerms = {
+        IlpV4PrepPacket
+      }
+      const response = {
+        method: 'put',
+        path: '/transfers/asdfasdf',
+        body: {...transferISOResponseBody}
+      }
+      IlpModel.handleTransferIlp(sampleContext, response)
+      console.log(response.body)
+      expect(response.body.TxInfAndSts.ExctnConf).toEqual(isoFulfilment)
+    })
+
     it('handleTransferIlp should not append fulfilment for get requests', () => {
       const sampleContext = {
         request: {
@@ -272,6 +548,27 @@ describe('ILP Model', () => {
       const result = IlpModel.validateTransferIlpPacket(sampleContext, sampleRequest)
       expect(result).toBe(true)
     })
+    it('validateTransferIlpPacket should validate the ilpPacket for ISO20022', () => {
+      const sampleRequest = {
+        payload: {
+          ...transferISORequestBody
+        },
+        method: 'post',
+        path: '/transfers',
+        customInfo: {
+          sessionID: '123'
+        }
+      }
+      sampleRequest.payload.CdtTrfTxInf.VrfctnOfTerms = {
+        IlpV4PrepPacket
+      }
+      const sampleContext = {
+        request: sampleRequest
+      }
+      const result = IlpModel.validateTransferIlpPacket(sampleContext, sampleRequest)
+      expect(result).toBe(true)
+    })
+
     it('validateTransferIlpPacket should fail with wrong ilpPacket', () => {
       const sampleRequest = {
         payload: {
@@ -338,6 +635,26 @@ describe('ILP Model', () => {
         customInfo: {
           sessionID: '123'
         }
+      }
+      const sampleContext = {
+        request: sampleRequest
+      }
+      const result = IlpModel.validateTransferCondition(sampleContext, sampleRequest)
+      expect(result).toBe(true)
+    })
+    it('validateTransferCondition should validate the ilpPacket', () => {
+      const sampleRequest = {
+        payload: {
+          ...transferISORequestBody,
+        },
+        method: 'post',
+        path: '/transfers',
+        customInfo: {
+          sessionID: '123'
+        }
+      }
+      sampleRequest.payload.CdtTrfTxInf.VrfctnOfTerms = {
+        IlpV4PrepPacket
       }
       const sampleContext = {
         request: sampleRequest
