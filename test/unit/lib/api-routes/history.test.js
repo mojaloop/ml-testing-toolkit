@@ -90,7 +90,7 @@ describe('API route /api/hisotry', () => {
   })
 })
 
-describe('API route /api/hisotry for requests and callbacks', () => {
+describe('API route /api/history for requests and callbacks', () => {
   beforeAll(() => {
     jest.resetAllMocks()
     requestLogger.logMessage.mockReturnValue()
@@ -120,7 +120,7 @@ describe('API route /api/hisotry for requests and callbacks', () => {
       expect(res.statusCode).toEqual(200)
       expect(res.body).toEqual([])
     })
-    it('Get requests history exeception', async () => {
+    it('Get requests history exception', async () => {
       SpyArrayStoreGet.mockImplementation(() => {
         throw new Error('Some error')
       })
@@ -133,6 +133,13 @@ describe('API route /api/hisotry for requests and callbacks', () => {
       SpyArrayStoreReset.mockReturnValue()
       const res = await request(app).delete(`/api/history/requests`).send()
       expect(res.statusCode).toEqual(200)
+    })
+    it('Delete requests history exception', async () => {
+      SpyArrayStoreReset.mockImplementation(() => {
+        throw new Error('Some error')
+      })
+      const res = await request(app).delete(`/api/history/requests`).send()
+      expect(res.statusCode).toEqual(500)
     })
   })
   describe('GET /api/history/callbacks', () => {
@@ -157,7 +164,7 @@ describe('API route /api/hisotry for requests and callbacks', () => {
       expect(res.statusCode).toEqual(200)
       expect(res.body).toEqual([])
     })
-    it('Get callbacks history exeception', async () => {
+    it('Get callbacks history exception', async () => {
       SpyArrayStoreGet.mockImplementation(() => {
         throw new Error('Some error')
       })
@@ -170,6 +177,13 @@ describe('API route /api/hisotry for requests and callbacks', () => {
       SpyArrayStoreReset.mockReturnValue()
       const res = await request(app).delete(`/api/history/callbacks`).send()
       expect(res.statusCode).toEqual(200)
+    })
+    it('Delete callbacks history exception', async () => {
+      SpyArrayStoreReset.mockImplementation(() => {
+        throw new Error('Some error')
+      })
+      const res = await request(app).delete(`/api/history/callbacks`).send()
+      expect(res.statusCode).toEqual(500)
     })
   })
   describe('GET /api/history/test-reports', () => {
@@ -211,6 +225,14 @@ describe('API route /api/hisotry for requests and callbacks', () => {
       dbAdapter.getReport.mockResolvedValueOnce(null)
       const res = await request(app).get(`/api/history/test-reports/1`).send()
       expect(res.statusCode).toEqual(404)
+    })
+    it('If download.query is true', async () => {
+      dbAdapter.getReport.mockResolvedValueOnce({})
+      const res = await request(app).get(`/api/history/test-reports/1?download=true`).send()
+      console.log(res)
+      expect(res.statusCode).toEqual(200)
+      expect(res.headers['content-disposition']).toBeDefined()
+      expect(res.headers['ttk-filename']).toEqual('TTK-Assertion-Report-1.json')
     })
   })
 })
