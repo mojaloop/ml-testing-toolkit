@@ -25,11 +25,6 @@
 
 'use strict'
 
-const Config = require('../../src/lib/config')
-const Server = require('../../src/server')
-const apiServer = require('../../src/lib/api-server')
-const ConnectionProvider = require('../../src/lib/configuration-providers/mb-connection-manager')
-
 jest.mock('../../src/lib/config')
 jest.mock('../../src/server')
 jest.mock('../../src/lib/api-server')
@@ -37,7 +32,22 @@ jest.mock('../../src/lib/requestLogger')
 jest.mock('../../src/lib/configuration-providers/mb-connection-manager')
 
 describe('Index', () => {
+  let Config
+  let Server
+  let apiServer
+  let ConnectionProvider
+
   describe('init', () => {
+    beforeEach(() => {
+      Config = require('../../src/lib/config')
+      Server = require('../../src/server')
+      apiServer = require('../../src/lib/api-server')
+      ConnectionProvider = require('../../src/lib/configuration-providers/mb-connection-manager')
+    })
+    afterEach(() => {
+      jest.resetModules()
+    })
+
     it('Init should not throw an error', async () => {
       apiServer.startServer.mockReturnValue()
       Config.loadUserConfig.mockResolvedValue()
@@ -45,11 +55,33 @@ describe('Index', () => {
         HOSTING_ENABLED: false,
         CONNECTION_MANAGER: {
           ENABLED: false
+        },
+        "SOCKET_IO_ENGINE_OPTIONS": {
+          "pingInterval": 25000,
+          "pingTimeout": 300000
         }
       })
       ConnectionProvider.initialize.mockResolvedValue()
       Server.initialize.mockResolvedValue()
-      expect(() => {require('../../src/index')}).not.toThrowError();
+      expect(() => {require('../../src/index').default}).not.toThrowError();
+    })
+
+    it('Init should initialize mbConnectionManager when enabled', async () => {
+      apiServer.startServer.mockReturnValue()
+      Config.loadUserConfig.mockResolvedValue()
+      Config.getSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false,
+        CONNECTION_MANAGER: {
+          ENABLED: true
+        },
+        "SOCKET_IO_ENGINE_OPTIONS": {
+          "pingInterval": 25000,
+          "pingTimeout": 300000
+        }
+      })
+      ConnectionProvider.initialize.mockResolvedValue()
+      Server.initialize.mockResolvedValue()
+      expect(() => {require('../../src/index').default}).not.toThrowError();
     })
   })
 })
