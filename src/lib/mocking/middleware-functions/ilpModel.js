@@ -58,20 +58,28 @@ const handleQuoteIlp = (context, response) => {
         note: response.body.note
       }
     } else {
+      const payeePartyIdType = context.request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id ||
+        context.request.body.CdtTrfTxInf.Cdtr.Id.PrvId.Othr.Id
+      const payeePartyIdentifier = context.request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.SchmeNm.Prtry ||
+        context.request.body.CdtTrfTxInf.Cdtr.Id.PrvId.Othr.SchmeNm.Prtry
+      const payerPartyIdType = context.request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id ||
+        context.request.body.CdtTrfTxInf.Dbtr.Id.PrvId.Othr.Id
+      const payerPartyIdentifier = context.request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.SchmeNm.Prtry ||
+        context.request.body.CdtTrfTxInf.Dbtr.Id.PrvId.Othr.SchmeNm.Prtry
       transactionObject = {
         transactionId: context.request.body.CdtTrfTxInf.PmtId.EndToEndId,
         quoteId: context.request.body.CdtTrfTxInf.PmtId.TxId,
         payee: {
           partyIdInfo: {
-            partyIdType: context.request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id,
-            partyIdentifier: context.request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.SchmeNm.Prtry,
+            partyIdType: payeePartyIdType,
+            partyIdentifier: payeePartyIdentifier,
             fspId: context.request.body.CdtTrfTxInf.CdtrAgt.FinInstnId.Othr.Id
           }
         },
         payer: {
           partyIdInfo: {
-            partyIdType: context.request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id,
-            partyIdentifier: context.request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.SchmeNm.Prtry,
+            partyIdType: payerPartyIdType,
+            partyIdentifier: payerPartyIdentifier,
             fspId: context.request.body.CdtTrfTxInf.DbtrAgt.FinInstnId.Othr.Id
           }
         },
