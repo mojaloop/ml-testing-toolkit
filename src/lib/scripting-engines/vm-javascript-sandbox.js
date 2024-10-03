@@ -260,6 +260,7 @@ async function _runScript (code, context = {}, options = {}) {
 }
 
 module.exports = {
+  registerAxiosRequestInterceptor,
   generateContextObj,
   executeAsync
 }

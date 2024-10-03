@@ -467,7 +467,7 @@ describe('OpenApiMockHandler', () => {
       SpyHandleCallback.mockResolvedValueOnce()
       const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
     })
-    it('Check for the returned value - existing path with previous quites validation passed', async () => {
+    it('Check for the returned value - existing path with previous quotes validation passed', async () => {
       const item = {}
       const sampleContext = {
         operation: {
@@ -479,7 +479,7 @@ describe('OpenApiMockHandler', () => {
       }
       const sampleRequest = {
         customInfo: {
-          
+
         }
       }
       SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
@@ -654,7 +654,7 @@ describe('OpenApiMockHandler', () => {
       SpyHandleRequest.mockReturnValueOnce()
       const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
     })
-    it('Check for the returned value - existing path with previous quites validation failed and empty ilp quote', async () => {
+    it('Check for the returned value - existing path with previous quotes validation failed and empty ilp quote', async () => {
       const item = {}
       const sampleContext = {
         operation: {
@@ -686,7 +686,7 @@ describe('OpenApiMockHandler', () => {
       SpyHandleRequest.mockReturnValueOnce()
       const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
     })
-    it('Check for the returned value - existing path with previous quites validation passed', async () => {
+    it('Check for the returned value - existing path with previous quotes validation passed', async () => {
       const item = {}
       const sampleContext = {
         operation: {
@@ -841,6 +841,296 @@ describe('OpenApiMockHandler', () => {
         body: {}
       })
       const result = await OpenApiMockHandler.openApiBackendNotImplementedHandler(sampleContext, sampleRequest, h, item)
+    })
+    describe('generateAsyncCallback iso20022', () => {
+      it('Check for the returned value - existing path with iso20022 type and previous quotes validation passed', async () => {
+        const item = {}
+        const sampleContext = {
+          operation: {
+            path: '/transfers'
+          },
+          request: {
+            method: 'post'
+          }
+        }
+        const sampleRequest = {
+          customInfo: {
+            selectedApi: {
+              type: 'iso20022'
+            }
+          }
+        }
+        SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+          '/transfers': {
+            'post': {}
+          }
+        }))
+        SpyRequestLogger.mockReturnValue()
+        SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+        SpyHandleCallback.mockResolvedValueOnce()
+        SpyGetUserConfig.mockReturnValueOnce({
+          HUB_ONLY_MODE: false,
+          TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true
+        })
+        SpyHandleTransfers.mockReturnValueOnce(true)
+        SpyCallbackRules.mockResolvedValueOnce({})
+        const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+
+      })
+
+      it('Check for the returned value - existing path with iso20022 type and ilp packet validation passed', async () => {
+        const item = {}
+        const sampleContext = {
+          operation: {
+            path: '/transfers'
+          },
+          request: {
+            method: 'post'
+          }
+        }
+        const sampleRequest = {
+          customInfo: {
+            selectedApi: {
+              type: 'iso20022'
+            }
+          }
+        }
+        SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+          '/transfers': {
+            'post': {}
+          }
+        }))
+        SpyRequestLogger.mockReturnValue()
+        SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+        SpyHandleCallback.mockResolvedValueOnce()
+        SpyGetUserConfig.mockReturnValueOnce({
+          HUB_ONLY_MODE: false,
+          TRANSFERS_VALIDATION_ILP_PACKET: true
+        })
+        SpyValidateTransferIlpPacket.mockReturnValueOnce(true)
+        SpyCallbackRules.mockResolvedValueOnce({})
+        const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+
+      })
+
+      it('Check for the returned value - existing path with iso20022 type and validating condition passed', async () => {
+        const item = {}
+        const sampleContext = {
+          operation: {
+            path: '/transfers'
+          },
+          request: {
+            method: 'post'
+          }
+        }
+        const sampleRequest = {
+          customInfo: {
+            selectedApi: {
+              type: 'iso20022'
+            }
+          }
+        }
+        SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+          '/transfers': {
+            'post': {}
+          }
+        }))
+        SpyRequestLogger.mockReturnValue()
+        SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+        SpyHandleCallback.mockResolvedValueOnce()
+        SpyGetUserConfig.mockReturnValueOnce({
+          HUB_ONLY_MODE: false,
+          TRANSFERS_VALIDATION_CONDITION: true
+        })
+        SpyValidateTransferCondition.mockReturnValueOnce(true)
+        SpyCallbackRules.mockResolvedValueOnce({})
+        const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+
+      })
+
+      it('Check for the returned value - existing path with iso20022 type and previous quotes validation failed', async () => {
+        const item = {}
+        const sampleContext = {
+          operation: {
+            path: '/transfers'
+          },
+          request: {
+            method: 'post'
+          }
+        }
+        const sampleRequest = {
+          customInfo: {
+            selectedApi: {
+              type: 'iso20022'
+            }
+          }
+        }
+        SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+          '/transfers': {
+            'post': {}
+          }
+        }))
+        SpyRequestLogger.mockReturnValue()
+        SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+        SpyHandleCallback.mockResolvedValueOnce()
+        SpyGetUserConfig.mockReturnValueOnce({
+          HUB_ONLY_MODE: false,
+          TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true
+        })
+        SpyHandleTransfers.mockReturnValueOnce(false)
+        SpyGenerateMockErrorCallback.mockResolvedValueOnce({})
+        SpyHandleCallback.mockResolvedValueOnce()
+        const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+
+      })
+
+      it('Check for the returned value - existing path with iso20022 type and ilp packet validation failed', async () => {
+        const item = {}
+        const sampleContext = {
+          operation: {
+            path: '/transfers'
+          },
+          request: {
+            method: 'post'
+          }
+        }
+        const sampleRequest = {
+          customInfo: {
+            selectedApi: {
+              type: 'iso20022'
+            }
+          }
+        }
+        SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+          '/transfers': {
+            'post': {}
+          }
+        }))
+        SpyRequestLogger.mockReturnValue()
+        SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+        SpyHandleCallback.mockResolvedValueOnce()
+        SpyGetUserConfig.mockReturnValueOnce({
+          HUB_ONLY_MODE: false,
+          TRANSFERS_VALIDATION_ILP_PACKET: true
+        })
+        SpyValidateTransferIlpPacket.mockReturnValueOnce(false)
+        SpyGenerateMockErrorCallback.mockResolvedValueOnce({})
+        SpyHandleCallback.mockResolvedValueOnce()
+        const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+
+      })
+
+      it('Check for the returned value - existing path with iso20022 type and validating condition failed', async () => {
+        const item = {}
+        const sampleContext = {
+          operation: {
+            path: '/transfers'
+          },
+          request: {
+            method: 'post'
+          }
+        }
+        const sampleRequest = {
+          customInfo: {
+            selectedApi: {
+              type: 'iso20022'
+            }
+          }
+        }
+        SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+          '/transfers': {
+            'post': {}
+          }
+        }))
+        SpyRequestLogger.mockReturnValue()
+        SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+        SpyHandleCallback.mockResolvedValueOnce()
+        SpyGetUserConfig.mockReturnValueOnce({
+          HUB_ONLY_MODE: false,
+          TRANSFERS_VALIDATION_CONDITION: true
+        })
+        SpyValidateTransferCondition.mockReturnValueOnce(false)
+        SpyGenerateMockErrorCallback.mockResolvedValueOnce({})
+        SpyHandleCallback.mockResolvedValueOnce()
+        const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+
+      })
+
+      it('Check for the returned value - existing path with iso20022 type and previous quotes validation passed and empty ilp quote', async () => {
+        const item = {}
+        const sampleContext = {
+          operation: {
+            path: '/transfers'
+          },
+          request: {
+            method: 'post'
+          }
+        }
+        const sampleRequest = {
+          customInfo: {
+            selectedApi: {
+              type: 'iso20022'
+            }
+          }
+        }
+        SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+          '/transfers': {
+            'post': {}
+          }
+        }))
+        SpyRequestLogger.mockReturnValue()
+        SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+        SpyHandleCallback.mockResolvedValueOnce()
+        SpyGetUserConfig.mockReturnValueOnce({
+          HUB_ONLY_MODE: false,
+          TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true
+        })
+        SpyHandleTransfers.mockReturnValueOnce(true)
+        SpyCallbackRules.mockResolvedValueOnce({body: {}})
+        SpyHandleCallback.mockResolvedValueOnce()
+        SpyHandleQuoteIlp.mockReturnValueOnce('')
+        SpyHandleTransferIlp.mockReturnValueOnce()
+        SpyHandleQuotes.mockReturnValueOnce()
+        SpyHandleRequest.mockReturnValueOnce()
+        const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+      })
+
+      it('Check for the returned value - existing path with iso20022 type and previous quotes validation failed and empty ilp quote', async () => {
+        const item = {}
+        const sampleContext = {
+          operation: {
+            path: '/transfers'
+          },
+          request: {
+            method: 'post'
+          }
+        }
+        const sampleRequest = {
+          customInfo: {
+            selectedApi: {
+              type: 'iso20022'
+            }
+          }
+        }
+        SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+          '/transfers': {
+            'post': {}
+          }
+        }))
+        SpyRequestLogger.mockReturnValue()
+        SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+        SpyHandleCallback.mockResolvedValueOnce()
+        SpyGetUserConfig.mockReturnValueOnce({
+          HUB_ONLY_MODE: false
+        })
+        SpyCallbackRules.mockResolvedValueOnce({body: {}})
+        SpyHandleCallback.mockResolvedValueOnce()
+        SpyHandleQuoteIlp.mockReturnValueOnce('')
+        SpyHandleTransferIlp.mockReturnValueOnce()
+        SpyHandleQuotes.mockReturnValueOnce()
+        SpyHandleRequest.mockReturnValueOnce()
+        const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+      })
     })
   })
 })

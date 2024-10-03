@@ -107,11 +107,13 @@ describe('WebSocketClientManager', () => {
       await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(false)
       expect(websocket.disconnect('test1')).toBe(true)
     })
-    it('websocket connect should return false on dupliceate name', async () => {
+    it('websocket connect should return false on duplicate name', async () => {
       WebSocket.mockImplementationOnce(webSocketPositiveMock)
       await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
       await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(false)
       expect(websocket.disconnect('test1')).toBe(true)
+    })
+    it('websocket connect CLIENT_MUTUAL_TLS_ENABLED should return true', async () => {
     })
     it('websocket getMessage', async () => {
       WebSocket.mockImplementationOnce(webSocketPositiveMock)
