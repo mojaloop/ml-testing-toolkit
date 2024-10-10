@@ -47,6 +47,7 @@ const dbAdapter = require('../db/adapters/dbAdapter')
 const arrayStore = require('../arrayStore')
 const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 const httpAgentStore = require('../httpAgentStore')
+const Transformers = require('../mocking/transformers')
 
 const terminateTraceIds = {}
 
@@ -265,7 +266,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
 
     // Form the actual http request headers, body, path and method by replacing configurable parameters
     // Replace the parameters
-    convertedRequest = replaceVariables(request, inputValues, request, requestsObj)
+    convertedRequest = replaceVariables(request, inputValues, request, requestsObj, templateOptions)
     convertedRequest = replaceRequestVariables(convertedRequest)
 
     if (convertedRequest.delay) {
@@ -323,7 +324,19 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         status = 'SKIPPED'
         await setSkippedResponse(convertedRequest, request, status, tracing, testCase, scriptsExecution, globalConfig)
       } else {
-        const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId, contextObj)
+        // Get transformer if specified
+        const transformerObj = {
+          transformer: null,
+          options: {}
+        }
+        if (contextObj.requestVariables && contextObj.requestVariables.TRANSFORM) {
+          transformerObj.transformer = Transformers.getTransformer(contextObj.requestVariables.TRANSFORM.transformerName)
+          transformerObj.options = contextObj.requestVariables.TRANSFORM.options
+        } else if (templateOptions?.transformerName) {
+          transformerObj.transformer = Transformers.getTransformer(templateOptions.transformerName)
+          // Currently no options are passed to the transformer in template level, we can add it later if needed
+        }
+        const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId, contextObj, transformerObj)
         status = 'SUCCESS'
         await setResponse(convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig)
       }
@@ -375,7 +388,6 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
   }
 
   let testResult = null
-  console.log('GVK', resp)
   if (globalConfig.testsExecution) {
     testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
   }
@@ -385,6 +397,7 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
     response: resp.syncResponse,
     callback: resp.callback,
     request: convertedRequest,
+    transformedRequest: resp.transformedRequest,
     additionalInfo: {
       curlRequest: resp.curlRequest
     }
@@ -405,6 +418,7 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
       requestId: request.id,
       response: resp.syncResponse,
       callback: resp.callback,
+      transformedRequest: resp.transformedRequest,
       requestSent: convertedRequest,
       additionalInfo: {
         curlRequest: resp.curlRequest,
@@ -578,7 +592,7 @@ const getUrlPrefix = (baseUrl) => {
   return returnUrl
 }
 
-const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId, contextObj = {}) => {
+const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId, contextObj = {}, transformerObj) => {
   return new Promise((resolve, reject) => {
     (async () => {
       const httpAgentProps = {}
@@ -628,13 +642,21 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         }
       }
 
+      const transformedRequest = {}
+
+      if (transformerObj && transformerObj.transformer && transformerObj.transformer.requestTransform) {
+        const result = await transformerObj.transformer.requestTransform({ method, path, headers, body })
+        transformedRequest.body = result.body
+        transformedRequest.headers = result.headers
+      }
+
       const reqOpts = {
         method,
         url: urlGenerated,
         path,
         params: queryParams,
-        headers,
-        data: body,
+        headers: transformedRequest.headers || headers,
+        data: transformedRequest.body || body,
         timeout: (contextObj.requestVariables && contextObj.requestVariables.REQUEST_TIMEOUT) || userConfig.DEFAULT_REQUEST_TIMEOUT,
         validateStatus: function (status) {
           return status < 900 // Reject only if the status code is greater than or equal to 900
@@ -667,18 +689,29 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           return reject(new Error(JSON.stringify({ curlRequest, syncResponse, errorCode: 4001, errorMessage: 'Timeout for receiving callback' })))
         }, userConfig.CALLBACK_TIMEOUT)
         // Listen for success callback
-        MyEventEmitter.getEmitter('testOutbound', user).once(successCallbackUrl, (callbackHeaders, callbackBody) => {
+        MyEventEmitter.getEmitter('testOutbound', user).once(successCallbackUrl, async (_callbackHeaders, _callbackBody, _callbackMethod, _callbackPath) => {
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
+          let callbackHeaders = _callbackHeaders
+          let callbackBody = _callbackBody
+          let originalBody
+          let originalHeaders
+          if (transformerObj && transformerObj.transformer && transformerObj.transformer.callbackTransform) {
+            const result = await transformerObj.transformer.callbackTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
+            originalBody = _callbackBody
+            callbackBody = result.body
+            originalHeaders = _callbackHeaders
+            callbackHeaders = result.headers
+          }
           customLogger.logMessage('info', 'Received success callback ' + successCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          return resolve({ curlRequest, syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody } })
+          return resolve({ curlRequest, transformedRequest, syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody, originalHeaders, originalBody } })
         })
         // Listen for error callback
         MyEventEmitter.getEmitter('testOutbound', user).once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
           customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          return reject(new Error(JSON.stringify({ curlRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
+          return reject(new Error(JSON.stringify({ curlRequest, transformedRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
         })
       }
 
@@ -700,13 +733,13 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
             MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
             MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
           }
-          return reject(new Error(JSON.stringify({ curlRequest, syncResponse })))
+          return reject(new Error(JSON.stringify({ curlRequest, transformedRequest, syncResponse })))
         } else {
           customLogger.logOutboundRequest('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: { response: result }, user, uniqueId, request: reqOpts })
         }
 
         if (!successCallbackUrl || !errorCallbackUrl || ignoreCallbacks) {
-          return resolve({ curlRequest, syncResponse })
+          return resolve({ curlRequest, transformedRequest, syncResponse })
         }
         customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user })
       }, (err) => {
@@ -730,7 +763,7 @@ const setResultObject = (inputObject) => {
   }
 }
 
-const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
+const replaceVariables = (inputObject, inputValues, request, requestsObj, templateOptions) => {
   let resultObject = setResultObject(inputObject)
   if (!resultObject) {
     return inputObject
@@ -743,7 +776,7 @@ const replaceVariables = (inputObject, inputValues, request, requestsObj) => {
       const splitArr = element.split('.')
       switch (splitArr[0]) {
         case '{$function': {
-          resultObject = resultObject.replace(element, getFunctionResult(element, inputValues, request))
+          resultObject = resultObject.replace(element, getFunctionResult(element, templateOptions, request))
           break
         }
         case '{$prev': {
@@ -839,8 +872,8 @@ const replacePathVariables = (operationPath, params) => {
 }
 
 // Execute the function and return the result
-const getFunctionResult = (param, inputValues, request) => {
-  return utilsInternal.getFunctionResult(param, inputValues, request)
+const getFunctionResult = (param, templateOptions, request) => {
+  return utilsInternal.getFunctionResult(param, templateOptions, request)
 }
 
 // Get Total Counts

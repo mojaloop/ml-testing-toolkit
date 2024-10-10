@@ -29,7 +29,12 @@ const handleQuotes = (context, request, fulfilment = null) => {
   // Check whether the request is POST /quotes
   if (request.method === 'post' && request.path === '/quotes') {
     // Save the Transaction ID in object store
-    ObjectStore.push('transactions', request.payload.transactionId, { fulfilment })
+    if (request.payload.CdtTrfTxInf?.PmtId?.EndToEndId) {
+      ObjectStore.push('transactions', request.payload.CdtTrfTxInf.PmtId.EndToEndId, { fulfilment })
+    }
+    if (request.payload.transactionId) {
+      ObjectStore.push('transactions', request.payload.transactionId, { fulfilment })
+    }
   }
 }
 
@@ -38,7 +43,10 @@ const handleTransfers = (context, request) => {
   if (request.method === 'post' && request.path === '/transfers') {
     let ilpTransactionObject
     try {
-      ilpTransactionObject = IlpModel.getIlpTransactionObject(request.payload.ilpPacket)
+      ilpTransactionObject = IlpModel.getIlpTransactionObject(
+        request.payload.ilpPacket ||
+        request.payload.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket
+      )
     } catch (err) {
       return false
     }

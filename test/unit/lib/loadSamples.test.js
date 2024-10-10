@@ -49,11 +49,12 @@ describe('loadSamples', () => {
             name: queryParams.collections[1],
             test_cases: [{id: 1}]
         }))
-        .mockResolvedValueOnce(JSON.stringify({inputValues: {}}))
+        .mockResolvedValueOnce(JSON.stringify({inputValues: {}, options: {}}))
       const sample = await loadSamples.getSample(queryParams)      
       expect(sample).toStrictEqual({
         name: 'multi',
         inputValues: {},
+        options: {},
         test_cases: [{id : 1}, {id : 2}]
       })
     })
@@ -70,6 +71,7 @@ describe('loadSamples', () => {
       expect(sample).toStrictEqual({
         name: queryParams.collections[0],
         inputValues: null,
+        options: null,
         test_cases: [{id: 1}]
       })
     })
@@ -81,6 +83,7 @@ describe('loadSamples', () => {
       expect(sample).toStrictEqual({
         name: null,
         inputValues: null,
+        options: null,
         test_cases: null
       })
     })
@@ -92,6 +95,7 @@ describe('loadSamples', () => {
       expect(sample).toStrictEqual({
         name: null,
         inputValues: null,
+        options: null,
         test_cases: null
       })
     })

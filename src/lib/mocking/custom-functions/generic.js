@@ -39,8 +39,8 @@ const curDateISO = () => {
 
 const generateULID = monotonicFactory()
 
-const generateID = (inputValues) => {
-  return inputValues.generateID === 'uuid' ? generateUUID() : generateULID()
+const generateID = (options) => {
+  return options.generateIDType === 'uuid' ? generateUUID() : generateULID()
 }
 
 module.exports = {

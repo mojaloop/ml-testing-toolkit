@@ -45,6 +45,8 @@ class RulesEngine {
     this.engine.addOperator('numericGreaterThan', (a, b) => Number(a) > Number(b))
     this.engine.addOperator('numericLessThanInclusive', (a, b) => Number(a) <= Number(b))
     this.engine.addOperator('numericGreaterThanInclusive', (a, b) => Number(a) >= Number(b))
+    this.engine.addOperator('includesString', (a, b) => a.includes(b))
+    this.engine.addOperator('excludesString', (a, b) => !a.includes(b))
   }
 
   /**

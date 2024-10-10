@@ -1,6 +1,5 @@
 ## Add a TODO comment indicating the reason for each rejected dependency upgrade added to this list, and what should be done to resolve it (i.e. handle it through a story, etc).
 reject: [
-  "chai", # version 5 uses only ESM
-  "@mojaloop/sdk-standard-components" ## version 17.4.0 introduces a bug: this.logger.isDebugEnabled is not a function
+  "chai" # version 5 uses only ESM
 ]
 

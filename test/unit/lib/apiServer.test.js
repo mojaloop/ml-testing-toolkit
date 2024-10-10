@@ -38,7 +38,7 @@ Config.getSystemConfig.mockReturnValue({
   }
 })
 
-describe('api-server', () => { 
+describe('api-server', () => {
   beforeEach(() => {
     jest.resetAllMocks()
     requestLogger.logMessage.mockReturnValue()
@@ -97,12 +97,18 @@ describe('api-server', () => {
     it('the server should be initialized', async () => {
       // apiServer.startServer()
       await expect((async () => {
-        await wait(); 
+        await wait();
         apiServer.startServer()
-        await wait(); 
+        await wait();
         apiServer.stopServer()
         return 'OK'
       })()).resolves.toBeTruthy()
+    })
+  })
+  describe('when getHttp is called', () => {
+    it('should return a http server', async () => {
+      const http = apiServer.getHttp()
+      expect(http).toBeTruthy()
     })
   })
   const wait = async (ms = 0) => new Promise(resolve => setTimeout(resolve, ms))

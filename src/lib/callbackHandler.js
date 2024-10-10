@@ -142,7 +142,7 @@ const handleCallback = async (callbackObject, context, req) => {
   if (reqOpts.headers['Content-Length']) {
     delete reqOpts.headers['Content-Length']
   }
-  if (reqOpts.headers['content-cength']) {
+  if (reqOpts.headers['content-length']) {
     delete reqOpts.headers['content-length']
   }
 

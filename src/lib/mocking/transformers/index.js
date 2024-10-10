@@ -17,57 +17,20 @@
  optionally within square brackets <email>.
  * Gates Foundation
 
- * ModusBox
- * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
+ * Infitx
+ * Vijaya Kumar Guthi <vijaya.guthi@infitx.com> (Original Author)
  --------------
  ******/
 
-'use strict'
-
-const mongoose = require('mongoose')
-
-const Schema = mongoose.Schema
-
-const models = {
-  common: new Schema({
-    _id: String,
-    data: { type: Schema.Types.Mixed }
-  }),
-  logs: new Schema({
-    _id: mongoose.Types.ObjectId,
-    uniqueId: {
-      type: String,
-      required: false
-    },
-    traceID: {
-      type: String,
-      required: false
-    },
-    resource: Object,
-    messageType: String,
-    notificationType: String,
-    verbosity: String,
-    message: String,
-    additionalData: Schema.Types.Mixed,
-    logTime: Date
-  }, { _id: false }),
-  reports: new Schema({
-    _id: String,
-    name: String,
-    inputValues: Object,
-    test_cases: [],
-    runtimeInformation: Object
-  })
+const getTransformer = (transformerName) => {
+  if (transformerName === 'none' || transformerName === 'NONE' || transformerName === 'no' || transformerName === 'NO') {
+    return null
+  } else {
+    const transformerModule = require(`./${transformerName}`)
+    return transformerModule
+  }
 }
 
-/* istanbul ignore next */
-process.on('SIGINT', async () => {
-  await mongoose.connection.close()
-  process.exit(0)
-})
-
 module.exports = {
-  models,
-  connect: mongoose.connect,
-  Types: mongoose.Types
+  getTransformer
 }

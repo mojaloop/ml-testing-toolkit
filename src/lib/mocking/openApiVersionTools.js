@@ -24,7 +24,7 @@
 
 const customLogger = require('../requestLogger')
 // eslint-disable-next-line
-const acceptHeaderRE = new RegExp('^application/vnd.interoperability\\.([a-zA-Z0-9\\*]+)?(\\+json)?(;)?(version=(([0-9]+)(\\.([0-9]+))?)?)?$')
+const acceptHeaderRE = new RegExp('^application/vnd.interoperability\\.?([a-zA-Z0-9\\*]+)?\\.([a-zA-Z0-9\\*]+)?(\\+json)?(;)?(version=(([0-9]+)(\\.([0-9]+))?)?)?$')
 
 module.exports.validateAcceptHeader = (acceptHeader) => {
   const validationFailed = !acceptHeaderRE.test(acceptHeader)
@@ -103,7 +103,7 @@ module.exports.negotiateVersion = (req, apis) => {
       }
     }
     if (!negotiationFailed) {
-      responseContentTypeHeader = `application/vnd.interoperability.${parsedAcceptHeader.resource}+json;version=${apis[negotiatedIndex].majorVersion}.${apis[negotiatedIndex].minorVersion}`
+      responseContentTypeHeader = `application/vnd.interoperability${parsedAcceptHeader.apiType !== 'fspiop' ? '.' + parsedAcceptHeader.apiType : ''}.${parsedAcceptHeader.resource}+json;version=${apis[negotiatedIndex].majorVersion}.${apis[negotiatedIndex].minorVersion}`
     }
   }
   customLogger.logMessage('debug', negotiationFailed ? 'Version negotiation failed for the Accept / Content-Type header ' + acceptHeader : 'Version negotiation succeeded, picked up the version ' + apis[negotiatedIndex].majorVersion + '.' + apis[negotiatedIndex].minorVersion, { request: req })
@@ -121,9 +121,10 @@ const parseAcceptHeader = (acceptHeader) => {
     return null
   }
   return {
-    resource: parsedArray[1],
-    majorVersion: +parsedArray[6],
-    minorVersion: +parsedArray[8]
+    apiType: parsedArray[1] ? parsedArray[1] : 'fspiop',
+    resource: parsedArray[2] ? parsedArray[2] : parsedArray[1],
+    majorVersion: +parsedArray[7],
+    minorVersion: +parsedArray[9]
   }
 }
 

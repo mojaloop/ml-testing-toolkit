@@ -83,6 +83,12 @@
       "asynchronous": true
     },
     {
+      "type": "iso20022",
+      "version": "2.0",
+      "folderPath": "fspiop_2.0_iso20022",
+      "asynchronous": true
+    },
+    {
       "type": "settlements",
       "version": "1.0",
       "folderPath": "settlements_1.0"

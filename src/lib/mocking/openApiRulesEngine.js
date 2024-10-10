@@ -220,6 +220,11 @@ const evaluate = async (rulesEngine, context) => {
 }
 
 const callbackRules = async (context, req) => {
+  if (!req.customInfo.callbackInfo?.successCallback) {
+    customLogger.logMessage('error', 'No success callback specified', { request: req })
+    return {}
+  }
+
   const rules = await rulesEngineModel.getCallbackRules(req.customInfo.user)
 
   const newRules = await replaceEnvironmentsFromRules(rules)

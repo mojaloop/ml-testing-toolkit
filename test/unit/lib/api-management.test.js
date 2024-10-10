@@ -41,7 +41,7 @@ const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 
 
-describe('API Management', () => { 
+describe('API Management', () => {
   describe('validateDefinition', () => {
     it('should not throw an error', async () => {
       await expect(APIManagement.validateDefinition(specFilePrefix + 'api_spec_sync.yaml')).resolves.not.toThrowError()
@@ -53,7 +53,7 @@ describe('API Management', () => {
       API_DEFINITIONS: []
     })
     SpyGetUserConfig.mockReturnValue({
-      ILP_SECRET: ''
+      ILP_SECRET: 'sample'
     })
     it('should not throw an error', async () => {
       await expect(APIManagement.addDefinition(specFilePrefix + 'api_spec_sync.yaml', 'name', '1.0', 'false')).resolves.toBeUndefined()
@@ -72,12 +72,12 @@ describe('API Management', () => {
         ]
       })
       SpyGetUserConfig.mockReturnValue({
-        ILP_SECRET: ''
+        ILP_SECRET: 'sample'
       })
       await expect(APIManagement.deleteDefinition('name', '1.0')).resolves.toBe(true)
     })
     it('should throw an error when API is inbuilt API', async () => {
-      
+
       SpyGetSystemConfig.mockReturnValue({
         API_DEFINITIONS: [
           {
@@ -89,7 +89,7 @@ describe('API Management', () => {
         ]
       })
       SpyGetUserConfig.mockReturnValue({
-        ILP_SECRET: ''
+        ILP_SECRET: 'sample'
       })
       await expect(APIManagement.deleteDefinition('name', '1.0')).rejects.toThrowError()
     })
@@ -98,9 +98,43 @@ describe('API Management', () => {
         API_DEFINITIONS: []
       })
       SpyGetUserConfig.mockReturnValue({
-        ILP_SECRET: ''
+        ILP_SECRET: 'sample'
       })
       await expect(APIManagement.deleteDefinition('name', '1.0')).rejects.toThrowError()
+    })
+  })
+  describe('patchDefinitionParams', () => {
+    it('should not throw an error when patching hostnames', async () => {
+      SpyGetSystemConfig.mockReturnValue({
+        API_DEFINITIONS: [
+          {
+            type: 'name',
+            version: '1.0',
+            folderPath: "name_1.0",
+            additionalApi: true
+          }
+        ]
+      })
+      await expect(APIManagement.patchDefinitionParams('name', '1.0', { hostnames: ['hostname1', 'hostname2'] })).resolves.toBe(true)
+    })
+    it('should not throw an error when patching prefix', async () => {
+      SpyGetSystemConfig.mockReturnValue({
+        API_DEFINITIONS: [
+          {
+            type: 'name',
+            version: '1.0',
+            folderPath: "name_1.0",
+            additionalApi: true
+          }
+        ]
+      })
+      await expect(APIManagement.patchDefinitionParams('name', '1.0', { prefix: '/new-prefix' })).resolves.toBe(true)
+    })
+    it('should throw an error when API not found', async () => {
+      SpyGetSystemConfig.mockReturnValue({
+        API_DEFINITIONS: []
+      })
+      await expect(APIManagement.patchDefinitionParams('name', '1.0', { hostnames: ['hostname1', 'hostname2'] })).rejects.toThrowError()
     })
   })
 })

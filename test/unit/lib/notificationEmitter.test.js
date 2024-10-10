@@ -26,12 +26,23 @@
 
 const NotificationEmitter = require('../../../src/lib/notificationEmitter')
 
+jest.mock('../../../src/lib/socket-server',() => ({
+  getIO: jest.fn(() => {
+    return {
+      emit: jest.fn()
+    }
+  })
+}))
+
 describe('NotificationEmitter', () => {
-  describe('boradcastLog', () => {
+  describe('broadcastLog', () => {
     it('should not throw an error when sessionID is missing', () => {
       expect(() => NotificationEmitter.broadcastLog({})).not.toThrowError()
     })
     it('should not throw an error', () => {
+      expect(() => NotificationEmitter.broadcastLog({}, 'sessionID')).not.toThrowError()
+    })
+    it('should not throw error when sessionID is provided', () => {
       expect(() => NotificationEmitter.broadcastLog({}, 'sessionID')).not.toThrowError()
     })
   })
