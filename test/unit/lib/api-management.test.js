@@ -53,7 +53,7 @@ describe('API Management', () => {
       API_DEFINITIONS: []
     })
     SpyGetUserConfig.mockReturnValue({
-      ILP_SECRET: ''
+      ILP_SECRET: 'sample'
     })
     it('should not throw an error', async () => {
       await expect(APIManagement.addDefinition(specFilePrefix + 'api_spec_sync.yaml', 'name', '1.0', 'false')).resolves.toBeUndefined()
@@ -72,7 +72,7 @@ describe('API Management', () => {
         ]
       })
       SpyGetUserConfig.mockReturnValue({
-        ILP_SECRET: ''
+        ILP_SECRET: 'sample'
       })
       await expect(APIManagement.deleteDefinition('name', '1.0')).resolves.toBe(true)
     })
@@ -89,7 +89,7 @@ describe('API Management', () => {
         ]
       })
       SpyGetUserConfig.mockReturnValue({
-        ILP_SECRET: ''
+        ILP_SECRET: 'sample'
       })
       await expect(APIManagement.deleteDefinition('name', '1.0')).rejects.toThrowError()
     })
@@ -98,7 +98,7 @@ describe('API Management', () => {
         API_DEFINITIONS: []
       })
       SpyGetUserConfig.mockReturnValue({
-        ILP_SECRET: ''
+        ILP_SECRET: 'sample'
       })
       await expect(APIManagement.deleteDefinition('name', '1.0')).rejects.toThrowError()
     })

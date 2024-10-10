@@ -74,7 +74,7 @@
                 "Ccy": "XTS"
               },
               "Pty": {
-                "Name": "Test Party",
+                "Nm": "Test Party",
                 "Id": {
                   "PrvtId": {
                     "Othr": {
@@ -183,7 +183,7 @@
                 "Ccy": "XTS"
               },
               "Pty": {
-                "Name": "Test Party",
+                "Nm": "Test Party",
                 "Id": {
                   "OrgId": {
                     "Othr": {
@@ -299,7 +299,7 @@
                 "Ccy": "XTS"
               },
               "Pty": {
-                "Name": "Test Party",
+                "Nm": "Test Party",
                 "Id": {
                   "OrgId": {
                     "Othr": {
@@ -329,7 +329,7 @@
   {
     "ruleId": 4,
     "priority": 1,
-    "description": "ISO20022 get /parties/{Type}/{ID}",
+    "description": "ISO20022 get /parties/{Type}/{ID} ACCOUNT_ID",
     "apiVersion": {
       "minorVersion": 0,
       "majorVersion": 2,
@@ -414,7 +414,7 @@
                 "Ccy": "XTS"
               },
               "Pty": {
-                "Name": "Test Party",
+                "Nm": "Test Party",
                 "Id": {
                   "PrvtId": {
                     "Othr": {
@@ -433,7 +433,116 @@
           "exec": [
             "environment.CreDtTm = new Date().toISOString()"
           ],
-          "scriptingEngine": "postman"
+          "scriptingEngine": "javascript"
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 5,
+    "priority": 1,
+    "description": "ISO20022 get /parties/{Type}/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "includesString",
+          "value": "application/vnd.interoperability.iso20022",
+          "path": "Accept"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.parties+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        },
+        "body": {
+          "Assgnmt": {
+            "MsgId": "{$function.generic.generateULID}",
+            "CreDtTm": "{$environment.CreDtTm}",
+            "Assgnr": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers.fspiop-source}"
+                  }
+                }
+              }
+            },
+            "Assgne": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              }
+            }
+          },
+          "Rpt": {
+            "OrgnlId": "{$request.params.Type}/{$request.params.ID}",
+            "Vrfctn": true,
+            "UpdtdPtyAndAcctId": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              },
+              "Acct": {
+                "Ccy": "XTS"
+              },
+              "Pty": {
+                "Nm": "Test Party",
+                "Id": {
+                  "PrvtId": {
+                    "Othr": {
+                      "Id": "{$request.params.ID}",
+                      "SchmeNm": {
+                        "Prtry": "{$request.params.Type}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()"
+          ],
+          "scriptingEngine": "javascript"
         }
       },
       "type": "FIXED_CALLBACK"
@@ -444,7 +553,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 5,
+    "ruleId": 6,
     "priority": 1,
     "description": "ISO20022 get /quotes/{ID}",
     "apiVersion": {
@@ -487,7 +596,7 @@
     }
   },
   {
-    "ruleId": 6,
+    "ruleId": 7,
     "priority": 1,
     "description": "ISO20022 post /quotes",
     "apiVersion": {
@@ -562,14 +671,14 @@
               "ActiveCurrencyAndAmount": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount}"
             },
             "InstdAmt": {
-              "Ccy": "{$request.body.CdtTrfTxInf.InstdAmt.Ccy}",
-              "ActiveOrHistoricCurrencyAndAmount": "{$request.body.CdtTrfTxInf.InstdAmt.ActiveOrHistoricCurrencyAndAmount}"
+              "Ccy": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}",
+              "ActiveOrHistoricCurrencyAndAmount": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount}"
             },
             "ChrgBr": "SLEV",
             "ChrgsInf": {
               "Amt": {
-                "Ccy": "{$request.body.CdtTrfTxInf.ChrgsInf.Amt.Ccy}",
-                "ActiveOrHistoricCurrencyAndAmount": "{$request.body.CdtTrfTxInf.ChrgsInf.Amt.ActiveOrHistoricCurrencyAndAmount}"
+                "Ccy": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}",
+                "ActiveOrHistoricCurrencyAndAmount": "0"
               },
               "Agt": {
                 "FinInstnId": {
@@ -628,30 +737,6 @@
                   }
                 }
               }
-            },
-            "DbtrAcct": {
-              "Id": {
-                "IBAN": "{$request.body.CdtTrfTxInf.DbtrAcct.Id.IBAN}",
-                "Ccy": "{$request.body.CdtTrfTxInf.DbtrAcct.Id.Ccy}"
-              }
-            },
-            "DbtrAgtAcct": {
-              "Id": {
-                "IBAN": "{$request.body.CdtTrfTxInf.DbtrAgtAcct.Id.IBAN}",
-                "Ccy": "{$request.body.CdtTrfTxInf.DbtrAgtAcct.Id.Ccy}"
-              }
-            },
-            "CdtrAcct": {
-              "Id": {
-                "IBAN": "{$request.body.CdtTrfTxInf.CdtrAcct.Id.IBAN}",
-                "Ccy": "{$request.body.CdtTrfTxInf.CdtrAcct.Id.Ccy}"
-              }
-            },
-            "CdtrAgtAcct": {
-              "Id": {
-                "IBAN": "{$request.body.CdtTrfTxInf.CdtrAgtAcct.Id.IBAN}",
-                "Ccy": "{$request.body.CdtTrfTxInf.CdtrAgtAcct.Id.Ccy}"
-              }
             }
           }
         }
@@ -663,7 +748,7 @@
   },
   {
     "type": "callback",
-    "ruleId": 7,
+    "ruleId": 8,
     "priority": 1,
     "description": "ISO20022 get /transfers/{ID}",
     "apiVersion": {
@@ -707,7 +792,7 @@
     "version": 1
   },
   {
-    "ruleId": 8,
+    "ruleId": 9,
     "priority": 1,
     "description": "ISO20022 post /transfers",
     "apiVersion": {
@@ -793,7 +878,7 @@
     "version": 1
   },
   {
-    "ruleId": 9,
+    "ruleId": 10,
     "priority": 1,
     "description": "ISO20022 get /fxQuotes/{ID}",
     "apiVersion": {
@@ -846,7 +931,7 @@
     "version": 1
   },
   {
-    "ruleId": 10,
+    "ruleId": 11,
     "priority": 1,
     "description": "ISO20022 post /fxQuotes",
     "apiVersion": {
@@ -1030,7 +1115,7 @@
     "version": 1
   },
   {
-    "ruleId": 11,
+    "ruleId": 12,
     "priority": 1,
     "description": "ISO20022 get /fxTransfers/{ID}",
     "apiVersion": {
@@ -1083,7 +1168,7 @@
     "version": 1
   },
   {
-    "ruleId": 12,
+    "ruleId": 13,
     "priority": 1,
     "description": "ISO20022 post /fxTransfers",
     "apiVersion": {

@@ -234,6 +234,9 @@ const quoteISOResponseBody = {
         }
       }
     }
+  },
+  "GrpHdr": {
+    "PmtInstrXpryDtTm": "2024-10-02T17:11:12.437Z"
   }
 }
 
@@ -487,7 +490,6 @@ describe('ILP Model', () => {
         body: {...transferISOResponseBody}
       }
       IlpModel.handleTransferIlp(sampleContext, response)
-      console.log(response.body)
       expect(response.body.TxInfAndSts.ExctnConf).toEqual(isoFulfilment)
     })
 

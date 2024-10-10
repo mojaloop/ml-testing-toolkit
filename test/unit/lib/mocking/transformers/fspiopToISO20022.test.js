@@ -59,7 +59,7 @@ describe('fspiopToISO20022 Transformers', () => {
         body: { quoteId: '123' }
       };
 
-      TransformFacades.FSPIOP.quotes.post.mockResolvedValue({ transformed: 'body' });
+      TransformFacades.FSPIOP.quotes.post.mockResolvedValue({ body: {transformed: 'body'} });
 
       const transformedRequest = await requestTransform(requestOptions);
 
@@ -111,7 +111,7 @@ describe('fspiopToISO20022 Transformers', () => {
         body: { partyId: '123' }
       };
 
-      TransformFacades.FSPIOPISO20022.parties.put.mockResolvedValue({ transformed: 'body' });
+      TransformFacades.FSPIOPISO20022.parties.put.mockResolvedValue({ body: {transformed: 'body'} });
 
       const transformedCallback = await callbackTransform(callbackOptions);
 
