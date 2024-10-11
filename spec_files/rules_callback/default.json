@@ -483,7 +483,8 @@
         "headers": {
           "Content-Type": "application/vnd.interoperability.iso20022.parties+json;version=2.0",
           "FSPIOP-Source": "{$config.FSPID}",
-          "Date": "{$request.headers.date}"
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}"
         },
         "body": {
           "Assgnmt": {
@@ -644,8 +645,9 @@
         },
         "headers": {
           "Content-Type": "application/vnd.interoperability.iso20022.quotes+json;version=2.0",
-          "FSPIOP-Source": "{$config.FSPID}",
-          "Date": "{$request.headers.date}"
+          "FSPIOP-Source": "{$request.headers.fspiop-destination}",
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}"
         },
         "body": {
           "GrpHdr": {
@@ -674,7 +676,7 @@
               "Ccy": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}",
               "ActiveOrHistoricCurrencyAndAmount": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount}"
             },
-            "ChrgBr": "SLEV",
+            "ChrgBr": "SHAR",
             "ChrgsInf": {
               "Amt": {
                 "Ccy": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}",
@@ -841,7 +843,8 @@
         "headers": {
           "Content-Type": "application/vnd.interoperability.iso20022.transfers+json;version=2.0",
           "FSPIOP-Source": "{$config.FSPID}",
-          "Date": "{$request.headers.date}"
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}"
         },
         "body": {
           "GrpHdr": {
@@ -854,14 +857,17 @@
             "OrgnlEndToEndId": "{$request.body.CdtTrfTxInf.PmtId.EndToEndId}",
             "OrgnlTxId": "{$request.body.CdtTrfTxInf.PmtId.TxId}",
             "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
-            "TxSts": "ACPT",
+            "TxSts": "COMM",
             "StsRsnInf": {
               "Rsn": {
-                "Prtry": "ACPT"
+                "Prtry": "COMM"
               },
               "AddtlInf": "ADDITIONAL"
             },
             "AccptncDtTm": "{$environment.AccptncDtTm}",
+            "PrcgDt": {
+              "Dt": "{$environment.AccptncDtTm}"
+            },
             "AcctSvcrRef": "ACCTSVCRREF",
             "ClrSysRef": "CLRSYSREF",
             "ExctnConf": "",
@@ -980,7 +986,8 @@
         "headers": {
           "Content-Type": "application/vnd.interoperability.iso20022.fxQuotes+json;version=2.0",
           "FSPIOP-Source": "{$config.FSPID}",
-          "Date": "{$request.headers.date}"
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}"
         },
         "body": {
           "GrpHdr": {
@@ -1217,7 +1224,8 @@
         "headers": {
           "Content-Type": "application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0",
           "FSPIOP-Source": "{$config.FSPID}",
-          "Date": "{$request.headers.date}"
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}"
         },
         "body": {
           "GrpHdr": {
@@ -1230,7 +1238,7 @@
             "OrgnlEndToEndId": "12345",
             "OrgnlTxId": "12345",
             "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
-            "TxSts": "APPR",
+            "TxSts": "COMM",
             "StsRsnInf": {
               "Rsn": {
                 "Prtry": "ACPT"

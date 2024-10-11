@@ -36,6 +36,31 @@ const _replaceHeaders = (newHeaders, headers) => {
   return clonedHeaders
 }
 
+const _transformPostResource = async (resource, requestOptions) => {
+  const headers = _replaceHeaders({
+    accept: `application/vnd.interoperability.iso20022.${resource}+json;version=2.0`,
+    'content-type': `application/vnd.interoperability.iso20022.${resource}+json;version=2.0`
+  }, requestOptions.headers)
+  const result = await TransformFacades.FSPIOP[resource].post({ body: requestOptions.body, headers: requestOptions.headers })
+  return {
+    ...requestOptions,
+    headers,
+    body: result.body
+  }
+}
+
+const _transformPutResource = async (resource, callbackOptions) => {
+  const headers = _replaceHeaders({
+    'content-type': `application/vnd.interoperability.${resource}+json;version=2.0`
+  }, callbackOptions.headers)
+  const result = await TransformFacades.FSPIOPISO20022[resource].put({ body: callbackOptions.body, headers: callbackOptions.headers })
+  return {
+    ...callbackOptions,
+    headers,
+    body: result.body
+  }
+}
+
 const requestTransform = async (requestOptions) => {
   try {
     switch (requestOptions.method) {
@@ -52,30 +77,14 @@ const requestTransform = async (requestOptions) => {
         }
         break
       case 'post':
-        // POST /quotes
         if (requestOptions.path.startsWith('/quotes')) {
-          const headers = _replaceHeaders({
-            accept: 'application/vnd.interoperability.iso20022.quotes+json;version=2.0',
-            'content-type': 'application/vnd.interoperability.iso20022.quotes+json;version=2.0'
-          }, requestOptions.headers)
-          const result = await TransformFacades.FSPIOP.quotes.post({ body: requestOptions.body, headers: requestOptions.headers })
-          return {
-            ...requestOptions,
-            headers,
-            body: result.body
-          }
-        }
-        if (requestOptions.path.startsWith('/transfers')) {
-          const headers = _replaceHeaders({
-            accept: 'application/vnd.interoperability.iso20022.transfers+json;version=2.0',
-            'content-type': 'application/vnd.interoperability.iso20022.transfers+json;version=2.0'
-          }, requestOptions.headers)
-          const result = await TransformFacades.FSPIOP.transfers.post({ body: requestOptions.body, headers: requestOptions.headers })
-          return {
-            ...requestOptions,
-            headers,
-            body: result.body
-          }
+          return _transformPostResource('quotes', requestOptions)
+        } else if (requestOptions.path.startsWith('/transfers')) {
+          return _transformPostResource('transfers', requestOptions)
+        } else if (requestOptions.path.startsWith('/fxQuotes')) {
+          return _transformPostResource('fxQuotes', requestOptions)
+        } else if (requestOptions.path.startsWith('/fxTransfers')) {
+          return _transformPostResource('fxTransfers', requestOptions)
         }
         break
     }
@@ -89,41 +98,16 @@ const callbackTransform = async (callbackOptions) => {
   try {
     switch (callbackOptions.method) {
       case 'put':
-        // PUT /parties
         if (callbackOptions.path.startsWith('/parties')) {
-          const headers = _replaceHeaders({
-            'content-type': 'application/vnd.interoperability.parties+json;version=2.0'
-          }, callbackOptions.headers)
-          const result = await TransformFacades.FSPIOPISO20022.parties.put({ body: callbackOptions.body, headers: callbackOptions.headers })
-          return {
-            ...callbackOptions,
-            body: result.body,
-            headers
-          }
-        }
-        // PUT /quotes
-        if (callbackOptions.path.startsWith('/quotes')) {
-          const headers = _replaceHeaders({
-            'content-type': 'application/vnd.interoperability.quotes+json;version=2.0'
-          }, callbackOptions.headers)
-          const result = await TransformFacades.FSPIOPISO20022.quotes.put({ body: callbackOptions.body, headers: callbackOptions.headers })
-          return {
-            ...callbackOptions,
-            body: result.body,
-            headers
-          }
-        }
-        // PUT /transfers
-        if (callbackOptions.path.startsWith('/transfers')) {
-          const headers = _replaceHeaders({
-            'content-type': 'application/vnd.interoperability.transfers+json;version=2.0'
-          }, callbackOptions.headers)
-          const result = await TransformFacades.FSPIOPISO20022.transfers.put({ body: callbackOptions.body, headers: callbackOptions.headers })
-          return {
-            ...callbackOptions,
-            body: result.body,
-            headers
-          }
+          return _transformPutResource('parties', callbackOptions)
+        } else if (callbackOptions.path.startsWith('/quotes')) {
+          return _transformPutResource('quotes', callbackOptions)
+        } else if (callbackOptions.path.startsWith('/transfers')) {
+          return _transformPutResource('transfers', callbackOptions)
+        } else if (callbackOptions.path.startsWith('/fxQuotes')) {
+          return _transformPutResource('fxQuotes', callbackOptions)
+        } else if (callbackOptions.path.startsWith('/fxTransfers')) {
+          return _transformPutResource('fxTransfers', callbackOptions)
         }
         break
     }
