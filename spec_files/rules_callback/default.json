@@ -993,6 +993,7 @@
           "GrpHdr": {
             "MsgId": "{$function.generic.generateULID}",
             "CreDtTm": "{$environment.CreDtTm}",
+            "PmtInstrXpryDtTm": "{$environment.PmtInstrXpryDtTm}",
             "NbOfTxs": "1",
             "SttlmInf": {
               "SttlmMtd": "CLRG"
@@ -1010,17 +1011,22 @@
                 "Cd": "SUPP"
               }
             },
+            "UndrlygCstmrCdtTrf": {
+              "InstdAmt": {
+                "Ccy": "{$request.body.CdtTrfTxInf.UndrlygCstmrCdtTrf.InstdAmt.Ccy}",
+                "ActiveOrHistoricCurrencyAndAmount": "{$request.body.CdtTrfTxInf.UndrlygCstmrCdtTrf.InstdAmt.ActiveOrHistoricCurrencyAndAmount}"
+              }
+            },
             "IntrBkSttlmAmt": {
               "ActiveCurrencyAndAmount": "100",
-              "Ccy": "XTS"
+              "Ccy": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}"
             },
             "ChrgBr": "SLEV",
             "Cdtr": {
               "Name": "Test Creditor",
               "FinInstnId": {
-                "Id": "{$request.body.CdtTrfTxInf.Cdtr.FinInstnId.Id}",
-                "SchmeNm": {
-                  "Prtry": "ACCOUNT_ID"
+                "Othr": {
+                  "Id": "{$request.body.CdtTrfTxInf.Cdtr.FinInstnId.Othr.Id}"
                 }
               },
               "Id": {
@@ -1067,9 +1073,8 @@
             "Dbtr": {
               "Name": "Test Debitor",
               "FinInstnId": {
-                "Id": "{$request.body.CdtTrfTxInf.Dbtr.FinInstnId.Id}",
-                "SchmeNm": {
-                  "Prtry": "ACCOUNT_ID"
+                "Othr": {
+                  "Id": "{$request.body.CdtTrfTxInf.Dbtr.FinInstnId.Othr.Id}"
                 }
               },
               "Id": {

@@ -29,8 +29,8 @@ let ilpObj = null
 let ilpV4Obj = null
 
 const init = (secret) => {
-  ilpObj = ilpFactory(ILP_VERSIONS.v1, {secret, logger: customLogger});
-  ilpV4Obj = ilpFactory(ILP_VERSIONS.v4, {secret, logger: customLogger});
+  ilpObj = ilpFactory(ILP_VERSIONS.v1, { secret, logger: customLogger })
+  ilpV4Obj = ilpFactory(ILP_VERSIONS.v4, { secret, logger: customLogger })
 }
 
 // ILP Packet inclusion functions
@@ -159,7 +159,6 @@ const validateTransferIlpPacket = (context, request) => {
         }
         return ilpV4Obj.validateIlpAgainstTransferRequest(validationBody)
       }
-      
     } catch (err) {
       customLogger.logMessage('error', 'Failed to validate the Ilp packet. Error: ' + err.message, { request })
       return false
