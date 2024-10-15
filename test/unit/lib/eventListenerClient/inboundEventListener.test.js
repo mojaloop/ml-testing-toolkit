@@ -168,6 +168,18 @@ describe('InboundEventListener', () => {
       })
       await expect(eventListener.getMessage('test1')).resolves.toBe(null)
     })
+    it('addListener should handle listeners with the same name', async () => {
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      eventListener.addListener('test1', 'post', '/quotes');
+      eventListener.addListener('test1', 'post', '/quotes');
+      expect(consoleSpy).toHaveBeenCalledWith('Event listener already exists with that name');
+      consoleSpy.mockRestore();
+    });
+
+    it('getMessage should handle message when no eventListeners are found', async () => {
+      const result = await eventListener.getMessage('nonExistentListener');
+      expect(result).toBe(null);
+    });
 
     // it('websocket connect should return false on websocket failure', async () => {
     //   WebSocket.mockImplementationOnce(webSocketNegativeMock1)

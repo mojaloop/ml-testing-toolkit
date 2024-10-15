@@ -22,15 +22,15 @@
  --------------
  ******/
 
-const Ilp = require('@mojaloop/sdk-standard-components').Ilp
+const { ilpFactory, ILP_VERSIONS } = require('@mojaloop/sdk-standard-components').Ilp
 const customLogger = require('../../requestLogger')
 
 let ilpObj = null
+let ilpV4Obj = null
 
 const init = (secret) => {
-  ilpObj = new Ilp({
-    secret
-  })
+  ilpObj = ilpFactory(ILP_VERSIONS.v1, { secret, logger: customLogger })
+  ilpV4Obj = ilpFactory(ILP_VERSIONS.v4, { secret, logger: customLogger })
 }
 
 // ILP Packet inclusion functions
@@ -46,18 +46,67 @@ const handleQuoteIlp = (context, response) => {
     // const transactionObject = {
     //   mockData: 'This is a test data from self testing toolkit'
     // }
-    const transactionObject = {
-      transactionId: context.request.body.transactionId,
-      quoteId: context.request.body.quoteId,
-      payee: context.request.body.payee,
-      payer: context.request.body.payer,
-      amount: response.body.transferAmount,
-      transactionType: context.request.body.transactionType,
-      note: response.body.note
+    let transactionObject
+    if (!_isIso20022(context.request)) {
+      transactionObject = {
+        transactionId: context.request.body.transactionId,
+        quoteId: context.request.body.quoteId,
+        payee: context.request.body.payee,
+        payer: context.request.body.payer,
+        amount: response.body.transferAmount,
+        transactionType: context.request.body.transactionType,
+        expiration: response.body.expiration,
+        note: response.body.note
+      }
+    } else {
+      const payeePartyIdType = context.request.body.CdtTrfTxInf.Cdtr.Id.OrgId?.Othr.Id ||
+        context.request.body.CdtTrfTxInf.Cdtr.Id.PrvtId?.Othr.Id
+      const payeePartyIdentifier = context.request.body.CdtTrfTxInf.Cdtr.Id.OrgId?.Othr.SchmeNm.Prtry ||
+        context.request.body.CdtTrfTxInf.Cdtr.Id.PrvtId?.Othr.SchmeNm.Prtry
+      const payerPartyIdType = context.request.body.CdtTrfTxInf.Dbtr.Id.OrgId?.Othr.Id ||
+        context.request.body.CdtTrfTxInf.Dbtr.Id.PrvtId?.Othr.Id
+      const payerPartyIdentifier = context.request.body.CdtTrfTxInf.Dbtr.Id.OrgId?.Othr.SchmeNm.Prtry ||
+        context.request.body.CdtTrfTxInf.Dbtr.Id.PrvtId?.Othr.SchmeNm.Prtry
+      transactionObject = {
+        transactionId: context.request.body.CdtTrfTxInf.PmtId.EndToEndId,
+        quoteId: context.request.body.CdtTrfTxInf.PmtId.TxId,
+        payee: {
+          partyIdInfo: {
+            partyIdType: payeePartyIdType,
+            partyIdentifier: payeePartyIdentifier,
+            fspId: context.request.body.CdtTrfTxInf.CdtrAgt.FinInstnId.Othr.Id
+          }
+        },
+        payer: {
+          partyIdInfo: {
+            partyIdType: payerPartyIdType,
+            partyIdentifier: payerPartyIdentifier,
+            fspId: context.request.body.CdtTrfTxInf.DbtrAgt.FinInstnId.Othr.Id
+          }
+        },
+        amount: {
+          currency: context.request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy,
+          amount: context.request.body.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount
+        },
+        transactionType: context.request.body.GrpHdr?.CdtTrfTxInf?.Purp?.Prtry || null,
+        expiration: response.body.GrpHdr?.PmtInstrXpryDtTm,
+        note: context.request.body.CdtTrfTxInf?.InstrForNxtAgt?.InstrInf || null
+      }
     }
-    const { ilpPacket, fulfilment, condition } = ilpObj.getResponseIlp(transactionObject)
-    response.body.ilpPacket = ilpPacket
-    response.body.condition = condition
+
+    let fulfilment
+    if (!_isIso20022(response)) {
+      const ilpResult = ilpObj.getResponseIlp(transactionObject)
+      fulfilment = ilpResult.fulfilment
+      response.body.ilpPacket = ilpResult.ilpPacket
+      response.body.condition = ilpResult.condition
+    } else {
+      const ilpResult = ilpV4Obj.getResponseIlp(transactionObject)
+      fulfilment = ilpResult.fulfilment
+      response.body.CdtTrfTxInf.VrfctnOfTerms = {
+        IlpV4PrepPacket: ilpResult.ilpPacket
+      }
+    }
     return fulfilment
   }
   return null
@@ -71,12 +120,18 @@ const handleTransferIlp = (context, response) => {
       response.eventInfo.params.body.fulfilment) {
       return null
     }
-    const generatedFulfilment = ilpObj.calculateFulfil(context.request.body.ilpPacket).replace('"', '')
-    // const generatedCondition = ilpObj.calculateConditionFromFulfil(generatedFulfilment).replace('"', '')
-    response.body.fulfilment = generatedFulfilment
+    if (context.request.body.ilpPacket) {
+      const generatedFulfilment = ilpObj.calculateFulfil(context.request.body.ilpPacket).replace('"', '')
+      response.body.fulfilment = generatedFulfilment
+    }
+    if (context.request.body.CdtTrfTxInf) {
+      // TODO: Need to change the following function call to pass ilpPacket directly when the standard components are updated
+      // For now transaction object is constructed from the ilpPacket and then fulfilment is calculated
+      const generatedFulfilment = ilpV4Obj.calculateFulfil(ilpV4Obj.getTransactionObject(context.request.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket)).replace('"', '')
+      response.body.TxInfAndSts.ExctnConf = generatedFulfilment
+    }
   }
   if (context.request.method === 'get' && response.method === 'put' && pathMatch.test(response.path)) {
-    // const generatedCondition = ilpObj.calculateConditionFromFulfil(generatedFulfilment).replace('"', '')
     delete response.body.fulfilment
   }
 }
@@ -88,7 +143,22 @@ const validateTransferIlpPacket = (context, request) => {
   if (request.method === 'post' && request.path === '/transfers') {
     customLogger.logMessage('info', 'Validating Ilp packet against the transfer request', { request })
     try {
-      return ilpObj.validateIlpAgainstTransferRequest(request.payload)
+      let validationBody
+      if (!_isIso20022(request)) {
+        validationBody = request.payload
+        return ilpObj.validateIlpAgainstTransferRequest(validationBody)
+      } else {
+        validationBody = {
+          payeeFsp: request.payload.CdtTrfTxInf.CdtrAgt.FinInstnId.Othr.Id,
+          payerFsp: request.payload.CdtTrfTxInf.DbtrAgt.FinInstnId.Othr.Id,
+          amount: {
+            currency: request.payload.CdtTrfTxInf.IntrBkSttlmAmt.Ccy,
+            amount: request.payload.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount
+          },
+          ilpPacket: request.payload.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket
+        }
+        return ilpV4Obj.validateIlpAgainstTransferRequest(validationBody)
+      }
     } catch (err) {
       customLogger.logMessage('error', 'Failed to validate the Ilp packet. Error: ' + err.message, { request })
       return false
@@ -106,15 +176,33 @@ const validateTransferCondition = (context, request) => {
       customLogger.logMessage('info', 'Validating condition with the stored fulfilment', { request })
     } else {
       try {
-        fulfilment = ilpObj.calculateFulfil(request.payload.ilpPacket).replace('"', '')
+        if (request.payload.ilpPacket) {
+          fulfilment = ilpObj.calculateFulfil(request.payload.ilpPacket).replace('"', '')
+        } else if (request.payload.CdtTrfTxInf) {
+          // TODO: Need to change the following function call to pass ilpPacket directly when the standard components are updated
+          // For now transaction object is constructed from the ilpPacket and then fulfilment is calculated
+          fulfilment = ilpV4Obj.calculateFulfil(ilpV4Obj.getTransactionObject(request.payload.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket)).replace('"', '')
+        }
         customLogger.logMessage('info', 'Validating condition with the generated fulfilment', { request })
       } catch (err) {
         customLogger.logMessage('error', 'Failed to calculate the fulfilment. Error: ' + err.message, { request })
         return false
       }
     }
+    let condition
+    if (!_isIso20022(request)) {
+      condition = request.payload?.condition
+    } else {
+      // Construct the ILP object from the request payload
+      // since ISO20022 expect the condition in the ilpPacket
+      condition = ilpV4Obj.getResponseIlp(ilpV4Obj.getTransactionObject(request.payload.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket)).condition
+    }
     try {
-      return ilpObj.validateFulfil(fulfilment, request.payload.condition)
+      if (!_isIso20022(request)) {
+        return ilpObj.validateFulfil(fulfilment, condition)
+      } else {
+        return ilpV4Obj.validateFulfil(fulfilment, condition)
+      }
     } catch (err) {
       customLogger.logMessage('error', 'Failed to validate the fulfilment. Error: ' + err.message, { request })
       return false
@@ -127,6 +215,10 @@ const validateTransferCondition = (context, request) => {
 
 const getIlpTransactionObject = (ilpPacket) => {
   return ilpObj.getTransactionObject(ilpPacket)
+}
+
+const _isIso20022 = (requestOrResponse) => {
+  return requestOrResponse.body?.CdtTrfTxInf || requestOrResponse.payload?.CdtTrfTxInf
 }
 
 module.exports = {

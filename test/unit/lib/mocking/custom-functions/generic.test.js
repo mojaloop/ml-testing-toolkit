@@ -25,7 +25,15 @@
 'use strict'
 
 const Generic = require('../../../../../src/lib/mocking/custom-functions/generic')
+const ulidx = require('ulidx')
 
+jest.mock('ulidx',() => {
+  const originalModule = jest.requireActual('ulidx');
+  return {
+    ...originalModule,
+    monotonicFactory: jest.fn(() => jest.fn()),
+  };
+})
 
 describe('Generic Custom Functions', () => {
   describe('generateUUID', () => {
@@ -54,6 +62,17 @@ describe('Generic Custom Functions', () => {
       const result = Generic.curDateISO()
       expect(result).toBeTruthy()
       expect(result.length).toBeGreaterThan(15)
+    })
+  })
+  describe('generateID', () => {
+    it('It should return some uuid value when options.generateIDType === uuid', async () => {
+      const result = Generic.generateID({ generateIDType: 'uuid' })
+      expect(result).toBeTruthy()
+      expect(result.length).toBeGreaterThan(20)
+    })
+    it('It should return some uuid value when options.generateIDType === ulid', async () => {
+      Generic.generateID({ generateIDType: 'ulid' })
+      expect(ulidx.monotonicFactory).toBeCalled()
     })
   })
 })

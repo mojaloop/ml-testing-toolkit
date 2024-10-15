@@ -1,4 +1,8 @@
 {
+  "options": {
+    "breakOnError": true,
+    "transformerName": "none"
+  },
   "inputValues": {
     "BASE_CENTRAL_LEDGER_ADMIN": "",
     "CALLBACK_ENDPOINT_BASE_URL": "http://172.17.0.1:4040",

@@ -1,6 +1,1273 @@
 [
   {
-    "ruleId": 30,
+    "ruleId": 1,
+    "priority": 1,
+    "description": "ISO20022 get /parties/{Type}/{ID}/{SubId}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "includesString",
+          "value": "application/vnd.interoperability.iso20022",
+          "path": "Accept"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}/{SubId}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}/{SubId}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.parties+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        },
+        "body": {
+          "Assgnmt": {
+            "MsgId": "{$function.generic.generateULID}",
+            "CreDtTm": "{$environment.CreDtTm}",
+            "Assgnr": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers.fspiop-source}"
+                  }
+                }
+              }
+            },
+            "Assgne": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              }
+            }
+          },
+          "Rpt": {
+            "OrgnlId": "{$request.params.Type}/{$request.params.ID}/{$request.params.SubId}",
+            "Vrfctn": true,
+            "UpdtdPtyAndAcctId": {
+              "Acct": {
+                "Ccy": "XTS"
+              },
+              "Pty": {
+                "Nm": "Test Party",
+                "Id": {
+                  "PrvtId": {
+                    "Othr": {
+                      "Id": "{$request.params.ID}",
+                      "SchmeNm": {
+                        "Prtry": "{$request.params.Type}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()"
+          ],
+          "scriptingEngine": "javascript"
+        }
+      },
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 2,
+    "priority": 1,
+    "description": "ISO20022 get /parties/{Type}/{ID}/{SubId}  for BUSINESS/ALIAS/DEVICE Types",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "includesString",
+          "value": "application/vnd.interoperability.iso20022",
+          "path": "Accept"
+        },
+        {
+          "fact": "pathParams",
+          "operator": "in",
+          "value": "BUSINESS,ALIAS,DEVICE",
+          "path": "Type"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}/{SubId}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}/{SubId}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.parties+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        },
+        "body": {
+          "Assgnmt": {
+            "MsgId": "{$function.generic.generateULID}",
+            "CreDtTm": "{$environment.CreDtTm}",
+            "Assgnr": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers.fspiop-source}"
+                  }
+                }
+              }
+            },
+            "Assgne": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              }
+            }
+          },
+          "Rpt": {
+            "OrgnlId": "{$request.params.Type}/{$request.params.ID}/{$request.params.SubId}",
+            "Vrfctn": true,
+            "UpdtdPtyAndAcctId": {
+              "Acct": {
+                "Ccy": "XTS"
+              },
+              "Pty": {
+                "Nm": "Test Party",
+                "Id": {
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "{$request.params.ID}",
+                      "SchmeNm": {
+                        "Prtry": "{$request.params.Type}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()"
+          ],
+          "scriptingEngine": "javascript"
+        }
+      },
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 3,
+    "priority": 1,
+    "description": "ISO20022 get /parties/{Type}/{ID} for BUSINESS/ALIAS/DEVICE Types",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "includesString",
+          "value": "application/vnd.interoperability.iso20022",
+          "path": "Accept"
+        },
+        {
+          "fact": "pathParams",
+          "operator": "in",
+          "value": "BUSINESS,ALIAS,DEVICE",
+          "path": "Type"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.parties+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        },
+        "body": {
+          "Assgnmt": {
+            "MsgId": "{$function.generic.generateULID}",
+            "CreDtTm": "{$environment.CreDtTm}",
+            "Assgnr": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers.fspiop-source}"
+                  }
+                }
+              }
+            },
+            "Assgne": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              }
+            }
+          },
+          "Rpt": {
+            "OrgnlId": "{$request.params.Type}/{$request.params.ID}",
+            "Vrfctn": true,
+            "UpdtdPtyAndAcctId": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              },
+              "Acct": {
+                "Ccy": "XTS"
+              },
+              "Pty": {
+                "Nm": "Test Party",
+                "Id": {
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "{$request.params.ID}",
+                      "SchmeNm": {
+                        "Prtry": "{$request.params.Type}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()"
+          ],
+          "scriptingEngine": "javascript"
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 4,
+    "priority": 1,
+    "description": "ISO20022 get /parties/{Type}/{ID} ACCOUNT_ID",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "includesString",
+          "value": "application/vnd.interoperability.iso20022",
+          "path": "Accept"
+        },
+        {
+          "fact": "pathParams",
+          "operator": "equal",
+          "path": "Type",
+          "value": "ACCOUNT_ID"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.parties+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        },
+        "body": {
+          "Assgnmt": {
+            "MsgId": "{$function.generic.generateULID}",
+            "CreDtTm": "{$environment.CreDtTm}",
+            "Assgnr": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers.fspiop-source}"
+                  }
+                }
+              }
+            },
+            "Assgne": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              }
+            }
+          },
+          "Rpt": {
+            "OrgnlId": "{$request.params.Type}/{$request.params.ID}",
+            "Vrfctn": true,
+            "UpdtdPtyAndAcctId": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              },
+              "Acct": {
+                "Ccy": "XTS"
+              },
+              "Pty": {
+                "Nm": "Test Party",
+                "Id": {
+                  "PrvtId": {
+                    "Othr": {
+                      "Id": "{$request.params.ID}",
+                      "SchmeNm": {
+                        "Prtry": "{$request.params.Type}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()"
+          ],
+          "scriptingEngine": "javascript"
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 5,
+    "priority": 1,
+    "description": "ISO20022 get /parties/{Type}/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "includesString",
+          "value": "application/vnd.interoperability.iso20022",
+          "path": "Accept"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/parties/{Type}/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/parties/{Type}/{ID}",
+      "params": {
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.parties+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}"
+        },
+        "body": {
+          "Assgnmt": {
+            "MsgId": "{$function.generic.generateULID}",
+            "CreDtTm": "{$environment.CreDtTm}",
+            "Assgnr": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers.fspiop-source}"
+                  }
+                }
+              }
+            },
+            "Assgne": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              }
+            }
+          },
+          "Rpt": {
+            "OrgnlId": "{$request.params.Type}/{$request.params.ID}",
+            "Vrfctn": true,
+            "UpdtdPtyAndAcctId": {
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$config.FSPID}"
+                  }
+                }
+              },
+              "Acct": {
+                "Ccy": "XTS"
+              },
+              "Pty": {
+                "Nm": "Test Party",
+                "Id": {
+                  "PrvtId": {
+                    "Othr": {
+                      "Id": "{$request.params.ID}",
+                      "SchmeNm": {
+                        "Prtry": "{$request.params.Type}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()"
+          ],
+          "scriptingEngine": "javascript"
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "type": "callback",
+    "version": 1,
+    "ruleId": 6,
+    "priority": 1,
+    "description": "ISO20022 get /quotes/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "includesString",
+          "value": "application/vnd.interoperability.iso20022",
+          "path": "Accept"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/quotes/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/quotes/{ID}",
+      "params": {},
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
+    }
+  },
+  {
+    "ruleId": 7,
+    "priority": 1,
+    "description": "ISO20022 post /quotes",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "includesString",
+          "value": "application/vnd.interoperability.iso20022",
+          "path": "Accept"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/quotes"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/quotes/{ID}",
+      "params": {
+        "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()",
+            "environment.AccptncDtTm = new Date().toISOString()",
+            "environment.PmtInstrXpryDtTm = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString()"
+          ],
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.quotes+json;version=2.0",
+          "FSPIOP-Source": "{$request.headers.fspiop-destination}",
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}"
+        },
+        "body": {
+          "GrpHdr": {
+            "MsgId": "{$function.generic.generateULID}",
+            "PmtInstrXpryDtTm": "{$environment.PmtInstrXpryDtTm}",
+            "CreDtTm": "{$environment.CreDtTm}",
+            "NbOfTxs": "1",
+            "SttlmInf": {
+              "SttlmMtd": "CLRG"
+            }
+          },
+          "CdtTrfTxInf": {
+            "VrfctnOfTerms": {
+              "IlpV4PrepPacket": ""
+            },
+            "PmtId": {
+              "TxId": "{$request.body.CdtTrfTxInf.PmtId.TxId}",
+              "InstrId": "{$request.body.CdtTrfTxInf.PmtId.InstrId}",
+              "EndToEndId": "{$request.body.CdtTrfTxInf.PmtId.EndToEndId}"
+            },
+            "IntrBkSttlmAmt": {
+              "Ccy": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}",
+              "ActiveCurrencyAndAmount": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount}"
+            },
+            "InstdAmt": {
+              "Ccy": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}",
+              "ActiveOrHistoricCurrencyAndAmount": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.ActiveCurrencyAndAmount}"
+            },
+            "ChrgBr": "SHAR",
+            "ChrgsInf": {
+              "Amt": {
+                "Ccy": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}",
+                "ActiveOrHistoricCurrencyAndAmount": "0"
+              },
+              "Agt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "123456789",
+                    "SchmeNm": {
+                      "Cd": "BBA",
+                      "Prtry": "Party Identification Scheme Name"
+                    }
+                  }
+                }
+              }
+            },
+            "Cdtr": {
+              "Nm": "{$request.body.CdtTrfTxInf.Cdtr.Nm}",
+              "Id": {
+                "OrgId": {
+                  "Othr": {
+                    "Id": "{$request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id}",
+                    "SchmeNm": {
+                      "Prtry": "{$request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.SchmeNm.Prtry}"
+                    }
+                  }
+                }
+              }
+            },
+            "Dbtr": {
+              "Nm": "{$request.body.CdtTrfTxInf.Dbtr.Nm}",
+              "Id": {
+                "OrgId": {
+                  "Othr": {
+                    "Id": "{$request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id}",
+                    "SchmeNm": {
+                      "Prtry": "{$request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.SchmeNm.Prtry}"
+                    }
+                  }
+                }
+              }
+            },
+            "DbtrAgt": {
+              "FinInstnId": {
+                "Othr": {
+                  "Id": "{$request.headers['FSPIOP-Source']}",
+                  "SchmeNm": {
+                    "Cd": "BDID"
+                  }
+                }
+              }
+            },
+            "CdtrAgt": {
+              "FinInstnId": {
+                "Othr": {
+                  "Id": "{$request.headers['FSPIOP-Destination']}",
+                  "SchmeNm": {
+                    "Cd": "BDID"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "type": "callback",
+    "ruleId": 8,
+    "priority": 1,
+    "description": "ISO20022 get /transfers/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "includesString",
+          "value": "application/vnd.interoperability.iso20022",
+          "path": "Accept"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transfers/{ID}",
+      "params": {},
+      "delay": 0,
+      "type": "MOCK_CALLBACK"
+    },
+    "version": 1
+  },
+  {
+    "ruleId": 9,
+    "priority": 1,
+    "description": "ISO20022 post /transfers",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "includesString",
+          "value": "application/vnd.interoperability.iso20022",
+          "path": "Accept"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/transfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/transfers/{ID}",
+      "params": {
+        "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()",
+            "environment.AccptncDtTm = new Date().toISOString()",
+            "environment.PmtInstrXpryDtTm = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString()"
+          ],
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.transfers+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}"
+        },
+        "body": {
+          "GrpHdr": {
+            "MsgId": "{$function.generic.generateULID}",
+            "CreDtTm": "{$environment.CreDtTm}"
+          },
+          "TxInfAndSts": {
+            "StsId": "{$function.generic.generateULID}",
+            "OrgnlInstrId": "{$request.body.CdtTrfTxInf.PmtId.InstrId}",
+            "OrgnlEndToEndId": "{$request.body.CdtTrfTxInf.PmtId.EndToEndId}",
+            "OrgnlTxId": "{$request.body.CdtTrfTxInf.PmtId.TxId}",
+            "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
+            "TxSts": "COMM",
+            "StsRsnInf": {
+              "Rsn": {
+                "Prtry": "COMM"
+              },
+              "AddtlInf": "ADDITIONAL"
+            },
+            "AccptncDtTm": "{$environment.AccptncDtTm}",
+            "PrcgDt": {
+              "Dt": "{$environment.AccptncDtTm}"
+            },
+            "AcctSvcrRef": "ACCTSVCRREF",
+            "ClrSysRef": "CLRSYSREF",
+            "ExctnConf": "",
+            "SplmtryData": {
+              "PlcAndNm": "PLACE",
+              "Envlp": {}
+            }
+          }
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 10,
+    "priority": 1,
+    "description": "ISO20022 get /fxQuotes/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "includesString",
+          "value": "application/vnd.interoperability.iso20022",
+          "path": "Accept"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/fxQuotes/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/fxQuotes/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.fxQuotes+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        }
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 11,
+    "priority": 1,
+    "description": "ISO20022 post /fxQuotes",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "includesString",
+          "value": "application/vnd.interoperability.iso20022",
+          "path": "Accept"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/fxQuotes"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/fxQuotes/{ID}",
+      "params": {
+        "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()",
+            "environment.AccptncDtTm = new Date().toISOString()",
+            "environment.PmtInstrXpryDtTm = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString()"
+          ],
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.fxQuotes+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}"
+        },
+        "body": {
+          "GrpHdr": {
+            "MsgId": "{$function.generic.generateULID}",
+            "CreDtTm": "{$environment.CreDtTm}",
+            "PmtInstrXpryDtTm": "{$environment.PmtInstrXpryDtTm}",
+            "NbOfTxs": "1",
+            "SttlmInf": {
+              "SttlmMtd": "CLRG"
+            }
+          },
+          "CdtTrfTxInf": {
+            "PmtId": {
+              "TxId": "{$request.body.CdtTrfTxInf.PmtId.TxId}",
+              "InstrId": "{$request.body.CdtTrfTxInf.PmtId.InstrId}",
+              "EndToEndId": "{$request.body.CdtTrfTxInf.PmtId.EndToEndId}"
+            },
+            "PmtTpInf": {
+              "InstrPrty": "NORM",
+              "CtgyPurp": {
+                "Cd": "SUPP"
+              }
+            },
+            "UndrlygCstmrCdtTrf": {
+              "InstdAmt": {
+                "Ccy": "{$request.body.CdtTrfTxInf.UndrlygCstmrCdtTrf.InstdAmt.Ccy}",
+                "ActiveOrHistoricCurrencyAndAmount": "{$request.body.CdtTrfTxInf.UndrlygCstmrCdtTrf.InstdAmt.ActiveOrHistoricCurrencyAndAmount}"
+              }
+            },
+            "IntrBkSttlmAmt": {
+              "ActiveCurrencyAndAmount": "100",
+              "Ccy": "{$request.body.CdtTrfTxInf.IntrBkSttlmAmt.Ccy}"
+            },
+            "ChrgBr": "SLEV",
+            "Cdtr": {
+              "Name": "Test Creditor",
+              "FinInstnId": {
+                "Othr": {
+                  "Id": "{$request.body.CdtTrfTxInf.Cdtr.FinInstnId.Othr.Id}"
+                }
+              },
+              "Id": {
+                "PrvtId": {
+                  "DtAndPlcOfBirth": {
+                    "BirthDt": "{$function.generic.curDate}"
+                  }
+                },
+                "OrgId": {
+                  "Othr": {
+                    "Id": "{$request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id}",
+                    "SchmeNm": {
+                      "Prtry": "ACCOUNT_ID"
+                    }
+                  }
+                }
+              }
+            },
+            "CdtrAcct": {
+              "Id": {
+                "IBAN": "BE71096123456769"
+              },
+              "Tp": {
+                "Cd": "CACC"
+              },
+              "Ccy": "XTS",
+              "Nm": "My account"
+            },
+            "CdtrAgt": {
+              "FinInstnId": {
+                "BICFI": "BNBABEBB"
+              }
+            },
+            "CdtrAgtAcct": {
+              "Id": {
+                "IBAN": "BE71096123456769"
+              },
+              "Tp": {
+                "Cd": "CACC"
+              },
+              "Ccy": "XTS",
+              "Nm": "My account"
+            },
+            "Dbtr": {
+              "Name": "Test Debitor",
+              "FinInstnId": {
+                "Othr": {
+                  "Id": "{$request.body.CdtTrfTxInf.Dbtr.FinInstnId.Othr.Id}"
+                }
+              },
+              "Id": {
+                "PrvtId": {
+                  "DtAndPlcOfBirth": {
+                    "BirthDt": "{$function.generic.curDate}"
+                  }
+                },
+                "OrgId": {
+                  "Othr": {
+                    "Id": "{$request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id}",
+                    "SchmeNm": {
+                      "Prtry": "ACCOUNT_ID"
+                    }
+                  }
+                }
+              }
+            },
+            "DbtrAcct": {
+              "Id": {
+                "IBAN": "BE71096123456769"
+              },
+              "Tp": {
+                "Cd": "CACC"
+              },
+              "Ccy": "XTS",
+              "Nm": "My account"
+            },
+            "DbtrAgt": {
+              "FinInstnId": {
+                "BICFI": "BNBABEBB"
+              }
+            },
+            "DbtrAgtAcct": {
+              "Id": {
+                "IBAN": "BE71096123456769"
+              },
+              "Tp": {
+                "Cd": "CACC"
+              },
+              "Ccy": "XTS",
+              "Nm": "My account"
+            }
+          }
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 12,
+    "priority": 1,
+    "description": "ISO20022 get /fxTransfers/{ID}",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "includesString",
+          "value": "application/vnd.interoperability.iso20022",
+          "path": "Accept"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/fxTransfers/{ID}"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "get"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/fxTransfers/{ID}",
+      "params": {
+        "scripts": {
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}"
+        }
+      },
+      "type": "MOCK_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 13,
+    "priority": 1,
+    "description": "ISO20022 post /fxTransfers",
+    "apiVersion": {
+      "minorVersion": 0,
+      "majorVersion": 2,
+      "type": "iso20022",
+      "asynchronous": true,
+      "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+      "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+      "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+      "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+      "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+    },
+    "conditions": {
+      "all": [
+        {
+          "fact": "headers",
+          "operator": "includesString",
+          "value": "application/vnd.interoperability.iso20022",
+          "path": "Accept"
+        },
+        {
+          "fact": "operationPath",
+          "operator": "equal",
+          "value": "/fxTransfers"
+        },
+        {
+          "fact": "method",
+          "operator": "equal",
+          "value": "post"
+        }
+      ]
+    },
+    "event": {
+      "method": "put",
+      "path": "/fxTransfers/{ID}",
+      "params": {
+        "scripts": {
+          "exec": [
+            "environment.CreDtTm = new Date().toISOString()",
+            "environment.AccptncDtTm = new Date().toISOString()",
+            "environment.PmtInstrXpryDtTm = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString()"
+          ],
+          "scriptingEngine": "javascript"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0",
+          "FSPIOP-Source": "{$config.FSPID}",
+          "Date": "{$request.headers.date}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}"
+        },
+        "body": {
+          "GrpHdr": {
+            "MsgId": "{$function.generic.generateULID}",
+            "CreDtTm": "{$environment.CreDtTm}"
+          },
+          "TxInfAndSts": {
+            "StsId": "12345",
+            "OrgnlInstrId": "12345",
+            "OrgnlEndToEndId": "12345",
+            "OrgnlTxId": "12345",
+            "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
+            "TxSts": "COMM",
+            "StsRsnInf": {
+              "Rsn": {
+                "Prtry": "ACPT"
+              },
+              "AddtlInf": "ADDITIONAL"
+            },
+            "AccptncDtTm": "{$environment.AccptncDtTm}",
+            "AcctSvcrRef": "ACCTSVCRREF",
+            "ClrSysRef": "CLRSYSREF",
+            "ExctnConf": "1234567890ABCDEF",
+            "SplmtryData": {
+              "PlcAndNm": "PLACE",
+              "Envlp": {}
+            }
+          }
+        }
+      },
+      "type": "FIXED_CALLBACK"
+    },
+    "type": "callback",
+    "version": 1
+  },
+  {
+    "ruleId": 51,
     "priority": 1,
     "description": "ttkpayeefsp PUT Notifications Failure Test-case due to invalid FSPIOP-Destination",
     "apiVersion": {
@@ -58,7 +1325,7 @@
     "version": 1
   },
   {
-    "ruleId": 29,
+    "ruleId": 52,
     "priority": 1,
     "description": "ttkpayeefsp PATCH Notifications Failure Test-case due to invalid fulfilment",
     "apiVersion": {
@@ -125,7 +1392,7 @@
     "version": 1
   },
   {
-    "ruleId": 28,
+    "ruleId": 53,
     "priority": 1,
     "description": "ttkpayeefsp PATCH Notifications Failure Test-case due to invalid FSPIOP-Destination",
     "apiVersion": {
@@ -192,7 +1459,7 @@
     "version": 1
   },
   {
-    "ruleId": 27,
+    "ruleId": 54,
     "priority": 1,
     "description": "ttkpayeefsp PATCH Notifications Success Test-case",
     "apiVersion": {
@@ -256,7 +1523,7 @@
     "version": 1
   },
   {
-    "ruleId": 20,
+    "ruleId": 61,
     "priority": 1,
     "description": "get /parties/{Type}/{ID} for pinkbank",
     "apiVersion": {
@@ -320,7 +1587,7 @@
     "version": 1
   },
   {
-    "ruleId": 1,
+    "ruleId": 101,
     "priority": 1,
     "description": "get /parties/{Type}/{ID}",
     "apiVersion": {
@@ -367,7 +1634,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 2,
+    "ruleId": 102,
     "priority": 1,
     "description": "post /quotes",
     "apiVersion": {
@@ -435,7 +1702,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 3,
+    "ruleId": 103,
     "priority": 1,
     "description": "post /transfers",
     "apiVersion": {
@@ -469,7 +1736,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 4,
+    "ruleId": 104,
     "priority": 1,
     "description": "post /transactionRequests",
     "apiVersion": {
@@ -507,7 +1774,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 5,
+    "ruleId": 105,
     "priority": 1,
     "description": "get /quotes/{ID}",
     "apiVersion": {
@@ -541,7 +1808,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 6,
+    "ruleId": 106,
     "priority": 1,
     "description": "get /participants/{Type}/{ID}/{SubId}",
     "apiVersion": {
@@ -575,7 +1842,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 7,
+    "ruleId": 107,
     "priority": 1,
     "description": "post /participants/{Type}/{ID}/{SubId}",
     "apiVersion": {
@@ -609,7 +1876,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 8,
+    "ruleId": 108,
     "priority": 1,
     "description": "get /participants/{Type}/{ID}",
     "apiVersion": {
@@ -643,7 +1910,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 9,
+    "ruleId": 109,
     "priority": 1,
     "description": "post /participants/{Type}/{ID}",
     "apiVersion": {
@@ -677,7 +1944,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 10,
+    "ruleId": 110,
     "priority": 1,
     "description": "post /participants",
     "apiVersion": {
@@ -711,7 +1978,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 11,
+    "ruleId": 111,
     "priority": 1,
     "description": "get /parties/{Type}/{ID}/{SubId}",
     "apiVersion": {
@@ -745,7 +2012,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 12,
+    "ruleId": 112,
     "priority": 1,
     "description": "get /transactionRequests/{ID}",
     "apiVersion": {
@@ -779,7 +2046,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 13,
+    "ruleId": 113,
     "priority": 1,
     "description": "get /authorizations/{ID}",
     "apiVersion": {
@@ -817,7 +2084,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 14,
+    "ruleId": 114,
     "priority": 1,
     "description": "get /transfers/{ID}",
     "apiVersion": {
@@ -851,7 +2118,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 15,
+    "ruleId": 115,
     "priority": 1,
     "description": "get /transactions/{ID}",
     "apiVersion": {
@@ -889,7 +2156,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 16,
+    "ruleId": 116,
     "priority": 1,
     "description": "get /bulkQuotes/{ID}",
     "apiVersion": {
@@ -923,7 +2190,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 17,
+    "ruleId": 117,
     "priority": 1,
     "description": "post /bulkQuotes",
     "apiVersion": {
@@ -957,7 +2224,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 18,
+    "ruleId": 118,
     "priority": 1,
     "description": "get /bulkTransfers/{ID}",
     "apiVersion": {
@@ -991,7 +2258,7 @@
   {
     "type": "callback",
     "version": 1,
-    "ruleId": 19,
+    "ruleId": 119,
     "priority": 1,
     "description": "post /bulkTransfers",
     "apiVersion": {
@@ -1023,7 +2290,7 @@
     }
   },
   {
-    "ruleId": 32,
+    "ruleId": 151,
     "priority": 1,
     "description": "get /fxQuotes/{ID}",
     "apiVersion": {
@@ -1103,7 +2370,7 @@
     "version": 1
   },
   {
-    "ruleId": 33,
+    "ruleId": 152,
     "priority": 1,
     "description": "post /fxTransfers",
     "apiVersion": {
@@ -1156,7 +2423,7 @@
     "version": 1
   },
   {
-    "ruleId": 34,
+    "ruleId": 153,
     "priority": 1,
     "description": "get /fxTransfers/{ID}",
     "apiVersion": {
@@ -1209,7 +2476,7 @@
     "version": 1
   },
   {
-    "ruleId": 35,
+    "ruleId": 154,
     "priority": 1,
     "description": "get /services/FXP",
     "apiVersion": {
@@ -1262,7 +2529,7 @@
     "version": 1
   },
   {
-    "ruleId": 36,
+    "ruleId": 155,
     "priority": 1,
     "description": "get /services/FXP/{SourceCurrency}/{TargetCurrency}",
     "apiVersion": {
@@ -1315,7 +2582,7 @@
     "version": 1
   },
   {
-    "ruleId": 37,
+    "ruleId": 156,
     "priority": 1,
     "description": "post /fxQuotes",
     "apiVersion": {

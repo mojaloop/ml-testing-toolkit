@@ -1,0 +1,926 @@
+{
+  "options": {},
+  "name": "self_referencing_iso20022",
+  "test_cases": [
+    {
+      "id": 1,
+      "name": "Self referencing ISO20022 requests",
+      "fileInfo": {
+        "path": "self_referencing_iso20022.json"
+      },
+      "meta": {
+        "info": "Self referencing ISO20022 requests"
+      },
+      "requests": [
+        {
+          "id": 1,
+          "description": "get/parties/{Type}/{ID}",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 2,
+            "type": "iso20022",
+            "asynchronous": true,
+            "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+          },
+          "operationPath": "/parties/{Type}/{ID}",
+          "path": "/parties/ACCOUNT_ID/1234",
+          "method": "get",
+          "params": {
+            "Type": "ACCOUNT_ID",
+            "ID": "1234"
+          },
+          "headers": {
+            "Content-Type": "application/vnd.interoperability.iso20022.parties+json;version=2.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "application/vnd.interoperability.iso20022.parties+json;version=2.0"
+          },
+          "disabled": false,
+          "url": null,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "expect callback",
+                "exec": [
+                  "expect(callback.body).to.have.property('Assgnmt')",
+                  "expect(callback.body).to.have.property('Rpt')"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "expect PrvtId",
+                "exec": [
+                  "expect(callback.body.Rpt.UpdtdPtyAndAcctId.Pty.Id).to.have.property('PrvtId')"
+                ]
+              }
+            ]
+          },
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "id": 2,
+          "description": "post/quotes",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 2,
+            "type": "iso20022",
+            "asynchronous": true,
+            "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+          },
+          "operationPath": "/quotes",
+          "path": "/quotes",
+          "method": "post",
+          "body": {
+            "GrpHdr": {
+              "MsgId": "{$function.generic.generateULID}",
+              "CreDtTm": "{$function.generic.curDateISO}",
+              "PmtInstrXpryDtTm": "{$function.generic.curDateISO}",
+              "NbOfTxs": "1",
+              "SttlmInf": {
+                "SttlmMtd": "CLRG"
+              }
+            },
+            "CdtTrfTxInf": {
+              "DbtrAgt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers['FSPIOP-Source']}",
+                    "SchmeNm": {
+                      "Cd": "BDID"
+                    }
+                  }
+                }
+              },
+              "CdtrAgt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers['FSPIOP-Destination']}",
+                    "SchmeNm": {
+                      "Cd": "BDID"
+                    }
+                  }
+                }
+              },
+              "Dbtr": {
+                "Name": "Test Debitor",
+                "Id": {
+                  "PrvtId": {
+                    "DtAndPlcOfBirth": {
+                      "BirthDt": "{$function.generic.curDateISO}"
+                    }
+                  },
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "12345",
+                      "SchmeNm": {
+                        "Prtry": "ACCOUNT_ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "Cdtr": {
+                "Name": "Test Creditor",
+                "Id": {
+                  "PrvtId": {
+                    "DtAndPlcOfBirth": {
+                      "BirthDt": "{$function.generic.curDateISO}"
+                    }
+                  },
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "54321",
+                      "SchmeNm": {
+                        "Prtry": "ACCOUNT_ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "PmtId": {
+                "TxId": "{$function.generic.generateULID}",
+                "InstrId": "{$function.generic.generateULID}",
+                "EndToEndId": "{$function.generic.generateULID}"
+              },
+              "PmtTpInf": {
+                "InstrPrty": "NORM",
+                "SvcLvl": {
+                  "Cd": "SEPA"
+                },
+                "LclInstrm": {
+                  "Cd": "CH03"
+                },
+                "CtgyPurp": {
+                  "Cd": "SUPP"
+                }
+              },
+              "IntrBkSttlmAmt": {
+                "Ccy": "XTS",
+                "ActiveCurrencyAndAmount": "100"
+              },
+              "InstdAmt": {
+                "Ccy": "XTS",
+                "ActiveOrHistoricCurrencyAndAmount": "100"
+              },
+              "ChrgBr": "CRED",
+              "ChrgsInf": {
+                "Amt": {
+                  "Ccy": "XTS",
+                  "ActiveOrHistoricCurrencyAndAmount": "0"
+                },
+                "Agt": {
+                  "FinInstnId": {
+                    "Othr": {
+                      "Id": "pinkbankfsp"
+                    }
+                  }
+                }
+              },
+              "DbtrAcct": {
+                "Id": {
+                  "IBAN": "XT1420041010050500013M02606",
+                  "Ccy": "XTS"
+                }
+              },
+              "DbtrAgtAcct": {
+                "Id": {
+                  "IBAN": "XT1420041010050500013M02606",
+                  "Ccy": "XTS"
+                }
+              },
+              "CdtrAcct": {
+                "Id": {
+                  "IBAN": "XT1420041010050500013M02606",
+                  "Ccy": "XTS"
+                }
+              },
+              "CdtrAgtAcct": {
+                "Id": {
+                  "IBAN": "XT1420041010050500013M02606",
+                  "Ccy": "XTS"
+                }
+              },
+              "UltmtCdtr": {
+                "Nm": "Ultimate Creditor Name",
+                "PstlAdr": {
+                  "AdrTp": "ADDR",
+                  "Dept": "Department",
+                  "SubDept": "SubDepartment",
+                  "StrtNm": "StreetName",
+                  "BldgNb": "BuildingNumber",
+                  "PstCd": "PostCode",
+                  "TwnNm": "TownName",
+                  "CtrySubDvsn": "CountrySubDivision",
+                  "Ctry": "Country"
+                },
+                "Id": {
+                  "OrgId": {
+                    "AnyBIC": "BBBBBBBB",
+                    "Othr": {
+                      "Id": "123456789",
+                      "SchmeNm": {
+                        "Cd": "IBAN",
+                        "Prtry": "Party Identification Scheme Name"
+                      }
+                    }
+                  }
+                }
+              },
+              "RgltryRptg": {
+                "DbtCdtRptgInd": "CRED",
+                "Authrty": {
+                  "Nm": "Swiss National Bank",
+                  "Ctry": "CH"
+                }
+              }
+            }
+          },
+          "headers": {
+            "Accept": "application/vnd.interoperability.iso20022.quotes+json;version=2.0",
+            "Content-Type": "application/vnd.interoperability.iso20022.quotes+json;version=2.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$inputs.toFspId}"
+          },
+          "url": null,
+          "disabled": false,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "expect callback",
+                "exec": [
+                  "expect(callback.body).to.have.property('GrpHdr')",
+                  "expect(callback.body).to.have.property('CdtTrfTxInf')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "description": "post/transfers",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 2,
+            "type": "iso20022",
+            "asynchronous": true,
+            "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+          },
+          "operationPath": "/transfers",
+          "path": "/transfers",
+          "method": "post",
+          "headers": {
+            "Accept": "application/vnd.interoperability.iso20022.transfers+json;version=2.0",
+            "Content-Type": "application/vnd.interoperability.iso20022.transfers+json;version=2.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$inputs.toFspId}"
+          },
+          "body": {
+            "GrpHdr": {
+              "MsgId": "01J8RG734N56MEF6DVWNZYB8KP",
+              "PmtInstrXpryDtTm": "{$function.generic.curDateISO}",
+              "CreDtTm": "{$function.generic.curDateISO}",
+              "NbOfTxs": "1",
+              "SttlmInf": {
+                "SttlmMtd": "CLRG"
+              },
+              "CtrlSum": "100",
+              "InitgPty": {
+                "Nm": "Initiating Party Name",
+                "Id": {
+                  "OrgId": {
+                    "Othr": [
+                      {
+                        "Id": "123456789",
+                        "SchmeNm": {
+                          "Cd": "BBA",
+                          "Prtry": "Party Identification Scheme Name"
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "FwdgAgt": {
+                "FinInstnId": {
+                  "BICFI": "BBBBBBBB"
+                }
+              }
+            },
+            "CdtTrfTxInf": {
+              "VrfctnOfTerms": {
+                "IlpV4PrepPacket": "{$prev.2.callback.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket}"
+              },
+              "PmtId": {
+                "TxId": "{$prev.2.request.body.CdtTrfTxInf.PmtId.EndToEndId}",
+                "InstrId": "01J8RG72ZT6DP73KKGMASRBF0F",
+                "EndToEndId": "01J8RG72ZT6DP73KKGMASRBF0F"
+              },
+              "PmtTpInf": {
+                "InstrPrty": "NORM",
+                "SvcLvl": {
+                  "Cd": "SEPA"
+                },
+                "LclInstrm": {
+                  "Cd": "CH03"
+                },
+                "CtgyPurp": {
+                  "Cd": "SUPP"
+                }
+              },
+              "IntrBkSttlmAmt": {
+                "Ccy": "XTS",
+                "ActiveCurrencyAndAmount": "100"
+              },
+              "InstdAmt": {
+                "Ccy": "XTS",
+                "ActiveOrHistoricCurrencyAndAmount": "100"
+              },
+              "ChrgBr": "SLEV",
+              "ChrgsInf": {
+                "Amt": {
+                  "Ccy": "XTS",
+                  "ActiveOrHistoricCurrencyAndAmount": "100"
+                },
+                "Agt": {
+                  "FinInstnId": {
+                    "Othr": {
+                      "Id": "123456789",
+                      "SchmeNm": {
+                        "Cd": "BBA",
+                        "Prtry": "Party Identification Scheme Name"
+                      }
+                    }
+                  }
+                }
+              },
+              "Cdtr": {
+                "Name": "Test Creditor",
+                "Id": {
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "54321",
+                      "SchmeNm": {
+                        "Prtry": "ACCOUNT_ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "Dbtr": {
+                "Name": "Test Debitor",
+                "Id": {
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "12345",
+                      "SchmeNm": {
+                        "Prtry": "ACCOUNT_ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "DbtrAgt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers['FSPIOP-Source']}",
+                    "SchmeNm": {
+                      "Cd": "BDID"
+                    }
+                  }
+                }
+              },
+              "CdtrAgt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.headers['FSPIOP-Destination']}",
+                    "SchmeNm": {
+                      "Cd": "BDID"
+                    }
+                  }
+                }
+              },
+              "DbtrAcct": {
+                "Id": {
+                  "IBAN": "XT1420041010050500013M02606",
+                  "Ccy": "XTS"
+                }
+              },
+              "DbtrAgtAcct": {
+                "Id": {
+                  "IBAN": "XT1420041010050500013M02606",
+                  "Ccy": "XTS"
+                }
+              },
+              "CdtrAcct": {
+                "Id": {
+                  "IBAN": "XT1420041010050500013M02606",
+                  "Ccy": "XTS"
+                }
+              },
+              "CdtrAgtAcct": {
+                "Id": {
+                  "IBAN": "XT1420041010050500013M02606",
+                  "Ccy": "XTS"
+                }
+              },
+              "UltmtCdtr": {
+                "Nm": "Ultimate Creditor Name",
+                "PstlAdr": {
+                  "AdrTp": {
+                    "Cd": "ADDR"
+                  },
+                  "Dept": "Department",
+                  "SubDept": "SubDepartment",
+                  "StrtNm": "StreetName",
+                  "BldgNb": "BuildingNumber",
+                  "PstCd": "PostCode",
+                  "TwnNm": "TownName",
+                  "CtrySubDvsn": "CountrySubDivision",
+                  "Ctry": "AZ"
+                },
+                "Id": {
+                  "OrgId": {
+                    "AnyBIC": "BBBBBBBB",
+                    "Othr": {
+                      "Id": "123456789",
+                      "SchmeNm": {
+                        "Cd": "IBAN",
+                        "Prtry": "Party Identification Scheme Name"
+                      }
+                    }
+                  }
+                }
+              },
+              "RgltryRptg": {
+                "DbtCdtRptgInd": "CRED",
+                "Authrty": {
+                  "Nm": "Swiss National Bank",
+                  "Ctry": "CH"
+                }
+              }
+            }
+          },
+          "disabled": false,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "expect callback",
+                "exec": [
+                  "expect(callback.body).to.have.property('GrpHdr')",
+                  ""
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "description": "post/fxQuotes",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 2,
+            "type": "iso20022",
+            "asynchronous": true,
+            "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+          },
+          "operationPath": "/fxQuotes",
+          "path": "/fxQuotes",
+          "method": "post",
+          "body": {
+            "GrpHdr": {
+              "MsgId": "{$function.generic.generateULID}",
+              "CreDtTm": "{$function.generic.curDateISO}",
+              "NbOfTxs": "1",
+              "TtlIntrBkSttlmAmt": {
+                "Ccy": "XTS",
+                "ActiveCurrencyAndAmount": "100"
+              },
+              "SttlmInf": {
+                "SttlmMtd": "INDA",
+                "SttlmAcct": {
+                  "Id": {
+                    "IBAN": "BE71096123456769"
+                  },
+                  "Ccy": "XTS"
+                },
+                "SttlmAcctOwnr": {
+                  "Nm": "Name"
+                },
+                "SttlmAcctSvcr": {
+                  "Nm": "Name"
+                },
+                "SttlmAgt": {
+                  "FinInstnId": {
+                    "BICFI": "BIC"
+                  }
+                }
+              },
+              "PmtTpInf": {
+                "InstrPrty": "NORM",
+                "CtgyPurp": {
+                  "Prtry": "CASH"
+                }
+              }
+            },
+            "CdtTrfTxInf": {
+              "PmtId": {
+                "TxId": "{$function.generic.generateULID}",
+                "InstrId": "{$function.generic.generateULID}",
+                "EndToEndId": "{$function.generic.generateULID}"
+              },
+              "Amt": {
+                "InstdAmt": {
+                  "Ccy": "XTS",
+                  "ActiveCurrencyAndAmount": "100"
+                }
+              },
+              "Dbtr": {
+                "Name": "Test Debitor",
+                "FinInstnId": {
+                  "Id": "54321",
+                  "SchmeNm": {
+                    "Prtry": "ACCOUNT_ID"
+                  }
+                },
+                "Id": {
+                  "PrvtId": {
+                    "DtAndPlcOfBirth": {
+                      "BirthDt": "{$function.generic.curDateISO}"
+                    }
+                  },
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "12345",
+                      "SchmeNm": {
+                        "Prtry": "ACCOUNT_ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "Cdtr": {
+                "Name": "Test Creditor",
+                "FinInstnId": {
+                  "Id": "54321",
+                  "SchmeNm": {
+                    "Prtry": "ACCOUNT_ID"
+                  }
+                },
+                "Id": {
+                  "PrvtId": {
+                    "DtAndPlcOfBirth": {
+                      "BirthDt": "{$function.generic.curDateISO}"
+                    }
+                  },
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "54321",
+                      "SchmeNm": {
+                        "Prtry": "ACCOUNT_ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "CdtrAcct": {
+                "Id": {
+                  "IBAN": "BE71096123456769"
+                },
+                "Ccy": "XTS"
+              },
+              "CdtrAgt": {
+                "FinInstnId": {
+                  "Nm": "Test"
+                }
+              },
+              "DbtrAcct": {
+                "Id": {
+                  "IBAN": "BE71096123456769"
+                },
+                "Ccy": "XTS"
+              },
+              "DbtrAgt": {
+                "FinInstnId": {
+                  "Nm": "Test"
+                }
+              },
+              "IntrBkSttlmAmt": {
+                "Ccy": "XTS",
+                "ActiveCurrencyAndAmount": "100"
+              },
+              "PmtTpInf": {
+                "InstrPrty": "NORM",
+                "ClrChanl": "RTGS",
+                "SvcLvl": {
+                  "Cd": "SEPA"
+                },
+                "LclInstrm": {
+                  "Cd": "CORE"
+                },
+                "CtgyPurp": {
+                  "Cd": "CASH"
+                }
+              },
+              "RgltryRptg": {
+                "Dbtr": {
+                  "Nm": "Name"
+                },
+                "DbtrAcct": {
+                  "Id": {
+                    "IBAN": "BE71096123456769"
+                  },
+                  "Ccy": "XTS"
+                },
+                "DbtrAgt": {
+                  "FinInstnId": {
+                    "BICFI": "BIC"
+                  }
+                },
+                "Cdtr": {
+                  "Nm": "Name"
+                }
+              }
+            }
+          },
+          "headers": {
+            "Accept": "application/vnd.interoperability.iso20022.fxQuotes+json;version=2.0",
+            "Content-Type": "application/vnd.interoperability.iso20022.fxQuotes+json;version=2.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$inputs.toFspId}"
+          },
+          "disabled": false,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "expect callback",
+                "exec": [
+                  "expect(callback.body).to.have.property('GrpHdr')",
+                  "expect(callback.body).to.have.property('CdtTrfTxInf')"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "description": "post/fxTransfers",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 2,
+            "type": "iso20022",
+            "asynchronous": true,
+            "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+          },
+          "operationPath": "/fxTransfers",
+          "path": "/fxTransfers",
+          "method": "post",
+          "headers": {
+            "Accept": "application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0",
+            "Content-Type": "application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "FSPIOP-Destination": "{$inputs.toFspId}"
+          },
+          "body": {
+            "GrpHdr": {
+              "MsgId": "{$function.generic.generateULID}",
+              "CreDtTm": "{$function.generic.curDateISO}",
+              "NbOfTxs": "1",
+              "CtrlSum": "1000",
+              "SttlmInf": {
+                "SttlmMtd": "INDA",
+                "SttlmAcct": {
+                  "Id": {
+                    "IBAN": "BE71096123456769"
+                  },
+                  "Ccy": "XTS"
+                },
+                "SttlmAcctOwnr": {
+                  "Nm": "Name"
+                },
+                "SttlmAcctSvcr": {
+                  "Nm": "Name"
+                },
+                "SttlmAgt": {
+                  "FinInstnId": {
+                    "BICFI": "BIC"
+                  }
+                }
+              },
+              "InitgPty": {
+                "Nm": "Initiating Party Name",
+                "Id": {
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "123456789",
+                      "SchmeNm": {
+                        "Cd": "BBA"
+                      }
+                    }
+                  }
+                }
+              },
+              "FwdgAgt": {
+                "FinInstnId": {
+                  "BICFI": "BBBBBBBB"
+                }
+              },
+              "DbtrAgt": {
+                "FinInstnId": {
+                  "BICFI": "AAAAAAAA"
+                }
+              },
+              "CdtrAgt": {
+                "FinInstnId": {
+                  "BICFI": "CCCCCCCC"
+                }
+              }
+            },
+            "CdtTrfTxInf": {
+              "PmtId": {
+                "TxId": "{$function.generic.generateULID}",
+                "InstrId": "{$function.generic.generateULID}",
+                "EndToEndId": "{$function.generic.generateULID}"
+              },
+              "PmtTpInf": {
+                "InstrPrty": "NORM",
+                "CtgyPurp": {
+                  "Cd": "SUPP"
+                }
+              },
+              "InstrForCdtrAgt": {
+                "Prtry": "/ACC/123456789"
+              },
+              "IntrBkSttlmAmt": {
+                "ActiveCurrencyAndAmount": "1000",
+                "Ccy": "XTS"
+              },
+              "ChrgBr": "SLEV",
+              "CdtrAgt": {
+                "FinInstnId": {
+                  "BICFI": "CCCCCCCC"
+                }
+              },
+              "Dbtr": {
+                "Name": "Test Debitor",
+                "FinInstnId": {
+                  "Id": "54321",
+                  "SchmeNm": {
+                    "Prtry": "ACCOUNT_ID"
+                  }
+                },
+                "Id": {
+                  "PrvtId": {
+                    "DtAndPlcOfBirth": {
+                      "BirthDt": "{$function.generic.curDateISO}"
+                    }
+                  },
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "12345",
+                      "SchmeNm": {
+                        "Prtry": "ACCOUNT_ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "DbtrAgt": {
+                "FinInstnId": {
+                  "Nm": "Test"
+                }
+              },
+              "Cdtr": {
+                "Name": "Test Creditor",
+                "FinInstnId": {
+                  "Id": "54321",
+                  "SchmeNm": {
+                    "Prtry": "ACCOUNT_ID"
+                  }
+                },
+                "Id": {
+                  "PrvtId": {
+                    "DtAndPlcOfBirth": {
+                      "BirthDt": "{$function.generic.curDate}"
+                    }
+                  },
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "54321",
+                      "SchmeNm": {
+                        "Prtry": "ACCOUNT_ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "CdtrAcct": {
+                "Id": {
+                  "IBAN": "BE71096123456769"
+                }
+              },
+              "RmtInf": {
+                "Ustrd": "Payment for invoice 12345"
+              }
+            }
+          },
+          "disabled": false,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "expect callback",
+                "exec": [
+                  "expect(callback.body).to.have.property('GrpHdr')",
+                  ""
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 6,
+          "description": "get/parties/{Type}/{ID} BUSINESS",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 2,
+            "type": "iso20022",
+            "asynchronous": true,
+            "specFile": "spec_files/api_definitions/fspiop_2.0_iso20022/api_spec.yaml",
+            "callbackMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/callback_map.json",
+            "responseMapFile": "spec_files/api_definitions/fspiop_2.0_iso20022/response_map.json",
+            "jsfRefFile": "spec_files/api_definitions/fspiop_2.0_iso20022/mockRef.json",
+            "triggerTemplatesFolder": "spec_files/api_definitions/fspiop_2.0_iso20022/trigger_templates"
+          },
+          "operationPath": "/parties/{Type}/{ID}",
+          "path": "/parties/BUSINESS/1234",
+          "method": "get",
+          "params": {
+            "Type": "BUSINESS",
+            "ID": "1234"
+          },
+          "headers": {
+            "Content-Type": "application/vnd.interoperability.iso20022.parties+json;version=2.0",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}",
+            "Accept": "application/vnd.interoperability.iso20022.parties+json;version=2.0"
+          },
+          "disabled": false,
+          "url": null,
+          "tests": {
+            "assertions": [
+              {
+                "id": 1,
+                "description": "expect callback",
+                "exec": [
+                  "expect(callback.body).to.have.property('Assgnmt')",
+                  "expect(callback.body).to.have.property('Rpt')"
+                ]
+              },
+              {
+                "id": 2,
+                "description": "expect OrgId",
+                "exec": [
+                  "expect(callback.body.Rpt.UpdtdPtyAndAcctId.Pty.Id).to.have.property('OrgId')"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

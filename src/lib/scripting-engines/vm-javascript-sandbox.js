@@ -125,6 +125,13 @@ const customWrapperFn = (requestVariables, consoleFn) => {
     skipRequest: function () {
       requestVariables.SKIP_REQUEST = true
     },
+    setTransformer: function (transformerName, options = {}) {
+      consoleFn.log(`Setting transformer '${transformerName}' if exists...`)
+      requestVariables.TRANSFORM = {
+        transformerName,
+        options
+      }
+    },
     appendRequestBody: function (newBody) {
       consoleFn.log('Mutating request...')
       requestVariables.OVERRIDE_REQUEST = {
@@ -253,6 +260,7 @@ async function _runScript (code, context = {}, options = {}) {
 }
 
 module.exports = {
+  registerAxiosRequestInterceptor,
   generateContextObj,
   executeAsync
 }
