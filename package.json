@@ -66,7 +66,7 @@
     "@hapi/inert": "7.1.0",
     "@hapi/vision": "7.0.3",
     "@mojaloop/central-services-logger": "11.5.1",
-    "@mojaloop/ml-schema-transformer-lib": "^v0.1.1-snapshot.56",
+    "@mojaloop/ml-schema-transformer-lib": "^v0.1.2",
     "@mojaloop/ml-testing-toolkit-shared-lib": "14.0.1",
     "@mojaloop/sdk-standard-components": "^19.0.0",
     "@now-ims/hapi-now-auth": "2.1.0",
