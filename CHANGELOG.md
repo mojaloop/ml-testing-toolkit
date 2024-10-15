@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+## [18.0.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v17.3.1...v18.0.0) (2024-10-15)
+
+
+### Features
+
+* test case payload transformation iso20022 ([#263](https://github.com/mojaloop/ml-testing-toolkit/issues/263)) ([01ed888](https://github.com/mojaloop/ml-testing-toolkit/commit/01ed888c38a4ccebb3e6180b8d9217df8a55c87c))
+
 ### [17.3.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v17.3.0...v17.3.1) (2024-09-30)
 
 
