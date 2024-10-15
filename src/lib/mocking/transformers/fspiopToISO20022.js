@@ -78,13 +78,13 @@ const requestTransform = async (requestOptions) => {
         break
       case 'post':
         if (requestOptions.path.startsWith('/quotes')) {
-          return _transformPostResource('quotes', requestOptions)
+          return await _transformPostResource('quotes', requestOptions)
         } else if (requestOptions.path.startsWith('/transfers')) {
-          return _transformPostResource('transfers', requestOptions)
+          return await _transformPostResource('transfers', requestOptions)
         } else if (requestOptions.path.startsWith('/fxQuotes')) {
-          return _transformPostResource('fxQuotes', requestOptions)
+          return await _transformPostResource('fxQuotes', requestOptions)
         } else if (requestOptions.path.startsWith('/fxTransfers')) {
-          return _transformPostResource('fxTransfers', requestOptions)
+          return await _transformPostResource('fxTransfers', requestOptions)
         }
         break
     }
@@ -99,15 +99,15 @@ const callbackTransform = async (callbackOptions) => {
     switch (callbackOptions.method) {
       case 'put':
         if (callbackOptions.path.startsWith('/parties')) {
-          return _transformPutResource('parties', callbackOptions)
+          return await _transformPutResource('parties', callbackOptions)
         } else if (callbackOptions.path.startsWith('/quotes')) {
-          return _transformPutResource('quotes', callbackOptions)
+          return await _transformPutResource('quotes', callbackOptions)
         } else if (callbackOptions.path.startsWith('/transfers')) {
-          return _transformPutResource('transfers', callbackOptions)
+          return await _transformPutResource('transfers', callbackOptions)
         } else if (callbackOptions.path.startsWith('/fxQuotes')) {
-          return _transformPutResource('fxQuotes', callbackOptions)
+          return await _transformPutResource('fxQuotes', callbackOptions)
         } else if (callbackOptions.path.startsWith('/fxTransfers')) {
-          return _transformPutResource('fxTransfers', callbackOptions)
+          return await _transformPutResource('fxTransfers', callbackOptions)
         }
         break
     }
