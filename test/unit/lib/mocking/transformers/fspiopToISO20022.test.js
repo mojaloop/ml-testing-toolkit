@@ -8,9 +8,9 @@ describe('fspiopToISO20022 Transformers', () => {
     it('should transform GET /parties request headers', async () => {
       const requestOptions = {
         method: 'get',
-        path: '/parties/123',
+        path: '/parties/MSISDN/123',
         headers: {
-          accept: 'application/json'
+          accept: 'application/vnd.interoperability.parties+json;version=2.0'
         }
       };
 
@@ -19,7 +19,67 @@ describe('fspiopToISO20022 Transformers', () => {
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.parties+json;version=2.0');
     });
 
-    it('should return original requestOptions if path does not match /parties on get', async () => {
+    it('should transform POST /quotes request headers', async () => {
+      const requestOptions = {
+        method: 'post',
+        path: '/quotes',
+        headers: {
+          accept: 'application/vnd.interoperability.quotes+json;version=2.0'
+        },
+        body: {}
+      };
+
+      const transformedRequest = await requestTransform(requestOptions);
+
+      expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.quotes+json;version=2.0');
+    });
+
+    it('should transform POST /fxQuotes request headers', async () => {
+      const requestOptions = {
+        method: 'post',
+        path: '/fxQuotes',
+        headers: {
+          accept: 'application/vnd.interoperability.fxQuotes+json;version=2.0'
+        },
+        body: {}
+      };
+
+      const transformedRequest = await requestTransform(requestOptions);
+
+      expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.fxQuotes+json;version=2.0');
+    });
+
+    it('should transform POST /transfers request headers', async () => {
+      const requestOptions = {
+        method: 'post',
+        path: '/transfers',
+        headers: {
+          accept: 'application/vnd.interoperability.transfers+json;version=2.0'
+        },
+        body: {}
+      };
+
+      const transformedRequest = await requestTransform(requestOptions);
+
+      expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.transfers+json;version=2.0');
+    });
+
+    it('should transform POST /fxTransfers request headers', async () => {
+      const requestOptions = {
+        method: 'post',
+        path: '/fxTransfers',
+        headers: {
+          accept: 'application/vnd.interoperability.fxTransfers+json;version=2.0'
+        },
+        body: {}
+      };
+
+      const transformedRequest = await requestTransform(requestOptions);
+
+      expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0');
+    });
+
+    it('should return original requestOptions if path contains unknown resource', async () => {
       const requestOptions = {
         method: 'get',
         path: '/resource',
@@ -33,7 +93,7 @@ describe('fspiopToISO20022 Transformers', () => {
       expect(transformedRequest).toEqual(requestOptions);
     });
 
-    it('should return original requestOptions if path does not match /quotes on post', async () => {
+    it('should return original requestOptions if path contains unknown resource', async () => {
       const requestOptions = {
         method: 'post',
         path: '/resource',
@@ -84,14 +144,15 @@ describe('fspiopToISO20022 Transformers', () => {
 
     it('should handle errors gracefully', async () => {
       const requestOptions = {
-        method: 'put',
-        path: '/parties/123',
+        method: 'post',
+        path: '/quotes',
         headers: {
           accept: 'application/json'
-        }
+        },
+        body: {}
       };
 
-      TransformFacades.FSPIOP.parties.put.mockRejectedValue(new Error('Transformation error'));
+      TransformFacades.FSPIOP.quotes.post.mockRejectedValue(new Error('Transformation error'));
 
       const transformedRequest = await requestTransform(requestOptions);
 
@@ -106,7 +167,7 @@ describe('fspiopToISO20022 Transformers', () => {
         method: 'put',
         path: '/parties/123',
         headers: {
-          'content-type': 'application/json'
+          'content-type': 'application/vnd.interoperability.iso20022.parties+json;version=2.0'
         },
         body: { partyId: '123' }
       };
@@ -119,8 +180,80 @@ describe('fspiopToISO20022 Transformers', () => {
       expect(transformedCallback.body).toEqual({ transformed: 'body' });
     });
 
+    it('should transform PUT /quotes callback headers and body', async () => {
+      const callbackOptions = {
+        method: 'put',
+        path: '/quotes/123',
+        headers: {
+          'content-type': 'application/vnd.interoperability.iso20022.quotes+json;version=2.0'
+        },
+        body: { quoteId: '123' }
+      };
 
-    it('should return original callbackOptions if no transformation is needed on put if resource does not match parties', async () => {
+      TransformFacades.FSPIOPISO20022.quotes.put.mockResolvedValue({ body: {transformed: 'body'} });
+
+      const transformedCallback = await callbackTransform(callbackOptions);
+
+      expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.quotes+json;version=2.0');
+      expect(transformedCallback.body).toEqual({ transformed: 'body' });
+    });
+
+    it('should transform PUT /fxQuotes callback headers and body', async () => {
+      const callbackOptions = {
+        method: 'put',
+        path: '/fxQuotes/123',
+        headers: {
+          'content-type': 'application/vnd.interoperability.iso20022.fxQuotes+json;version=2.0'
+        },
+        body: { quoteId: '123' }
+      };
+
+      TransformFacades.FSPIOPISO20022.fxQuotes.put.mockResolvedValue({ body: {transformed: 'body'} });
+
+      const transformedCallback = await callbackTransform(callbackOptions);
+
+      expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.fxQuotes+json;version=2.0');
+      expect(transformedCallback.body).toEqual({ transformed: 'body' });
+    });
+
+    it('should transform PUT /fxTransfers callback headers and body', async () => {
+      const callbackOptions = {
+        method: 'put',
+        path: '/fxTransfers/123',
+        headers: {
+          'content-type': 'application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0'
+        },
+        body: { quoteId: '123' }
+      };
+
+      TransformFacades.FSPIOPISO20022.fxTransfers.put.mockResolvedValue({ body: {transformed: 'body'} });
+
+      const transformedCallback = await callbackTransform(callbackOptions);
+
+      expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.fxTransfers+json;version=2.0');
+      expect(transformedCallback.body).toEqual({ transformed: 'body' });
+    });
+
+    it('should transform PUT /transfers callback headers and body', async () => {
+      const callbackOptions = {
+        method: 'put',
+        path: '/transfers/123',
+        headers: {
+          'content-type': 'application/vnd.interoperability.iso20022.transfers+json;version=2.0'
+        },
+        body: { quoteId: '123' }
+      };
+
+      TransformFacades.FSPIOPISO20022.transfers.put.mockResolvedValue({ body: {transformed: 'body'} });
+
+      const transformedCallback = await callbackTransform(callbackOptions);
+
+      expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.transfers+json;version=2.0');
+      expect(transformedCallback.body).toEqual({ transformed: 'body' });
+    });
+
+
+    it('should return original callbackOptions if no transformation is needed on put if resource is unknown', async () => {
       const callbackOptions = {
         method: 'put',
         path: '/resource',

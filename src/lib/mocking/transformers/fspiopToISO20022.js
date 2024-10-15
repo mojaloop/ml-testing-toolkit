@@ -45,7 +45,7 @@ const _transformPostResource = async (resource, requestOptions) => {
   return {
     ...requestOptions,
     headers,
-    body: result.body
+    body: result?.body
   }
 }
 
@@ -57,7 +57,7 @@ const _transformPutResource = async (resource, callbackOptions) => {
   return {
     ...callbackOptions,
     headers,
-    body: result.body
+    body: result?.body
   }
 }
 
