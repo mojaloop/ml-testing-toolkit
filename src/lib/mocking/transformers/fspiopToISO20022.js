@@ -68,12 +68,12 @@ const _transformPutResource = async (resource, callbackOptions) => {
 const _getHeader = (headers, name) => {
   return Object.entries(headers).find(
     ([key]) => key.toLowerCase() === name.toLowerCase()
-  )?.[1];
+  )?.[1]
 }
 
 const requestTransform = async (requestOptions) => {
   if (!_getHeader(requestOptions.headers, 'content-type')?.startsWith('application/vnd.interoperability.')) {
-    return requestOptions;
+    return requestOptions
   }
   try {
     switch (requestOptions.method) {
@@ -114,7 +114,7 @@ const requestTransform = async (requestOptions) => {
 
 const callbackTransform = async (callbackOptions) => {
   if (!_getHeader(callbackOptions.headers, 'content-type')?.startsWith('application/vnd.interoperability.iso20022.')) {
-    return callbackOptions;
+    return callbackOptions
   }
   try {
     switch (callbackOptions.method) {
