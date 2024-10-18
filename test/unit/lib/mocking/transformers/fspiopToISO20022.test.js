@@ -20,6 +20,21 @@ describe('fspiopToISO20022 Transformers', () => {
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.parties+json;version=2.0');
     });
 
+    it('should transform GET /parties request headers with content type header in different case', async () => {
+      const requestOptions = {
+        method: 'get',
+        path: '/parties/MSISDN/123',
+        headers: {
+          accept: 'application/vnd.interoperability.parties+json;version=2.0',
+          'Content-Type': 'application/vnd.interoperability.parties+json;version=2.0'
+        }
+      };
+
+      const transformedRequest = await requestTransform(requestOptions);
+
+      expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.parties+json;version=2.0');
+    });
+
     it('should transform POST /participants request headers', async () => {
       const requestOptions = {
         method: 'post',
@@ -233,6 +248,24 @@ describe('fspiopToISO20022 Transformers', () => {
       const transformedCallback = await callbackTransform(callbackOptions);
 
       expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.parties+json;version=2.0');
+      expect(transformedCallback.body).toEqual({ transformed: 'body' });
+    });
+
+    it('should transform PUT /parties callback headers and body if contenty-type is in different case', async () => {
+      const callbackOptions = {
+        method: 'put',
+        path: '/parties/123',
+        headers: {
+          'Content-Type': 'application/vnd.interoperability.iso20022.parties+json;version=2.0'
+        },
+        body: { partyId: '123' }
+      };
+
+      TransformFacades.FSPIOPISO20022.parties.put.mockResolvedValue({ body: {transformed: 'body'} });
+
+      const transformedCallback = await callbackTransform(callbackOptions);
+
+      expect(transformedCallback.headers['Content-Type']).toBe('application/vnd.interoperability.parties+json;version=2.0');
       expect(transformedCallback.body).toEqual({ transformed: 'body' });
     });
 
