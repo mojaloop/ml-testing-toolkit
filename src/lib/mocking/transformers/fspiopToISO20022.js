@@ -53,7 +53,7 @@ const _transformGetResource = (resource, requestOptions) => {
 
 const _transformPostResource = async (resource, requestOptions) => {
   const headers = _replaceISO20022Headers(requestOptions.headers, resource)
-  TransformFacades.FSPIOP.configure({isTestingMode: true})
+  TransformFacades.FSPIOP.configure({ isTestingMode: true })
   const result = await TransformFacades.FSPIOP[resource].post({ body: requestOptions.body, headers: requestOptions.headers })
   return {
     ...requestOptions,
@@ -66,7 +66,7 @@ const _transformPutResource = async (resource, callbackOptions) => {
   const headers = _replaceHeaders({
     'content-type': `application/vnd.interoperability.${resource}+json;version=2.0`
   }, callbackOptions.headers)
-  TransformFacades.FSPIOP.configure({isTestingMode: true})
+  TransformFacades.FSPIOP.configure({ isTestingMode: true })
   const result = await TransformFacades.FSPIOPISO20022[resource].put({ body: callbackOptions.body, headers: callbackOptions.headers })
   return {
     ...callbackOptions,
