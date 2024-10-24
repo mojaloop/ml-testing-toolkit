@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+## [18.1.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.0.0...v18.1.0) (2024-10-24)
+
+
+### Features
+
+* **csi-785:** used unified ilp version ([#267](https://github.com/mojaloop/ml-testing-toolkit/issues/267)) ([2270291](https://github.com/mojaloop/ml-testing-toolkit/commit/22702917dfa7bf598b640049515294606f29168e))
+
 ## [18.0.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v17.3.1...v18.0.0) (2024-10-15)
 
 
