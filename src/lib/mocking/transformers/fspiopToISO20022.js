@@ -43,6 +43,14 @@ const _replaceISO20022Headers = (headers, resource) => {
   }, headers)
 }
 
+const _transformGetResource = (resource, requestOptions) => {
+  const headers = _replaceISO20022Headers(requestOptions.headers, resource)
+  return {
+    ...requestOptions,
+    headers
+  }
+}
+
 const _transformPostResource = async (resource, requestOptions) => {
   const headers = _replaceISO20022Headers(requestOptions.headers, resource)
   const result = await TransformFacades.FSPIOP[resource].post({ body: requestOptions.body, headers: requestOptions.headers })
@@ -78,13 +86,18 @@ const requestTransform = async (requestOptions) => {
   try {
     switch (requestOptions.method) {
       case 'get':
-        // GET /parties - Only the headers need to be transformed
         if (requestOptions.path.startsWith('/parties')) {
-          const headers = _replaceISO20022Headers(requestOptions.headers, 'parties')
-          return {
-            ...requestOptions,
-            headers
-          }
+          return _transformGetResource('parties', requestOptions)
+        } else if (requestOptions.path.startsWith('/quotes')) {
+          return _transformGetResource('quotes', requestOptions)
+        } else if (requestOptions.path.startsWith('/transfers')) {
+          return _transformGetResource('transfers', requestOptions)
+        } else if (requestOptions.path.startsWith('/fxQuotes')) {
+          return _transformGetResource('fxQuotes', requestOptions)
+        } else if (requestOptions.path.startsWith('/fxTransfers')) {
+          return _transformGetResource('fxTransfers', requestOptions)
+        } else if (requestOptions.path.startsWith('/participants')) {
+          return _transformGetResource('participants', requestOptions)
         }
         break
       case 'post':

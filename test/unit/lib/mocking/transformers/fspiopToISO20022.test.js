@@ -35,6 +35,26 @@ describe('fspiopToISO20022 Transformers', () => {
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.parties+json;version=2.0');
     });
 
+    it('should transform GET request headers', async () => {
+      const _validateGetTransformation = async (resource) => {
+        const requestOptions = {
+          method: 'get',
+          path: '/participants/MSISDN/123',
+          headers: {
+            accept: 'application/vnd.interoperability.participants+json;version=2.0',
+            'content-type': 'application/vnd.interoperability.participants+json;version=2.0'
+          }
+        };
+        const transformedRequest = await requestTransform(requestOptions);
+        expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.participants+json;version=2.0');
+      }
+      await _validateGetTransformation('participants')
+      await _validateGetTransformation('quotes')
+      await _validateGetTransformation('transfers')
+      await _validateGetTransformation('fxQuotes')
+      
+    });
+
     it('should transform POST /participants request headers', async () => {
       const requestOptions = {
         method: 'post',
