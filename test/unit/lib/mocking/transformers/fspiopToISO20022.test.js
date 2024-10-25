@@ -39,19 +39,20 @@ describe('fspiopToISO20022 Transformers', () => {
       const _validateGetTransformation = async (resource) => {
         const requestOptions = {
           method: 'get',
-          path: '/participants/MSISDN/123',
+          path: `/${resource}/MSISDN/123`,
           headers: {
-            accept: 'application/vnd.interoperability.participants+json;version=2.0',
-            'content-type': 'application/vnd.interoperability.participants+json;version=2.0'
+            accept: `application/vnd.interoperability.${resource}+json;version=2.0`,
+            'content-type': `application/vnd.interoperability.${resource}+json;version=2.0`
           }
         };
         const transformedRequest = await requestTransform(requestOptions);
-        expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.participants+json;version=2.0');
+        expect(transformedRequest.headers.accept).toBe(`application/vnd.interoperability.iso20022.${resource}+json;version=2.0`);
       }
       await _validateGetTransformation('participants')
       await _validateGetTransformation('quotes')
       await _validateGetTransformation('transfers')
       await _validateGetTransformation('fxQuotes')
+      await _validateGetTransformation('fxTransfers')
       
     });
 
@@ -338,6 +339,24 @@ describe('fspiopToISO20022 Transformers', () => {
 
       expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.fxQuotes+json;version=2.0');
       expect(transformedCallback.body).toEqual({ transformed: 'body' });
+    });
+
+    it('should transform PUT /fxQuotes error callback headers and body', async () => {
+      const callbackOptions = {
+        method: 'put',
+        path: '/fxQuotes/123/error',
+        headers: {
+          'content-type': 'application/vnd.interoperability.iso20022.fxQuotes+json;version=2.0'
+        },
+        body: { errorInISO: 'isoError' }
+      };
+
+      TransformFacades.FSPIOPISO20022.fxQuotes.putError.mockResolvedValue({ body: {errorInformation: 'fspiopError'} });
+
+      const transformedCallback = await callbackTransform(callbackOptions);
+
+      expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.fxQuotes+json;version=2.0');
+      expect(transformedCallback.body).toEqual({ errorInformation: 'fspiopError' });
     });
 
     it('should transform PUT /fxTransfers callback headers and body', async () => {
