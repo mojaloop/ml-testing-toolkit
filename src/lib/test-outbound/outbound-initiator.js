@@ -707,11 +707,22 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           return resolve({ curlRequest, transformedRequest, syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody, originalHeaders, originalBody } })
         })
         // Listen for error callback
-        MyEventEmitter.getEmitter('testOutbound', user).once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
+        MyEventEmitter.getEmitter('testOutbound', user).once(errorCallbackUrl, async (_callbackHeaders, _callbackBody, _callbackMethod, _callbackPath) => {
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
+          let callbackHeaders = _callbackHeaders
+          let callbackBody = _callbackBody
+          let originalBody
+          let originalHeaders
+          if (transformerObj && transformerObj.transformer && transformerObj.transformer.callbackTransform) {
+            const result = await transformerObj.transformer.callbackTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
+            originalBody = _callbackBody
+            callbackBody = result.body
+            originalHeaders = _callbackHeaders
+            callbackHeaders = result.headers
+          }
           customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          return reject(new Error(JSON.stringify({ curlRequest, transformedRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
+          return reject(new Error(JSON.stringify({ curlRequest, transformedRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody, originalHeaders, originalBody } })))
         })
       }
 
