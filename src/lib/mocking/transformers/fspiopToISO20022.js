@@ -63,12 +63,12 @@ const _transformPostResource = async (resource, requestOptions) => {
   }
 }
 
-const _transformPutResource = async (resource, callbackOptions) => {
+const _transformPutResource = async (resource, callbackOptions, isError) => {
   const headers = _replaceHeaders({
     'content-type': `application/vnd.interoperability.${resource}+json;version=2.0`
   }, callbackOptions.headers)
   TransformFacades.FSPIOPISO20022.configure({ isTestingMode: true, logger: customLogger })
-  const result = await TransformFacades.FSPIOPISO20022[resource].put({ body: callbackOptions.body, headers: callbackOptions.headers })
+  const result = await TransformFacades.FSPIOPISO20022[resource][isError ? 'putError' : 'put']({ body: callbackOptions.body, headers: callbackOptions.headers })
   return {
     ...callbackOptions,
     headers,
@@ -135,16 +135,20 @@ const callbackTransform = async (callbackOptions) => {
   try {
     switch (callbackOptions.method) {
       case 'put':
+        let isError = false
+        if (callbackOptions.path.endsWith('/error')) {
+          isError = true
+        }
         if (callbackOptions.path.startsWith('/parties')) {
-          return await _transformPutResource('parties', callbackOptions)
+          return await _transformPutResource('parties', callbackOptions, isError)
         } else if (callbackOptions.path.startsWith('/quotes')) {
-          return await _transformPutResource('quotes', callbackOptions)
+          return await _transformPutResource('quotes', callbackOptions, isError)
         } else if (callbackOptions.path.startsWith('/transfers')) {
-          return await _transformPutResource('transfers', callbackOptions)
+          return await _transformPutResource('transfers', callbackOptions, isError)
         } else if (callbackOptions.path.startsWith('/fxQuotes')) {
-          return await _transformPutResource('fxQuotes', callbackOptions)
+          return await _transformPutResource('fxQuotes', callbackOptions, isError)
         } else if (callbackOptions.path.startsWith('/fxTransfers')) {
-          return await _transformPutResource('fxTransfers', callbackOptions)
+          return await _transformPutResource('fxTransfers', callbackOptions, isError)
         } else if (callbackOptions.path.startsWith('/participants')) {
           // PUT /participants - Only the headers need to be transformed
           const headers = _replaceHeaders({
