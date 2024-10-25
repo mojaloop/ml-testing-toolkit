@@ -133,9 +133,9 @@ const callbackTransform = async (callbackOptions) => {
     return callbackOptions
   }
   try {
+    let isError = false
     switch (callbackOptions.method) {
       case 'put':
-        let isError = false
         if (callbackOptions.path.endsWith('/error')) {
           isError = true
         }
