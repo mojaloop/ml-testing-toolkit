@@ -23,6 +23,7 @@
  ******/
 
 const { TransformFacades } = require('@mojaloop/ml-schema-transformer-lib')
+const customLogger = require('../../requestLogger')
 
 const _replaceHeaders = (newHeaders, headers) => {
   // Replace headers considering the case sensitivity
@@ -36,11 +37,24 @@ const _replaceHeaders = (newHeaders, headers) => {
   return clonedHeaders
 }
 
-const _transformPostResource = async (resource, requestOptions) => {
-  const headers = _replaceHeaders({
+const _replaceISO20022Headers = (headers, resource) => {
+  return _replaceHeaders({
     accept: `application/vnd.interoperability.iso20022.${resource}+json;version=2.0`,
     'content-type': `application/vnd.interoperability.iso20022.${resource}+json;version=2.0`
-  }, requestOptions.headers)
+  }, headers)
+}
+
+const _transformGetResource = (resource, requestOptions) => {
+  const headers = _replaceISO20022Headers(requestOptions.headers, resource)
+  return {
+    ...requestOptions,
+    headers
+  }
+}
+
+const _transformPostResource = async (resource, requestOptions) => {
+  const headers = _replaceISO20022Headers(requestOptions.headers, resource)
+  TransformFacades.FSPIOP.configure({ isTestingMode: true, logger: customLogger })
   const result = await TransformFacades.FSPIOP[resource].post({ body: requestOptions.body, headers: requestOptions.headers })
   return {
     ...requestOptions,
@@ -49,11 +63,12 @@ const _transformPostResource = async (resource, requestOptions) => {
   }
 }
 
-const _transformPutResource = async (resource, callbackOptions) => {
+const _transformPutResource = async (resource, callbackOptions, isError) => {
   const headers = _replaceHeaders({
     'content-type': `application/vnd.interoperability.${resource}+json;version=2.0`
   }, callbackOptions.headers)
-  const result = await TransformFacades.FSPIOPISO20022[resource].put({ body: callbackOptions.body, headers: callbackOptions.headers })
+  TransformFacades.FSPIOPISO20022.configure({ isTestingMode: true, logger: customLogger })
+  const result = await TransformFacades.FSPIOPISO20022[resource][isError ? 'putError' : 'put']({ body: callbackOptions.body, headers: callbackOptions.headers })
   return {
     ...callbackOptions,
     headers,
@@ -61,19 +76,31 @@ const _transformPutResource = async (resource, callbackOptions) => {
   }
 }
 
+const _getHeader = (headers, name) => {
+  return Object.entries(headers).find(
+    ([key]) => key.toLowerCase() === name.toLowerCase()
+  )?.[1]
+}
+
 const requestTransform = async (requestOptions) => {
+  if (!_getHeader(requestOptions.headers, 'content-type')?.startsWith('application/vnd.interoperability.')) {
+    return requestOptions
+  }
   try {
     switch (requestOptions.method) {
       case 'get':
-        // GET /parties
         if (requestOptions.path.startsWith('/parties')) {
-          const headers = _replaceHeaders({
-            accept: 'application/vnd.interoperability.iso20022.parties+json;version=2.0'
-          }, requestOptions.headers)
-          return {
-            ...requestOptions,
-            headers
-          }
+          return _transformGetResource('parties', requestOptions)
+        } else if (requestOptions.path.startsWith('/quotes')) {
+          return _transformGetResource('quotes', requestOptions)
+        } else if (requestOptions.path.startsWith('/transfers')) {
+          return _transformGetResource('transfers', requestOptions)
+        } else if (requestOptions.path.startsWith('/fxQuotes')) {
+          return _transformGetResource('fxQuotes', requestOptions)
+        } else if (requestOptions.path.startsWith('/fxTransfers')) {
+          return _transformGetResource('fxTransfers', requestOptions)
+        } else if (requestOptions.path.startsWith('/participants')) {
+          return _transformGetResource('participants', requestOptions)
         }
         break
       case 'post':
@@ -85,6 +112,13 @@ const requestTransform = async (requestOptions) => {
           return await _transformPostResource('fxQuotes', requestOptions)
         } else if (requestOptions.path.startsWith('/fxTransfers')) {
           return await _transformPostResource('fxTransfers', requestOptions)
+        } else if (requestOptions.path.startsWith('/participants')) {
+          // POST /participants - Only the headers need to be transformed
+          const headers = _replaceISO20022Headers(requestOptions.headers, 'participants')
+          return {
+            ...requestOptions,
+            headers
+          }
         }
         break
     }
@@ -95,19 +129,35 @@ const requestTransform = async (requestOptions) => {
 }
 
 const callbackTransform = async (callbackOptions) => {
+  if (!_getHeader(callbackOptions.headers, 'content-type')?.startsWith('application/vnd.interoperability.iso20022.')) {
+    return callbackOptions
+  }
   try {
+    let isError = false
     switch (callbackOptions.method) {
       case 'put':
+        if (callbackOptions.path.endsWith('/error')) {
+          isError = true
+        }
         if (callbackOptions.path.startsWith('/parties')) {
-          return await _transformPutResource('parties', callbackOptions)
+          return await _transformPutResource('parties', callbackOptions, isError)
         } else if (callbackOptions.path.startsWith('/quotes')) {
-          return await _transformPutResource('quotes', callbackOptions)
+          return await _transformPutResource('quotes', callbackOptions, isError)
         } else if (callbackOptions.path.startsWith('/transfers')) {
-          return await _transformPutResource('transfers', callbackOptions)
+          return await _transformPutResource('transfers', callbackOptions, isError)
         } else if (callbackOptions.path.startsWith('/fxQuotes')) {
-          return await _transformPutResource('fxQuotes', callbackOptions)
+          return await _transformPutResource('fxQuotes', callbackOptions, isError)
         } else if (callbackOptions.path.startsWith('/fxTransfers')) {
-          return await _transformPutResource('fxTransfers', callbackOptions)
+          return await _transformPutResource('fxTransfers', callbackOptions, isError)
+        } else if (callbackOptions.path.startsWith('/participants')) {
+          // PUT /participants - Only the headers need to be transformed
+          const headers = _replaceHeaders({
+            'content-type': 'application/vnd.interoperability.participants+json;version=2.0'
+          }, callbackOptions.headers)
+          return {
+            ...callbackOptions,
+            headers
+          }
         }
         break
     }

@@ -348,5 +348,161 @@
         }
       }
     }
+  },
+  "/participants": {
+    "post": {
+      "fspid": "{$request.headers.fspiop-source}",
+      "successCallback": {
+        "method": "put",
+        "path": "/participants/{ID}",
+        "pathPattern": "/participants/{$request.body.partyList[0].partyIdentifier}",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      },
+      "errorCallback": {
+        "method": "put",
+        "path": "/participants/{ID}/error",
+        "pathPattern": "/participants/{$request.body.partyList[0].partyIdentifier}/error",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      }
+    }
+  },
+  "/participants/{Type}/{ID}": {
+    "get": {
+      "fspid": "{$request.headers.fspiop-source}",
+      "successCallback": {
+        "method": "put",
+        "path": "/participants/{Type}/{ID}",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      },
+      "errorCallback": {
+        "method": "put",
+        "path": "/participants/{Type}/{ID}/error",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}/error",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      }
+    },
+    "post": {
+      "fspid": "{$request.headers.fspiop-source}",
+      "successCallback": {
+        "method": "put",
+        "path": "/participants/{Type}/{ID}",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      },
+      "errorCallback": {
+        "method": "put",
+        "path": "/participants/{Type}/{ID}/error",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}/error",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      }
+    },
+    "delete": {
+      "fspid": "{$request.headers.fspiop-source}",
+      "successCallback": {
+        "method": "put",
+        "path": "/participants/{Type}/{ID}",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      },
+      "errorCallback": {
+        "method": "put",
+        "path": "/participants/{Type}/{ID}/error",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}/error",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      }
+    }
+  },
+  "/participants/{Type}/{ID}/{SubId}": {
+    "get": {
+      "fspid": "{$request.headers.fspiop-source}",
+      "successCallback": {
+        "method": "put",
+        "path": "/participants/{Type}/{ID}/{SubId}",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}/{$request.params.SubId}",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      },
+      "errorCallback": {
+        "method": "put",
+        "path": "/participants/{Type}/{ID}/{SubId}/error",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}/{$request.params.SubId}/error",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      }
+    },
+    "post": {
+      "fspid": "{$request.headers.fspiop-source}",
+      "successCallback": {
+        "method": "put",
+        "path": "/participants/{Type}/{ID}/{SubId}",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}/{$request.params.SubId}",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      },
+      "errorCallback": {
+        "method": "put",
+        "path": "/participants/{Type}/{ID}/{SubId}/error",
+        "pathPattern": "/participants/{$request.params.Type}/{$request.params.ID}/{$request.params.SubId}/error",
+        "headerOverride": {
+          "FSPIOP-Source": "{$config.FSPID}",
+          "FSPIOP-Destination": "{$request.headers.fspiop-source}",
+          "Content-Type": "{$session.negotiatedContentType}",
+          "Date": "{$request.headers.date}"
+        }
+      }
+    }
   }
 }
