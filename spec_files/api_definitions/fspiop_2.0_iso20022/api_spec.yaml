@@ -2113,13 +2113,182 @@ components:
     ActiveCurrencyCode:
       title: ActiveCurrencyCode
       type: string
-      pattern: ^[A-Z]{3,3}$
       description: >-
         A code allocated to a currency by a Maintenance Agency under an
         international identification scheme as described in the latest edition
         of the international standard ISO 4217 "Codes for the representation of
         currencies and funds".
+
+        NOTE: This has been modified away from the original ISO20022 pattern to
+        enums.
       example: USD
+      minLength: 3
+      maxLength: 3
+      enum:
+        - AED
+        - AFN
+        - ALL
+        - AMD
+        - ANG
+        - AOA
+        - ARS
+        - AUD
+        - AWG
+        - AZN
+        - BAM
+        - BBD
+        - BDT
+        - BGN
+        - BHD
+        - BIF
+        - BMD
+        - BND
+        - BOB
+        - BRL
+        - BSD
+        - BTN
+        - BWP
+        - BYN
+        - BZD
+        - CAD
+        - CDF
+        - CHF
+        - CLP
+        - CNY
+        - COP
+        - CRC
+        - CUC
+        - CUP
+        - CVE
+        - CZK
+        - DJF
+        - DKK
+        - DOP
+        - DZD
+        - EGP
+        - ERN
+        - ETB
+        - EUR
+        - FJD
+        - FKP
+        - GBP
+        - GEL
+        - GGP
+        - GHS
+        - GIP
+        - GMD
+        - GNF
+        - GTQ
+        - GYD
+        - HKD
+        - HNL
+        - HRK
+        - HTG
+        - HUF
+        - IDR
+        - ILS
+        - IMP
+        - INR
+        - IQD
+        - IRR
+        - ISK
+        - JEP
+        - JMD
+        - JOD
+        - JPY
+        - KES
+        - KGS
+        - KHR
+        - KMF
+        - KPW
+        - KRW
+        - KWD
+        - KYD
+        - KZT
+        - LAK
+        - LBP
+        - LKR
+        - LRD
+        - LSL
+        - LYD
+        - MAD
+        - MDL
+        - MGA
+        - MKD
+        - MMK
+        - MNT
+        - MOP
+        - MRO
+        - MUR
+        - MVR
+        - MWK
+        - MXN
+        - MYR
+        - MZN
+        - NAD
+        - NGN
+        - NIO
+        - NOK
+        - NPR
+        - NZD
+        - OMR
+        - PAB
+        - PEN
+        - PGK
+        - PHP
+        - PKR
+        - PLN
+        - PYG
+        - QAR
+        - RON
+        - RSD
+        - RUB
+        - RWF
+        - SAR
+        - SBD
+        - SCR
+        - SDG
+        - SEK
+        - SGD
+        - SHP
+        - SLL
+        - SOS
+        - SPL
+        - SRD
+        - STD
+        - SVC
+        - SYP
+        - SZL
+        - THB
+        - TJS
+        - TMT
+        - TND
+        - TOP
+        - TRY
+        - TTD
+        - TVD
+        - TWD
+        - TZS
+        - UAH
+        - UGX
+        - USD
+        - UYU
+        - UZS
+        - VEF
+        - VND
+        - VUV
+        - WST
+        - XAF
+        - XCD
+        - XDR
+        - XOF
+        - XPF
+        - XTS
+        - XXX
+        - YER
+        - ZAR
+        - ZMW
+        - ZWD
     ActiveOrHistoricCurrencyAndAmount:
       title: ActiveOrHistoricCurrencyAndAmount
       type: object
@@ -2161,8 +2330,177 @@ components:
         international identification scheme, as described in the latest edition
         of the international standard ISO 4217 "Codes for the representation of
         currencies and funds".
-      pattern: ^[A-Z]{3,3}$
+
+        NOTE: This has been modified away from the original ISO20022 pattern to
+        enums.
       example: USD
+      minLength: 3
+      maxLength: 3
+      enum:
+        - AED
+        - AFN
+        - ALL
+        - AMD
+        - ANG
+        - AOA
+        - ARS
+        - AUD
+        - AWG
+        - AZN
+        - BAM
+        - BBD
+        - BDT
+        - BGN
+        - BHD
+        - BIF
+        - BMD
+        - BND
+        - BOB
+        - BRL
+        - BSD
+        - BTN
+        - BWP
+        - BYN
+        - BZD
+        - CAD
+        - CDF
+        - CHF
+        - CLP
+        - CNY
+        - COP
+        - CRC
+        - CUC
+        - CUP
+        - CVE
+        - CZK
+        - DJF
+        - DKK
+        - DOP
+        - DZD
+        - EGP
+        - ERN
+        - ETB
+        - EUR
+        - FJD
+        - FKP
+        - GBP
+        - GEL
+        - GGP
+        - GHS
+        - GIP
+        - GMD
+        - GNF
+        - GTQ
+        - GYD
+        - HKD
+        - HNL
+        - HRK
+        - HTG
+        - HUF
+        - IDR
+        - ILS
+        - IMP
+        - INR
+        - IQD
+        - IRR
+        - ISK
+        - JEP
+        - JMD
+        - JOD
+        - JPY
+        - KES
+        - KGS
+        - KHR
+        - KMF
+        - KPW
+        - KRW
+        - KWD
+        - KYD
+        - KZT
+        - LAK
+        - LBP
+        - LKR
+        - LRD
+        - LSL
+        - LYD
+        - MAD
+        - MDL
+        - MGA
+        - MKD
+        - MMK
+        - MNT
+        - MOP
+        - MRO
+        - MUR
+        - MVR
+        - MWK
+        - MXN
+        - MYR
+        - MZN
+        - NAD
+        - NGN
+        - NIO
+        - NOK
+        - NPR
+        - NZD
+        - OMR
+        - PAB
+        - PEN
+        - PGK
+        - PHP
+        - PKR
+        - PLN
+        - PYG
+        - QAR
+        - RON
+        - RSD
+        - RUB
+        - RWF
+        - SAR
+        - SBD
+        - SCR
+        - SDG
+        - SEK
+        - SGD
+        - SHP
+        - SLL
+        - SOS
+        - SPL
+        - SRD
+        - STD
+        - SVC
+        - SYP
+        - SZL
+        - THB
+        - TJS
+        - TMT
+        - TND
+        - TOP
+        - TRY
+        - TTD
+        - TVD
+        - TWD
+        - TZS
+        - UAH
+        - UGX
+        - USD
+        - UYU
+        - UZS
+        - VEF
+        - VND
+        - VUV
+        - WST
+        - XAF
+        - XCD
+        - XDR
+        - XOF
+        - XPF
+        - XTS
+        - XXX
+        - YER
+        - ZAR
+        - ZMW
+        - ZWD
     AddressType2Code:
       description: |
         AddressType2Code
@@ -2208,6 +2546,16 @@ components:
             - Prtry
       example:
         Cd: ADDR
+    AmountTypeEnum:
+      title: AmountTypeEnum
+      description: |
+        NOTE: This pattern is not the original ISO20022 specification.
+              This represents the enum values when mapping to and from FSPIOP specification.
+      type: string
+      enum:
+        - SEND
+        - RECEIVE
+      example: SEND
     AnyBICDec2014Identifier:
       title: AnyBICDec2014Identifier
       type: string
@@ -3304,6 +3652,141 @@ components:
         VrfctnOfTerms:
           Cntt: CONTENT
           CnttTp: PROPRIETARY
+    CreditTransferTransaction68_Put_FX_Quotes_ID:
+      title: CreditTransferTransaction68_Put_FX_Quotes_ID
+      description: >
+        Provides further details specific to the individual transaction(s)
+        included in the message.
+      type: object
+      properties:
+        PmtId:
+          allOf:
+            - $ref: "#/components/schemas/PaymentIdentification13"
+            - description: |
+                PaymentIdentification
+                Set of elements used to reference a payment instruction.
+        PmtTpInf:
+          allOf:
+            - $ref: "#/components/schemas/PaymentTypeInformation28"
+            - description: |
+                PaymentTypeInformation
+                Set of elements used to further specify the type of transaction.
+        UndrlygCstmrCdtTrf:
+          allOf:
+            - $ref: "#/components/schemas/UnderlyingCustomerCreditTransfer"
+            - description: |
+                Underlying Customer Credit Transfer
+                TBD
+        IntrBkSttlmAmt:
+          allOf:
+            - $ref: "#/components/schemas/ActiveCurrencyAndAmount"
+            - description: >
+                InterbankSettlementAmount
+
+                Amount of money moved between the instructing agent and the
+                instructed agent.
+        Dbtr:
+          allOf:
+            - $ref: >-
+                #/components/schemas/BranchAndFinancialInstitutionIdentification8
+            - description: |
+                Debtor
+                Party that owes an amount of money to the (ultimate) creditor.
+        DbtrAcct:
+          allOf:
+            - $ref: "#/components/schemas/CashAccount40"
+            - description: |
+                DebtorAccount
+                Account used to process a payment.
+        DbtrAgt:
+          allOf:
+            - $ref: >-
+                #/components/schemas/BranchAndFinancialInstitutionIdentification8
+            - description: |
+                DebtorAgent
+                Financial institution servicing an account for the debtor.
+        CdtrAgt:
+          allOf:
+            - $ref: >-
+                #/components/schemas/BranchAndFinancialInstitutionIdentification8
+            - description: |
+                CreditorAgent
+                Financial institution servicing an account for the creditor.
+        Cdtr:
+          allOf:
+            - $ref: >-
+                #/components/schemas/BranchAndFinancialInstitutionIdentification8
+            - description: |
+                Creditor
+                Party to which an amount of money is due.
+        CdtrAcct:
+          allOf:
+            - $ref: "#/components/schemas/CashAccount40"
+            - description: |
+                CreditorAccount
+                Account to which a credit entry is made.
+        InstrForCdtrAgt:
+          allOf:
+            - $ref: >-
+                #/components/schemas/InstructionForCreditorAgent3_Put_FX_Quotes_ID
+            - description: >
+                InstructionForCreditorAgent
+
+                Set of elements used to provide information on the remittance
+                advice.
+        Purp:
+          allOf:
+            - $ref: "#/components/schemas/Purpose2Choice"
+            - description: |
+                Purpose
+                Underlying reason for the payment transaction.
+        VrfctnOfTerms:
+          allOf:
+            - $ref: "#/components/schemas/CryptographicLockChoice"
+            - description: >
+                VerificationOfTerms
+
+                Set of elements used to provide information on the underlying
+                terms of the transaction.
+      required:
+        - PmtId
+        - IntrBkSttlmAmt
+        - Dbtr
+        - Cdtr
+      example:
+        PmtId:
+          InstrId: INSTRID
+          EndToEndId: ENDTOENDID
+        PmtTpInf:
+          LclInstrm:
+            Cd: CHQB
+            Prtry: PROPRIETARY
+        IntrBkSttlmAmt:
+          Amount: 123.45
+          Ccy: EUR
+        Dbtr:
+          Nm: Debtor Name
+        DbtrAcct:
+          Id:
+            IBAN: IBAN
+        DbtrAgt:
+          FinInstnId:
+            BICFI: BICFI
+        CdtrAgt:
+          FinInstnId:
+            BICFI: BICFI
+        Cdtr:
+          Nm: Creditor Name
+        CdtrAcct:
+          Id:
+            IBAN: IBAN
+        InstrForCdtrAgt:
+          Cd: INSTRUCTION
+        Purp:
+          Cd: CHAR
+        VrfctnOfTerms:
+          Cntt: CONTENT
+          CnttTp: PROPRIETARY
     CryptographicLockChoice:
       title: CryptographicLockChoice
       description: |
@@ -3670,9 +4153,12 @@ components:
     Exact32HexBinaryText:
       title: Exact32HexBinaryText
       description: |
-        Specifies a hexadecimal string with a length of 32 characters.
+        Specifies a hexadecimal string.
+
+        NOTE: This pattern is not the original ISO20022 specification.
       type: string
-      example: 1234567890ABCDEF1234567890ABCDEF
+      pattern: ^[A-Za-z0-9-_]{43}$
+      maxLength: 48
     Exact4AlphaNumericText:
       title: Exact4AlphaNumericText
       description: |
@@ -3868,20 +4354,31 @@ components:
       example: 1234
     ExternalPaymentTransactionStatus1Code:
       title: ExternalPaymentTransactionStatus1Code
-      description: |
+      description: >
         Specifies the external payment transaction status code.
 
+
         For FSPIOP transfer state enumeration mappings:
+
         {
           "COMM": "COMMITED",
           "RESV": "RESERVED",
           "RECV": "RECEIVED",
           "ABOR": "ABORTED"
         }
+
+
+        NOTE: enum enforcement is not apart of the ISO20022 specification, but
+        is added here for FSPIOP mappings.
       type: string
       minLength: 1
       maxLength: 4
       example: COMM
+      enum:
+        - COMM
+        - RESV
+        - RECV
+        - ABOR
     ExternalPersonIdentification1Code:
       title: ExternalPersonIdentification1Code
       description: Specifies the external person identification code.
@@ -4230,9 +4727,10 @@ components:
                 included in the message.
         CdtTrfTxInf:
           allOf:
-            - $ref: "#/components/schemas/CreditTransferTransaction68"
+            - $ref: >-
+                #/components/schemas/CreditTransferTransaction68_Put_FX_Quotes_ID
             - description: >
-                CreditTransferTransactionInformation
+                CreditTransferTransaction68_Put_FX_Quotes_ID
 
                 Set of elements providing information specific to the individual
                 credit transfer(s).
@@ -5173,6 +5671,35 @@ components:
       example:
         Cd: PHOA
         InstrInf: Please advise/contact next agent by phone.
+    InstructionForCreditorAgent3_Put_FX_Quotes_ID:
+      title: InstructionForCreditorAgent3_Put_FX_Quotes_ID
+      description: >
+        Further information related to the processing of the payment
+        instruction, provided by the initiating party, and intended for the
+        creditor agent.
+      type: object
+      properties:
+        Cd:
+          allOf:
+            - $ref: "#/components/schemas/ExternalCreditorAgentInstruction1Code"
+            - description: >
+                Code
+
+                Coded information related to the processing of the payment
+                instruction, provided by the initiating party, and intended for
+                the creditor's agent.
+        InstrInf:
+          allOf:
+            - $ref: "#/components/schemas/AmountTypeEnum"
+            - description: >
+                InstructionInformation
+
+                Further information complementing the coded instruction or
+                instruction to the creditor's agent that is bilaterally agreed
+                or specific to a user community.
+      example:
+        Cd: PHOA
+        InstrInf: Please advise/contact next agent by phone.
     InstructionForNextAgent1:
       title: InstructionForNextAgent1
       description: >
@@ -6032,7 +6559,7 @@ components:
       properties:
         InstrId:
           allOf:
-            - $ref: "#/components/schemas/Max35Text"
+            - $ref: "#/components/schemas/ULIDIdentifier"
             - description: >
                 InstructionIdentification (FSPIOP equivalent:
                 transactionRequestId)
@@ -6051,9 +6578,13 @@ components:
                 individual instruction. It can be included in
 
                 several messages related to the instruction.
+
+
+                This field has been changed from the original ISO20022
+                `Max35Text`` schema to a ULIDIdentifier schema.
         EndToEndId:
           allOf:
-            - $ref: "#/components/schemas/Max35Text"
+            - $ref: "#/components/schemas/ULIDIdentifier"
             - description: >
                 EndToEndIdentification (FSPIOP equivalent: transactionId)
 
@@ -6077,9 +6608,13 @@ components:
 
                 identification must be passed on throughout the entire
                 end-to-end chain.
+
+
+                This field has been changed from the original ISO20022
+                `Max35Text`` schema to a ULIDIdentifier schema.
         TxId:
           allOf:
-            - $ref: "#/components/schemas/Max35Text"
+            - $ref: "#/components/schemas/ULIDIdentifier"
             - description: >
                 TransactionIdentification (FSPIOP equivalent: quoteId in quote
                 request, transferId in transfer request)
@@ -6100,6 +6635,10 @@ components:
 
                 Usage: The instructing agent has to make sure that the
                 transaction identification is unique for a preagreed period.
+
+
+                This field has been changed from the original ISO20022
+                `Max35Text`` schema to a ULIDIdentifier schema.
         UETR:
           allOf:
             - $ref: "#/components/schemas/UUIDv4Identifier"
@@ -7615,6 +8154,11 @@ components:
           FwdgAgt:
             FinInstnId:
               BICFI: BBBBBBBB
+    ULIDIdentifier:
+      title: ULIDIdentifier
+      type: string
+      pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+      example: 01AN4Z07BY79KA1307SR9X4MV3
     UUIDv4Identifier:
       title: UUIDv4Identifier
       type: string
