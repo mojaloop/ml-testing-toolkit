@@ -63,6 +63,17 @@ const _transformPostResource = async (resource, requestOptions) => {
   }
 }
 
+const _transformFSPIOPToISO20022PutResource = async (resource, requestOptions, isError) => {
+  const headers = _replaceISO20022Headers(requestOptions.headers, resource)
+  TransformFacades.FSPIOP.configure({ isTestingMode: true, logger: customLogger })
+  const result = await TransformFacades.FSPIOP[resource][isError ? 'putError' : 'put']({ body: requestOptions.body, headers: requestOptions.headers })
+  return {
+    ...requestOptions,
+    headers,
+    body: result?.body
+  }
+}
+
 const _transformPutResource = async (resource, callbackOptions, isError) => {
   const headers = _replaceHeaders({
     'content-type': `application/vnd.interoperability.${resource}+json;version=2.0`
@@ -87,6 +98,7 @@ const requestTransform = async (requestOptions) => {
     return requestOptions
   }
   try {
+    let isError = false
     switch (requestOptions.method) {
       case 'get':
         if (requestOptions.path.startsWith('/parties')) {
@@ -112,6 +124,27 @@ const requestTransform = async (requestOptions) => {
           return await _transformPostResource('fxQuotes', requestOptions)
         } else if (requestOptions.path.startsWith('/fxTransfers')) {
           return await _transformPostResource('fxTransfers', requestOptions)
+        } else if (requestOptions.path.startsWith('/participants')) {
+          // POST /participants - Only the headers need to be transformed
+          const headers = _replaceISO20022Headers(requestOptions.headers, 'participants')
+          return {
+            ...requestOptions,
+            headers
+          }
+        }
+        break
+      case 'put':
+        if (requestOptions.path.endsWith('/error')) {
+          isError = true
+        }
+        if (requestOptions.path.startsWith('/quotes')) {
+          return await _transformFSPIOPToISO20022PutResource('quotes', requestOptions, isError)
+        } else if (requestOptions.path.startsWith('/transfers')) {
+          return await _transformFSPIOPToISO20022PutResource('transfers', requestOptions, isError)
+        } else if (requestOptions.path.startsWith('/fxQuotes')) {
+          return await _transformFSPIOPToISO20022PutResource('fxQuotes', requestOptions, isError)
+        } else if (requestOptions.path.startsWith('/fxTransfers')) {
+          return await _transformFSPIOPToISO20022PutResource('fxTransfers', requestOptions, isError)
         } else if (requestOptions.path.startsWith('/participants')) {
           // POST /participants - Only the headers need to be transformed
           const headers = _replaceISO20022Headers(requestOptions.headers, 'participants')
