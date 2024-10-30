@@ -145,13 +145,6 @@ const requestTransform = async (requestOptions) => {
           return await _transformFSPIOPToISO20022PutResource('fxQuotes', requestOptions, isError)
         } else if (requestOptions.path.startsWith('/fxTransfers')) {
           return await _transformFSPIOPToISO20022PutResource('fxTransfers', requestOptions, isError)
-        } else if (requestOptions.path.startsWith('/participants')) {
-          // POST /participants - Only the headers need to be transformed
-          const headers = _replaceISO20022Headers(requestOptions.headers, 'participants')
-          return {
-            ...requestOptions,
-            headers
-          }
         }
         break
     }
