@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.2.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.2.1...v18.2.2) (2024-10-30)
+
+
+### Chore
+
+* add transform for ttk put requests ([#270](https://github.com/mojaloop/ml-testing-toolkit/issues/270)) ([a3cf90e](https://github.com/mojaloop/ml-testing-toolkit/commit/a3cf90ece22361452a03073dc266d87ebf01b325))
+
 ### [18.2.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.2.0...v18.2.1) (2024-10-29)
 
 
