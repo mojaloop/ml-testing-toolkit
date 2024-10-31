@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.2.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.2.2...v18.2.3) (2024-10-31)
+
+
+### Bug Fixes
+
+* transform iso put quotes ([#271](https://github.com/mojaloop/ml-testing-toolkit/issues/271)) ([cb9a299](https://github.com/mojaloop/ml-testing-toolkit/commit/cb9a2997df17fd2c14494ae31b3e264f578ee564))
+
 ### [18.2.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.2.1...v18.2.2) (2024-10-30)
 
 
