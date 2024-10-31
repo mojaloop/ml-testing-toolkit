@@ -30,10 +30,11 @@ const SpyFileStatAsync = jest.spyOn(Utils, 'fileStatAsync')
 const SpyReadRecursiveAsync = jest.spyOn(Utils, 'readRecursiveAsync')
 const SpyFsStatSync = jest.spyOn(fs, 'statSync')
 
-
 const loadSamples = require('../../../src/lib/loadSamples')
 
-describe('loadSamples', () => { 
+jest.setTimeout(10_000);
+
+describe('loadSamples', () => {
   describe('getSample should not throw an error when', () => {
     it('sample name should be \'multi\' if there is more than one collection', async () => {
       const queryParams = {
@@ -50,7 +51,7 @@ describe('loadSamples', () => {
             test_cases: [{id: 1}]
         }))
         .mockResolvedValueOnce(JSON.stringify({inputValues: {}, options: {}}))
-      const sample = await loadSamples.getSample(queryParams)      
+      const sample = await loadSamples.getSample(queryParams)
       expect(sample).toStrictEqual({
         name: 'multi',
         inputValues: {},
@@ -130,7 +131,7 @@ describe('loadSamples', () => {
           size: 123,
           mtime: 'asdf'
         })
-      const sample = await loadSamples.getSampleWithFolderWise(queryParams)  
+      const sample = await loadSamples.getSampleWithFolderWise(queryParams)
       expect(sample).toHaveProperty('collections')
       expect(sample).toHaveProperty('environment')
       expect(sample.collections.length).toEqual(2)

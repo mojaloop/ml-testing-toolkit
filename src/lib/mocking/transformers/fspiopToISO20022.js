@@ -63,10 +63,19 @@ const _transformPostResource = async (resource, requestOptions) => {
   }
 }
 
+const headersToLowerCase = (headers) => Object.fromEntries(
+  Object.entries(headers).map(([k, v]) => [k.toLowerCase(), v])
+)
+
 const _transformFSPIOPToISO20022PutResource = async (resource, requestOptions, isError) => {
   const headers = _replaceISO20022Headers(requestOptions.headers, resource)
+  const ID = requestOptions.path.split('/')[2]
   TransformFacades.FSPIOP.configure({ isTestingMode: true, logger: customLogger })
-  const result = await TransformFacades.FSPIOP[resource][isError ? 'putError' : 'put']({ body: requestOptions.body, headers: requestOptions.headers })
+  const result = await TransformFacades.FSPIOP[resource][isError ? 'putError' : 'put']({
+    body: requestOptions.body,
+    headers: headersToLowerCase(headers),
+    params: { ID }
+  })
   return {
     ...requestOptions,
     headers,
