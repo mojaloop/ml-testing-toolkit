@@ -66,7 +66,7 @@ const _transformPostResource = async (resource, options, isReverse) => {
     TransformFacades.FSPIOP.configure({ isTestingMode: true, logger: customLogger })
     result = await TransformFacades.FSPIOP[resource].post({ body: options.body, headers: options.headers })
   }
-  
+
   return {
     ...options,
     headers,

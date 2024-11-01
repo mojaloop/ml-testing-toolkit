@@ -66,6 +66,7 @@ class InboundEventListener {
   setTransformer (transformerObj) {
     this.transformer = transformerObj.transformer
   }
+
   addListener (clientName, method, path, conditionFn, timeout = 15000) {
     if (this.eventListeners[clientName]) {
       this.customLog('Event listener already exists with that name')
@@ -91,7 +92,7 @@ class InboundEventListener {
   }
 
   getMessage (clientName, timeout = 5000) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       if (!this.eventListeners[clientName]) {
         resolve(null)
       } else {
@@ -104,12 +105,11 @@ class InboundEventListener {
           // Return the stored message
           // this.customLog('Returning stored message...')
           if (this.transformer.reverseTransform) {
-            try {
-              const result = await this.transformer.reverseTransform(retMessage)
+            this.transformer.reverseTransform(retMessage).then((result) => {
               resolve(result)
-            } catch (err) {
+            }).catch((err) => {
               this.customLog('Error transforming message: ' + err)
-            }
+            })
           }
           resolve(retMessage)
         } else {

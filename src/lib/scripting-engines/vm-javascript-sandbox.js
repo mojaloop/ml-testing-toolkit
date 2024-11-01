@@ -225,7 +225,7 @@ const executeAsync = async (script, data, contextObj) => {
     contextObj.collectionVariables = data.context.collectionVariables.reduce((rObj, item) => { rObj[item.key] = item.value; return rObj }, {})
   }
 
-  if(contextObj.transformerObj) {
+  if (contextObj.transformerObj) {
     contextObj.inboundEvent.setTransformer(contextObj.transformerObj)
   }
 
