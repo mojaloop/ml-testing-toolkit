@@ -336,7 +336,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
           transformerObj.transformer = Transformers.getTransformer(templateOptions.transformerName)
           // Currently no options are passed to the transformer in template level, we can add it later if needed
         }
-        const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId, contextObj, transformerObj)
+        const resp = await sendRequest(convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj, transformerObj)
         status = 'SUCCESS'
         await setResponse(convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig)
       }
@@ -592,7 +592,9 @@ const getUrlPrefix = (baseUrl) => {
   return returnUrl
 }
 
-const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId, contextObj = {}, transformerObj) => {
+const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj = {}, transformerObj) => {
+  const { url, method, path, queryParams, headers, body, params, ignoreCallbacks } = convertedRequest
+  const baseUrl = url
   return new Promise((resolve, reject) => {
     (async () => {
       const httpAgentProps = {}
@@ -645,7 +647,7 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
       const transformedRequest = {}
 
       if (transformerObj && transformerObj.transformer && transformerObj.transformer.requestTransform) {
-        const result = await transformerObj.transformer.requestTransform({ method, path, headers, body })
+        const result = await transformerObj.transformer.requestTransform({ method, path, headers, body, params })
         transformedRequest.body = result.body
         transformedRequest.headers = result.headers
       }

@@ -533,7 +533,16 @@ describe('Outbound Initiator Functions', () => {
       }
       
       try {
-        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'userdfsp')
+        const testRequestObj = {
+          url: 'localhost/',
+          method: 'post',
+          path: '/quotes',
+          queryParams: null,
+          headers: sampleRequest.headers,
+          body: sampleRequest.body,
+          ignoreCallbacks: null
+        }
+        await OutboundInitiator.sendRequest(testRequestObj, null, null, 'userdfsp')
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
     })
@@ -587,7 +596,16 @@ describe('Outbound Initiator Functions', () => {
       }
       
       try{
-        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, {}, {}, null, 'userdfsp')
+        const testRequestObj = {
+          url: 'localhost/',
+          method: 'post',
+          path: '/quotes',
+          queryParams: null,
+          headers: sampleRequest.headers,
+          body: sampleRequest.body,
+          ignoreCallbacks: null
+        }
+        await OutboundInitiator.sendRequest(testRequestObj, {}, {}, 'userdfsp')
 
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
@@ -642,7 +660,16 @@ describe('Outbound Initiator Functions', () => {
       }
       
       try {
-        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'userdfsp')
+        const testRequestObj = {
+          url: 'localhost/',
+          method: 'post',
+          path: '/quotes',
+          queryParams: null,
+          headers: sampleRequest.headers,
+          body: sampleRequest.body,
+          ignoreCallbacks: null
+        }
+        await OutboundInitiator.sendRequest(testRequestObj, null, null, 'userdfsp')
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
     })
@@ -695,7 +722,16 @@ describe('Outbound Initiator Functions', () => {
       }
       
       try {
-        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, {}, {}, null, 'userdfsp')
+        const testRequestObj = {
+          url: 'localhost/',
+          method: 'post',
+          path: '/quotes',
+          queryParams: null,
+          headers: sampleRequest.headers,
+          body: sampleRequest.body,
+          ignoreCallbacks: null
+        }
+        await OutboundInitiator.sendRequest(testRequestObj, {}, {}, 'userdfsp')
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
     })
@@ -753,7 +789,16 @@ describe('Outbound Initiator Functions', () => {
       }
       
       try {
-        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, {}, {}, null, 'userdfsp')
+        const testRequestObj = {
+          url: 'localhost/',
+          method: 'post',
+          path: '/quotes',
+          queryParams: null,
+          headers: sampleRequest.headers,
+          body: sampleRequest.body,
+          ignoreCallbacks: null
+        }
+        await OutboundInitiator.sendRequest(testRequestObj, {}, {}, 'userdfsp')
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
     })
@@ -811,7 +856,16 @@ describe('Outbound Initiator Functions', () => {
       }
       axios.mockClear()
       try {
-        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, {}, {}, null, 'userdfsp')
+        const testRequestObj = {
+          url: 'localhost/',
+          method: 'post',
+          path: '/quotes',
+          queryParams: null,
+          headers: sampleRequest.headers,
+          body: sampleRequest.body,
+          ignoreCallbacks: null
+        }
+        await OutboundInitiator.sendRequest(testRequestObj, {}, {}, 'userdfsp')
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
     })
@@ -857,10 +911,16 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      // try {
-      //   await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'notExistingDfsp')
-      // } catch (err) {}
-      await expect(OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'notExistingDfsp')).rejects.toThrowError()
+      const testRequestObj = {
+        url: 'localhost/',
+        method: 'post',
+        path: '/quotes',
+        queryParams: null,
+        headers: sampleRequest.headers,
+        body: sampleRequest.body,
+        ignoreCallbacks: null
+      }
+      await expect(OutboundInitiator.sendRequest(testRequestObj, null, null, 'notExistingDfsp')).rejects.toThrowError()
     })
     it('sendRequest should call axios with appropriate params 9 and with CLIENT_MUTUAL_TLS_ENABLED', async () => {
       axios.mockImplementation(() => Promise.resolve({
@@ -911,7 +971,16 @@ describe('Outbound Initiator Functions', () => {
         }
       }
       try {
-        await OutboundInitiator.sendRequest('localhost:4040/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'notExistingDfsp')
+        const testRequestObj = {
+          url: 'localhost:4040/',
+          method: 'post',
+          path: '/quotes',
+          queryParams: null,
+          headers: sampleRequest.headers,
+          body: sampleRequest.body,
+          ignoreCallbacks: null
+        }
+        await OutboundInitiator.sendRequest(testRequestObj, null, null, 'notExistingDfsp')
       } catch (err) {}
     })
     it('sendRequest should call axios with appropriate params 10 and with http and https urls', async () => {
@@ -956,8 +1025,22 @@ describe('Outbound Initiator Functions', () => {
         }
       }
       try {
-        await OutboundInitiator.sendRequest('http://localhost:4040/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'notExistingDfsp')
-        await OutboundInitiator.sendRequest('https://localhost:4040/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'notExistingDfsp')
+        const baseTestRequestObj = {
+          url: 'http://localhost:4040/',
+          method: 'post',
+          path: '/quotes',
+          queryParams: null,
+          headers: sampleRequest.headers,
+          body: sampleRequest.body,
+          ignoreCallbacks: null
+        }
+        const testRequestObj1 = {...baseTestRequestObj}
+        const testRequestObj2 = {
+          ...baseTestRequestObj,
+          url: 'https://localhost:4040/'
+        }
+        await OutboundInitiator.sendRequest(testRequestObj1, null, null, 'notExistingDfsp')
+        await OutboundInitiator.sendRequest(testRequestObj2, null, null, 'notExistingDfsp')
       } catch (err) {}
     })
     it('sendRequest should call JwsSigning.signWithKey', async () => {
@@ -1013,7 +1096,16 @@ describe('Outbound Initiator Functions', () => {
       }
       
       try {
-        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'userdfsp', {requestVariables: {TTK_JWS_SIGN_KEY: 'SOME_KEY'}})
+        const testRequestObj = {
+          url: 'localhost/',
+          method: 'post',
+          path: '/quotes',
+          queryParams: null,
+          headers: sampleRequest.headers,
+          body: sampleRequest.body,
+          ignoreCallbacks: null
+        }
+        await OutboundInitiator.sendRequest(testRequestObj, null, null, 'userdfsp', {requestVariables: {TTK_JWS_SIGN_KEY: 'SOME_KEY'}})
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
       expect(SpyJwsSignWithKey).toHaveBeenCalledTimes(1);
@@ -1071,7 +1163,16 @@ describe('Outbound Initiator Functions', () => {
       }
       
       try {
-        await OutboundInitiator.sendRequest('localhost/', 'post', '/quotes', null, sampleRequest.headers, sampleRequest.body, null, null, null, 'userdfsp', {requestVariables: {TTK_JWS_SIGN_KEY: 'SOME_KEY'}})
+        const testRequestObj = {
+          url: 'localhost/',
+          method: 'post',
+          path: '/quotes',
+          queryParams: null,
+          headers: sampleRequest.headers,
+          body: sampleRequest.body,
+          ignoreCallbacks: null
+        }
+        await OutboundInitiator.sendRequest(testRequestObj, null, null, 'userdfsp', {requestVariables: {TTK_JWS_SIGN_KEY: 'SOME_KEY'}})
       } catch (err) {}
       expect(axios).toHaveBeenCalledTimes(1);
       expect(SpyJwsSignWithKey).toHaveBeenCalledTimes(1);

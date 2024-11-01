@@ -5,6 +5,9 @@ describe('requestTransform Tests with real transformLib -->', () => {
     const requestOptions = {
       method: 'put',
       path: '/quotes/01JBHNDR4S6TWQ0YVKZWCXMEDX',
+      params: {
+        ID: '01JBHNDR4S6TWQ0YVKZWCXMEDX'
+      },
       headers: {
         'Content-Type': 'application/vnd.interoperability.quotes+json;version=2.0',
         Date: 'Thu, 31 Oct 2024 16:09:34 GMT',
