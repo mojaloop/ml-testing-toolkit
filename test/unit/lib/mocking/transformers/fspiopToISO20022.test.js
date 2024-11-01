@@ -1,10 +1,10 @@
 const { TransformFacades } = require('@mojaloop/ml-schema-transformer-lib')
-const { requestTransform, callbackTransform } = require('../../../../../src/lib/mocking/transformers/fspiopToISO20022')
+const { forwardTransform, reverseTransform } = require('../../../../../src/lib/mocking/transformers/fspiopToISO20022')
 
 jest.mock('@mojaloop/ml-schema-transformer-lib')
 
 describe('fspiopToISO20022 Transformers', () => {
-  describe('requestTransform', () => {
+  describe('forwardTransform', () => {
     it('should transform GET /parties request headers', async () => {
       const requestOptions = {
         method: 'get',
@@ -15,7 +15,7 @@ describe('fspiopToISO20022 Transformers', () => {
         }
       };
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.parties+json;version=2.0');
     });
@@ -30,7 +30,7 @@ describe('fspiopToISO20022 Transformers', () => {
         }
       };
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.parties+json;version=2.0');
     });
@@ -45,7 +45,7 @@ describe('fspiopToISO20022 Transformers', () => {
             'content-type': `application/vnd.interoperability.${resource}+json;version=2.0`
           }
         };
-        const transformedRequest = await requestTransform(requestOptions);
+        const transformedRequest = await forwardTransform(requestOptions);
         expect(transformedRequest.headers.accept).toBe(`application/vnd.interoperability.iso20022.${resource}+json;version=2.0`);
       }
       await _validateGetTransformation('participants')
@@ -66,7 +66,7 @@ describe('fspiopToISO20022 Transformers', () => {
         }
       };
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.participants+json;version=2.0');
     });
@@ -82,7 +82,7 @@ describe('fspiopToISO20022 Transformers', () => {
         body: {}
       };
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.quotes+json;version=2.0');
     });
@@ -98,7 +98,7 @@ describe('fspiopToISO20022 Transformers', () => {
         body: {}
       };
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.fxQuotes+json;version=2.0');
     });
@@ -114,7 +114,7 @@ describe('fspiopToISO20022 Transformers', () => {
         body: {}
       };
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.transfers+json;version=2.0');
     });
@@ -130,7 +130,7 @@ describe('fspiopToISO20022 Transformers', () => {
         body: {}
       };
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0');
     });
@@ -144,7 +144,7 @@ describe('fspiopToISO20022 Transformers', () => {
         }
       };
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest).toEqual(requestOptions);
     });
@@ -158,7 +158,7 @@ describe('fspiopToISO20022 Transformers', () => {
         }
       };
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest).toEqual(requestOptions);
     });
@@ -176,7 +176,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOP.quotes.post.mockResolvedValue({ body: {transformed: 'body'} });
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.quotes+json;version=2.0');
       expect(transformedRequest.headers['content-type']).toBe('application/vnd.interoperability.iso20022.quotes+json;version=2.0');
@@ -196,7 +196,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOP.quotes.post.mockResolvedValue({ body: {transformed: 'body'} });
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest).toEqual(requestOptions);
 
@@ -212,7 +212,7 @@ describe('fspiopToISO20022 Transformers', () => {
         }
       };
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest).toEqual(requestOptions);
     });
@@ -227,7 +227,7 @@ describe('fspiopToISO20022 Transformers', () => {
         }
       };
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest).toEqual(requestOptions);
     });
@@ -245,7 +245,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOP.quotes.post.mockRejectedValue(new Error('Transformation error'));
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest).toEqual(requestOptions);
     })
@@ -263,7 +263,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOP.quotes.put.mockResolvedValue({ body: {transformed: 'body'} });
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.quotes+json;version=2.0');
       expect(transformedRequest.headers['content-type']).toBe('application/vnd.interoperability.iso20022.quotes+json;version=2.0');
@@ -283,7 +283,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOP.fxQuotes.put.mockResolvedValue({ body: {transformed: 'body'} });
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.fxQuotes+json;version=2.0');
       expect(transformedRequest.headers['content-type']).toBe('application/vnd.interoperability.iso20022.fxQuotes+json;version=2.0');
@@ -303,7 +303,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOP.transfers.put.mockResolvedValue({ body: {transformed: 'body'} });
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.transfers+json;version=2.0');
       expect(transformedRequest.headers['content-type']).toBe('application/vnd.interoperability.iso20022.transfers+json;version=2.0');
@@ -323,7 +323,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOP.fxTransfers.put.mockResolvedValue({ body: {transformed: 'body'} });
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0');
       expect(transformedRequest.headers['content-type']).toBe('application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0');
@@ -343,7 +343,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOP.quotes.putError.mockResolvedValue({ body: {transformed: 'body'} });
 
-      const transformedRequest = await requestTransform(requestOptions);
+      const transformedRequest = await forwardTransform(requestOptions);
 
       expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.quotes+json;version=2.0');
       expect(transformedRequest.headers['content-type']).toBe('application/vnd.interoperability.iso20022.quotes+json;version=2.0');
@@ -352,7 +352,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
   });
 
-  describe('callbackTransform', () => {
+  describe('reverseTransform', () => {
     it('should transform PUT /parties callback headers and body', async () => {
       const callbackOptions = {
         method: 'put',
@@ -365,7 +365,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOPISO20022.parties.put.mockResolvedValue({ body: {transformed: 'body'} });
 
-      const transformedCallback = await callbackTransform(callbackOptions);
+      const transformedCallback = await reverseTransform(callbackOptions);
 
       expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.parties+json;version=2.0');
       expect(transformedCallback.body).toEqual({ transformed: 'body' });
@@ -383,7 +383,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOPISO20022.parties.put.mockResolvedValue({ body: {transformed: 'body'} });
 
-      const transformedCallback = await callbackTransform(callbackOptions);
+      const transformedCallback = await reverseTransform(callbackOptions);
 
       expect(transformedCallback.headers['Content-Type']).toBe('application/vnd.interoperability.parties+json;version=2.0');
       expect(transformedCallback.body).toEqual({ transformed: 'body' });
@@ -399,7 +399,7 @@ describe('fspiopToISO20022 Transformers', () => {
         body: { partyId: '123' }
       };
 
-      const transformedCallback = await callbackTransform(callbackOptions);
+      const transformedCallback = await reverseTransform(callbackOptions);
 
       expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.participants+json;version=2.0');
     });
@@ -416,7 +416,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOPISO20022.quotes.put.mockResolvedValue({ body: {transformed: 'body'} });
 
-      const transformedCallback = await callbackTransform(callbackOptions);
+      const transformedCallback = await reverseTransform(callbackOptions);
 
       expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.quotes+json;version=2.0');
       expect(transformedCallback.body).toEqual({ transformed: 'body' });
@@ -434,7 +434,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOPISO20022.fxQuotes.put.mockResolvedValue({ body: {transformed: 'body'} });
 
-      const transformedCallback = await callbackTransform(callbackOptions);
+      const transformedCallback = await reverseTransform(callbackOptions);
 
       expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.fxQuotes+json;version=2.0');
       expect(transformedCallback.body).toEqual({ transformed: 'body' });
@@ -452,7 +452,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOPISO20022.fxQuotes.putError.mockResolvedValue({ body: {errorInformation: 'fspiopError'} });
 
-      const transformedCallback = await callbackTransform(callbackOptions);
+      const transformedCallback = await reverseTransform(callbackOptions);
 
       expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.fxQuotes+json;version=2.0');
       expect(transformedCallback.body).toEqual({ errorInformation: 'fspiopError' });
@@ -470,7 +470,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOPISO20022.fxTransfers.put.mockResolvedValue({ body: {transformed: 'body'} });
 
-      const transformedCallback = await callbackTransform(callbackOptions);
+      const transformedCallback = await reverseTransform(callbackOptions);
 
       expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.fxTransfers+json;version=2.0');
       expect(transformedCallback.body).toEqual({ transformed: 'body' });
@@ -488,7 +488,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOPISO20022.transfers.put.mockResolvedValue({ body: {transformed: 'body'} });
 
-      const transformedCallback = await callbackTransform(callbackOptions);
+      const transformedCallback = await reverseTransform(callbackOptions);
 
       expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.transfers+json;version=2.0');
       expect(transformedCallback.body).toEqual({ transformed: 'body' });
@@ -506,7 +506,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOPISO20022.transfers.put.mockResolvedValue({ body: {transformed: 'body'} });
 
-      const transformedCallback = await callbackTransform(callbackOptions);
+      const transformedCallback = await reverseTransform(callbackOptions);
 
       expect(transformedCallback).toEqual(callbackOptions);
     });
@@ -521,7 +521,7 @@ describe('fspiopToISO20022 Transformers', () => {
         }
       };
 
-      const transformedCallback = await callbackTransform(callbackOptions);
+      const transformedCallback = await reverseTransform(callbackOptions);
 
       expect(transformedCallback).toEqual(callbackOptions);
     });
@@ -538,7 +538,7 @@ describe('fspiopToISO20022 Transformers', () => {
 
       TransformFacades.FSPIOPISO20022.parties.put.mockRejectedValue(new Error('Transformation error'));
 
-      const transformedCallback = await callbackTransform(callbackOptions);
+      const transformedCallback = await reverseTransform(callbackOptions);
 
       expect(transformedCallback).toEqual(callbackOptions);
     });

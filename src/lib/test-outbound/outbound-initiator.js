@@ -646,8 +646,8 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
 
       const transformedRequest = {}
 
-      if (transformerObj && transformerObj.transformer && transformerObj.transformer.requestTransform) {
-        const result = await transformerObj.transformer.requestTransform({ method, path, headers, body, params })
+      if (transformerObj && transformerObj.transformer && transformerObj.transformer.forwardTransform) {
+        const result = await transformerObj.transformer.forwardTransform({ method, path, headers, body, params })
         transformedRequest.body = result.body
         transformedRequest.headers = result.headers
       }
@@ -698,8 +698,8 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
           let callbackBody = _callbackBody
           let originalBody
           let originalHeaders
-          if (transformerObj && transformerObj.transformer && transformerObj.transformer.callbackTransform) {
-            const result = await transformerObj.transformer.callbackTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
+          if (transformerObj && transformerObj.transformer && transformerObj.transformer.reverseTransform) {
+            const result = await transformerObj.transformer.reverseTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
             originalBody = _callbackBody
             callbackBody = result.body
             originalHeaders = _callbackHeaders
@@ -716,8 +716,8 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
           let callbackBody = _callbackBody
           let originalBody
           let originalHeaders
-          if (transformerObj && transformerObj.transformer && transformerObj.transformer.callbackTransform) {
-            const result = await transformerObj.transformer.callbackTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
+          if (transformerObj && transformerObj.transformer && transformerObj.transformer.reverseTransform) {
+            const result = await transformerObj.transformer.reverseTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
             originalBody = _callbackBody
             callbackBody = result.body
             originalHeaders = _callbackHeaders

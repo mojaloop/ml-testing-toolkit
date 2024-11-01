@@ -101,7 +101,7 @@ const _getHeader = (headers, name) => {
   )?.[1]
 }
 
-const requestTransform = async (requestOptions) => {
+const forwardTransform = async (requestOptions) => {
   if (!_getHeader(requestOptions.headers, 'content-type')?.startsWith('application/vnd.interoperability.')) {
     return requestOptions
   }
@@ -162,7 +162,7 @@ const requestTransform = async (requestOptions) => {
   return requestOptions
 }
 
-const callbackTransform = async (callbackOptions) => {
+const reverseTransform = async (callbackOptions) => {
   if (!_getHeader(callbackOptions.headers, 'content-type')?.startsWith('application/vnd.interoperability.iso20022.')) {
     return callbackOptions
   }
@@ -202,6 +202,6 @@ const callbackTransform = async (callbackOptions) => {
 }
 
 module.exports = {
-  requestTransform,
-  callbackTransform
+  forwardTransform,
+  reverseTransform
 }
