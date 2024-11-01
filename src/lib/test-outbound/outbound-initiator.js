@@ -327,16 +327,20 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         // Get transformer if specified
         const transformerObj = {
           transformer: null,
+          transformerName: null,
           options: {}
         }
         if (contextObj.requestVariables && contextObj.requestVariables.TRANSFORM) {
           transformerObj.transformer = Transformers.getTransformer(contextObj.requestVariables.TRANSFORM.transformerName)
+          transformerObj.transformerName = contextObj.requestVariables.TRANSFORM.transformerName
           transformerObj.options = contextObj.requestVariables.TRANSFORM.options
         } else if (templateOptions?.transformerName) {
           transformerObj.transformer = Transformers.getTransformer(templateOptions.transformerName)
+          transformerObj.transformerName = templateOptions.transformerName
           // Currently no options are passed to the transformer in template level, we can add it later if needed
         }
-        const resp = await sendRequest(convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj, transformerObj)
+        contextObj.transformerObj = transformerObj
+        const resp = await sendRequest(convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj)
         status = 'SUCCESS'
         await setResponse(convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig)
       }
@@ -592,7 +596,8 @@ const getUrlPrefix = (baseUrl) => {
   return returnUrl
 }
 
-const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj = {}, transformerObj) => {
+const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj = {}) => {
+  const transformerObj = contextObj.transformerObj
   const { url, method, path, queryParams, headers, body, params, ignoreCallbacks } = convertedRequest
   const baseUrl = url
   return new Promise((resolve, reject) => {

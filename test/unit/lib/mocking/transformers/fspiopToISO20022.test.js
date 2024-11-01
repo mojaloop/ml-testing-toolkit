@@ -275,8 +275,8 @@ describe('fspiopToISO20022 Transformers', () => {
         method: 'put',
         path: '/fxQuotes/123',
         headers: {
-          accept: 'application/vnd.interoperability.quotes+json;version=2.0',
-          'content-type': 'application/vnd.interoperability.quotes+json;version=2.0'
+          accept: 'application/vnd.interoperability.fxQuotes+json;version=2.0',
+          'content-type': 'application/vnd.interoperability.fxQuotes+json;version=2.0'
         },
         body: { conversionRequestId: '123' }
       };

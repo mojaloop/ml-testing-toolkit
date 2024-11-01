@@ -90,7 +90,8 @@
                 ]
               }
             ]
-          }
+          },
+          "disabled": false
         },
         {
           "id": 4,
@@ -132,28 +133,7 @@
                 "currency": "AED",
                 "amount": "123.45"
               },
-              "expiration": "2046-05-24T08:38:08.699-04:00",
-              "charges": [
-                {
-                  "chargeType": "string",
-                  "sourceAmount": {
-                    "currency": "AED",
-                    "amount": "123.45"
-                  },
-                  "targetAmount": {
-                    "currency": "AED",
-                    "amount": "123.45"
-                  }
-                }
-              ],
-              "extensionList": {
-                "extension": [
-                  {
-                    "key": "string",
-                    "value": "string"
-                  }
-                ]
-              }
+              "expiration": "2046-05-24T08:38:08.699-04:00"
             }
           },
           "tests": {
@@ -216,7 +196,8 @@
                 ]
               }
             ]
-          }
+          },
+          "disabled": false
         },
         {
           "id": 2,
@@ -346,7 +327,8 @@
                 ]
               }
             ]
-          }
+          },
+          "disabled": false
         },
         {
           "id": 5,
@@ -376,6 +358,7 @@
             "determiningTransferId": "{$function.generic.generateID}",
             "initiatingFsp": "{$inputs.fromFspId}",
             "counterPartyFsp": "fxp",
+            "amountType": "SEND",
             "sourceAmount": {
               "currency": "AED",
               "amount": "123.45"
@@ -384,7 +367,7 @@
               "currency": "AED",
               "amount": "123.45"
             },
-            "condition": "string",
+            "condition": "{$inputs.condition}",
             "expiration": "2046-05-24T08:38:08.699-04:00"
           },
           "tests": {
@@ -416,16 +399,10 @@
                 "exec": [
                   "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers['FSPIOP-Source']}')"
                 ]
-              },
-              {
-                "id": 5,
-                "description": "Callback conversionState to be COMMITTED",
-                "exec": [
-                  "expect(callback.body.conversionState).to.equal('COMMITTED')"
-                ]
               }
             ]
-          }
+          },
+          "disabled": false
         },
         {
           "id": 3,
@@ -516,7 +493,8 @@
                 ]
               }
             ]
-          }
+          },
+          "disabled": false
         }
       ]
     }

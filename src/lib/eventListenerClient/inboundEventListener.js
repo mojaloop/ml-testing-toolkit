@@ -30,6 +30,7 @@ const Config = require('../config')
 class InboundEventListener {
   constructor (consoleFn) {
     this.eventListeners = {}
+    this.transformer = {}
     this.userConfig = {}
     if (consoleFn) {
       this.consoleFn = consoleFn
@@ -62,6 +63,9 @@ class InboundEventListener {
     this.consoleFn.log(logMessage)
   }
 
+  setTransformer (transformerObj) {
+    this.transformer = transformerObj.transformer
+  }
   addListener (clientName, method, path, conditionFn, timeout = 15000) {
     if (this.eventListeners[clientName]) {
       this.customLog('Event listener already exists with that name')
@@ -87,7 +91,7 @@ class InboundEventListener {
   }
 
   getMessage (clientName, timeout = 5000) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (!this.eventListeners[clientName]) {
         resolve(null)
       } else {
@@ -99,6 +103,14 @@ class InboundEventListener {
           this.destroy(clientName)
           // Return the stored message
           // this.customLog('Returning stored message...')
+          if (this.transformer.reverseTransform) {
+            try {
+              const result = await this.transformer.reverseTransform(retMessage)
+              resolve(result)
+            } catch (err) {
+              this.customLog('Error transforming message: ' + err)
+            }
+          }
           resolve(retMessage)
         } else {
           // Listen for the new message for some time

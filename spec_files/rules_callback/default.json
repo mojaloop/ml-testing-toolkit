@@ -665,7 +665,6 @@
             },
             "PmtId": {
               "TxId": "{$request.body.CdtTrfTxInf.PmtId.TxId}",
-              "InstrId": "{$request.body.CdtTrfTxInf.PmtId.InstrId}",
               "EndToEndId": "{$request.body.CdtTrfTxInf.PmtId.EndToEndId}"
             },
             "IntrBkSttlmAmt": {
@@ -1000,6 +999,9 @@
             }
           },
           "CdtTrfTxInf": {
+            "VrfctnOfTerms": {
+              "Sh256Sgntr": "GRzLaTP7DJ9t4P-a_BA0WA9wzzlsugf00-Tn6kESAfM"
+            },
             "PmtId": {
               "TxId": "{$request.body.CdtTrfTxInf.PmtId.TxId}",
               "InstrId": "{$request.body.CdtTrfTxInf.PmtId.InstrId}",
@@ -1015,6 +1017,38 @@
               "InstdAmt": {
                 "Ccy": "{$request.body.CdtTrfTxInf.UndrlygCstmrCdtTrf.InstdAmt.Ccy}",
                 "ActiveOrHistoricCurrencyAndAmount": "{$request.body.CdtTrfTxInf.UndrlygCstmrCdtTrf.InstdAmt.ActiveOrHistoricCurrencyAndAmount}"
+              },
+              "Dbtr": {
+                "Id": {
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "{$request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id}"
+                    }
+                  }
+                }
+              },
+              "Cdtr": {
+                "Id": {
+                  "OrgId": {
+                    "Othr": {
+                      "Id": "{$request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id}"
+                    }
+                  }
+                }
+              },
+              "CdtrAgt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.body.CdtTrfTxInf.Cdtr.Id.OrgId.Othr.Id}"
+                  }
+                }
+              },
+              "DbtrAgt": {
+                "FinInstnId": {
+                  "Othr": {
+                    "Id": "{$request.body.CdtTrfTxInf.Dbtr.Id.OrgId.Othr.Id}"
+                  }
+                }
               }
             },
             "IntrBkSttlmAmt": {
@@ -1243,7 +1277,7 @@
             "OrgnlEndToEndId": "12345",
             "OrgnlTxId": "12345",
             "OrgnlUETR": "123e4567-e89b-12d3-a456-426614174000",
-            "TxSts": "COMM",
+            "TxSts": "RESV",
             "StsRsnInf": {
               "Rsn": {
                 "Prtry": "ACPT"
@@ -1253,7 +1287,7 @@
             "AccptncDtTm": "{$environment.AccptncDtTm}",
             "AcctSvcrRef": "ACCTSVCRREF",
             "ClrSysRef": "CLRSYSREF",
-            "ExctnConf": "1234567890ABCDEF",
+            "ExctnConf": "UNlJ98hZTY_dsw0cAqw4i_UN3v4utt7CZFB4yfLbVFA",
             "SplmtryData": {
               "PlcAndNm": "PLACE",
               "Envlp": {}
