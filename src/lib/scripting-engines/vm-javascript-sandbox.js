@@ -229,7 +229,6 @@ const executeAsync = async (script, data, contextObj) => {
     contextObj.inboundEvent.setTransformer(contextObj.transformerObj)
   }
 
-  contextObj.inboundEvent.setContext
   try {
     const options = { timeout: (contextObj.userConfig && contextObj.userConfig.SCRIPT_TIMEOUT) || 30000, microtaskMode: 'afterEvaluate' }
     await _runScript(fullScript, contextObj, options)
