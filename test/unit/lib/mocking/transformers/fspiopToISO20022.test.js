@@ -371,6 +371,24 @@ describe('fspiopToISO20022 Transformers', () => {
       expect(transformedCallback.body).toEqual({ transformed: 'body' });
     });
 
+    it('should transform POST /quotes headers and body', async () => {
+      const callbackOptions = {
+        method: 'post',
+        path: '/quotes/123',
+        headers: {
+          'content-type': 'application/vnd.interoperability.iso20022.quotes+json;version=2.0'
+        },
+        body: { partyId: '123' }
+      };
+
+      TransformFacades.FSPIOPISO20022.quotes.post.mockResolvedValue({ body: {transformed: 'body'} });
+
+      const transformedCallback = await reverseTransform(callbackOptions);
+
+      expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.quotes+json;version=2.0');
+      expect(transformedCallback.body).toEqual({ transformed: 'body' });
+    });
+
     it('should transform PUT /parties callback headers and body if contenty-type is in different case', async () => {
       const callbackOptions = {
         method: 'put',

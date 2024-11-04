@@ -64,7 +64,7 @@ class InboundEventListener {
   }
 
   setTransformer (transformerObj) {
-    this.transformer = transformerObj.transformer
+    this.transformer = transformerObj?.transformer || {}
   }
 
   addListener (clientName, method, path, conditionFn, timeout = 15000) {
@@ -109,9 +109,11 @@ class InboundEventListener {
               resolve(result)
             }).catch((err) => {
               this.customLog('Error transforming message: ' + err)
+              resolve(retMessage)
             })
+          } else {
+            resolve(retMessage)
           }
-          resolve(retMessage)
         } else {
           // Listen for the new message for some time
           let timer = null
@@ -130,7 +132,17 @@ class InboundEventListener {
           this.eventListeners[clientName].eventEmitter.once('newMessage', (message) => {
             clearTimeout(timer)
             this.destroy(clientName)
-            resolve(this.parseMessage(message))
+            const retMessage = this.parseMessage(message)
+            if (this.transformer.reverseTransform) {
+              this.transformer.reverseTransform(retMessage).then((result) => {
+                resolve(result)
+              }).catch((err) => {
+                this.customLog('Error transforming message: ' + err)
+                resolve(retMessage)
+              })
+            } else {
+              resolve(retMessage)
+            }
           })
         }
       }
