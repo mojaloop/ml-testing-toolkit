@@ -292,9 +292,17 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       contextObj = await context.generateContextObj(variableData.environment)
     }
 
+    // Get transformer if specified
+    if (contextObj.transformerObj && templateOptions?.transformerName) {
+      contextObj.transformerObj.transformer = Transformers.getTransformer(templateOptions.transformerName)
+      contextObj.transformerObj.transformerName = templateOptions.transformerName
+      // Currently no options are passed to the transformer in template level, we can add it later if needed
+    }
+
     // Send http request
     let status
     try {
+
       // Extra step to access request variables that consists of environment variables in scripts
       const tmpRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
       if (globalConfig.scriptExecution) {
@@ -324,22 +332,12 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         status = 'SKIPPED'
         await setSkippedResponse(convertedRequest, request, status, tracing, testCase, scriptsExecution, globalConfig)
       } else {
-        // Get transformer if specified
-        const transformerObj = {
-          transformer: null,
-          transformerName: null,
-          options: {}
+        // Replace transformer if it is specified in the request level
+        if (contextObj.transformerObj && contextObj.requestVariables && contextObj.requestVariables.TRANSFORM) {
+          contextObj.transformerObj.transformer = Transformers.getTransformer(contextObj.requestVariables.TRANSFORM.transformerName)
+          contextObj.transformerObj.transformerName = contextObj.requestVariables.TRANSFORM.transformerName
+          contextObj.transformerObj.options = contextObj.requestVariables.TRANSFORM.options
         }
-        if (contextObj.requestVariables && contextObj.requestVariables.TRANSFORM) {
-          transformerObj.transformer = Transformers.getTransformer(contextObj.requestVariables.TRANSFORM.transformerName)
-          transformerObj.transformerName = contextObj.requestVariables.TRANSFORM.transformerName
-          transformerObj.options = contextObj.requestVariables.TRANSFORM.options
-        } else if (templateOptions?.transformerName) {
-          transformerObj.transformer = Transformers.getTransformer(templateOptions.transformerName)
-          transformerObj.transformerName = templateOptions.transformerName
-          // Currently no options are passed to the transformer in template level, we can add it later if needed
-        }
-        contextObj.transformerObj = transformerObj
         const resp = await sendRequest(convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj)
         status = 'SUCCESS'
         await setResponse(convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig)
