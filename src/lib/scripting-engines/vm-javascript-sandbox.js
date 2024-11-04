@@ -127,6 +127,9 @@ const customWrapperFn = (requestVariables, consoleFn) => {
     },
     setTransformer: function (transformerName, options = {}) {
       consoleFn.log(`Setting transformer '${transformerName}' if exists...`)
+      if (!transformerName) {
+        requestVariables.TRANSFORM = undefined
+      }
       requestVariables.TRANSFORM = {
         transformerName,
         options
@@ -224,6 +227,11 @@ const executeAsync = async (script, data, contextObj) => {
   if (data.context.collectionVariables) {
     contextObj.collectionVariables = data.context.collectionVariables.reduce((rObj, item) => { rObj[item.key] = item.value; return rObj }, {})
   }
+
+  if (contextObj.transformerObj) {
+    contextObj.inboundEvent.setTransformer(contextObj.transformerObj)
+  }
+
   try {
     const options = { timeout: (contextObj.userConfig && contextObj.userConfig.SCRIPT_TIMEOUT) || 30000, microtaskMode: 'afterEvaluate' }
     await _runScript(fullScript, contextObj, options)

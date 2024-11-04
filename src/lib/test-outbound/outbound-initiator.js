@@ -327,16 +327,20 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         // Get transformer if specified
         const transformerObj = {
           transformer: null,
+          transformerName: null,
           options: {}
         }
         if (contextObj.requestVariables && contextObj.requestVariables.TRANSFORM) {
           transformerObj.transformer = Transformers.getTransformer(contextObj.requestVariables.TRANSFORM.transformerName)
+          transformerObj.transformerName = contextObj.requestVariables.TRANSFORM.transformerName
           transformerObj.options = contextObj.requestVariables.TRANSFORM.options
         } else if (templateOptions?.transformerName) {
           transformerObj.transformer = Transformers.getTransformer(templateOptions.transformerName)
+          transformerObj.transformerName = templateOptions.transformerName
           // Currently no options are passed to the transformer in template level, we can add it later if needed
         }
-        const resp = await sendRequest(convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj, transformerObj)
+        contextObj.transformerObj = transformerObj
+        const resp = await sendRequest(convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj)
         status = 'SUCCESS'
         await setResponse(convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig)
       }
@@ -592,7 +596,8 @@ const getUrlPrefix = (baseUrl) => {
   return returnUrl
 }
 
-const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj = {}, transformerObj) => {
+const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj = {}) => {
+  const transformerObj = contextObj.transformerObj
   const { url, method, path, queryParams, headers, body, params, ignoreCallbacks } = convertedRequest
   const baseUrl = url
   return new Promise((resolve, reject) => {
@@ -646,8 +651,8 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
 
       const transformedRequest = {}
 
-      if (transformerObj && transformerObj.transformer && transformerObj.transformer.requestTransform) {
-        const result = await transformerObj.transformer.requestTransform({ method, path, headers, body, params })
+      if (transformerObj && transformerObj.transformer && transformerObj.transformer.forwardTransform) {
+        const result = await transformerObj.transformer.forwardTransform({ method, path, headers, body, params })
         transformedRequest.body = result.body
         transformedRequest.headers = result.headers
       }
@@ -698,8 +703,8 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
           let callbackBody = _callbackBody
           let originalBody
           let originalHeaders
-          if (transformerObj && transformerObj.transformer && transformerObj.transformer.callbackTransform) {
-            const result = await transformerObj.transformer.callbackTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
+          if (transformerObj && transformerObj.transformer && transformerObj.transformer.reverseTransform) {
+            const result = await transformerObj.transformer.reverseTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
             originalBody = _callbackBody
             callbackBody = result.body
             originalHeaders = _callbackHeaders
@@ -716,8 +721,8 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
           let callbackBody = _callbackBody
           let originalBody
           let originalHeaders
-          if (transformerObj && transformerObj.transformer && transformerObj.transformer.callbackTransform) {
-            const result = await transformerObj.transformer.callbackTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
+          if (transformerObj && transformerObj.transformer && transformerObj.transformer.reverseTransform) {
+            const result = await transformerObj.transformer.reverseTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
             originalBody = _callbackBody
             callbackBody = result.body
             originalHeaders = _callbackHeaders

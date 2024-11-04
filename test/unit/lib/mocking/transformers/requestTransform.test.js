@@ -1,6 +1,6 @@
-const { requestTransform } = require('../../../../../src/lib/mocking/transformers/fspiopToISO20022')
+const { forwardTransform } = require('../../../../../src/lib/mocking/transformers/fspiopToISO20022')
 
-describe('requestTransform Tests with real transformLib -->', () => {
+describe('forwardTransform Tests with real transformLib -->', () => {
   it('should transform real PUT /quotes request', async () => {
     const requestOptions = {
       method: 'put',
@@ -38,7 +38,7 @@ describe('requestTransform Tests with real transformLib -->', () => {
       }
     };
 
-    const transformedRequest = await requestTransform(requestOptions);
+    const transformedRequest = await forwardTransform(requestOptions);
 
     expect(transformedRequest.headers['Content-Type']).toBe('application/vnd.interoperability.iso20022.quotes+json;version=2.0');
     expect(transformedRequest.body.GrpHdr).toBeTruthy();

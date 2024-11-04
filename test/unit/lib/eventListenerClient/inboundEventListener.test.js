@@ -101,6 +101,9 @@ describe('InboundEventListener', () => {
       eventListener = new InboundEventListener()
       await eventListener.init()
     })
+    beforeEach(() => {
+      eventListener.setTransformer(null)
+    })
     it('addListener and getMessage with mock event', async () => {
       eventListener.addListener('test1', 'post', '/quotes')
       eventCallbackFn({
@@ -141,6 +144,48 @@ describe('InboundEventListener', () => {
       })
       await expect(eventListener.getMessage('test2')).resolves.toBeTruthy()
     })
+    it('addListener and getMessage with transformation', async () => {
+      eventListener.addListener('test2', 'post', '/quotes', (headers, body) => {
+        return body.sampleBodyParam1 === 'value2'
+      })
+      eventCallbackFn({
+        method: 'post',
+        path: '/quotes',
+        headers: {
+          sampleHeader1: 'value2'
+        },
+        body: {
+          sampleBodyParam1: 'value2'
+        }
+      })
+      eventListener.setTransformer({
+        transformer: {
+          reverseTransform: async () => ({ data: 'transformed data' })
+        }
+      })
+      await expect(eventListener.getMessage('test2')).resolves.toEqual({ data: 'transformed data' })
+    })
+    it('addListener and getMessage with erroneous transformation', async () => {
+      eventListener.addListener('test2', 'post', '/quotes', (headers, body) => {
+        return body.sampleBodyParam1 === 'value2'
+      })
+      eventCallbackFn({
+        method: 'post',
+        path: '/quotes',
+        headers: {
+          sampleHeader1: 'value2'
+        },
+        body: {
+          sampleBodyParam1: 'value2'
+        }
+      })
+      eventListener.setTransformer({
+        transformer: {
+          reverseTransform: async () => { throw new Error('transform error') }
+        }
+      })
+      await expect(eventListener.getMessage('test2')).resolves.toBeTruthy()
+    })
     it('addListener and getMessage with mock event', async () => {
       eventListener.addListener('test2', 'post', '/quotes')
       setTimeout(() => {
@@ -155,6 +200,49 @@ describe('InboundEventListener', () => {
           }
         })
       }, 10)
+      await expect(eventListener.getMessage('test2')).resolves.toBeTruthy()
+    })
+    it('addListener and getMessage transformation with mock event', async () => {
+      eventListener.addListener('test2', 'post', '/quotes')
+      setTimeout(() => {
+        eventCallbackFn({
+          method: 'post',
+          path: '/quotes',
+          headers: {
+            sampleHeader1: 'value1'
+          },
+          body: {
+            sampleBodyParam1: 'value1'
+          }
+        })
+      }, 10)
+      eventListener.setTransformer({
+        transformer: {
+          reverseTransform: async () => ({ data: 'transformed data' })
+        }
+      })
+      await expect(eventListener.getMessage('test2')).resolves.toEqual({ data: 'transformed data' })
+    })
+
+    it('addListener and getMessage transformation with mock event', async () => {
+      eventListener.addListener('test2', 'post', '/quotes')
+      setTimeout(() => {
+        eventCallbackFn({
+          method: 'post',
+          path: '/quotes',
+          headers: {
+            sampleHeader1: 'value1'
+          },
+          body: {
+            sampleBodyParam1: 'value1'
+          }
+        })
+      }, 10)
+      eventListener.setTransformer({
+        transformer: {
+          reverseTransform: async () => { throw new Error('transform error') }
+        }
+      })
       await expect(eventListener.getMessage('test2')).resolves.toBeTruthy()
     })
     it('addListener and getMessage with wrong event till timeout', async () => {
