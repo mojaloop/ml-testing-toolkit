@@ -302,7 +302,6 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
     // Send http request
     let status
     try {
-
       // Extra step to access request variables that consists of environment variables in scripts
       const tmpRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
       if (globalConfig.scriptExecution) {
