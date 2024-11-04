@@ -532,11 +532,23 @@ const executePostRequestScript = async (convertedRequest, resp, scriptsExecution
   }
 }
 
-const handleTests = async (request, response = null, callback = null, environment = {}, backgroundData = {}, requestVariables = {}) => {
+const handleTests = async (inRequest, response = null, callback = null, environment = {}, backgroundData = {}, requestVariables = {}) => {
   try {
     const results = {}
     let passedCount = 0
     let isFailed = false
+    // Change headers to lower case
+    const newRequestHeaders = {}
+    if (inRequest.headers) {
+      for (const k in inRequest.headers) {
+        newRequestHeaders[k.toLowerCase()] = inRequest.headers[k]
+      }
+    }
+    const request = {
+      ...inRequest,
+      headers: newRequestHeaders
+    }
+
     if (request.tests && request.tests.assertions.length > 0) {
       for (const k in request.tests.assertions) {
         const testCase = request.tests.assertions[k]
