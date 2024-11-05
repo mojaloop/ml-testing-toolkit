@@ -198,7 +198,6 @@ const _transform = async (options, isReverse = false) => {
         break
       }
       case 'patch': {
-        let isError = false
         if (options.path.startsWith('/transfers')) {
           return await _transformPatchResource('transfers', options, isReverse)
         } else if (options.path.startsWith('/fxTransfers')) {
