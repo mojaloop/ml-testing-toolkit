@@ -117,14 +117,14 @@ const handleTransferIlp = (context, response) => {
   const pathMatch = /\/transfers\/([^/]+)$/
   if (context.request.method === 'post' && response.method === 'put' && pathMatch.test(response.path)) {
     if (response.eventInfo && response.eventInfo.params && response.eventInfo.params.body &&
-      response.eventInfo.params.body.fulfilment) {
+      (response.eventInfo.params.body.fulfilment || response.eventInfo.params.body.TxInfAndSts.ExctnConf)) {
       return null
     }
     if (context.request.body.ilpPacket) {
       const generatedFulfilment = ilpObj.calculateFulfil(context.request.body.ilpPacket).replace('"', '')
       response.body.fulfilment = generatedFulfilment
     }
-    if (context.request.body.CdtTrfTxInf) {
+    if (context.request.body.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket) {
       const generatedFulfilment = ilpV4Obj.calculateFulfil(context.request.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
       response.body.TxInfAndSts.ExctnConf = generatedFulfilment
     }
