@@ -50,13 +50,13 @@ const headersToLowerCase = (headers) => Object.fromEntries(
 
 const urlToPath = (url) => {
   try {
-    const parsedUrl = new URL(url);
+    const parsedUrl = new URL(url)
     // Combine the hostname and path, replacing '/' with the platform-specific separator
-    const path = parsedUrl.pathname.replace(/\//g, '/');
-    return path; // Remove leading separator if present
+    const path = parsedUrl.pathname.replace(/\//g, '/')
+    return path // Remove leading separator if present
   } catch (error) {
-    console.error("Invalid URL:", error);
-    return null;
+    console.error('Invalid URL:', error)
+    return null
   }
 }
 
