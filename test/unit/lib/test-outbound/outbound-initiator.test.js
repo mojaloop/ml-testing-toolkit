@@ -1320,7 +1320,7 @@ describe('Outbound Initiator Functions', () => {
           ]
         }
       }
-      const testResult = await OutboundInitiator.handleTests(sampleRequest, sampleResponse)
+      const testResult = await OutboundInitiator.handleTests(sampleRequest, null, sampleResponse)
       expect(testResult.passedCount).toEqual(1)
     })
     it('handleTests should execute test cases about callback and return results', async () => {
@@ -1341,7 +1341,7 @@ describe('Outbound Initiator Functions', () => {
           ]
         }
       }
-      const testResult = await OutboundInitiator.handleTests(sampleRequest, null, sampleCallback)
+      const testResult = await OutboundInitiator.handleTests(sampleRequest, null, null, sampleCallback)
       expect(testResult.passedCount).toEqual(1)
     })
     
