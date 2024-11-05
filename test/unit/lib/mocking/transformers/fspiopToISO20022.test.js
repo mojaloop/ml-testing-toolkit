@@ -330,6 +330,46 @@ describe('fspiopToISO20022 Transformers', () => {
       expect(transformedRequest.body).toEqual({ transformed: 'body' });
     })
 
+    it('should transform PATCH /transfer request headers and body', async () => {
+      const requestOptions = {
+        method: 'patch',
+        path: '/transfers/123',
+        headers: {
+          accept: 'application/vnd.interoperability.transfers+json;version=2.0',
+          'content-type': 'application/vnd.interoperability.transfers+json;version=2.0'
+        },
+        body: { transferId: '123' }
+      };
+
+      TransformFacades.FSPIOP.transfers.patch.mockResolvedValue({ body: {transformed: 'body'} });
+
+      const transformedRequest = await forwardTransform(requestOptions);
+
+      expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.transfers+json;version=2.0');
+      expect(transformedRequest.headers['content-type']).toBe('application/vnd.interoperability.iso20022.transfers+json;version=2.0');
+      expect(transformedRequest.body).toEqual({ transformed: 'body' });
+    })
+
+    it('should transform PATCH /fxTransfers request headers and body', async () => {
+      const requestOptions = {
+        method: 'patch',
+        path: '/fxTransfers/123',
+        headers: {
+          accept: 'application/vnd.interoperability.fxTransfers+json;version=2.0',
+          'content-type': 'application/vnd.interoperability.fxTransfers+json;version=2.0'
+        },
+        body: { conversionRequestId: '123' }
+      };
+
+      TransformFacades.FSPIOP.fxTransfers.patch.mockResolvedValue({ body: {transformed: 'body'} });
+
+      const transformedRequest = await forwardTransform(requestOptions);
+
+      expect(transformedRequest.headers.accept).toBe('application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0');
+      expect(transformedRequest.headers['content-type']).toBe('application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0');
+      expect(transformedRequest.body).toEqual({ transformed: 'body' });
+    })
+
     it('should transform PUT /quotes/{ID}/error request headers and body', async () => {
       const requestOptions = {
         method: 'put',
@@ -509,6 +549,42 @@ describe('fspiopToISO20022 Transformers', () => {
       const transformedCallback = await reverseTransform(callbackOptions);
 
       expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.transfers+json;version=2.0');
+      expect(transformedCallback.body).toEqual({ transformed: 'body' });
+    });
+
+    it('should transform PATCH /transfers callback headers and body', async () => {
+      const callbackOptions = {
+        method: 'patch',
+        path: '/transfers/123',
+        headers: {
+          'content-type': 'application/vnd.interoperability.iso20022.transfers+json;version=2.0'
+        },
+        body: { quoteId: '123' }
+      };
+
+      TransformFacades.FSPIOPISO20022.transfers.patch.mockResolvedValue({ body: {transformed: 'body'} });
+
+      const transformedCallback = await reverseTransform(callbackOptions);
+
+      expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.transfers+json;version=2.0');
+      expect(transformedCallback.body).toEqual({ transformed: 'body' });
+    });
+
+    it('should transform PATCH /fxTransfers callback headers and body', async () => {
+      const callbackOptions = {
+        method: 'patch',
+        path: '/fxTransfers/123',
+        headers: {
+          'content-type': 'application/vnd.interoperability.iso20022.fxTransfers+json;version=2.0'
+        },
+        body: { quoteId: '123' }
+      };
+
+      TransformFacades.FSPIOPISO20022.fxTransfers.patch.mockResolvedValue({ body: {transformed: 'body'} });
+
+      const transformedCallback = await reverseTransform(callbackOptions);
+
+      expect(transformedCallback.headers['content-type']).toBe('application/vnd.interoperability.fxTransfers+json;version=2.0');
       expect(transformedCallback.body).toEqual({ transformed: 'body' });
     });
 

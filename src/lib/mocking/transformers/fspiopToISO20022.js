@@ -101,6 +101,32 @@ const _transformPutResource = async (resource, options, isError, isReverse) => {
   }
 }
 
+const _transformPatchResource = async (resource, options, isReverse) => {
+  const headers = _replaceHeaders(options.headers, isReverse)
+  let result
+  if (isReverse) {
+    TransformFacades.FSPIOPISO20022.configure({ isTestingMode: true, logger: customLogger })
+    result = await TransformFacades.FSPIOPISO20022[resource].patch({
+      body: options.body,
+      headers: headersToLowerCase(headers),
+      params: options.params
+    })
+  } else {
+    TransformFacades.FSPIOP.configure({ isTestingMode: true, logger: customLogger })
+    result = await TransformFacades.FSPIOP[resource].patch({
+      body: options.body,
+      headers: headersToLowerCase(headers),
+      params: options.params
+    })
+  }
+
+  return {
+    ...options,
+    headers,
+    body: result?.body
+  }
+}
+
 const _transform = async (options, isReverse = false) => {
   if (isReverse) {
     if (!getHeader(options.headers, 'content-type')?.startsWith('application/vnd.interoperability.iso20022.')) {
@@ -168,6 +194,15 @@ const _transform = async (options, isReverse = false) => {
             ...options,
             headers
           }
+        }
+        break
+      }
+      case 'patch': {
+        let isError = false
+        if (options.path.startsWith('/transfers')) {
+          return await _transformPatchResource('transfers', options, isReverse)
+        } else if (options.path.startsWith('/fxTransfers')) {
+          return await _transformPatchResource('fxTransfers', options, isReverse)
         }
         break
       }
