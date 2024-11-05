@@ -33,22 +33,15 @@ const Config = require('../config')
 const httpAgentStore = require('../httpAgentStore')
 const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 const customLogger = require('../requestLogger')
+const { getHeader, urlToPath } = require('../utils')
 
-const registerAxiosRequestInterceptor = (userConfig, axios) => {
-  axios.interceptors.request.use(config => {
+const registerAxiosRequestInterceptor = (userConfig, axios, transformerObj) => {
+  axios.interceptors.request.use(async config => {
     const options = { rejectUnauthorized: false }
     // Log the request
     const uniqueId = UniqueIdGenerator.generateUniqueId()
     config.uniqueId = uniqueId
-    const reqObject = {
-      method: config.method,
-      url: config.url,
-      path: config.url,
-      headers: config.headers,
-      data: config.body
-    }
-    config.reqObject = reqObject
-    customLogger.logOutboundRequest('info', 'Request: ' + reqObject.method + ' ' + reqObject.url, { additionalData: { request: reqObject }, request: reqObject, uniqueId })
+
     // get the httpsAgent before the request is sent
     const urlObject = new URL(config.url)
     if (userConfig.CLIENT_MUTUAL_TLS_ENABLED) {
@@ -68,6 +61,21 @@ const registerAxiosRequestInterceptor = (userConfig, axios) => {
         config.httpAgent = httpAgentStore.getHttpAgent('generic')
       }
     }
+    if (transformerObj && transformerObj.transformer && transformerObj.transformer.forwardTransform) {
+      const result = await transformerObj.transformer.forwardTransform({ method: config.method, path: urlToPath(config.url), headers: config.headers, body: config.data, params: {} })
+      delete getHeader(config.headers, 'content-length')
+      config.data = result.body
+      config.headers = result.headers
+    }
+    const reqObject = {
+      method: config.method,
+      url: config.url,
+      path: config.url,
+      headers: config.headers,
+      data: config.body
+    }
+    config.reqObject = reqObject
+    customLogger.logOutboundRequest('info', 'Request: ' + reqObject.method + ' ' + reqObject.url, { additionalData: { request: reqObject }, request: reqObject, uniqueId })
     return config
   })
   axios.interceptors.response.use(res => {
@@ -186,8 +194,13 @@ const generateContextObj = async (environmentObj = {}) => {
 
   const userConfig = await Config.getStoredUserConfig()
 
+  const transformerObj = {
+    transformer: null,
+    transformerName: null,
+    options: {}
+  }
   const axios = axiosModule.create()
-  registerAxiosRequestInterceptor(userConfig, axios)
+  registerAxiosRequestInterceptor(userConfig, axios, transformerObj)
 
   const contextObj = {
     ctx: {
@@ -205,7 +218,8 @@ const generateContextObj = async (environmentObj = {}) => {
     console: consoleFn,
     custom: customFn,
     consoleOutObj,
-    userConfig
+    userConfig,
+    transformerObj
   }
   return contextObj
 }

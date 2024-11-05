@@ -23,6 +23,7 @@
  ******/
 
 const { TransformFacades } = require('@mojaloop/ml-schema-transformer-lib')
+const { getHeader, headersToLowerCase } = require('../../utils')
 const customLogger = require('../../requestLogger')
 
 const _replaceAcceptOrContentTypeHeader = (inputStr, isReverse) => {
@@ -74,10 +75,6 @@ const _transformPostResource = async (resource, options, isReverse) => {
   }
 }
 
-const headersToLowerCase = (headers) => Object.fromEntries(
-  Object.entries(headers).map(([k, v]) => [k.toLowerCase(), v])
-)
-
 const _transformPutResource = async (resource, options, isError, isReverse) => {
   const headers = _replaceHeaders(options.headers, isReverse)
   let result
@@ -104,19 +101,13 @@ const _transformPutResource = async (resource, options, isError, isReverse) => {
   }
 }
 
-const _getHeader = (headers, name) => {
-  return Object.entries(headers).find(
-    ([key]) => key.toLowerCase() === name.toLowerCase()
-  )?.[1]
-}
-
 const _transform = async (options, isReverse = false) => {
   if (isReverse) {
-    if (!_getHeader(options.headers, 'content-type')?.startsWith('application/vnd.interoperability.iso20022.')) {
+    if (!getHeader(options.headers, 'content-type')?.startsWith('application/vnd.interoperability.iso20022.')) {
       return options
     }
   } else {
-    if (!_getHeader(options.headers, 'content-type')?.startsWith('application/vnd.interoperability.')) {
+    if (!getHeader(options.headers, 'content-type')?.startsWith('application/vnd.interoperability.')) {
       return options
     }
   }

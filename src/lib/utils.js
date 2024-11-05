@@ -38,6 +38,28 @@ const readRecursiveAsync = promisify(files)
 const rmdirAsync = promisify(fs.rmdir)
 const mvAsync = promisify(mv)
 
+const getHeader = (headers, name) => {
+  return Object.entries(headers).find(
+    ([key]) => key.toLowerCase() === name.toLowerCase()
+  )?.[1]
+}
+
+const headersToLowerCase = (headers) => Object.fromEntries(
+  Object.entries(headers).map(([k, v]) => [k.toLowerCase(), v])
+)
+
+const urlToPath = (url) => {
+  try {
+    const parsedUrl = new URL(url)
+    // Combine the hostname and path, replacing '/' with the platform-specific separator
+    const path = parsedUrl.pathname.replace(/\//g, '/')
+    return path // Remove leading separator if present
+  } catch (error) {
+    console.error('Invalid URL:', error)
+    return null
+  }
+}
+
 module.exports = {
   readFileAsync,
   writeFileAsync,
@@ -49,5 +71,8 @@ module.exports = {
   fileStatAsync,
   readRecursiveAsync,
   rmdirAsync,
-  mvAsync
+  mvAsync,
+  getHeader,
+  headersToLowerCase,
+  urlToPath
 }
