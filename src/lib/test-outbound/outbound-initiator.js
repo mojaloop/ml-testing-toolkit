@@ -30,7 +30,7 @@ const https = require('https')
 const Config = require('../config')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
-const { readFileAsync } = require('../utils')
+const { readFileAsync, headersToLowerCase } = require('../utils')
 const expectOriginal = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
 const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
@@ -316,6 +316,9 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       convertedRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
       convertedRequest = replaceRequestLevelEnvironmentVariables(convertedRequest, contextObj.requestVariables)
 
+      // Change header names to lower case
+      convertedRequest.headers = headersToLowerCase(convertedRequest.headers)
+
       let successCallbackUrl = null
       let errorCallbackUrl = null
       if (request.apiVersion.asynchronous === true) {
@@ -391,7 +394,7 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
 
   let testResult = null
   if (globalConfig.testsExecution) {
-    testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
+    testResult = await handleTests(convertedRequest, resp.requestSent, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
   }
   request.appended = {
     status,
@@ -530,7 +533,7 @@ const executePostRequestScript = async (convertedRequest, resp, scriptsExecution
   }
 }
 
-const handleTests = async (request, response = null, callback = null, environment = {}, backgroundData = {}, requestVariables = {}) => {
+const handleTests = async (request, requestSent, response = null, callback = null, environment = {}, backgroundData = {}, requestVariables = {}) => {
   try {
     const results = {}
     let passedCount = 0
@@ -684,6 +687,14 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
         }
       }
 
+      const requestSent = {
+        url: reqOpts.url,
+        method: reqOpts.method,
+        path: reqOpts.path,
+        headers: reqOpts.headers,
+        body: reqOpts.data
+      }
+
       let syncResponse = {}
       let curlRequest = ''
       let timer = null
@@ -709,7 +720,7 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
             callbackHeaders = result.headers
           }
           customLogger.logMessage('info', 'Received success callback ' + successCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          return resolve({ curlRequest, transformedRequest, syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody, originalHeaders, originalBody } })
+          return resolve({ curlRequest, requestSent, transformedRequest, syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody, originalHeaders, originalBody } })
         })
         // Listen for error callback
         MyEventEmitter.getEmitter('testOutbound', user).once(errorCallbackUrl, async (_callbackHeaders, _callbackBody, _callbackMethod, _callbackPath) => {
@@ -727,7 +738,7 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
             callbackHeaders = result.headers
           }
           customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          return reject(new Error(JSON.stringify({ curlRequest, transformedRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody, originalHeaders, originalBody } })))
+          return reject(new Error(JSON.stringify({ curlRequest, requestSent, transformedRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody, originalHeaders, originalBody } })))
         })
       }
 
@@ -749,13 +760,13 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
             MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
             MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
           }
-          return reject(new Error(JSON.stringify({ curlRequest, transformedRequest, syncResponse })))
+          return reject(new Error(JSON.stringify({ curlRequest, requestSent, transformedRequest, syncResponse })))
         } else {
           customLogger.logOutboundRequest('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: { response: result }, user, uniqueId, request: reqOpts })
         }
 
         if (!successCallbackUrl || !errorCallbackUrl || ignoreCallbacks) {
-          return resolve({ curlRequest, transformedRequest, syncResponse })
+          return resolve({ curlRequest, requestSent, transformedRequest, syncResponse })
         }
         customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user })
       }, (err) => {

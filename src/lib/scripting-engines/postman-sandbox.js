@@ -48,9 +48,15 @@ const generateContextObj = async (environment = {}) => {
     // log the error in postman sandbox
     console.log(cursor, err)
   })
+  const transformerObj = {
+    transformer: null,
+    transformerName: null,
+    options: {}
+  }
   const contextObj = {
     ctx,
-    environment
+    environment,
+    transformerObj
   }
   return contextObj
 }

@@ -41,15 +41,7 @@ const registerAxiosRequestInterceptor = (userConfig, axios, transformerObj) => {
     // Log the request
     const uniqueId = UniqueIdGenerator.generateUniqueId()
     config.uniqueId = uniqueId
-    const reqObject = {
-      method: config.method,
-      url: config.url,
-      path: config.url,
-      headers: config.headers,
-      data: config.body
-    }
-    config.reqObject = reqObject
-    customLogger.logOutboundRequest('info', 'Request: ' + reqObject.method + ' ' + reqObject.url, { additionalData: { request: reqObject }, request: reqObject, uniqueId })
+
     // get the httpsAgent before the request is sent
     const urlObject = new URL(config.url)
     if (userConfig.CLIENT_MUTUAL_TLS_ENABLED) {
@@ -75,6 +67,15 @@ const registerAxiosRequestInterceptor = (userConfig, axios, transformerObj) => {
       config.data = result.body
       config.headers = result.headers
     }
+    const reqObject = {
+      method: config.method,
+      url: config.url,
+      path: config.url,
+      headers: config.headers,
+      data: config.body
+    }
+    config.reqObject = reqObject
+    customLogger.logOutboundRequest('info', 'Request: ' + reqObject.method + ' ' + reqObject.url, { additionalData: { request: reqObject }, request: reqObject, uniqueId })
     return config
   })
   axios.interceptors.response.use(res => {
