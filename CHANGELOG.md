@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.4.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.4.2...v18.4.3) (2024-11-06)
+
+
+### Bug Fixes
+
+* ilp regresssion ([#278](https://github.com/mojaloop/ml-testing-toolkit/issues/278)) ([5048060](https://github.com/mojaloop/ml-testing-toolkit/commit/5048060084bb0b2198a8bc6c4026d73dac330894))
+
 ### [18.4.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.4.1...v18.4.2) (2024-11-05)
 
 
