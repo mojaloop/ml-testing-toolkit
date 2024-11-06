@@ -116,8 +116,13 @@ const handleTransferIlp = (context, response) => {
   // Check whether the request is POST /transfers
   const pathMatch = /\/transfers\/([^/]+)$/
   if (context.request.method === 'post' && response.method === 'put' && pathMatch.test(response.path)) {
-    if (response.eventInfo && response.eventInfo.params && response.eventInfo.params.body &&
-      (response.eventInfo.params.body.fulfilment || response.eventInfo.params.body.TxInfAndSts.ExctnConf)) {
+    if (
+      response.eventInfo && response.eventInfo.params && response.eventInfo.params.body &&
+      (
+        response.eventInfo.params.body.fulfilment ||
+        (response.eventInfo.params.body.TxInfAndSts && response.eventInfo.params.body.TxInfAndSts.ExctnConf)
+      )
+    ) {
       return null
     }
     if (context.request.body.ilpPacket) {
