@@ -53,6 +53,9 @@ const initServer = () => {
   app.use(cookieParser())
   OAuthHelper.handleMiddleware()
 
+  // Metrics
+  app.use(require('./metrics')())
+
   const verifyUserMiddleware = verifyUser()
   // For admin API
   app.use('/api/rules', verifyUserMiddleware, require('./api-routes/rules'))

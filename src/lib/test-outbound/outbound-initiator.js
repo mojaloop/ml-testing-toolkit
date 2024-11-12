@@ -66,7 +66,13 @@ const getTracing = (traceID, dfspId) => {
   return tracing
 }
 
-const OutboundSend = async (inputTemplate, traceID, dfspId, sync = false) => {
+const OutboundSend = async (
+  inputTemplate,
+  traceID,
+  dfspId,
+  sync = false,
+  metrics
+) => {
   const totalCounts = getTotalCounts(inputTemplate)
   const globalConfig = {
     broadcastOutboundProgressEnabled: true,
@@ -93,7 +99,17 @@ const OutboundSend = async (inputTemplate, traceID, dfspId, sync = false) => {
   try {
     for (const i in inputTemplate.test_cases) {
       globalConfig.totalProgress.testCasesProcessed++
-      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, variableData, dfspId, globalConfig, inputTemplate.options)
+      await processTestCase(
+        inputTemplate.test_cases[i],
+        traceID,
+        inputTemplate.inputValues,
+        variableData,
+        dfspId,
+        globalConfig,
+        inputTemplate.options,
+        metrics,
+        inputTemplate.name
+      )
     }
 
     const completedTimeStamp = new Date()
@@ -111,10 +127,10 @@ const OutboundSend = async (inputTemplate, traceID, dfspId, sync = false) => {
       totalPassedAssertions: 0
     }
     if (sync) {
-      return generateFinalReport(inputTemplate, runtimeInformation)
+      return generateFinalReport(inputTemplate, runtimeInformation, metrics)
     }
     if (tracing.outboundID) {
-      const totalResult = generateFinalReport(inputTemplate, runtimeInformation)
+      const totalResult = generateFinalReport(inputTemplate, runtimeInformation, metrics)
       if (Config.getSystemConfig().HOSTING_ENABLED) {
         dbAdapter.upsert('reports', totalResult, { dfspId })
       }
@@ -146,7 +162,7 @@ const OutboundSend = async (inputTemplate, traceID, dfspId, sync = false) => {
   }
 }
 
-const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
+const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metrics) => {
   const totalCounts = getTotalCounts(inputTemplate)
 
   const globalConfig = {
@@ -178,7 +194,17 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
       const tmpTemplate = JSON.parse(JSON.stringify(inputTemplate))
       // Execute all the test cases in the template
       for (const i in tmpTemplate.test_cases) {
-        await processTestCase(tmpTemplate.test_cases[i], traceID, tmpTemplate.inputValues, environmentVariables, dfspId, globalConfig, tmpTemplate.options)
+        await processTestCase(
+          tmpTemplate.test_cases[i],
+          traceID,
+          tmpTemplate.inputValues,
+          environmentVariables,
+          dfspId,
+          globalConfig,
+          tmpTemplate.options,
+          metrics,
+          tmpTemplate.name
+        )
       }
       const completedTimeStamp = new Date()
       const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
@@ -192,7 +218,7 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
         totalPassedAssertions: 0
       }
       // TODO: This can be optimized by storing only results into the iterations array
-      totalReport.iterations.push(generateFinalReport(tmpTemplate, runtimeInformation))
+      totalReport.iterations.push(generateFinalReport(tmpTemplate, runtimeInformation, metrics))
       notificationEmitter.broadcastOutboundProgress({
         status: 'ITERATION_PROGRESS',
         outboundID: tracing.outboundID,
@@ -224,7 +250,17 @@ const terminateOutbound = (traceID) => {
   terminateTraceIds[traceID] = true
 }
 
-const processTestCase = async (testCase, traceID, inputValues, variableData, dfspId, globalConfig, templateOptions = {}) => {
+const processTestCase = async (
+  testCase,
+  traceID,
+  inputValues,
+  variableData,
+  dfspId,
+  globalConfig,
+  templateOptions = {},
+  metrics,
+  templateName
+) => {
   const tracing = getTracing(traceID)
 
   // Load the requests array into an object by the request id to access a particular object faster
@@ -316,7 +352,7 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       convertedRequest = replaceRequestLevelEnvironmentVariables(convertedRequest, contextObj.requestVariables)
 
       // Change header names to lower case
-      convertedRequest.headers = headersToLowerCase(convertedRequest.headers)
+      convertedRequest.headers = headersToLowerCase(convertedRequest.headers || {})
 
       let successCallbackUrl = null
       let errorCallbackUrl = null
@@ -342,7 +378,20 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         }
         const resp = await sendRequest(convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj)
         status = 'SUCCESS'
-        await setResponse(convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig)
+        await setResponse(
+          convertedRequest,
+          resp,
+          variableData,
+          request,
+          status,
+          tracing,
+          testCase,
+          scriptsExecution,
+          contextObj,
+          globalConfig,
+          metrics,
+          templateName
+        )
       }
     } catch (err) {
       let resp
@@ -352,7 +401,19 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         resp = err.message
       }
       status = 'ERROR'
-      await setResponse(convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig)
+      await setResponse(convertedRequest,
+        resp,
+        variableData,
+        request,
+        status,
+        tracing,
+        testCase,
+        scriptsExecution,
+        contextObj,
+        globalConfig,
+        metrics,
+        templateName
+      )
     } finally {
       if (request.appended?.testResult?.isFailed) {
         if (templateOptions.breakOnError) {
@@ -378,7 +439,20 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
   // Set a timeout if the response callback is not received in a particular time
 }
 
-const setResponse = async (convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig) => {
+const setResponse = async (
+  convertedRequest,
+  resp,
+  variableData,
+  request,
+  status,
+  tracing,
+  testCase,
+  scriptsExecution,
+  contextObj,
+  globalConfig,
+  metrics,
+  templateName
+) => {
   // Get the requestsHistory and callbacksHistory from the arrayStore
   const requestsHistoryObj = arrayStore.get('requestsHistory')
   const callbacksHistoryObj = arrayStore.get('callbacksHistory')
@@ -411,7 +485,11 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
   globalConfig.totalProgress.requestsProcessed++
   globalConfig.totalProgress.assertionsProcessed += request.tests && request.tests.assertions ? request.tests.assertions.length : 0
   globalConfig.totalProgress.assertionsPassed += testResult.passedCount
-  globalConfig.totalProgress.assertionsFailed += request.tests && request.tests.assertions ? (request.tests.assertions.length - testResult.passedCount) : 0
+  const failed = request.tests && request.tests.assertions ? (request.tests.assertions.length - testResult.passedCount) : 0
+  globalConfig.totalProgress.assertionsFailed += failed
+  const tags = { job: templateName, test: testCase.name }
+  metrics?.assertSuccess.add(testResult.passedCount, tags)
+  metrics?.assertFail.add(failed, tags)
 
   if (tracing.outboundID && globalConfig.broadcastOutboundProgressEnabled) {
     notificationEmitter.broadcastOutboundProgress({
@@ -922,7 +1000,7 @@ const getTotalCounts = (inputTemplate) => {
 }
 
 // Generate consolidated final report
-const generateFinalReport = (inputTemplate, runtimeInformation) => {
+const generateFinalReport = (inputTemplate, runtimeInformation, metrics) => {
   const { test_cases, ...remaingPropsInTemplate } = inputTemplate  // eslint-disable-line
   const resultTestCases = test_cases.map(testCase => { // eslint-disable-line
     const { requests, ...remainingPropsInTestCase } = testCase
@@ -949,6 +1027,7 @@ const generateFinalReport = (inputTemplate, runtimeInformation) => {
       requests: resultRequests
     }
   })
+  if (runtimeInformation.totalPassedAssertions === runtimeInformation.totalAssertions) { metrics?.testSuccess.add(1, { job: inputTemplate.name }) } else { metrics?.testFail.add(1, { job: inputTemplate.name }) }
   return {
     ...remaingPropsInTemplate,
     test_cases: resultTestCases,
