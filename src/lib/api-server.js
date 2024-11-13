@@ -54,7 +54,7 @@ const initServer = () => {
   OAuthHelper.handleMiddleware()
 
   // Metrics
-  app.use(require('./metrics')())
+  app.use(require('./metrics')(Config.getSystemConfig().METRICS))
 
   const verifyUserMiddleware = verifyUser()
   // For admin API
