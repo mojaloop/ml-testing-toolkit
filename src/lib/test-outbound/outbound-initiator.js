@@ -1027,7 +1027,11 @@ const generateFinalReport = (inputTemplate, runtimeInformation, metrics) => {
       requests: resultRequests
     }
   })
-  if (runtimeInformation.totalPassedAssertions === runtimeInformation.totalAssertions) { metrics?.testSuccess.add(1, { job: inputTemplate.name }) } else { metrics?.testFail.add(1, { job: inputTemplate.name }) }
+  if (runtimeInformation.totalPassedAssertions === runtimeInformation.totalAssertions) {
+    metrics?.testSuccess.add(1, { job: inputTemplate.name })
+  } else {
+    metrics?.testFail.add(1, { job: inputTemplate.name })
+  }
   return {
     ...remaingPropsInTemplate,
     test_cases: resultTestCases,
