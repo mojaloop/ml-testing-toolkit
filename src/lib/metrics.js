@@ -1,12 +1,8 @@
 const Metrics = require('@mojaloop/central-services-metrics')
 
-module.exports = function metricsMiddleware (config = {}) {
+module.exports = function metricsMiddleware (config) {
   Metrics.getDefaultRegister().clear()
-  Metrics.setup({
-    timeout: 5000,
-    defaultLabels: {},
-    ...config
-  })
+  Metrics.setup(config)
 
   const client = Metrics.getClient()
   const assertSuccess = new client.Counter({
