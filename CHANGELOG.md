@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+## [18.5.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.4.3...v18.5.0) (2024-11-14)
+
+
+### Features
+
+* add metrics middleware and integrate with outbound send ([#279](https://github.com/mojaloop/ml-testing-toolkit/issues/279)) ([af581cd](https://github.com/mojaloop/ml-testing-toolkit/commit/af581cdab7e1c77d318abef09583b3d7afa47933))
+
 ### [18.4.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.4.2...v18.4.3) (2024-11-06)
 
 
