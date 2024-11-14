@@ -47,6 +47,7 @@ const SpySign = jest.spyOn(JwsSigning, 'sign')
 const SpyJwsSignWithKey = jest.spyOn(JwsSigning, 'signWithKey')
 const SpyGetApiDefinitions = jest.spyOn(OpenApiDefinitionsModel, 'getApiDefinitions')
 const spyDbAdapterUpsertReport = jest.spyOn(dbAdapter, 'upsertReport')
+const SpyAxios = jest.spyOn(axios.default, 'create')
 
 jest.mock('../../../../src/lib/notificationEmitter.js')
 jest.mock('axios')
@@ -531,7 +532,7 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      
+
       try {
         const testRequestObj = {
           url: 'localhost/',
@@ -594,7 +595,7 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      
+
       try{
         const testRequestObj = {
           url: 'localhost/',
@@ -658,7 +659,7 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      
+
       try {
         const testRequestObj = {
           url: 'localhost/',
@@ -720,7 +721,7 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      
+
       try {
         const testRequestObj = {
           url: 'localhost/',
@@ -787,7 +788,7 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      
+
       try {
         const testRequestObj = {
           url: 'localhost/',
@@ -1094,7 +1095,7 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      
+
       try {
         const testRequestObj = {
           url: 'localhost/',
@@ -1161,7 +1162,7 @@ describe('Outbound Initiator Functions', () => {
           }
         }
       }
-      
+
       try {
         const testRequestObj = {
           url: 'localhost/',
@@ -1232,7 +1233,7 @@ describe('Outbound Initiator Functions', () => {
 
       expect(result.test_cases[0].requests[0]).toHaveProperty('name')
       expect(result.test_cases[0].requests[0]).toHaveProperty('request')
-      expect(result.test_cases[0].requests[0].name).toEqual('request1') 
+      expect(result.test_cases[0].requests[0].name).toEqual('request1')
 
       expect(result.test_cases[0].requests[0].request).toHaveProperty('tests')
       expect(result.test_cases[0].requests[0].request.tests).toHaveProperty('assertions')
@@ -1344,7 +1345,7 @@ describe('Outbound Initiator Functions', () => {
       const testResult = await OutboundInitiator.handleTests(sampleRequest, null, null, sampleCallback)
       expect(testResult.passedCount).toEqual(1)
     })
-    
+
     // Negative Scenarios
     it('handleTests test cases should be failed about request and return status as FAILED', async () => {
       const sampleRequest = {
@@ -1566,7 +1567,7 @@ describe('Outbound Initiator Functions', () => {
         specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
         type: 'fspiop'
       }])
-      await expect(OutboundInitiator.OutboundSend(sampleTemplate)).resolves.not.toBeNull
+      await expect(OutboundInitiator.OutboundSend(sampleTemplate)).resolves.not.toBeNull()
     })
     it('OutboundSend with postman script should not throw any error', async () => {
       axios.mockImplementation(() => Promise.resolve({
@@ -1582,7 +1583,7 @@ describe('Outbound Initiator Functions', () => {
         type: 'fspiop'
       }])
       sampleTemplate.test_cases[0].requests[0].scriptingEngine = 'postmanscript'
-      await expect(OutboundInitiator.OutboundSend(sampleTemplate, '123')).resolves.not.toBeNull
+      await expect(OutboundInitiator.OutboundSend(sampleTemplate, '123')).resolves.not.toBeNull()
     })
     it('OutboundSend with traceID 123', async () => {
       axios.mockImplementation(() => Promise.resolve({
@@ -1597,7 +1598,40 @@ describe('Outbound Initiator Functions', () => {
         specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
         type: 'fspiop'
       }])
-      await expect(OutboundInitiator.OutboundSend(sampleTemplate, '123')).resolves.not.toBeNull
+      await expect(OutboundInitiator.OutboundSend(sampleTemplate, '123')).resolves.not.toBeNull()
+    })
+    it('OutboundSend with metrics', async () => {
+      SpyAxios.mockImplementation(() => ({
+        interceptors: {
+          request: {
+            use: jest.fn()
+          },
+          response: {
+            use: jest.fn()
+          }
+        }
+      }))
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpySign.mockReturnValue( Promise.resolve() )
+      SpyGetApiDefinitions.mockResolvedValue([{
+        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+        type: 'fspiop'
+      }])
+      const metrics = {
+        assertSuccess: {add: jest.fn()},
+        assertFail: {add: jest.fn()},
+        testSuccess: {add: jest.fn()},
+        testFail: {add: jest.fn()}
+      }
+      await expect(OutboundInitiator.OutboundSend(sampleTemplate, '123', 'userdfsp', undefined, metrics)).resolves.not.toBeNull()
+      expect(metrics.testSuccess.add).toHaveBeenCalledTimes(1)
     })
     it('OutboundSend with traceID aabb123aabb', async () => {
       axios.mockImplementation(() => Promise.resolve({
@@ -1612,7 +1646,7 @@ describe('Outbound Initiator Functions', () => {
         specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
         type: 'fspiop'
       }])
-      await expect(OutboundInitiator.OutboundSend(sampleTemplate, 'aabb123aabb')).resolves.not.toBeNull
+      await expect(OutboundInitiator.OutboundSend(sampleTemplate, 'aabb123aabb')).resolves.not.toBeNull()
     })
     it('OutboundSendLoop should not throw any error', async () => {
       axios.mockImplementation(() => Promise.resolve({
@@ -1627,7 +1661,7 @@ describe('Outbound Initiator Functions', () => {
         specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
         type: 'fspiop'
       }])
-      await expect(OutboundInitiator.OutboundSendLoop(sampleTemplate, '123', null, 2)).resolves.not.toBeNull
+      await expect(OutboundInitiator.OutboundSendLoop(sampleTemplate, '123', null, 2)).resolves.not.toBeNull()
     })
     it('OutboundSend with disabled request', async () => {
       axios.mockImplementation(() => Promise.resolve({
@@ -1644,7 +1678,7 @@ describe('Outbound Initiator Functions', () => {
       }])
       const sampleTemplateModified1 = JSON.parse(JSON.stringify(sampleTemplate))
       sampleTemplateModified1.test_cases[0].requests[0].disabled = true
-      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified1, '123')).resolves.not.toBeNull
+      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified1, '123')).resolves.not.toBeNull()
     })
     it('OutboundSend with delayed request', async () => {
       axios.mockImplementation(() => Promise.resolve({
@@ -1707,8 +1741,8 @@ describe('Outbound Initiator Functions', () => {
         type: 'fspiop'
       }])
       const sampleTemplateModified3 = JSON.parse(JSON.stringify(sampleTemplate))
-      sampleTemplateModified3.test_cases[0].requests[0].apiVersion.asynchronous = true      
-      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified3, '123')).resolves.not.toBeNull
+      sampleTemplateModified3.test_cases[0].requests[0].apiVersion.asynchronous = true
+      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified3, '123')).resolves.not.toBeNull()
     })
 
     it('OutboundSend with breakOnError in a testCase', async () => {
@@ -1736,7 +1770,7 @@ describe('Outbound Initiator Functions', () => {
           }
         ]
       }
-      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified11, '123')).resolves.not.toBeNull
+      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified11, '123')).resolves.not.toBeNull()
     })
     it('OutboundSend with breakOnError in template', async () => {
       axios.mockImplementation(() => Promise.resolve({
@@ -1765,7 +1799,7 @@ describe('Outbound Initiator Functions', () => {
           }
         ]
       }
-      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified12, '123')).resolves.not.toBeNull
+      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified12, '123')).resolves.not.toBeNull()
     })
 
     it('OutboundSend with transformation in template', async () => {
@@ -1795,7 +1829,7 @@ describe('Outbound Initiator Functions', () => {
           }
         ]
       }
-      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified12, '123')).resolves.not.toBeNull
+      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified12, '123')).resolves.not.toBeNull()
     })
 
     it('OutboundSend with transformation in a request', async () => {
@@ -1826,7 +1860,7 @@ describe('Outbound Initiator Functions', () => {
       sampleTemplateModified12.test_cases[0].requests[0].scripts.preRequest.exec = [
         "custom.setTransformer('fspiopToISO20022')"
       ]
-      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified12, '123')).resolves.not.toBeNull
+      await expect(OutboundInitiator.OutboundSend(sampleTemplateModified12, '123')).resolves.not.toBeNull()
     })
 
     it('OutboundSend with saveReport enabled', async () => {
@@ -1884,12 +1918,12 @@ describe('Outbound Initiator Functions', () => {
         type: 'fspiop'
       }])
       const syncResp = await OutboundInitiator.OutboundSend(sampleTemplate, 'aabb123aabb', null, true)
-      expect(syncResp).not.toBeNull
+      expect(syncResp).not.toBeNull()
       expect(syncResp.test_cases[0]?.requests[0]).toHaveProperty('status')
       expect(syncResp.test_cases[0]?.requests[0]).toHaveProperty('response')
     })
   })
-  
+
   describe('terminateOutbound', () => {
     // Positive Scenarios
     it('terminateOutbound should terminate outbound', async () => {

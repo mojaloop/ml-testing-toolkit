@@ -18,6 +18,11 @@
     "PASSWORD": "ttk",
     "DATABASE": "ttk"
   },
+  "METRICS": {
+    "timeout": 5000,
+    "defaultLabels": {},
+    "defaultMetrics": true
+  },
   "OAUTH": {
     "AUTH_ENABLED": false,
     "APP_OAUTH_CLIENT_KEY": "ttk",
