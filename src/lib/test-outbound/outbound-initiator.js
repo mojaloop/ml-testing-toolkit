@@ -487,7 +487,7 @@ const setResponse = async (
   globalConfig.totalProgress.assertionsPassed += testResult.passedCount
   const failed = request.tests && request.tests.assertions ? (request.tests.assertions.length - testResult.passedCount) : 0
   globalConfig.totalProgress.assertionsFailed += failed
-  const tags = { job: templateName, test: testCase.name }
+  const tags = { request: request.description, test: testCase.name }
   metrics?.assertSuccess.add(testResult.passedCount, tags)
   metrics?.assertFail.add(failed, tags)
 
@@ -1028,9 +1028,9 @@ const generateFinalReport = (inputTemplate, runtimeInformation, metrics) => {
     }
   })
   if (runtimeInformation.totalPassedAssertions === runtimeInformation.totalAssertions) {
-    metrics?.testSuccess.add(1, { job: inputTemplate.name })
+    metrics?.testSuccess.add(1, { template: inputTemplate.name })
   } else {
-    metrics?.testFail.add(1, { job: inputTemplate.name })
+    metrics?.testFail.add(1, { template: inputTemplate.name })
   }
   return {
     ...remaingPropsInTemplate,
