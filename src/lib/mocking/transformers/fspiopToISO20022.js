@@ -24,7 +24,6 @@
 
 const { TransformFacades } = require('@mojaloop/ml-schema-transformer-lib')
 const { getHeader, headersToLowerCase } = require('../../utils')
-const customLogger = require('../../requestLogger')
 
 const _replaceAcceptOrContentTypeHeader = (inputStr, isReverse) => {
   if (isReverse) {
@@ -61,10 +60,10 @@ const _transformPostResource = async (resource, options, isReverse) => {
   const headers = _replaceHeaders(options.headers, isReverse)
   let result
   if (isReverse) {
-    TransformFacades.FSPIOPISO20022.configure({ isTestingMode: true, logger: customLogger })
+    TransformFacades.FSPIOPISO20022.configure({ isTestingMode: true })
     result = await TransformFacades.FSPIOPISO20022[resource].post({ body: options.body, headers: options.headers })
   } else {
-    TransformFacades.FSPIOP.configure({ isTestingMode: true, logger: customLogger })
+    TransformFacades.FSPIOP.configure({ isTestingMode: true })
     result = await TransformFacades.FSPIOP[resource].post({ body: options.body, headers: options.headers })
   }
 
@@ -79,14 +78,14 @@ const _transformPutResource = async (resource, options, isError, isReverse) => {
   const headers = _replaceHeaders(options.headers, isReverse)
   let result
   if (isReverse) {
-    TransformFacades.FSPIOPISO20022.configure({ isTestingMode: true, logger: customLogger })
+    TransformFacades.FSPIOPISO20022.configure({ isTestingMode: true })
     result = await TransformFacades.FSPIOPISO20022[resource][isError ? 'putError' : 'put']({
       body: options.body,
       headers: headersToLowerCase(headers),
       params: options.params
     })
   } else {
-    TransformFacades.FSPIOP.configure({ isTestingMode: true, logger: customLogger })
+    TransformFacades.FSPIOP.configure({ isTestingMode: true })
     result = await TransformFacades.FSPIOP[resource][isError ? 'putError' : 'put']({
       body: options.body,
       headers: headersToLowerCase(headers),
@@ -105,14 +104,14 @@ const _transformPatchResource = async (resource, options, isReverse) => {
   const headers = _replaceHeaders(options.headers, isReverse)
   let result
   if (isReverse) {
-    TransformFacades.FSPIOPISO20022.configure({ isTestingMode: true, logger: customLogger })
+    TransformFacades.FSPIOPISO20022.configure({ isTestingMode: true })
     result = await TransformFacades.FSPIOPISO20022[resource].patch({
       body: options.body,
       headers: headersToLowerCase(headers),
       params: options.params
     })
   } else {
-    TransformFacades.FSPIOP.configure({ isTestingMode: true, logger: customLogger })
+    TransformFacades.FSPIOP.configure({ isTestingMode: true })
     result = await TransformFacades.FSPIOP[resource].patch({
       body: options.body,
       headers: headersToLowerCase(headers),
