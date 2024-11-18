@@ -12,22 +12,22 @@ module.exports = function metricsMiddleware (config = {}) {
   const assertSuccess = new client.Counter({
     name: 'assert_success_total',
     help: 'Successful assertions',
-    labelNames: ['job', 'test']
+    labelNames: ['request', 'test']
   })
   const assertFail = new client.Counter({
     name: 'assert_fail_total',
     help: 'Failed assertions',
-    labelNames: ['job', 'test']
+    labelNames: ['request', 'test']
   })
   const testSuccess = new client.Counter({
     name: 'test_success_total',
     help: 'Successful tests',
-    labelNames: ['job']
+    labelNames: ['template']
   })
   const testFail = new client.Counter({
     name: 'test_fail_total',
     help: 'Failed tests',
-    labelNames: ['job']
+    labelNames: ['template']
   })
 
   const metrics = {
