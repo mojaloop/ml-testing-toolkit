@@ -1083,6 +1083,592 @@ paths:
           $ref: "#/components/responses/501"
         "503":
           $ref: "#/components/responses/503"
+  /participants/{Type}/{ID}:
+    parameters:
+      - $ref: "#/components/parameters/Type"
+      - $ref: "#/components/parameters/ID"
+      - $ref: "#/components/parameters/Content-Type"
+      - $ref: "#/components/parameters/Date"
+      - $ref: "#/components/parameters/X-Forwarded-For"
+      - $ref: "#/components/parameters/FSPIOP-Source"
+      - $ref: "#/components/parameters/FSPIOP-Destination"
+      - $ref: "#/components/parameters/FSPIOP-Encryption"
+      - $ref: "#/components/parameters/FSPIOP-Signature"
+      - $ref: "#/components/parameters/FSPIOP-URI"
+      - $ref: "#/components/parameters/FSPIOP-HTTP-Method"
+    post:
+      description: >-
+        The HTTP request `POST /participants/{Type}/{ID}` (or `POST
+        /participants/{Type}/{ID}/{SubId}`) is used to create information in the
+        server regarding the provided identity, defined by `{Type}`, `{ID}`, and
+        optionally `{SubId}` (for example, `POST /participants/MSISDN/123456789`
+        or `POST /participants/BUSINESS/shoecompany/employee1`). An
+        ExtensionList element has been added to this reqeust in version v1.1
+      summary: Create participant information
+      tags:
+        - participants
+      operationId: ParticipantsByIDAndType
+      parameters:
+        - $ref: "#/components/parameters/Accept"
+        - $ref: "#/components/parameters/Content-Length"
+      requestBody:
+        description: Participant information to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ParticipantsTypeIDSubIDPostRequest"
+      responses:
+        "202":
+          $ref: "#/components/responses/202"
+        "400":
+          $ref: "#/components/responses/400-2"
+        "401":
+          $ref: "#/components/responses/401-2"
+        "403":
+          $ref: "#/components/responses/403-2"
+        "404":
+          $ref: "#/components/responses/404-2"
+        "405":
+          $ref: "#/components/responses/405-2"
+        "406":
+          $ref: "#/components/responses/406-2"
+        "501":
+          $ref: "#/components/responses/501-2"
+        "503":
+          $ref: "#/components/responses/503-2"
+    get:
+      description: >-
+        The HTTP request `GET /participants/{Type}/{ID}` (or `GET
+        /participants/{Type}/{ID}/{SubId}`) is used to find out in which FSP the
+        requested Party, defined by `{Type}`, `{ID}` and optionally `{SubId}`,
+        is located (for example, `GET /participants/MSISDN/123456789`, or `GET
+        /participants/BUSINESS/shoecompany/employee1`). This HTTP request should
+        support a query string for filtering of currency. To use filtering of
+        currency, the HTTP request `GET /participants/{Type}/{ID}?currency=XYZ`
+        should be used, where `XYZ` is the requested currency.
+      summary: Look up participant information
+      tags:
+        - participants
+      operationId: ParticipantsByTypeAndID
+      parameters:
+        - $ref: "#/components/parameters/Accept"
+      responses:
+        "202":
+          $ref: "#/components/responses/202"
+        "400":
+          $ref: "#/components/responses/400-2"
+        "401":
+          $ref: "#/components/responses/401-2"
+        "403":
+          $ref: "#/components/responses/403-2"
+        "404":
+          $ref: "#/components/responses/404-2"
+        "405":
+          $ref: "#/components/responses/405-2"
+        "406":
+          $ref: "#/components/responses/406-2"
+        "501":
+          $ref: "#/components/responses/501-2"
+        "503":
+          $ref: "#/components/responses/503-2"
+    put:
+      description: >-
+        The callback `PUT /participants/{Type}/{ID}` (or `PUT
+        /participants/{Type}/{ID}/{SubId}`) is used to inform the client of a
+        successful result of the lookup, creation, or deletion of the FSP
+        information related to the Party. If the FSP information is deleted, the
+        fspId element should be empty; otherwise the element should include the
+        FSP information for the Party.
+      summary: Return participant information
+      tags:
+        - participants
+      operationId: ParticipantsByTypeAndID3
+      parameters:
+        - $ref: "#/components/parameters/Content-Length"
+      requestBody:
+        description: Participant information returned.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ParticipantsTypeIDPutResponse"
+      responses:
+        "200":
+          $ref: "#/components/responses/200"
+        "400":
+          $ref: "#/components/responses/400-2"
+        "401":
+          $ref: "#/components/responses/401-2"
+        "403":
+          $ref: "#/components/responses/403-2"
+        "404":
+          $ref: "#/components/responses/404-2"
+        "405":
+          $ref: "#/components/responses/405-2"
+        "406":
+          $ref: "#/components/responses/406-2"
+        "501":
+          $ref: "#/components/responses/501-2"
+        "503":
+          $ref: "#/components/responses/503-2"
+    delete:
+      description: >-
+        The HTTP request `DELETE /participants/{Type}/{ID}` (or `DELETE
+        /participants/{Type}/{ID}/{SubId}`) is used to delete information in the
+        server regarding the provided identity, defined by `{Type}` and `{ID}`)
+        (for example, `DELETE /participants/MSISDN/123456789`), and optionally
+        `{SubId}`. This HTTP request should support a query string to delete FSP
+        information regarding a specific currency only. To delete a specific
+        currency only, the HTTP request `DELETE
+        /participants/{Type}/{ID}?currency=XYZ` should be used, where `XYZ` is
+        the requested currency.
+
+
+        **Note:** The Account Lookup System should verify that it is the Party’s
+        current FSP that is deleting the FSP information.
+      summary: Delete participant information
+      tags:
+        - participants
+      operationId: ParticipantsByTypeAndID2
+      parameters:
+        - $ref: "#/components/parameters/Accept"
+      responses:
+        "202":
+          $ref: "#/components/responses/202"
+        "400":
+          $ref: "#/components/responses/400-2"
+        "401":
+          $ref: "#/components/responses/401-2"
+        "403":
+          $ref: "#/components/responses/403-2"
+        "404":
+          $ref: "#/components/responses/404-2"
+        "405":
+          $ref: "#/components/responses/405-2"
+        "406":
+          $ref: "#/components/responses/406-2"
+        "501":
+          $ref: "#/components/responses/501-2"
+        "503":
+          $ref: "#/components/responses/503-2"
+  /participants/{Type}/{ID}/error:
+    put:
+      description: >-
+        If the server is unable to find, create or delete the associated FSP of
+        the provided identity, or another processing error occurred, the error
+        callback `PUT /participants/{Type}/{ID}/error` (or `PUT
+        /participants/{Type}/{ID}/{SubId}/error`) is used.
+      summary: Return participant information error
+      tags:
+        - participants
+      operationId: ParticipantsErrorByTypeAndID
+      parameters:
+        - $ref: "#/components/parameters/Type"
+        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/Content-Length"
+        - $ref: "#/components/parameters/Content-Type"
+        - $ref: "#/components/parameters/Date"
+        - $ref: "#/components/parameters/X-Forwarded-For"
+        - $ref: "#/components/parameters/FSPIOP-Source"
+        - $ref: "#/components/parameters/FSPIOP-Destination"
+        - $ref: "#/components/parameters/FSPIOP-Encryption"
+        - $ref: "#/components/parameters/FSPIOP-Signature"
+        - $ref: "#/components/parameters/FSPIOP-URI"
+        - $ref: "#/components/parameters/FSPIOP-HTTP-Method"
+      requestBody:
+        description: Details of the error returned.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorInformationObject"
+      responses:
+        "200":
+          $ref: "#/components/responses/200"
+        "400":
+          $ref: "#/components/responses/400-2"
+        "401":
+          $ref: "#/components/responses/401-2"
+        "403":
+          $ref: "#/components/responses/403-2"
+        "404":
+          $ref: "#/components/responses/404-2"
+        "405":
+          $ref: "#/components/responses/405-2"
+        "406":
+          $ref: "#/components/responses/406-2"
+        "501":
+          $ref: "#/components/responses/501-2"
+        "503":
+          $ref: "#/components/responses/503-2"
+  /participants/{Type}/{ID}/{SubId}:
+    parameters:
+      - $ref: "#/components/parameters/Type"
+      - $ref: "#/components/parameters/ID"
+      - $ref: "#/components/parameters/SubId"
+      - $ref: "#/components/parameters/Content-Type"
+      - $ref: "#/components/parameters/Date"
+      - $ref: "#/components/parameters/X-Forwarded-For"
+      - $ref: "#/components/parameters/FSPIOP-Source"
+      - $ref: "#/components/parameters/FSPIOP-Destination"
+      - $ref: "#/components/parameters/FSPIOP-Encryption"
+      - $ref: "#/components/parameters/FSPIOP-Signature"
+      - $ref: "#/components/parameters/FSPIOP-URI"
+      - $ref: "#/components/parameters/FSPIOP-HTTP-Method"
+    post:
+      description: >-
+        The HTTP request `POST /participants/{Type}/{ID}` (or `POST
+        /participants/{Type}/{ID}/{SubId}`) is used to create information in the
+        server regarding the provided identity, defined by `{Type}`, `{ID}`, and
+        optionally `{SubId}` (for example, `POST /participants/MSISDN/123456789`
+        or `POST /participants/BUSINESS/shoecompany/employee1`). An
+        ExtensionList element has been added to this reqeust in version v1.1
+      summary: Create participant information
+      tags:
+        - participants
+      operationId: ParticipantsSubIdByTypeAndIDPost
+      parameters:
+        - $ref: "#/components/parameters/Accept"
+        - $ref: "#/components/parameters/Content-Length"
+      requestBody:
+        description: Participant information to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ParticipantsTypeIDSubIDPostRequest"
+      responses:
+        "202":
+          $ref: "#/components/responses/202"
+        "400":
+          $ref: "#/components/responses/400-2"
+        "401":
+          $ref: "#/components/responses/401-2"
+        "403":
+          $ref: "#/components/responses/403-2"
+        "404":
+          $ref: "#/components/responses/404-2"
+        "405":
+          $ref: "#/components/responses/405-2"
+        "406":
+          $ref: "#/components/responses/406-2"
+        "501":
+          $ref: "#/components/responses/501-2"
+        "503":
+          $ref: "#/components/responses/503-2"
+    get:
+      description: >-
+        The HTTP request `GET /participants/{Type}/{ID}` (or `GET
+        /participants/{Type}/{ID}/{SubId}`) is used to find out in which FSP the
+        requested Party, defined by `{Type}`, `{ID}` and optionally `{SubId}`,
+        is located (for example, `GET /participants/MSISDN/123456789`, or `GET
+        /participants/BUSINESS/shoecompany/employee1`). This HTTP request should
+        support a query string for filtering of currency. To use filtering of
+        currency, the HTTP request `GET /participants/{Type}/{ID}?currency=XYZ`
+        should be used, where `XYZ` is the requested currency.
+      summary: Look up participant information
+      tags:
+        - participants
+      operationId: ParticipantsSubIdByTypeAndID
+      parameters:
+        - $ref: "#/components/parameters/Accept"
+      responses:
+        "202":
+          $ref: "#/components/responses/202"
+        "400":
+          $ref: "#/components/responses/400-2"
+        "401":
+          $ref: "#/components/responses/401-2"
+        "403":
+          $ref: "#/components/responses/403-2"
+        "404":
+          $ref: "#/components/responses/404-2"
+        "405":
+          $ref: "#/components/responses/405-2"
+        "406":
+          $ref: "#/components/responses/406-2"
+        "501":
+          $ref: "#/components/responses/501-2"
+        "503":
+          $ref: "#/components/responses/503-2"
+    put:
+      description: >-
+        The callback `PUT /participants/{Type}/{ID}` (or `PUT
+        /participants/{Type}/{ID}/{SubId}`) is used to inform the client of a
+        successful result of the lookup, creation, or deletion of the FSP
+        information related to the Party. If the FSP information is deleted, the
+        fspId element should be empty; otherwise the element should include the
+        FSP information for the Party.
+      summary: Return participant information
+      tags:
+        - participants
+      operationId: ParticipantsSubIdByTypeAndID3
+      parameters:
+        - $ref: "#/components/parameters/Content-Length"
+      requestBody:
+        description: Participant information returned.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ParticipantsTypeIDPutResponse"
+      responses:
+        "200":
+          $ref: "#/components/responses/200"
+        "400":
+          $ref: "#/components/responses/400-2"
+        "401":
+          $ref: "#/components/responses/401-2"
+        "403":
+          $ref: "#/components/responses/403-2"
+        "404":
+          $ref: "#/components/responses/404-2"
+        "405":
+          $ref: "#/components/responses/405-2"
+        "406":
+          $ref: "#/components/responses/406-2"
+        "501":
+          $ref: "#/components/responses/501-2"
+        "503":
+          $ref: "#/components/responses/503-2"
+    delete:
+      description: >-
+        The HTTP request `DELETE /participants/{Type}/{ID}` (or `DELETE
+        /participants/{Type}/{ID}/{SubId}`) is used to delete information in the
+        server regarding the provided identity, defined by `{Type}` and `{ID}`)
+        (for example, `DELETE /participants/MSISDN/123456789`), and optionally
+        `{SubId}`. This HTTP request should support a query string to delete FSP
+        information regarding a specific currency only. To delete a specific
+        currency only, the HTTP request `DELETE
+        /participants/{Type}/{ID}?currency=XYZ` should be used, where `XYZ` is
+        the requested currency.
+
+
+        **Note:** The Account Lookup System should verify that it is the Party’s
+        current FSP that is deleting the FSP information.
+      summary: Delete participant information
+      tags:
+        - participants
+      operationId: ParticipantsSubIdByTypeAndID2
+      parameters:
+        - $ref: "#/components/parameters/Accept"
+      responses:
+        "202":
+          $ref: "#/components/responses/202"
+        "400":
+          $ref: "#/components/responses/400-2"
+        "401":
+          $ref: "#/components/responses/401-2"
+        "403":
+          $ref: "#/components/responses/403-2"
+        "404":
+          $ref: "#/components/responses/404-2"
+        "405":
+          $ref: "#/components/responses/405-2"
+        "406":
+          $ref: "#/components/responses/406-2"
+        "501":
+          $ref: "#/components/responses/501-2"
+        "503":
+          $ref: "#/components/responses/503-2"
+  /participants/{Type}/{ID}/{SubId}/error:
+    put:
+      description: >-
+        If the server is unable to find, create or delete the associated FSP of
+        the provided identity, or another processing error occurred, the error
+        callback `PUT /participants/{Type}/{ID}/error` (or `PUT
+        /participants/{Type}/{ID}/{SubId}/error`) is used.
+      summary: Return participant information error
+      tags:
+        - participants
+      operationId: ParticipantsSubIdErrorByTypeAndID
+      parameters:
+        - $ref: "#/components/parameters/Type"
+        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/SubId"
+        - $ref: "#/components/parameters/Content-Length"
+        - $ref: "#/components/parameters/Content-Type"
+        - $ref: "#/components/parameters/Date"
+        - $ref: "#/components/parameters/X-Forwarded-For"
+        - $ref: "#/components/parameters/FSPIOP-Source"
+        - $ref: "#/components/parameters/FSPIOP-Destination"
+        - $ref: "#/components/parameters/FSPIOP-Encryption"
+        - $ref: "#/components/parameters/FSPIOP-Signature"
+        - $ref: "#/components/parameters/FSPIOP-URI"
+        - $ref: "#/components/parameters/FSPIOP-HTTP-Method"
+      requestBody:
+        description: Details of the error returned.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorInformationObject"
+      responses:
+        "200":
+          $ref: "#/components/responses/200"
+        "400":
+          $ref: "#/components/responses/400-2"
+        "401":
+          $ref: "#/components/responses/401-2"
+        "403":
+          $ref: "#/components/responses/403-2"
+        "404":
+          $ref: "#/components/responses/404-2"
+        "405":
+          $ref: "#/components/responses/405-2"
+        "406":
+          $ref: "#/components/responses/406-2"
+        "501":
+          $ref: "#/components/responses/501-2"
+        "503":
+          $ref: "#/components/responses/503-2"
+  /participants:
+    post:
+      description: >-
+        The HTTP request `POST /participants` is used to create information in
+        the server regarding the provided list of identities. This request
+        should be used for bulk creation of FSP information for more than one
+        Party. The optional currency parameter should indicate that each
+        provided Party supports the currency.
+      summary: Create bulk participant information
+      tags:
+        - participants
+      operationId: Participants1
+      parameters:
+        - $ref: "#/components/parameters/Accept"
+        - $ref: "#/components/parameters/Content-Length"
+        - $ref: "#/components/parameters/Content-Type"
+        - $ref: "#/components/parameters/Date"
+        - $ref: "#/components/parameters/X-Forwarded-For"
+        - $ref: "#/components/parameters/FSPIOP-Source"
+        - $ref: "#/components/parameters/FSPIOP-Destination"
+        - $ref: "#/components/parameters/FSPIOP-Encryption"
+        - $ref: "#/components/parameters/FSPIOP-Signature"
+        - $ref: "#/components/parameters/FSPIOP-URI"
+        - $ref: "#/components/parameters/FSPIOP-HTTP-Method"
+      requestBody:
+        description: Participant information to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ParticipantsPostRequest"
+      responses:
+        "202":
+          $ref: "#/components/responses/202"
+        "400":
+          $ref: "#/components/responses/400-2"
+        "401":
+          $ref: "#/components/responses/401-2"
+        "403":
+          $ref: "#/components/responses/403-2"
+        "404":
+          $ref: "#/components/responses/404-2"
+        "405":
+          $ref: "#/components/responses/405-2"
+        "406":
+          $ref: "#/components/responses/406-2"
+        "501":
+          $ref: "#/components/responses/501-2"
+        "503":
+          $ref: "#/components/responses/503-2"
+  /participants/{ID}:
+    put:
+      description: >-
+        The callback `PUT /participants/{ID}` is used to inform the client of
+        the result of the creation of the provided list of identities.
+      summary: Return bulk participant information
+      tags:
+        - participants
+      operationId: putParticipantsByID
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/Content-Length"
+        - $ref: "#/components/parameters/Content-Type"
+        - $ref: "#/components/parameters/Date"
+        - $ref: "#/components/parameters/X-Forwarded-For"
+        - $ref: "#/components/parameters/FSPIOP-Source"
+        - $ref: "#/components/parameters/FSPIOP-Destination"
+        - $ref: "#/components/parameters/FSPIOP-Encryption"
+        - $ref: "#/components/parameters/FSPIOP-Signature"
+        - $ref: "#/components/parameters/FSPIOP-URI"
+        - $ref: "#/components/parameters/FSPIOP-HTTP-Method"
+      requestBody:
+        description: Participant information returned.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ParticipantsIDPutResponse"
+      responses:
+        "200":
+          $ref: "#/components/responses/200"
+        "400":
+          $ref: "#/components/responses/400-2"
+        "401":
+          $ref: "#/components/responses/401-2"
+        "403":
+          $ref: "#/components/responses/403-2"
+        "404":
+          $ref: "#/components/responses/404-2"
+        "405":
+          $ref: "#/components/responses/405-2"
+        "406":
+          $ref: "#/components/responses/406-2"
+        "501":
+          $ref: "#/components/responses/501-2"
+        "503":
+          $ref: "#/components/responses/503-2"
+  /participants/{ID}/error:
+    put:
+      description: >-
+        If there is an error during FSP information creation in the server, the
+        error callback `PUT /participants/{ID}/error` is used. The `{ID}` in the
+        URI should contain the requestId that was used for the creation of the
+        participant information.
+      summary: Return bulk participant information error
+      tags:
+        - participants
+      operationId: ParticipantsByIDAndError
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/Content-Length"
+        - $ref: "#/components/parameters/Content-Type"
+        - $ref: "#/components/parameters/Date"
+        - $ref: "#/components/parameters/X-Forwarded-For"
+        - $ref: "#/components/parameters/FSPIOP-Source"
+        - $ref: "#/components/parameters/FSPIOP-Destination"
+        - $ref: "#/components/parameters/FSPIOP-Encryption"
+        - $ref: "#/components/parameters/FSPIOP-Signature"
+        - $ref: "#/components/parameters/FSPIOP-URI"
+        - $ref: "#/components/parameters/FSPIOP-HTTP-Method"
+      requestBody:
+        description: Details of the error returned.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorInformationObject"
+      responses:
+        "200":
+          $ref: "#/components/responses/200"
+        "400":
+          $ref: "#/components/responses/400-2"
+        "401":
+          $ref: "#/components/responses/401-2"
+        "403":
+          $ref: "#/components/responses/403-2"
+        "404":
+          $ref: "#/components/responses/404-2"
+        "405":
+          $ref: "#/components/responses/405-2"
+        "406":
+          $ref: "#/components/responses/406-2"
+        "501":
+          $ref: "#/components/responses/501-2"
+        "503":
+          $ref: "#/components/responses/503-2"
 components:
   parameters:
     Accept:
@@ -1324,6 +1910,94 @@ components:
           $ref: "#/components/headers/Content-Length"
         Content-Type:
           $ref: "#/components/headers/Content-Type"
+    400-2:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInformationResponse-2"
+      headers:
+        Content-Length:
+          $ref: "#/components/headers/Content-Length"
+        Content-Type:
+          $ref: "#/components/headers/Content-Type"
+    401-2:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInformationResponse-2"
+      headers:
+        Content-Length:
+          $ref: "#/components/headers/Content-Length"
+        Content-Type:
+          $ref: "#/components/headers/Content-Type"
+    403-2:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInformationResponse-2"
+      headers:
+        Content-Length:
+          $ref: "#/components/headers/Content-Length"
+        Content-Type:
+          $ref: "#/components/headers/Content-Type"
+    404-2:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInformationResponse-2"
+      headers:
+        Content-Length:
+          $ref: "#/components/headers/Content-Length"
+        Content-Type:
+          $ref: "#/components/headers/Content-Type"
+    405-2:
+      description: Method Not Allowed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInformationResponse-2"
+      headers:
+        Content-Length:
+          $ref: "#/components/headers/Content-Length"
+        Content-Type:
+          $ref: "#/components/headers/Content-Type"
+    406-2:
+      description: Not Acceptable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInformationResponse-2"
+      headers:
+        Content-Length:
+          $ref: "#/components/headers/Content-Length"
+        Content-Type:
+          $ref: "#/components/headers/Content-Type"
+    501-2:
+      description: Not Implemented
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInformationResponse-2"
+      headers:
+        Content-Length:
+          $ref: "#/components/headers/Content-Length"
+        Content-Type:
+          $ref: "#/components/headers/Content-Type"
+    503-2:
+      description: Service Unavailable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInformationResponse-2"
+      headers:
+        Content-Length:
+          $ref: "#/components/headers/Content-Length"
+        Content-Type:
+          $ref: "#/components/headers/Content-Type"
   headers:
     Content-Length:
       required: false
@@ -1439,13 +2113,182 @@ components:
     ActiveCurrencyCode:
       title: ActiveCurrencyCode
       type: string
-      pattern: ^[A-Z]{3,3}$
       description: >-
         A code allocated to a currency by a Maintenance Agency under an
         international identification scheme as described in the latest edition
         of the international standard ISO 4217 "Codes for the representation of
         currencies and funds".
+
+        NOTE: This has been modified away from the original ISO20022 pattern to
+        enums.
       example: USD
+      minLength: 3
+      maxLength: 3
+      enum:
+        - AED
+        - AFN
+        - ALL
+        - AMD
+        - ANG
+        - AOA
+        - ARS
+        - AUD
+        - AWG
+        - AZN
+        - BAM
+        - BBD
+        - BDT
+        - BGN
+        - BHD
+        - BIF
+        - BMD
+        - BND
+        - BOB
+        - BRL
+        - BSD
+        - BTN
+        - BWP
+        - BYN
+        - BZD
+        - CAD
+        - CDF
+        - CHF
+        - CLP
+        - CNY
+        - COP
+        - CRC
+        - CUC
+        - CUP
+        - CVE
+        - CZK
+        - DJF
+        - DKK
+        - DOP
+        - DZD
+        - EGP
+        - ERN
+        - ETB
+        - EUR
+        - FJD
+        - FKP
+        - GBP
+        - GEL
+        - GGP
+        - GHS
+        - GIP
+        - GMD
+        - GNF
+        - GTQ
+        - GYD
+        - HKD
+        - HNL
+        - HRK
+        - HTG
+        - HUF
+        - IDR
+        - ILS
+        - IMP
+        - INR
+        - IQD
+        - IRR
+        - ISK
+        - JEP
+        - JMD
+        - JOD
+        - JPY
+        - KES
+        - KGS
+        - KHR
+        - KMF
+        - KPW
+        - KRW
+        - KWD
+        - KYD
+        - KZT
+        - LAK
+        - LBP
+        - LKR
+        - LRD
+        - LSL
+        - LYD
+        - MAD
+        - MDL
+        - MGA
+        - MKD
+        - MMK
+        - MNT
+        - MOP
+        - MRO
+        - MUR
+        - MVR
+        - MWK
+        - MXN
+        - MYR
+        - MZN
+        - NAD
+        - NGN
+        - NIO
+        - NOK
+        - NPR
+        - NZD
+        - OMR
+        - PAB
+        - PEN
+        - PGK
+        - PHP
+        - PKR
+        - PLN
+        - PYG
+        - QAR
+        - RON
+        - RSD
+        - RUB
+        - RWF
+        - SAR
+        - SBD
+        - SCR
+        - SDG
+        - SEK
+        - SGD
+        - SHP
+        - SLL
+        - SOS
+        - SPL
+        - SRD
+        - STD
+        - SVC
+        - SYP
+        - SZL
+        - THB
+        - TJS
+        - TMT
+        - TND
+        - TOP
+        - TRY
+        - TTD
+        - TVD
+        - TWD
+        - TZS
+        - UAH
+        - UGX
+        - USD
+        - UYU
+        - UZS
+        - VEF
+        - VND
+        - VUV
+        - WST
+        - XAF
+        - XCD
+        - XDR
+        - XOF
+        - XPF
+        - XTS
+        - XXX
+        - YER
+        - ZAR
+        - ZMW
+        - ZWD
     ActiveOrHistoricCurrencyAndAmount:
       title: ActiveOrHistoricCurrencyAndAmount
       type: object
@@ -1487,8 +2330,177 @@ components:
         international identification scheme, as described in the latest edition
         of the international standard ISO 4217 "Codes for the representation of
         currencies and funds".
-      pattern: ^[A-Z]{3,3}$
+
+        NOTE: This has been modified away from the original ISO20022 pattern to
+        enums.
       example: USD
+      minLength: 3
+      maxLength: 3
+      enum:
+        - AED
+        - AFN
+        - ALL
+        - AMD
+        - ANG
+        - AOA
+        - ARS
+        - AUD
+        - AWG
+        - AZN
+        - BAM
+        - BBD
+        - BDT
+        - BGN
+        - BHD
+        - BIF
+        - BMD
+        - BND
+        - BOB
+        - BRL
+        - BSD
+        - BTN
+        - BWP
+        - BYN
+        - BZD
+        - CAD
+        - CDF
+        - CHF
+        - CLP
+        - CNY
+        - COP
+        - CRC
+        - CUC
+        - CUP
+        - CVE
+        - CZK
+        - DJF
+        - DKK
+        - DOP
+        - DZD
+        - EGP
+        - ERN
+        - ETB
+        - EUR
+        - FJD
+        - FKP
+        - GBP
+        - GEL
+        - GGP
+        - GHS
+        - GIP
+        - GMD
+        - GNF
+        - GTQ
+        - GYD
+        - HKD
+        - HNL
+        - HRK
+        - HTG
+        - HUF
+        - IDR
+        - ILS
+        - IMP
+        - INR
+        - IQD
+        - IRR
+        - ISK
+        - JEP
+        - JMD
+        - JOD
+        - JPY
+        - KES
+        - KGS
+        - KHR
+        - KMF
+        - KPW
+        - KRW
+        - KWD
+        - KYD
+        - KZT
+        - LAK
+        - LBP
+        - LKR
+        - LRD
+        - LSL
+        - LYD
+        - MAD
+        - MDL
+        - MGA
+        - MKD
+        - MMK
+        - MNT
+        - MOP
+        - MRO
+        - MUR
+        - MVR
+        - MWK
+        - MXN
+        - MYR
+        - MZN
+        - NAD
+        - NGN
+        - NIO
+        - NOK
+        - NPR
+        - NZD
+        - OMR
+        - PAB
+        - PEN
+        - PGK
+        - PHP
+        - PKR
+        - PLN
+        - PYG
+        - QAR
+        - RON
+        - RSD
+        - RUB
+        - RWF
+        - SAR
+        - SBD
+        - SCR
+        - SDG
+        - SEK
+        - SGD
+        - SHP
+        - SLL
+        - SOS
+        - SPL
+        - SRD
+        - STD
+        - SVC
+        - SYP
+        - SZL
+        - THB
+        - TJS
+        - TMT
+        - TND
+        - TOP
+        - TRY
+        - TTD
+        - TVD
+        - TWD
+        - TZS
+        - UAH
+        - UGX
+        - USD
+        - UYU
+        - UZS
+        - VEF
+        - VND
+        - VUV
+        - WST
+        - XAF
+        - XCD
+        - XDR
+        - XOF
+        - XPF
+        - XTS
+        - XXX
+        - YER
+        - ZAR
+        - ZMW
+        - ZWD
     AddressType2Code:
       description: |
         AddressType2Code
@@ -1534,6 +2546,16 @@ components:
             - Prtry
       example:
         Cd: ADDR
+    AmountTypeEnum:
+      title: AmountTypeEnum
+      description: |
+        NOTE: This pattern is not the original ISO20022 specification.
+              This represents the enum values when mapping to and from FSPIOP specification.
+      type: string
+      enum:
+        - SEND
+        - RECEIVE
+      example: SEND
     AnyBICDec2014Identifier:
       title: AnyBICDec2014Identifier
       type: string
@@ -2256,6 +3278,17 @@ components:
         MobNb: +123-123-321
         FaxNb: +123-123-321
         EmailAdr: example@example.com
+    CorrelationId:
+      title: CorrelationId
+      type: string
+      pattern: >-
+        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$|^[0-9A-HJKMNP-TV-Z]{26}$
+      description: >-
+        Identifier that correlates all messages of the same sequence. The
+        supported identifiers formats are for lowercase
+        [UUID](https://datatracker.ietf.org/doc/html/rfc9562) and uppercase
+        [ULID](https://github.com/ulid/spec)
+      example: b51ec534-ee48-4575-b6a9-ead2955b8069
     CountryCode:
       title: CountryCode
       type: string
@@ -2619,6 +3652,140 @@ components:
         VrfctnOfTerms:
           Cntt: CONTENT
           CnttTp: PROPRIETARY
+    CreditTransferTransaction68_FX_Quotes:
+      title: CreditTransferTransaction68_FX_Quotes
+      description: >
+        Provides further details specific to the individual transaction(s)
+        included in the message.
+      type: object
+      properties:
+        PmtId:
+          allOf:
+            - $ref: "#/components/schemas/PaymentIdentification13"
+            - description: |
+                PaymentIdentification
+                Set of elements used to reference a payment instruction.
+        PmtTpInf:
+          allOf:
+            - $ref: "#/components/schemas/PaymentTypeInformation28"
+            - description: |
+                PaymentTypeInformation
+                Set of elements used to further specify the type of transaction.
+        UndrlygCstmrCdtTrf:
+          allOf:
+            - $ref: "#/components/schemas/UnderlyingCustomerCreditTransfer"
+            - description: |
+                Underlying Customer Credit Transfer
+                TBD
+        IntrBkSttlmAmt:
+          allOf:
+            - $ref: "#/components/schemas/ActiveCurrencyAndAmount"
+            - description: >
+                InterbankSettlementAmount
+
+                Amount of money moved between the instructing agent and the
+                instructed agent.
+        Dbtr:
+          allOf:
+            - $ref: >-
+                #/components/schemas/BranchAndFinancialInstitutionIdentification8
+            - description: |
+                Debtor
+                Party that owes an amount of money to the (ultimate) creditor.
+        DbtrAcct:
+          allOf:
+            - $ref: "#/components/schemas/CashAccount40"
+            - description: |
+                DebtorAccount
+                Account used to process a payment.
+        DbtrAgt:
+          allOf:
+            - $ref: >-
+                #/components/schemas/BranchAndFinancialInstitutionIdentification8
+            - description: |
+                DebtorAgent
+                Financial institution servicing an account for the debtor.
+        CdtrAgt:
+          allOf:
+            - $ref: >-
+                #/components/schemas/BranchAndFinancialInstitutionIdentification8
+            - description: |
+                CreditorAgent
+                Financial institution servicing an account for the creditor.
+        Cdtr:
+          allOf:
+            - $ref: >-
+                #/components/schemas/BranchAndFinancialInstitutionIdentification8
+            - description: |
+                Creditor
+                Party to which an amount of money is due.
+        CdtrAcct:
+          allOf:
+            - $ref: "#/components/schemas/CashAccount40"
+            - description: |
+                CreditorAccount
+                Account to which a credit entry is made.
+        InstrForCdtrAgt:
+          allOf:
+            - $ref: "#/components/schemas/InstructionForCreditorAgent3_FX_Quotes"
+            - description: >
+                InstructionForCreditorAgent
+
+                Set of elements used to provide information on the remittance
+                advice.
+        Purp:
+          allOf:
+            - $ref: "#/components/schemas/Purpose2Choice"
+            - description: |
+                Purpose
+                Underlying reason for the payment transaction.
+        VrfctnOfTerms:
+          allOf:
+            - $ref: "#/components/schemas/CryptographicLockChoice"
+            - description: >
+                VerificationOfTerms
+
+                Set of elements used to provide information on the underlying
+                terms of the transaction.
+      required:
+        - PmtId
+        - IntrBkSttlmAmt
+        - Dbtr
+        - Cdtr
+      example:
+        PmtId:
+          InstrId: INSTRID
+          EndToEndId: ENDTOENDID
+        PmtTpInf:
+          LclInstrm:
+            Cd: CHQB
+            Prtry: PROPRIETARY
+        IntrBkSttlmAmt:
+          Amount: 123.45
+          Ccy: EUR
+        Dbtr:
+          Nm: Debtor Name
+        DbtrAcct:
+          Id:
+            IBAN: IBAN
+        DbtrAgt:
+          FinInstnId:
+            BICFI: BICFI
+        CdtrAgt:
+          FinInstnId:
+            BICFI: BICFI
+        Cdtr:
+          Nm: Creditor Name
+        CdtrAcct:
+          Id:
+            IBAN: IBAN
+        InstrForCdtrAgt:
+          Cd: INSTRUCTION
+        Purp:
+          Cd: CHAR
+        VrfctnOfTerms:
+          Cntt: CONTENT
+          CnttTp: PROPRIETARY
     CryptographicLockChoice:
       title: CryptographicLockChoice
       description: |
@@ -2644,6 +3811,181 @@ components:
             - Sh256Sgntr
       example:
         IlpV4PrepPacket: 1234567890ABCDEF
+    Currency:
+      title: Currency
+      description: >-
+        The currency codes defined in [ISO
+        4217](https://www.iso.org/iso-4217-currency-codes.html) as three-letter
+        alphabetic codes are used as the standard naming representation for
+        currencies.
+      type: string
+      minLength: 3
+      maxLength: 3
+      enum:
+        - AED
+        - AFN
+        - ALL
+        - AMD
+        - ANG
+        - AOA
+        - ARS
+        - AUD
+        - AWG
+        - AZN
+        - BAM
+        - BBD
+        - BDT
+        - BGN
+        - BHD
+        - BIF
+        - BMD
+        - BND
+        - BOB
+        - BRL
+        - BSD
+        - BTN
+        - BWP
+        - BYN
+        - BZD
+        - CAD
+        - CDF
+        - CHF
+        - CLP
+        - CNY
+        - COP
+        - CRC
+        - CUC
+        - CUP
+        - CVE
+        - CZK
+        - DJF
+        - DKK
+        - DOP
+        - DZD
+        - EGP
+        - ERN
+        - ETB
+        - EUR
+        - FJD
+        - FKP
+        - GBP
+        - GEL
+        - GGP
+        - GHS
+        - GIP
+        - GMD
+        - GNF
+        - GTQ
+        - GYD
+        - HKD
+        - HNL
+        - HRK
+        - HTG
+        - HUF
+        - IDR
+        - ILS
+        - IMP
+        - INR
+        - IQD
+        - IRR
+        - ISK
+        - JEP
+        - JMD
+        - JOD
+        - JPY
+        - KES
+        - KGS
+        - KHR
+        - KMF
+        - KPW
+        - KRW
+        - KWD
+        - KYD
+        - KZT
+        - LAK
+        - LBP
+        - LKR
+        - LRD
+        - LSL
+        - LYD
+        - MAD
+        - MDL
+        - MGA
+        - MKD
+        - MMK
+        - MNT
+        - MOP
+        - MRO
+        - MUR
+        - MVR
+        - MWK
+        - MXN
+        - MYR
+        - MZN
+        - NAD
+        - NGN
+        - NIO
+        - NOK
+        - NPR
+        - NZD
+        - OMR
+        - PAB
+        - PEN
+        - PGK
+        - PHP
+        - PKR
+        - PLN
+        - PYG
+        - QAR
+        - RON
+        - RSD
+        - RUB
+        - RWF
+        - SAR
+        - SBD
+        - SCR
+        - SDG
+        - SEK
+        - SGD
+        - SHP
+        - SLL
+        - SOS
+        - SPL
+        - SRD
+        - STD
+        - SVC
+        - SYP
+        - SZL
+        - THB
+        - TJS
+        - TMT
+        - TND
+        - TOP
+        - TRY
+        - TTD
+        - TVD
+        - TWD
+        - TZS
+        - UAH
+        - UGX
+        - USD
+        - UYU
+        - UZS
+        - VEF
+        - VND
+        - VUV
+        - WST
+        - XAF
+        - XCD
+        - XDR
+        - XOF
+        - XPF
+        - XTS
+        - XXX
+        - YER
+        - ZAR
+        - ZMW
+        - ZWD
     DateAndDateTime2Choice:
       title: StatusReason6Choice
       description: |
@@ -2766,6 +4108,29 @@ components:
       required:
         - errorCode
         - errorDescription
+    ErrorInformation-2:
+      title: ErrorInformation
+      type: object
+      description: Data model for the complex type ErrorInformation.
+      properties:
+        errorCode:
+          $ref: "#/components/schemas/ErrorCode"
+        errorDescription:
+          $ref: "#/components/schemas/ErrorDescription"
+        extensionList:
+          $ref: "#/components/schemas/ExtensionList-2"
+      required:
+        - errorCode
+        - errorDescription
+    ErrorInformationObject:
+      title: ErrorInformationObject
+      type: object
+      description: Data model for the complex type object that contains ErrorInformation.
+      properties:
+        errorInformation:
+          $ref: "#/components/schemas/ErrorInformation-2"
+      required:
+        - errorInformation
     ErrorInformationResponse:
       title: ErrorInformationResponse
       type: object
@@ -2775,12 +4140,24 @@ components:
       properties:
         errorInformation:
           $ref: "#/components/schemas/ErrorInformation"
+    ErrorInformationResponse-2:
+      title: ErrorInformationResponse
+      type: object
+      description: >-
+        Data model for the complex type object that contains an optional element
+        ErrorInformation used along with 4xx and 5xx responses.
+      properties:
+        errorInformation:
+          $ref: "#/components/schemas/ErrorInformation-2"
     Exact32HexBinaryText:
       title: Exact32HexBinaryText
       description: |
-        Specifies a hexadecimal string with a length of 32 characters.
+        Specifies a hexadecimal string.
+
+        NOTE: This pattern is not the original ISO20022 specification.
       type: string
-      example: 1234567890ABCDEF1234567890ABCDEF
+      pattern: ^[A-Za-z0-9-_]{43}$
+      maxLength: 48
     Exact4AlphaNumericText:
       title: Exact4AlphaNumericText
       description: |
@@ -2880,6 +4257,22 @@ components:
           description: Number of Extension elements.
       required:
         - extension
+    ExtensionList-2:
+      title: ExtensionList
+      type: object
+      description: >-
+        Data model for the complex type ExtensionList. An optional list of
+        extensions, specific to deployment.
+      properties:
+        extension:
+          type: array
+          items:
+            $ref: "#/components/schemas/Extension"
+          minItems: 1
+          maxItems: 16
+          description: Number of Extension elements.
+      required:
+        - extension
     ExtensionValue:
       title: ExtensionValue
       type: string
@@ -2960,21 +4353,31 @@ components:
       example: 1234
     ExternalPaymentTransactionStatus1Code:
       title: ExternalPaymentTransactionStatus1Code
-      description: |
+      description: >
         Specifies the external payment transaction status code.
 
+
         For FSPIOP transfer state enumeration mappings:
+
         {
           "COMM": "COMMITED",
           "RESV": "RESERVED",
           "RECV": "RECEIVED",
-          "ABOR": "ABORTED",
-          "SETT": "SETTLED"
+          "ABOR": "ABORTED"
         }
+
+
+        NOTE: enum enforcement is not apart of the ISO20022 specification, but
+        is added here for FSPIOP mappings.
       type: string
       minLength: 1
       maxLength: 4
-      example: SETT
+      example: COMM
+      enum:
+        - COMM
+        - RESV
+        - RECV
+        - ABOR
     ExternalPersonIdentification1Code:
       title: ExternalPersonIdentification1Code
       description: Specifies the external person identification code.
@@ -3098,7 +4501,6 @@ components:
 
                 Unique identification of an agent, as assigned by an
                 institution, using an identification scheme.
-      required: []
       example:
         BICFI: J5BMVH7D
         ClrSysMmbId:
@@ -3175,7 +4577,6 @@ components:
 
                 Unique identification of an agent, as assigned by an
                 institution, using an identification scheme.
-      required: []
       example:
         BICFI: J5BMVH7D
         ClrSysMmbId:
@@ -3200,6 +4601,12 @@ components:
             Cd: 123
             Prtry: 123
           Issr: 123
+    FspId:
+      title: FspId
+      type: string
+      minLength: 1
+      maxLength: 32
+      description: FSP identifier.
     FxRequest_FICreditTransferProposal:
       title: FxRequest_FICreditTransferProposal
       type: object
@@ -3219,7 +4626,7 @@ components:
                 included in the message.
         CdtTrfTxInf:
           allOf:
-            - $ref: "#/components/schemas/CreditTransferTransaction68"
+            - $ref: "#/components/schemas/CreditTransferTransaction68_FX_Quotes"
             - description: |
                 Credit Transfer Transaction Information
       required:
@@ -3319,9 +4726,9 @@ components:
                 included in the message.
         CdtTrfTxInf:
           allOf:
-            - $ref: "#/components/schemas/CreditTransferTransaction68"
+            - $ref: "#/components/schemas/CreditTransferTransaction68_FX_Quotes"
             - description: >
-                CreditTransferTransactionInformation
+                CreditTransferTransaction68_FX_Quotes
 
                 Set of elements providing information specific to the individual
                 credit transfer(s).
@@ -4262,6 +5669,35 @@ components:
       example:
         Cd: PHOA
         InstrInf: Please advise/contact next agent by phone.
+    InstructionForCreditorAgent3_FX_Quotes:
+      title: InstructionForCreditorAgent3_Put_FX_Quotes_ID
+      description: >
+        Further information related to the processing of the payment
+        instruction, provided by the initiating party, and intended for the
+        creditor agent.
+      type: object
+      properties:
+        Cd:
+          allOf:
+            - $ref: "#/components/schemas/ExternalCreditorAgentInstruction1Code"
+            - description: >
+                Code
+
+                Coded information related to the processing of the payment
+                instruction, provided by the initiating party, and intended for
+                the creditor's agent.
+        InstrInf:
+          allOf:
+            - $ref: "#/components/schemas/AmountTypeEnum"
+            - description: >
+                InstructionInformation
+
+                Further information complementing the coded instruction or
+                instruction to the creditor's agent that is bilaterally agreed
+                or specific to a user community.
+      example:
+        Cd: PHOA
+        InstrInf: Please advise/contact next agent by phone.
     InstructionForNextAgent1:
       title: InstructionForNextAgent1
       description: >
@@ -4681,6 +6117,70 @@ components:
             SplmtryData:
               PlcAndNm: PLACE
               Envlp: ENVELOPE
+    ParticipantsIDPutResponse:
+      title: ParticipantsIDPutResponse
+      type: object
+      description: The object sent in the PUT /participants/{ID} callback.
+      properties:
+        partyList:
+          type: array
+          items:
+            $ref: "#/components/schemas/PartyResult"
+          minItems: 1
+          maxItems: 10000
+          description: >-
+            List of PartyResult elements that were either created or failed to
+            be created.
+        currency:
+          $ref: "#/components/schemas/Currency"
+      required:
+        - partyList
+    ParticipantsPostRequest:
+      title: ParticipantsPostRequest
+      type: object
+      description: The object sent in the POST /participants request.
+      properties:
+        requestId:
+          $ref: "#/components/schemas/CorrelationId"
+        partyList:
+          type: array
+          items:
+            $ref: "#/components/schemas/PartyIdInfo"
+          minItems: 1
+          maxItems: 10000
+          description: >-
+            List of PartyIdInfo elements that the client would like to update or
+            create FSP information about.
+        currency:
+          $ref: "#/components/schemas/Currency"
+      required:
+        - requestId
+        - partyList
+    ParticipantsTypeIDPutResponse:
+      title: ParticipantsTypeIDPutResponse
+      type: object
+      description: >-
+        The object sent in the PUT /participants/{Type}/{ID}/{SubId} and
+        /participants/{Type}/{ID} callbacks.
+      properties:
+        fspId:
+          $ref: "#/components/schemas/FspId"
+    ParticipantsTypeIDSubIDPostRequest:
+      title: ParticipantsTypeIDSubIDPostRequest
+      type: object
+      description: >-
+        The object sent in the POST /participants/{Type}/{ID}/{SubId} and
+        /participants/{Type}/{ID} requests. An additional optional ExtensionList
+        element has been added as part of v1.1 changes.
+      properties:
+        fspId:
+          $ref: "#/components/schemas/FspId"
+        currency:
+          $ref: "#/components/schemas/Currency"
+        extensionList:
+          $ref: "#/components/schemas/ExtensionList-2"
+      required:
+        - fspId
     Party38Choice:
       title: Party38Choice
       description: |
@@ -4795,6 +6295,84 @@ components:
           DtAndPlcOfBirth:
             Dt: "2018-01-01"
             CityOfBirth: City
+    PartyIdInfo:
+      title: PartyIdInfo
+      type: object
+      description: >-
+        Data model for the complex type PartyIdInfo. An ExtensionList element
+        has been added to this reqeust in version v1.1
+      properties:
+        partyIdType:
+          $ref: "#/components/schemas/PartyIdType"
+        partyIdentifier:
+          $ref: "#/components/schemas/PartyIdentifier"
+        partySubIdOrType:
+          $ref: "#/components/schemas/PartySubIdOrType"
+        fspId:
+          $ref: "#/components/schemas/FspId"
+        extensionList:
+          $ref: "#/components/schemas/ExtensionList-2"
+      required:
+        - partyIdType
+        - partyIdentifier
+    PartyIdType:
+      title: PartyIdType
+      type: string
+      enum:
+        - MSISDN
+        - EMAIL
+        - PERSONAL_ID
+        - BUSINESS
+        - DEVICE
+        - ACCOUNT_ID
+        - IBAN
+        - ALIAS
+      description: >-
+        Below are the allowed values for the enumeration.
+
+        - MSISDN - An MSISDN (Mobile Station International Subscriber Directory
+        Number, that is, the phone number) is used as reference to a
+        participant. The MSISDN identifier should be in international format
+        according to the [ITU-T E.164
+        standard](https://www.itu.int/rec/T-REC-E.164/en). Optionally, the
+        MSISDN may be prefixed by a single plus sign, indicating the
+        international prefix.
+
+        - EMAIL - An email is used as reference to a participant. The format of
+        the email should be according to the informational [RFC
+        3696](https://tools.ietf.org/html/rfc3696).
+
+        - PERSONAL_ID - A personal identifier is used as reference to a
+        participant. Examples of personal identification are passport number,
+        birth certificate number, and national registration number. The
+        identifier number is added in the PartyIdentifier element. The personal
+        identifier type is added in the PartySubIdOrType element.
+
+        - BUSINESS - A specific Business (for example, an organization or a
+        company) is used as reference to a participant. The BUSINESS identifier
+        can be in any format. To make a transaction connected to a specific
+        username or bill number in a Business, the PartySubIdOrType element
+        should be used.
+
+        - DEVICE - A specific device (for example, a POS or ATM) ID connected to
+        a specific business or organization is used as reference to a Party. For
+        referencing a specific device under a specific business or organization,
+        use the PartySubIdOrType element.
+
+        - ACCOUNT_ID - A bank account number or FSP account ID should be used as
+        reference to a participant. The ACCOUNT_ID identifier can be in any
+        format, as formats can greatly differ depending on country and FSP.
+
+        - IBAN - A bank account number or FSP account ID is used as reference to
+        a participant. The IBAN identifier can consist of up to 34 alphanumeric
+        characters and should be entered without whitespace.
+
+        - ALIAS An alias is used as reference to a participant. The alias should
+        be created in the FSP as an alternative reference to an account owner.
+        Another example of an alias is a username in the FSP system. The ALIAS
+        identifier can be in any format. It is also possible to use the
+        PartySubIdOrType element for identifying an account under an Alias
+        defined by the PartyIdentifier.
     PartyIdentification135:
       title: PartyIdentification135
       description: |
@@ -4945,6 +6523,32 @@ components:
           MobNb: +123-123-321
           FaxNb: +123-123-321
           EmailAdr: example@example.com
+    PartyIdentifier:
+      title: PartyIdentifier
+      type: string
+      minLength: 1
+      maxLength: 128
+      description: Identifier of the Party.
+      example: "16135551212"
+    PartyResult:
+      title: PartyResult
+      type: object
+      description: Data model for the complex type PartyResult.
+      properties:
+        partyId:
+          $ref: "#/components/schemas/PartyIdInfo"
+        errorInformation:
+          $ref: "#/components/schemas/ErrorInformation-2"
+      required:
+        - partyId
+    PartySubIdOrType:
+      title: PartySubIdOrType
+      type: string
+      minLength: 1
+      maxLength: 128
+      description: >-
+        Either a sub-identifier of a PartyIdentifier, or a sub-type of the
+        PartyIdType, normally a PersonalIdentifierType.
     PaymentIdentification13:
       title: PaymentIdentification13
       description: |
@@ -4953,7 +6557,7 @@ components:
       properties:
         InstrId:
           allOf:
-            - $ref: "#/components/schemas/Max35Text"
+            - $ref: "#/components/schemas/ULIDIdentifier"
             - description: >
                 InstructionIdentification (FSPIOP equivalent:
                 transactionRequestId)
@@ -4972,9 +6576,13 @@ components:
                 individual instruction. It can be included in
 
                 several messages related to the instruction.
+
+
+                This field has been changed from the original ISO20022
+                `Max35Text`` schema to a ULIDIdentifier schema.
         EndToEndId:
           allOf:
-            - $ref: "#/components/schemas/Max35Text"
+            - $ref: "#/components/schemas/ULIDIdentifier"
             - description: >
                 EndToEndIdentification (FSPIOP equivalent: transactionId)
 
@@ -4998,9 +6606,13 @@ components:
 
                 identification must be passed on throughout the entire
                 end-to-end chain.
+
+
+                This field has been changed from the original ISO20022
+                `Max35Text`` schema to a ULIDIdentifier schema.
         TxId:
           allOf:
-            - $ref: "#/components/schemas/Max35Text"
+            - $ref: "#/components/schemas/ULIDIdentifier"
             - description: >
                 TransactionIdentification (FSPIOP equivalent: quoteId in quote
                 request, transferId in transfer request)
@@ -5021,6 +6633,10 @@ components:
 
                 Usage: The instructing agent has to make sure that the
                 transaction identification is unique for a preagreed period.
+
+
+                This field has been changed from the original ISO20022
+                `Max35Text`` schema to a ULIDIdentifier schema.
         UETR:
           allOf:
             - $ref: "#/components/schemas/UUIDv4Identifier"
@@ -6536,6 +8152,11 @@ components:
           FwdgAgt:
             FinInstnId:
               BICFI: BBBBBBBB
+    ULIDIdentifier:
+      title: ULIDIdentifier
+      type: string
+      pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+      example: 01AN4Z07BY79KA1307SR9X4MV3
     UUIDv4Identifier:
       title: UUIDv4Identifier
       type: string
@@ -6577,6 +8198,11 @@ components:
                 #/components/schemas/BranchAndFinancialInstitutionIdentification8
             - description: |
                 Financial institution servicing an account for the creditor.
+      required:
+        - Dbtr
+        - Cdtr
+        - DbtrAgt
+        - CdtrAgt
     VerificationReason1Choice:
       title: VerificationReason1Choice
       type: object

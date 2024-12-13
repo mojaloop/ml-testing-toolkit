@@ -116,18 +116,21 @@ const handleTransferIlp = (context, response) => {
   // Check whether the request is POST /transfers
   const pathMatch = /\/transfers\/([^/]+)$/
   if (context.request.method === 'post' && response.method === 'put' && pathMatch.test(response.path)) {
-    if (response.eventInfo && response.eventInfo.params && response.eventInfo.params.body &&
-      response.eventInfo.params.body.fulfilment) {
+    if (
+      response.eventInfo && response.eventInfo.params && response.eventInfo.params.body &&
+      (
+        response.eventInfo.params.body.fulfilment ||
+        (response.eventInfo.params.body.TxInfAndSts && response.eventInfo.params.body.TxInfAndSts.ExctnConf)
+      )
+    ) {
       return null
     }
     if (context.request.body.ilpPacket) {
       const generatedFulfilment = ilpObj.calculateFulfil(context.request.body.ilpPacket).replace('"', '')
       response.body.fulfilment = generatedFulfilment
     }
-    if (context.request.body.CdtTrfTxInf) {
-      // TODO: Need to change the following function call to pass ilpPacket directly when the standard components are updated
-      // For now transaction object is constructed from the ilpPacket and then fulfilment is calculated
-      const generatedFulfilment = ilpV4Obj.calculateFulfil(ilpV4Obj.getTransactionObject(context.request.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket)).replace('"', '')
+    if (context.request.body.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket) {
+      const generatedFulfilment = ilpV4Obj.calculateFulfil(context.request.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
       response.body.TxInfAndSts.ExctnConf = generatedFulfilment
     }
   }
@@ -179,9 +182,7 @@ const validateTransferCondition = (context, request) => {
         if (request.payload.ilpPacket) {
           fulfilment = ilpObj.calculateFulfil(request.payload.ilpPacket).replace('"', '')
         } else if (request.payload.CdtTrfTxInf) {
-          // TODO: Need to change the following function call to pass ilpPacket directly when the standard components are updated
-          // For now transaction object is constructed from the ilpPacket and then fulfilment is calculated
-          fulfilment = ilpV4Obj.calculateFulfil(ilpV4Obj.getTransactionObject(request.payload.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket)).replace('"', '')
+          fulfilment = ilpV4Obj.calculateFulfil(request.payload.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
         }
         customLogger.logMessage('info', 'Validating condition with the generated fulfilment', { request })
       } catch (err) {

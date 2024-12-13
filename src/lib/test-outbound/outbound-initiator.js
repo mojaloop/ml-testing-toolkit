@@ -30,7 +30,7 @@ const https = require('https')
 const Config = require('../config')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
-const { readFileAsync } = require('../utils')
+const { readFileAsync, headersToLowerCase } = require('../utils')
 const expectOriginal = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
 const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
@@ -66,7 +66,13 @@ const getTracing = (traceID, dfspId) => {
   return tracing
 }
 
-const OutboundSend = async (inputTemplate, traceID, dfspId, sync = false) => {
+const OutboundSend = async (
+  inputTemplate,
+  traceID,
+  dfspId,
+  sync = false,
+  metrics
+) => {
   const totalCounts = getTotalCounts(inputTemplate)
   const globalConfig = {
     broadcastOutboundProgressEnabled: true,
@@ -93,7 +99,17 @@ const OutboundSend = async (inputTemplate, traceID, dfspId, sync = false) => {
   try {
     for (const i in inputTemplate.test_cases) {
       globalConfig.totalProgress.testCasesProcessed++
-      await processTestCase(inputTemplate.test_cases[i], traceID, inputTemplate.inputValues, variableData, dfspId, globalConfig, inputTemplate.options)
+      await processTestCase(
+        inputTemplate.test_cases[i],
+        traceID,
+        inputTemplate.inputValues,
+        variableData,
+        dfspId,
+        globalConfig,
+        inputTemplate.options,
+        metrics,
+        inputTemplate.name
+      )
     }
 
     const completedTimeStamp = new Date()
@@ -111,10 +127,10 @@ const OutboundSend = async (inputTemplate, traceID, dfspId, sync = false) => {
       totalPassedAssertions: 0
     }
     if (sync) {
-      return generateFinalReport(inputTemplate, runtimeInformation)
+      return generateFinalReport(inputTemplate, runtimeInformation, metrics)
     }
     if (tracing.outboundID) {
-      const totalResult = generateFinalReport(inputTemplate, runtimeInformation)
+      const totalResult = generateFinalReport(inputTemplate, runtimeInformation, metrics)
       if (Config.getSystemConfig().HOSTING_ENABLED) {
         dbAdapter.upsert('reports', totalResult, { dfspId })
       }
@@ -146,7 +162,7 @@ const OutboundSend = async (inputTemplate, traceID, dfspId, sync = false) => {
   }
 }
 
-const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
+const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metrics) => {
   const totalCounts = getTotalCounts(inputTemplate)
 
   const globalConfig = {
@@ -178,7 +194,17 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
       const tmpTemplate = JSON.parse(JSON.stringify(inputTemplate))
       // Execute all the test cases in the template
       for (const i in tmpTemplate.test_cases) {
-        await processTestCase(tmpTemplate.test_cases[i], traceID, tmpTemplate.inputValues, environmentVariables, dfspId, globalConfig, tmpTemplate.options)
+        await processTestCase(
+          tmpTemplate.test_cases[i],
+          traceID,
+          tmpTemplate.inputValues,
+          environmentVariables,
+          dfspId,
+          globalConfig,
+          tmpTemplate.options,
+          metrics,
+          tmpTemplate.name
+        )
       }
       const completedTimeStamp = new Date()
       const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
@@ -192,7 +218,7 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations) => {
         totalPassedAssertions: 0
       }
       // TODO: This can be optimized by storing only results into the iterations array
-      totalReport.iterations.push(generateFinalReport(tmpTemplate, runtimeInformation))
+      totalReport.iterations.push(generateFinalReport(tmpTemplate, runtimeInformation, metrics))
       notificationEmitter.broadcastOutboundProgress({
         status: 'ITERATION_PROGRESS',
         outboundID: tracing.outboundID,
@@ -224,7 +250,17 @@ const terminateOutbound = (traceID) => {
   terminateTraceIds[traceID] = true
 }
 
-const processTestCase = async (testCase, traceID, inputValues, variableData, dfspId, globalConfig, templateOptions = {}) => {
+const processTestCase = async (
+  testCase,
+  traceID,
+  inputValues,
+  variableData,
+  dfspId,
+  globalConfig,
+  templateOptions = {},
+  metrics,
+  templateName
+) => {
   const tracing = getTracing(traceID)
 
   // Load the requests array into an object by the request id to access a particular object faster
@@ -292,6 +328,13 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       contextObj = await context.generateContextObj(variableData.environment)
     }
 
+    // Get transformer if specified
+    if (contextObj.transformerObj && templateOptions?.transformerName) {
+      contextObj.transformerObj.transformer = Transformers.getTransformer(templateOptions.transformerName)
+      contextObj.transformerObj.transformerName = templateOptions.transformerName
+      // Currently no options are passed to the transformer in template level, we can add it later if needed
+    }
+
     // Send http request
     let status
     try {
@@ -307,6 +350,9 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
       }
       convertedRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
       convertedRequest = replaceRequestLevelEnvironmentVariables(convertedRequest, contextObj.requestVariables)
+
+      // Change header names to lower case
+      convertedRequest.headers = headersToLowerCase(convertedRequest.headers || {})
 
       let successCallbackUrl = null
       let errorCallbackUrl = null
@@ -324,21 +370,28 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         status = 'SKIPPED'
         await setSkippedResponse(convertedRequest, request, status, tracing, testCase, scriptsExecution, globalConfig)
       } else {
-        // Get transformer if specified
-        const transformerObj = {
-          transformer: null,
-          options: {}
+        // Replace transformer if it is specified in the request level
+        if (contextObj.transformerObj && contextObj.requestVariables && contextObj.requestVariables.TRANSFORM) {
+          contextObj.transformerObj.transformer = Transformers.getTransformer(contextObj.requestVariables.TRANSFORM.transformerName)
+          contextObj.transformerObj.transformerName = contextObj.requestVariables.TRANSFORM.transformerName
+          contextObj.transformerObj.options = contextObj.requestVariables.TRANSFORM.options
         }
-        if (contextObj.requestVariables && contextObj.requestVariables.TRANSFORM) {
-          transformerObj.transformer = Transformers.getTransformer(contextObj.requestVariables.TRANSFORM.transformerName)
-          transformerObj.options = contextObj.requestVariables.TRANSFORM.options
-        } else if (templateOptions?.transformerName) {
-          transformerObj.transformer = Transformers.getTransformer(templateOptions.transformerName)
-          // Currently no options are passed to the transformer in template level, we can add it later if needed
-        }
-        const resp = await sendRequest(convertedRequest.url, convertedRequest.method, convertedRequest.path, convertedRequest.queryParams, convertedRequest.headers, convertedRequest.body, successCallbackUrl, errorCallbackUrl, convertedRequest.ignoreCallbacks, dfspId, contextObj, transformerObj)
+        const resp = await sendRequest(convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj)
         status = 'SUCCESS'
-        await setResponse(convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig)
+        await setResponse(
+          convertedRequest,
+          resp,
+          variableData,
+          request,
+          status,
+          tracing,
+          testCase,
+          scriptsExecution,
+          contextObj,
+          globalConfig,
+          metrics,
+          templateName
+        )
       }
     } catch (err) {
       let resp
@@ -348,7 +401,19 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
         resp = err.message
       }
       status = 'ERROR'
-      await setResponse(convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig)
+      await setResponse(convertedRequest,
+        resp,
+        variableData,
+        request,
+        status,
+        tracing,
+        testCase,
+        scriptsExecution,
+        contextObj,
+        globalConfig,
+        metrics,
+        templateName
+      )
     } finally {
       if (request.appended?.testResult?.isFailed) {
         if (templateOptions.breakOnError) {
@@ -374,7 +439,20 @@ const processTestCase = async (testCase, traceID, inputValues, variableData, dfs
   // Set a timeout if the response callback is not received in a particular time
 }
 
-const setResponse = async (convertedRequest, resp, variableData, request, status, tracing, testCase, scriptsExecution, contextObj, globalConfig) => {
+const setResponse = async (
+  convertedRequest,
+  resp,
+  variableData,
+  request,
+  status,
+  tracing,
+  testCase,
+  scriptsExecution,
+  contextObj,
+  globalConfig,
+  metrics,
+  templateName
+) => {
   // Get the requestsHistory and callbacksHistory from the arrayStore
   const requestsHistoryObj = arrayStore.get('requestsHistory')
   const callbacksHistoryObj = arrayStore.get('callbacksHistory')
@@ -389,7 +467,7 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
 
   let testResult = null
   if (globalConfig.testsExecution) {
-    testResult = await handleTests(convertedRequest, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
+    testResult = await handleTests(convertedRequest, resp.requestSent, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
   }
   request.appended = {
     status,
@@ -407,7 +485,11 @@ const setResponse = async (convertedRequest, resp, variableData, request, status
   globalConfig.totalProgress.requestsProcessed++
   globalConfig.totalProgress.assertionsProcessed += request.tests && request.tests.assertions ? request.tests.assertions.length : 0
   globalConfig.totalProgress.assertionsPassed += testResult.passedCount
-  globalConfig.totalProgress.assertionsFailed += request.tests && request.tests.assertions ? (request.tests.assertions.length - testResult.passedCount) : 0
+  const failed = request.tests && request.tests.assertions ? (request.tests.assertions.length - testResult.passedCount) : 0
+  globalConfig.totalProgress.assertionsFailed += failed
+  const tags = { request: request.description, test: testCase.name }
+  metrics?.assertSuccess.add(testResult.passedCount, tags)
+  metrics?.assertFail.add(failed, tags)
 
   if (tracing.outboundID && globalConfig.broadcastOutboundProgressEnabled) {
     notificationEmitter.broadcastOutboundProgress({
@@ -528,7 +610,7 @@ const executePostRequestScript = async (convertedRequest, resp, scriptsExecution
   }
 }
 
-const handleTests = async (request, response = null, callback = null, environment = {}, backgroundData = {}, requestVariables = {}) => {
+const handleTests = async (request, requestSent, response = null, callback = null, environment = {}, backgroundData = {}, requestVariables = {}) => {
   try {
     const results = {}
     let passedCount = 0
@@ -592,7 +674,10 @@ const getUrlPrefix = (baseUrl) => {
   return returnUrl
 }
 
-const sendRequest = (baseUrl, method, path, queryParams, headers, body, successCallbackUrl, errorCallbackUrl, ignoreCallbacks, dfspId, contextObj = {}, transformerObj) => {
+const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj = {}) => {
+  const transformerObj = contextObj.transformerObj
+  const { url, method, path, queryParams, headers, body, params, ignoreCallbacks } = convertedRequest
+  const baseUrl = url
   return new Promise((resolve, reject) => {
     (async () => {
       const httpAgentProps = {}
@@ -644,8 +729,8 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
 
       const transformedRequest = {}
 
-      if (transformerObj && transformerObj.transformer && transformerObj.transformer.requestTransform) {
-        const result = await transformerObj.transformer.requestTransform({ method, path, headers, body })
+      if (transformerObj && transformerObj.transformer && transformerObj.transformer.forwardTransform) {
+        const result = await transformerObj.transformer.forwardTransform({ method, path, headers, body, params })
         transformedRequest.body = result.body
         transformedRequest.headers = result.headers
       }
@@ -679,6 +764,14 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
         }
       }
 
+      const requestSent = {
+        url: reqOpts.url,
+        method: reqOpts.method,
+        path: reqOpts.path,
+        headers: reqOpts.headers,
+        body: reqOpts.data
+      }
+
       let syncResponse = {}
       let curlRequest = ''
       let timer = null
@@ -696,22 +789,33 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
           let callbackBody = _callbackBody
           let originalBody
           let originalHeaders
-          if (transformerObj && transformerObj.transformer && transformerObj.transformer.callbackTransform) {
-            const result = await transformerObj.transformer.callbackTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
+          if (transformerObj && transformerObj.transformer && transformerObj.transformer.reverseTransform) {
+            const result = await transformerObj.transformer.reverseTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
             originalBody = _callbackBody
             callbackBody = result.body
             originalHeaders = _callbackHeaders
             callbackHeaders = result.headers
           }
           customLogger.logMessage('info', 'Received success callback ' + successCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          return resolve({ curlRequest, transformedRequest, syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody, originalHeaders, originalBody } })
+          return resolve({ curlRequest, requestSent, transformedRequest, syncResponse, callback: { url: successCallbackUrl, headers: callbackHeaders, body: callbackBody, originalHeaders, originalBody } })
         })
         // Listen for error callback
-        MyEventEmitter.getEmitter('testOutbound', user).once(errorCallbackUrl, (callbackHeaders, callbackBody) => {
+        MyEventEmitter.getEmitter('testOutbound', user).once(errorCallbackUrl, async (_callbackHeaders, _callbackBody, _callbackMethod, _callbackPath) => {
           clearTimeout(timer)
           MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
+          let callbackHeaders = _callbackHeaders
+          let callbackBody = _callbackBody
+          let originalBody
+          let originalHeaders
+          if (transformerObj && transformerObj.transformer && transformerObj.transformer.reverseTransform) {
+            const result = await transformerObj.transformer.reverseTransform({ method: _callbackMethod, path: _callbackPath, headers: _callbackHeaders, body: _callbackBody })
+            originalBody = _callbackBody
+            callbackBody = result.body
+            originalHeaders = _callbackHeaders
+            callbackHeaders = result.headers
+          }
           customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          return reject(new Error(JSON.stringify({ curlRequest, transformedRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody } })))
+          return reject(new Error(JSON.stringify({ curlRequest, requestSent, transformedRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody, originalHeaders, originalBody } })))
         })
       }
 
@@ -733,13 +837,13 @@ const sendRequest = (baseUrl, method, path, queryParams, headers, body, successC
             MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(successCallbackUrl)
             MyEventEmitter.getEmitter('testOutbound', user).removeAllListeners(errorCallbackUrl)
           }
-          return reject(new Error(JSON.stringify({ curlRequest, transformedRequest, syncResponse })))
+          return reject(new Error(JSON.stringify({ curlRequest, requestSent, transformedRequest, syncResponse })))
         } else {
           customLogger.logOutboundRequest('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: { response: result }, user, uniqueId, request: reqOpts })
         }
 
         if (!successCallbackUrl || !errorCallbackUrl || ignoreCallbacks) {
-          return resolve({ curlRequest, transformedRequest, syncResponse })
+          return resolve({ curlRequest, requestSent, transformedRequest, syncResponse })
         }
         customLogger.logMessage('info', 'Received response ' + result.status + ' ' + result.statusText, { additionalData: result.data, notification: false, user })
       }, (err) => {
@@ -896,7 +1000,7 @@ const getTotalCounts = (inputTemplate) => {
 }
 
 // Generate consolidated final report
-const generateFinalReport = (inputTemplate, runtimeInformation) => {
+const generateFinalReport = (inputTemplate, runtimeInformation, metrics) => {
   const { test_cases, ...remaingPropsInTemplate } = inputTemplate  // eslint-disable-line
   const resultTestCases = test_cases.map(testCase => { // eslint-disable-line
     const { requests, ...remainingPropsInTestCase } = testCase
@@ -923,6 +1027,11 @@ const generateFinalReport = (inputTemplate, runtimeInformation) => {
       requests: resultRequests
     }
   })
+  if (runtimeInformation.totalPassedAssertions === runtimeInformation.totalAssertions) {
+    metrics?.testSuccess.add(1, { template: inputTemplate.name })
+  } else {
+    metrics?.testFail.add(1, { template: inputTemplate.name })
+  }
   return {
     ...remaingPropsInTemplate,
     test_cases: resultTestCases,

@@ -30,6 +30,7 @@ const Config = require('../config')
 class InboundEventListener {
   constructor (consoleFn) {
     this.eventListeners = {}
+    this.transformer = {}
     this.userConfig = {}
     if (consoleFn) {
       this.consoleFn = consoleFn
@@ -60,6 +61,10 @@ class InboundEventListener {
 
   customLog (logMessage) {
     this.consoleFn.log(logMessage)
+  }
+
+  setTransformer (transformerObj) {
+    this.transformer = transformerObj?.transformer || {}
   }
 
   addListener (clientName, method, path, conditionFn, timeout = 15000) {
@@ -99,7 +104,16 @@ class InboundEventListener {
           this.destroy(clientName)
           // Return the stored message
           // this.customLog('Returning stored message...')
-          resolve(retMessage)
+          if (this.transformer.reverseTransform) {
+            this.transformer.reverseTransform(retMessage).then((result) => {
+              resolve(result)
+            }).catch((err) => {
+              this.customLog('Error transforming message: ' + err)
+              resolve(retMessage)
+            })
+          } else {
+            resolve(retMessage)
+          }
         } else {
           // Listen for the new message for some time
           let timer = null
@@ -118,7 +132,17 @@ class InboundEventListener {
           this.eventListeners[clientName].eventEmitter.once('newMessage', (message) => {
             clearTimeout(timer)
             this.destroy(clientName)
-            resolve(this.parseMessage(message))
+            const retMessage = this.parseMessage(message)
+            if (this.transformer.reverseTransform) {
+              this.transformer.reverseTransform(retMessage).then((result) => {
+                resolve(result)
+              }).catch((err) => {
+                this.customLog('Error transforming message: ' + err)
+                resolve(retMessage)
+              })
+            } else {
+              resolve(retMessage)
+            }
           })
         }
       }
