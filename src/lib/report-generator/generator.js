@@ -25,8 +25,8 @@ const Handlebars = require('handlebars')
 const { readFileAsync } = require('../utils')
 const reportHelpers = require('./helpers')
 const customLogger = require('../requestLogger')
-
-const BASE_TEMPLATE_PATH = 'spec_files/reports/templates'
+const path = require('path')
+const BASE_TEMPLATE_PATH = path.resolve(__dirname, '../../../spec_files/reports/templates')
 
 const testResultTemplates = {
   html: {

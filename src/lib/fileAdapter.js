@@ -26,22 +26,26 @@
 
 const utils = require('./utils')
 
+const resolve = (filename) => {
+  return require.resolve('../../' + filename)
+}
+
 const read = async (filename) => {
-  const data = await utils.readFileAsync(filename)
+  const data = await utils.readFileAsync(resolve(filename))
   return JSON.parse(data)
 }
 
 const readDir = async (filename) => {
-  const data = await utils.readDirAsync(filename)
+  const data = await utils.readDirAsync(resolve(filename))
   return data
 }
 
 const upsert = async (filename, data) => {
-  await utils.writeFileAsync(filename, JSON.stringify(data, null, 2))
+  await utils.writeFileAsync(resolve(filename), JSON.stringify(data, null, 2))
 }
 
 const remove = async (filename) => {
-  await utils.deleteFileAsync(filename)
+  await utils.deleteFileAsync(resolve(filename))
 }
 
 module.exports = {
