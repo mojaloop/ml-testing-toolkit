@@ -28,7 +28,8 @@ const { loggerFactory } = require('@mojaloop/central-services-logger/src/context
 
 const logger = loggerFactory('TTK')
 
-const BATCH_TIMEOUT_MS = parseInt(process.env.BATCH_TIMEOUT_MS, 10) || 10
+const DEFAULT_BATCH_SIZE = parseInt(process.env.DEFAULT_BATCH_SIZE, 10) || 1
+const BATCH_PAUSE_MS = parseInt(process.env.BATCH_PAUSE_MS, 10) || 10
 
 /**
  * Run async tasks in series - waits for the first {batchSize} promises
@@ -38,7 +39,7 @@ const BATCH_TIMEOUT_MS = parseInt(process.env.BATCH_TIMEOUT_MS, 10) || 10
  * @param {int} batchSize  Default is 1 (run all sequentially)
  * @returns {Promise[]}
  */
-const runPromiseListInBatches = async (promiseList, batchSize = 1) => {
+const runPromiseListInBatches = async (promiseList, batchSize = DEFAULT_BATCH_SIZE) => {
   const startAt = Date.now()
   const results = []
 
@@ -55,7 +56,7 @@ const runPromiseListInBatches = async (promiseList, batchSize = 1) => {
     iteration += 1
     position += batchSize
 
-    if (BATCH_TIMEOUT_MS) await sleep(BATCH_TIMEOUT_MS)
+    if (BATCH_PAUSE_MS) await sleep(BATCH_PAUSE_MS)
   }
 
   const duration = ((Date.now() - startAt) / 1000).toFixed(1)

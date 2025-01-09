@@ -53,7 +53,6 @@ const runPromiseListInBatches = require('./runPromiseListInBatches')
 
 delete axios.defaults.headers.common.Accept
 
-const DEFAULT_BATCH_SIZE = parseInt(process.env.DEFAULT_BATCH_SIZE, 10) || 1
 const terminateTraceIds = {}
 
 const OutboundSend = async (
@@ -232,7 +231,7 @@ const terminateOutbound = (traceID) => {
 
 // todo: think, how to define batchSize
 const processAllTestCases = async ({
-  inputTemplate, traceID, variableData, dfspId, globalConfig, metrics, batchSize = DEFAULT_BATCH_SIZE
+  inputTemplate, traceID, variableData, dfspId, globalConfig, metrics, batchSize
 }) => {
   const promises = inputTemplate.test_cases.map(testCase => () => {
     globalConfig.totalProgress.testCasesProcessed++
