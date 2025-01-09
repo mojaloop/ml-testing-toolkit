@@ -115,7 +115,6 @@
     "socket.io-client": "4.8.1",
     "ulidx": "2.4.1",
     "uuid": "11.0.4",
-    "uuid4": "2.0.3",
     "ws": "8.18.0"
   },
   "devDependencies": {
@@ -135,6 +134,10 @@
     "standard": "17.1.2",
     "standard-version": "9.5.0",
     "supertest": "7.0.0"
+  },
+  "imports": {
+    "#src/*": "./src/*.js",
+    "#test/*": "./test/*.js"
   },
   "generator-swaggerize": {
     "version": "4.1.0"

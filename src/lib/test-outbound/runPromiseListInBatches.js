@@ -32,12 +32,12 @@ const DEFAULT_BATCH_SIZE = parseInt(process.env.DEFAULT_BATCH_SIZE, 10) || 1
 const BATCH_PAUSE_MS = parseInt(process.env.BATCH_PAUSE_MS, 10) || 10
 
 /**
- * Run async tasks in series - waits for the first {batchSize} promises
- * to finish before starting the next batch.
+ * Executes a list of promises (async functions) in series (batches).
+ * It waits for the first {batchSize} promises to finish before starting the next batch.
  *
- * @param {Array<async function>} promiseList array of promises (async tasks/jobs/operations)
- * @param {int} batchSize  Default is 1 (run all sequentially)
- * @returns {Promise[]}
+ * @param {Array<() => Promise<any>>} promiseList - array of functions, which return promises (async tasks/jobs/operations)
+ * @param {number} [batchSize=DEFAULT_BATCH_SIZE] - batchSize (default is 1 - run all sequentially)
+ * @returns {Promise<any[]>} - array of results from all promises
  */
 const runPromiseListInBatches = async (promiseList, batchSize = DEFAULT_BATCH_SIZE) => {
   const startAt = Date.now()
