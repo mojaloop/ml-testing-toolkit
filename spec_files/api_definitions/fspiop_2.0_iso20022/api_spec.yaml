@@ -31,6 +31,7 @@ paths:
       - $ref: "#/components/parameters/FSPIOP-Signature"
       - $ref: "#/components/parameters/FSPIOP-URI"
       - $ref: "#/components/parameters/FSPIOP-HTTP-Method"
+      - $ref: "#/components/parameters/FSPIOP-Proxy"
     get:
       description: >-
         The HTTP request `GET /parties/{Type}/{ID}` (or `GET
@@ -125,6 +126,7 @@ paths:
         - $ref: "#/components/parameters/FSPIOP-Signature"
         - $ref: "#/components/parameters/FSPIOP-URI"
         - $ref: "#/components/parameters/FSPIOP-HTTP-Method"
+        - $ref: "#/components/parameters/FSPIOP-Proxy"
       requestBody:
         description: Details of the error returned.
         required: true
@@ -1745,6 +1747,16 @@ components:
         method. Required if signature verification is used, for more
         information, see [the API Signature
         document](https://github.com/mojaloop/docs/tree/main/Specification%20Document%20Set).
+    FSPIOP-Proxy:
+      name: FSPIOP-Proxy
+      in: header
+      schema:
+        type: string
+      required: false
+      description: >-
+        The `FSPIOP-Proxy` header field is a non-HTTP standard field used
+        by the API to indicate that the request has been proxied. The field
+        should be set by the proxy that is forwarding the request.
     FSPIOP-Signature:
       name: FSPIOP-Signature
       in: header
