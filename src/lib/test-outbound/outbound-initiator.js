@@ -24,47 +24,37 @@
  ******/
 
 const _ = require('lodash')
-const customLogger = require('../requestLogger')
 const axios = require('axios').default
 const https = require('https')
+const uuid = require('uuid')
+require('request-to-curl')
+require('atob') // eslint-disable-line
+
 const Config = require('../config')
+const customLogger = require('../requestLogger')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
 const { readFileAsync, headersToLowerCase } = require('../utils')
 const expectOriginal = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
-const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
-require('request-to-curl')
-require('atob') // eslint-disable-line
-delete axios.defaults.headers.common.Accept
+
 const postmanContext = require('../scripting-engines/postman-sandbox')
 const javascriptContext = require('../scripting-engines/vm-javascript-sandbox')
 const openApiDefinitionsModel = require('../mocking/openApiDefinitionsModel')
-const uuid = require('uuid')
 const utilsInternal = require('../utilsInternal')
 const dbAdapter = require('../db/adapters/dbAdapter')
 const arrayStore = require('../arrayStore')
 const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 const httpAgentStore = require('../httpAgentStore')
 const Transformers = require('../mocking/transformers')
+const getTracing = require('./getTracing')
+const runPromiseListInBatches = require('./runPromiseListInBatches')
 
+delete axios.defaults.headers.common.Accept
+
+const DEFAULT_BATCH_SIZE = parseInt(process.env.DEFAULT_BATCH_SIZE, 10) || 1
 const terminateTraceIds = {}
-
-const getTracing = (traceID, dfspId) => {
-  const tracing = {
-    outboundID: traceID,
-    sessionID: null
-  }
-  if (traceID && TraceHeaderUtils.isCustomTraceID(traceID)) {
-    tracing.outboundID = TraceHeaderUtils.getEndToEndID(traceID)
-    tracing.sessionID = TraceHeaderUtils.getSessionID(traceID)
-  }
-  if (Config.getSystemConfig().HOSTING_ENABLED) {
-    tracing.sessionID = dfspId
-  }
-  return tracing
-}
 
 const OutboundSend = async (
   inputTemplate,
@@ -97,20 +87,9 @@ const OutboundSend = async (
     environment: { ...inputTemplate.inputValues }
   }
   try {
-    for (const i in inputTemplate.test_cases) {
-      globalConfig.totalProgress.testCasesProcessed++
-      await processTestCase(
-        inputTemplate.test_cases[i],
-        traceID,
-        inputTemplate.inputValues,
-        variableData,
-        dfspId,
-        globalConfig,
-        inputTemplate.options,
-        metrics,
-        inputTemplate.name
-      )
-    }
+    await processAllTestCases({
+      inputTemplate, traceID, variableData, dfspId, globalConfig, metrics
+    })
 
     const completedTimeStamp = new Date()
     const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
@@ -154,7 +133,7 @@ const OutboundSend = async (
       }, tracing.sessionID)
     }
   } catch (err) {
-    console.log(err)
+    console.log('error in OutboundSend:', err)
     notificationEmitter.broadcastOutboundProgress({
       status: 'TERMINATED',
       outboundID: tracing.outboundID
@@ -238,6 +217,7 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metr
       }, tracing.sessionID)
     }
   } catch (err) {
+    console.log('error in OutboundSendLoop:', err)
     notificationEmitter.broadcastOutboundProgress({
       status: 'ITERATIONS_TERMINATED',
       outboundID: tracing.outboundID,
@@ -248,6 +228,27 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metr
 
 const terminateOutbound = (traceID) => {
   terminateTraceIds[traceID] = true
+}
+
+// todo: think, how to define batchSize
+const processAllTestCases = async ({
+  inputTemplate, traceID, variableData, dfspId, globalConfig, metrics, batchSize = DEFAULT_BATCH_SIZE
+}) => {
+  const promises = inputTemplate.test_cases.map(testCase => () => {
+    globalConfig.totalProgress.testCasesProcessed++
+    return processTestCase(
+      testCase,
+      traceID,
+      inputTemplate.inputValues,
+      variableData,
+      dfspId,
+      globalConfig,
+      inputTemplate.options,
+      metrics,
+      inputTemplate.name
+    )
+  })
+  return runPromiseListInBatches(promises, batchSize)
 }
 
 const processTestCase = async (
@@ -401,7 +402,8 @@ const processTestCase = async (
         resp = err.message
       }
       status = 'ERROR'
-      await setResponse(convertedRequest,
+      await setResponse(
+        convertedRequest,
         resp,
         variableData,
         request,

@@ -50,7 +50,7 @@ const getStoredUserConfig = async (user) => {
     const storedConfig = await loadUserConfigDFSPWise(user)
     return storedConfig
   } catch (err) {
-    console.log(`Can not read the file ${USER_CONFIG_FILE}`)
+    console.log(`Can not read the file ${USER_CONFIG_FILE}`, err)
     return {}
   }
 }

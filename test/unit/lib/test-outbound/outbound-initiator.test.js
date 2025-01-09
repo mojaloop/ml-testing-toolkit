@@ -25,17 +25,20 @@
 
 'use strict'
 
-const OutboundInitiator = require('../../../../src/lib/test-outbound/outbound-initiator')
-const axios = require('axios').default
 const https = require('https')
+const axios = require('axios').default
+const OutboundInitiator = require('../../../../src/lib/test-outbound/outbound-initiator')
 const ConnectionProvider = require('../../../../src/lib/configuration-providers/mb-connection-manager')
 const Config = require('../../../../src/lib/config')
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
-const notificationEmitter = require('../../../../src/lib/notificationEmitter.js')
 const dbAdapter = require('../../../../src/lib/db/adapters/dbAdapter')
 const OpenApiDefinitionsModel = require('../../../../src/lib/mocking/openApiDefinitionsModel')
 const Utils = require('../../../../src/lib/utils')
+
+jest.mock('axios')
 jest.mock('../../../../src/lib/webSocketClient/WebSocketClientManager')
+jest.mock('../../../../src/lib/notificationEmitter.js')
+jest.mock('../../../../src/lib/db/adapters/dbAdapter')
 
 const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
 const SpyAgent = jest.spyOn(https, 'Agent')
@@ -48,11 +51,6 @@ const SpyJwsSignWithKey = jest.spyOn(JwsSigning, 'signWithKey')
 const SpyGetApiDefinitions = jest.spyOn(OpenApiDefinitionsModel, 'getApiDefinitions')
 const spyDbAdapterUpsertReport = jest.spyOn(dbAdapter, 'upsertReport')
 const SpyAxios = jest.spyOn(axios.default, 'create')
-
-jest.mock('../../../../src/lib/notificationEmitter.js')
-jest.mock('axios')
-jest.mock('../../../../src/lib/db/adapters/dbAdapter')
-
 
 describe('Outbound Initiator Functions', () => {
   describe('getFunctionResult', () => {
@@ -87,6 +85,7 @@ describe('Outbound Initiator Functions', () => {
       expect(uuid).toEqual(fnWrongSyntax)
     })
   })
+
   describe('replacePathVariables', () => {
     beforeEach(() => {
       jest.resetAllMocks()
@@ -127,6 +126,7 @@ describe('Outbound Initiator Functions', () => {
       expect(path).toEqual('/parties/MSISDN/{ID}')
     })
   })
+
   describe('replaceRequestVariables', () => {
     beforeEach(() => {
       jest.resetAllMocks()
@@ -1401,7 +1401,54 @@ describe('Outbound Initiator Functions', () => {
       expect(testResult.passedCount).toEqual(1)
     })
   })
+
   describe('OutboundSend & OutboundSendLoop', () => {
+    // todo: figure out why there's a hanging connection
+    const makeTestCaseJson = (id = 1) => ({
+      "id": 1,
+      "name": "P2P Transfer Happy Path",
+      "requests": [
+        {
+          "id": 1,
+          "description": "Get party information",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": false
+          },
+          "operationPath": "/parties/{Type}/{ID}",
+          "method": "get",
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "params": {
+            "Type": "{$inputs.toIdType}",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "tests": {
+            "assertions": []
+          },
+          "scriptingEngine": "javascript",
+          "ignoreCallbacks": true,
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "console.log('sample')"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "console.log('sample')"
+              ]
+            }
+          }
+        }
+      ]
+    })
     const sampleTemplate = {
       "inputValues": {
         "fromIdType": "MSISDN",
@@ -1436,51 +1483,7 @@ describe('Outbound Initiator Functions', () => {
       },
       "name": "multi",
       "test_cases": [
-        {
-          "id": 1,
-          "name": "P2P Transfer Happy Path",
-          "requests": [
-            {
-              "id": 1,
-              "description": "Get party information",
-              "apiVersion": {
-                "minorVersion": 0,
-                "majorVersion": 1,
-                "type": "fspiop",
-                "asynchronous": false
-              },
-              "operationPath": "/parties/{Type}/{ID}",
-              "method": "get",
-              "headers": {
-                "Accept": "{$inputs.accept}",
-                "Content-Type": "{$inputs.contentType}",
-                "Date": "{$function.generic.curDate}",
-                "FSPIOP-Source": "{$inputs.fromFspId}"
-              },
-              "params": {
-                "Type": "{$inputs.toIdType}",
-                "ID": "{$inputs.toIdValue}"
-              },
-              "tests": {
-                "assertions": []
-              },
-              "scriptingEngine": "javascript",
-              "ignoreCallbacks": true,
-              "scripts": {
-                "preRequest": {
-                  "exec": [
-                    "console.log('sample')"
-                  ]
-                },
-                "postRequest": {
-                  "exec": [
-                    "console.log('sample')"
-                  ]
-                }
-              }
-            }
-          ]
-        }
+        makeTestCaseJson(1)
       ]
     }
     beforeEach(() => {
@@ -1904,6 +1907,7 @@ describe('Outbound Initiator Functions', () => {
       await OutboundInitiator.OutboundSend(sampleTemplateModified4, '123')
       expect(spyDbAdapterUpsertReport).toBeCalled()
     })
+
     it('OutboundSend with sync option enabled', async () => {
       axios.mockImplementation(() => Promise.resolve({
         status: 200,
