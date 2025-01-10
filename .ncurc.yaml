@@ -1,12 +1,6 @@
 ## Add a TODO comment indicating the reason for each rejected dependency upgrade added to this list, and what should be done to resolve it (i.e. handle it through a story, etc).
 reject: [
   "chai", # version 5 uses only ESM
-  "hapi-swagger",
-  "json-rules-engine",
-  "mongoose",
-  "nodemon",
-  "axios",
-  "dotenv",
-  "uuid"
+  "axios" # version 1.7.9 causes func tests to hanging up
 ]
 
