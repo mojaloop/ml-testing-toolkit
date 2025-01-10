@@ -4,6 +4,9 @@ reject: [
   "hapi-swagger",
   "json-rules-engine",
   "mongoose",
-  "nodemon"
+  "nodemon",
+  "axios",
+  "dotenv",
+  "uuid"
 ]
 
