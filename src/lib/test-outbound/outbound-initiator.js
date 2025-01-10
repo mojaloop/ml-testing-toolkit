@@ -231,7 +231,7 @@ const terminateOutbound = (traceID) => {
 
 // todo: think, how to define batchSize
 const processAllTestCases = async ({
-  inputTemplate, traceID, variableData, dfspId, globalConfig, metrics, batchSize
+  inputTemplate, traceID, variableData, dfspId, globalConfig, metrics
 }) => {
   const promises = inputTemplate.test_cases.map(testCase => () => {
     globalConfig.totalProgress.testCasesProcessed++
@@ -247,7 +247,7 @@ const processAllTestCases = async ({
       inputTemplate.name
     )
   })
-  return runPromiseListInBatches(promises, batchSize)
+  return runPromiseListInBatches(promises, inputTemplate.batchSize)
 }
 
 const processTestCase = async (
