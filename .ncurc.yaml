@@ -3,8 +3,6 @@ reject: [
   "chai", # version 5 uses only ESM
   "axios",
   "dotenv",
-  "express",
-  "express-validator",
   "hapi-swagger",
   "json-rules-engine",
   "mongoose",
