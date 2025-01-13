@@ -1056,25 +1056,32 @@ $(".prettyPrint").each(function () {
 <script>
 window.onscroll = function() {scrollFunction()};
 
+function updateDisplay(elementId, displayValue) {
+    var element = document.getElementById(elementId);
+    if (element && element.style) {
+        element.style.display = displayValue;
+    }
+}
+
 function scrollFunction() {
   if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-    document.getElementById("topOfRequestsScreen").style.display = "block";
-    document.getElementById("topOfFailuresScreen").style.display = "block";
-    document.getElementById("topOfSkippedScreen").style.display = "block";
-    document.getElementById("topOfLogsScreen").style.display = "block";
-    document.getElementById("openAll").style.display = "none";
-    document.getElementById("closeAll").style.display = "none";
-    document.getElementById("openAllRequests").style.display = "none";
-    document.getElementById("closeAllRequests").style.display = "none";
+    updateDisplay("topOfRequestsScreen", "block");
+    updateDisplay("topOfFailuresScreen", "block");
+    updateDisplay("topOfSkippedScreen", "block");
+    updateDisplay("topOfLogsScreen", "block");
+    updateDisplay("openAll", "none");
+    updateDisplay("closeAll", "none");
+    updateDisplay("openAllRequests", "none");
+    updateDisplay("closeAllRequests", "none");
   } else {
-    document.getElementById("topOfRequestsScreen").style.display = "none";
-    document.getElementById("topOfFailuresScreen").style.display = "none";
-    document.getElementById("topOfSkippedScreen").style.display = "none";
-    document.getElementById("topOfLogsScreen").style.display = "none";
-    document.getElementById("openAll").style.display = "block";
-    document.getElementById("closeAll").style.display = "block";
-    document.getElementById("openAllRequests").style.display = "block";
-    document.getElementById("closeAllRequests").style.display = "block";
+    updateDisplay("topOfRequestsScreen", "none");
+    updateDisplay("topOfFailuresScreen", "none");
+    updateDisplay("topOfSkippedScreen", "none");
+    updateDisplay("topOfLogsScreen", "none");
+    updateDisplay("openAll", "block");
+    updateDisplay("closeAll", "block");
+    updateDisplay("openAllRequests", "block");
+    updateDisplay("closeAllRequests", "block");
   }
 }
 
