@@ -37,7 +37,11 @@ const getConnection = async () => {
       password: encodeURIComponent(systemConfig.DB.PASSWORD),
       host: systemConfig.DB.HOST,
       port: systemConfig.DB.PORT,
-      database: systemConfig.DB.DATABASE
+      database: systemConfig.DB.DATABASE,
+      replicas: systemConfig.DB.REPLICAS,
+      ...systemConfig.DB.OPTIONS && Object.keys(systemConfig.DB.OPTIONS).length && {
+        options: systemConfig.DB.OPTIONS
+      }
     })
     conn = await mongoDBWrapper.connect(connectionString, {
       useNewUrlParser: true,
