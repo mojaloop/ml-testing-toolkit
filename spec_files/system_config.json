@@ -17,8 +17,7 @@
     "USER": "ttk",
     "PASSWORD": "ttk",
     "DATABASE": "ttk",
-    "REPLICAS": [],
-    "OPTIONS": {}
+    "CONNECTION_STRING": null
   },
   "METRICS": {
     "timeout": 5000,
