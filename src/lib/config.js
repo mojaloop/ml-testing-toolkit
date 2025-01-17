@@ -94,17 +94,20 @@ const loadSystemConfig = async () => {
 
 const _getSecretsFromEnvironment = () => {
   const secretsFromEnvironment = {}
-  if (process.env.REPORTING_DB_CONNECTION_PASSWORD) {
+  if (process.env.REPORTING_DB_CONNECTION_PASSWORD || process.env.REPORTING_DB_CONNECTION_STRING) {
     try {
       const reportingDbConnectionPassword = process.env.REPORTING_DB_CONNECTION_PASSWORD
-      console.log(`Retrieved reporting database password in environment ${process.env.REPORTING_DB_CONNECTION_PASSWORD}`)
+      const reportingDbConnectionString = process.env.REPORTING_DB_CONNECTION_STRING
+      console.log(`Retrieved reporting database password in environment '${process.env.REPORTING_DB_CONNECTION_PASSWORD}'`)
+      console.log(`Retrieved reporting database connection string in environment '${process.env.REPORTING_DB_CONNECTION_STRING}'`)
       secretsFromEnvironment.DB = {
-        PASSWORD: reportingDbConnectionPassword
+        PASSWORD: reportingDbConnectionPassword,
+        CONNECTION_STRING: reportingDbConnectionString
       }
       console.log(`Secrets retrieved from environment to be merged into system config ${secretsFromEnvironment}`)
     } catch (err) {
       console.log(err)
-      console.log('Failed to retrieve reporting database password in environment')
+      console.log('Failed to retrieve reporting database password or connection string in environment')
     }
   }
   return secretsFromEnvironment

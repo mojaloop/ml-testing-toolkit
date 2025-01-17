@@ -39,7 +39,6 @@ const getConnection = async () => {
       port: systemConfig.DB.PORT,
       database: systemConfig.DB.DATABASE
     })
-    console.log(`Connecting to MongoDB: ${connectionString}`)
     conn = await mongoDBWrapper.connect(connectionString, {
       useNewUrlParser: true,
       useUnifiedTopology: true
