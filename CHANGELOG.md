@@ -1,4 +1,16 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+## [18.6.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.5.1...v18.6.0) (2025-01-20)
+
+
+### Features
+
+* **csi-1019:** add db connection string support ([#288](https://github.com/mojaloop/ml-testing-toolkit/issues/288)) ([0918232](https://github.com/mojaloop/ml-testing-toolkit/commit/09182327361d6d439cb9a821cd0411f0e2affe4b))
+
+
+### Chore
+
+* **moja-tools-bot:** update license file ([#266](https://github.com/mojaloop/ml-testing-toolkit/issues/266)) ([c30f389](https://github.com/mojaloop/ml-testing-toolkit/commit/c30f389dd613ea457920701d6b227aac40212925))
+
 ### [18.5.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.5.0...v18.5.1) (2024-11-18)
 
 
