@@ -124,20 +124,20 @@ const logMessage = (verbosity, message, externalData = {}) => {
   switch (verbosity) {
     case 'debug':
       Logger.debug(message)
-      if (data.additionalData !==undefined) Logger.debug(data.additionalData)
+      if (data.additionalData !==undefined) Logger.debug(JSON.stringify(data.additionalData))
       break
     case 'warn':
       Logger.warn(message)
-      if (data.additionalData !==undefined) Logger.warn(data.additionalData)
+      if (data.additionalData !==undefined) Logger.warn(JSON.stringify(data.additionalData))
       break
     case 'error':
       Logger.error(message)
-      if (data.additionalData !==undefined) Logger.error(data.additionalData)
+      if (data.additionalData !==undefined) Logger.error(JSON.stringify(data.additionalData))
       break
     case 'info':
     default: {
       Logger.info(message)
-      if (data.additionalData !==undefined) Logger.info(data.additionalData)
+      if (data.additionalData !==undefined) Logger.info(JSON.stringify(data.additionalData))
     }
   }
 
