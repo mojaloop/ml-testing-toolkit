@@ -819,6 +819,10 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
         })
       }
 
+      // Check for 'content-type' and add it as false if not present to avoid axios setting it to 'application/json' by default
+      if (!Object.keys(reqOpts.headers).some(key => key.toLowerCase() === 'content-type')) {
+        reqOpts.headers['content-type'] = false
+      }
       customLogger.logOutboundRequest('info', 'Sending request ' + reqOpts.method + ' ' + reqOpts.url, { additionalData: { request: reqOpts }, user, uniqueId, request: reqOpts })
 
       axios(reqOpts).then((result) => {
