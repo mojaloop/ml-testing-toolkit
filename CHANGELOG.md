@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.6.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.6.1...v18.6.2) (2025-01-22)
+
+
+### Bug Fixes
+
+* content type default header ([#4034](https://github.com/mojaloop/ml-testing-toolkit/issues/4034)) ([#289](https://github.com/mojaloop/ml-testing-toolkit/issues/289)) ([c29ea4d](https://github.com/mojaloop/ml-testing-toolkit/commit/c29ea4d67628411358374e6bacd63cf147420762))
+
 ### [18.6.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.6.0...v18.6.1) (2025-01-20)
 
 
