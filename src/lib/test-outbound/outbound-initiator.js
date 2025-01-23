@@ -49,7 +49,7 @@ const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 const httpAgentStore = require('../httpAgentStore')
 const Transformers = require('../mocking/transformers')
 const getTracing = require('./getTracing')
-const testCaseRunner = require('./testCaseRunner')
+const TestCaseRunner = require('./TestCaseRunner')
 
 delete axios.defaults.headers.common.Accept
 
@@ -86,7 +86,7 @@ const OutboundSend = async (
     environment: { ...inputTemplate.inputValues }
   }
   try {
-    await testCaseRunner.runAll({
+    await (new TestCaseRunner(Config)).runAll({
       processTestCase, inputTemplate, traceID, variableData, dfspId, globalConfig, metrics
     })
 
