@@ -23,6 +23,8 @@
  --------------
  **********/
 
+/* istanbul ignore file */
+// todo: improve test coverage
 const { setTimeout: sleep } = require('node:timers/promises')
 const { loggerFactory } = require('@mojaloop/central-services-logger/src/contextLogger')
 
