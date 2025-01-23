@@ -24,7 +24,7 @@
  **********/
 
 const { setTimeout: sleep } = require('node:timers/promises')
-const runPromiseListInBatches = require('#src/lib/test-outbound/runPromiseListInBatches')
+const testCaseRunner = require('#src/lib/test-outbound/testCaseRunner')
 
 const makePromiseList = (count, timeoutMs) => [...Array(count)].map(() => () => sleep(timeoutMs))
 
@@ -35,7 +35,7 @@ describe('runPromiseListInBatches Tests -->', () => {
     const promiseList = makePromiseList(count, timeoutMs)
     const startAt = Date.now()
 
-    await runPromiseListInBatches(promiseList, count)
+    await testCaseRunner.runPromiseListInBatches(promiseList, count)
     const durationMs = Date.now() - startAt
     expect(durationMs).toBeLessThan(timeoutMs * 2) // a bit more than 1 iteration
   })
@@ -46,7 +46,7 @@ describe('runPromiseListInBatches Tests -->', () => {
     const promiseList = makePromiseList(count, timeoutMs)
     const startAt = Date.now()
 
-    await runPromiseListInBatches(promiseList, 1)
+    await testCaseRunner.runPromiseListInBatches(promiseList, 1)
     const durationMs = Date.now() - startAt
     expect(durationMs).toBeGreaterThanOrEqual(timeoutMs * count)
   })
@@ -55,7 +55,7 @@ describe('runPromiseListInBatches Tests -->', () => {
     const response = 123
     const promiseList = [async () => response]
 
-    const results = await runPromiseListInBatches(promiseList)
+    const results = await testCaseRunner.runPromiseListInBatches(promiseList)
     expect(results).toEqual([response])
   })
 })

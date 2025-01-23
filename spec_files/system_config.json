@@ -4,6 +4,7 @@
   "REQUEST_PAYLOAD_MAX_BYTES": 20485760,
   "INBOUND_MUTUAL_TLS_ENABLED": false,
   "OUTBOUND_MUTUAL_TLS_ENABLED": false,
+  "PARALLEL_RUN_ENABLED": true,
   "CONFIG_VERSIONS": {
     "response": 1,
     "callback": 1,

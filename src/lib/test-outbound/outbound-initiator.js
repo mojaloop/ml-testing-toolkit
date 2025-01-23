@@ -49,7 +49,7 @@ const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 const httpAgentStore = require('../httpAgentStore')
 const Transformers = require('../mocking/transformers')
 const getTracing = require('./getTracing')
-const runPromiseListInBatches = require('./runPromiseListInBatches')
+const testCaseRunner = require('./testCaseRunner')
 
 delete axios.defaults.headers.common.Accept
 
@@ -86,8 +86,8 @@ const OutboundSend = async (
     environment: { ...inputTemplate.inputValues }
   }
   try {
-    await processAllTestCases({
-      inputTemplate, traceID, variableData, dfspId, globalConfig, metrics
+    await testCaseRunner.runAll({
+      processTestCase, inputTemplate, traceID, variableData, dfspId, globalConfig, metrics
     })
 
     const completedTimeStamp = new Date()
@@ -227,27 +227,6 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metr
 
 const terminateOutbound = (traceID) => {
   terminateTraceIds[traceID] = true
-}
-
-// todo: think, how to define batchSize
-const processAllTestCases = async ({
-  inputTemplate, traceID, variableData, dfspId, globalConfig, metrics
-}) => {
-  const promises = inputTemplate.test_cases.map(testCase => () => {
-    globalConfig.totalProgress.testCasesProcessed++
-    return processTestCase(
-      testCase,
-      traceID,
-      inputTemplate.inputValues,
-      variableData,
-      dfspId,
-      globalConfig,
-      inputTemplate.options,
-      metrics,
-      inputTemplate.name
-    )
-  })
-  return runPromiseListInBatches(promises, inputTemplate.batchSize)
 }
 
 const processTestCase = async (
@@ -633,7 +612,7 @@ const handleTests = async (request, requestSent, response = null, callback = nul
           }
           passedCount++
         } catch (err) {
-          console.log(err)
+          console.log('error during eval tests results:', err)
           isFailed = true
           results[testCase.id] = {
             status: 'FAILED',
@@ -644,7 +623,7 @@ const handleTests = async (request, requestSent, response = null, callback = nul
     }
     return { results, passedCount, isFailed }
   } catch (err) {
-    console.log(err)
+    console.log('error in handleTests:', err)
     return null
   }
 }

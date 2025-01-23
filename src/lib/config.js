@@ -29,6 +29,7 @@ const USER_CONFIG_FILE = 'spec_files/user_config.json'
 const _ = require('lodash')
 
 let SYSTEM_CONFIG = {}
+
 const USER_CONFIG = {
   data: undefined
 }

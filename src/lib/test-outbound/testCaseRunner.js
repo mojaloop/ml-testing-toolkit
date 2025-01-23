@@ -25,9 +25,13 @@
 
 const { setTimeout: sleep } = require('node:timers/promises')
 const { loggerFactory } = require('@mojaloop/central-services-logger/src/contextLogger')
+const config = require('../config')
 
 const logger = loggerFactory('TTK')
 
+const { PARALLEL_RUN_ENABLED = false } = config.getSystemConfig()
+
+// think, if it's better to move to system config
 const DEFAULT_BATCH_SIZE = parseInt(process.env.DEFAULT_BATCH_SIZE, 10) || 1
 const BATCH_PAUSE_MS = parseInt(process.env.BATCH_PAUSE_MS, 10) || 10
 
@@ -65,5 +69,70 @@ const runPromiseListInBatches = async (promiseList, batchSize = DEFAULT_BATCH_SI
   return results
 }
 
+/**
+ * Executes a list of promises (async functions) sequentially.
+ * It waits for a promise to finish before starting the next one.
+ *
+ * @param {Array<() => Promise<any>>} promiseList - array of functions, which return promises (async tasks/jobs/operations)
+ * @returns {Promise<any[]>} - array of results from all promises
+ */
+const runPromiseListSequentially = async (promiseList) => {
+  const results = []
+  for (const pr of promiseList) {
+    results.push(await pr())
+  }
+  logger.verbose('all testCases are run sequentially')
+  return results
+}
+
+/**
+ * Executes a list of promises sequentially or in batches.
+ * It waits for the first {batchSize} promises to finish before starting the next batch.
+ *
+ * @param {Array<() => Promise<any>>} promiseList - array of functions, which return promises (async tasks/jobs/operations)
+ * @param {number} [batchSize] - batchSize (default is 1 - run all sequentially)
+ * @returns {Promise<any[]>} - array of results from all promises
+ */
+// const run = async (promiseList, batchSize) => {
+//   const isParallelRun = PARALLEL_RUN_ENABLED && batchSize > 1
+//   logger.info(`isParallelRun: ${isParallelRun}`)
+//
+//   return isParallelRun
+//     ? runPromiseListInBatches(promiseList, batchSize)
+//     : runPromiseListSequentially(promiseList)
+// }
+
+// todo: add JSDocs
+const runAll = async ({
+  processTestCase, inputTemplate, traceID, variableData, dfspId, globalConfig, metrics
+}) => {
+  const runOneTestCase = testCase => () => {
+    globalConfig.totalProgress.testCasesProcessed++
+    return processTestCase(
+      testCase,
+      traceID,
+      inputTemplate.inputValues,
+      variableData,
+      dfspId,
+      globalConfig,
+      inputTemplate.options,
+      metrics,
+      inputTemplate.name
+    )
+  }
+  const asyncFnList = inputTemplate.test_cases.map(runOneTestCase)
+
+  const isParallelRun = PARALLEL_RUN_ENABLED && inputTemplate.batchSize > 1
+  logger.info(`isParallelRun: ${isParallelRun}`)
+
+  return isParallelRun
+    ? runPromiseListInBatches(asyncFnList, inputTemplate.batchSize)
+    : runPromiseListSequentially(asyncFnList)
+}
+
 // todo: add unit-tests
-module.exports = runPromiseListInBatches
+module.exports = {
+  runAll,
+  runPromiseListInBatches,
+  runPromiseListSequentially
+}
