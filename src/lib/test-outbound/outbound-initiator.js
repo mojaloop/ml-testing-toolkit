@@ -972,9 +972,10 @@ const getTotalCounts = (inputTemplate) => {
   const testCasesToRun = []
 
   inputTemplate.test_cases.forEach(testCase => {
-    if (isParallelRun && typeof !testCase.meta.executionOrder === 'number') return
+    if (isParallelRun && typeof !testCase.meta?.executionOrder === 'number') return
     // todo: - think, if we need to skip testCases without executionOrder (in parallel run)
     //       - optimise the logic to avoid additional looping in runAll (define executionBuckets here)
+    //       - check if all testCases should have "meta" field
     testCasesToRun.push(testCase)
     result.totalRequests += testCase.requests.length
     testCase.requests.forEach(request => {
