@@ -1449,45 +1449,48 @@ describe('Outbound Initiator Functions', () => {
         }
       ]
     })
-    const sampleTemplate = {
-      "inputValues": {
-        "fromIdType": "MSISDN",
-        "fromIdValue": "44123456789",
-        "fromFirstName": "Firstname-Test",
-        "fromLastName": "Lastname-Test",
-        "fromDOB": "1984-01-01",
-        "note": "test",
-        "currency": "USD",
-        "amount": "100",
-        "homeTransactionId": "123ABC",
-        "fromFspId": "testingtoolkitdfsp",
-        "accept": "application/vnd.interoperability.parties+json;version=1.0",
-        "contentType": "application/vnd.interoperability.parties+json;version=1.0",
-        "toIdValue": "27713803912",
-        "toIdType": "MSISDN",
-        "toFspId": "payeefsp",
-        "acceptQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
-        "contentTypeQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
-        "acceptTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
-        "contentTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
-        "hub_operator": "NOT_APPLICABLE",
-        "payerfsp": "testingtoolkitdfsp",
-        "accountId": "6",
-        "payeefsp": "payeefsp",
-        "HUB_OPERATOR_BEARER_TOKEN": "NOT_APPLICABLE",
-        "BASE_CENTRAL_LEDGER_ADMIN": "",
-        "payerIdType": "MSISDN",
-        "payerIdentifier": "22507008181",
-        "payeeIdType": "MSISDN",
-        "payeeIdentifier": "22556999125"
-      },
-      "name": "multi",
-      "test_cases": [
-        makeTestCaseJson(1)
-      ]
-    }
+
+    let sampleTemplate
+
     beforeEach(() => {
       jest.resetAllMocks()
+      sampleTemplate = {
+        "inputValues": {
+          "fromIdType": "MSISDN",
+          "fromIdValue": "44123456789",
+          "fromFirstName": "Firstname-Test",
+          "fromLastName": "Lastname-Test",
+          "fromDOB": "1984-01-01",
+          "note": "test",
+          "currency": "USD",
+          "amount": "100",
+          "homeTransactionId": "123ABC",
+          "fromFspId": "testingtoolkitdfsp",
+          "accept": "application/vnd.interoperability.parties+json;version=1.0",
+          "contentType": "application/vnd.interoperability.parties+json;version=1.0",
+          "toIdValue": "27713803912",
+          "toIdType": "MSISDN",
+          "toFspId": "payeefsp",
+          "acceptQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
+          "contentTypeQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
+          "acceptTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
+          "contentTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
+          "hub_operator": "NOT_APPLICABLE",
+          "payerfsp": "testingtoolkitdfsp",
+          "accountId": "6",
+          "payeefsp": "payeefsp",
+          "HUB_OPERATOR_BEARER_TOKEN": "NOT_APPLICABLE",
+          "BASE_CENTRAL_LEDGER_ADMIN": "",
+          "payerIdType": "MSISDN",
+          "payerIdentifier": "22507008181",
+          "payeeIdType": "MSISDN",
+          "payeeIdentifier": "22556999125"
+        },
+        "name": "multi",
+        "test_cases": [
+          makeTestCaseJson(1)
+        ]
+      }
       SpySign.mockImplementation(async () => {throw new Error()})
       SpyAgent.mockImplementation(async () => {
         return {httpsAgent: {}}
@@ -1917,6 +1920,12 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
+      axios.create.mockReturnValue({
+        interceptors: {
+          request: { use: jest.fn() },
+          response: { use: jest.fn() }
+        }
+      })
       SpyGetApiDefinitions.mockResolvedValue([{
         specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
         type: 'fspiop'

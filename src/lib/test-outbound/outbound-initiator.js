@@ -22,6 +22,7 @@
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
+/* eslint-disable camelcase */
 
 const _ = require('lodash')
 const axios = require('axios').default
@@ -967,26 +968,33 @@ const getTotalCounts = (inputTemplate) => {
     totalRequests: 0,
     totalAssertions: 0
   }
-  const { test_cases } = inputTemplate  // eslint-disable-line
-  result.totalTestCases = test_cases.length  // eslint-disable-line
-  test_cases.forEach(testCase => { // eslint-disable-line
-    const { requests } = testCase
-    result.totalRequests += requests.length
-    requests.forEach(request => {
-      result.totalAssertions += request.tests && request.tests.assertions && request.tests.assertions.length
+  const isParallelRun = Config.getSystemConfig().PARALLEL_RUN_ENABLED && inputTemplate.batchSize > 1
+  const testCasesToRun = []
+
+  inputTemplate.test_cases.forEach(testCase => {
+    if (isParallelRun && typeof !testCase.meta.executionOrder === 'number') return
+    // todo: - think, if we need to skip testCases without executionOrder (in parallel run)
+    //       - optimise the logic to avoid additional looping in runAll (define executionBuckets here)
+    testCasesToRun.push(testCase)
+    result.totalRequests += testCase.requests.length
+    testCase.requests.forEach(request => {
+      result.totalAssertions += (request.tests?.assertions?.length || 0)
     })
   })
+  inputTemplate.test_cases = testCasesToRun
+  result.totalTestCases = testCasesToRun.length
+
   return result
 }
 
 // Generate consolidated final report
 const generateFinalReport = (inputTemplate, runtimeInformation, metrics) => {
-  const { test_cases, ...remaingPropsInTemplate } = inputTemplate  // eslint-disable-line
-  const resultTestCases = test_cases.map(testCase => { // eslint-disable-line
+  const { test_cases, ...remaingPropsInTemplate } = inputTemplate
+  const resultTestCases = test_cases.map(testCase => {
     const { requests, ...remainingPropsInTestCase } = testCase
     const resultRequests = requests.map(requestItem => {
       const { testResult, request, ...remainginPropsInRequest } = requestItem.appended
-      if (request.tests && request.tests.assertions) {
+      if (request?.tests?.assertions) {
         request.tests.assertions = request.tests.assertions.map(assertion => {
           return {
             ...assertion,
