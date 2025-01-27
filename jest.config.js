@@ -7,7 +7,7 @@ module.exports = {
     global: {
       statements: 90,
       functions: 90,
-      branches: 85, // todo: improve test coverage
+      branches: 90,
       lines: 90
     }
   },

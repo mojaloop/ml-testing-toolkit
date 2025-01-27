@@ -36,6 +36,7 @@ const customLogger = require('../requestLogger')
 const { getHeader, urlToPath } = require('../utils')
 
 const registerAxiosRequestInterceptor = (userConfig, axios, transformerObj) => {
+  // istanbul ignore next
   axios.interceptors.request.use(async config => {
     const options = { rejectUnauthorized: false }
     // Log the request

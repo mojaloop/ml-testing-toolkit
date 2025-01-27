@@ -23,8 +23,6 @@
  --------------
  **********/
 
-/* istanbul ignore file */
-// todo: improve test coverage
 const { setTimeout: sleep } = require('node:timers/promises')
 const { loggerFactory } = require('@mojaloop/central-services-logger/src/contextLogger')
 
@@ -43,7 +41,6 @@ class TestCaseRunner {
     this.logger = logger || loggerFactory('TestCaseRunner')
   }
 
-  // todo: add JSDocs
   async runAll ({
     processTestCase, inputTemplate, traceID, variableData, dfspId, globalConfig, metrics
   }) {
@@ -89,7 +86,6 @@ class TestCaseRunner {
     return this.runBucketsInExecutionOrder(executionBuckets, inputTemplate.batchSize)
   }
 
-  // todo: add JSDocs
   async runBucketsInExecutionOrder (executionBuckets, batchSize) {
     const sortedOrderKeys = Array.from(executionBuckets.keys()).sort((a, b) => a - b)
     this.logger.info('sortedOrderKeys:', { sortedOrderKeys })

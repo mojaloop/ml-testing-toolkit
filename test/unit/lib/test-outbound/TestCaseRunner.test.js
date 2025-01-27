@@ -34,7 +34,7 @@ const makePromiseList = (count, timeoutMs) => [...Array(count)].map(() => () => 
 describe('TestCaseRunner Tests -->', () => {
   let testCaseRunner
 
-  beforeAll(  () => {
+  beforeEach(  () => {
     testCaseRunner = new TestCaseRunner(config)
   })
 
@@ -83,6 +83,43 @@ describe('TestCaseRunner Tests -->', () => {
       })
       expect(testCaseRunner.runBucketsInExecutionOrder).toHaveBeenCalled()
     })
+
+    test('should increase globalConfig.totalProgress.testCasesProcessed', async () => {
+      config.getSystemConfig.mockReturnValue({ PARALLEL_RUN_ENABLED: true })
+      const globalConfig = {
+        totalProgress: { testCasesProcessed: 0 }
+      }
+
+      await testCaseRunner.runAll({
+        processTestCase: async () => {},
+        inputTemplate: {
+          test_cases: [
+            { meta: { executionOrder: 1 } },
+            { meta: { executionOrder: 1 } }
+          ],
+          batchSize: 2
+        },
+        globalConfig
+      })
+      expect(globalConfig.totalProgress.testCasesProcessed).toBeGreaterThan(0)
+    })
+
+    test('should not call processTestCase fn if no testCases with executionOrder', async () => {
+      config.getSystemConfig.mockReturnValue({ PARALLEL_RUN_ENABLED: true })
+      const processTestCase = jest.fn()
+
+      await testCaseRunner.runAll({
+        processTestCase,
+        inputTemplate: {
+          test_cases: [
+            { meta: {} },
+            { meta: {} }
+          ],
+          batchSize: 2
+        },
+      })
+      expect(processTestCase).not.toHaveBeenCalled()
+    })
   })
 
   describe('runPromiseListInBatches method Tests', () => {
@@ -117,4 +154,16 @@ describe('TestCaseRunner Tests -->', () => {
     })
   })
 
+  describe('runPromiseListSequentially method Tests', () => {
+    test('should run promises sequentially', async () => {
+      const count = 10
+      const timeoutMs = 50
+      const promiseList = makePromiseList(count, timeoutMs)
+      const startAt = Date.now()
+
+      await testCaseRunner.runPromiseListSequentially(promiseList)
+      const durationMs = Date.now() - startAt
+      expect(durationMs).toBeGreaterThanOrEqual(timeoutMs * count)
+    })
+  })
 })

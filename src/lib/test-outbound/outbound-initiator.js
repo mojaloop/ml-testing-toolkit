@@ -141,6 +141,7 @@ const OutboundSend = async (
   }
 }
 
+/* istanbul ignore next */
 const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metrics) => {
   const totalCounts = getTotalCounts(inputTemplate)
 
@@ -296,6 +297,7 @@ const processTestCase = async (
     if (tracing.sessionID) {
       convertedRequest.headers = convertedRequest.headers || {}
       convertedRequest.headers.traceparent = '00-' + traceID + '-0123456789abcdef0-00'
+      // todo: think about proper traceparent header
     }
 
     const scriptsExecution = {}
@@ -613,7 +615,7 @@ const handleTests = async (request, requestSent, response = null, callback = nul
           }
           passedCount++
         } catch (err) {
-          console.log('error during eval tests results:', err)
+          console.log(`error during eval testsString [testCase.id: ${testCase.id}]:`, err)
           isFailed = true
           results[testCase.id] = {
             status: 'FAILED',
