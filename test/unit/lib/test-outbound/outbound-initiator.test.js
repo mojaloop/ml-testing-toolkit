@@ -1178,6 +1178,177 @@ describe('Outbound Initiator Functions', () => {
       expect(axios).toHaveBeenCalledTimes(1);
       expect(SpyJwsSignWithKey).toHaveBeenCalledTimes(1);
     })
+    it('sendRequest should call axios with appropriate params and preserve content-type header when present in the request', async () => {
+      axios.mockImplementation(() =>
+        Promise.resolve({
+          status: 200,
+          statusText: 'OK',
+          data: {},
+          request: {
+            toCurl: () => '',
+          },
+        })
+      );
+    
+      SpySign.mockReturnValue(Promise.resolve());
+      SpyAgent.mockImplementation(() => {
+        return {
+          httpsAgent: {}
+        };
+      });
+      SpyGetTlsConfig.mockReturnValue(
+        Promise.resolve({
+          dfsps: {
+            userdfsp: {
+              hubClientCert: 'cert',
+              dfspServerCaRootCert: 'ca',
+            },
+          },
+          hubClientKey: 'key',
+        })
+      );
+      SpyGetUserConfig.mockResolvedValue({
+        CALLBACK_ENDPOINT: 'http://localhost:4040',
+      });
+      SpyGetSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: true,
+      });
+    
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'userdfsp',
+          Date: '2020-01-01 01:01:01',
+          TimeStamp: '{$request.headers.Date}',
+          'Content-Type': 'application/json'
+        },
+        body: {
+          transactionId: '123',
+          amount: {
+            amount: '100',
+            currency: 'USD',
+          },
+          transactionAmount: {
+            amount: '{$request.body.amount.amount}',
+            currency: '{$request.body.amount.currency}',
+          },
+        },
+      };
+    
+      try {
+        const testRequestObj = {
+          url: 'localhost/',
+          method: 'post',
+          path: '/quotes',
+          queryParams: null,
+          headers: sampleRequest.headers,
+          body: sampleRequest.body,
+          ignoreCallbacks: null,
+        };
+        await OutboundInitiator.sendRequest(testRequestObj, null, null, 'userdfsp');
+      } catch (err) {}
+    
+      // Assert axios was called once
+      expect(axios).toHaveBeenCalledTimes(1);
+    
+      // Capture the first call arguments to axios
+      const [axiosCall] = axios.mock.calls[0];
+    
+      // Check that the headers match the expected headers
+      expect(axiosCall.headers).toEqual(
+        expect.objectContaining({
+          'FSPIOP-Source': 'userdfsp',
+          Date: '2020-01-01 01:01:01',
+          TimeStamp: '{$request.headers.Date}',
+          'Content-Type': 'application/json'
+        })
+      );
+    })
+    it('sendRequest should call axios with appropriate params and remove default content-type header (set to false)', async () => {
+      axios.mockImplementation(() =>
+        Promise.resolve({
+          status: 200,
+          statusText: 'OK',
+          data: {},
+          request: {
+            toCurl: () => '',
+          },
+        })
+      );
+    
+      SpySign.mockReturnValue(Promise.resolve());
+      SpyAgent.mockImplementation(() => {
+        return {
+          httpsAgent: {}
+        };
+      });
+      SpyGetTlsConfig.mockReturnValue(
+        Promise.resolve({
+          dfsps: {
+            userdfsp: {
+              hubClientCert: 'cert',
+              dfspServerCaRootCert: 'ca',
+            },
+          },
+          hubClientKey: 'key',
+        })
+      );
+      SpyGetUserConfig.mockResolvedValue({
+        CALLBACK_ENDPOINT: 'http://localhost:4040',
+      });
+      SpyGetSystemConfig.mockReturnValue({
+        HOSTING_ENABLED: false,
+        OUTBOUND_MUTUAL_TLS_ENABLED: true,
+      });
+    
+      const sampleRequest = {
+        headers: {
+          'FSPIOP-Source': 'userdfsp',
+          Date: '2020-01-01 01:01:01',
+          TimeStamp: '{$request.headers.Date}',
+        },
+        body: {
+          transactionId: '123',
+          amount: {
+            amount: '100',
+            currency: 'USD',
+          },
+          transactionAmount: {
+            amount: '{$request.body.amount.amount}',
+            currency: '{$request.body.amount.currency}',
+          },
+        },
+      };
+    
+      try {
+        const testRequestObj = {
+          url: 'localhost/',
+          method: 'post',
+          path: '/quotes',
+          queryParams: null,
+          headers: sampleRequest.headers,
+          body: sampleRequest.body,
+          ignoreCallbacks: null,
+        };
+        await OutboundInitiator.sendRequest(testRequestObj, null, null, 'userdfsp');
+      } catch (err) {}
+    
+      // Assert axios was called once
+      expect(axios).toHaveBeenCalledTimes(1);
+    
+      // Capture the first call arguments to axios
+      const [axiosCall] = axios.mock.calls[0];
+    
+      // Check that the headers match the expected headers
+      expect(axiosCall.headers).toEqual(
+        expect.objectContaining({
+          'FSPIOP-Source': 'userdfsp',
+          Date: '2020-01-01 01:01:01',
+          TimeStamp: '{$request.headers.Date}',
+          'Content-Type': false
+        })
+      );
+    })
   })
 
   describe('generateFinalReport', () => {

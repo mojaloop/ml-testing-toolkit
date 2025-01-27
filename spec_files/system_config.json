@@ -17,7 +17,8 @@
     "PORT": 27017,
     "USER": "ttk",
     "PASSWORD": "ttk",
-    "DATABASE": "ttk"
+    "DATABASE": "ttk",
+    "CONNECTION_STRING": null
   },
   "METRICS": {
     "timeout": 5000,

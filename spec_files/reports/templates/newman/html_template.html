@@ -408,21 +408,21 @@ input:checked + .slider:before {
 <body class="">
   <div class="container">
         <div class="container">
-            <label>Light</label>
+            <label for="slider">Light</label>
             <label id="switch" class="switch">
                 <input type="checkbox" onchange="toggleTheme()" id="slider">
                 <span class="slider round"></span>
             </label>
-            <label>Dark</label>
+            <label for="slider">Dark</label>
         </div>
         <div class="card">
         <div class="card-header">
             <ul class="nav nav-pills mb-3 nav-justified" id="pills-tab" role="tablist">
             <li class="nav-item bg-info active" data-toggle="tooltip" title="Click to view the Summary">
-                <a class="nav-link text-white" id="pills-summary-tab" data-toggle="pill" href="#pills-summary" role="tab" aria-controls="pills-summary" aria-selected="true">Summary</a>
+                <a class="nav-link text-white" id="pills-summary-tab" data-toggle="pill" href="#" data-target="#pills-summary" role="tab" aria-controls="pills-summary" aria-selected="true">Summary</a>
             </li>
             <li class="nav-item bg-success" data-toggle="tooltip" title="Click to view the Requests">
-                <a class="nav-link text-white" id="pills-requests-tab" data-toggle="pill" href="#pills-requests" role="tab" aria-controls="pills-requests" aria-selected="false">Details</a>
+                <a class="nav-link text-white" id="pills-requests-tab" data-toggle="pill" href="#" data-target="#pills-requests" role="tab" aria-controls="pills-requests" aria-selected="false">Details</a>
             </li>
             </ul>
         <div class="tab-content" id="pills-tabContent">
@@ -1056,25 +1056,32 @@ $(".prettyPrint").each(function () {
 <script>
 window.onscroll = function() {scrollFunction()};
 
+function updateDisplay(elementId, displayValue) {
+    var element = document.getElementById(elementId);
+    if (element && element.style) {
+        element.style.display = displayValue;
+    }
+}
+
 function scrollFunction() {
   if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-    document.getElementById("topOfRequestsScreen").style.display = "block";
-    document.getElementById("topOfFailuresScreen").style.display = "block";
-    document.getElementById("topOfSkippedScreen").style.display = "block";
-    document.getElementById("topOfLogsScreen").style.display = "block";
-    document.getElementById("openAll").style.display = "none";
-    document.getElementById("closeAll").style.display = "none";
-    document.getElementById("openAllRequests").style.display = "none";
-    document.getElementById("closeAllRequests").style.display = "none";
+    updateDisplay("topOfRequestsScreen", "block");
+    updateDisplay("topOfFailuresScreen", "block");
+    updateDisplay("topOfSkippedScreen", "block");
+    updateDisplay("topOfLogsScreen", "block");
+    updateDisplay("openAll", "none");
+    updateDisplay("closeAll", "none");
+    updateDisplay("openAllRequests", "none");
+    updateDisplay("closeAllRequests", "none");
   } else {
-    document.getElementById("topOfRequestsScreen").style.display = "none";
-    document.getElementById("topOfFailuresScreen").style.display = "none";
-    document.getElementById("topOfSkippedScreen").style.display = "none";
-    document.getElementById("topOfLogsScreen").style.display = "none";
-    document.getElementById("openAll").style.display = "block";
-    document.getElementById("closeAll").style.display = "block";
-    document.getElementById("openAllRequests").style.display = "block";
-    document.getElementById("closeAllRequests").style.display = "block";
+    updateDisplay("topOfRequestsScreen", "none");
+    updateDisplay("topOfFailuresScreen", "none");
+    updateDisplay("topOfSkippedScreen", "none");
+    updateDisplay("topOfLogsScreen", "none");
+    updateDisplay("openAll", "block");
+    updateDisplay("closeAll", "block");
+    updateDisplay("openAllRequests", "block");
+    updateDisplay("closeAllRequests", "block");
   }
 }
 
@@ -1088,16 +1095,8 @@ function topFunction() {
     "use strict";
 
 window.onload = function () {
-
-  // hides all blocks of response
-  var allItems = document.querySelectorAll('[class*=iteration-]');
-  allItems.forEach(function(elem){
-    elem.style.display = 'none';
-  });
-
    
   let totalIterations = 1;
-   
 
   let menu = document.querySelector('#execution-menu .nav');
 
