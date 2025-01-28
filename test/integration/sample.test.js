@@ -24,7 +24,7 @@
 
 'use strict'
 
-const request = require('request-promise-native')
+const axios = require('axios')
 
 const {
   TEST_TOOLKIT_HOST,
@@ -36,17 +36,13 @@ describe('plugins', () => {
 
     it('Checks the health endpoint', async () => {
       // Arrange
-      const options = {
-        uri: `http://${TEST_TOOLKIT_HOST}:${API_PORT}/health`,
-        json: true,
-        simple: true
-      }
+      const url = `http://${TEST_TOOLKIT_HOST}:${API_PORT}/health`
 
       // Act
-      const result = await request(options)
+      const response = await axios.get(url)
 
       // Assert
-      expect(result.status).toBe('OK')
+      expect(response.data.status).toBe('OK')
     })
   })
 })

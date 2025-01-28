@@ -24,27 +24,35 @@
 
 'use strict'
 const Config = require('../config')
-const rp = require('request-promise-native')
+const axios = require('axios')
 const customLogger = require('../requestLogger')
 
 exports.getToken = async (username, password) => {
-  const form = {
+  const form = new URLSearchParams({
     username,
     password,
     scope: 'openid',
     grant_type: 'password'
-  }
+  })
 
   try {
     const Constants = Config.getSystemConfig()
     const url = Constants.OAUTH.OAUTH2_ISSUER
-    const loginResponse = await rp.post(url).form(form).auth(Constants.OAUTH.APP_OAUTH_CLIENT_KEY, Constants.OAUTH.APP_OAUTH_CLIENT_SECRET) // MP-757
-    customLogger.logMessage('info', `Wso2Client.getToken received ${loginResponse}`, { notification: false })
-    const loginResponseObj = JSON.parse(loginResponse)
-    return loginResponseObj
+    const response = await axios.post(url, form.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      auth: {
+        username: Constants.OAUTH.APP_OAUTH_CLIENT_KEY,
+        password: Constants.OAUTH.APP_OAUTH_CLIENT_SECRET
+      }
+    })
+
+    customLogger.logMessage('info', `Wso2Client.getToken received ${JSON.stringify(response.data)}`, { notification: false })
+    return response.data
   } catch (error) {
-    if (error && error.statusCode === 400 && error.message.includes('Authentication failed')) {
-      throw new Error(`Authentication failed for user ${username}`, error.error)
+    if (error.response?.status === 400 && error.response?.data?.message.includes('Authentication failed')) {
+      throw new Error(`Authentication failed for user ${username}`)
     }
     throw error
   }
