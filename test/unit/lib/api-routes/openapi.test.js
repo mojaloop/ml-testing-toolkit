@@ -50,6 +50,7 @@ const SpyDeleteApiDefinition = jest.spyOn(APIManagement, 'deleteDefinition')
 const requestLogger = require('../../../../src/lib/requestLogger')
 const specFilePrefix = 'test/'
 
+jest.setTimeout(10_000)
 jest.mock('../../../../src/lib/requestLogger')
 jest.mock('../../../../src/lib/config')
 
@@ -61,6 +62,7 @@ describe('API route /api/openapi', () => {
   afterEach(() => {
     jest.resetAllMocks()
   })
+
   describe('GET /api/openapi/api_versions', () => {
     it('Getting all api versions', async () => {
       const mockGetApiDefinitionsResponse = [{
@@ -88,6 +90,7 @@ describe('API route /api/openapi', () => {
       expect(res.statusCode).toEqual(404)
     })
   })
+
   describe('GET /api/openapi/definition/:type/:version', () => {
     it('Getting api definition', async () => {
       const mockGetApiDefinitionsResponse = [{
@@ -132,6 +135,7 @@ describe('API route /api/openapi', () => {
       expect(res.statusCode).toEqual(500)
     })
   })
+
   describe('POST /api/openapi/definition', () => {
     it('Happy Path', async () => {
       SpyAddApiDefinition.mockResolvedValue({})
@@ -168,6 +172,7 @@ describe('API route /api/openapi', () => {
       expect(res.statusCode).toEqual(422)
     })
   })
+
   describe('DELETE /api/openapi/definition/:type/:version', () => {
     it('Happy Path', async () => {
       SpyDeleteApiDefinition.mockResolvedValue({})
@@ -183,6 +188,7 @@ describe('API route /api/openapi', () => {
       expect(res.statusCode).toEqual(404)
     })
   })
+
   describe('POST /api/openapi/validate_definition', () => {
     it('Happy Path', async () => {
       SpyValidateApiDefinition.mockResolvedValue({})
@@ -205,6 +211,7 @@ describe('API route /api/openapi', () => {
       expect(res.statusCode).toEqual(404)
     })
   })
+
   describe('GET /api/openapi/callback_map/:type/:version', () => {
     it('Getting api definition', async () => {
       const mockGetApiDefinitionsResponse = [{
@@ -220,7 +227,7 @@ describe('API route /api/openapi', () => {
       const res = await request(app).get(`/api/openapi/callback_map/${reqItem.type}/${reqItem.majorVersion}.${reqItem.minorVersion}`)
       expect(res.statusCode).toEqual(200)
     })
-    
+
     it('Getting api definition - not found api definition', async () => {
       const mockGetApiDefinitionsResponse = [{
         minorVersion: 0,
@@ -319,6 +326,7 @@ describe('API route /api/openapi', () => {
       expect(res.statusCode).toEqual(500)
     })
   })
+
   describe('GET /api/openapi/response_map/:type/:version', () => {
     it('Getting api definition', async () => {
       const mockGetApiDefinitionsResponse = [{
@@ -334,7 +342,7 @@ describe('API route /api/openapi', () => {
       const res = await request(app).get(`/api/openapi/response_map/${reqItem.type}/${reqItem.majorVersion}.${reqItem.minorVersion}`)
       expect(res.statusCode).toEqual(200)
     })
-    
+
     it('Getting api definition - not found api definition', async () => {
       const mockGetApiDefinitionsResponse = [{
         minorVersion: 0,

@@ -1,7 +1,7 @@
 {
   "name": "ml-testing-toolkit",
   "description": "Testing Toolkit for Mojaloop implementations",
-  "version": "18.6.2",
+  "version": "18.7.0-snapshot.0",
   "license": "Apache-2.0",
   "author": "Vijaya Kumar Guthi, ModusBox Inc. ",
   "contributors": [
@@ -71,11 +71,11 @@
     "@hapi/hapi": "21.3.12",
     "@hapi/inert": "7.1.0",
     "@hapi/vision": "7.0.3",
-    "@mojaloop/central-services-logger": "11.5.2",
-    "@mojaloop/central-services-metrics": "12.4.3",
+    "@mojaloop/central-services-logger": "11.5.3",
+    "@mojaloop/central-services-metrics": "12.4.4",
     "@mojaloop/ml-schema-transformer-lib": "^v2.5.1",
-    "@mojaloop/ml-testing-toolkit-shared-lib": "14.0.2",
-    "@mojaloop/sdk-standard-components": "^19.6.3",
+    "@mojaloop/ml-testing-toolkit-shared-lib": "14.0.3",
+    "@mojaloop/sdk-standard-components": "^19.6.4",
     "@now-ims/hapi-now-auth": "2.1.0",
     "@types/socket.io": "3.0.2",
     "adm-zip": "0.5.16",
@@ -121,7 +121,6 @@
     "socket.io-client": "4.8.1",
     "ulidx": "2.4.1",
     "uuid": "11.0.5",
-    "uuid4": "2.0.3",
     "ws": "8.18.0"
   },
   "devDependencies": {
@@ -141,6 +140,10 @@
     "standard": "17.1.2",
     "standard-version": "9.5.0",
     "supertest": "7.0.0"
+  },
+  "imports": {
+    "#src/*": "./src/*.js",
+    "#test/*": "./test/*.js"
   },
   "generator-swaggerize": {
     "version": "4.1.0"

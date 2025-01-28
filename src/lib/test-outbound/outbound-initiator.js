@@ -22,49 +22,39 @@
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
+/* eslint-disable camelcase */
 
 const _ = require('lodash')
-const customLogger = require('../requestLogger')
 const axios = require('axios').default
 const https = require('https')
+const uuid = require('uuid')
+require('request-to-curl')
+require('atob') // eslint-disable-line
+
 const Config = require('../config')
+const customLogger = require('../requestLogger')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
 const { readFileAsync, headersToLowerCase } = require('../utils')
 const expectOriginal = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
-const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
-require('request-to-curl')
-require('atob') // eslint-disable-line
-delete axios.defaults.headers.common.Accept
+
 const postmanContext = require('../scripting-engines/postman-sandbox')
 const javascriptContext = require('../scripting-engines/vm-javascript-sandbox')
 const openApiDefinitionsModel = require('../mocking/openApiDefinitionsModel')
-const uuid = require('uuid')
 const utilsInternal = require('../utilsInternal')
 const dbAdapter = require('../db/adapters/dbAdapter')
 const arrayStore = require('../arrayStore')
 const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 const httpAgentStore = require('../httpAgentStore')
 const Transformers = require('../mocking/transformers')
+const getTracing = require('./getTracing')
+const TestCaseRunner = require('./TestCaseRunner')
+
+delete axios.defaults.headers.common.Accept
 
 const terminateTraceIds = {}
-
-const getTracing = (traceID, dfspId) => {
-  const tracing = {
-    outboundID: traceID,
-    sessionID: null
-  }
-  if (traceID && TraceHeaderUtils.isCustomTraceID(traceID)) {
-    tracing.outboundID = TraceHeaderUtils.getEndToEndID(traceID)
-    tracing.sessionID = TraceHeaderUtils.getSessionID(traceID)
-  }
-  if (Config.getSystemConfig().HOSTING_ENABLED) {
-    tracing.sessionID = dfspId
-  }
-  return tracing
-}
 
 const OutboundSend = async (
   inputTemplate,
@@ -97,20 +87,9 @@ const OutboundSend = async (
     environment: { ...inputTemplate.inputValues }
   }
   try {
-    for (const i in inputTemplate.test_cases) {
-      globalConfig.totalProgress.testCasesProcessed++
-      await processTestCase(
-        inputTemplate.test_cases[i],
-        traceID,
-        inputTemplate.inputValues,
-        variableData,
-        dfspId,
-        globalConfig,
-        inputTemplate.options,
-        metrics,
-        inputTemplate.name
-      )
-    }
+    await (new TestCaseRunner(Config)).runAll({
+      processTestCase, inputTemplate, traceID, variableData, dfspId, globalConfig, metrics
+    })
 
     const completedTimeStamp = new Date()
     const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
@@ -154,7 +133,7 @@ const OutboundSend = async (
       }, tracing.sessionID)
     }
   } catch (err) {
-    console.log(err)
+    console.log('error in OutboundSend:', err)
     notificationEmitter.broadcastOutboundProgress({
       status: 'TERMINATED',
       outboundID: tracing.outboundID
@@ -162,6 +141,7 @@ const OutboundSend = async (
   }
 }
 
+/* istanbul ignore next */
 const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metrics) => {
   const totalCounts = getTotalCounts(inputTemplate)
 
@@ -238,6 +218,7 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metr
       }, tracing.sessionID)
     }
   } catch (err) {
+    console.log('error in OutboundSendLoop:', err)
     notificationEmitter.broadcastOutboundProgress({
       status: 'ITERATIONS_TERMINATED',
       outboundID: tracing.outboundID,
@@ -316,6 +297,7 @@ const processTestCase = async (
     if (tracing.sessionID) {
       convertedRequest.headers = convertedRequest.headers || {}
       convertedRequest.headers.traceparent = '00-' + traceID + '-0123456789abcdef0-00'
+      // todo: think about proper traceparent header
     }
 
     const scriptsExecution = {}
@@ -401,7 +383,8 @@ const processTestCase = async (
         resp = err.message
       }
       status = 'ERROR'
-      await setResponse(convertedRequest,
+      await setResponse(
+        convertedRequest,
         resp,
         variableData,
         request,
@@ -632,7 +615,7 @@ const handleTests = async (request, requestSent, response = null, callback = nul
           }
           passedCount++
         } catch (err) {
-          console.log(err)
+          console.log(`error during eval testsString [testCase.id: ${testCase.id}]:`, err)
           isFailed = true
           results[testCase.id] = {
             status: 'FAILED',
@@ -643,7 +626,7 @@ const handleTests = async (request, requestSent, response = null, callback = nul
     }
     return { results, passedCount, isFailed }
   } catch (err) {
-    console.log(err)
+    console.log('error in handleTests:', err)
     return null
   }
 }
@@ -991,26 +974,34 @@ const getTotalCounts = (inputTemplate) => {
     totalRequests: 0,
     totalAssertions: 0
   }
-  const { test_cases } = inputTemplate  // eslint-disable-line
-  result.totalTestCases = test_cases.length  // eslint-disable-line
-  test_cases.forEach(testCase => { // eslint-disable-line
-    const { requests } = testCase
-    result.totalRequests += requests.length
-    requests.forEach(request => {
-      result.totalAssertions += request.tests && request.tests.assertions && request.tests.assertions.length
+  const isParallelRun = Config.getSystemConfig().PARALLEL_RUN_ENABLED && inputTemplate.batchSize > 1
+  const testCasesToRun = []
+
+  inputTemplate.test_cases.forEach(testCase => {
+    if (isParallelRun && typeof testCase.meta?.executionOrder !== 'number') return
+    // todo: - think, if we need to skip testCases without executionOrder (in parallel run)
+    //       - optimise the logic to avoid additional looping in runAll (define executionBuckets here)
+    //       - check if all testCases should have "meta" field
+    testCasesToRun.push(testCase)
+    result.totalRequests += testCase.requests.length
+    testCase.requests.forEach(request => {
+      result.totalAssertions += (request.tests?.assertions?.length || 0)
     })
   })
+  inputTemplate.test_cases = testCasesToRun
+  result.totalTestCases = testCasesToRun.length
+
   return result
 }
 
 // Generate consolidated final report
 const generateFinalReport = (inputTemplate, runtimeInformation, metrics) => {
-  const { test_cases, ...remaingPropsInTemplate } = inputTemplate  // eslint-disable-line
-  const resultTestCases = test_cases.map(testCase => { // eslint-disable-line
+  const { test_cases, ...remaingPropsInTemplate } = inputTemplate
+  const resultTestCases = test_cases.map(testCase => {
     const { requests, ...remainingPropsInTestCase } = testCase
     const resultRequests = requests.map(requestItem => {
       const { testResult, request, ...remainginPropsInRequest } = requestItem.appended
-      if (request.tests && request.tests.assertions) {
+      if (request?.tests?.assertions) {
         request.tests.assertions = request.tests.assertions.map(assertion => {
           return {
             ...assertion,

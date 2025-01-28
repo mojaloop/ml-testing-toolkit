@@ -77,7 +77,7 @@ router.post('/template/:traceID', [
     const inputJson = JSON.parse(JSON.stringify(req.body))
     // TODO: Change the following value to the dfspId based on the login incase HOSTING_ENABLED
     const dfspId = req.user ? req.user.dfspId : null
-    if (req.query.sync && req.query.sync === 'true') {
+    if (req.query?.sync === 'true') {
       const result = await outbound.OutboundSend(inputJson, traceID, dfspId, true, req.metrics)
       return res.status(200).json(result)
     } else {
