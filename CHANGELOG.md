@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+## [18.7.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.6.2...v18.7.0) (2025-01-28)
+
+
+### Features
+
+* **csi-706:** added testCases executionOrder support to be able to run in parallel ([#290](https://github.com/mojaloop/ml-testing-toolkit/issues/290)) ([f7b30d6](https://github.com/mojaloop/ml-testing-toolkit/commit/f7b30d69fa79a749dbe435488f16f9163dc6559d))
+
 ### [18.6.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.6.1...v18.6.2) (2025-01-22)
 
 
