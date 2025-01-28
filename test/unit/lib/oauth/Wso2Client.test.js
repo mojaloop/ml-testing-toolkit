@@ -22,68 +22,70 @@
  --------------
  ******/
 
-const Config = require('../../../../src/lib/config')
-jest.mock('../../../../src/lib/config')
-Config.getSystemConfig.mockReturnValue({
-  OAUTH: {
-    OAUTH2_ISSUER: ''
-  }
-})
-
-const Wso2Client = require('../../../../src/lib/oauth/Wso2Client')
-const rp = require('request-promise-native')
-const customLogger = require('../../../../src/lib/requestLogger')
-
-jest.mock('request-promise-native')
-jest.mock('../../../../src/lib/requestLogger')
-
-describe('Wso2Client tests', () => {
-  beforeAll(() => {
-    customLogger.logMessage.mockReturnValue()
-  })
-
-  describe('get token', () => {
-    it('should not throw an error', async () => {
-      rp.post.mockReturnValue({
-        form: () => {
-          return {
-            auth: () => JSON.stringify({})
-          }
-        }
-      })
-      await Wso2Client.getToken()
-    });
-    it('should throw an error', async () => {
-      rp.post.mockReturnValue({
-        form: () => {
-          return {
-            auth: () => {throw {}}
-          }
-        }
-      })
-      try {
-        await Wso2Client.getToken()
-      } catch (err) {
-
-      }
-    });
-    it('should throw an error', async () => {
-      rp.post.mockReturnValue({
-        form: () => {
-          return {
-            auth: () => {throw {
-              statusCode: 400,
-              message: 'Authentication failed'
-            }}
-          }
-        }
-      })
-      try {
-        await Wso2Client.getToken()
-      } catch (err) {
-
-      }
-    });
-  });
-});
-
+ const Config = require('../../../../src/lib/config')
+ jest.mock('../../../../src/lib/config')
+ Config.getSystemConfig.mockReturnValue({
+   OAUTH: {
+     OAUTH2_ISSUER: ''
+   }
+ })
+ 
+ const Wso2Client = require('../../../../src/lib/oauth/Wso2Client')
+ const axios = require('axios')
+ const AxiosMockAdapter = require('axios-mock-adapter')
+ const customLogger = require('../../../../src/lib/requestLogger')
+ 
+ jest.mock('../../../../src/lib/requestLogger')
+ 
+ describe('Wso2Client tests', () => {
+   let axiosMock
+ 
+   beforeAll(() => {
+     customLogger.logMessage.mockReturnValue()
+     axiosMock = new AxiosMockAdapter(axios)
+   })
+ 
+   afterEach(() => {
+     axiosMock.reset() // Reset Axios mocks between tests
+   })
+ 
+   afterAll(() => {
+     axiosMock.restore() // Restore Axios to its original state
+   })
+ 
+   describe('get token', () => {
+     it('should not throw an error', async () => {
+       // Arrange
+       axiosMock.onPost('').reply(200, {})
+ 
+       // Act
+       await Wso2Client.getToken('username', 'password')
+ 
+       // Assert
+       expect(customLogger.logMessage).toHaveBeenCalledWith(
+         'info',
+         expect.stringContaining('Wso2Client.getToken received'),
+         { notification: false }
+       )
+     })
+ 
+     it('should throw an error for failed authentication', async () => {
+       // Arrange
+       axiosMock.onPost('').reply(400, { message: 'Authentication failed' })
+ 
+       // Act & Assert
+       await expect(Wso2Client.getToken('username', 'password')).rejects.toThrow(
+         'Authentication failed for user username'
+       )
+     })
+ 
+     it('should throw an error for generic failures', async () => {
+       // Arrange
+       axiosMock.onPost('').networkError()
+ 
+       // Act & Assert
+       await expect(Wso2Client.getToken('username', 'password')).rejects.toThrow()
+     })
+   })
+ })
+ 

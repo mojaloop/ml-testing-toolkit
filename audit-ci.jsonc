@@ -3,32 +3,5 @@
   // audit-ci supports reading JSON, JSONC, and JSON5 config files.
   // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
   "moderate": true,
-  "allowlist": [
-    // TODO: multer lib is using some vulnerable dependency
-    "GHSA-wm7h-9275-46v2", // https://github.com/advisories/GHSA-wm7h-9275-46v2
-    // json web token, no fix available
-    "GHSA-8cf7-32gw-wr33", // https://github.com/advisories/GHSA-8cf7-32gw-wr33
-    "GHSA-hjrf-2m68-5959", // https://github.com/advisories/GHSA-hjrf-2m68-5959
-    "GHSA-qwph-4952-7xr6", // https://github.com/advisories/GHSA-qwph-4952-7xr6
-    // request-provise-native, no fix available
-    "GHSA-p8p7-x288-28g6", // https://github.com/advisories/GHSA-p8p7-x288-28g6
-    "GHSA-72xf-g2v4-qvf3", // https://github.com/advisories/GHSA-72xf-g2v4-qvf3,
-    "GHSA-78xj-cgh5-2h22", // https://github.com/advisories/GHSA-78xj-cgh5-2h22
-    "GHSA-2p57-rm9w-gvfp", // https://github.com/advisories/GHSA-2p57-rm9w-gvfp,
-    "GHSA-282f-qqgm-c34q",
-    "GHSA-6vfc-qv3f-vr6c",
-    "GHSA-7fh5-64p2-3v2j",
-    "GHSA-cgfm-xwp7-2cvr",
-    "GHSA-ghr5-ch3p-vcr6",
-    "GHSA-mjxr-4v3x-q3m4",
-    "GHSA-p9pc-299p-vxgp",
-    "GHSA-phwq-j96m-2c2q",
-    "GHSA-rjqq-98f6-6j3r",
-    "GHSA-rm97-x556-q36h",
-    "GHSA-v88g-cgmw-v5xw",
-    "GHSA-pppg-cpfq-h7wr",
-    "GHSA-3xgq-45jj-v275",
-    "GHSA-m7xq-9374-9rvx", // https://github.com/advisories/GHSA-m7xq-9374-9rvx
-    "GHSA-c76h-2ccp-4975" // https://github.com/advisories/GHSA-c76h-2ccp-4975
-  ]
+  "allowlist": []
 }
