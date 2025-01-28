@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.7.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.7.0...v18.7.1) (2025-01-28)
+
+
+### Chore
+
+* update dependencies and remove request-promise-native ([#291](https://github.com/mojaloop/ml-testing-toolkit/issues/291)) ([2ff3452](https://github.com/mojaloop/ml-testing-toolkit/commit/2ff3452b602529e080180a3a9caa45c12dc56cd0))
+
 ## [18.7.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.6.2...v18.7.0) (2025-01-28)
 
 
