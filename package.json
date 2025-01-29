@@ -184,7 +184,7 @@
     "jsonwebtoken": "9.0.2",
     "yargs-parser": "21.1.1",
     "oas-validator": {
-      "ajv": "8.6.2"
+      "ajv": "6.12.3"
     }
   }
 }
