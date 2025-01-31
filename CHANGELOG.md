@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.7.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.7.2...v18.7.3) (2025-01-31)
+
+
+### Chore
+
+* run testCases with empty executionOrder in parallel mode ([#293](https://github.com/mojaloop/ml-testing-toolkit/issues/293)) ([5e49e0e](https://github.com/mojaloop/ml-testing-toolkit/commit/5e49e0ead364469426a077d4f4a33d10fdbf2a76))
+
 ### [18.7.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.7.1...v18.7.2) (2025-01-29)
 
 
