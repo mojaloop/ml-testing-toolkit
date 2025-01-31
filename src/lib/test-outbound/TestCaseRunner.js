@@ -32,8 +32,7 @@ const BATCH_PAUSE_MS = parseInt(process.env.BATCH_PAUSE_MS, 10) || 10
 
 const EMPTY_ORDER_KEY = -1 // default bucket for testCases without executionOrder
 // think, if testCases without executionOrder should be run together with executionOrder = 0?
-const SKIP_EMPTY_EXECUTION_ORDER = true // skip testCases without executionOrder in parallel run
-// think, if we need to make it configurable
+const SKIP_EMPTY_EXECUTION_ORDER = false // skip testCases without executionOrder in parallel run
 
 class TestCaseRunner {
   constructor (config, logger) {
