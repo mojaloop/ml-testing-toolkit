@@ -1,20 +1,14 @@
 openapi: 3.0.1
 info:
   title: Mojaloop SDK Outbound Scheme Adapter API
-  description: >
+  description: |
     Specification for the Mojaloop SDK Scheme Adapter Outbound Transfers API
 
+    This API can be used by DFSP backends to simplify the process of sending funds to other parties within a Mojaloop scheme.
 
-    This API can be used by DFSP backends to simplify the process of sending
-    funds to other parties within a Mojaloop scheme.
+    Please see other documentation on https://github.com/mojaloop/sdk-scheme-adapter for more information.
 
-
-    Please see other documentation on
-    https://github.com/mojaloop/sdk-scheme-adapter for more information.
-
-
-    **Note on terminology:** The term "Switch" is equal to the term "Hub", and
-    the term "FSP" is equal to the term "DFSP".
+    **Note on terminology:** The term "Switch" is equal to the term "Hub", and the term "FSP" is equal to the term "DFSP".
   license:
     name: Apache License Version 2.0, January 2004
     url: https://github.com/mojaloop/documentation/blob/main/LICENSE.md
@@ -23,24 +17,17 @@ paths:
   /:
     get:
       summary: Health check endpoint
-      description: >-
-        This endpoint allows a user of the SDK scheme adapter to check the
-        outbound transfers service is listening.
+      description: This endpoint allows a user of the SDK scheme adapter to check the outbound transfers service is listening.
       tags:
         - Health
       responses:
         '200':
-          description: >-
-            Returns empty body if the scheme adapter outbound transfers service
-            is running.
+          description: Returns empty body if the scheme adapter outbound transfers service is running.
   /accounts:
     post:
       summary: Create accounts on the Account Lookup Service
-      description: >-
-        The HTTP request `POST /accounts` is used to create account information
-        on the Account Lookup Service (ALS) regarding the provided list of
-        identities.
-
+      description: |-
+        The HTTP request `POST /accounts` is used to create account information on the Account Lookup Service (ALS) regarding the provided list of identities.
 
         Caller DFSP is used as the account source FSP information
       tags:
@@ -64,9 +51,8 @@ paths:
   /bulkQuotes:
     post:
       summary: Request bulk quotes for the provided financial transactions
-      description: >
-        The HTTP request `POST /bulkQuotes` is used to request a bulk quote to
-        fascilitate funds transfer from payer DFSP to payees' DFSP.
+      description: |
+        The HTTP request `POST /bulkQuotes` is used to request a bulk quote to fascilitate funds transfer from payer DFSP to payees' DFSP.
       tags:
         - BulkQuotes
       requestBody:
@@ -88,11 +74,7 @@ paths:
   /bulkQuotes/{bulkQuoteId}:
     get:
       summary: Retrieves information for a specific bulk quote
-      description: >-
-        The HTTP request `GET /bulkQuotes/{bulktQuoteId}` is used to get
-        information regarding a bulk quote created or requested earlier. The
-        `{bulkQuoteId}` in the URI should contain the `bulkQuoteId` that was
-        used for the creation of the bulk quote.
+      description: The HTTP request `GET /bulkQuotes/{bulktQuoteId}` is used to get information regarding a bulk quote created or requested earlier. The `{bulkQuoteId}` in the URI should contain the `bulkQuoteId` that was used for the creation of the bulk quote.
       tags:
         - BulkQuotes
       parameters:
@@ -113,9 +95,8 @@ paths:
   /bulkTransactions:
     post:
       summary: Sends money from one account to multiple accounts
-      description: >
-        The HTTP request `POST /bulkTransactions` is used to request the
-        movement of funds from payer DFSP to payees' DFSP.
+      description: |
+        The HTTP request `POST /bulkTransactions` is used to request the movement of funds from payer DFSP to payees' DFSP.
       tags:
         - BulkTransactions
       requestBody:
@@ -135,13 +116,7 @@ paths:
   /bulkTransactions/{bulkTransactionId}:
     put:
       summary: Amends the bulk transaction request
-      description: >-
-        The HTTP request `PUT /bulkTransactions/{bulkTransactionId}` is used to
-        amend information regarding a bulk transaction, i.e. when
-        autoAcceptParty or autoAcceptQuote  is false then the payer need to
-        provide confirmation to proceed with further processing of the request.
-        The `{bulkTransactionId}` in the URI should contain the
-        `bulkTransactionId` that was used for the creation of the bulk transfer.
+      description: The HTTP request `PUT /bulkTransactions/{bulkTransactionId}` is used to amend information regarding a bulk transaction, i.e. when autoAcceptParty or autoAcceptQuote  is false then the payer need to provide confirmation to proceed with further processing of the request. The `{bulkTransactionId}` in the URI should contain the `bulkTransactionId` that was used for the creation of the bulk transfer.
       tags:
         - BulkTransactions
       parameters:
@@ -169,9 +144,8 @@ paths:
   /bulkTransfers:
     post:
       summary: Sends money from one account to multiple accounts
-      description: >
-        The HTTP request `POST /bulkTransfers` is used to request the movement
-        of funds from payer DFSP to payees' DFSP.
+      description: |
+        The HTTP request `POST /bulkTransfers` is used to request the movement of funds from payer DFSP to payees' DFSP.
       tags:
         - BulkTransfers
       requestBody:
@@ -191,11 +165,7 @@ paths:
   /bulkTransfers/{bulkTransferId}:
     get:
       summary: Retrieves information for a specific bulk transfer
-      description: >-
-        The HTTP request `GET /bulkTransfers/{bulkTransferId}` is used to get
-        information regarding a bulk transfer created or requested earlier. The
-        `{bulkTransferId}` in the URI should contain the `bulkTransferId` that
-        was used for the creation of the bulk transfer.
+      description: The HTTP request `GET /bulkTransfers/{bulkTransferId}` is used to get information regarding a bulk transfer created or requested earlier. The `{bulkTransferId}` in the URI should contain the `bulkTransferId` that was used for the creation of the bulk transfer.
       tags:
         - BulkTransfers
       parameters:
@@ -218,11 +188,7 @@ paths:
       - $ref: '#/components/parameters/Type'
       - $ref: '#/components/parameters/ID'
     get:
-      description: >-
-        The HTTP request GET /parties// (or GET /parties///) is used to lookup
-        information regarding the requested Party, defined by ,  and optionally
-        (for example, GET /parties/MSISDN/123456789, or GET
-        /parties/BUSINESS/shoecompany/employee1).
+      description: The HTTP request GET /parties// (or GET /parties///) is used to lookup information regarding the requested Party, defined by ,  and optionally (for example, GET /parties/MSISDN/123456789, or GET /parties/BUSINESS/shoecompany/employee1).
       summary: PartiesByTypeAndID
       tags:
         - parties
@@ -238,11 +204,7 @@ paths:
       - $ref: '#/components/parameters/ID'
       - $ref: '#/components/parameters/SubId'
     get:
-      description: >-
-        The HTTP request GET /parties// (or GET /parties///) is used to lookup
-        information regarding the requested Party, defined by ,  and optionally
-        (for example, GET /parties/MSISDN/123456789, or GET
-        /parties/BUSINESS/shoecompany/employee1).
+      description: The HTTP request GET /parties// (or GET /parties///) is used to lookup information regarding the requested Party, defined by ,  and optionally (for example, GET /parties/MSISDN/123456789, or GET /parties/BUSINESS/shoecompany/employee1).
       summary: PartiesSubIdByTypeAndID
       tags:
         - parties
@@ -274,10 +236,8 @@ paths:
   /requestToPay:
     post:
       summary: Receiver requesting funds from Sender
-      description: >
-        The HTTP request `POST /requestToPay` is used to support Pull Funds
-        pattern where in a receiver can request for funds from the Sender.
-
+      description: |
+        The HTTP request `POST /requestToPay` is used to support Pull Funds pattern where in a receiver can request for funds from the Sender.
         The underlying API has two stages:
 
           1. Party lookup. This facilitates a check by the sending party that the destination party is correct before proceeding with a money movement.
@@ -296,19 +256,11 @@ paths:
           $ref: '#/components/responses/requestToPaySuccess'
   /requestToPay/{transactionRequestId}:
     put:
-      summary: >-
-        Continues a request funds from sender that has paused at the party
-        resolution stage in order to accept or reject party information
-      description: >
-        The HTTP request `PUT /requestToPay/{transactionRequestId}` is used to
-        continue a transfer initiated via the `POST /requestToPay` method that
-        has halted after party lookup stage.
-
-        The request body should contain the "acceptParty" property set to `true`
-        as required to continue the transfer.
-
-        See the description of the `POST /requestToPay` HTTP method for more
-        information on modes of transfer.
+      summary: Continues a request funds from sender that has paused at the party resolution stage in order to accept or reject party information
+      description: |
+        The HTTP request `PUT /requestToPay/{transactionRequestId}` is used to continue a transfer initiated via the `POST /requestToPay` method that has halted after party lookup stage.
+        The request body should contain the "acceptParty" property set to `true` as required to continue the transfer.
+        See the description of the `POST /requestToPay` HTTP method for more information on modes of transfer.
       tags:
         - RequestToPay
       requestBody:
@@ -327,13 +279,9 @@ paths:
           $ref: '#/components/responses/transferTimeout'
   /requestToPayTransfer:
     post:
-      summary: >-
-        Used to trigger funds from customer fsp account to merchant fsp account.
-        This is a follow-up request to requestToPay.
-      description: >
-        The HTTP request `POST /requestToPayTransfer` is used to request the
-        movement of funds from payer DFSP to payee DFSP.
-
+      summary: Used to trigger funds from customer fsp account to merchant fsp account. This is a follow-up request to requestToPay.
+      description: |
+        The HTTP request `POST /requestToPayTransfer` is used to request the movement of funds from payer DFSP to payee DFSP.
         The underlying Mojaloop API has three stages for money transfer:
 
           1. Quotation. This facilitates the exchange of fee information and the construction of a cryptographic "contract" between payee and payer DFSPs before funds are transferred.
@@ -341,30 +289,17 @@ paths:
           3. Transfer. The enactment of the previously agreed "contract"
 
         This method has several modes of operation.
-
-        - If the configuration variable `AUTO_ACCEPT_QUOTES` is set to `"false"`
-        this method will terminate and return the quotation when it has been
-        received from the payee DFSP.
+        - If the configuration variable `AUTO_ACCEPT_QUOTES` is set to `"false"` this method will terminate and return the quotation when it has been received from the payee DFSP.
           If the payee wished to proceed with the otp, then a subsequent `PUT /transfers/{transferId}` request (accepting the quote) is required to continue the operation.
           The scheme adapter will then proceed with the transfer state.
 
-        - If the configuration variable `AUTO_ACCEPT_OTP` is set to `"false"`
-        this method will terminate and return the otp when it has been received
-        from the payee DFSP.
+        - If the configuration variable `AUTO_ACCEPT_OTP` is set to `"false"` this method will terminate and return the otp when it has been received from the payee DFSP.
           If the payer wished to proceed with the transfer, then a subsequent `PUT /transfers/{transferId}` request (accepting the quote) is required to continue the operation.
           The scheme adapter will then proceed with the transfer state.
 
-        If the configuration variables `AUTO_ACCEPT_PARTIES` and
-        `AUTO_ACCEPT_QUOTES` are both set to `"true"` this method will block
-        until all three transfer stages are complete. Upon completion it will
-        return the entire set of transfer details received during the operation.
+        If the configuration variables `AUTO_ACCEPT_PARTIES` and `AUTO_ACCEPT_QUOTES` are both set to `"true"` this method will block until all three transfer stages are complete. Upon completion it will return the entire set of transfer details received during the operation.
 
-
-        Combinations of settings for `AUTO_ACCEPT...` configuration variables
-        allow the scheme adapter user to decide which mode of operation best
-        suits their use cases. i.e. the scheme adapter can be configured to
-        "break" the three stage transfer at these points in order to execute
-        backend logic such as party verification, quoted fees assessments etc...
+        Combinations of settings for `AUTO_ACCEPT...` configuration variables allow the scheme adapter user to decide which mode of operation best suits their use cases. i.e. the scheme adapter can be configured to "break" the three stage transfer at these points in order to execute backend logic such as party verification, quoted fees assessments etc...
       tags:
         - RequestToPayTransfer
       requestBody:
@@ -385,21 +320,13 @@ paths:
           $ref: '#/components/responses/transferTimeout'
   /requestToPayTransfer/{transactionRequestId}:
     put:
-      summary: >-
-        Continues a transfer that has paused at the otp stage in order to accept
-        or reject quote
-      description: >
-        This request is used to continue a requestToPayTransfer initiated via
-        the `POST /requestToPayTransfer` method that has halted after quotation
-        stage and/or otp stage.
+      summary: Continues a transfer that has paused at the otp stage in order to accept or reject quote
+      description: |
+        This request is used to continue a requestToPayTransfer initiated via the `POST /requestToPayTransfer` method that has halted after quotation stage and/or otp stage.
 
+        The request body should contain either the "acceptOTP" or "acceptQuote" property set to `true` as required to continue the transfer.
 
-        The request body should contain either the "acceptOTP" or "acceptQuote"
-        property set to `true` as required to continue the transfer.
-
-
-        See the description of the `POST /requestToPayTransfer` HTTP method for
-        more information on modes of transfer.
+        See the description of the `POST /requestToPayTransfer` HTTP method for more information on modes of transfer.
       tags:
         - RequestToPayTransferID
       requestBody:
@@ -440,10 +367,8 @@ paths:
   /transfers:
     post:
       summary: Sends money from one account to another
-      description: >
-        The HTTP request `POST /transfers` is used to request the movement of
-        funds from payer DFSP to payee DFSP.
-
+      description: |
+        The HTTP request `POST /transfers` is used to request the movement of funds from payer DFSP to payee DFSP.
         The underlying Mojaloop API has three stages for money transfer:
 
           1. Party lookup. This facilitates a check by the sending party that the destination party is correct before proceeding with a money movement.
@@ -451,30 +376,17 @@ paths:
           3. Transfer. The enactment of the previously agreed "contract"
 
         This method has several modes of operation.
-
-        - If the configuration variables `AUTO_ACCEPT_PARTIES` is set to
-        `"false"` this method will terminate when the payee party has been
-        resolved and return the payee party details.
+        - If the configuration variables `AUTO_ACCEPT_PARTIES` is set to `"false"` this method will terminate when the payee party has been resolved and return the payee party details.
           If the payee wishes to proceed with the transfer, then a subsequent `PUT /transfers/{transferId}` request (accepting the payee party) is required to continue the operation.
           The scheme adapter will then proceed with quotation stage...
 
-        - If the configuration variable `AUTO_ACCEPT_QUOTES` is set to `"false"`
-        this method will terminate and return the quotation when it has been
-        received from the payee DFSP.
+        - If the configuration variable `AUTO_ACCEPT_QUOTES` is set to `"false"` this method will terminate and return the quotation when it has been received from the payee DFSP.
           If the payee wished to proceed with the transfer, then a subsequent `PUT /transfers/{transferId}` request (accepting the quote) is required to continue the operation.
           The scheme adapter will then proceed with the transfer state.
 
-        If the configuration variables `AUTO_ACCEPT_PARTIES` and
-        `AUTO_ACCEPT_QUOTES` are both set to `"true"` this method will block
-        until all three transfer stages are complete. Upon completion it will
-        return the entire set of transfer details received during the operation.
+        If the configuration variables `AUTO_ACCEPT_PARTIES` and `AUTO_ACCEPT_QUOTES` are both set to `"true"` this method will block until all three transfer stages are complete. Upon completion it will return the entire set of transfer details received during the operation.
 
-
-        Combinations of settings for `AUTO_ACCEPT...` configuration variables
-        allow the scheme adapter user to decide which mode of operation best
-        suits their use cases. i.e. the scheme adapter can be configured to
-        "break" the three stage transfer at these points in order to execute
-        backend logic such as party verification, quoted fees assessments etc...
+        Combinations of settings for `AUTO_ACCEPT...` configuration variables allow the scheme adapter user to decide which mode of operation best suits their use cases. i.e. the scheme adapter can be configured to "break" the three stage transfer at these points in order to execute backend logic such as party verification, quoted fees assessments etc...
       tags:
         - Transfers
       requestBody:
@@ -495,23 +407,13 @@ paths:
           $ref: '#/components/responses/transferTimeout'
   /transfers/{transferId}:
     put:
-      summary: >-
-        Continues a transfer that has paused at the quote stage in order to
-        accept or reject payee party and/or quote and/or conversion
-      description: >
-        The HTTP request `PUT /transfers/{transferId}` is used to continue a
-        transfer initiated via the `POST /transfers` method that has halted
-        after party lookup and/or quotation stage and/or currency conversion
-        stage.
+      summary: Continues a transfer that has paused at the quote stage in order to accept or reject payee party and/or quote and/or conversion
+      description: |
+        The HTTP request `PUT /transfers/{transferId}` is used to continue a transfer initiated via the `POST /transfers` method that has halted after party lookup and/or quotation stage and/or currency conversion stage.
 
+        The request body should contain either the "acceptParty" or "acceptQuote" or "acceptConversion" property set to `true` as required to continue the transfer.
 
-        The request body should contain either the "acceptParty" or
-        "acceptQuote" or "acceptConversion" property set to `true` as required
-        to continue the transfer.
-
-
-        See the description of the `POST /transfers` HTTP method for more
-        information on modes of transfer.
+        See the description of the `POST /transfers` HTTP method for more information on modes of transfer.
       tags:
         - Transfers
       requestBody:
@@ -533,11 +435,7 @@ paths:
           $ref: '#/components/responses/transferTimeout'
     get:
       summary: Retrieves information for a specific transfer
-      description: >-
-        The HTTP request `GET /transfers/{transferId}` is used to get
-        information regarding a transfer created or requested earlier. The
-        `{transferId}` in the URI should contain the `transferId` that was used
-        for the creation of the transfer.
+      description: The HTTP request `GET /transfers/{transferId}` is used to get information regarding a transfer created or requested earlier. The `{transferId}` in the URI should contain the `transferId` that was used for the creation of the transfer.
       tags:
         - Transfers
       parameters:
@@ -557,10 +455,7 @@ paths:
                 $ref: '#/components/schemas/errorResponse'
   /services/FXP:
     get:
-      description: >-
-        The HTTP request `GET /services/FXP` is used to request information
-        about the participants in a scheme who offer currency conversion
-        services.
+      description: The HTTP request `GET /services/FXP` is used to request information about the participants in a scheme who offer currency conversion services.
       summary: Obtain a list of the DFSPs in the scheme who provide FXP service
       tags:
         - servicesFXP
@@ -574,12 +469,7 @@ paths:
           $ref: '#/components/responses/500'
   /services/FXP/{SourceCurrency}/{TargetCurrency}:
     get:
-      description: >-
-        The HTTP request `GET /services/FXP/{SourceCurrency}/{TargetCurrency}`
-        is used to request information about the participants in a scheme who
-        offer currency conversion services in a particular currency corridor.
-        The required corridor is specified by giving the ISO 4217 currency code
-        for the SourceCurrency and the TargetCurrency.
+      description: The HTTP request `GET /services/FXP/{SourceCurrency}/{TargetCurrency}` is used to request information about the participants in a scheme who offer currency conversion services in a particular currency corridor. The required corridor is specified by giving the ISO 4217 currency code for the SourceCurrency and the TargetCurrency.
       summary: Obtain a list of the DFSPs in the scheme who provide FXP service
       tags:
         - servicesFXP
@@ -596,9 +486,7 @@ paths:
           $ref: '#/components/responses/500'
   /fxQuotes:
     post:
-      description: >-
-        The HTTP request `POST /fxQuotes` is used to ask to provide a quotation
-        for a currency conversion.
+      description: The HTTP request `POST /fxQuotes` is used to ask to provide a quotation for a currency conversion.
       summary: Calculate FX quote
       tags:
         - Fx
@@ -623,9 +511,7 @@ paths:
           $ref: '#/components/responses/500'
   /fxTransfers:
     post:
-      description: >-
-        The HTTP request `POST /fxTransfers` is used to ask to confirm the
-        execution of an agreed currency conversion.
+      description: The HTTP request `POST /fxTransfers` is used to ask to confirm the execution of an agreed currency conversion.
       summary: Perform FX transfer
       tags:
         - Fx
@@ -662,52 +548,16 @@ components:
         - ACCOUNT_ID
         - IBAN
         - ALIAS
-      description: >-
+      description: |-
         Below are the allowed values for the enumeration.
-
-        - MSISDN - An MSISDN (Mobile Station International Subscriber Directory
-        Number, that is, the phone number) is used as reference to a
-        participant. The MSISDN identifier should be in international format
-        according to the [ITU-T E.164
-        standard](https://www.itu.int/rec/T-REC-E.164/en). Optionally, the
-        MSISDN may be prefixed by a single plus sign, indicating the
-        international prefix.
-
-        - EMAIL - An email is used as reference to a participant. The format of
-        the email should be according to the informational [RFC
-        3696](https://tools.ietf.org/html/rfc3696).
-
-        - PERSONAL_ID - A personal identifier is used as reference to a
-        participant. Examples of personal identification are passport number,
-        birth certificate number, and national registration number. The
-        identifier number is added in the PartyIdentifier element. The personal
-        identifier type is added in the PartySubIdOrType element.
-
-        - BUSINESS - A specific Business (for example, an organization or a
-        company) is used as reference to a participant. The BUSINESS identifier
-        can be in any format. To make a transaction connected to a specific
-        username or bill number in a Business, the PartySubIdOrType element
-        should be used.
-
-        - DEVICE - A specific device (for example, a POS or ATM) ID connected to
-        a specific business or organization is used as reference to a Party. For
-        referencing a specific device under a specific business or organization,
-        use the PartySubIdOrType element.
-
-        - ACCOUNT_ID - A bank account number or FSP account ID should be used as
-        reference to a participant. The ACCOUNT_ID identifier can be in any
-        format, as formats can greatly differ depending on country and FSP.
-
-        - IBAN - A bank account number or FSP account ID is used as reference to
-        a participant. The IBAN identifier can consist of up to 34 alphanumeric
-        characters and should be entered without whitespace.
-
-        - ALIAS An alias is used as reference to a participant. The alias should
-        be created in the FSP as an alternative reference to an account owner.
-        Another example of an alias is a username in the FSP system. The ALIAS
-        identifier can be in any format. It is also possible to use the
-        PartySubIdOrType element for identifying an account under an Alias
-        defined by the PartyIdentifier.
+        - MSISDN - An MSISDN (Mobile Station International Subscriber Directory Number, that is, the phone number) is used as reference to a participant. The MSISDN identifier should be in international format according to the [ITU-T E.164 standard](https://www.itu.int/rec/T-REC-E.164/en). Optionally, the MSISDN may be prefixed by a single plus sign, indicating the international prefix.
+        - EMAIL - An email is used as reference to a participant. The format of the email should be according to the informational [RFC 3696](https://tools.ietf.org/html/rfc3696).
+        - PERSONAL_ID - A personal identifier is used as reference to a participant. Examples of personal identification are passport number, birth certificate number, and national registration number. The identifier number is added in the PartyIdentifier element. The personal identifier type is added in the PartySubIdOrType element.
+        - BUSINESS - A specific Business (for example, an organization or a company) is used as reference to a participant. The BUSINESS identifier can be in any format. To make a transaction connected to a specific username or bill number in a Business, the PartySubIdOrType element should be used.
+        - DEVICE - A specific device (for example, a POS or ATM) ID connected to a specific business or organization is used as reference to a Party. For referencing a specific device under a specific business or organization, use the PartySubIdOrType element.
+        - ACCOUNT_ID - A bank account number or FSP account ID should be used as reference to a participant. The ACCOUNT_ID identifier can be in any format, as formats can greatly differ depending on country and FSP.
+        - IBAN - A bank account number or FSP account ID is used as reference to a participant. The IBAN identifier can consist of up to 34 alphanumeric characters and should be entered without whitespace.
+        - ALIAS An alias is used as reference to a participant. The alias should be created in the FSP as an alternative reference to an account owner. Another example of an alias is a username in the FSP system. The ALIAS identifier can be in any format. It is also possible to use the PartySubIdOrType element for identifying an account under an Alias defined by the PartyIdentifier.
     PartyIdentifier:
       title: PartyIdentifier
       type: string
@@ -720,16 +570,10 @@ components:
       type: string
       minLength: 1
       maxLength: 128
-      description: >-
-        Either a sub-identifier of a PartyIdentifier, or a sub-type of the
-        PartyIdType, normally a PersonalIdentifierType.
+      description: Either a sub-identifier of a PartyIdentifier, or a sub-type of the PartyIdType, normally a PersonalIdentifierType.
     Currency:
       title: Currency
-      description: >-
-        The currency codes defined in [ISO
-        4217](https://www.iso.org/iso-4217-currency-codes.html) as three-letter
-        alphabetic codes are used as the standard naming representation for
-        currencies.
+      description: The currency codes defined in [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) as three-letter alphabetic codes are used as the standard naming representation for currencies.
       type: string
       minLength: 3
       maxLength: 3
@@ -918,26 +762,17 @@ components:
     CorrelationId:
       title: CorrelationId
       type: string
-      pattern: >-
-        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$|^[0-9A-HJKMNP-TV-Z]{26}$
-      description: >-
-        Identifier that correlates all messages of the same sequence.
-        The supported identifiers formats are for
-        lowercase [UUID](https://datatracker.ietf.org/doc/html/rfc9562) and
-        uppercase [ULID](https://github.com/ulid/spec)
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$|^[0-9A-HJKMNP-TV-Z]{26}$
+      description: Identifier that correlates all messages of the same sequence. The supported identifiers formats are for lowercase [UUID](https://datatracker.ietf.org/doc/html/rfc9562) and uppercase [ULID](https://github.com/ulid/spec)
       example: b51ec534-ee48-4575-b6a9-ead2955b8069
     errorResponse:
       type: object
       properties:
         statusCode:
           type: string
-          description: >
-            Backend error code from FSP. Ideally, statusCode is FSPIOP
-            conforming. SDK will use status code to retrieve an FSPIOP error
-            with the same code.
-
-            Otherwise, a suitable generic FSPIOP will be used with the
-            errorResponse in the FSPIOP error message.
+          description: |
+            Backend error code from FSP. Ideally, statusCode is FSPIOP conforming. SDK will use status code to retrieve an FSPIOP error with the same code.
+            Otherwise, a suitable generic FSPIOP will be used with the errorResponse in the FSPIOP error message.
         message:
           type: string
           description: Error message text.
@@ -966,14 +801,7 @@ components:
       title: ErrorCode
       type: string
       pattern: ^[1-9]\d{3}$
-      description: >-
-        The API data type ErrorCode is a JSON String of four characters,
-        consisting of digits only. Negative numbers are not allowed. A leading
-        zero is not allowed. Each error code in the API is a four-digit number,
-        for example, 1234, where the first number (1 in the example) represents
-        the high-level error category, the second number (2 in the example)
-        represents the low-level error category, and the last two numbers (34 in
-        the example) represent the specific error.
+      description: The API data type ErrorCode is a JSON String of four characters, consisting of digits only. Negative numbers are not allowed. A leading zero is not allowed. Each error code in the API is a four-digit number, for example, 1234, where the first number (1 in the example) represents the high-level error category, the second number (2 in the example) represents the low-level error category, and the last two numbers (34 in the example) represent the specific error.
       example: '5100'
     ErrorDescription:
       title: ErrorDescription
@@ -981,11 +809,10 @@ components:
       minLength: 1
       maxLength: 128
       description: Error description string.
-    ExtensionKey:
-      title: ExtensionKey
+    ExtensionKey_v2_1_0:
+      title: ExtensionKey_v2_1_0
       type: string
       minLength: 1
-      maxLength: 32
       description: Extension key.
     ExtensionValue:
       title: ExtensionValue
@@ -993,29 +820,27 @@ components:
       minLength: 1
       maxLength: 128
       description: Extension value.
-    Extension:
-      title: Extension
+    Extension_v2_1_0:
+      title: Extension_v2_1_0
       type: object
       description: Data model for the complex type Extension.
       properties:
         key:
-          $ref: '#/components/schemas/ExtensionKey'
+          $ref: '#/components/schemas/ExtensionKey_v2_1_0'
         value:
           $ref: '#/components/schemas/ExtensionValue'
       required:
         - key
         - value
-    ExtensionList:
+    ExtensionList_v2_1_0:
       title: ExtensionList
       type: object
-      description: >-
-        Data model for the complex type ExtensionList. An optional list of
-        extensions, specific to deployment.
+      description: Data model for the complex type ExtensionList. An optional list of extensions, specific to deployment.
       properties:
         extension:
           type: array
           items:
-            $ref: '#/components/schemas/Extension'
+            $ref: '#/components/schemas/Extension_v2_1_0'
           minItems: 1
           maxItems: 16
           description: Number of Extension elements.
@@ -1031,7 +856,7 @@ components:
         errorDescription:
           $ref: '#/components/schemas/ErrorDescription'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
       required:
         - errorCode
         - errorDescription
@@ -1042,15 +867,11 @@ components:
           $ref: '#/components/schemas/ErrorInformation'
     transferError:
       type: object
-      description: >-
-        This object represents a Mojaloop API error received at any time during
-        the transfer process
+      description: This object represents a Mojaloop API error received at any time during the transfer process
       properties:
         httpStatusCode:
           type: integer
-          description: >-
-            The HTTP status code returned to the caller. This is the same as the
-            actual HTTP status code returned with the response.
+          description: The HTTP status code returned to the caller. This is the same as the actual HTTP status code returned with the response.
         mojaloopError:
           $ref: '#/components/schemas/mojaloopError'
     accountsResponse:
@@ -1105,29 +926,18 @@ components:
       title: Name
       type: string
       pattern: ^(?!\s*$)[\w .,'-]{1,128}$
-      description: >-
-        The API data type Name is a JSON String, restricted by a regular
-        expression to avoid characters which are generally not used in a name.
+      description: |-
+        The API data type Name is a JSON String, restricted by a regular expression to avoid characters which are generally not used in a name.
 
+        Regular Expression - The regular expression for restricting the Name type is "^(?!\s*$)[\w .,'-]{1,128}$". The restriction does not allow a string consisting of whitespace only, all Unicode characters are allowed, as well as the period (.) (apostrophe (‘), dash (-), comma (,) and space characters ( ).
 
-        Regular Expression - The regular expression for restricting the Name
-        type is "^(?!\s*$)[\w .,'-]{1,128}$". The restriction does not allow a
-        string consisting of whitespace only, all Unicode characters are
-        allowed, as well as the period (.) (apostrophe (‘), dash (-), comma (,)
-        and space characters ( ).
-
-
-        **Note:** In some programming languages, Unicode support must be
-        specifically enabled. For example, if Java is used, the flag
-        UNICODE_CHARACTER_CLASS must be enabled to allow Unicode characters.
+        **Note:** In some programming languages, Unicode support must be specifically enabled. For example, if Java is used, the flag UNICODE_CHARACTER_CLASS must be enabled to allow Unicode characters.
     FirstName:
       title: FirstName
       type: string
       minLength: 1
       maxLength: 128
-      pattern: >-
-        ^(?!\s*$)[\p{L}\p{gc=Mark}\p{digit}\p{gc=Connector_Punctuation}\p{Join_Control}
-        .,''-]{1,128}$
+      pattern: ^(?!\s*$)[\p{L}\p{gc=Mark}\p{digit}\p{gc=Connector_Punctuation}\p{Join_Control} .,''-]{1,128}$
       description: First name of the Party (Name Type).
       example: Henrik
     MiddleName:
@@ -1135,9 +945,7 @@ components:
       type: string
       minLength: 1
       maxLength: 128
-      pattern: >-
-        ^(?!\s*$)[\p{L}\p{gc=Mark}\p{digit}\p{gc=Connector_Punctuation}\p{Join_Control}
-        .,''-]{1,128}$
+      pattern: ^(?!\s*$)[\p{L}\p{gc=Mark}\p{digit}\p{gc=Connector_Punctuation}\p{Join_Control} .,''-]{1,128}$
       description: Middle name of the Party (Name Type).
       example: Johannes
     LastName:
@@ -1145,26 +953,20 @@ components:
       type: string
       minLength: 1
       maxLength: 128
-      pattern: >-
-        ^(?!\s*$)[\p{L}\p{gc=Mark}\p{digit}\p{gc=Connector_Punctuation}\p{Join_Control}
-        .,''-]{1,128}$
+      pattern: ^(?!\s*$)[\p{L}\p{gc=Mark}\p{digit}\p{gc=Connector_Punctuation}\p{Join_Control} .,''-]{1,128}$
       description: Last name of the Party (Name Type).
       example: Karlsson
     DateOfBirth:
       title: DateofBirth (type Date)
       type: string
-      pattern: >-
-        ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)$
+      pattern: ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)$
       description: Date of Birth of the Party.
       example: '1966-06-16'
     MerchantClassificationCode:
       title: MerchantClassificationCode
       type: string
       pattern: ^[\d]{1,4}$
-      description: >-
-        A limited set of pre-defined numbers. This list would be a limited set
-        of numbers identifying a set of popular merchant types like School Fees,
-        Pubs and Restaurants, Groceries, etc.
+      description: A limited set of pre-defined numbers. This list would be a limited set of numbers identifying a set of popular merchant types like School Fees, Pubs and Restaurants, Groceries, etc.
     FspId:
       title: FspId
       type: string
@@ -1176,9 +978,7 @@ components:
       type: string
       minLength: 1
       maxLength: 2048
-      description: >-
-        KYC information for the party in a form mandated by an individual
-        scheme.
+      description: KYC information for the party in a form mandated by an individual scheme.
       example: |-
         {
             "metadata": {
@@ -1210,7 +1010,7 @@ components:
     extensionListEmptiable:
       type: array
       items:
-        $ref: '#/components/schemas/Extension'
+        $ref: '#/components/schemas/Extension_v2_1_0'
       minItems: 0
       maxItems: 16
     transferParty:
@@ -1258,26 +1058,16 @@ components:
       enum:
         - SEND
         - RECEIVE
-      description: >-
+      description: |-
         Below are the allowed values for the enumeration AmountType.
-
-        - SEND - Amount the Payer would like to send, that is, the amount that
-        should be withdrawn from the Payer account including any fees.
-
-        - RECEIVE - Amount the Payer would like the Payee to receive, that is,
-        the amount that should be sent to the receiver exclusive of any fees.
+        - SEND - Amount the Payer would like to send, that is, the amount that should be withdrawn from the Payer account including any fees.
+        - RECEIVE - Amount the Payer would like the Payee to receive, that is, the amount that should be sent to the receiver exclusive of any fees.
       example: RECEIVE
     Amount:
       title: Amount
       type: string
       pattern: ^([0]|([1-9][0-9]{0,17}))([.][0-9]{0,3}[1-9])?$
-      description: >-
-        The API data type Amount is a JSON String in a canonical format that is
-        restricted by a regular expression for interoperability reasons. This
-        pattern does not allow any trailing zeroes at all, but allows an amount
-        without a minor currency unit. It also only allows four digits in the
-        minor currency unit; a negative value is not allowed. Using more than 18
-        digits in the major currency unit is not allowed.
+      description: The API data type Amount is a JSON String in a canonical format that is restricted by a regular expression for interoperability reasons. This pattern does not allow any trailing zeroes at all, but allows an amount without a minor currency unit. It also only allows four digits in the minor currency unit; a negative value is not allowed. Using more than 18 digits in the major currency unit is not allowed.
       example: '123.45'
     transferTransactionType:
       title: transferTransactionType
@@ -1289,9 +1079,7 @@ components:
       title: TransactionSubScenario
       type: string
       pattern: ^[A-Z_]{1,32}$
-      description: >-
-        Possible sub-scenario, defined locally within the scheme (UndefinedEnum
-        Type).
+      description: Possible sub-scenario, defined locally within the scheme (UndefinedEnum Type).
       example: LOCALLY_DEFINED_SUBSCENARIO
     Note:
       title: Note
@@ -1322,7 +1110,7 @@ components:
         note:
           $ref: '#/components/schemas/Note'
         extensions:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
       required:
         - quoteId
         - to
@@ -1339,9 +1127,7 @@ components:
       properties:
         homeTransactionId:
           type: string
-          description: >-
-            Transaction ID from the DFSP backend, used to reconcile transactions
-            between the Switch and DFSP backend systems.
+          description: Transaction ID from the DFSP backend, used to reconcile transactions between the Switch and DFSP backend systems.
         bulkQuoteId:
           $ref: '#/components/schemas/CorrelationId'
         from:
@@ -1354,21 +1140,12 @@ components:
           items:
             $ref: '#/components/schemas/individualQuote'
         extensions:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
     DateTime:
       title: DateTime
       type: string
-      pattern: >-
-        ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:(\.\d{3}))(?:Z|[+-][01]\d:[0-5]\d)$
-      description: >-
-        The API data type DateTime is a JSON String in a lexical format that is
-        restricted by a regular expression for interoperability reasons. The
-        format is according to [ISO
-        8601](https://www.iso.org/iso-8601-date-and-time-format.html), expressed
-        in a combined date, time and time zone format. A more readable version
-        of the format is yyyy-MM-ddTHH:mm:ss.SSS[-HH:MM]. Examples are
-        "2016-05-24T08:38:08.699-04:00", "2016-05-24T08:38:08.699Z" (where Z
-        indicates Zulu time zone, same as UTC).
+      pattern: ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:(\.\d{3}))(?:Z|[+-][01]\d:[0-5]\d)$
+      description: The API data type DateTime is a JSON String in a lexical format that is restricted by a regular expression for interoperability reasons. The format is according to [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html), expressed in a combined date, time and time zone format. A more readable version of the format is yyyy-MM-ddTHH:mm:ss.SSS[-HH:MM]. Examples are "2016-05-24T08:38:08.699-04:00", "2016-05-24T08:38:08.699Z" (where Z indicates Zulu time zone, same as UTC).
       example: '2016-05-24T08:38:08.699-04:00'
     bulkTransferStatus:
       type: string
@@ -1390,27 +1167,19 @@ components:
     Latitude:
       title: Latitude
       type: string
-      pattern: >-
-        ^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$
-      description: >-
-        The API data type Latitude is a JSON String in a lexical format that is
-        restricted by a regular expression for interoperability reasons.
+      pattern: ^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$
+      description: The API data type Latitude is a JSON String in a lexical format that is restricted by a regular expression for interoperability reasons.
       example: '+45.4215'
     Longitude:
       title: Longitude
       type: string
-      pattern: >-
-        ^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$
-      description: >-
-        The API data type Longitude is a JSON String in a lexical format that is
-        restricted by a regular expression for interoperability reasons.
+      pattern: ^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$
+      description: The API data type Longitude is a JSON String in a lexical format that is restricted by a regular expression for interoperability reasons.
       example: '+75.6972'
     GeoCode:
       title: GeoCode
       type: object
-      description: >-
-        Data model for the complex type GeoCode. Indicates the geographic
-        location from where the transaction was initiated.
+      description: Data model for the complex type GeoCode. Indicates the geographic location from where the transaction was initiated.
       properties:
         latitude:
           $ref: '#/components/schemas/Latitude'
@@ -1426,8 +1195,7 @@ components:
       minLength: 1
       maxLength: 32768
       description: Information for recipient (transport layer information).
-      example: >-
-        AYIBgQAAAAAAAASwNGxldmVsb25lLmRmc3AxLm1lci45T2RTOF81MDdqUUZERmZlakgyOVc4bXFmNEpLMHlGTFGCAUBQU0svMS4wCk5vbmNlOiB1SXlweUYzY3pYSXBFdzVVc05TYWh3CkVuY3J5cHRpb246IG5vbmUKUGF5bWVudC1JZDogMTMyMzZhM2ItOGZhOC00MTYzLTg0NDctNGMzZWQzZGE5OGE3CgpDb250ZW50LUxlbmd0aDogMTM1CkNvbnRlbnQtVHlwZTogYXBwbGljYXRpb24vanNvbgpTZW5kZXItSWRlbnRpZmllcjogOTI4MDYzOTEKCiJ7XCJmZWVcIjowLFwidHJhbnNmZXJDb2RlXCI6XCJpbnZvaWNlXCIsXCJkZWJpdE5hbWVcIjpcImFsaWNlIGNvb3BlclwiLFwiY3JlZGl0TmFtZVwiOlwibWVyIGNoYW50XCIsXCJkZWJpdElkZW50aWZpZXJcIjpcIjkyODA2MzkxXCJ9IgA
+      example: AYIBgQAAAAAAAASwNGxldmVsb25lLmRmc3AxLm1lci45T2RTOF81MDdqUUZERmZlakgyOVc4bXFmNEpLMHlGTFGCAUBQU0svMS4wCk5vbmNlOiB1SXlweUYzY3pYSXBFdzVVc05TYWh3CkVuY3J5cHRpb246IG5vbmUKUGF5bWVudC1JZDogMTMyMzZhM2ItOGZhOC00MTYzLTg0NDctNGMzZWQzZGE5OGE3CgpDb250ZW50LUxlbmd0aDogMTM1CkNvbnRlbnQtVHlwZTogYXBwbGljYXRpb24vanNvbgpTZW5kZXItSWRlbnRpZmllcjogOTI4MDYzOTEKCiJ7XCJmZWVcIjowLFwidHJhbnNmZXJDb2RlXCI6XCJpbnZvaWNlXCIsXCJkZWJpdE5hbWVcIjpcImFsaWNlIGNvb3BlclwiLFwiY3JlZGl0TmFtZVwiOlwibWVyIGNoYW50XCIsXCJkZWJpdElkZW50aWZpZXJcIjpcIjkyODA2MzkxXCJ9IgA
     IlpCondition:
       title: IlpCondition
       type: string
@@ -1436,15 +1204,11 @@ components:
       description: Condition that must be attached to the transfer by the Payer.
     quoteError:
       type: object
-      description: >-
-        This object represents a Mojaloop API error received at any time during
-        the quote process
+      description: This object represents a Mojaloop API error received at any time during the quote process
       properties:
         httpStatusCode:
           type: integer
-          description: >-
-            The HTTP status code returned to the caller. This is the same as the
-            actual HTTP status code returned with the response.
+          description: The HTTP status code returned to the caller. This is the same as the actual HTTP status code returned with the response.
         mojaloopError:
           $ref: '#/components/schemas/mojaloopError'
     individualQuoteResult:
@@ -1467,7 +1231,7 @@ components:
         condition:
           $ref: '#/components/schemas/IlpCondition'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
         lastError:
           $ref: '#/components/schemas/quoteError'
       required:
@@ -1484,13 +1248,11 @@ components:
           $ref: '#/components/schemas/CorrelationId'
         homeTransactionId:
           type: string
-          description: >-
-            Transaction ID from the DFSP backend, used to reconcile transactions
-            between the Switch and DFSP backend systems.
+          description: Transaction ID from the DFSP backend, used to reconcile transactions between the Switch and DFSP backend systems.
         expiration:
           $ref: '#/components/schemas/DateTime'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
         currentState:
           $ref: '#/components/schemas/bulkTransferStatus'
         individualQuoteResults:
@@ -1573,42 +1335,27 @@ components:
         - bulkExpiration
       properties:
         onlyValidateParty:
-          description: >-
-            Set to true if only party validation is required.  This means the
-            quotes and transfers will not run. This is useful for only party
-            resolution.
+          description: Set to true if only party validation is required.  This means the quotes and transfers will not run. This is useful for only party resolution.
           type: boolean
         autoAcceptParty:
           $ref: '#/components/schemas/autoAcceptPartyOption'
         autoAcceptQuote:
-          description: >-
-            Set to true if the quote response is accepted without confirmation
-            from the payer. The fees applied by the payee will be acceptable to
-            the payer abiding by the limits set by optional
-            'perTransferFeeLimits' array.
+          description: Set to true if the quote response is accepted without confirmation from the payer. The fees applied by the payee will be acceptable to the payer abiding by the limits set by optional 'perTransferFeeLimits' array.
           type: object
           oneOf:
             - $ref: '#/components/schemas/autoAcceptQuote'
         skipPartyLookup:
-          description: >-
-            Set to true if supplying an FSPID for the payee party and no party
-            resolution is needed. This may be useful if a previous party
-            resolution has been performed.
+          description: Set to true if supplying an FSPID for the payee party and no party resolution is needed. This may be useful if a previous party resolution has been performed.
           type: boolean
         synchronous:
-          description: >-
-            Set to true if the bulkTransfer requests need be handled
-            synchronous. Otherwise the requests will be handled asynchronously,
-            meaning there will  be callbacks whenever the processing is done
+          description: Set to true if the bulkTransfer requests need be handled synchronous. Otherwise the requests will be handled asynchronously, meaning there will  be callbacks whenever the processing is done
           type: boolean
         bulkExpiration:
           $ref: '#/components/schemas/DateTime'
     PartyIdInfo:
       title: PartyIdInfo
       type: object
-      description: >-
-        Data model for the complex type PartyIdInfo. An ExtensionList element
-        has been added to this reqeust in version v1.1
+      description: Data model for the complex type PartyIdInfo. An ExtensionList element has been added to this reqeust in version v1.1
       properties:
         partyIdType:
           $ref: '#/components/schemas/PartyIdType'
@@ -1619,7 +1366,7 @@ components:
         fspId:
           $ref: '#/components/schemas/FspId'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
       required:
         - partyIdType
         - partyIdentifier
@@ -1680,9 +1427,7 @@ components:
       properties:
         homeTransactionId:
           type: string
-          description: >-
-            Transaction ID from the DFSP backend, used to reconcile transactions
-            between the Switch and DFSP backend systems.
+          description: Transaction ID from the DFSP backend, used to reconcile transactions between the Switch and DFSP backend systems.
         to:
           $ref: '#/components/schemas/Party'
         reference:
@@ -1697,9 +1442,9 @@ components:
         note:
           $ref: '#/components/schemas/Note'
         quoteExtensions:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
         transferExtensions:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
         lastError:
           $ref: '#/components/schemas/transferError'
       required:
@@ -1719,9 +1464,7 @@ components:
       properties:
         bulkHomeTransactionID:
           type: string
-          description: >-
-            Transaction ID from the DFSP backend, used to reconcile transactions
-            between the Switch and DFSP backend systems.
+          description: Transaction ID from the DFSP backend, used to reconcile transactions between the Switch and DFSP backend systems.
         bulkTransactionId:
           $ref: '#/components/schemas/CorrelationId'
         options:
@@ -1735,7 +1478,7 @@ components:
           items:
             $ref: '#/components/schemas/bulkTransactionIndividualTransfer'
         extensions:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
     TransferState:
       title: TransferState
       type: string
@@ -1744,17 +1487,12 @@ components:
         - RESERVED
         - COMMITTED
         - ABORTED
-      description: >-
+      description: |-
         Below are the allowed values for the enumeration.
-
         - RECEIVED - Next ledger has received the transfer.
-
         - RESERVED - Next ledger has reserved the transfer.
-
         - COMMITTED - Next ledger has successfully performed the transfer.
-
-        - ABORTED - Next ledger has aborted the transfer due to a rejection or
-        failure to perform the transfer.
+        - ABORTED - Next ledger has aborted the transfer due to a rejection or failure to perform the transfer.
       example: RESERVED
     IlpFulfilment:
       title: IlpFulfilment
@@ -1773,7 +1511,7 @@ components:
         fulfilment:
           $ref: '#/components/schemas/IlpFulfilment'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
         transferState:
           $ref: '#/components/schemas/TransferState'
         lastError:
@@ -1791,15 +1529,13 @@ components:
           $ref: '#/components/schemas/CorrelationId'
         homeTransactionId:
           type: string
-          description: >-
-            Transaction ID from the DFSP backend, used to reconcile transactions
-            between the Switch and DFSP backend systems.
+          description: Transaction ID from the DFSP backend, used to reconcile transactions between the Switch and DFSP backend systems.
         bulkTransferState:
           $ref: '#/components/schemas/TransferState'
         completedTimestamp:
           $ref: '#/components/schemas/DateTime'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
         currentState:
           $ref: '#/components/schemas/bulkTransferStatus'
         individualTransferResults:
@@ -1836,17 +1572,13 @@ components:
             - true
             - false
     bulkTransactionContinuationAcceptParty:
-      description: >-
-        The object sent back as confirmation of payee parties when
-        autoAcceptParty is false.
+      description: The object sent back as confirmation of payee parties when autoAcceptParty is false.
       type: object
       required:
         - individualTransfers
       properties:
         individualTransfers:
-          description: >-
-            List of individual transfers in a bulk transfer with accept party
-            information.
+          description: List of individual transfers in a bulk transfer with accept party information.
           type: array
           minItems: 1
           items:
@@ -1864,9 +1596,7 @@ components:
             - true
             - false
     bulkTransactionContinuationAcceptQuote:
-      description: >-
-        The object sent back as confirmation of quotes when autoAcceptQuotes is
-        false.
+      description: The object sent back as confirmation of quotes when autoAcceptQuotes is false.
       type: object
       required:
         - individualTransfers
@@ -1881,15 +1611,11 @@ components:
               - $ref: '#/components/schemas/transferContinuationAcceptQuote'
     partyError:
       type: object
-      description: >-
-        This object represents a Mojaloop API error received at any time during
-        the party discovery process
+      description: This object represents a Mojaloop API error received at any time during the party discovery process
       properties:
         httpStatusCode:
           type: integer
-          description: >-
-            The HTTP status code returned to the caller. This is the same as the
-            actual HTTP status code returned with the response.
+          description: The HTTP status code returned to the caller. This is the same as the actual HTTP status code returned with the response.
         mojaloopError:
           $ref: '#/components/schemas/mojaloopError'
     bulkTransactionAcceptPartyErrorResponse:
@@ -1940,7 +1666,7 @@ components:
         note:
           $ref: '#/components/schemas/Note'
         extensions:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
       required:
         - transferId
         - to
@@ -1960,9 +1686,7 @@ components:
       properties:
         homeTransactionId:
           type: string
-          description: >-
-            Transaction ID from the DFSP backend, used to reconcile transactions
-            between the Switch and DFSP backend systems.
+          description: Transaction ID from the DFSP backend, used to reconcile transactions between the Switch and DFSP backend systems.
         bulkTransferId:
           $ref: '#/components/schemas/CorrelationId'
         bulkQuoteId:
@@ -1977,17 +1701,15 @@ components:
           items:
             $ref: '#/components/schemas/individualTransfer'
         extensions:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
     individualTransferFulfilment:
       type: object
-      description: >-
-        A Mojaloop API transfer fulfilment for individual transfers in a bulk
-        transfer
+      description: A Mojaloop API transfer fulfilment for individual transfers in a bulk transfer
       properties:
         fulfilment:
           $ref: '#/components/schemas/IlpFulfilment'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
     bulkTransferStatusResponse:
       type: object
       required:
@@ -2039,28 +1761,12 @@ components:
         - TRANSFER
         - PAYMENT
         - REFUND
-      description: >-
+      description: |-
         Below are the allowed values for the enumeration.
-
-        - DEPOSIT - Used for performing a Cash-In (deposit) transaction. In a
-        normal scenario, electronic funds are transferred from a Business
-        account to a Consumer account, and physical cash is given from the
-        Consumer to the Business User.
-
-        - WITHDRAWAL - Used for performing a Cash-Out (withdrawal) transaction.
-        In a normal scenario, electronic funds are transferred from a Consumer’s
-        account to a Business account, and physical cash is given from the
-        Business User to the Consumer.
-
-        - TRANSFER - Used for performing a P2P (Peer to Peer, or Consumer to
-        Consumer) transaction.
-
-        - PAYMENT - Usually used for performing a transaction from a Consumer to
-        a Merchant or Organization, but could also be for a B2B (Business to
-        Business) payment. The transaction could be online for a purchase in an
-        Internet store, in a physical store where both the Consumer and Business
-        User are present, a bill payment, a donation, and so on.
-
+        - DEPOSIT - Used for performing a Cash-In (deposit) transaction. In a normal scenario, electronic funds are transferred from a Business account to a Consumer account, and physical cash is given from the Consumer to the Business User.
+        - WITHDRAWAL - Used for performing a Cash-Out (withdrawal) transaction. In a normal scenario, electronic funds are transferred from a Consumer’s account to a Business account, and physical cash is given from the Business User to the Consumer.
+        - TRANSFER - Used for performing a P2P (Peer to Peer, or Consumer to Consumer) transaction.
+        - PAYMENT - Usually used for performing a transaction from a Consumer to a Merchant or Organization, but could also be for a B2B (Business to Business) payment. The transaction could be online for a purchase in an Internet store, in a physical store where both the Consumer and Business User are present, a bill payment, a donation, and so on.
         - REFUND - Used for performing a refund of transaction.
       example: DEPOSIT
     TransactionInitiator:
@@ -2069,17 +1775,10 @@ components:
       enum:
         - PAYER
         - PAYEE
-      description: >-
+      description: |-
         Below are the allowed values for the enumeration.
-
-        - PAYER - Sender of funds is initiating the transaction. The account to
-        send from is either owned by the Payer or is connected to the Payer in
-        some way.
-
-        - PAYEE - Recipient of the funds is initiating the transaction by
-        sending a transaction request. The Payer must approve the transaction,
-        either automatically by a pre-generated OTP or by pre-approval of the
-        Payee, or by manually approving in his or her own Device.
+        - PAYER - Sender of funds is initiating the transaction. The account to send from is either owned by the Payer or is connected to the Payer in some way.
+        - PAYEE - Recipient of the funds is initiating the transaction by sending a transaction request. The Payer must approve the transaction, either automatically by a pre-generated OTP or by pre-approval of the Payee, or by manually approving in his or her own Device.
       example: PAYEE
     RefundReason:
       title: RefundReason
@@ -2103,11 +1802,7 @@ components:
       title: BalanceOfPayments
       type: string
       pattern: ^[1-9]\d{2}$
-      description: >-
-        (BopCode) The API data type
-        [BopCode](https://www.imf.org/external/np/sta/bopcode/) is a JSON String
-        of 3 characters, consisting of digits only. Negative numbers are not
-        allowed. A leading zero is not allowed.
+      description: (BopCode) The API data type [BopCode](https://www.imf.org/external/np/sta/bopcode/) is a JSON String of 3 characters, consisting of digits only. Negative numbers are not allowed. A leading zero is not allowed.
       example: '123'
     TransactionType:
       title: TransactionType
@@ -2136,18 +1831,11 @@ components:
       enum:
         - PAYER
         - PAYEE
-      description: >-
-        Below are the allowed values for the enumeration CurrencyConverter. -
-        PAYER - Currency conversion should be performed by the payer. - PAYEE -
-        Currency conversion should be performed by the payee.
+      description: Below are the allowed values for the enumeration CurrencyConverter. - PAYER - Currency conversion should be performed by the payer. - PAYEE - Currency conversion should be performed by the payee.
     FxRate:
       title: FxRate
       type: object
-      description: >-
-        The FxRate object contains information about a currency conversion in
-        the transfer. It can be used by parties to the transfer to exchange
-        information with each other about the exchange rate for the transfer, to
-        ensure that the best rate can be agreed on.
+      description: The FxRate object contains information about a currency conversion in the transfer. It can be used by parties to the transfer to exchange information with each other about the exchange rate for the transfer, to ensure that the best rate can be agreed on.
       properties:
         sourceAmount:
           allOf:
@@ -2186,23 +1874,11 @@ components:
         converter:
           allOf:
             - $ref: '#/components/schemas/CurrencyConverter'
-            - description: >-
-                An optional field which will allow the payer DFSP to specify
-                which DFSP it wants to undertake currency conversion. This is
-                useful incase of if the sender wants the recipient to receive a
-                specified amount of the target currency, but the payer DFSP does
-                not want to undertake the currency conversion. In this case, the
-                amount of the transfer would be expressed in the target currency
-                and the amountType would be set to RECEIVE.
+            - description: An optional field which will allow the payer DFSP to specify which DFSP it wants to undertake currency conversion. This is useful incase of if the sender wants the recipient to receive a specified amount of the target currency, but the payer DFSP does not want to undertake the currency conversion. In this case, the amount of the transfer would be expressed in the target currency and the amountType would be set to RECEIVE.
         currencyConversion:
           allOf:
             - $ref: '#/components/schemas/FxRate'
-            - description: >-
-                Used by the debtor party if it wants to share information about
-                the currency conversion it proposes to make; or if it is
-                required by scheme rules to share this information. This object
-                contains the amount of the transfer in the source and target
-                currencies, but does not identify the FXP being used.
+            - description: Used by the debtor party if it wants to share information about the currency conversion it proposes to make; or if it is required by scheme rules to share this information. This object contains the amount of the transfer in the source and target currencies, but does not identify the FXP being used.
         geoCode:
           $ref: '#/components/schemas/GeoCode'
         note:
@@ -2210,7 +1886,7 @@ components:
         expiration:
           $ref: '#/components/schemas/DateTime'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
       required:
         - quoteId
         - transactionId
@@ -2252,9 +1928,7 @@ components:
                   $ref: '#/components/schemas/Money'
                 expiration:
                   type: string
-                  description: >-
-                    Date and time until when the quotation is valid and can be
-                    honored when used in the subsequent transaction.
+                  description: Date and time until when the quotation is valid and can be honored when used in the subsequent transaction.
                   example: '2016-05-24T08:38:08.699-04:00'
                 geoCode:
                   $ref: '#/components/schemas/GeoCode'
@@ -2263,7 +1937,7 @@ components:
                 condition:
                   $ref: '#/components/schemas/IlpCondition'
                 extensionList:
-                  $ref: '#/components/schemas/ExtensionList'
+                  $ref: '#/components/schemas/ExtensionList_v2_1_0'
               required:
                 - transferAmount
                 - expiration
@@ -2309,9 +1983,7 @@ components:
       properties:
         homeR2PTransactionId:
           type: string
-          description: >-
-            Transaction ID from the DFSP backend, used to reconcile transactions
-            between the Switch and DFSP backend systems.
+          description: Transaction ID from the DFSP backend, used to reconcile transactions between the Switch and DFSP backend systems.
         from:
           $ref: '#/components/schemas/transferParty'
         to:
@@ -2374,7 +2046,7 @@ components:
             transactionRequestState:
               $ref: '#/components/schemas/TransactionRequestState'
             extensionList:
-              $ref: '#/components/schemas/ExtensionList'
+              $ref: '#/components/schemas/ExtensionList_v2_1_0'
           required:
             - transactionRequestState
         headers:
@@ -2448,7 +2120,7 @@ components:
         condition:
           $ref: '#/components/schemas/IlpCondition'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
       required:
         - transferAmount
         - expiration
@@ -2457,9 +2129,7 @@ components:
     FxMoney:
       title: FxMoney
       type: object
-      description: >-
-        Data model for the complex type FxMoney; This is based on the type Money
-        but allows the amount to be optional to support FX quotations.
+      description: Data model for the complex type FxMoney; This is based on the type Money but allows the amount to be optional to support FX quotations.
       properties:
         currency:
           $ref: '#/components/schemas/Currency'
@@ -2470,9 +2140,7 @@ components:
     FxCharge:
       title: FxCharge
       type: object
-      description: >-
-        An FXP will be able to specify a charge which it proposes to levy on the
-        currency conversion operation using a FxCharge object.
+      description: An FXP will be able to specify a charge which it proposes to levy on the currency conversion operation using a FxCharge object.
       properties:
         chargeType:
           type: string
@@ -2482,24 +2150,49 @@ components:
         sourceAmount:
           allOf:
             - $ref: '#/components/schemas/Money'
-            - description: >-
-                The amount of the charge which is being levied, expressed in the
-                source currency.
+            - description: The amount of the charge which is being levied, expressed in the source currency.
         targetAmount:
           allOf:
             - $ref: '#/components/schemas/Money'
-            - description: >-
-                The amount of the charge which is being levied, expressed in the
-                target currency.
+            - description: The amount of the charge which is being levied, expressed in the target currency.
       required:
         - chargeType
+    ExtensionKey:
+      title: ExtensionKey
+      type: string
+      minLength: 1
+      maxLength: 32
+      description: Extension key.
+    Extension:
+      title: Extension
+      type: object
+      description: Data model for the complex type Extension.
+      properties:
+        key:
+          $ref: '#/components/schemas/ExtensionKey'
+        value:
+          $ref: '#/components/schemas/ExtensionValue'
+      required:
+        - key
+        - value
+    ExtensionList:
+      title: ExtensionList
+      type: object
+      description: Data model for the complex type ExtensionList. An optional list of extensions, specific to deployment.
+      properties:
+        extension:
+          type: array
+          items:
+            $ref: '#/components/schemas/Extension'
+          minItems: 1
+          maxItems: 16
+          description: Number of Extension elements.
+      required:
+        - extension
     FxConversion:
       title: FxConversion
       type: object
-      description: >-
-        A DFSP will be able to request a currency conversion, and an FX provider
-        will be able to describe its involvement in a proposed transfer, using a
-        FxConversion object.
+      description: A DFSP will be able to request a currency conversion, and an FX provider will be able to describe its involvement in a proposed transfer, using a FxConversion object.
       properties:
         conversionId:
           allOf:
@@ -2508,15 +2201,11 @@ components:
         determiningTransferId:
           allOf:
             - $ref: '#/components/schemas/CorrelationId'
-            - description: >-
-                The transaction ID of the transfer on whose success this
-                currency conversion depends.
+            - description: The transaction ID of the transfer on whose success this currency conversion depends.
         initiatingFsp:
           allOf:
             - $ref: '#/components/schemas/FspId'
-            - description: >-
-                The id of the participant who is requesting a currency
-                conversion.
+            - description: The id of the participant who is requesting a currency conversion.
         counterPartyFsp:
           allOf:
             - $ref: '#/components/schemas/FspId'
@@ -2524,13 +2213,7 @@ components:
         amountType:
           allOf:
             - $ref: '#/components/schemas/AmountType'
-            - description: >-
-                This is the AmountType for the base transaction - If SEND - then
-                any charges levied by the FXP as part of the transaction will be
-                deducted by the FXP from the amount shown for the target party
-                in the conversion. If RECEIVE - then any charges levied by the
-                FXP as part of the transaction will be added by the FXP to the
-                amount shown for the source party in the conversion.
+            - description: This is the AmountType for the base transaction - If SEND - then any charges levied by the FXP as part of the transaction will be deducted by the FXP from the amount shown for the target party in the conversion. If RECEIVE - then any charges levied by the FXP as part of the transaction will be added by the FXP to the amount shown for the source party in the conversion.
         sourceAmount:
           allOf:
             - $ref: '#/components/schemas/FxMoney'
@@ -2542,15 +2225,10 @@ components:
         expiration:
           allOf:
             - $ref: '#/components/schemas/DateTime'
-            - description: >-
-                The end of the period for which the currency conversion is
-                required to remain valid.
+            - description: The end of the period for which the currency conversion is required to remain valid.
         charges:
           type: array
-          description: >-
-            One or more charges which the FXP intends to levy as part of the
-            currency conversion, or which the payee DFSP intends to add to the
-            amount transferred.
+          description: One or more charges which the FXP intends to levy as part of the currency conversion, or which the payee DFSP intends to add to the amount transferred.
           items:
             $ref: '#/components/schemas/FxCharge'
           minItems: 0
@@ -2570,15 +2248,10 @@ components:
     FxQuotesPostOutboundResponse:
       title: FxQuotesPostOutboundResponse
       type: object
-      description: >-
-        The object sent as a response for the POST /fxQuotes request. The terms
-        under which the FXP will undertake the currency conversion proposed by
-        the requester.
+      description: The object sent as a response for the POST /fxQuotes request. The terms under which the FXP will undertake the currency conversion proposed by the requester.
       properties:
         homeTransactionId:
-          description: >-
-            Transaction ID for the FXP backend, used to reconcile transactions
-            between the Switch and FXP backend systems.
+          description: Transaction ID for the FXP backend, used to reconcile transactions between the Switch and FXP backend systems.
           type: string
         condition:
           allOf:
@@ -2587,9 +2260,7 @@ components:
         conversionTerms:
           allOf:
             - $ref: '#/components/schemas/FxConversion'
-            - description: >-
-                The terms under which the FXP will undertake the currency
-                conversion proposed by the requester.
+            - description: The terms under which the FXP will undertake the currency conversion proposed by the requester.
       required:
         - conversionTerms
     TransfersIDPutResponse:
@@ -2604,7 +2275,7 @@ components:
         transferState:
           $ref: '#/components/schemas/TransferState'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
       required:
         - transferState
     transferResponse:
@@ -2622,9 +2293,7 @@ components:
           $ref: '#/components/schemas/CorrelationId'
         homeTransactionId:
           type: string
-          description: >-
-            Transaction ID from the DFSP backend, used to reconcile transactions
-            between the Switch and DFSP backend systems.
+          description: Transaction ID from the DFSP backend, used to reconcile transactions between the Switch and DFSP backend systems.
         from:
           $ref: '#/components/schemas/transferParty'
         to:
@@ -2647,13 +2316,25 @@ components:
           $ref: '#/components/schemas/CorrelationId'
         getPartiesResponse:
           type: object
-          required:
-            - body
           properties:
             body:
-              type: object
+              oneOf:
+                - type: object
+                  properties:
+                    party:
+                      $ref: '#/components/schemas/Party'
+                  required:
+                    - party
+                - type: object
+                  properties:
+                    errorInformation:
+                      $ref: '#/components/schemas/ErrorInformation'
+                  required:
+                    - errorInformation
             headers:
               type: object
+          required:
+            - body
         quoteResponse:
           type: object
           required:
@@ -2665,11 +2346,8 @@ components:
               type: object
         quoteResponseSource:
           type: string
-          description: >
-            FSPID of the entity that supplied the quote response. This may not
-            be the same as the FSPID of the entity which owns the end user
-            account in the case of a FOREX transfer. i.e. it may be a FOREX
-            gateway.
+          description: |
+            FSPID of the entity that supplied the quote response. This may not be the same as the FSPID of the entity which owns the end user account in the case of a FOREX transfer. i.e. it may be a FOREX gateway.
         conversionRequestId:
           $ref: '#/components/schemas/CorrelationId'
         fxQuotesResponse:
@@ -2697,10 +2375,7 @@ components:
         lastError:
           $ref: '#/components/schemas/transferError'
         skipPartyLookup:
-          description: >-
-            Set to true if supplying an FSPID for the payee party and no party
-            resolution is needed. This may be useful is a previous party
-            resolution has been performed.
+          description: Set to true if supplying an FSPID for the payee party and no party resolution is needed. This may be useful is a previous party resolution has been performed.
           type: boolean
     errorTransferResponse:
       allOf:
@@ -2727,9 +2402,7 @@ components:
       properties:
         homeR2PTransactionId:
           type: string
-          description: >-
-            Transaction ID from the DFSP backend, used to reconcile transactions
-            between the Switch and DFSP backend systems.
+          description: Transaction ID from the DFSP backend, used to reconcile transactions between the Switch and DFSP backend systems.
         transactionRequestId:
           $ref: '#/components/schemas/CorrelationId'
         from:
@@ -2760,10 +2433,7 @@ components:
         - title: OtpValue
           type: string
           pattern: ^\d{3,10}$
-          description: >-
-            The API data type OtpValue is a JSON String of 3 to 10 characters,
-            consisting of digits only. Negative numbers are not allowed. One or
-            more leading zeros are allowed.
+          description: The API data type OtpValue is a JSON String of 3 to 10 characters, consisting of digits only. Negative numbers are not allowed. One or more leading zeros are allowed.
         - title: QRCODE
           type: string
           minLength: 1
@@ -2771,33 +2441,26 @@ components:
           description: QR code used as a One Time Password.
         - title: U2FPinValue
           type: object
-          description: >
-            U2F challenge-response, where payer FSP verifies if the response
-            provided by end-user device matches the previously registered key.
+          description: |
+            U2F challenge-response, where payer FSP verifies if the response provided by end-user device matches the previously registered key.
           properties:
             pinValue:
               type: string
               pattern: ^\S{1,64}$
               minLength: 1
               maxLength: 64
-              description: >
-                U2F challenge-response, where payer FSP verifies if the response
-                provided by end-user device matches the previously registered
-                key.
+              description: |
+                U2F challenge-response, where payer FSP verifies if the response provided by end-user device matches the previously registered key.
             counter:
               title: Integer
               type: string
               pattern: ^[1-9]\d*$
-              description: >-
-                Sequential counter used for cloning detection. Present only for
-                U2F authentication.
+              description: Sequential counter used for cloning detection. Present only for U2F authentication.
           required:
             - pinValue
             - counter
       pattern: ^\d{3,10}$|^\S{1,64}$
-      description: >-
-        Contains the authentication value. The format depends on the
-        authentication type used in the AuthenticationInfo complex type.
+      description: Contains the authentication value. The format depends on the authentication type used in the AuthenticationInfo complex type.
     AuthenticationInfo:
       title: AuthenticationInfo
       type: object
@@ -2849,9 +2512,7 @@ components:
           $ref: '#/components/schemas/CorrelationId'
         homeR2PTransactionId:
           type: string
-          description: >-
-            Transaction ID from the DFSP backend, used to reconcile transactions
-            between the Switch and DFSP backend systems.
+          description: Transaction ID from the DFSP backend, used to reconcile transactions between the Switch and DFSP backend systems.
         transactionRequestId:
           $ref: '#/components/schemas/CorrelationId'
         from:
@@ -2883,11 +2544,8 @@ components:
               type: object
         quoteResponseSource:
           type: string
-          description: >
-            FSPID of the entity that supplied the quote response. This may not
-            be the same as the FSPID of the entity which owns the end user
-            account in the case of a FOREX transfer. i.e. it may be a FOREX
-            gateway.
+          description: |
+            FSPID of the entity that supplied the quote response. This may not be the same as the FSPID of the entity which owns the end user account in the case of a FOREX transfer. i.e. it may be a FOREX gateway.
         authorizationResponse:
           type: object
           required:
@@ -2938,7 +2596,7 @@ components:
         expiration:
           $ref: '#/components/schemas/DateTime'
         extensionList:
-          $ref: '#/components/schemas/ExtensionList'
+          $ref: '#/components/schemas/ExtensionList_v2_1_0'
       required:
         - transferId
         - payeeFsp
@@ -2993,9 +2651,7 @@ components:
       properties:
         homeTransactionId:
           type: string
-          description: >-
-            Transaction ID from the DFSP backend, used to reconcile transactions
-            between the Switch and DFSP backend systems.
+          description: Transaction ID from the DFSP backend, used to reconcile transactions between the Switch and DFSP backend systems.
         from:
           $ref: '#/components/schemas/transferParty'
         to:
@@ -3017,10 +2673,7 @@ components:
         transferRequestExtensions:
           $ref: '#/components/schemas/extensionListEmptiable'
         skipPartyLookup:
-          description: >-
-            Set to true if supplying an FSPID for the payee party and no party
-            resolution is needed. This may be useful is a previous party
-            resolution has been performed.
+          description: Set to true if supplying an FSPID for the payee party and no party resolution is needed. This may be useful is a previous party resolution has been performed.
           type: boolean
     transferStatusResponse:
       type: object
@@ -3059,9 +2712,7 @@ components:
       properties:
         providers:
           type: array
-          description: >-
-            The FSP Id(s) of the participant(s) who offer currency conversion
-            services.
+          description: The FSP Id(s) of the participant(s) who offer currency conversion services.
           items:
             $ref: '#/components/schemas/FspId'
           minItems: 0
@@ -3074,9 +2725,7 @@ components:
       description: The object sent in the POST /fxQuotes request.
       properties:
         homeTransactionId:
-          description: >-
-            Transaction ID for the backend, used to reconcile transactions
-            between the Switch and backend systems.
+          description: Transaction ID for the backend, used to reconcile transactions between the Switch and backend systems.
           type: string
         conversionRequestId:
           allOf:
@@ -3085,9 +2734,7 @@ components:
         conversionTerms:
           allOf:
             - $ref: '#/components/schemas/FxConversion'
-            - description: >-
-                The terms of the currency conversion for which a quotation is
-                sought.
+            - description: The terms of the currency conversion for which a quotation is sought.
       required:
         - conversionRequestId
         - conversionTerms
@@ -3098,10 +2745,7 @@ components:
     determiningTransferId:
       allOf:
         - $ref: '#/components/schemas/CorrelationId'
-        - description: >-
-            The transaction ID of the transfer to which this currency conversion
-            relates, if the conversion is part of a transfer. If the conversion
-            is a bulk currency purchase, this field should be omitted.
+        - description: The transaction ID of the transfer to which this currency conversion relates, if the conversion is part of a transfer. If the conversion is a bulk currency purchase, this field should be omitted.
     initiatingFsp:
       allOf:
         - $ref: '#/components/schemas/FspId'
@@ -3117,24 +2761,18 @@ components:
     targetAmount:
       allOf:
         - $ref: '#/components/schemas/Money'
-        - description: >-
-            The amount which the FXP is to credit to the requesting FSP in the
-            target currency.
+        - description: The amount which the FXP is to credit to the requesting FSP in the target currency.
     condition:
       allOf:
         - $ref: '#/components/schemas/IlpCondition'
-        - description: >-
-            ILP condition received by the requesting FSP when the quote was
-            approved.
+        - description: ILP condition received by the requesting FSP when the quote was approved.
     FxTransfersPostOutboundRequest:
       title: FxTransfersPostOutboundRequest
       type: object
       description: The object sent in the POST /fxTransfers request.
       properties:
         homeTransactionId:
-          description: >-
-            Transaction ID for the backend, used to reconcile transactions
-            between the Switch and backend systems.
+          description: Transaction ID for the backend, used to reconcile transactions between the Switch and backend systems.
           type: string
         commitRequestId:
           $ref: '#/components/schemas/commitRequestId'
@@ -3159,10 +2797,7 @@ components:
     fulfilment:
       allOf:
         - $ref: '#/components/schemas/IlpFulfilment'
-        - description: >-
-            The fulfilment of the condition specified for the currency
-            conversion. Mandatory if the conversion has been executed
-            successfully.
+        - description: The fulfilment of the condition specified for the currency conversion. Mandatory if the conversion has been executed successfully.
     completedTimestamp:
       allOf:
         - $ref: '#/components/schemas/DateTime'
@@ -3177,9 +2812,7 @@ components:
       description: The object sent as a response for the POST /fxTransfers request.
       properties:
         homeTransactionId:
-          description: >-
-            Transaction ID for the backend, used to reconcile transactions
-            between the Switch and backend systems.
+          description: Transaction ID for the backend, used to reconcile transactions between the Switch and backend systems.
           type: string
         fulfilment:
           $ref: '#/components/schemas/fulfilment'
@@ -3356,10 +2989,7 @@ components:
           schema:
             $ref: '#/components/schemas/errorTransferResponse'
     servicesFXPSucess:
-      description: >-
-        The response contains participants in a scheme who offer currency
-        conversion services. If no participants offer these services, the return
-        object will be blank.
+      description: The response contains participants in a scheme who offer currency conversion services. If no participants offer these services, the return object will be blank.
       content:
         application/json:
           schema:
@@ -3371,27 +3001,21 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/CorrelationId'
-      description: >-
-        Identifier of the bulk transfer to continue as returned in the response
-        to a `POST /bulkTransfers` request.
+      description: Identifier of the bulk transfer to continue as returned in the response to a `POST /bulkTransfers` request.
     bulkTransactionId:
       name: bulkTransactionId
       in: path
       required: true
       schema:
         $ref: '#/components/schemas/CorrelationId'
-      description: >-
-        Identifier of the bulk transaction to continue as returned in the
-        response to a `POST /bulkTransaction` request.
+      description: Identifier of the bulk transaction to continue as returned in the response to a `POST /bulkTransaction` request.
     bulkTransferId:
       name: bulkTransferId
       in: path
       required: true
       schema:
         $ref: '#/components/schemas/CorrelationId'
-      description: >-
-        Identifier of the bulk transfer to continue as returned in the response
-        to a `POST /bulkTransfers` request.
+      description: Identifier of the bulk transfer to continue as returned in the response to a `POST /bulkTransfers` request.
     Type:
       name: Type
       in: path
@@ -3412,27 +3036,21 @@ components:
       required: true
       schema:
         type: string
-      description: >-
-        A sub-identifier of the party identifier, or a sub-type of the party
-        identifier's type. For example, `PASSPORT`, `DRIVING_LICENSE`.
+      description: A sub-identifier of the party identifier, or a sub-type of the party identifier's type. For example, `PASSPORT`, `DRIVING_LICENSE`.
     transactionRequestId:
       name: transactionRequestId
       in: path
       required: true
       schema:
         $ref: '#/components/schemas/CorrelationId'
-      description: >-
-        Identifier of the merchant request to pay to continue as returned in the
-        response to a `POST /requestToPay` request.
+      description: Identifier of the merchant request to pay to continue as returned in the response to a `POST /requestToPay` request.
     transferId:
       name: transferId
       in: path
       required: true
       schema:
         $ref: '#/components/schemas/CorrelationId'
-      description: >-
-        Identifier of the transfer to continue as returned in the response to a
-        `POST /transfers` request.
+      description: Identifier of the transfer to continue as returned in the response to a `POST /transfers` request.
     SourceCurrency:
       name: SourceCurrency
       in: path
