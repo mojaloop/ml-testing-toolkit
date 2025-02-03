@@ -296,7 +296,7 @@ const processTestCase = async (
     // Insert traceparent header if sessionID passed
     if (tracing.sessionID) {
       convertedRequest.headers = convertedRequest.headers || {}
-      convertedRequest.headers.traceparent = '00-' + traceID + '-0123456789abcdef0-00'
+      convertedRequest.headers.traceparent = '00-' + traceID + '-' + String(testCase.id).padStart(8, '0') + String(templateIDArr[i]).padStart(8, '0') + '-01'
       // todo: think about proper traceparent header
     }
 
