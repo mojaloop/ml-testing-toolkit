@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.7.4](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.7.3...v18.7.4) (2025-02-03)
+
+
+### Bug Fixes
+
+* generate correct traceparent ([#294](https://github.com/mojaloop/ml-testing-toolkit/issues/294)) ([9aae1ee](https://github.com/mojaloop/ml-testing-toolkit/commit/9aae1eebd7cd27d820314add9b6617a733b4f1ff))
+
 ### [18.7.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.7.2...v18.7.3) (2025-01-31)
 
 
