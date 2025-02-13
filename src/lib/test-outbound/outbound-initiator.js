@@ -132,7 +132,7 @@ const OutboundSend = async (
             url: Config.releaseCd.reportUrl,
             data: {
               tests: {
-                [inputTemplate.name]: totalResult
+                [inputTemplate.name]: totalResult.runtimeInformation
               }
             }
           })
