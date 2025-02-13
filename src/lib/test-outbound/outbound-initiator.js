@@ -125,6 +125,21 @@ const OutboundSend = async (
           saveReportStatus.message = err.message
         }
       }
+      if (Config.releaseCd.reportUrl) {
+        try {
+          await axios({
+            method: 'post',
+            url: Config.releaseCd.reportUrl,
+            data: {
+              tests: {
+                [inputTemplate.name]: totalResult
+              }
+            }
+          })
+        } catch (err) {
+          customLogger.logMessage('error', 'Error while sending report to release CD: ' + err.message)
+        }
+      }
       notificationEmitter.broadcastOutboundProgress({
         status: 'FINISHED',
         outboundID: tracing.outboundID,
