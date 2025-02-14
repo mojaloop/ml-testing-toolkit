@@ -27,6 +27,9 @@ const storageAdapter = require('./storageAdapter')
 const SYSTEM_CONFIG_FILE = 'spec_files/system_config.json'
 const USER_CONFIG_FILE = 'spec_files/user_config.json'
 const _ = require('lodash')
+const rc = require('rc')
+
+const releaseCd = rc('release_cd', {})
 
 let SYSTEM_CONFIG = {}
 
@@ -168,5 +171,6 @@ module.exports = {
   getSystemConfig,
   loadSystemConfig,
   setSystemConfig,
-  getObjectStoreInitConfig
+  getObjectStoreInitConfig,
+  releaseCd
 }
