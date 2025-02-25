@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.7.5](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.7.4...v18.7.5) (2025-02-25)
+
+
+### Chore
+
+* maintenance updates ([#299](https://github.com/mojaloop/ml-testing-toolkit/issues/299)) ([eeff34a](https://github.com/mojaloop/ml-testing-toolkit/commit/eeff34aad774c809fca451cafa5add63271e7b3d))
+
 ### [18.7.4](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.7.3...v18.7.4) (2025-02-03)
 
 
