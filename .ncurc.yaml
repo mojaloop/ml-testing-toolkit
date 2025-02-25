@@ -2,5 +2,7 @@
 reject: [
   "chai", # version 5 uses only ESM
   "axios" # version 1.7.9 causes functional tests to hang up
+  "postman-collection",
+  "postman-sandbox"
 ]
 
