@@ -73,7 +73,7 @@
     "@hapi/vision": "7.0.3",
     "@mojaloop/central-services-logger": "11.5.5",
     "@mojaloop/central-services-metrics": "12.4.5",
-    "@mojaloop/ml-schema-transformer-lib": "v2.5.4",
+    "@mojaloop/ml-schema-transformer-lib": "2.5.4",
     "@mojaloop/ml-testing-toolkit-shared-lib": "14.0.4",
     "@mojaloop/sdk-standard-components": "19.7.0",
     "@now-ims/hapi-now-auth": "2.1.0",
@@ -178,9 +178,6 @@
     },
     "cross-spawn": "7.0.6",
     "markdown-it": "14.1.0",
-    "sanitize-html": {
-      "postcss": "8.5.1"
-    },
     "jsonwebtoken": "9.0.2",
     "yargs-parser": "21.1.1",
     "oas-validator": {
