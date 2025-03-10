@@ -343,7 +343,7 @@ const processTestCase = async (
 
       let successCallbackUrl = null
       let errorCallbackUrl = null
-      if (request.apiVersion.asynchronous === true) {
+      if (reqApiDefinition?.asynchronous === true) {
         const cbMapRawdata = await readFileAsync(reqApiDefinition.callbackMapFile)
         const reqCallbackMap = JSON.parse(cbMapRawdata)
         if (reqCallbackMap[request.operationPath] && reqCallbackMap[request.operationPath][request.method]) {
@@ -381,6 +381,7 @@ const processTestCase = async (
         )
       }
     } catch (err) {
+      customLogger.logMessage('error', err.message)
       let resp
       try {
         resp = JSON.parse(err.message)

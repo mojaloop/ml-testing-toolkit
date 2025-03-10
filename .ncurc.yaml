@@ -1,7 +1,7 @@
 ## Add a TODO comment indicating the reason for each rejected dependency upgrade added to this list, and what should be done to resolve it (i.e. handle it through a story, etc).
 reject: [
   "chai", # version 5 uses only ESM
-  "axios" # version 1.7.9 causes functional tests to hang up
+  "axios", # version 1.7.9 causes functional tests to hang up
   "postman-collection",
   "postman-sandbox"
 ]
