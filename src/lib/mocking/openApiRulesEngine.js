@@ -113,7 +113,7 @@ const replaceEnvironmentsFromRules = async (rulesObject) => {
   rules.forEach(rule => {
     Object.keys(rule.conditions).forEach(conditionType => {
       rule.conditions[conditionType].forEach((condition) => {
-        if (condition.value && condition.value.split('.')[0] === '{$environment') {
+        if (condition.value && (typeof condition.value === 'string') && condition.value.split('.')[0] === '{$environment') {
           condition.value = getEnvironmentValue(condition.value, environment)
           reloadRules = true
         }
