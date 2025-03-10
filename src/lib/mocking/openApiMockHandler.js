@@ -169,8 +169,8 @@ module.exports.handleRequest = async (req, h) => {
     req.customInfo.negotiatedContentType = versionNegotiationResult.responseContentTypeHeader
     selectedApi = pickedApis[versionNegotiationResult.negotiatedIndex]
     req.customInfo.selectedApi = selectedApi
-    customLogger.logMessage('info', 'API matched: ' + selectedApi.type, { request: req })
   }
+  customLogger.logMessage('info', 'API matched: ' + selectedApi.type, { request: req })
   try {
     return await selectedApi.openApiBackendObject.handleRequest(
       {
