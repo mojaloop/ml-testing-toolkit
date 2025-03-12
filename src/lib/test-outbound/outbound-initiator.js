@@ -33,6 +33,8 @@ const _ = require('lodash')
 const axios = require('axios').default
 const https = require('https')
 const uuid = require('uuid')
+const util = require('node:util')
+const crypto = require('node:crypto')
 require('request-to-curl')
 require('atob') // eslint-disable-line
 
@@ -255,6 +257,7 @@ const processTestCase = async (
   const templateIDArr = []
   for (const i in testCase.requests) {
     requestsObj[testCase.requests[i].id] = testCase.requests[i]
+    if (testCase.requests[i].requestId) requestsObj[testCase.requests[i].requestId] = testCase.requests[i]
     templateIDArr.push(testCase.requests[i].id)
   }
   // Sort the request ids array
@@ -297,11 +300,12 @@ const processTestCase = async (
 
     // Form the path from params and operationPath
     convertedRequest.path = replacePathVariables(request.operationPath, convertedRequest.params)
+    const requestTraceId = templateOptions.traceUrl ? crypto.randomBytes(8).toString('hex') : traceID
 
     // Insert traceparent header if sessionID passed
     if (tracing.sessionID) {
       convertedRequest.headers = convertedRequest.headers || {}
-      convertedRequest.headers.traceparent = '00-' + traceID + '-' + String(testCase.id).padStart(8, '0') + String(templateIDArr[i]).padStart(8, '0') + '-01'
+      convertedRequest.headers.traceparent = '00-' + requestTraceId + '-' + String(testCase.id).padStart(8, '0') + String(templateIDArr[i]).padStart(8, '0') + '-01'
       // todo: think about proper traceparent header
     }
 
@@ -377,7 +381,9 @@ const processTestCase = async (
           contextObj,
           globalConfig,
           metrics,
-          templateName
+          templateName,
+          requestTraceId,
+          util.format(templateOptions.traceUrl || '//trace/%s', requestTraceId)
         )
       }
     } catch (err) {
@@ -400,7 +406,9 @@ const processTestCase = async (
         contextObj,
         globalConfig,
         metrics,
-        templateName
+        templateName,
+        requestTraceId,
+        util.format(templateOptions.traceUrl || '//trace/%s', requestTraceId)
       )
     } finally {
       if (request.appended?.testResult?.isFailed) {
@@ -439,7 +447,9 @@ const setResponse = async (
   contextObj,
   globalConfig,
   metrics,
-  templateName
+  templateName,
+  traceId,
+  traceUrl
 ) => {
   // Get the requestsHistory and callbacksHistory from the arrayStore
   const requestsHistoryObj = arrayStore.get('requestsHistory')
@@ -460,6 +470,8 @@ const setResponse = async (
   request.appended = {
     status,
     testResult,
+    traceId,
+    traceUrl,
     response: resp.syncResponse,
     callback: resp.callback,
     request: convertedRequest,
@@ -1031,7 +1043,16 @@ const generateFinalReport = (inputTemplate, runtimeInformation, metrics) => {
   return {
     ...remaingPropsInTemplate,
     test_cases: resultTestCases,
-    runtimeInformation
+    runtimeInformation,
+    assertions: Object.fromEntries(resultTestCases.map(
+      testCase => testCase?.requests?.map(
+        request => request?.request?.tests?.assertions
+        .filter(assertion => assertion?.assertionId ?? assertion.id)
+        .map(
+          assertion => [`${testCase.testCaseId ?? testCase.name}.${request.request.requestId ?? request.request.id}.${assertion?.assertionId ?? assertion.id}`, assertion?.resultStatus?.status]
+        )
+      )
+    ).flat(2))
   }
 }
 
