@@ -29,13 +29,14 @@
 
 const { ilpFactory, ILP_VERSIONS } = require('@mojaloop/sdk-standard-components').Ilp
 const customLogger = require('../../requestLogger')
+const { logger } = require('../../logger')
 
 let ilpObj = null
 let ilpV4Obj = null
 
 const init = (secret) => {
-  ilpObj = ilpFactory(ILP_VERSIONS.v1, { secret, logger: customLogger })
-  ilpV4Obj = ilpFactory(ILP_VERSIONS.v4, { secret, logger: customLogger })
+  ilpObj = ilpFactory(ILP_VERSIONS.v1, { secret, logger })
+  ilpV4Obj = ilpFactory(ILP_VERSIONS.v4, { secret, logger })
 }
 
 // ILP Packet inclusion functions
