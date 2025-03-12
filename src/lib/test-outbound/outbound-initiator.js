@@ -1043,16 +1043,7 @@ const generateFinalReport = (inputTemplate, runtimeInformation, metrics) => {
   return {
     ...remaingPropsInTemplate,
     test_cases: resultTestCases,
-    runtimeInformation,
-    assertions: Object.fromEntries(resultTestCases.map(
-      testCase => testCase?.requests?.map(
-        request => request?.request?.tests?.assertions
-        .filter(assertion => assertion?.assertionId ?? assertion.id)
-        .map(
-          assertion => [`${testCase.testCaseId ?? testCase.name}.${request.request.requestId ?? request.request.id}.${assertion?.assertionId ?? assertion.id}`, assertion?.resultStatus?.status]
-        )
-      )
-    ).flat(2))
+    runtimeInformation
   }
 }
 
