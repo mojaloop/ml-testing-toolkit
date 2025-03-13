@@ -595,7 +595,9 @@ input:checked + .slider:before {
                                     {{/if}}
                                     <span><i class="fas fa-info-circle"></i></span><strong> Request Method:</strong> <span class="badge-outline-success badge badge-success"> {{request.method}}</span><br>
                                     <span><i class="fas fa-info-circle"></i></span><strong> Request URL:</strong> {{request.path}} <br>
-                                    <span><i class="fas fa-info-circle"></i></span><strong> trace-id:</strong> <a href="{{traceUrl}}">{{traceId}}</a><br>
+                                    <span><i class="fas fa-info-circle"></i></span><strong> trace-id:</strong> <a href="{{traceUrl}}"><span id="copyText-trace-id-{{../id}}-{{request.id}}">{{traceId}}</span></a>
+                                    <button class="btn btn-outline-secondary btn-sm copyButton" type="button" data-clipboard-action="copy" data-clipboard-target="#copyText-trace-id-{{../id}}-{{request.id}}">Copy to Clipboard</button>
+                                    <br>
                                     </div>
                                 </div>
                                 <div class="card border-info" style="width: 50rem;">
