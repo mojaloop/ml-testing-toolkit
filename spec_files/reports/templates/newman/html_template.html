@@ -320,15 +320,15 @@ body, html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1; 
+  background: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888; 
+  background: #888;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555; 
+  background: #555;
 }
 
 /* The switch - the box around the slider */
@@ -533,7 +533,7 @@ input:checked + .slider:before {
             <div class="tab-pane fade" id="pills-requests" role="tabcard" aria-labelledby="pills-requests-tab">
 
             <button id="topOfRequestsScreen" class="btn btn-outline-success btn-sm backToTop" onclick="topFunction()">Go To Top</button>
-            
+
             <div class="btn-group float-right" role="group" aria-label="Button Group">
                 <button id="openAll" class="btn btn-outline-success btn-sm float-right">Expand Folders</button>
                 <button id="openAllRequests" class="btn btn-outline-success btn-sm float-right">Expand Requests</button>
@@ -541,7 +541,7 @@ input:checked + .slider:before {
                 <button id="closeAllRequests" class="btn btn-outline-success btn-sm float-right">Collapse Requests</button>
             </div>
 
-    <div class="text-uppercase" id="execution-menu">        
+    <div class="text-uppercase" id="execution-menu">
         <nav class="table-responsive">
         <ul class="nav single-line-tabs d-none" id="iterationList">
         </ul>
@@ -595,14 +595,15 @@ input:checked + .slider:before {
                                     {{/if}}
                                     <span><i class="fas fa-info-circle"></i></span><strong> Request Method:</strong> <span class="badge-outline-success badge badge-success"> {{request.method}}</span><br>
                                     <span><i class="fas fa-info-circle"></i></span><strong> Request URL:</strong> {{request.path}} <br>
+                                    <span><i class="fas fa-info-circle"></i></span><strong> trace-id:</strong> <a href="{{traceUrl}}"><span id="copyText-trace-id-{{../id}}-{{request.id}}">{{traceId}}</span></a>
+                                    <button class="btn btn-outline-secondary btn-sm copyButton" type="button" data-clipboard-action="copy" data-clipboard-target="#copyText-trace-id-{{../id}}-{{request.id}}">Copy to Clipboard</button>
+                                    <br>
                                     </div>
                                 </div>
                                 <div class="card border-info" style="width: 50rem;">
                                     <div class="card-body">
                                     <h5 class="card-title text-uppercase text-white text-center bg-info">Response Information</h5>
                                     <span><i class="fas fa-info-circle"></i></span><strong> Response Code:</strong> <span class="float-right badge-outline badge badge-success"> {{response.status}} - {{response.statusText}} </span><br>
-                                    <span><i class="fas fa-stopwatch"></i></span><strong> Mean time per request:</strong> <span class="float-right badge-outline badge badge-success"> NA</span><br>
-                                    <span><i class="fas fa-database"></i></span><strong> Mean size per request:</strong> <span class="float-right badge-outline badge badge-success"> NA</span><br>
                                     <hr>
                                     <h5 class="card-title text-uppercase text-white text-center bg-info">Test Pass Percentage</h5>
                                     <div>
@@ -839,7 +840,7 @@ input:checked + .slider:before {
                                                     </td>
                                                     {{else}}
                                                     <td class="text-center bg-danger">
-                                                        FAILED 
+                                                        FAILED
                                                     </td>
                                                     </tr><tr><td colspan="2" class="text-center bg-danger">({{resultStatus.message}})</td>
                                                     {{/if}}
@@ -1005,7 +1006,7 @@ $(".prettyPrint").each(function () {
                 data = JSON.stringify(obj, null, 2);
         }
         else if(isXML(data)) {
-            data = formatXML(data);            
+            data = formatXML(data);
         }
         $(this).text(data);
 });
@@ -1095,7 +1096,7 @@ function topFunction() {
     "use strict";
 
 window.onload = function () {
-   
+
   let totalIterations = 1;
 
   let menu = document.querySelector('#execution-menu .nav');
@@ -1118,7 +1119,7 @@ window.onload = function () {
       allMenus.forEach(function(elem){
         elem.style.borderBottom = 'none';
       })
-    
+
       this.style.borderBottom = 'solid 3px #032a33';
 
       let items = document.querySelectorAll("." + this.id);
