@@ -219,8 +219,7 @@ const properJsonReport = {
     completedTimeISO: '2020-05-11T13:39:54.987Z',
     startedTime: 'Mon, 11 May 2020 13:39:54 GMT',
     completedTime: 'Mon, 11 May 2020 13:39:54 GMT',
-    runDurationMs: 179,
-    avgResponseTime: 'NA'
+    runDurationMs: 179
   }
 }
 

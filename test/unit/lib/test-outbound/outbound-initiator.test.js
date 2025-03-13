@@ -1210,7 +1210,7 @@ describe('Outbound Initiator Functions', () => {
                     ]
                   }
                 },
-                testResult: {
+                assertionResults: {
                   results: {
                     '1': {
                       status: 'SUCCESS'

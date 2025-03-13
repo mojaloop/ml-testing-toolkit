@@ -477,7 +477,6 @@ input:checked + .slider:before {
                 <span><i class="fas fa-file-code"></i></span><strong> Template Name:</strong> {{name}}<br>
                 {{#if runtimeInformation}}
                 <span><i class="fas fa-stopwatch"></i></span><strong> Total run duration:</strong> {{runtimeInformation.runDurationMs}} ms<br>
-                <span><i class="fas fa-stopwatch"></i></span><strong> Average response time:</strong> {{runtimeInformation.avgResponseTime}}<br>
                 {{/if}}
                 {{#if extraRuntimeInformation}}
                 {{#each extraRuntimeInformation}}
@@ -560,6 +559,12 @@ input:checked + .slider:before {
         </a>
         </div>
         <div id="folder-collapse-{{id}}" class="collapse" aria-labelledby="folder-{{id}}">
+            <div class="card border-info" style="width: 100%;">
+                <div class="card-body">
+                <span><i class="fas fa-stopwatch"></i></span><strong> Testcase Duration:</strong> <span class="badge-outline badge badge-success"> {{testResult.runDurationMs}} ms</span><br>
+                </div>
+            </div>
+            <br>
             {{#each requests}}
             <div id="folder-{{../id}}-{{request.id}}" class="card-deck iteration-0">
             <div class="row iteration-0">
@@ -604,6 +609,7 @@ input:checked + .slider:before {
                                     <div class="card-body">
                                     <h5 class="card-title text-uppercase text-white text-center bg-info">Response Information</h5>
                                     <span><i class="fas fa-info-circle"></i></span><strong> Response Code:</strong> <span class="float-right badge-outline badge badge-success"> {{response.status}} - {{response.statusText}} </span><br>
+                                    <span><i class="fas fa-stopwatch"></i></span><strong> Request Duration:</strong> <span class="float-right badge-outline badge badge-success"> {{testResult.runDurationMs}} ms</span><br>
                                     <hr>
                                     <h5 class="card-title text-uppercase text-white text-center bg-info">Test Pass Percentage</h5>
                                     <div>
