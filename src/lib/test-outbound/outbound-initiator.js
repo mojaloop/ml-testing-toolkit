@@ -305,7 +305,7 @@ const processTestCase = async (
 
     // Form the path from params and operationPath
     convertedRequest.path = replacePathVariables(request.operationPath, convertedRequest.params)
-    const requestTraceId = templateOptions.traceUrl ? crypto.randomBytes(8).toString('hex') : traceID
+    const requestTraceId = templateOptions.traceUrl ? crypto.randomBytes(16).toString('hex') : traceID
 
     // Insert traceparent header if sessionID passed
     if (tracing.sessionID) {
