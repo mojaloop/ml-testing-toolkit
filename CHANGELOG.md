@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.9.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.9.1...v18.9.2) (2025-03-14)
+
+
+### Bug Fixes
+
+* update trace-id link to open in Grafana and increase trace ID length ([#303](https://github.com/mojaloop/ml-testing-toolkit/issues/303)) ([ad7dac5](https://github.com/mojaloop/ml-testing-toolkit/commit/ad7dac51ac6abf8ae11e982bbb0076ff236bbcf2))
+
 ### [18.9.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.9.0...v18.9.1) (2025-03-14)
 
 
