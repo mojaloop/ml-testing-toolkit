@@ -1,10 +1,13 @@
 /*****
  License
  --------------
- Copyright © 2017 Bill & Melinda Gates Foundation
- The Mojaloop files are made available by the Bill & Melinda Gates Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
+ Copyright © 2020-2025 Mojaloop Foundation
+ The Mojaloop files are made available by the Mojaloop Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
+
  http://www.apache.org/licenses/LICENSE-2.0
+
  Unless required by applicable law or agreed to in writing, the Mojaloop files are distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
  Contributors
  --------------
  This is the official list of the Mojaloop project contributors for this file.
@@ -12,59 +15,53 @@
  should be listed with a '*' in the first column. People who have
  contributed from an organization can be listed under the organization
  that actually holds the copyright for their contributions (see the
- Gates Foundation organization for an example). Those individuals should have
+ Mojaloop Foundation for an example). Those individuals should have
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
- * Gates Foundation
+
+ * Mojaloop Foundation
+ - Name Surname <name.surname@mojaloop.io>
 
  * ModusBox
  * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
+/* eslint-disable camelcase */
 
 const _ = require('lodash')
-const customLogger = require('../requestLogger')
 const axios = require('axios').default
 const https = require('https')
+const uuid = require('uuid')
+const util = require('node:util')
+const crypto = require('node:crypto')
+require('request-to-curl')
+require('atob') // eslint-disable-line
+
 const Config = require('../config')
+const customLogger = require('../requestLogger')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
 const { readFileAsync, headersToLowerCase } = require('../utils')
 const expectOriginal = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
-const { TraceHeaderUtils } = require('@mojaloop/ml-testing-toolkit-shared-lib')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
-require('request-to-curl')
-require('atob') // eslint-disable-line
-delete axios.defaults.headers.common.Accept
+
 const postmanContext = require('../scripting-engines/postman-sandbox')
 const javascriptContext = require('../scripting-engines/vm-javascript-sandbox')
 const openApiDefinitionsModel = require('../mocking/openApiDefinitionsModel')
-const uuid = require('uuid')
 const utilsInternal = require('../utilsInternal')
 const dbAdapter = require('../db/adapters/dbAdapter')
 const arrayStore = require('../arrayStore')
 const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 const httpAgentStore = require('../httpAgentStore')
 const Transformers = require('../mocking/transformers')
+const getTracing = require('./getTracing')
+const TestCaseRunner = require('./TestCaseRunner')
+
+delete axios.defaults.headers.common.Accept
 
 const terminateTraceIds = {}
-
-const getTracing = (traceID, dfspId) => {
-  const tracing = {
-    outboundID: traceID,
-    sessionID: null
-  }
-  if (traceID && TraceHeaderUtils.isCustomTraceID(traceID)) {
-    tracing.outboundID = TraceHeaderUtils.getEndToEndID(traceID)
-    tracing.sessionID = TraceHeaderUtils.getSessionID(traceID)
-  }
-  if (Config.getSystemConfig().HOSTING_ENABLED) {
-    tracing.sessionID = dfspId
-  }
-  return tracing
-}
 
 const OutboundSend = async (
   inputTemplate,
@@ -97,20 +94,9 @@ const OutboundSend = async (
     environment: { ...inputTemplate.inputValues }
   }
   try {
-    for (const i in inputTemplate.test_cases) {
-      globalConfig.totalProgress.testCasesProcessed++
-      await processTestCase(
-        inputTemplate.test_cases[i],
-        traceID,
-        inputTemplate.inputValues,
-        variableData,
-        dfspId,
-        globalConfig,
-        inputTemplate.options,
-        metrics,
-        inputTemplate.name
-      )
-    }
+    await (new TestCaseRunner(Config)).runAll({
+      processTestCase, inputTemplate, traceID, variableData, dfspId, globalConfig, metrics
+    })
 
     const completedTimeStamp = new Date()
     const runDurationMs = completedTimeStamp.getTime() - startedTimeStamp.getTime()
@@ -121,8 +107,9 @@ const OutboundSend = async (
       startedTime: startedTimeStamp.toUTCString(),
       completedTime: completedTimeStamp,
       completedTimeUTC: completedTimeStamp.toUTCString(),
+      startedTS: startedTimeStamp.getTime(),
+      completedTS: completedTimeStamp.getTime(),
       runDurationMs,
-      avgResponseTime: 'NA',
       totalAssertions: 0,
       totalPassedAssertions: 0
     }
@@ -154,7 +141,7 @@ const OutboundSend = async (
       }, tracing.sessionID)
     }
   } catch (err) {
-    console.log(err)
+    console.log('error in OutboundSend:', err)
     notificationEmitter.broadcastOutboundProgress({
       status: 'TERMINATED',
       outboundID: tracing.outboundID
@@ -162,6 +149,7 @@ const OutboundSend = async (
   }
 }
 
+/* istanbul ignore next */
 const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metrics) => {
   const totalCounts = getTotalCounts(inputTemplate)
 
@@ -238,6 +226,7 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metr
       }, tracing.sessionID)
     }
   } catch (err) {
+    console.log('error in OutboundSendLoop:', err)
     notificationEmitter.broadcastOutboundProgress({
       status: 'ITERATIONS_TERMINATED',
       outboundID: tracing.outboundID,
@@ -262,6 +251,7 @@ const processTestCase = async (
   templateName
 ) => {
   const tracing = getTracing(traceID)
+  const testCaseStartedTime = new Date()
 
   // Load the requests array into an object by the request id to access a particular object faster
   const requestsObj = {}
@@ -269,6 +259,7 @@ const processTestCase = async (
   const templateIDArr = []
   for (const i in testCase.requests) {
     requestsObj[testCase.requests[i].id] = testCase.requests[i]
+    if (testCase.requests[i].requestId) requestsObj[testCase.requests[i].requestId] = testCase.requests[i]
     templateIDArr.push(testCase.requests[i].id)
   }
   // Sort the request ids array
@@ -283,6 +274,9 @@ const processTestCase = async (
       delete terminateTraceIds[traceID]
       throw new Error('Terminated')
     }
+
+    const requestStartedTime = new Date()
+
     const request = requestsObj[templateIDArr[i]]
 
     let convertedRequest = JSON.parse(JSON.stringify(request))
@@ -311,11 +305,13 @@ const processTestCase = async (
 
     // Form the path from params and operationPath
     convertedRequest.path = replacePathVariables(request.operationPath, convertedRequest.params)
+    const requestTraceId = templateOptions.traceUrl ? crypto.randomBytes(16).toString('hex') : traceID
 
     // Insert traceparent header if sessionID passed
     if (tracing.sessionID) {
       convertedRequest.headers = convertedRequest.headers || {}
-      convertedRequest.headers.traceparent = '00-' + traceID + '-0123456789abcdef0-00'
+      convertedRequest.headers.traceparent = '00-' + requestTraceId + '-' + String(testCase.id).padStart(8, '0') + String(templateIDArr[i]).padStart(8, '0') + '-01'
+      // todo: think about proper traceparent header
     }
 
     const scriptsExecution = {}
@@ -356,7 +352,7 @@ const processTestCase = async (
 
       let successCallbackUrl = null
       let errorCallbackUrl = null
-      if (request.apiVersion.asynchronous === true) {
+      if (reqApiDefinition?.asynchronous === true) {
         const cbMapRawdata = await readFileAsync(reqApiDefinition.callbackMapFile)
         const reqCallbackMap = JSON.parse(cbMapRawdata)
         if (reqCallbackMap[request.operationPath] && reqCallbackMap[request.operationPath][request.method]) {
@@ -390,10 +386,13 @@ const processTestCase = async (
           contextObj,
           globalConfig,
           metrics,
-          templateName
+          templateName,
+          requestTraceId,
+          util.format(templateOptions.traceUrl || '//trace/%s', requestTraceId)
         )
       }
     } catch (err) {
+      customLogger.logMessage('error', err.message)
       let resp
       try {
         resp = JSON.parse(err.message)
@@ -401,7 +400,8 @@ const processTestCase = async (
         resp = err.message
       }
       status = 'ERROR'
-      await setResponse(convertedRequest,
+      await setResponse(
+        convertedRequest,
         resp,
         variableData,
         request,
@@ -412,10 +412,12 @@ const processTestCase = async (
         contextObj,
         globalConfig,
         metrics,
-        templateName
+        templateName,
+        requestTraceId,
+        util.format(templateOptions.traceUrl || '//trace/%s', requestTraceId)
       )
     } finally {
-      if (request.appended?.testResult?.isFailed) {
+      if (request.appended?.assertionResults?.isFailed) {
         if (templateOptions.breakOnError) {
           // Terminate the test run if assertion failed
           // eslint-disable-next-line
@@ -432,6 +434,20 @@ const processTestCase = async (
         contextObj.ctx = null
       }
     }
+
+    const requestCompletedTime = new Date()
+    request.appended.testResult = {
+      startedTS: requestStartedTime.getTime(),
+      completedTS: requestCompletedTime.getTime(),
+      runDurationMs: requestCompletedTime.getTime() - requestStartedTime.getTime()
+    }
+  }
+
+  const testCaseCompletedTime = new Date()
+  testCase.testResult = {
+    startedTS: testCaseStartedTime.getTime(),
+    completedTS: testCaseCompletedTime.getTime(),
+    runDurationMs: testCaseCompletedTime.getTime() - testCaseStartedTime.getTime()
   }
 
   // Return status report of this test case
@@ -451,7 +467,9 @@ const setResponse = async (
   contextObj,
   globalConfig,
   metrics,
-  templateName
+  templateName,
+  traceId,
+  traceUrl
 ) => {
   // Get the requestsHistory and callbacksHistory from the arrayStore
   const requestsHistoryObj = arrayStore.get('requestsHistory')
@@ -465,13 +483,15 @@ const setResponse = async (
     await executePostRequestScript(convertedRequest, resp, scriptsExecution, contextObj, variableData, backgroundData)
   }
 
-  let testResult = null
+  let assertionResults = null
   if (globalConfig.testsExecution) {
-    testResult = await handleTests(convertedRequest, resp.requestSent, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
+    assertionResults = await handleTests(convertedRequest, resp.requestSent, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
   }
   request.appended = {
     status,
-    testResult,
+    assertionResults,
+    traceId,
+    traceUrl,
     response: resp.syncResponse,
     callback: resp.callback,
     request: convertedRequest,
@@ -484,11 +504,11 @@ const setResponse = async (
   // Update total progress counts
   globalConfig.totalProgress.requestsProcessed++
   globalConfig.totalProgress.assertionsProcessed += request.tests && request.tests.assertions ? request.tests.assertions.length : 0
-  globalConfig.totalProgress.assertionsPassed += testResult.passedCount
-  const failed = request.tests && request.tests.assertions ? (request.tests.assertions.length - testResult.passedCount) : 0
+  globalConfig.totalProgress.assertionsPassed += assertionResults.passedCount
+  const failed = request.tests && request.tests.assertions ? (request.tests.assertions.length - assertionResults.passedCount) : 0
   globalConfig.totalProgress.assertionsFailed += failed
   const tags = { request: request.description, test: testCase.name }
-  metrics?.assertSuccess.add(testResult.passedCount, tags)
+  metrics?.assertSuccess.add(assertionResults.passedCount, tags)
   metrics?.assertFail.add(failed, tags)
 
   if (tracing.outboundID && globalConfig.broadcastOutboundProgressEnabled) {
@@ -506,20 +526,20 @@ const setResponse = async (
         curlRequest: resp.curlRequest,
         scriptsExecution
       },
-      testResult,
+      testResult: assertionResults, // This should be changed, but it breaks UI. So keeping it for now.
       totalProgress: globalConfig.totalProgress
     }, tracing.sessionID)
   }
 }
 
 const setSkippedResponse = async (convertedRequest, request, status, tracing, testCase, scriptsExecution, globalConfig) => {
-  let testResult = null
+  let assertionResults = null
   if (globalConfig.testsExecution) {
-    testResult = await setAllTestsSkipped(convertedRequest)
+    assertionResults = await setAllTestsSkipped(convertedRequest)
   }
   request.appended = {
     status,
-    testResult,
+    assertionResults,
     response: null,
     callback: null,
     request: convertedRequest,
@@ -531,7 +551,7 @@ const setSkippedResponse = async (convertedRequest, request, status, tracing, te
   // Update total progress counts
   globalConfig.totalProgress.requestsProcessed++
   globalConfig.totalProgress.assertionsProcessed += request.tests && request.tests.assertions && request.tests.assertions.length
-  globalConfig.totalProgress.assertionsPassed += testResult.passedCount
+  globalConfig.totalProgress.assertionsPassed += assertionResults.passedCount
   // globalConfig.totalProgress.assertionsFailed += 0
 
   if (tracing.outboundID && globalConfig.broadcastOutboundProgressEnabled) {
@@ -548,7 +568,7 @@ const setSkippedResponse = async (convertedRequest, request, status, tracing, te
         curlRequest: null,
         scriptsExecution
       },
-      testResult,
+      testResult: assertionResults, // This should be changed, but it breaks UI. So keeping it for now.
       totalProgress: globalConfig.totalProgress
     }, tracing.sessionID)
   }
@@ -617,24 +637,24 @@ const handleTests = async (request, requestSent, response = null, callback = nul
     let isFailed = false
     if (request.tests && request.tests.assertions.length > 0) {
       for (const k in request.tests.assertions) {
-        const testCase = request.tests.assertions[k]
+        const assertion = request.tests.assertions[k]
         try {
           let status = 'SKIPPED'
           const expect = (args) => { // eslint-disable-line
             status = 'SUCCESS'
             return expectOriginal(args)
           }
-          const testsString = testCase.exec.join('\n')
+          const testsString = assertion.exec.join('\n')
 
           eval(testsString) // eslint-disable-line
-          results[testCase.id] = {
+          results[assertion.id] = {
             status
           }
           passedCount++
         } catch (err) {
-          console.log(err)
+          console.log(`error during eval testsString [assertion.id: ${assertion.id}]:`, err)
           isFailed = true
-          results[testCase.id] = {
+          results[assertion.id] = {
             status: 'FAILED',
             message: err.message
           }
@@ -643,7 +663,7 @@ const handleTests = async (request, requestSent, response = null, callback = nul
     }
     return { results, passedCount, isFailed }
   } catch (err) {
-    console.log(err)
+    console.log('error in handleTests:', err)
     return null
   }
 }
@@ -987,33 +1007,41 @@ const getTotalCounts = (inputTemplate) => {
     totalRequests: 0,
     totalAssertions: 0
   }
-  const { test_cases } = inputTemplate  // eslint-disable-line
-  result.totalTestCases = test_cases.length  // eslint-disable-line
-  test_cases.forEach(testCase => { // eslint-disable-line
-    const { requests } = testCase
-    result.totalRequests += requests.length
-    requests.forEach(request => {
-      result.totalAssertions += request.tests && request.tests.assertions && request.tests.assertions.length
+  const isParallelRun = Config.getSystemConfig().PARALLEL_RUN_ENABLED && inputTemplate.batchSize > 1
+  const testCasesToRun = []
+
+  inputTemplate.test_cases.forEach(testCase => {
+    if (isParallelRun && typeof testCase.meta?.executionOrder !== 'number') return
+    // todo: - think, if we need to skip testCases without executionOrder (in parallel run)
+    //       - optimise the logic to avoid additional looping in runAll (define executionBuckets here)
+    //       - check if all testCases should have "meta" field
+    testCasesToRun.push(testCase)
+    result.totalRequests += testCase.requests.length
+    testCase.requests.forEach(request => {
+      result.totalAssertions += (request.tests?.assertions?.length || 0)
     })
   })
+  inputTemplate.test_cases = testCasesToRun
+  result.totalTestCases = testCasesToRun.length
+
   return result
 }
 
 // Generate consolidated final report
 const generateFinalReport = (inputTemplate, runtimeInformation, metrics) => {
-  const { test_cases, ...remaingPropsInTemplate } = inputTemplate  // eslint-disable-line
-  const resultTestCases = test_cases.map(testCase => { // eslint-disable-line
+  const { test_cases, ...remaingPropsInTemplate } = inputTemplate
+  const resultTestCases = test_cases.map(testCase => {
     const { requests, ...remainingPropsInTestCase } = testCase
     const resultRequests = requests.map(requestItem => {
-      const { testResult, request, ...remainginPropsInRequest } = requestItem.appended
-      if (request.tests && request.tests.assertions) {
+      const { assertionResults, request, ...remainginPropsInRequest } = requestItem.appended
+      if (request?.tests?.assertions) {
         request.tests.assertions = request.tests.assertions.map(assertion => {
           return {
             ...assertion,
-            resultStatus: testResult.results[assertion.id]
+            resultStatus: assertionResults.results[assertion.id]
           }
         })
-        request.tests.passedAssertionsCount = testResult.passedCount
+        request.tests.passedAssertionsCount = assertionResults.passedCount
         runtimeInformation.totalAssertions += request.tests.assertions.length
         runtimeInformation.totalPassedAssertions += request.tests.passedAssertionsCount
       }

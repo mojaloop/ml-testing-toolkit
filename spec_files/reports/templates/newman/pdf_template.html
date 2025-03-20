@@ -320,15 +320,15 @@ body, html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1; 
+  background: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888; 
+  background: #888;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555; 
+  background: #555;
 }
 
 /* The switch - the box around the slider */
@@ -465,7 +465,6 @@ input:checked + .slider:before {
                 <span><i class="fas fa-file-code"></i></span><strong> Template Name:</strong> {{name}}<br>
                 {{#if runtimeInformation}}
                 <span><i class="fas fa-stopwatch"></i></span><strong> Total run duration:</strong> {{runtimeInformation.runDurationMs}} ms<br>
-                <span><i class="fas fa-stopwatch"></i></span><strong> Average response time:</strong> {{runtimeInformation.avgResponseTime}}<br>
                 {{/if}}
                 </div>
             </div>
@@ -515,7 +514,7 @@ input:checked + .slider:before {
         <div>
 
 
-    <div class="text-uppercase" id="execution-menu">        
+    <div class="text-uppercase" id="execution-menu">
         <nav class="table-responsive">
         <ul class="nav single-line-tabs d-none" id="iterationList">
         </ul>
@@ -534,6 +533,12 @@ input:checked + .slider:before {
         </a>
         </div>
         <div id="folder-collapse-{{id}}" class="show" aria-labelledby="folder-{{id}}">
+            <div class="card border-info" style="width: 100%;">
+                <div class="card-body">
+                <span><i class="fas fa-stopwatch"></i></span><strong> Testcase Duration:</strong> <span class="badge-outline badge badge-success"> {{testResult.runDurationMs}} ms</span><br>
+                </div>
+            </div>
+            <br>
             {{#each requests}}
             <div id="folder-{{../id}}-{{request.id}}" class="card-deck iteration-0">
             <div class="row iteration-0">
@@ -558,14 +563,14 @@ input:checked + .slider:before {
                                     <h5 class="card-title text-uppercase text-white text-center bg-info">Request Information</h5>
                                     <span><i class="fas fa-info-circle"></i></span><strong> Request Method:</strong> <span class="badge-outline-success badge badge-success"> {{request.method}}</span><br>
                                     <span><i class="fas fa-info-circle"></i></span><strong> Request URL:</strong> {{request.path}} <br>
+                                    <span><i class="fas fa-info-circle"></i></span><strong> trace-id:</strong> <a href="{{traceUrl}}">{{traceId}}</a><br>
                                     </div>
                                 </div>
                                 <div class="card border-info" style="width: 50rem;">
                                     <div class="card-body">
                                     <h5 class="card-title text-uppercase text-white text-center bg-info">Response Information</h5>
                                     <span><i class="fas fa-info-circle"></i></span><strong> Response Code:</strong> <span class="float-right badge-outline badge badge-success"> {{response.status}} - {{response.statusText}} </span><br>
-                                    <span><i class="fas fa-stopwatch"></i></span><strong> Mean time per request:</strong> <span class="float-right badge-outline badge badge-success"> NA</span><br>
-                                    <span><i class="fas fa-database"></i></span><strong> Mean size per request:</strong> <span class="float-right badge-outline badge badge-success"> NA</span><br>
+                                    <span><i class="fas fa-stopwatch"></i></span><strong> Request Duration:</strong> <span class="float-right badge-outline badge badge-success"> {{testResult.runDurationMs}} ms</span><br>
                                     <hr>
                                     <h5 class="card-title text-uppercase text-white text-center bg-info">Test Pass Percentage</h5>
                                     <div>
@@ -722,7 +727,7 @@ input:checked + .slider:before {
                                                     </td>
                                                     {{else}}
                                                     <td class="text-center bg-danger">
-                                                        FAILED 
+                                                        FAILED
                                                     </td>
                                                     </tr><tr><td colspan="2" class="text-center bg-danger">({{resultStatus.message}})</td>
                                                     {{/if}}

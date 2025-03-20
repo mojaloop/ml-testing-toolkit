@@ -1,10 +1,13 @@
 /*****
  License
  --------------
- Copyright © 2017 Bill & Melinda Gates Foundation
- The Mojaloop files are made available by the Bill & Melinda Gates Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
+ Copyright © 2020-2025 Mojaloop Foundation
+ The Mojaloop files are made available by the Mojaloop Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
+
  http://www.apache.org/licenses/LICENSE-2.0
+
  Unless required by applicable law or agreed to in writing, the Mojaloop files are distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
  Contributors
  --------------
  This is the official list of the Mojaloop project contributors for this file.
@@ -12,10 +15,12 @@
  should be listed with a '*' in the first column. People who have
  contributed from an organization can be listed under the organization
  that actually holds the copyright for their contributions (see the
- Gates Foundation organization for an example). Those individuals should have
+ Mojaloop Foundation for an example). Those individuals should have
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
- * Gates Foundation
+
+ * Mojaloop Foundation
+ - Name Surname <name.surname@mojaloop.io>
 
  * ModusBox
  * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
@@ -25,17 +30,20 @@
 
 'use strict'
 
-const OutboundInitiator = require('../../../../src/lib/test-outbound/outbound-initiator')
-const axios = require('axios').default
 const https = require('https')
+const axios = require('axios').default
+const OutboundInitiator = require('../../../../src/lib/test-outbound/outbound-initiator')
 const ConnectionProvider = require('../../../../src/lib/configuration-providers/mb-connection-manager')
 const Config = require('../../../../src/lib/config')
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
-const notificationEmitter = require('../../../../src/lib/notificationEmitter.js')
 const dbAdapter = require('../../../../src/lib/db/adapters/dbAdapter')
 const OpenApiDefinitionsModel = require('../../../../src/lib/mocking/openApiDefinitionsModel')
 const Utils = require('../../../../src/lib/utils')
+
+jest.mock('axios')
 jest.mock('../../../../src/lib/webSocketClient/WebSocketClientManager')
+jest.mock('../../../../src/lib/notificationEmitter.js')
+jest.mock('../../../../src/lib/db/adapters/dbAdapter')
 
 const SpyReadFileAsync = jest.spyOn(Utils, 'readFileAsync')
 const SpyAgent = jest.spyOn(https, 'Agent')
@@ -48,11 +56,6 @@ const SpyJwsSignWithKey = jest.spyOn(JwsSigning, 'signWithKey')
 const SpyGetApiDefinitions = jest.spyOn(OpenApiDefinitionsModel, 'getApiDefinitions')
 const spyDbAdapterUpsertReport = jest.spyOn(dbAdapter, 'upsertReport')
 const SpyAxios = jest.spyOn(axios.default, 'create')
-
-jest.mock('../../../../src/lib/notificationEmitter.js')
-jest.mock('axios')
-jest.mock('../../../../src/lib/db/adapters/dbAdapter')
-
 
 describe('Outbound Initiator Functions', () => {
   describe('getFunctionResult', () => {
@@ -87,6 +90,7 @@ describe('Outbound Initiator Functions', () => {
       expect(uuid).toEqual(fnWrongSyntax)
     })
   })
+
   describe('replacePathVariables', () => {
     beforeEach(() => {
       jest.resetAllMocks()
@@ -127,6 +131,7 @@ describe('Outbound Initiator Functions', () => {
       expect(path).toEqual('/parties/MSISDN/{ID}')
     })
   })
+
   describe('replaceRequestVariables', () => {
     beforeEach(() => {
       jest.resetAllMocks()
@@ -1205,7 +1210,7 @@ describe('Outbound Initiator Functions', () => {
                     ]
                   }
                 },
-                testResult: {
+                assertionResults: {
                   results: {
                     '1': {
                       status: 'SUCCESS'
@@ -1401,90 +1406,96 @@ describe('Outbound Initiator Functions', () => {
       expect(testResult.passedCount).toEqual(1)
     })
   })
+
   describe('OutboundSend & OutboundSendLoop', () => {
-    const sampleTemplate = {
-      "inputValues": {
-        "fromIdType": "MSISDN",
-        "fromIdValue": "44123456789",
-        "fromFirstName": "Firstname-Test",
-        "fromLastName": "Lastname-Test",
-        "fromDOB": "1984-01-01",
-        "note": "test",
-        "currency": "USD",
-        "amount": "100",
-        "homeTransactionId": "123ABC",
-        "fromFspId": "testingtoolkitdfsp",
-        "accept": "application/vnd.interoperability.parties+json;version=1.0",
-        "contentType": "application/vnd.interoperability.parties+json;version=1.0",
-        "toIdValue": "27713803912",
-        "toIdType": "MSISDN",
-        "toFspId": "payeefsp",
-        "acceptQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
-        "contentTypeQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
-        "acceptTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
-        "contentTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
-        "hub_operator": "NOT_APPLICABLE",
-        "payerfsp": "testingtoolkitdfsp",
-        "accountId": "6",
-        "payeefsp": "payeefsp",
-        "HUB_OPERATOR_BEARER_TOKEN": "NOT_APPLICABLE",
-        "BASE_CENTRAL_LEDGER_ADMIN": "",
-        "payerIdType": "MSISDN",
-        "payerIdentifier": "22507008181",
-        "payeeIdType": "MSISDN",
-        "payeeIdentifier": "22556999125"
-      },
-      "name": "multi",
-      "test_cases": [
+    // todo: figure out why there's a hanging connection
+    const makeTestCaseJson = (id = 1) => ({
+      "id": 1,
+      "name": "P2P Transfer Happy Path",
+      "requests": [
         {
           "id": 1,
-          "name": "P2P Transfer Happy Path",
-          "requests": [
-            {
-              "id": 1,
-              "description": "Get party information",
-              "apiVersion": {
-                "minorVersion": 0,
-                "majorVersion": 1,
-                "type": "fspiop",
-                "asynchronous": false
-              },
-              "operationPath": "/parties/{Type}/{ID}",
-              "method": "get",
-              "headers": {
-                "Accept": "{$inputs.accept}",
-                "Content-Type": "{$inputs.contentType}",
-                "Date": "{$function.generic.curDate}",
-                "FSPIOP-Source": "{$inputs.fromFspId}"
-              },
-              "params": {
-                "Type": "{$inputs.toIdType}",
-                "ID": "{$inputs.toIdValue}"
-              },
-              "tests": {
-                "assertions": []
-              },
-              "scriptingEngine": "javascript",
-              "ignoreCallbacks": true,
-              "scripts": {
-                "preRequest": {
-                  "exec": [
-                    "console.log('sample')"
-                  ]
-                },
-                "postRequest": {
-                  "exec": [
-                    "console.log('sample')"
-                  ]
-                }
-              }
+          "description": "Get party information",
+          "apiVersion": {
+            "minorVersion": 0,
+            "majorVersion": 1,
+            "type": "fspiop",
+            "asynchronous": false
+          },
+          "operationPath": "/parties/{Type}/{ID}",
+          "method": "get",
+          "headers": {
+            "Accept": "{$inputs.accept}",
+            "Content-Type": "{$inputs.contentType}",
+            "Date": "{$function.generic.curDate}",
+            "FSPIOP-Source": "{$inputs.fromFspId}"
+          },
+          "params": {
+            "Type": "{$inputs.toIdType}",
+            "ID": "{$inputs.toIdValue}"
+          },
+          "tests": {
+            "assertions": []
+          },
+          "scriptingEngine": "javascript",
+          "ignoreCallbacks": true,
+          "scripts": {
+            "preRequest": {
+              "exec": [
+                "console.log('sample')"
+              ]
+            },
+            "postRequest": {
+              "exec": [
+                "console.log('sample')"
+              ]
             }
-          ]
+          }
         }
       ]
-    }
+    })
+
+    let sampleTemplate
+
     beforeEach(() => {
       jest.resetAllMocks()
+      sampleTemplate = {
+        "inputValues": {
+          "fromIdType": "MSISDN",
+          "fromIdValue": "44123456789",
+          "fromFirstName": "Firstname-Test",
+          "fromLastName": "Lastname-Test",
+          "fromDOB": "1984-01-01",
+          "note": "test",
+          "currency": "USD",
+          "amount": "100",
+          "homeTransactionId": "123ABC",
+          "fromFspId": "testingtoolkitdfsp",
+          "accept": "application/vnd.interoperability.parties+json;version=1.0",
+          "contentType": "application/vnd.interoperability.parties+json;version=1.0",
+          "toIdValue": "27713803912",
+          "toIdType": "MSISDN",
+          "toFspId": "payeefsp",
+          "acceptQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
+          "contentTypeQuotes": "application/vnd.interoperability.quotes+json;version=1.0",
+          "acceptTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
+          "contentTransfers": "application/vnd.interoperability.transfers+json;version=1.0",
+          "hub_operator": "NOT_APPLICABLE",
+          "payerfsp": "testingtoolkitdfsp",
+          "accountId": "6",
+          "payeefsp": "payeefsp",
+          "HUB_OPERATOR_BEARER_TOKEN": "NOT_APPLICABLE",
+          "BASE_CENTRAL_LEDGER_ADMIN": "",
+          "payerIdType": "MSISDN",
+          "payerIdentifier": "22507008181",
+          "payeeIdType": "MSISDN",
+          "payeeIdentifier": "22556999125"
+        },
+        "name": "multi",
+        "test_cases": [
+          makeTestCaseJson(1)
+        ]
+      }
       SpySign.mockImplementation(async () => {throw new Error()})
       SpyAgent.mockImplementation(async () => {
         return {httpsAgent: {}}
@@ -1904,6 +1915,7 @@ describe('Outbound Initiator Functions', () => {
       await OutboundInitiator.OutboundSend(sampleTemplateModified4, '123')
       expect(spyDbAdapterUpsertReport).toBeCalled()
     })
+
     it('OutboundSend with sync option enabled', async () => {
       axios.mockImplementation(() => Promise.resolve({
         status: 200,
@@ -1913,6 +1925,12 @@ describe('Outbound Initiator Functions', () => {
           toCurl: () => ''
         }
       }))
+      axios.create.mockReturnValue({
+        interceptors: {
+          request: { use: jest.fn() },
+          response: { use: jest.fn() }
+        }
+      })
       SpyGetApiDefinitions.mockResolvedValue([{
         specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
         type: 'fspiop'

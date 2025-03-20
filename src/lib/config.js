@@ -1,10 +1,13 @@
 /*****
  License
  --------------
- Copyright © 2017 Bill & Melinda Gates Foundation
- The Mojaloop files are made available by the Bill & Melinda Gates Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
+ Copyright © 2020-2025 Mojaloop Foundation
+ The Mojaloop files are made available by the Mojaloop Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
+
  http://www.apache.org/licenses/LICENSE-2.0
+
  Unless required by applicable law or agreed to in writing, the Mojaloop files are distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
  Contributors
  --------------
  This is the official list of the Mojaloop project contributors for this file.
@@ -12,10 +15,12 @@
  should be listed with a '*' in the first column. People who have
  contributed from an organization can be listed under the organization
  that actually holds the copyright for their contributions (see the
- Gates Foundation organization for an example). Those individuals should have
+ Mojaloop Foundation for an example). Those individuals should have
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
- * Gates Foundation
+
+ * Mojaloop Foundation
+ - Name Surname <name.surname@mojaloop.io>
 
  * ModusBox
  * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
@@ -29,6 +34,7 @@ const USER_CONFIG_FILE = 'spec_files/user_config.json'
 const _ = require('lodash')
 
 let SYSTEM_CONFIG = {}
+
 const USER_CONFIG = {
   data: undefined
 }
@@ -50,7 +56,7 @@ const getStoredUserConfig = async (user) => {
     const storedConfig = await loadUserConfigDFSPWise(user)
     return storedConfig
   } catch (err) {
-    console.log(`Can not read the file ${USER_CONFIG_FILE}`)
+    console.log(`Can not read the file ${USER_CONFIG_FILE}`, err)
     return {}
   }
 }
@@ -94,17 +100,20 @@ const loadSystemConfig = async () => {
 
 const _getSecretsFromEnvironment = () => {
   const secretsFromEnvironment = {}
-  if (process.env.REPORTING_DB_CONNECTION_PASSWORD) {
+  if (process.env.REPORTING_DB_CONNECTION_PASSWORD || process.env.REPORTING_DB_CONNECTION_STRING) {
     try {
       const reportingDbConnectionPassword = process.env.REPORTING_DB_CONNECTION_PASSWORD
-      console.log(`Retrieved reporting database password in environment ${process.env.REPORTING_DB_CONNECTION_PASSWORD}`)
+      const reportingDbConnectionString = process.env.REPORTING_DB_CONNECTION_STRING
+      console.log(`Retrieved reporting database password in environment '${process.env.REPORTING_DB_CONNECTION_PASSWORD}'`)
+      console.log(`Retrieved reporting database connection string in environment '${process.env.REPORTING_DB_CONNECTION_STRING}'`)
       secretsFromEnvironment.DB = {
-        PASSWORD: reportingDbConnectionPassword
+        PASSWORD: reportingDbConnectionPassword,
+        CONNECTION_STRING: reportingDbConnectionString
       }
       console.log(`Secrets retrieved from environment to be merged into system config ${secretsFromEnvironment}`)
     } catch (err) {
       console.log(err)
-      console.log('Failed to retrieve reporting database password in environment')
+      console.log('Failed to retrieve reporting database password or connection string in environment')
     }
   }
   return secretsFromEnvironment

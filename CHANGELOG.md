@@ -1,4 +1,107 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.9.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.9.1...v18.9.2) (2025-03-14)
+
+
+### Bug Fixes
+
+* update trace-id link to open in Grafana and increase trace ID length ([#303](https://github.com/mojaloop/ml-testing-toolkit/issues/303)) ([ad7dac5](https://github.com/mojaloop/ml-testing-toolkit/commit/ad7dac51ac6abf8ae11e982bbb0076ff236bbcf2))
+
+### [18.9.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.9.0...v18.9.1) (2025-03-14)
+
+
+### Chore
+
+* add kleyow to code owners ([cb31789](https://github.com/mojaloop/ml-testing-toolkit/commit/cb31789acdf2e77ef3cadd04b9b30babda1cf853))
+
+## [18.9.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.8.0...v18.9.0) (2025-03-14)
+
+
+### Features
+
+* added durations and timestamps ([#302](https://github.com/mojaloop/ml-testing-toolkit/issues/302)) ([aee9e14](https://github.com/mojaloop/ml-testing-toolkit/commit/aee9e14fbf234995abd8bbe633f47b962fc4460a))
+
+## [18.8.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.7.6...v18.8.0) (2025-03-13)
+
+
+### Features
+
+* improve reports ([#301](https://github.com/mojaloop/ml-testing-toolkit/issues/301)) ([4e9280e](https://github.com/mojaloop/ml-testing-toolkit/commit/4e9280e2b1efb1c4cd4ea5dea51d51d48db2521c))
+
+### [18.7.6](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.7.5...v18.7.6) (2025-03-12)
+
+
+### Chore
+
+* error message ([#300](https://github.com/mojaloop/ml-testing-toolkit/issues/300)) ([c8dd7e0](https://github.com/mojaloop/ml-testing-toolkit/commit/c8dd7e0c68ebac35ce47b5ea367246f20b405372))
+
+### [18.7.5](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.7.4...v18.7.5) (2025-02-25)
+
+
+### Chore
+
+* maintenance updates ([#299](https://github.com/mojaloop/ml-testing-toolkit/issues/299)) ([eeff34a](https://github.com/mojaloop/ml-testing-toolkit/commit/eeff34aad774c809fca451cafa5add63271e7b3d))
+
+### [18.7.4](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.7.3...v18.7.4) (2025-02-03)
+
+
+### Bug Fixes
+
+* generate correct traceparent ([#294](https://github.com/mojaloop/ml-testing-toolkit/issues/294)) ([9aae1ee](https://github.com/mojaloop/ml-testing-toolkit/commit/9aae1eebd7cd27d820314add9b6617a733b4f1ff))
+
+### [18.7.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.7.2...v18.7.3) (2025-01-31)
+
+
+### Chore
+
+* run testCases with empty executionOrder in parallel mode ([#293](https://github.com/mojaloop/ml-testing-toolkit/issues/293)) ([5e49e0e](https://github.com/mojaloop/ml-testing-toolkit/commit/5e49e0ead364469426a077d4f4a33d10fdbf2a76))
+
+### [18.7.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.7.1...v18.7.2) (2025-01-29)
+
+
+### Bug Fixes
+
+* rollback content type header changes because it's breaking some tests ( [#4034](https://github.com/mojaloop/ml-testing-toolkit/issues/4034)) ([#292](https://github.com/mojaloop/ml-testing-toolkit/issues/292)) ([6a3de7f](https://github.com/mojaloop/ml-testing-toolkit/commit/6a3de7fb5042ad6d91bcc5f945b9f2f327b4d527))
+
+### [18.7.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.7.0...v18.7.1) (2025-01-28)
+
+
+### Chore
+
+* update dependencies and remove request-promise-native ([#291](https://github.com/mojaloop/ml-testing-toolkit/issues/291)) ([2ff3452](https://github.com/mojaloop/ml-testing-toolkit/commit/2ff3452b602529e080180a3a9caa45c12dc56cd0))
+
+## [18.7.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.6.2...v18.7.0) (2025-01-28)
+
+
+### Features
+
+* **csi-706:** added testCases executionOrder support to be able to run in parallel ([#290](https://github.com/mojaloop/ml-testing-toolkit/issues/290)) ([f7b30d6](https://github.com/mojaloop/ml-testing-toolkit/commit/f7b30d69fa79a749dbe435488f16f9163dc6559d))
+
+### [18.6.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.6.1...v18.6.2) (2025-01-22)
+
+
+### Bug Fixes
+
+* content type default header ([#4034](https://github.com/mojaloop/ml-testing-toolkit/issues/4034)) ([#289](https://github.com/mojaloop/ml-testing-toolkit/issues/289)) ([c29ea4d](https://github.com/mojaloop/ml-testing-toolkit/commit/c29ea4d67628411358374e6bacd63cf147420762))
+
+### [18.6.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.6.0...v18.6.1) (2025-01-20)
+
+
+### Bug Fixes
+
+* **csi-973:** ttk report fixes ([#287](https://github.com/mojaloop/ml-testing-toolkit/issues/287)) ([f17413c](https://github.com/mojaloop/ml-testing-toolkit/commit/f17413c6cd912753a2adaa7de4a8c854d7c4c8a2))
+
+## [18.6.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.5.1...v18.6.0) (2025-01-20)
+
+
+### Features
+
+* **csi-1019:** add db connection string support ([#288](https://github.com/mojaloop/ml-testing-toolkit/issues/288)) ([0918232](https://github.com/mojaloop/ml-testing-toolkit/commit/09182327361d6d439cb9a821cd0411f0e2affe4b))
+
+
+### Chore
+
+* **moja-tools-bot:** update license file ([#266](https://github.com/mojaloop/ml-testing-toolkit/issues/266)) ([c30f389](https://github.com/mojaloop/ml-testing-toolkit/commit/c30f389dd613ea457920701d6b227aac40212925))
+
 ### [18.5.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.5.0...v18.5.1) (2024-11-18)
 
 

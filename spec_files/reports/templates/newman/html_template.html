@@ -320,15 +320,15 @@ body, html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1; 
+  background: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888; 
+  background: #888;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555; 
+  background: #555;
 }
 
 /* The switch - the box around the slider */
@@ -408,21 +408,21 @@ input:checked + .slider:before {
 <body class="">
   <div class="container">
         <div class="container">
-            <label>Light</label>
+            <label for="slider">Light</label>
             <label id="switch" class="switch">
                 <input type="checkbox" onchange="toggleTheme()" id="slider">
                 <span class="slider round"></span>
             </label>
-            <label>Dark</label>
+            <label for="slider">Dark</label>
         </div>
         <div class="card">
         <div class="card-header">
             <ul class="nav nav-pills mb-3 nav-justified" id="pills-tab" role="tablist">
             <li class="nav-item bg-info active" data-toggle="tooltip" title="Click to view the Summary">
-                <a class="nav-link text-white" id="pills-summary-tab" data-toggle="pill" href="#pills-summary" role="tab" aria-controls="pills-summary" aria-selected="true">Summary</a>
+                <a class="nav-link text-white" id="pills-summary-tab" data-toggle="pill" href="#" data-target="#pills-summary" role="tab" aria-controls="pills-summary" aria-selected="true">Summary</a>
             </li>
             <li class="nav-item bg-success" data-toggle="tooltip" title="Click to view the Requests">
-                <a class="nav-link text-white" id="pills-requests-tab" data-toggle="pill" href="#pills-requests" role="tab" aria-controls="pills-requests" aria-selected="false">Details</a>
+                <a class="nav-link text-white" id="pills-requests-tab" data-toggle="pill" href="#" data-target="#pills-requests" role="tab" aria-controls="pills-requests" aria-selected="false">Details</a>
             </li>
             </ul>
         <div class="tab-content" id="pills-tabContent">
@@ -477,7 +477,6 @@ input:checked + .slider:before {
                 <span><i class="fas fa-file-code"></i></span><strong> Template Name:</strong> {{name}}<br>
                 {{#if runtimeInformation}}
                 <span><i class="fas fa-stopwatch"></i></span><strong> Total run duration:</strong> {{runtimeInformation.runDurationMs}} ms<br>
-                <span><i class="fas fa-stopwatch"></i></span><strong> Average response time:</strong> {{runtimeInformation.avgResponseTime}}<br>
                 {{/if}}
                 {{#if extraRuntimeInformation}}
                 {{#each extraRuntimeInformation}}
@@ -533,7 +532,7 @@ input:checked + .slider:before {
             <div class="tab-pane fade" id="pills-requests" role="tabcard" aria-labelledby="pills-requests-tab">
 
             <button id="topOfRequestsScreen" class="btn btn-outline-success btn-sm backToTop" onclick="topFunction()">Go To Top</button>
-            
+
             <div class="btn-group float-right" role="group" aria-label="Button Group">
                 <button id="openAll" class="btn btn-outline-success btn-sm float-right">Expand Folders</button>
                 <button id="openAllRequests" class="btn btn-outline-success btn-sm float-right">Expand Requests</button>
@@ -541,7 +540,7 @@ input:checked + .slider:before {
                 <button id="closeAllRequests" class="btn btn-outline-success btn-sm float-right">Collapse Requests</button>
             </div>
 
-    <div class="text-uppercase" id="execution-menu">        
+    <div class="text-uppercase" id="execution-menu">
         <nav class="table-responsive">
         <ul class="nav single-line-tabs d-none" id="iterationList">
         </ul>
@@ -560,6 +559,12 @@ input:checked + .slider:before {
         </a>
         </div>
         <div id="folder-collapse-{{id}}" class="collapse" aria-labelledby="folder-{{id}}">
+            <div class="card border-info" style="width: 100%;">
+                <div class="card-body">
+                <span><i class="fas fa-stopwatch"></i></span><strong> Testcase Duration:</strong> <span class="badge-outline badge badge-success"> {{testResult.runDurationMs}} ms</span><br>
+                </div>
+            </div>
+            <br>
             {{#each requests}}
             <div id="folder-{{../id}}-{{request.id}}" class="card-deck iteration-0">
             <div class="row iteration-0">
@@ -595,14 +600,16 @@ input:checked + .slider:before {
                                     {{/if}}
                                     <span><i class="fas fa-info-circle"></i></span><strong> Request Method:</strong> <span class="badge-outline-success badge badge-success"> {{request.method}}</span><br>
                                     <span><i class="fas fa-info-circle"></i></span><strong> Request URL:</strong> {{request.path}} <br>
+                                    <span><i class="fas fa-info-circle"></i></span><strong> trace-id:</strong> <a href="{{traceUrl}}" target="grafana"><span id="copyText-trace-id-{{../id}}-{{request.id}}">{{traceId}}</span></a>
+                                    <button class="btn btn-outline-secondary btn-sm copyButton" type="button" data-clipboard-action="copy" data-clipboard-target="#copyText-trace-id-{{../id}}-{{request.id}}">Copy to Clipboard</button>
+                                    <br>
                                     </div>
                                 </div>
                                 <div class="card border-info" style="width: 50rem;">
                                     <div class="card-body">
                                     <h5 class="card-title text-uppercase text-white text-center bg-info">Response Information</h5>
                                     <span><i class="fas fa-info-circle"></i></span><strong> Response Code:</strong> <span class="float-right badge-outline badge badge-success"> {{response.status}} - {{response.statusText}} </span><br>
-                                    <span><i class="fas fa-stopwatch"></i></span><strong> Mean time per request:</strong> <span class="float-right badge-outline badge badge-success"> NA</span><br>
-                                    <span><i class="fas fa-database"></i></span><strong> Mean size per request:</strong> <span class="float-right badge-outline badge badge-success"> NA</span><br>
+                                    <span><i class="fas fa-stopwatch"></i></span><strong> Request Duration:</strong> <span class="float-right badge-outline badge badge-success"> {{testResult.runDurationMs}} ms</span><br>
                                     <hr>
                                     <h5 class="card-title text-uppercase text-white text-center bg-info">Test Pass Percentage</h5>
                                     <div>
@@ -839,7 +846,7 @@ input:checked + .slider:before {
                                                     </td>
                                                     {{else}}
                                                     <td class="text-center bg-danger">
-                                                        FAILED 
+                                                        FAILED
                                                     </td>
                                                     </tr><tr><td colspan="2" class="text-center bg-danger">({{resultStatus.message}})</td>
                                                     {{/if}}
@@ -1005,7 +1012,7 @@ $(".prettyPrint").each(function () {
                 data = JSON.stringify(obj, null, 2);
         }
         else if(isXML(data)) {
-            data = formatXML(data);            
+            data = formatXML(data);
         }
         $(this).text(data);
 });
@@ -1056,25 +1063,32 @@ $(".prettyPrint").each(function () {
 <script>
 window.onscroll = function() {scrollFunction()};
 
+function updateDisplay(elementId, displayValue) {
+    var element = document.getElementById(elementId);
+    if (element && element.style) {
+        element.style.display = displayValue;
+    }
+}
+
 function scrollFunction() {
   if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-    document.getElementById("topOfRequestsScreen").style.display = "block";
-    document.getElementById("topOfFailuresScreen").style.display = "block";
-    document.getElementById("topOfSkippedScreen").style.display = "block";
-    document.getElementById("topOfLogsScreen").style.display = "block";
-    document.getElementById("openAll").style.display = "none";
-    document.getElementById("closeAll").style.display = "none";
-    document.getElementById("openAllRequests").style.display = "none";
-    document.getElementById("closeAllRequests").style.display = "none";
+    updateDisplay("topOfRequestsScreen", "block");
+    updateDisplay("topOfFailuresScreen", "block");
+    updateDisplay("topOfSkippedScreen", "block");
+    updateDisplay("topOfLogsScreen", "block");
+    updateDisplay("openAll", "none");
+    updateDisplay("closeAll", "none");
+    updateDisplay("openAllRequests", "none");
+    updateDisplay("closeAllRequests", "none");
   } else {
-    document.getElementById("topOfRequestsScreen").style.display = "none";
-    document.getElementById("topOfFailuresScreen").style.display = "none";
-    document.getElementById("topOfSkippedScreen").style.display = "none";
-    document.getElementById("topOfLogsScreen").style.display = "none";
-    document.getElementById("openAll").style.display = "block";
-    document.getElementById("closeAll").style.display = "block";
-    document.getElementById("openAllRequests").style.display = "block";
-    document.getElementById("closeAllRequests").style.display = "block";
+    updateDisplay("topOfRequestsScreen", "none");
+    updateDisplay("topOfFailuresScreen", "none");
+    updateDisplay("topOfSkippedScreen", "none");
+    updateDisplay("topOfLogsScreen", "none");
+    updateDisplay("openAll", "block");
+    updateDisplay("closeAll", "block");
+    updateDisplay("openAllRequests", "block");
+    updateDisplay("closeAllRequests", "block");
   }
 }
 
@@ -1089,15 +1103,7 @@ function topFunction() {
 
 window.onload = function () {
 
-  // hides all blocks of response
-  var allItems = document.querySelectorAll('[class*=iteration-]');
-  allItems.forEach(function(elem){
-    elem.style.display = 'none';
-  });
-
-   
   let totalIterations = 1;
-   
 
   let menu = document.querySelector('#execution-menu .nav');
 
@@ -1119,7 +1125,7 @@ window.onload = function () {
       allMenus.forEach(function(elem){
         elem.style.borderBottom = 'none';
       })
-    
+
       this.style.borderBottom = 'solid 3px #032a33';
 
       let items = document.querySelectorAll("." + this.id);
