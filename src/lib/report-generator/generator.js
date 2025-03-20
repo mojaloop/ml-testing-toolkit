@@ -22,11 +22,10 @@
  --------------
  ******/
 const Handlebars = require('handlebars')
-const { readFileAsync } = require('../utils')
+const { readFileAsync, resolve } = require('../utils')
 const reportHelpers = require('./helpers')
 const customLogger = require('../requestLogger')
-const path = require('path')
-const BASE_TEMPLATE_PATH = path.resolve(__dirname, '../../../spec_files/reports/templates')
+const BASE_TEMPLATE_PATH = resolve('spec_files/reports/templates')
 
 const testResultTemplates = {
   html: {

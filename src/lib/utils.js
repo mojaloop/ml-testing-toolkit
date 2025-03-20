@@ -60,6 +60,8 @@ const urlToPath = (url) => {
   }
 }
 
+const resolve = relativePath => process.env.TTK_ROOT ? `${process.env.TTK_ROOT}/${relativePath}` : relativePath
+
 module.exports = {
   readFileAsync,
   writeFileAsync,
@@ -74,5 +76,6 @@ module.exports = {
   mvAsync,
   getHeader,
   headersToLowerCase,
-  urlToPath
+  urlToPath,
+  resolve
 }
