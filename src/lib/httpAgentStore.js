@@ -43,6 +43,7 @@ const _createAgent = (agentModule, options) => {
     keepAlive: (Config.getSystemConfig().HTTP_CLIENT && Config.getSystemConfig().HTTP_CLIENT.KEEP_ALIVE) || true,
     maxSockets: (Config.getSystemConfig().HTTP_CLIENT && Config.getSystemConfig().HTTP_CLIENT.MAX_SOCKETS) || 50
   })
+  httpAgent.toJSON = () => ({})
   return httpAgent
 }
 
