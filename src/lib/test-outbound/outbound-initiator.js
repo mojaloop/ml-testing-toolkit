@@ -490,7 +490,7 @@ const setResponse = async (
     status,
     assertionResults,
     traceId,
-    traceUrl: util.format(Config.getSystemConfig().TRACE_URL || '//trace/%s', requestTraceId),
+    traceUrl: util.format(Config.getSystemConfig().TRACE_URL || '//trace/%s', traceId),
     response: resp.syncResponse,
     callback: resp.callback,
     request: convertedRequest,
