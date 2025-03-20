@@ -27,7 +27,7 @@
  --------------
  ******/
 
-const addFormats = require("ajv-formats")
+const addFormats = require('ajv-formats')
 const OpenApiBackend = require('openapi-backend').default
 const Utils = require('./utils')
 const path = require('path')

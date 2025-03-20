@@ -191,7 +191,8 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metr
           globalConfig,
           tmpTemplate.options,
           metrics,
-          tmpTemplate.name
+          tmpTemplate.name,
+          tmpTemplate.saveReport
         )
       }
       const completedTimeStamp = new Date()
@@ -248,7 +249,8 @@ const processTestCase = async (
   globalConfig,
   templateOptions = {},
   metrics,
-  templateName
+  templateName,
+  saveReport
 ) => {
   const tracing = getTracing(traceID)
   const testCaseStartedTime = new Date()
@@ -305,7 +307,7 @@ const processTestCase = async (
 
     // Form the path from params and operationPath
     convertedRequest.path = replacePathVariables(request.operationPath, convertedRequest.params)
-    const requestTraceId = templateOptions.traceUrl ? crypto.randomBytes(16).toString('hex') : traceID
+    const requestTraceId = saveReport ? crypto.randomBytes(16).toString('hex') : traceID
 
     // Insert traceparent header if sessionID passed
     if (tracing.sessionID) {
@@ -387,8 +389,7 @@ const processTestCase = async (
           globalConfig,
           metrics,
           templateName,
-          requestTraceId,
-          util.format(templateOptions.traceUrl || '//trace/%s', requestTraceId)
+          requestTraceId
         )
       }
     } catch (err) {
@@ -413,8 +414,7 @@ const processTestCase = async (
         globalConfig,
         metrics,
         templateName,
-        requestTraceId,
-        util.format(templateOptions.traceUrl || '//trace/%s', requestTraceId)
+        requestTraceId
       )
     } finally {
       if (request.appended?.assertionResults?.isFailed) {
@@ -468,8 +468,7 @@ const setResponse = async (
   globalConfig,
   metrics,
   templateName,
-  traceId,
-  traceUrl
+  traceId
 ) => {
   // Get the requestsHistory and callbacksHistory from the arrayStore
   const requestsHistoryObj = arrayStore.get('requestsHistory')
@@ -491,7 +490,7 @@ const setResponse = async (
     status,
     assertionResults,
     traceId,
-    traceUrl,
+    traceUrl: util.format(Config.getSystemConfig().TRACE_URL || '//trace/%s', requestTraceId),
     response: resp.syncResponse,
     callback: resp.callback,
     request: convertedRequest,

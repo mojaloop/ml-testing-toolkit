@@ -57,7 +57,8 @@ class TestCaseRunner {
         globalConfig,
         inputTemplate.options,
         metrics,
-        inputTemplate.name
+        inputTemplate.name,
+        inputTemplate.saveReport
       )
     }
 

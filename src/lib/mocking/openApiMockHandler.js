@@ -30,7 +30,7 @@
 
 'use strict'
 
-const addFormats = require("ajv-formats")
+const addFormats = require('ajv-formats')
 const OpenApiBackend = require('openapi-backend').default
 const OpenApiDefinitionsModel = require('./openApiDefinitionsModel')
 const OpenApiVersionTools = require('./openApiVersionTools')
