@@ -5,6 +5,7 @@
   "INBOUND_MUTUAL_TLS_ENABLED": false,
   "OUTBOUND_MUTUAL_TLS_ENABLED": false,
   "PARALLEL_RUN_ENABLED": false,
+  "TRACE_URL": "//trace/%s",
   "CONFIG_VERSIONS": {
     "response": 1,
     "callback": 1,

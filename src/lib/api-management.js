@@ -27,6 +27,7 @@
  --------------
  ******/
 
+const addFormats = require('ajv-formats')
 const OpenApiBackend = require('openapi-backend').default
 const Utils = require('./utils')
 const path = require('path')
@@ -39,6 +40,7 @@ const apiDefinitionsPath = 'spec_files/api_definitions/'
 const validateDefinition = async (apiFilePath) => {
   const newApi = new OpenApiBackend({
     definition: path.join(apiFilePath),
+    customizeAjv: ajv => addFormats(ajv),
     strict: true,
     quick: true
   })

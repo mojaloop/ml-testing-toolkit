@@ -30,7 +30,7 @@
 
 'use strict'
 
-// const Util = require('util')
+const util = require('node:util')
 const Logger = require('@mojaloop/central-services-logger')
 const Config = require('./config')
 const NotificationEmitter = require('./notificationEmitter')
@@ -118,12 +118,6 @@ const logResponse = async (request, user) => {
   }
 }
 
-const printAdditionalData = (additionalData) => {
-  if (additionalData !== undefined) {
-    console.log(additionalData)
-  }
-}
-
 const logMessage = (verbosity, message, externalData = {}) => {
   const data = {
     additionalData: externalData.additionalData,
@@ -135,20 +129,20 @@ const logMessage = (verbosity, message, externalData = {}) => {
   switch (verbosity) {
     case 'debug':
       Logger.debug(message)
-      printAdditionalData(data.additionalData)
+      if (data.additionalData !== undefined) Logger.debug(util.inspect(data.additionalData))
       break
     case 'warn':
       Logger.warn(message)
-      printAdditionalData(data.additionalData)
+      if (data.additionalData !== undefined) Logger.warn(util.inspect(data.additionalData))
       break
     case 'error':
       Logger.error(message)
-      printAdditionalData(data.additionalData)
+      if (data.additionalData !== undefined) Logger.error(util.inspect(data.additionalData))
       break
     case 'info':
     default: {
       Logger.info(message)
-      printAdditionalData(data.additionalData)
+      if (data.additionalData !== undefined) Logger.info(util.inspect(data.additionalData))
     }
   }
 
