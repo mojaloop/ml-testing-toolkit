@@ -27,7 +27,7 @@
  --------------
  ******/
 const Handlebars = require('handlebars')
-const { readFileAsync, resolve } = require('../utils')
+const { readFileAsync } = require('../utils')
 const reportHelpers = require('./helpers')
 const customLogger = require('../requestLogger')
 const BASE_TEMPLATE_PATH = 'spec_files/reports/templates'
