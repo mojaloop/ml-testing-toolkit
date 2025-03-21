@@ -140,7 +140,7 @@
     "sinon": "19.0.4",
     "standard": "17.1.2",
     "standard-version": "9.5.0",
-    "supertest": "7.0.0"
+    "supertest": "7.1.0"
   },
   "imports": {
     "#src/*": "./src/*.js",

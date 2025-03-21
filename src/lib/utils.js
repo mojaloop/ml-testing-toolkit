@@ -67,19 +67,21 @@ const urlToPath = (url) => {
 }
 
 const resolveRoot = path => resolve(process.env.TTK_ROOT || '.', path)
+const resolve1 = fn => (arg1, ...rest) => fn(resolveRoot(arg1), ...rest)
+const resolve2 = fn => (arg1, arg2, ...rest) => fn(resolveRoot(arg1), resolveRoot(arg2), ...rest)
 
 module.exports = {
-  readFileAsync: (name, ...rest) => readFileAsync(resolveRoot(name), ...rest),
-  writeFileAsync: (name, ...rest) => writeFileAsync(resolveRoot(name), ...rest),
-  accessFileAsync: (name, ...rest) => accessFileAsync(resolveRoot(name), ...rest),
-  readDirAsync: (name, ...rest) => readDirAsync(resolveRoot(name), ...rest),
-  deleteFileAsync: (name, ...rest) => deleteFileAsync(resolveRoot(name), ...rest),
-  renameFileAsync: (source, dest, ...rest) => renameFileAsync(resolveRoot(source), resolveRoot(dest), ...rest),
-  makeDirectoryAsync: (name, ...rest) => makeDirectoryAsync(resolveRoot(name), ...rest),
-  fileStatAsync: (name, ...rest) => fileStatAsync(resolveRoot(name), ...rest),
-  readRecursiveAsync: (name, ...rest) => readRecursiveAsync(resolveRoot(name), ...rest),
-  rmdirAsync: (name, ...rest) => rmdirAsync(resolveRoot(name), ...rest),
-  mvAsync: (source, dest, ...rest) => mvAsync(resolveRoot(source), resolveRoot(dest), ...rest),
+  readFileAsync: resolve1(readFileAsync),
+  writeFileAsync: resolve1(writeFileAsync),
+  accessFileAsync: resolve1(accessFileAsync),
+  readDirAsync: resolve1(readDirAsync),
+  deleteFileAsync: resolve1(deleteFileAsync),
+  renameFileAsync: resolve2(renameFileAsync),
+  makeDirectoryAsync: resolve1(makeDirectoryAsync),
+  fileStatAsync: resolve1(fileStatAsync),
+  readRecursiveAsync: resolve1(readRecursiveAsync),
+  rmdirAsync: resolve1(rmdirAsync),
+  mvAsync: resolve2(mvAsync),
   getHeader,
   headersToLowerCase,
   urlToPath,
