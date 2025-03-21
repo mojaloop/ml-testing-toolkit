@@ -422,7 +422,7 @@ const processTestCase = async (
           // Terminate the test run if assertion failed
           // eslint-disable-next-line
           throw new Error('Terminated')
-        } else if (testCase.breakOnError) {
+        } else if (testCase.options?.breakOnError) {
           // Disable the following requests if assertion failed
           for (let j = i + 1; j < templateIDArr.length; j++) {
             requestsObj[templateIDArr[j]].disabled = true
@@ -1012,7 +1012,7 @@ const getTotalCounts = (inputTemplate) => {
   const testCasesToRun = []
 
   inputTemplate.test_cases.forEach(testCase => {
-    if (isParallelRun && typeof testCase.meta?.executionOrder !== 'number') return
+    if (isParallelRun && typeof testCase.options?.executionOrder !== 'number') return
     // todo: - think, if we need to skip testCases without executionOrder (in parallel run)
     //       - optimise the logic to avoid additional looping in runAll (define executionBuckets here)
     //       - check if all testCases should have "meta" field

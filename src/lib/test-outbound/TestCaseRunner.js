@@ -71,7 +71,7 @@ class TestCaseRunner {
 
     const executionBuckets = new Map([[EMPTY_ORDER_KEY, []]])
     inputTemplate.test_cases.forEach(testCase => {
-      const { executionOrder } = testCase.meta || {}
+      const { executionOrder } = testCase.options || {}
       if (typeof executionOrder !== 'number') {
         this.logger.warn(`executionOrder should be a number! Skipped testCase: ${testCase.name}`, { executionOrder })
         return
