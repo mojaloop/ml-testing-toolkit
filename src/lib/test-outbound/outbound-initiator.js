@@ -720,6 +720,7 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
           ca: [tlsConfig.dfsps[dfspId].dfspServerCaRootCert],
           rejectUnauthorized: true
         })
+        httpAgentProps.httpsAgent.toJSON = () => ({})
         urlGenerated = urlGenerated.replace('http:', 'https:')
       } else if (userConfig.CLIENT_MUTUAL_TLS_ENABLED) {
         const urlObject = new URL(urlGenerated)
@@ -731,6 +732,7 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
             key: cred[0].KEY,
             rejectUnauthorized: false
           })
+          httpAgentProps.httpsAgent.toJSON = () => ({})
           urlGenerated = urlGenerated.replace('http:', 'https:')
         } else {
           const errorMsg = `client mutual TLS is enabled, but there is no TLS config found for ${urlObject.host}`

@@ -29,7 +29,7 @@
 
 const Config = require('../config')
 let apiDefinitions = null
-const specFilePrefix = require('../utils').resolve('spec_files/api_definitions/')
+const specFilePrefix = require('../utils').resolve('spec_files/api_definitions') + '/'
 
 const getApiDefinitions = async () => {
   if (!apiDefinitions) {

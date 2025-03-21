@@ -91,6 +91,7 @@ const handleCallback = async (callbackObject, context, req) => {
       ca: [tlsConfig.dfsps[callbackObject.callbackInfo.fspid].dfspServerCaRootCert],
       rejectUnauthorized: true
     })
+    httpsAgent.toJSON = () => ({})
     httpAgentProps.httpsAgent = httpsAgent
     urlGenerated = urlGenerated.replace('http:', 'https:')
   } else if (userConfig.CLIENT_MUTUAL_TLS_ENABLED) {

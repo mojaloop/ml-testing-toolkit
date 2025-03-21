@@ -42,6 +42,7 @@ const fileStatAsync = promisify(fs.stat)
 const readRecursiveAsync = promisify(files)
 const rmdirAsync = promisify(fs.rmdir)
 const mvAsync = promisify(mv)
+const { resolve } = require('path')
 
 const getHeader = (headers, name) => {
   return Object.entries(headers).find(
@@ -65,22 +66,22 @@ const urlToPath = (url) => {
   }
 }
 
-const resolve = relativePath => process.env.TTK_ROOT ? `${process.env.TTK_ROOT}/${relativePath}` : relativePath
+const resolveRoot = path => resolve(process.env.TTK_ROOT || '.', path)
 
 module.exports = {
-  readFileAsync,
-  writeFileAsync,
-  accessFileAsync,
-  readDirAsync,
-  deleteFileAsync,
-  renameFileAsync,
-  makeDirectoryAsync,
-  fileStatAsync,
-  readRecursiveAsync,
-  rmdirAsync,
-  mvAsync,
+  readFileAsync: (name, ...rest) => readFileAsync(resolveRoot(name), ...rest),
+  writeFileAsync: (name, ...rest) => writeFileAsync(resolveRoot(name), ...rest),
+  accessFileAsync: (name, ...rest) => accessFileAsync(resolveRoot(name), ...rest),
+  readDirAsync: (name, ...rest) => readDirAsync(resolveRoot(name), ...rest),
+  deleteFileAsync: (name, ...rest) => deleteFileAsync(resolveRoot(name), ...rest),
+  renameFileAsync: (source, dest, ...rest) => renameFileAsync(resolveRoot(source), resolveRoot(dest), ...rest),
+  makeDirectoryAsync: (name, ...rest) => makeDirectoryAsync(resolveRoot(name), ...rest),
+  fileStatAsync: (name, ...rest) => fileStatAsync(resolveRoot(name), ...rest),
+  readRecursiveAsync: (name, ...rest) => readRecursiveAsync(resolveRoot(name), ...rest),
+  rmdirAsync: (name, ...rest) => rmdirAsync(resolveRoot(name), ...rest),
+  mvAsync: (source, dest, ...rest) => mvAsync(resolveRoot(source), resolveRoot(dest), ...rest),
   getHeader,
   headersToLowerCase,
   urlToPath,
-  resolve
+  resolve: resolveRoot
 }
