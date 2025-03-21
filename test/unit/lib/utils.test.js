@@ -1,6 +1,12 @@
 const utils = require('../../../src/lib/utils')
+const { readFileSync, existsSync } = require('fs')
+const tmpdir = require('os').tmpdir()
 
 describe('utils', () => {
+    afterEach(() => {
+        delete process.env.TTK_ROOT
+    })
+
     describe('getHeader', () => {
         it('should return the header value', () => {
         const headers = {
@@ -52,5 +58,27 @@ describe('utils', () => {
         expect(result).toBe('/root/file.txt')
         })
     })
-
+    describe('file functions', () => {
+        it('should work from CWD', async () => {
+            const tempFile = 'temp.log'
+            const newFile = 'new.log'
+            await utils.writeFileAsync(tempFile, 'Hello, World!')
+            await utils.renameFileAsync(tempFile, newFile)
+            await utils.accessFileAsync(newFile)
+            expect(readFileSync(newFile, 'utf8')).toBe('Hello, World!')
+            await utils.deleteFileAsync(newFile)
+            expect(existsSync(newFile)).toBe(false)
+        })
+        it('should work from TTK_ROOT', async () => {
+            const tempFile = 'temp.log'
+            const newFile = 'new.log'
+            process.env.TTK_ROOT = tmpdir
+            await utils.writeFileAsync(tempFile, 'Hello, World!')
+            await utils.renameFileAsync(tempFile, newFile)
+            await utils.accessFileAsync(newFile)
+            expect(readFileSync(tmpdir + '/' + newFile, 'utf8')).toBe('Hello, World!')
+            await utils.deleteFileAsync(newFile)
+            expect(existsSync(tmpdir + '/' + newFile)).toBe(false)
+        })
+    })
 })
