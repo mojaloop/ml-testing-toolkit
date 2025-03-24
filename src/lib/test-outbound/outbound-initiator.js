@@ -261,7 +261,6 @@ const processTestCase = async (
   const templateIDArr = []
   for (const i in testCase.requests) {
     requestsObj[testCase.requests[i].id] = testCase.requests[i]
-    if (testCase.requests[i].requestId) requestsObj[testCase.requests[i].requestId] = testCase.requests[i]
     templateIDArr.push(testCase.requests[i].id)
   }
   // Sort the request ids array
