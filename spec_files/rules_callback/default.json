@@ -865,7 +865,7 @@
             },
             "AccptncDtTm": "{$environment.AccptncDtTm}",
             "PrcgDt": {
-              "Dt": "{$environment.AccptncDtTm}"
+              "DtTm": "{$environment.AccptncDtTm}"
             },
             "AcctSvcrRef": "ACCTSVCRREF",
             "ClrSysRef": "CLRSYSREF",
