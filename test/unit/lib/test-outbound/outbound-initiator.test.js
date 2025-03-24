@@ -1770,7 +1770,9 @@ describe('Outbound Initiator Functions', () => {
         type: 'fspiop'
       }])
       const sampleTemplateModified11 = JSON.parse(JSON.stringify(sampleTemplate))
-      sampleTemplateModified11.test_cases[0].breakOnError = true
+      sampleTemplateModified11.test_cases[0].options = {
+        breakOnError: true
+      }
       sampleTemplateModified11.test_cases[0].requests[0].tests = {
         assertions: [
           {

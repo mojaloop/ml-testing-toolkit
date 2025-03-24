@@ -97,8 +97,8 @@ describe('TestCaseRunner Tests -->', () => {
         processTestCase: async () => {},
         inputTemplate: {
           test_cases: [
-            { meta: { executionOrder: 1 } },
-            { meta: { executionOrder: 1 } }
+            { options: { executionOrder: 1 } },
+            { options: { executionOrder: 1 } }
           ],
           batchSize: 2
         },
@@ -115,8 +115,8 @@ describe('TestCaseRunner Tests -->', () => {
         processTestCase,
         inputTemplate: {
           test_cases: [
-            { meta: {} },
-            { meta: {} }
+            { options: {} },
+            { options: {} }
           ],
           batchSize: 2
         },
