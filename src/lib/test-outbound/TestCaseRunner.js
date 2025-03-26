@@ -46,7 +46,7 @@ class TestCaseRunner {
   async runAll ({
     processTestCase, inputTemplate, traceID, variableData, dfspId, globalConfig, metrics
   }) {
-    const runOneTestCase = testCase => () => {
+    const runOneTestCase = (testCase, index) => () => {
       globalConfig.totalProgress.testCasesProcessed++
       return processTestCase(
         testCase,
@@ -58,7 +58,8 @@ class TestCaseRunner {
         inputTemplate.options,
         metrics,
         inputTemplate.name,
-        inputTemplate.saveReport
+        inputTemplate.saveReport,
+        index
       )
     }
 
@@ -70,7 +71,7 @@ class TestCaseRunner {
     }
 
     const executionBuckets = new Map([[EMPTY_ORDER_KEY, []]])
-    inputTemplate.test_cases.forEach(testCase => {
+    inputTemplate.test_cases.forEach((testCase, index) => {
       const { executionOrder } = testCase.options || {}
       if (typeof executionOrder !== 'number') {
         this.logger.warn(`executionOrder should be a number! Skipped testCase: ${testCase.name}`, { executionOrder })
@@ -79,10 +80,10 @@ class TestCaseRunner {
       }
 
       if (!executionOrder) {
-        executionBuckets.get(EMPTY_ORDER_KEY).push(runOneTestCase(testCase))
+        executionBuckets.get(EMPTY_ORDER_KEY).push(runOneTestCase(testCase, index))
       } else {
         if (!executionBuckets.has(executionOrder)) executionBuckets.set(executionOrder, [])
-        executionBuckets.get(executionOrder).push(runOneTestCase(testCase))
+        executionBuckets.get(executionOrder).push(runOneTestCase(testCase, index))
       }
     })
 

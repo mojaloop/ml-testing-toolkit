@@ -192,7 +192,8 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metr
           tmpTemplate.options,
           metrics,
           tmpTemplate.name,
-          tmpTemplate.saveReport
+          tmpTemplate.saveReport,
+          i
         )
       }
       const completedTimeStamp = new Date()
@@ -250,7 +251,8 @@ const processTestCase = async (
   templateOptions = {},
   metrics,
   templateName,
-  saveReport
+  saveReport,
+  testCaseIndex
 ) => {
   const tracing = getTracing(traceID)
   const testCaseStartedTime = new Date()
@@ -263,14 +265,10 @@ const processTestCase = async (
     requestsObj[testCase.requests[i].id] = testCase.requests[i]
     templateIDArr.push(testCase.requests[i].id)
   }
-  // Sort the request ids array
-  templateIDArr.sort((a, b) => {
-    return a > b
-  })
 
   const apiDefinitions = await openApiDefinitionsModel.getApiDefinitions()
   // Iterate the request ID array
-  for (let i = 0; i < templateIDArr.length; i++) {
+  for (let requestIndex = 0; requestIndex < templateIDArr.length; requestIndex++) {
     if (terminateTraceIds[traceID]) {
       delete terminateTraceIds[traceID]
       throw new Error('Terminated')
@@ -278,7 +276,7 @@ const processTestCase = async (
 
     const requestStartedTime = new Date()
 
-    const request = requestsObj[templateIDArr[i]]
+    const request = requestsObj[templateIDArr[requestIndex]]
 
     let convertedRequest = JSON.parse(JSON.stringify(request))
 
@@ -311,7 +309,7 @@ const processTestCase = async (
     // Insert traceparent header if sessionID passed
     if (tracing.sessionID) {
       convertedRequest.headers = convertedRequest.headers || {}
-      convertedRequest.headers.traceparent = '00-' + requestTraceId + '-' + String(testCase.id).padStart(8, '0') + String(templateIDArr[i]).padStart(8, '0') + '-01'
+      convertedRequest.headers.traceparent = '00-' + requestTraceId + '-' + String(testCaseIndex).padStart(8, '0') + String(requestIndex).padStart(8, '0') + '-01'
       // todo: think about proper traceparent header
     }
 
@@ -423,7 +421,7 @@ const processTestCase = async (
           throw new Error('Terminated')
         } else if (testCase.options?.breakOnError) {
           // Disable the following requests if assertion failed
-          for (let j = i + 1; j < templateIDArr.length; j++) {
+          for (let j = requestIndex + 1; j < templateIDArr.length; j++) {
             requestsObj[templateIDArr[j]].disabled = true
           }
         }
