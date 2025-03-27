@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.11.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.11.1...v18.11.2) (2025-03-27)
+
+
+### Chore
+
+* **csi-1321:** update deps ([#307](https://github.com/mojaloop/ml-testing-toolkit/issues/307)) ([5ee715e](https://github.com/mojaloop/ml-testing-toolkit/commit/5ee715e6217939591e875bc2293cf1e7bb4f424f))
+
 ### [18.11.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.11.0...v18.11.1) (2025-03-26)
 
 
