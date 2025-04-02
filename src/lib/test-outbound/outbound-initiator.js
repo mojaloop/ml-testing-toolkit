@@ -869,9 +869,10 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
           status: 500,
           statusText: err.message
         }
+        curlRequest = err.request._currentRequest ? err.request._currentRequest.toCurl() : ''
         customLogger.logOutboundRequest('error', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: { errorStack: err.stack }, user, uniqueId, request: reqOpts })
         customLogger.logMessage('error', 'Failed to send request ' + method + ' Error: ' + err.message, { additionalData: { errorStack: err.stack }, notification: false, user })
-        return reject(new Error(JSON.stringify({ errorCode: 4000, syncResponse })))
+        return reject(new Error(JSON.stringify({ errorCode: 4000, curlRequest, requestSent, transformedRequest, syncResponse })))
       })
     })()
   })
