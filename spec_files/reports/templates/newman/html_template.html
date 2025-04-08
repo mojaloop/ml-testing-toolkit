@@ -257,6 +257,10 @@ body, html {
   height:100%;
 }
 
+.hidden {
+    display:none;
+}
+
 .card {
   overflow:hidden;
 }
@@ -538,6 +542,8 @@ input:checked + .slider:before {
                 <button id="openAllRequests" class="btn btn-outline-success btn-sm float-right">Expand Requests</button>
                 <button id="closeAll" class="btn btn-outline-success btn-sm float-right">Collapse Folders</button>
                 <button id="closeAllRequests" class="btn btn-outline-success btn-sm float-right">Collapse Requests</button>
+                <button id="showAll" class="btn btn-outline-success btn-sm float-right">Show All</button>
+                <button id="showOnlyFailed" class="btn btn-outline-success btn-sm float-right">Show Only Failed</button>
             </div>
 
     <div class="text-uppercase" id="execution-menu">
@@ -963,6 +969,36 @@ $('#closeAllRequests').on('click', function(e) {
 </script>
 
 <script>
+$('#showAll').on('click', function(e) {
+    {{#each test_cases}}
+        {{#each requests}}
+        $('#requests-{{../id}}-{{request.id}}').closest('.tab-content').removeClass('collapsed')
+        $('#collapse-{{../id}}-{{request.id}}').closest('.tab-content').removeClass('collapsed')
+        $('#requests-{{../id}}-{{request.id}}').closest('.tab-content').addClass('show')
+        $('#collapse-{{../id}}-{{request.id}}').closest('.tab-content').addClass('show')
+        {{/each}}
+    {{/each}}
+})
+</script>
+
+<script>
+$('#showOnlyFailed').on('click', function(e) {
+    {{#each test_cases}}
+        {{#each requests}}
+        {{#if (ifAllTestsPassedInRequest request)}}
+            $('#requests-{{../id}}-{{request.id}}').closest('.tab-content').removeClass('show')
+            $('#collapse-{{../id}}-{{request.id}}').closest('.tab-content').removeClass('show')
+            $('#requests-{{../id}}-{{request.id}}').closest('.tab-content').addClass('collapsed')
+            $('#collapse-{{../id}}-{{request.id}}').closest('.tab-content').addClass('collapsed')
+        {{/if}}
+        {{/each}}
+    {{/each}}
+})
+</script>
+
+
+
+<script>
 function isJSON(data)
 {
     var ret = true;
@@ -1080,6 +1116,8 @@ function scrollFunction() {
     updateDisplay("closeAll", "none");
     updateDisplay("openAllRequests", "none");
     updateDisplay("closeAllRequests", "none");
+    updateDisplay("showAll", "none");
+    updateDisplay("showOnlyFailed", "none");
   } else {
     updateDisplay("topOfRequestsScreen", "none");
     updateDisplay("topOfFailuresScreen", "none");
@@ -1089,6 +1127,8 @@ function scrollFunction() {
     updateDisplay("closeAll", "block");
     updateDisplay("openAllRequests", "block");
     updateDisplay("closeAllRequests", "block");
+    updateDisplay("showAll", "block");
+    updateDisplay("showOnlyFailed", "block");
   }
 }
 
