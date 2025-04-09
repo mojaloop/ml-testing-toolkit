@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.11.5](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.11.4...v18.11.5) (2025-04-09)
+
+
+### Chore
+
+* alter failed only function ([#312](https://github.com/mojaloop/ml-testing-toolkit/issues/312)) ([040c403](https://github.com/mojaloop/ml-testing-toolkit/commit/040c4032556b6fa143064bb0bc308a491ded9e87))
+
 ### [18.11.4](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.11.3...v18.11.4) (2025-04-09)
 
 
