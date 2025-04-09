@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.11.4](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.11.3...v18.11.4) (2025-04-09)
+
+
+### Chore
+
+* update report template with failed test filter ([#311](https://github.com/mojaloop/ml-testing-toolkit/issues/311)) ([27bdc6e](https://github.com/mojaloop/ml-testing-toolkit/commit/27bdc6ece555cca2ccc297fdf7d5b8db21afb3bd))
+
 ### [18.11.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.11.2...v18.11.3) (2025-04-02)
 
 
