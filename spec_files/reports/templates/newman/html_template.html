@@ -980,10 +980,11 @@
         <script>
           $('#showOnlyFailed').on('click', function(e) {
             {{#each test_cases}}
-            {{#unless (ifFailedTestCase this)}}
-            $('#folder-{{id}}').parent('.tab-content').addClass('hidden')
-            $('#folder-collapse-{{id}}').parent('.tab-content').addClass('hidden')
-            {{/unless}}
+            $('#folder-{{id}}').each(function() {
+              if ($(this).find('.resultsInfoFail').length === 0) {
+                $(this).closest('.tab-content').addClass('hidden');
+              }
+            });
             {{/each}}
           })
         </script>
