@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+## [18.12.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.11.5...v18.12.0) (2025-04-10)
+
+
+### Features
+
+* enhance user config loading functions, tracing and mocking ([#313](https://github.com/mojaloop/ml-testing-toolkit/issues/313)) ([39b8f70](https://github.com/mojaloop/ml-testing-toolkit/commit/39b8f70157f44a29b96de82bfaef0d405da7bcf9))
+
 ### [18.11.5](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.11.4...v18.11.5) (2025-04-09)
 
 
