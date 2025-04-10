@@ -395,6 +395,31 @@ const addTypeAndVersion = (model, fileContent) => {
   }
 }
 
+// used for integration tests
+const setTestRules = async ({
+  response,
+  validation,
+  callback,
+  forward
+}) => {
+  if (response) {
+    model.data.response.rules = (await storageAdapter.read(response)).data
+    loadRules(model.data.response, model.data.response.rules)
+  }
+  if (validation) {
+    model.data.validation.rules = (await storageAdapter.read(validation)).data
+    loadRules(model.data.validation, model.data.validation.rules)
+  }
+  if (callback) {
+    model.data.callback.rules = (await storageAdapter.read(callback)).data
+    loadRules(model.data.callback, model.data.callback.rules)
+  }
+  if (forward) {
+    model.data.forward.rules = (await storageAdapter.read(forward)).data
+    loadRules(model.data.forward, model.data.forward.rules)
+  }
+}
+
 module.exports = {
   getModel,
 
@@ -432,5 +457,7 @@ module.exports = {
   getForwardRulesFiles,
   getForwardRulesFileContent,
   setForwardRulesFileContent,
-  deleteForwardRulesFile
+  deleteForwardRulesFile,
+
+  setTestRules
 }

@@ -220,8 +220,8 @@ const validateTransferCondition = (context, request) => {
 
 // Decoding functions
 
-const getIlpTransactionObject = (ilpPacket) => {
-  return ilpObj.getTransactionObject(ilpPacket)
+const getIlpTransactionObject = (ilpPacket, isIso20022) => {
+  return isIso20022 ? ilpV4Obj.getTransactionObject(ilpPacket) : ilpObj.getTransactionObject(ilpPacket)
 }
 
 const _isIso20022 = (requestOrResponse) => {
