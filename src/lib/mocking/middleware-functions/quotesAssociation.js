@@ -50,7 +50,8 @@ const handleTransfers = (context, request) => {
     try {
       ilpTransactionObject = IlpModel.getIlpTransactionObject(
         request.payload.ilpPacket ||
-        request.payload.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket
+        request.payload.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket,
+        !!request.payload.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket
       )
     } catch (err) {
       return false

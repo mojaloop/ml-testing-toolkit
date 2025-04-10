@@ -307,11 +307,15 @@ const processTestCase = async (
     const requestTraceId = saveReport ? crypto.randomBytes(16).toString('hex') : traceID
 
     // Insert traceparent header if sessionID passed
-    if (tracing.sessionID) {
+    if (tracing.sessionID || saveReport) {
       convertedRequest.headers = convertedRequest.headers || {}
       convertedRequest.headers.traceparent = '00-' + requestTraceId + '-' + String(testCaseIndex).padStart(8, '0') + String(requestIndex).padStart(8, '0') + '-01'
       // todo: think about proper traceparent header
     }
+
+    let baggage = convertedRequest.headers.baggage || '';
+    if (baggage) baggage = baggage + ',';
+    convertedRequest.headers.baggage = baggage + `testCaseId=${testCase.id},requestId=${request.id}`
 
     const scriptsExecution = {}
     let contextObj = null

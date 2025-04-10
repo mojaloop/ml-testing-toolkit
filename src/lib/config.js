@@ -70,30 +70,30 @@ const setStoredUserConfig = async (newConfig, user) => {
   }
 }
 
-const loadUserConfig = async (user) => {
+const loadUserConfig = async (user, filename = USER_CONFIG_FILE) => {
   try {
-    USER_CONFIG[user ? user.dfspId : 'data'] = await loadUserConfigDFSPWise(user)
+    USER_CONFIG[user ? user.dfspId : 'data'] = await loadUserConfigDFSPWise(user, filename)
   } catch (err) {
     console.log(`Can not read the file ${USER_CONFIG_FILE}`, err)
   }
   return true
 }
 
-const loadUserConfigDFSPWise = async (user) => {
-  const userConfig = await storageAdapter.read(USER_CONFIG_FILE, user)
+const loadUserConfigDFSPWise = async (user, filename = USER_CONFIG_FILE) => {
+  const userConfig = await storageAdapter.read(filename, user)
   return userConfig.data
 }
 
-const loadSystemConfig = async () => {
+const loadSystemConfig = async (filename = SYSTEM_CONFIG_FILE) => {
   try {
-    SYSTEM_CONFIG = (await storageAdapter.read(SYSTEM_CONFIG_FILE)).data
+    SYSTEM_CONFIG = (await storageAdapter.read(filename)).data
     const systemConfigFromEnvironment = _getSystemConfigFromEnvironment()
     _.merge(SYSTEM_CONFIG, systemConfigFromEnvironment)
     const secretsFromEnvironment = _getSecretsFromEnvironment()
     console.log(secretsFromEnvironment)
     _.merge(SYSTEM_CONFIG, secretsFromEnvironment)
   } catch (err) {
-    console.log(`Can not read the file ${SYSTEM_CONFIG_FILE}`, err)
+    console.log(`Can not read the file ${filename}`, err)
   }
   return true
 }

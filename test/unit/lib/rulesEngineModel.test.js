@@ -53,7 +53,7 @@ describe('RulesEngineModel', () => {
   describe('model', () => {
     it('getModel should return the model', async () => {
       const result = await RulesEngineModel.getModel(undefined, 'response')
-      expect(result).toBeDefined()      
+      expect(result).toBeDefined()
     })
     it('getModel should return the model', async () => {
       dbAdapter.read.mockResolvedValue({
@@ -61,7 +61,7 @@ describe('RulesEngineModel', () => {
       })
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
       const result = await RulesEngineModel.getModel({dfspId: 'userdfsp'}, 'response')
-      expect(result).toBeDefined()      
+      expect(result).toBeDefined()
     })
     it('getModel should return the model', async () => {
       dbAdapter.read.mockResolvedValue({
@@ -70,7 +70,7 @@ describe('RulesEngineModel', () => {
         }
       })
       const result = await RulesEngineModel.getModel({dfspId: 'userdfsp'}, 'response')
-      expect(result).toBeDefined()      
+      expect(result).toBeDefined()
     })
   })
   describe('response', () => {
@@ -79,7 +79,7 @@ describe('RulesEngineModel', () => {
     })
     it('getResponseRulesEngine with a parameter should not reload rules', async () => {
       const result = await RulesEngineModel.getResponseRulesEngine([])
-      expect(result).not.toBeUndefined()      
+      expect(result).not.toBeUndefined()
     })
     it('reloadResponseRules when active rules file is found with no rule conditions', async () => {
       SpyReadFileAsync.mockResolvedValue(JSON.stringify({
@@ -87,7 +87,7 @@ describe('RulesEngineModel', () => {
       }))
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
       const result = await RulesEngineModel.reloadResponseRules()
-      expect(result).toBeUndefined()      
+      expect(result).toBeUndefined()
     })
     it('reloadResponseRules when active rules file is found with rule conditions', async () => {
       SpyReadFileAsync.mockResolvedValue(JSON.stringify({
@@ -122,9 +122,9 @@ describe('RulesEngineModel', () => {
           "type": "MOCK_RESPONSE"
         }
       }]))
-      
+
       const result = await RulesEngineModel.reloadResponseRules()
-      expect(result).toBeUndefined()      
+      expect(result).toBeUndefined()
     })
     it('reloadResponseRules when active rules file is not found', async () => {
       SpyReadFileAsync.mockResolvedValue(JSON.stringify({
@@ -138,19 +138,19 @@ describe('RulesEngineModel', () => {
       SpyWriteFileAsync.mockResolvedValue()
       SpyReadFileAsync.mockResolvedValue(JSON.stringify({activeRulesFile: 'test.json'}))
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
-      
+
       const result = await RulesEngineModel.setActiveResponseRulesFile('test.json')
-      expect(result).toBeUndefined()      
+      expect(result).toBeUndefined()
     })
     it('getResponseRules should reload rules if not loaded', async () => {
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
       const result = await RulesEngineModel.getResponseRules()
-      expect(result).not.toBeUndefined()      
+      expect(result).not.toBeUndefined()
     })
     it('getResponseRules should return stored rules', async () => {
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
       const result = await RulesEngineModel.getResponseRules()
-      expect(result).not.toBeUndefined()      
+      expect(result).not.toBeUndefined()
     })
     it('getResponseRulesEngine should return rulesEngine', async () => {
       SpyReadFileAsync.mockResolvedValue(JSON.stringify({
@@ -158,17 +158,17 @@ describe('RulesEngineModel', () => {
       }))
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
       const result = await RulesEngineModel.getResponseRulesEngine()
-      expect(result).not.toBeUndefined()      
+      expect(result).not.toBeUndefined()
     })
     it('getResponseRulesFiles should return activeRulesFile', async () => {
       SpyReadDirAsync.mockResolvedValue(['test.json', 'config.json'])
       const result = await RulesEngineModel.getResponseRulesFiles()
-      expect(result).not.toBeNull()      
+      expect(result).not.toBeNull()
     })
     it('getResponseRulesFiles should return null', async () => {
       SpyReadDirAsync.mockRejectedValueOnce()
       const result = await RulesEngineModel.getResponseRulesFiles()
-      expect(result).toBeNull()   
+      expect(result).toBeNull()
     })
     it('deleteResponseRulesFile should return true', async () => {
       SpyDeleteFileAsync.mockResolvedValue()
@@ -176,14 +176,14 @@ describe('RulesEngineModel', () => {
         activeRulesFile: 'activeRulesFile'
       }))
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
-      
+
       const result = await RulesEngineModel.deleteResponseRulesFile('test.json')
-      expect(result).toBeTruthy()  
+      expect(result).toBeTruthy()
     })
     it('deleteResponseRulesFile should return error', async () => {
       SpyDeleteFileAsync.mockRejectedValueOnce({message: 'error'})
       const result = await RulesEngineModel.deleteResponseRulesFile('test.json')
-      expect(result).toStrictEqual({message: 'error'})  
+      expect(result).toStrictEqual({message: 'error'})
     })
     it('setResponseRulesFileContent should return true', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
@@ -199,9 +199,9 @@ describe('RulesEngineModel', () => {
         activeRulesFile: 'activeRulesFile'
       }))
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
-      
+
       const result = await RulesEngineModel.setResponseRulesFileContent('test.json', fileContent)
-      expect(result).toBeTruthy() 
+      expect(result).toBeTruthy()
     })
     it('setResponseRulesFileContent should return true', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
@@ -218,9 +218,9 @@ describe('RulesEngineModel', () => {
         activeRulesFile: 'activeRulesFile'
       }))
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
-      
+
       const result = await RulesEngineModel.setResponseRulesFileContent('test.json', fileContent)
-      expect(result).toBeTruthy() 
+      expect(result).toBeTruthy()
     })
     it('setResponseRulesFileContent should return error', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
@@ -248,49 +248,49 @@ describe('RulesEngineModel', () => {
         activeRulesFile: 'activeRulesFile'
       }))
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
-      
+
       const result = await RulesEngineModel.reloadCallbackRules()
-      expect(result).toBeUndefined()      
+      expect(result).toBeUndefined()
     })
     it('setActiveCallbackRulesFile should set activeRulesFile', async () => {
       SpyWriteFileAsync.mockResolvedValue()
       SpyReadFileAsync.mockResolvedValue(JSON.stringify({activeRulesFile: 'activeRulesFile'}))
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
-      
+
       const result = await RulesEngineModel.setActiveCallbackRulesFile('test.json')
-      expect(result).toBeUndefined()      
+      expect(result).toBeUndefined()
     })
     it('getCallbackRules should return stored rules', async () => {
       const result = await RulesEngineModel.getCallbackRules()
-      expect(result).not.toBeUndefined()      
+      expect(result).not.toBeUndefined()
     })
     it('getCallbackRulesEngine should return rulesEngine', async () => {
       const result = await RulesEngineModel.getCallbackRulesEngine()
-      expect(result).not.toBeUndefined()      
+      expect(result).not.toBeUndefined()
     })
     it('getCallbackRulesFiles should return activeRulesFile', async () => {
       SpyReadDirAsync.mockResolvedValue(['test.json', 'config.json'])
       const result = await RulesEngineModel.getCallbackRulesFiles()
-      expect(result).not.toBeNull()      
+      expect(result).not.toBeNull()
     })
     it('getCallbackRulesFiles should return null', async () => {
       SpyReadDirAsync.mockRejectedValueOnce()
       const result = await RulesEngineModel.getCallbackRulesFiles()
-      expect(result).toBeNull()   
+      expect(result).toBeNull()
     })
     it('deleteCallbackRulesFile should return true', async () => {
       SpyDeleteFileAsync.mockResolvedValue()
       SpyWriteFileAsync.mockResolvedValue(JSON.stringify({
         activeRulesFile: 'activeRulesFile'
       }))
-      
+
       const result = await RulesEngineModel.deleteCallbackRulesFile('test.json')
-      expect(result).toBeTruthy()  
+      expect(result).toBeTruthy()
     })
     it('deleteCallbackRulesFile should return error', async () => {
       SpyDeleteFileAsync.mockRejectedValueOnce({message: 'error'})
       const result = await RulesEngineModel.deleteCallbackRulesFile('test.json')
-      expect(result).toStrictEqual({message: 'error'})  
+      expect(result).toStrictEqual({message: 'error'})
     })
     it('setCallbackRulesFileContent should return true', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
@@ -303,9 +303,9 @@ describe('RulesEngineModel', () => {
       }]
       SpyWriteFileAsync.mockResolvedValue()
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
-      
+
       const result = await RulesEngineModel.setCallbackRulesFileContent('test.json', fileContent)
-      expect(result).toBeTruthy() 
+      expect(result).toBeTruthy()
     })
     it('setCallbackRulesFileContent should return error', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
@@ -333,35 +333,35 @@ describe('RulesEngineModel', () => {
         activeRulesFile: 'activeRulesFile'
       }))
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
-      
+
       const result = await RulesEngineModel.reloadValidationRules()
-      expect(result).toBeUndefined()      
+      expect(result).toBeUndefined()
     })
     it('setActiveValidationRulesFile should set activeRulesFile', async () => {
       SpyWriteFileAsync.mockResolvedValue()
       SpyReadFileAsync.mockResolvedValue(JSON.stringify({activeRulesFile: 'activeRulesFile'}))
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
-      
+
       const result = await RulesEngineModel.setActiveValidationRulesFile('test.json')
-      expect(result).toBeUndefined()      
+      expect(result).toBeUndefined()
     })
     it('getValidationRules should return stored rules', async () => {
       const result = await RulesEngineModel.getValidationRules()
-      expect(result).not.toBeUndefined()      
+      expect(result).not.toBeUndefined()
     })
     it('getValidationRulesEngine should return rulesEngine', async () => {
       const result = await RulesEngineModel.getValidationRulesEngine()
-      expect(result).not.toBeUndefined()      
+      expect(result).not.toBeUndefined()
     })
     it('getValidationRulesFiles should return activeRulesFile', async () => {
       SpyReadDirAsync.mockResolvedValue(['test.json', 'config.json'])
       const result = await RulesEngineModel.getValidationRulesFiles()
-      expect(result).not.toBeNull()      
+      expect(result).not.toBeNull()
     })
     it('getValidationRulesFiles should return null', async () => {
       SpyReadDirAsync.mockRejectedValueOnce()
       const result = await RulesEngineModel.getValidationRulesFiles()
-      expect(result).toBeNull()   
+      expect(result).toBeNull()
     })
     it('deleteValidationRulesFile should return true', async () => {
       SpyDeleteFileAsync.mockResolvedValue()
@@ -369,14 +369,14 @@ describe('RulesEngineModel', () => {
         activeRulesFile: 'activeRulesFile'
       }))
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
-      
+
       const result = await RulesEngineModel.deleteValidationRulesFile('test.json')
-      expect(result).toBeTruthy()  
+      expect(result).toBeTruthy()
     })
     it('deleteValidationRulesFile should return error', async () => {
       SpyDeleteFileAsync.mockRejectedValueOnce({message: 'error'})
       const result = await RulesEngineModel.deleteValidationRulesFile('test.json')
-      expect(result).toStrictEqual({message: 'error'})  
+      expect(result).toStrictEqual({message: 'error'})
     })
     it('setValidationRulesFileContent should return true', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
@@ -391,9 +391,9 @@ describe('RulesEngineModel', () => {
       SpyReadFileAsync.mockResolvedValue(JSON.stringify({
         activeRulesFile: 'activeRulesFile'
       }))
-      
+
       const result = await RulesEngineModel.setValidationRulesFileContent('test.json', fileContent)
-      expect(result).toBeTruthy() 
+      expect(result).toBeTruthy()
     })
     it('setValidationRulesFileContent should return error', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
@@ -421,49 +421,49 @@ describe('RulesEngineModel', () => {
         activeRulesFile: 'activeRulesFile'
       }))
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
-      
+
       const result = await RulesEngineModel.reloadForwardRules()
-      expect(result).toBeUndefined()      
+      expect(result).toBeUndefined()
     })
     it('setActiveForwardRulesFile should set activeRulesFile', async () => {
       SpyWriteFileAsync.mockResolvedValue()
       SpyReadFileAsync.mockResolvedValue(JSON.stringify({activeRulesFile: 'activeRulesFile'}))
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
-      
+
       const result = await RulesEngineModel.setActiveForwardRulesFile('test.json')
-      expect(result).toBeUndefined()      
+      expect(result).toBeUndefined()
     })
     it('getForwardRules should return stored rules', async () => {
       const result = await RulesEngineModel.getForwardRules()
-      expect(result).not.toBeUndefined()      
+      expect(result).not.toBeUndefined()
     })
     it('getForwardRulesEngine should return rulesEngine', async () => {
       const result = await RulesEngineModel.getForwardRulesEngine()
-      expect(result).not.toBeUndefined()      
+      expect(result).not.toBeUndefined()
     })
     it('getForwardRulesFiles should return activeRulesFile', async () => {
       SpyReadDirAsync.mockResolvedValue(['test.json', 'config.json'])
       const result = await RulesEngineModel.getForwardRulesFiles()
-      expect(result).not.toBeNull()      
+      expect(result).not.toBeNull()
     })
     it('getForwardRulesFiles should return null', async () => {
       SpyReadDirAsync.mockRejectedValueOnce()
       const result = await RulesEngineModel.getForwardRulesFiles()
-      expect(result).toBeNull()   
+      expect(result).toBeNull()
     })
     it('deleteForwardRulesFile should return true', async () => {
       SpyDeleteFileAsync.mockResolvedValue()
       SpyWriteFileAsync.mockResolvedValue(JSON.stringify({
         activeRulesFile: 'activeRulesFile'
       }))
-      
+
       const result = await RulesEngineModel.deleteForwardRulesFile('test.json')
-      expect(result).toBeTruthy()  
+      expect(result).toBeTruthy()
     })
     it('deleteForwardRulesFile should return error', async () => {
       SpyDeleteFileAsync.mockRejectedValueOnce({message: 'error'})
       const result = await RulesEngineModel.deleteForwardRulesFile('test.json')
-      expect(result).toStrictEqual({message: 'error'})  
+      expect(result).toStrictEqual({message: 'error'})
     })
     it('setForwardRulesFileContent should return true', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
@@ -476,9 +476,9 @@ describe('RulesEngineModel', () => {
       }]
       SpyWriteFileAsync.mockResolvedValue()
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
-      
+
       const result = await RulesEngineModel.setForwardRulesFileContent('test.json', fileContent)
-      expect(result).toBeTruthy() 
+      expect(result).toBeTruthy()
     })
     it('setForwardRulesFileContent should return error', async () => {
       SpyGetSystemConfig.mockReturnValueOnce({
@@ -497,6 +497,25 @@ describe('RulesEngineModel', () => {
       SpyReadFileAsync.mockResolvedValue(JSON.stringify([]))
       const result = await RulesEngineModel.getForwardRulesFileContent('test.json')
       expect(result).toStrictEqual([])
+    })
+    it('setTestRules should set test rules', async () => {
+      const response = 'response.json'
+      const validation = 'validation.json'
+      const callback = 'callback.json'
+      const forward = 'forward.json'
+      const rules = [{conditions: {all: []}, event: {type: 'mock'}, priority: 1}]
+      const rulesString = JSON.stringify(rules)
+      SpyReadFileAsync.mockResolvedValueOnce(rulesString)
+      SpyReadFileAsync.mockResolvedValueOnce(rulesString)
+      SpyReadFileAsync.mockResolvedValueOnce(rulesString)
+      SpyReadFileAsync.mockResolvedValueOnce(rulesString)
+
+      await RulesEngineModel.setTestRules({ response, validation, callback, forward })
+
+      expect(await RulesEngineModel.getResponseRules()).toStrictEqual(rules)
+      expect(await RulesEngineModel.getValidationRules()).toStrictEqual(rules)
+      expect(await RulesEngineModel.getCallbackRules()).toStrictEqual(rules)
+      expect(await RulesEngineModel.getForwardRules()).toStrictEqual(rules)
     })
   })
 })
