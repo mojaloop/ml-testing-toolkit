@@ -396,7 +396,7 @@ const addTypeAndVersion = (model, fileContent) => {
 }
 
 // used for integration tests
-const setTestRules = async({
+const setTestRules = async ({
   response,
   validation,
   callback,

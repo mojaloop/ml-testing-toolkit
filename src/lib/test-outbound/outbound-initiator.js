@@ -313,8 +313,8 @@ const processTestCase = async (
       // todo: think about proper traceparent header
     }
 
-    let baggage = convertedRequest.headers.baggage || '';
-    if (baggage) baggage = baggage + ',';
+    let baggage = convertedRequest.headers.baggage || ''
+    if (baggage) baggage = baggage + ','
     convertedRequest.headers.baggage = baggage + `testCaseId=${testCase.id},requestId=${request.id}`
 
     const scriptsExecution = {}
