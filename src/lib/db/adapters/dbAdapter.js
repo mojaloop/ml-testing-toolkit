@@ -144,9 +144,9 @@ const listReports = async (queryParams) => {
   }
 
   if (queryParams?.filterStatus === 'passed') {
-    query.$expr = { $eq: ['$runtimeInformation.totalPassedAssertions', '$runtimeInformation.totalAssertions'] }
+    query['runtimeInformation.isPassed'] = true
   } else if (queryParams?.filterStatus === 'failed') {
-    query.$expr = { $ne: ['$runtimeInformation.totalPassedAssertions', '$runtimeInformation.totalAssertions'] }
+    query['runtimeInformation.isPassed'] = false
   }
 
   // General Query Options like skip and limit
