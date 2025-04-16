@@ -980,7 +980,7 @@
         <script>
           $('#showOnlyFailed').on('click', function(e) {
             {{#each test_cases}}
-            $('#folder-{{id}}').each(function() {
+            $('[aria-labelledby="folder-{{id}}"]').each(function() {
               if ($(this).find('.resultsInfoFail').length === 0) {
                 $(this).closest('.tab-content').addClass('hidden');
               }
