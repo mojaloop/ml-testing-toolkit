@@ -31,11 +31,10 @@
 
 const uuid = require('uuid')
 const axios = require('axios').default
+jest.mock('axios')
+axios.create = jest.fn(() => axios)
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
 const NotificationEmitter = require('../../../../src/lib/notificationEmitter')
-jest.mock('axios')
-axios.create.mockImplementation((config) => axios)
-jest.mock('../../../../src/lib/jws/JwsSigning')
 const Context = require('../../../../src/lib/scripting-engines/vm-javascript-sandbox')
 
 const spyNotificationEmitterSendMessage = jest.spyOn(NotificationEmitter, 'sendMessage')
@@ -189,7 +188,7 @@ describe('Test Outbound Context', () => {
 
     it('executeAsync should call JWS validate function', async () => {
 
-      JwsSigning.validateWithCert.mockImplementation(() => { return "VALID" })
+      JwsSigning.validateWithCert = jest.fn(() => { return "VALID" })
       const contextObj = await Context.generateContextObj({})
 
       const args = {
@@ -215,7 +214,7 @@ describe('Test Outbound Context', () => {
 
     it('executeAsync should call JWS validateProtectedHeaders function', async () => {
 
-      JwsSigning.validateProtectedHeaders.mockImplementation(() => { return "VALID" })
+      JwsSigning.validateProtectedHeaders = jest.fn(() => { return "VALID" })
       const contextObj = await Context.generateContextObj({})
 
       const args = {
@@ -361,7 +360,7 @@ describe('Test Outbound Context', () => {
 
     })
     it('executeAsync JWS validateProtectedHeaders should fail', async () => {
-      JwsSigning.validateProtectedHeaders.mockImplementation(() => { throw new Error('SAMPLE_ERROR') })
+      JwsSigning.validateProtectedHeaders = jest.fn(() => { throw new Error('SAMPLE_ERROR') })
       const contextObj = await Context.generateContextObj({})
 
       const args = {

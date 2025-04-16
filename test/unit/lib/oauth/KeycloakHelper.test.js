@@ -29,7 +29,7 @@
 
 const KeycloakHelper = require('../../../../src/lib/oauth/KeycloakHelper')
 const axios = require('axios').default
-
+axios.create = jest.fn(() => axios)
 const Config = require('../../../../src/lib/config')
 const SpyGetSystemConfig = jest.spyOn(Config, 'getSystemConfig')
 const requestLogger = require('../../../../src/lib/requestLogger')

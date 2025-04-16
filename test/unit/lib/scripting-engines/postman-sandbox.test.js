@@ -32,6 +32,7 @@
 const Context = require('../../../../src/lib/scripting-engines/postman-sandbox')
 const uuid = require('uuid')
 const axios = require('axios').default
+axios.create = jest.fn(() => axios)
 jest.mock('axios')
 
 

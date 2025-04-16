@@ -2,7 +2,6 @@
 reject: [
   "chai", # version 5 uses only ESM
   "postman-collection",
-  "postman-sandbox",
-  "@mojaloop/sdk-standard-components" # https://github.com/mojaloop/project/issues/4097
+  "postman-sandbox"
 ]
 

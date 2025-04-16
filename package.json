@@ -75,7 +75,7 @@
     "@mojaloop/central-services-metrics": "12.5.0",
     "@mojaloop/ml-schema-transformer-lib": "2.7.1",
     "@mojaloop/ml-testing-toolkit-shared-lib": "14.0.4",
-    "@mojaloop/sdk-standard-components": "19.11.3",
+    "@mojaloop/sdk-standard-components": "19.13.0",
     "@now-ims/hapi-now-auth": "2.1.0",
     "@types/socket.io": "3.0.2",
     "adm-zip": "0.5.16",
