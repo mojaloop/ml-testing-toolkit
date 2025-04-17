@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.12.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.12.0...v18.12.1) (2025-04-17)
+
+
+### Bug Fixes
+
+* mongo index ([#314](https://github.com/mojaloop/ml-testing-toolkit/issues/314)) ([cad00b4](https://github.com/mojaloop/ml-testing-toolkit/commit/cad00b4798c830ae7c105a1a698b16844394c31f))
+
 ## [18.12.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.11.5...v18.12.0) (2025-04-10)
 
 
