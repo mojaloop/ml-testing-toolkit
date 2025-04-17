@@ -62,7 +62,7 @@ const models = {
     inputValues: Object,
     test_cases: [],
     runtimeInformation: Object
-  })
+  }).index({ 'runtimeInformation.completedTime': -1, 'runtimeInformation.isPassed': 1 })
 }
 
 /* istanbul ignore next */

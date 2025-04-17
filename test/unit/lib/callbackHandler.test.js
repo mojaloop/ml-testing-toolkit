@@ -28,13 +28,15 @@
  ******/
 
 const Config = require('../../../src/lib/config')
+const axios = require('axios').default
+axios.create = jest.fn(() => axios)
 const callbackHandler = require('../../../src/lib/callbackHandler')
 const JwsSigning = require('../../../src/lib/jws/JwsSigning')
 const ObjectStore = require('../../../src/lib/objectStore')
 const ArrayStore = require('../../../src/lib/arrayStore')
 const RequestLogger = require('../../../src/lib/requestLogger')
 const MyEventEmitter = require('../../../src/lib/MyEventEmitter')
-const axios = require('axios').default
+
 const https = require('https')
 const ConnectionProvider = require('../../../src/lib/configuration-providers/mb-connection-manager')
 
@@ -47,6 +49,7 @@ const SpyAgent = jest.spyOn(https, 'Agent')
 const SpyGetTlsConfig = jest.spyOn(ConnectionProvider, 'getTlsConfig')
 const SpyEndpointsConfig = jest.spyOn(ConnectionProvider, 'getEndpointsConfig')
 jest.mock('axios')
+
 jest.mock('../../../src/lib/config')
 
 describe('callbackHandler', () => {

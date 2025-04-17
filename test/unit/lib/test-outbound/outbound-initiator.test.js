@@ -32,6 +32,7 @@
 
 const https = require('https')
 const axios = require('axios').default
+axios.create = jest.fn(() => axios)
 const OutboundInitiator = require('../../../../src/lib/test-outbound/outbound-initiator')
 const ConnectionProvider = require('../../../../src/lib/configuration-providers/mb-connection-manager')
 const Config = require('../../../../src/lib/config')

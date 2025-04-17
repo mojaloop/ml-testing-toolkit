@@ -31,6 +31,7 @@
 const MBConnectionManagerProvider = require('../../../../src/lib/configuration-providers/mb-connection-manager')
 const Config = require('../../../../src/lib/config')
 const axios = require('axios').default
+axios.create = jest.fn(() => axios)
 const { readFileAsync }  = require('../../../../src/lib/utils')
 const requestLogger = require('../../../../src/lib/requestLogger')
 

@@ -29,6 +29,8 @@
  ******/
 
 const Config = require('../../../../src/lib/config')
+const axios = require('axios').default
+axios.create = jest.fn(() => axios)
 jest.mock('../../../../src/lib/config')
 Config.getSystemConfig.mockReturnValue({
   "API_PORT": 4040,
@@ -86,7 +88,6 @@ Config.getUserConfig.mockResolvedValue({
 const request = require('supertest')
 const apiServer = require('../../../../src/lib/api-server')
 const app = apiServer.getApp()
-const axios = require('axios').default
 const OutboundInitiator = require('../../../../src/lib/test-outbound/outbound-initiator')
 
 const SpyTerminateOutbound = jest.spyOn(OutboundInitiator, 'terminateOutbound')

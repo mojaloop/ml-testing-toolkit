@@ -31,6 +31,7 @@
 const dfspMockUsers = require('../../../../src/lib/db/dfspMockUsers')
 const Config = require('../../../../src/lib/config')
 const axios = require('axios').default
+axios.create = jest.fn(() => axios)
 
 jest.mock('../../../../src/lib/config')
 jest.mock('axios')
