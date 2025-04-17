@@ -13,7 +13,7 @@ services:
       - "./secrets:/opt/app/secrets"
       - "./examples:/opt/app/examples"
     environment:
-      REPORTING_DB_CONNECTION_PASSWORD: ttk@123$asdf
+      REPORTING_DB_CONNECTION_PASSWORD: ttk@123
       TTK_SYSTEM_CONFIG: |-
         {
           "DB": {
@@ -47,7 +47,7 @@ services:
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: ttk
-      MONGO_INITDB_ROOT_PASSWORD: ttk@123$asdf
+      MONGO_INITDB_ROOT_PASSWORD: ttk@123
       ALLOW_EMPTY_PASSWORD: "true"
     ports:
       - 27017:27017

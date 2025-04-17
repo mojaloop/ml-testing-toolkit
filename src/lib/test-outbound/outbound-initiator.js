@@ -111,7 +111,8 @@ const OutboundSend = async (
       completedTS: completedTimeStamp.getTime(),
       runDurationMs,
       totalAssertions: 0,
-      totalPassedAssertions: 0
+      totalPassedAssertions: 0,
+      isPassed: false
     }
     if (sync) {
       return generateFinalReport(inputTemplate, runtimeInformation, metrics)
@@ -205,7 +206,8 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metr
         completedTime: completedTimeStamp.toUTCString(),
         runDurationMs,
         totalAssertions: 0,
-        totalPassedAssertions: 0
+        totalPassedAssertions: 0,
+        isPassed: false
       }
       // TODO: This can be optimized by storing only results into the iterations array
       totalReport.iterations.push(generateFinalReport(tmpTemplate, runtimeInformation, metrics))
@@ -1059,6 +1061,7 @@ const generateFinalReport = (inputTemplate, runtimeInformation, metrics) => {
     }
   })
   if (runtimeInformation.totalPassedAssertions === runtimeInformation.totalAssertions) {
+    runtimeInformation.isPassed = true
     metrics?.testSuccess.add(1, { template: inputTemplate.name })
   } else {
     metrics?.testFail.add(1, { template: inputTemplate.name })

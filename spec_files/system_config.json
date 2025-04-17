@@ -17,8 +17,8 @@
     "HOST": "localhost",
     "PORT": 27017,
     "USER": "ttk",
-    "PASSWORD": "ttk",
-    "DATABASE": "ttk",
+    "PASSWORD": "ttk@123",
+    "DATABASE": "admin",
     "CONNECTION_STRING": null
   },
   "METRICS": {
