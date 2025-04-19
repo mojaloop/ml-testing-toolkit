@@ -40,7 +40,7 @@ const SKIP_EMPTY_EXECUTION_ORDER = false // skip testCases without executionOrde
 class TestCaseRunner {
   constructor (config, logger) {
     this.config = config
-    this.logger = logger || loggerFactory('TestCaseRunner')
+    this.logger = logger || loggerFactory('TTK')
   }
 
   async runAll ({

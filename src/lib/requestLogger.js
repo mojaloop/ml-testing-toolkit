@@ -30,8 +30,7 @@
 
 'use strict'
 
-const util = require('node:util')
-const Logger = require('@mojaloop/central-services-logger')
+const Logger = require('@mojaloop/central-services-logger').child({ context: 'TTK' })
 const Config = require('./config')
 const NotificationEmitter = require('./notificationEmitter')
 const DBAdapter = require('./db/adapters/dbAdapter')
@@ -128,21 +127,17 @@ const logMessage = (verbosity, message, externalData = {}) => {
   }
   switch (verbosity) {
     case 'debug':
-      Logger.debug(message)
-      if (data.additionalData !== undefined) Logger.debug(util.inspect(data.additionalData))
+      Logger.debug(message, data.additionalData)
       break
     case 'warn':
-      Logger.warn(message)
-      if (data.additionalData !== undefined) Logger.warn(util.inspect(data.additionalData))
+      Logger.warn(message, data.additionalData)
       break
     case 'error':
-      Logger.error(message)
-      if (data.additionalData !== undefined) Logger.error(util.inspect(data.additionalData))
+      Logger.error(message, data.additionalData)
       break
     case 'info':
     default: {
-      Logger.info(message)
-      if (data.additionalData !== undefined) Logger.info(util.inspect(data.additionalData))
+      Logger.info(message, data.additionalData)
     }
   }
 
