@@ -840,7 +840,7 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
           }
           customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
           const error = new Error(JSON.stringify({ curlRequest, requestSent, transformedRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody, originalHeaders, originalBody } }))
-          error.error = callbackBody;
+          error.error = callbackBody
           return reject(error)
         })
       }
