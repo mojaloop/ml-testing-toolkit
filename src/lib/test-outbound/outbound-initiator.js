@@ -392,7 +392,8 @@ const processTestCase = async (
           globalConfig,
           metrics,
           templateName,
-          requestTraceId
+          requestTraceId,
+          requestStartedTime.getTime()
         )
       }
     } catch (err) {
@@ -417,7 +418,8 @@ const processTestCase = async (
         globalConfig,
         metrics,
         templateName,
-        requestTraceId
+        requestTraceId,
+        requestStartedTime.getTime()
       )
     } finally {
       if (request.appended?.assertionResults?.isFailed) {
@@ -471,7 +473,8 @@ const setResponse = async (
   globalConfig,
   metrics,
   templateName,
-  traceId
+  traceId,
+  started
 ) => {
   // Get the requestsHistory and callbacksHistory from the arrayStore
   const requestsHistoryObj = arrayStore.get('requestsHistory')
@@ -493,7 +496,7 @@ const setResponse = async (
     status,
     assertionResults,
     traceId,
-    traceUrl: util.format(Config.getSystemConfig().TRACE_URL || '//trace/%s', traceId),
+    traceUrl: util.format(Config.getSystemConfig().TRACE_URL || '//trace/%s', traceId, started - 60000, Date.now() + 60000),
     response: resp.syncResponse,
     callback: resp.callback,
     request: convertedRequest,
