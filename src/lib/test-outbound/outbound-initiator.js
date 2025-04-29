@@ -432,8 +432,9 @@ const processTestCase = async (
           contextObj.ctx = null
         }
         if (request.appended?.assertionResults?.isFailed) {
-          if (convertedRequest.retry < retries) continue
-          if (templateOptions.breakOnError) {
+          if (convertedRequest.retry < retries) {
+            // safe continue outside of finally
+          } else if (templateOptions.breakOnError) {
             // Terminate the test run if assertion failed
             // eslint-disable-next-line
             throw new Error('Terminated')
@@ -443,8 +444,11 @@ const processTestCase = async (
               requestsObj[templateIDArr[j]].disabled = true
             }
           }
-        } else break
+        }
       }
+      if (request.appended?.assertionResults?.isFailed) {
+        if (convertedRequest.retry < retries) continue
+      } else break
     }
 
     const requestCompletedTime = new Date()
