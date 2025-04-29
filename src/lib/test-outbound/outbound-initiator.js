@@ -306,7 +306,7 @@ const processTestCase = async (
 
     // Form the path from params and operationPath
     convertedRequest.path = replacePathVariables(request.operationPath, convertedRequest.params)
-    let retries = request.retries || 0
+    const retries = request.retries || 0
     for (convertedRequest.retry = 0; convertedRequest.retry <= retries; convertedRequest.retry++) {
       if (convertedRequest.retry > 0) await new Promise(resolve => setTimeout(resolve, [250, 500, 1000, 2000][convertedRequest.retry] || 4000))
       const requestTraceId = saveReport ? crypto.randomBytes(16).toString('hex') : traceID
