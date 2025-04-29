@@ -306,79 +306,109 @@ const processTestCase = async (
 
     // Form the path from params and operationPath
     convertedRequest.path = replacePathVariables(request.operationPath, convertedRequest.params)
-    const requestTraceId = saveReport ? crypto.randomBytes(16).toString('hex') : traceID
+    let retries = request.retries || 0
+    for (convertedRequest.retry = 0; convertedRequest.retry <= retries; convertedRequest.retry++) {
+      if (convertedRequest.retry > 0) await new Promise(resolve => setTimeout(resolve, [250, 500, 1000, 2000][convertedRequest.retry] || 4000))
+      const requestTraceId = saveReport ? crypto.randomBytes(16).toString('hex') : traceID
 
-    // Insert traceparent header if sessionID passed
-    if (tracing.sessionID || saveReport) {
-      convertedRequest.headers = convertedRequest.headers || {}
-      convertedRequest.headers.traceparent = '00-' + requestTraceId + '-' + String(testCaseIndex).padStart(8, '0') + String(requestIndex).padStart(8, '0') + '-01'
-      // todo: think about proper traceparent header
-    }
-
-    let baggage = convertedRequest.headers.baggage || ''
-    if (baggage) baggage = baggage + ','
-    convertedRequest.headers.baggage = baggage + `testCaseId=${testCase.id},requestId=${request.id}`
-
-    const scriptsExecution = {}
-    let contextObj = null
-    if (globalConfig.scriptExecution) {
-      let context = postmanContext
-      if (convertedRequest.scriptingEngine && convertedRequest.scriptingEngine === 'javascript') {
-        context = javascriptContext
+      // Insert traceparent header if sessionID passed
+      if (tracing.sessionID || saveReport) {
+        convertedRequest.headers = convertedRequest.headers || {}
+        convertedRequest.headers.traceparent = '00-' + requestTraceId + '-' + String(testCaseIndex).padStart(8, '0') + String(requestIndex).padStart(8, '0') + '-01'
+        // todo: think about proper traceparent header
       }
-      contextObj = await context.generateContextObj(variableData.environment)
-    }
 
-    // Get transformer if specified
-    if (contextObj.transformerObj && templateOptions?.transformerName) {
-      contextObj.transformerObj.transformer = Transformers.getTransformer(templateOptions.transformerName)
-      contextObj.transformerObj.transformerName = templateOptions.transformerName
-      // Currently no options are passed to the transformer in template level, we can add it later if needed
-    }
+      let baggage = convertedRequest.headers.baggage || ''
+      if (baggage) baggage = baggage + ','
+      convertedRequest.headers.baggage = baggage + `testCaseId=${testCase.id},requestId=${request.id}`
 
-    // Send http request
-    let status
-    try {
-      // Extra step to access request variables that consists of environment variables in scripts
-      const tmpRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
+      const scriptsExecution = {}
+      let contextObj = null
       if (globalConfig.scriptExecution) {
-        await executePreRequestScript(tmpRequest, scriptsExecution, contextObj, variableData)
-      }
-
-      // Mutating request based on script output
-      if (contextObj.requestVariables?.OVERRIDE_REQUEST?.appendMode) {
-        _.merge(convertedRequest.body, contextObj.requestVariables.OVERRIDE_REQUEST?.body)
-      }
-      convertedRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
-      convertedRequest = replaceRequestLevelEnvironmentVariables(convertedRequest, contextObj.requestVariables)
-
-      // Change header names to lower case
-      convertedRequest.headers = headersToLowerCase(convertedRequest.headers || {})
-
-      let successCallbackUrl = null
-      let errorCallbackUrl = null
-      if (reqApiDefinition?.asynchronous === true) {
-        const cbMapRawdata = await readFileAsync(reqApiDefinition.callbackMapFile)
-        const reqCallbackMap = JSON.parse(cbMapRawdata)
-        if (reqCallbackMap[request.operationPath] && reqCallbackMap[request.operationPath][request.method]) {
-          const successCallback = reqCallbackMap[request.operationPath][request.method].successCallback
-          const errorCallback = reqCallbackMap[request.operationPath][request.method].errorCallback
-          successCallbackUrl = successCallback.method + ' ' + replaceVariables(successCallback.pathPattern, null, convertedRequest)
-          errorCallbackUrl = errorCallback.method + ' ' + replaceVariables(errorCallback.pathPattern, null, convertedRequest)
+        let context = postmanContext
+        if (convertedRequest.scriptingEngine && convertedRequest.scriptingEngine === 'javascript') {
+          context = javascriptContext
         }
+        contextObj = await context.generateContextObj(variableData.environment)
       }
-      if (contextObj.requestVariables && contextObj.requestVariables.SKIP_REQUEST) {
-        status = 'SKIPPED'
-        await setSkippedResponse(convertedRequest, request, status, tracing, testCase, scriptsExecution, globalConfig)
-      } else {
-        // Replace transformer if it is specified in the request level
-        if (contextObj.transformerObj && contextObj.requestVariables && contextObj.requestVariables.TRANSFORM) {
-          contextObj.transformerObj.transformer = Transformers.getTransformer(contextObj.requestVariables.TRANSFORM.transformerName)
-          contextObj.transformerObj.transformerName = contextObj.requestVariables.TRANSFORM.transformerName
-          contextObj.transformerObj.options = contextObj.requestVariables.TRANSFORM.options
+
+      // Get transformer if specified
+      if (contextObj.transformerObj && templateOptions?.transformerName) {
+        contextObj.transformerObj.transformer = Transformers.getTransformer(templateOptions.transformerName)
+        contextObj.transformerObj.transformerName = templateOptions.transformerName
+        // Currently no options are passed to the transformer in template level, we can add it later if needed
+      }
+
+      // Send http request
+      let status
+      try {
+        // Extra step to access request variables that consists of environment variables in scripts
+        const tmpRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
+        if (globalConfig.scriptExecution) {
+          await executePreRequestScript(tmpRequest, scriptsExecution, contextObj, variableData)
         }
-        const resp = await sendRequest(convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj)
-        status = 'SUCCESS'
+
+        // Mutating request based on script output
+        if (contextObj.requestVariables?.OVERRIDE_REQUEST?.appendMode) {
+          _.merge(convertedRequest.body, contextObj.requestVariables.OVERRIDE_REQUEST?.body)
+        }
+        convertedRequest = replaceEnvironmentVariables(convertedRequest, variableData.environment)
+        convertedRequest = replaceRequestLevelEnvironmentVariables(convertedRequest, contextObj.requestVariables)
+
+        // Change header names to lower case
+        convertedRequest.headers = headersToLowerCase(convertedRequest.headers || {})
+
+        let successCallbackUrl = null
+        let errorCallbackUrl = null
+        if (reqApiDefinition?.asynchronous === true) {
+          const cbMapRawdata = await readFileAsync(reqApiDefinition.callbackMapFile)
+          const reqCallbackMap = JSON.parse(cbMapRawdata)
+          if (reqCallbackMap[request.operationPath] && reqCallbackMap[request.operationPath][request.method]) {
+            const successCallback = reqCallbackMap[request.operationPath][request.method].successCallback
+            const errorCallback = reqCallbackMap[request.operationPath][request.method].errorCallback
+            successCallbackUrl = successCallback.method + ' ' + replaceVariables(successCallback.pathPattern, null, convertedRequest)
+            errorCallbackUrl = errorCallback.method + ' ' + replaceVariables(errorCallback.pathPattern, null, convertedRequest)
+          }
+        }
+        if (contextObj.requestVariables && contextObj.requestVariables.SKIP_REQUEST) {
+          status = 'SKIPPED'
+          await setSkippedResponse(convertedRequest, request, status, tracing, testCase, scriptsExecution, globalConfig)
+        } else {
+          // Replace transformer if it is specified in the request level
+          if (contextObj.transformerObj && contextObj.requestVariables && contextObj.requestVariables.TRANSFORM) {
+            contextObj.transformerObj.transformer = Transformers.getTransformer(contextObj.requestVariables.TRANSFORM.transformerName)
+            contextObj.transformerObj.transformerName = contextObj.requestVariables.TRANSFORM.transformerName
+            contextObj.transformerObj.options = contextObj.requestVariables.TRANSFORM.options
+          }
+          const resp = await sendRequest(convertedRequest, successCallbackUrl, errorCallbackUrl, dfspId, contextObj)
+          status = 'SUCCESS'
+          await setResponse(
+            convertedRequest,
+            resp,
+            variableData,
+            request,
+            status,
+            tracing,
+            testCase,
+            scriptsExecution,
+            contextObj,
+            globalConfig,
+            metrics,
+            templateName,
+            requestTraceId,
+            requestStartedTime.getTime(),
+            convertedRequest.retry === retries
+          )
+        }
+      } catch (err) {
+        customLogger.logMessage('error', err.message)
+        let resp
+        try {
+          resp = JSON.parse(err.message)
+        } catch (parsingErr) {
+          resp = err.message
+        }
+        status = 'ERROR'
         await setResponse(
           convertedRequest,
           resp,
@@ -393,50 +423,27 @@ const processTestCase = async (
           metrics,
           templateName,
           requestTraceId,
-          requestStartedTime.getTime()
+          requestStartedTime.getTime(),
+          convertedRequest.retry === retries
         )
-      }
-    } catch (err) {
-      customLogger.logMessage('error', err.message)
-      let resp
-      try {
-        resp = JSON.parse(err.message)
-      } catch (parsingErr) {
-        resp = err.message
-      }
-      status = 'ERROR'
-      await setResponse(
-        convertedRequest,
-        resp,
-        variableData,
-        request,
-        status,
-        tracing,
-        testCase,
-        scriptsExecution,
-        contextObj,
-        globalConfig,
-        metrics,
-        templateName,
-        requestTraceId,
-        requestStartedTime.getTime()
-      )
-    } finally {
-      if (request.appended?.assertionResults?.isFailed) {
-        if (templateOptions.breakOnError) {
-          // Terminate the test run if assertion failed
-          // eslint-disable-next-line
-          throw new Error('Terminated')
-        } else if (testCase.options?.breakOnError) {
-          // Disable the following requests if assertion failed
-          for (let j = requestIndex + 1; j < templateIDArr.length; j++) {
-            requestsObj[templateIDArr[j]].disabled = true
-          }
+      } finally {
+        if (contextObj) {
+          contextObj.ctx.dispose()
+          contextObj.ctx = null
         }
-      }
-      if (contextObj) {
-        contextObj.ctx.dispose()
-        contextObj.ctx = null
+        if (request.appended?.assertionResults?.isFailed) {
+          if (convertedRequest.retry < retries) continue
+          if (templateOptions.breakOnError) {
+            // Terminate the test run if assertion failed
+            // eslint-disable-next-line
+            throw new Error('Terminated')
+          } else if (testCase.options?.breakOnError) {
+            // Disable the following requests if assertion failed
+            for (let j = requestIndex + 1; j < templateIDArr.length; j++) {
+              requestsObj[templateIDArr[j]].disabled = true
+            }
+          }
+        } else break
       }
     }
 
@@ -474,7 +481,8 @@ const setResponse = async (
   metrics,
   templateName,
   traceId,
-  started
+  started,
+  lastRetry
 ) => {
   // Get the requestsHistory and callbacksHistory from the arrayStore
   const requestsHistoryObj = arrayStore.get('requestsHistory')
@@ -507,33 +515,35 @@ const setResponse = async (
   }
 
   // Update total progress counts
-  globalConfig.totalProgress.requestsProcessed++
-  globalConfig.totalProgress.assertionsProcessed += request.tests && request.tests.assertions ? request.tests.assertions.length : 0
-  globalConfig.totalProgress.assertionsPassed += assertionResults.passedCount
-  const failed = request.tests && request.tests.assertions ? (request.tests.assertions.length - assertionResults.passedCount) : 0
-  globalConfig.totalProgress.assertionsFailed += failed
-  const tags = { request: request.description, test: testCase.name }
-  metrics?.assertSuccess.add(assertionResults.passedCount, tags)
-  metrics?.assertFail.add(failed, tags)
+  if (lastRetry || !assertionResults.isFailed) {
+    globalConfig.totalProgress.requestsProcessed++
+    globalConfig.totalProgress.assertionsProcessed += request.tests && request.tests.assertions ? request.tests.assertions.length : 0
+    globalConfig.totalProgress.assertionsPassed += assertionResults.passedCount
+    const failed = request.tests && request.tests.assertions ? (request.tests.assertions.length - assertionResults.passedCount) : 0
+    globalConfig.totalProgress.assertionsFailed += failed
+    const tags = { request: request.description, test: testCase.name }
+    metrics?.assertSuccess.add(assertionResults.passedCount, tags)
+    metrics?.assertFail.add(failed, tags)
 
-  if (tracing.outboundID && globalConfig.broadcastOutboundProgressEnabled) {
-    notificationEmitter.broadcastOutboundProgress({
-      outboundID: tracing.outboundID,
-      testCaseId: testCase.id,
-      testCaseName: testCase.name,
-      status,
-      requestId: request.id,
-      response: resp.syncResponse,
-      callback: resp.callback,
-      transformedRequest: resp.transformedRequest,
-      requestSent: convertedRequest,
-      additionalInfo: {
-        curlRequest: resp.curlRequest,
-        scriptsExecution
-      },
-      testResult: assertionResults, // This should be changed, but it breaks UI. So keeping it for now.
-      totalProgress: globalConfig.totalProgress
-    }, tracing.sessionID)
+    if (tracing.outboundID && globalConfig.broadcastOutboundProgressEnabled) {
+      notificationEmitter.broadcastOutboundProgress({
+        outboundID: tracing.outboundID,
+        testCaseId: testCase.id,
+        testCaseName: testCase.name,
+        status,
+        requestId: request.id,
+        response: resp.syncResponse,
+        callback: resp.callback,
+        transformedRequest: resp.transformedRequest,
+        requestSent: convertedRequest,
+        additionalInfo: {
+          curlRequest: resp.curlRequest,
+          scriptsExecution
+        },
+        testResult: assertionResults, // This should be changed, but it breaks UI. So keeping it for now.
+        totalProgress: globalConfig.totalProgress
+      }, tracing.sessionID)
+    }
   }
 }
 
@@ -580,7 +590,7 @@ const setSkippedResponse = async (convertedRequest, request, status, tracing, te
 }
 
 const executePreRequestScript = async (convertedRequest, scriptsExecution, contextObj, variableData) => {
-  if (convertedRequest.scripts && convertedRequest.scripts.preRequest && convertedRequest.scripts.preRequest.exec.length > 0 && convertedRequest.scripts.preRequest.exec !== ['']) {
+  if (convertedRequest.scripts && convertedRequest.scripts.preRequest && convertedRequest.scripts.preRequest.exec.length > 0) {
     let context = postmanContext
     if (convertedRequest.scriptingEngine && convertedRequest.scriptingEngine === 'javascript') {
       context = javascriptContext
@@ -599,7 +609,7 @@ const executePreRequestScript = async (convertedRequest, scriptsExecution, conte
 }
 
 const executePostRequestScript = async (convertedRequest, resp, scriptsExecution, contextObj, variableData, backgroundData) => {
-  if (convertedRequest.scripts && convertedRequest.scripts.postRequest && convertedRequest.scripts.postRequest.exec.length > 0 && convertedRequest.scripts.postRequest.exec !== ['']) {
+  if (convertedRequest.scripts && convertedRequest.scripts.postRequest && convertedRequest.scripts.postRequest.exec.length > 0) {
     let response
     if (_.isString(resp)) {
       response = resp
