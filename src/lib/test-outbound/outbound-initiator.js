@@ -304,8 +304,13 @@ const processTestCase = async (
       await new Promise(resolve => setTimeout(resolve, convertedRequest.delay))
     }
 
+    convertedRequest.headers = convertedRequest.headers || {}
     // Form the path from params and operationPath
     convertedRequest.path = replacePathVariables(request.operationPath, convertedRequest.params)
+    let baggage = convertedRequest.headers.baggage || ''
+    if (baggage) baggage = baggage + ','
+    convertedRequest.headers.baggage = baggage + `testCaseId=${testCase.id},requestId=${request.id}`
+
     const retries = request.retries || 0
     for (convertedRequest.retry = 0; convertedRequest.retry <= retries; convertedRequest.retry++) {
       if (convertedRequest.retry > 0) await new Promise(resolve => setTimeout(resolve, [250, 500, 1000, 2000][convertedRequest.retry] || 4000))
@@ -313,14 +318,9 @@ const processTestCase = async (
 
       // Insert traceparent header if sessionID passed
       if (tracing.sessionID || saveReport) {
-        convertedRequest.headers = convertedRequest.headers || {}
         convertedRequest.headers.traceparent = '00-' + requestTraceId + '-' + String(testCaseIndex).padStart(8, '0') + String(requestIndex).padStart(8, '0') + '-01'
         // todo: think about proper traceparent header
       }
-
-      let baggage = convertedRequest.headers.baggage || ''
-      if (baggage) baggage = baggage + ','
-      convertedRequest.headers.baggage = baggage + `testCaseId=${testCase.id},requestId=${request.id}`
 
       const scriptsExecution = {}
       let contextObj = null
