@@ -397,7 +397,7 @@ const processTestCase = async (
         )
       }
     } catch (err) {
-      customLogger.logMessage('error', err.message)
+      customLogger.logMessage('error', err.message, { additionalData: err })
       let resp
       try {
         resp = JSON.parse(err.message)
@@ -842,7 +842,9 @@ const sendRequest = (convertedRequest, successCallbackUrl, errorCallbackUrl, dfs
             callbackHeaders = result.headers
           }
           customLogger.logMessage('info', 'Received error callback ' + errorCallbackUrl, { request: { headers: callbackHeaders, body: callbackBody }, notification: false })
-          return reject(new Error(JSON.stringify({ curlRequest, requestSent, transformedRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody, originalHeaders, originalBody } })))
+          const error = new Error(JSON.stringify({ curlRequest, requestSent, transformedRequest, syncResponse, callback: { url: errorCallbackUrl, headers: callbackHeaders, body: callbackBody, originalHeaders, originalBody } }))
+          error.error = callbackBody
+          return reject(error)
         })
       }
 
