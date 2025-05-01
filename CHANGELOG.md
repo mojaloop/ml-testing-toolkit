@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.12.4](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.12.3...v18.12.4) (2025-05-01)
+
+
+### Bug Fixes
+
+* implement retry logic in outbound initiator ([#319](https://github.com/mojaloop/ml-testing-toolkit/issues/319)) ([36c8b2f](https://github.com/mojaloop/ml-testing-toolkit/commit/36c8b2f1eca313f7e1eecdd0f1b6d497830b1123))
+
 ### [18.12.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.12.2...v18.12.3) (2025-04-22)
 
 
