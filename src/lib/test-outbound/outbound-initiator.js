@@ -312,8 +312,9 @@ const processTestCase = async (
     convertedRequest.headers.baggage = baggage + `testCaseId=${testCase.id},requestId=${request.id}`
 
     const retries = request.retries || 0
+    const retriesDelay = request.retriesDelay?.split(',').map(Number) || [250, 500, 1000, 2000, 4000]
     for (convertedRequest.retry = 0; convertedRequest.retry <= retries; convertedRequest.retry++) {
-      if (convertedRequest.retry > 0) await new Promise(resolve => setTimeout(resolve, [250, 500, 1000, 2000][convertedRequest.retry] || 4000))
+      if (convertedRequest.retry > 0) await new Promise(resolve => setTimeout(resolve, retriesDelay[Math.min(convertedRequest.retry, retriesDelay.length - 1)] || 5000))
       const requestTraceId = saveReport ? crypto.randomBytes(16).toString('hex') : traceID
 
       // Insert traceparent header if sessionID passed
