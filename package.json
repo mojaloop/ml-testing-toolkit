@@ -1,7 +1,7 @@
 {
   "name": "ml-testing-toolkit",
   "description": "Testing Toolkit for Mojaloop implementations",
-  "version": "18.12.3",
+  "version": "18.12.4-snapshot.4",
   "license": "Apache-2.0",
   "author": "Vijaya Kumar Guthi, ModusBox Inc. ",
   "contributors": [
@@ -64,7 +64,7 @@
     "genexec": "pkg -t node8-win ."
   },
   "dependencies": {
-    "@elastic/elasticsearch": "9.0.0",
+    "@elastic/elasticsearch": "9.0.1",
     "@hapi/basic": "7.0.2",
     "@hapi/boom": "10.0.1",
     "@hapi/good": "9.0.1",
@@ -81,7 +81,7 @@
     "adm-zip": "0.5.16",
     "ajv-formats": "3.0.1",
     "atob": "2.1.2",
-    "axios": "1.8.4",
+    "axios": "1.9.0",
     "chai": "4.4.1",
     "cookie-parser": "1.4.7",
     "cookies": "0.9.1",
@@ -101,7 +101,7 @@
     "jsonwebtoken": "9.0.2",
     "lodash": "4.17.21",
     "mongo-uri-builder": "4.0.0",
-    "mongoose": "8.13.2",
+    "mongoose": "8.14.1",
     "multer": "1.4.5-lts.2",
     "mustache": "4.2.0",
     "mv": "2.1.1",
@@ -130,8 +130,8 @@
     "get-port": "7.1.0",
     "jest": "29.7.0",
     "jest-junit": "16.0.0",
-    "nodemon": "3.1.9",
-    "npm-check-updates": "18.0.0",
+    "nodemon": "3.1.10",
+    "npm-check-updates": "18.0.1",
     "nyc": "17.1.0",
     "parse-strings-in-object": "1.6.0",
     "pre-commit": "1.2.2",

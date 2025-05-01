@@ -1816,6 +1816,50 @@ describe('Outbound Initiator Functions', () => {
       await expect(OutboundInitiator.OutboundSend(sampleTemplateModified12, '123')).resolves.not.toBeNull()
     })
 
+    const retries = (retries, calledTimes, passedCount) => async () => {
+      SpyAxios.mockImplementation(() => ({
+        interceptors: {
+          request: {
+            use: jest.fn()
+          },
+          response: {
+            use: jest.fn()
+          }
+        }
+      }))
+      axios.mockImplementation(() => Promise.resolve({
+        status: 200,
+        statusText: 'OK',
+        data: {},
+        request: {
+          toCurl: () => ''
+        }
+      }))
+      SpySign.mockReturnValue( Promise.resolve() )
+      SpyGetApiDefinitions.mockResolvedValue([{
+        specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+        type: 'fspiop'
+      }])
+      const templateWithRetry = JSON.parse(JSON.stringify(sampleTemplate))
+      templateWithRetry.test_cases[0].requests[0].retries = retries
+      templateWithRetry.test_cases[0].requests[0].tests = {
+        assertions: [
+          {
+            id: 1,
+            exec: [
+              "expect(request.retry).to.equal(2)",
+            ]
+          }
+        ]
+      }
+      await expect(OutboundInitiator.OutboundSend(templateWithRetry, '123', 'userdfsp')).resolves.not.toBeNull()
+      expect(axios).toHaveBeenCalledTimes(calledTimes);
+      expect(templateWithRetry.test_cases[0].requests[0].appended.assertionResults.passedCount).toEqual(passedCount)
+    }
+
+    it('OutboundSend with failed retries', retries(1, 2, 0));
+    it('OutboundSend with successful retries', retries(2, 3, 1));
+
     it('OutboundSend with transformation in template', async () => {
       axios.mockImplementation(() => Promise.resolve({
         status: 200,
