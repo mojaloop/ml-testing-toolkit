@@ -44,9 +44,13 @@
     "test": "npm run test:unit",
     "test:unit": "jest --testMatch '**/test/unit/**/*.test.js'",
     "test:int": "jest --reporters=default --reporters=jest-junit --testMatch '**/test/integration/**/*.test.js'",
+    "test:integration": "echo 'No integration tests defined'",
+    "test:func": "cd test/func && docker-compose up --exit-code-from=test-service",
+    "test:functional": "npm run docker:build && npm run test:func && npm run docker:down",
     "test:coverage": "jest --coverage --coverageThreshold='{}' --testMatch '**/test/unit/**/*.test.js'",
     "test:coverage-check": "jest --coverage --testMatch '**/test/unit/**/*.test.js'",
     "test:junit": "jest --reporters=default --reporters=jest-junit --testMatch '**/test/unit/**/*.test.js'",
+    "test:xunit": "npm run test:unit | tap-xunit > ./test/results/xunit.xml",
     "lint": "npm run standard",
     "lint:fix": "npm run standard:fix",
     "docker:build": "docker build --build-arg NODE_VERSION=\"$(cat .nvmrc)-alpine\" -t mojaloop/ml-testing-toolkit:local .",
@@ -61,21 +65,22 @@
     "dep:update": "npx ncu -u",
     "release": "npx standard-version --no-verify --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'",
     "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'",
-    "genexec": "pkg -t node8-win ."
+    "genexec": "pkg -t node8-win .",
+    "wait-4-docker": "node ./scripts/_wait4_all.js"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "9.0.1",
+    "@elastic/elasticsearch": "9.0.2",
     "@hapi/basic": "7.0.2",
     "@hapi/boom": "10.0.1",
     "@hapi/good": "9.0.1",
     "@hapi/hapi": "21.4.0",
     "@hapi/inert": "7.1.0",
     "@hapi/vision": "7.0.3",
-    "@mojaloop/central-services-logger": "11.8.1",
-    "@mojaloop/central-services-metrics": "12.5.0",
+    "@mojaloop/central-services-logger": "11.9.0",
+    "@mojaloop/central-services-metrics": "12.6.0",
     "@mojaloop/ml-schema-transformer-lib": "2.7.1",
-    "@mojaloop/ml-testing-toolkit-shared-lib": "14.0.4",
-    "@mojaloop/sdk-standard-components": "19.14.0",
+    "@mojaloop/ml-testing-toolkit-shared-lib": "14.0.5",
+    "@mojaloop/sdk-standard-components": "19.15.2",
     "@now-ims/hapi-now-auth": "2.1.0",
     "@types/socket.io": "3.0.2",
     "adm-zip": "0.5.16",
@@ -101,8 +106,8 @@
     "jsonwebtoken": "9.0.2",
     "lodash": "4.17.21",
     "mongo-uri-builder": "4.0.0",
-    "mongoose": "8.14.1",
-    "multer": "1.4.5-lts.2",
+    "mongoose": "8.15.1",
+    "multer": "2.0.0",
     "mustache": "4.2.0",
     "mv": "2.1.1",
     "node-dir": "0.1.17",
@@ -121,7 +126,7 @@
     "socket.io-client": "4.8.1",
     "ulidx": "2.4.1",
     "uuid": "11.1.0",
-    "ws": "8.18.1"
+    "ws": "8.18.2"
   },
   "devDependencies": {
     "@types/jest": "29.5.14",
@@ -140,7 +145,8 @@
     "sinon": "20.0.0",
     "standard": "17.1.2",
     "standard-version": "9.5.0",
-    "supertest": "7.1.0"
+    "supertest": "7.1.1",
+    "tap-xunit": "2.4.1"
   },
   "imports": {
     "#src/*": "./src/*.js",

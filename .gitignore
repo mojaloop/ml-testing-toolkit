@@ -103,3 +103,5 @@ spec_files/rules_response/*
 uploads/*
 
 .rush
+
+junit.xml
