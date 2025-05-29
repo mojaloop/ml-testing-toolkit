@@ -33,94 +33,64 @@
 
 const InboundEventListener = require('../../../../src/lib/eventListenerClient/inboundEventListener').InboundEventListener
 const MyEventEmitter = require('../../../../src/lib/MyEventEmitter')
-const SpyMyEventEmitter = jest.spyOn(MyEventEmitter, 'getEmitter')
-let eventCallbackFn = null
-SpyMyEventEmitter.mockReturnValue({
-  emit: () => {},
-  on: (eventName, passedEventCallbackFn) => {
-    eventCallbackFn = passedEventCallbackFn
-  }
-})
-
-jest.setTimeout(8000)
-
-// const webSocketPositiveMock = () => {
-//   return {
-//     on: (eventType, callbackFn) => {
-//       if (eventType=='open') {
-//         callbackFn()
-//       } else if (eventType=='message') {
-//         callbackFn({ data: 'some data' })
-//       }
-//     },
-//     close: () => {}
-//   }
-// }
-// const webSocketPositiveMockDelayedMessage = () => {
-//   return {
-//     on: (eventType, callbackFn) => {
-//       if (eventType=='open') {
-//         callbackFn()
-//       } else if (eventType=='message') {
-//         setTimeout(callbackFn, 100, { data: 'some data' })
-//       }
-//     },
-//     close: () => {}
-//   }
-// }
-// const webSocketPositiveMockNoMessage = () => {
-//   return {
-//     on: (eventType, callbackFn) => {
-//       if (eventType=='open') {
-//         callbackFn()
-//       }
-//     },
-//     close: () => {}
-//   }
-// }
-// const webSocketNegativeMock1 = () => {
-//   return {
-//     on: (eventType, callbackFn) => {
-//       if (eventType=='close') {
-//         callbackFn()
-//       }
-//     },
-//     close: () => {}
-//   }
-// }
-// const webSocketNegativeMock2 = () => {
-//   return {
-//     on: (eventType, callbackFn) => {
-//       if (eventType=='error') {
-//         callbackFn()
-//       }
-//     },
-//     close: () => {}
-//   }
-// }
 
 describe('InboundEventListener', () => {
   describe('eventlistener init', () => {
     let eventListener = null
+    let newInboundCallback = null
+    let emitterMock = null
+
     beforeAll(async () => {
+      emitterMock = {
+        emit: jest.fn(),
+        on: jest.fn((event, callback) => {
+          if (event === 'newInbound') newInboundCallback = callback
+        }),
+        removeAllListeners: jest.fn()
+      }
+      jest.spyOn(MyEventEmitter, 'getEmitter').mockReturnValue(emitterMock)
       eventListener = new InboundEventListener()
       await eventListener.init()
     })
+
     beforeEach(() => {
+      jest.useFakeTimers()
       eventListener.setTransformer(null)
+      emitterMock.emit.mockReset()
+      emitterMock.on.mockReset()
+      emitterMock.removeAllListeners.mockReset()
     })
+
+    afterEach(() => {
+      jest.runAllTimers()
+      emitterMock.removeAllListeners()
+      if (eventListener) {
+        Object.keys(eventListener.eventListeners).forEach(clientName => {
+          eventListener.destroy(clientName)
+        })
+      }
+    })
+
+    afterAll(() => {
+      if (eventListener) {
+        eventListener.emitter.removeAllListeners('newInbound')
+        Object.keys(eventListener.eventListeners).forEach(clientName => {
+          eventListener.destroy(clientName)
+        })
+        eventListener = null
+      }
+      jest.useRealTimers()
+    })
+
     it('addListener and getMessage with mock event', async () => {
       eventListener.addListener('test1', 'post', '/quotes')
-      eventCallbackFn({
+      const mockEvent = {
         method: 'post',
         path: '/quotes',
-        headers: {
-          sampleHeader1: 'value1'
-        },
-        body: {
-          sampleBodyParam1: 'value1'
-        }
-      })
+        headers: { sampleHeader1: 'value1' },
+        body: { sampleBodyParam1: 'value1' }
+      }
+      newInboundCallback(mockEvent)
       const result1 = await eventListener.getMessage('test1')
       expect(result1).toHaveProperty('method')
       expect(result1).toHaveProperty('path')
@@ -128,41 +98,35 @@ describe('InboundEventListener', () => {
       expect(result1).toHaveProperty('body')
       expect(result1.method).toEqual('post')
       expect(result1.path).toEqual('/quotes')
-      expect(result1.headers).toHaveProperty('sampleHeader1')
-      expect(result1.headers.sampleHeader1).toEqual('value1')
-      expect(result1.body).toHaveProperty('sampleBodyParam1')
-      expect(result1.body.sampleBodyParam1).toEqual('value1')
+      expect(result1.headers).toHaveProperty('sampleHeader1', 'value1')
+      expect(result1.body).toHaveProperty('sampleBodyParam1', 'value1')
     })
+
     it('addListener and getMessage with mock event with matching function', async () => {
       eventListener.addListener('test2', 'post', '/quotes', (headers, body) => {
         return body.sampleBodyParam1 === 'value2'
       })
-      eventCallbackFn({
+      const mockEvent = {
         method: 'post',
         path: '/quotes',
-        headers: {
-          sampleHeader1: 'value2'
-        },
-        body: {
-          sampleBodyParam1: 'value2'
-        }
-      })
+        headers: { sampleHeader1: 'value2' },
+        body: { sampleBodyParam1: 'value2' }
+      }
+      newInboundCallback(mockEvent)
       await expect(eventListener.getMessage('test2')).resolves.toBeTruthy()
     })
+
     it('addListener and getMessage with transformation', async () => {
       eventListener.addListener('test2', 'post', '/quotes', (headers, body) => {
         return body.sampleBodyParam1 === 'value2'
       })
-      eventCallbackFn({
+      const mockEvent = {
         method: 'post',
         path: '/quotes',
-        headers: {
-          sampleHeader1: 'value2'
-        },
-        body: {
-          sampleBodyParam1: 'value2'
-        }
-      })
+        headers: { sampleHeader1: 'value2' },
+        body: { sampleBodyParam1: 'value2' }
+      }
+      newInboundCallback(mockEvent)
       eventListener.setTransformer({
         transformer: {
           reverseTransform: async () => ({ data: 'transformed data' })
@@ -170,20 +134,18 @@ describe('InboundEventListener', () => {
       })
       await expect(eventListener.getMessage('test2')).resolves.toEqual({ data: 'transformed data' })
     })
+
     it('addListener and getMessage with erroneous transformation', async () => {
       eventListener.addListener('test2', 'post', '/quotes', (headers, body) => {
         return body.sampleBodyParam1 === 'value2'
       })
-      eventCallbackFn({
+      const mockEvent = {
         method: 'post',
         path: '/quotes',
-        headers: {
-          sampleHeader1: 'value2'
-        },
-        body: {
-          sampleBodyParam1: 'value2'
-        }
-      })
+        headers: { sampleHeader1: 'value2' },
+        body: { sampleBodyParam1: 'value2' }
+      }
+      newInboundCallback(mockEvent)
       eventListener.setTransformer({
         transformer: {
           reverseTransform: async () => { throw new Error('transform error') }
@@ -191,36 +153,30 @@ describe('InboundEventListener', () => {
       })
       await expect(eventListener.getMessage('test2')).resolves.toBeTruthy()
     })
+
     it('addListener and getMessage with mock event', async () => {
       eventListener.addListener('test2', 'post', '/quotes')
-      setTimeout(() => {
-        eventCallbackFn({
-          method: 'post',
-          path: '/quotes',
-          headers: {
-            sampleHeader1: 'value1'
-          },
-          body: {
-            sampleBodyParam1: 'value1'
-          }
-        })
-      }, 10)
+      const mockEvent = {
+        method: 'post',
+        path: '/quotes',
+        headers: { sampleHeader1: 'value1' },
+        body: { sampleBodyParam1: 'value1' }
+      }
+      jest.advanceTimersByTime(10)
+      newInboundCallback(mockEvent)
       await expect(eventListener.getMessage('test2')).resolves.toBeTruthy()
     })
+
     it('addListener and getMessage transformation with mock event', async () => {
       eventListener.addListener('test2', 'post', '/quotes')
-      setTimeout(() => {
-        eventCallbackFn({
-          method: 'post',
-          path: '/quotes',
-          headers: {
-            sampleHeader1: 'value1'
-          },
-          body: {
-            sampleBodyParam1: 'value1'
-          }
-        })
-      }, 10)
+      const mockEvent = {
+        method: 'post',
+        path: '/quotes',
+        headers: { sampleHeader1: 'value1' },
+        body: { sampleBodyParam1: 'value1' }
+      }
+      jest.advanceTimersByTime(10)
+      newInboundCallback(mockEvent)
       eventListener.setTransformer({
         transformer: {
           reverseTransform: async () => ({ data: 'transformed data' })
@@ -231,18 +187,14 @@ describe('InboundEventListener', () => {
 
     it('addListener and getMessage transformation with mock event', async () => {
       eventListener.addListener('test2', 'post', '/quotes')
-      setTimeout(() => {
-        eventCallbackFn({
-          method: 'post',
-          path: '/quotes',
-          headers: {
-            sampleHeader1: 'value1'
-          },
-          body: {
-            sampleBodyParam1: 'value1'
-          }
-        })
-      }, 10)
+      const mockEvent = {
+        method: 'post',
+        path: '/quotes',
+        headers: { sampleHeader1: 'value1' },
+        body: { sampleBodyParam1: 'value1' }
+      }
+      jest.advanceTimersByTime(10)
+      newInboundCallback(mockEvent)
       eventListener.setTransformer({
         transformer: {
           reverseTransform: async () => { throw new Error('transform error') }
@@ -250,83 +202,33 @@ describe('InboundEventListener', () => {
       })
       await expect(eventListener.getMessage('test2')).resolves.toBeTruthy()
     })
+
     it('addListener and getMessage with wrong event till timeout', async () => {
-      // TODO: use fake timers to speed up the test
+      jest.setTimeout(35000)
       eventListener.addListener('test1', 'post', '/transfers')
-      eventCallbackFn({
+      const mockEvent = {
         method: 'post',
         path: '/quotes',
         headers: {},
         body: {}
-      })
+      }
+      newInboundCallback(mockEvent)
+      jest.advanceTimersByTime(15000)
+      jest.advanceTimersByTime(5000)
       await expect(eventListener.getMessage('test1')).resolves.toBe(null)
     })
+
     it('addListener should handle listeners with the same name', async () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-      eventListener.addListener('test1', 'post', '/quotes');
-      eventListener.addListener('test1', 'post', '/quotes');
-      expect(consoleSpy).toHaveBeenCalledWith('Event listener already exists with that name');
-      consoleSpy.mockRestore();
-    });
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+      eventListener.addListener('test1', 'post', '/quotes')
+      eventListener.addListener('test1', 'post', '/quotes')
+      expect(consoleSpy).toHaveBeenCalledWith('Event listener already exists with that name')
+      consoleSpy.mockRestore()
+    })
 
     it('getMessage should handle message when no eventListeners are found', async () => {
-      const result = await eventListener.getMessage('nonExistentListener');
-      expect(result).toBe(null);
-    });
-
-    // it('websocket connect should return false on websocket failure', async () => {
-    //   WebSocket.mockImplementationOnce(webSocketNegativeMock1)
-    //   await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(false)
-    //   expect(websocket.disconnect('test1')).toBe(true)
-    // })
-    // it('websocket connect should return false on websocket failure', async () => {
-    //   WebSocket.mockImplementationOnce(webSocketNegativeMock2)
-    //   await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(false)
-    //   expect(websocket.disconnect('test1')).toBe(true)
-    // })
-    // it('websocket connect should return false on dupliceate name', async () => {
-    //   WebSocket.mockImplementationOnce(webSocketPositiveMock)
-    //   await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
-    //   await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(false)
-    //   expect(websocket.disconnect('test1')).toBe(true)
-    // })
-    // it('websocket getMessage', async () => {
-    //   WebSocket.mockImplementationOnce(webSocketPositiveMock)
-    //   await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
-    //   await expect(websocket.getMessage('test1')).resolves.toEqual({data: 'some data'})
-    //   expect(websocket.disconnect('test1')).toBe(true)
-    // })
-    // it('websocket getMessage with delayed message', async () => {
-    //   WebSocket.mockImplementationOnce(webSocketPositiveMockDelayedMessage)
-    //   await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
-    //   await expect(websocket.getMessage('test1')).resolves.toEqual({data: 'some data'})
-    //   expect(websocket.disconnect('test1')).toBe(true)
-    // })
-    // it('websocket getMessage with no message', async () => {
-    //   WebSocket.mockImplementationOnce(webSocketPositiveMockNoMessage)
-    //   await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
-    //   await expect(websocket.getMessage('test1', 100)).resolves.toBe(null)
-    //   expect(websocket.disconnect('test1')).toBe(true)
-    // })
-    // it('websocket getMessage should fail with wrong websocket name', async () => {
-    //   WebSocket.mockImplementationOnce(webSocketPositiveMock)
-    //   await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
-    //   await expect(websocket.getMessage('test2')).resolves.toBe(null)
-    //   expect(websocket.disconnect('test1')).toBe(true)
-    // })
-    // it('websocket getMessage should fail after connect timeout', async () => {
-    //   WebSocket.mockImplementationOnce(webSocketPositiveMock)
-    //   await expect(websocket.connect('wss://www.host.com', 'test1', 100)).resolves.toBe(true)
-    //   await new Promise((r) => setTimeout(r, 150));
-    //   await expect(websocket.getMessage('test1')).resolves.toBe(null)
-    //   expect(websocket.disconnect('test1')).toBe(true)
-    // })
-    // it('websocket disconnectAll should not throw error', async () => {
-    //   WebSocket.mockImplementationOnce(webSocketPositiveMock)
-    //   await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
-    //   WebSocket.mockImplementationOnce(webSocketPositiveMock)
-    //   await expect(websocket.connect('wss://www.host.com', 'test2')).resolves.toBe(true)
-    //   expect(websocket.disconnectAll()).toBe(true)
-    // })
+      const result = await eventListener.getMessage('nonExistentListener')
+      expect(result).toBe(null)
+    })
   })
 })

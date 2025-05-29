@@ -35,6 +35,7 @@ const Config = require('../config')
 class WebSocketClientManager {
   constructor (consoleFn) {
     this.ws = {}
+    this.timers = {}
     this.userConfig = {}
     if (consoleFn) {
       this.consoleFn = consoleFn
@@ -79,7 +80,7 @@ class WebSocketClientManager {
         this.ws[clientName].client.on('open', () => {
           this.customLog('WebSocket Client Connected')
           this.ws[clientName].eventEmitter = new MyEmitter()
-          setTimeout(() => {
+          this.timers[clientName] = setTimeout(() => {
             // Auto destroy the connection after timeout
             this.disconnect(clientName)
           }, timeout)
@@ -155,6 +156,13 @@ class WebSocketClientManager {
   disconnect (clientName) {
     if (this.ws[clientName]) {
       this.ws[clientName].client.close()
+      if (this.ws[clientName].eventEmitter) {
+        this.ws[clientName].eventEmitter.removeAllListeners()
+      }
+      if (this.timers[clientName]) {
+        clearTimeout(this.timers[clientName])
+        delete this.timers[clientName]
+      }
       delete this.ws[clientName]
     }
     return true
@@ -163,10 +171,24 @@ class WebSocketClientManager {
   disconnectAll () {
     for (const clientName in this.ws) {
       this.ws[clientName].client.close()
+      if (this.ws[clientName].eventEmitter) {
+        this.ws[clientName].eventEmitter.removeAllListeners()
+      }
+      if (this.timers[clientName]) {
+        clearTimeout(this.timers[clientName])
+        delete this.timers[clientName]
+      }
       delete this.ws[clientName]
       this.customLog(`${clientName}: Deleted`)
     }
     return true
+  }
+
+  clearAllTimers() {
+    Object.keys(this.timers).forEach((clientName) => {
+      clearTimeout(this.timers[clientName])
+      delete this.timers[clientName]
+    })
   }
 }
 

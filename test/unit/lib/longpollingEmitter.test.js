@@ -30,22 +30,37 @@
 const longpollingEmitter = require('../../../src/lib/longpollingEmitter')
 const MyEventEmitter = require('../../../src/lib/MyEventEmitter')
 
-describe('longpollingEmitter', () => { 
+describe('longpollingEmitter', () => {
+  beforeEach(() => {
+    jest.useFakeTimers() // Enable fake timers
+  })
+
+  afterEach(() => {
+    jest.runAllTimers() // Run all timers to completion
+    jest.useRealTimers() // Restore real timers
+  })
+
   describe('when setAssertionStoreEmitter is called', () => {
     const res = {
-      status: () => {
-        return {
-          json: () => {}
-        }
-      }
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
     }
-    it('should not throw an error', async () => {
-      longpollingEmitter.setAssertionStoreEmitter('requests','/123', res)
+
+    it('should not throw an error and handle event emission', async () => {
+      longpollingEmitter.setAssertionStoreEmitter('requests', '/123', res)
       const emitter = MyEventEmitter.getEmitter('assertionRequest')
-      emitter.emit('/123')
+      emitter.emit('/123', { data: 'test' })
+
+      expect(res.status).toHaveBeenCalledWith(200)
+      expect(res.json).toHaveBeenCalledWith({ data: 'test' })
     })
-    it('should not throw an error', async () => {
-      longpollingEmitter.setAssertionStoreEmitter('callbacks','/123', res)
+
+    it('should not throw an error and handle timeout', async () => {
+      longpollingEmitter.setAssertionStoreEmitter('callbacks', '/123', res)
+      jest.runAllTimers() // Simulate timeout
+
+      expect(res.status).toHaveBeenCalledWith(500)
+      expect(res.json).toHaveBeenCalledWith({ error: 'Timed out' })
     })
   })
 })
