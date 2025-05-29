@@ -184,7 +184,7 @@ class WebSocketClientManager {
     return true
   }
 
-  clearAllTimers() {
+  clearAllTimers () {
     Object.keys(this.timers).forEach((clientName) => {
       clearTimeout(this.timers[clientName])
       delete this.timers[clientName]
