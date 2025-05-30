@@ -68,8 +68,7 @@
     "dep:update": "npx ncu -u",
     "release": "npx standard-version --no-verify --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'",
     "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'",
-    "genexec": "pkg -t node8-win .",
-    "wait-4-docker": "node ./scripts/_wait4_all.js"
+    "genexec": "pkg -t node8-win ."
   },
   "dependencies": {
     "@elastic/elasticsearch": "9.0.2",
