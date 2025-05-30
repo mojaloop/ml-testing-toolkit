@@ -53,7 +53,7 @@
     "test:coverage": "jest --coverage --coverageThreshold='{}' --testMatch '**/test/unit/**/*.test.js'",
     "test:coverage-check": "jest --coverage --testMatch '**/test/unit/**/*.test.js'",
     "test:junit": "jest --reporters=default --reporters=jest-junit --testMatch '**/test/unit/**/*.test.js'",
-    "test:xunit": "npm run test:unit | tap-xunit > ./test/results/xunit.xml",
+    "test:xunit": "npm run test:unit > ./test/results/xunit.xml",
     "lint": "npm run standard",
     "lint:fix": "npm run standard:fix",
     "docker:build": "docker build --build-arg NODE_VERSION=\"$(cat .nvmrc)-alpine\" -t mojaloop/ml-testing-toolkit:local .",
