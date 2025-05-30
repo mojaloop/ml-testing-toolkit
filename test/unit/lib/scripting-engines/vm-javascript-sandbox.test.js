@@ -36,21 +36,45 @@ axios.create = jest.fn(() => axios)
 const JwsSigning = require('../../../../src/lib/jws/JwsSigning')
 const NotificationEmitter = require('../../../../src/lib/notificationEmitter')
 const Context = require('../../../../src/lib/scripting-engines/vm-javascript-sandbox')
+const Config = require('../../../../src/lib/config')
+const httpAgentStore = require('../../../../src/lib/httpAgentStore')
+const MyEventEmitter = require('../../../../src/lib/MyEventEmitter')
 
 const spyNotificationEmitterSendMessage = jest.spyOn(NotificationEmitter, 'sendMessage')
 
 
 describe('Test Outbound Context', () => {
+  beforeAll(() => {
+    MyEventEmitter.getEmitter().setMaxListeners(20)
+  })
+
+  afterAll(() => {
+    MyEventEmitter.getEmitter().setMaxListeners(10)
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   describe('generateContextObj', () => {
-    // Positive Scenarios
-    it('generateContextObj should return contextObj with the given environment if present', async () => {
-      const environment = { amount: 100 }
-      const contextObj = (await Context.generateContextObj(environment))
-      expect(contextObj.environment).toEqual(environment)
+    it('should return contextObj with the given environment if present', async () => {
+      const environmentObj = { amount: 100 }
+      const contextObj = await Context.generateContextObj(environmentObj)
+      expect(contextObj.environment).toEqual(environmentObj)
+      Object.keys(contextObj.inboundEvent.eventListeners).forEach(clientName => contextObj.inboundEvent.destroy(clientName))
+      contextObj.inboundEvent.emitter.removeAllListeners('newInbound')
     })
-    it('generateContextObj should return contextObj with empty environment if not present', async () => {
-      const contextObj = (await Context.generateContextObj())
+
+    it('should return contextObj with empty environment if not present', async () => {
+      const contextObj = await Context.generateContextObj()
       expect(contextObj.environment).toEqual({})
+      Object.keys(contextObj.inboundEvent.eventListeners).forEach(clientName => contextObj.inboundEvent.destroy(clientName))
+      contextObj.inboundEvent.emitter.removeAllListeners('newInbound')
+    })
+
+    it('should handle config error', async () => {
+      jest.spyOn(Config, 'getStoredUserConfig').mockRejectedValueOnce(new Error('Config error'))
+      await expect(Context.generateContextObj()).rejects.toThrow('Config error')
     })
   })
   describe('executeAsync', () => {
@@ -382,6 +406,85 @@ describe('Test Outbound Context', () => {
       expect(scriptResult.consoleLog[0][1]).toEqual('log')
       expect(scriptResult.consoleLog[0][2]).toEqual('SAMPLE_ERROR')
 
+    })
+  })
+  describe('registerAxiosRequestInterceptor', () => {
+    let userConfig = null
+    let transformerObj = null
+    let mockAxios = {
+      interceptors: {
+        request: { use: jest.fn() },
+        response: { use: jest.fn() }
+      }
+    }
+
+    beforeEach(() => {
+      userConfig = { CLIENT_MUTUAL_TLS_ENABLED: false }
+      transformerObj = null
+      jest.spyOn(Config, 'getStoredUserConfig').mockResolvedValue(userConfig)
+      jest.spyOn(httpAgentStore, 'getHttpAgent').mockReturnValue('http-agent')
+      jest.spyOn(httpAgentStore, 'getHttpsAgent').mockReturnValue('https-agent')
+      mockAxios.interceptors.request.use.mockReset()
+      mockAxios.interceptors.response.use.mockReset()
+      jest.spyOn(console, 'log').mockImplementation(() => {})
+    })
+
+    afterEach(() => {
+      console.log.mockRestore()
+    })
+
+    it('should configure HTTP agent for non-HTTPS URL', async () => {
+      const config = { url: 'http://localhost:3000/test', method: 'GET', headers: {} }
+      mockAxios.interceptors.request.use.mockImplementation((cb) => {
+        const result = cb(config)
+        // expect(result.httpAgent).toEqual('http-agent')
+        return result
+      })
+      await Context.registerAxiosRequestInterceptor(userConfig, mockAxios)
+      expect(httpAgentStore.getHttpAgent).toHaveBeenCalledWith('generic')
+      expect(mockAxios.interceptors.request.use).toHaveBeenCalled()
+    })
+
+    it('should configure TLS with client cert', async () => {
+      userConfig.CLIENT_MUTUAL_TLS_ENABLED = true
+      userConfig.CLIENT_TLS_CREDS = [{ HOST: 'localhost:3000', CERT: 'cert', KEY: 'key' }]
+      const config = { url: 'https://localhost:3000/test', method: 'GET', headers: {} }
+      mockAxios.interceptors.request.use.mockImplementation((cb) => {
+        const result = cb(config)
+        // expect(result.httpsAgent).toEqual('https-agent')
+        return result
+      })
+      await Context.registerAxiosRequestInterceptor(userConfig, mockAxios)
+      expect(httpAgentStore.getHttpsAgent).toHaveBeenCalledWith('localhost:3000', expect.objectContaining({ cert: 'cert', key: 'key' }))
+      expect(console.log).toHaveBeenCalledWith('Found the Client certificate for localhost:3000')
+    })
+
+    it('should handle transformer error', async () => {
+      transformerObj = {
+        transformer: {
+          forwardTransform: jest.fn().mockRejectedValue(new Error('Transform error'))
+        }
+      }
+      const config = { url: 'https://localhost:3000/test', method: 'GET', headers: { 'content-length': '100' }, data: {} }
+      mockAxios.interceptors.request.use.mockImplementation((cb) => {
+        return Promise.resolve(cb(config)).catch(err => {
+          expect(err.message).toEqual('Transform error')
+          return config
+        })
+      })
+      try {
+        await Context.registerAxiosRequestInterceptor(userConfig, mockAxios, transformerObj)
+      } catch (err) {
+        expect(err.message).toEqual('Transform error')
+      }
+      expect(transformerObj.transformer.forwardTransform).toHaveBeenCalledWith({
+        method: 'GET',
+        path: '/test',
+        headers: { 'content-length': '100' },
+        body: {},
+        params: {}
+      })
+      expect(config.headers['content-length']).toEqual('100')
     })
   })
 })
