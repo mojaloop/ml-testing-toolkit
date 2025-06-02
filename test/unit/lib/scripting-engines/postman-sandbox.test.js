@@ -24,6 +24,9 @@
 
  * ModusBox
  * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
+ * 
+ * Mojaloop
+ * Shashikant Hirugade <shashi.mojaloop@gmail.com>
  --------------
  ******/
 
@@ -35,28 +38,43 @@ const axios = require('axios').default
 axios.create = jest.fn(() => axios)
 jest.mock('axios')
 
-
 describe('Test Outbound Context', () => {
+  let contextObj // Store contextObj for cleanup
+
+  // Global cleanup to ensure no contexts are left open
+  afterEach(async () => {
+    if (contextObj && contextObj.ctx) {
+      // Remove all event listeners to prevent leaks
+      contextObj.ctx.removeAllListeners()
+      try {
+        await contextObj.ctx.dispose() // Ensure dispose is awaited
+      } catch (err) {
+        console.warn('Error disposing context:', err)
+      }
+      contextObj.ctx = null
+      contextObj = null
+    }
+  })
+
   describe('generateContextObj', () => {
-    // Positive Scenarios
     it('generateContextObj should return contextObj with the given environment if present', async () => {
       const environment = { amount: 100 }
-      const contextObj = (await Context.generateContextObj(environment))
+      contextObj = await Context.generateContextObj(environment)
       expect(contextObj.environment).toEqual(environment)
     })
+
     it('generateContextObj should return contextObj with empty environment if not present', async () => {
-      const contextObj = (await Context.generateContextObj())
+      contextObj = await Context.generateContextObj()
       expect(contextObj.environment).toEqual({})
     })
   })
-  describe('executeAsync', () => {
-    // Positive Scenarios
-    it('executeAsync should return consoleLog and environment', async () => {
 
+  describe('executeAsync', () => {
+    it('executeAsync should return consoleLog and environment', async () => {
       axios.mockImplementation(() => Promise.resolve(true))
       const amountBefore = 100
       const expectedAmount = 200
-      const contextObj = await Context.generateContextObj({amountBefore})
+      contextObj = await Context.generateContextObj({ amountBefore })
 
       const args = {
         script: [
@@ -65,17 +83,12 @@ describe('Test Outbound Context', () => {
           "console.log('amountAfter: ', pm.environment.get('amountAfter'))",
           "pm.sendRequest({ url: 'http://localhost:3999/test?state=OPEN', body: { mode: 'raw', raw: '{}'}, header: {'Accept': 'application/json'}}, function (err, response) {})"
         ],
-        data: { context: {...contextObj}, id: uuid.v4()},
+        data: { context: { ...contextObj }, id: uuid.v4() },
         contextObj: contextObj
       }
 
-      let scriptResult
-      try {
-        scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
-      } finally {
-        contextObj.ctx.dispose()
-        contextObj.ctx = null
-      }
+      const scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
+
       expect(scriptResult.consoleLog[0][1]).toEqual('log')
       expect(scriptResult.consoleLog[0][2]).toEqual('amountAfter: ')
       expect(scriptResult.consoleLog[0][3]).toEqual(expectedAmount)
@@ -84,15 +97,13 @@ describe('Test Outbound Context', () => {
       expect(scriptResult.environment).toHaveProperty('amountAfter')
       expect(scriptResult.environment.amountBefore).toEqual(amountBefore)
       expect(scriptResult.environment.amountAfter).toEqual(expectedAmount)
-
     })
 
     it('executeAsync should return consoleLog and environment', async () => {
-
       axios.mockImplementation(() => Promise.resolve(true))
       const amountBefore = 100
       const expectedAmount = 200
-      const contextObj = await Context.generateContextObj({amountBefore})
+      contextObj = await Context.generateContextObj({ amountBefore })
 
       const args = {
         script: [
@@ -101,17 +112,11 @@ describe('Test Outbound Context', () => {
           "console.log('amountAfter: ', pm.environment.get('amountAfter'))",
           "pm.sendRequest({ url: 'http://localhost/test'}, function (err, response) {})"
         ],
-        data: { context: {...contextObj}, id: uuid.v4()},
+        data: { context: { ...contextObj }, id: uuid.v4() },
         contextObj: contextObj
       }
 
-      let scriptResult
-      try {
-        scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
-      } finally {
-        contextObj.ctx.dispose()
-        contextObj.ctx = null
-      }
+      const scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
 
       expect(scriptResult.consoleLog[0][1]).toEqual('log')
       expect(scriptResult.consoleLog[0][2]).toEqual('amountAfter: ')
@@ -121,15 +126,13 @@ describe('Test Outbound Context', () => {
       expect(scriptResult.environment).toHaveProperty('amountAfter')
       expect(scriptResult.environment.amountBefore).toEqual(amountBefore)
       expect(scriptResult.environment.amountAfter).toEqual(expectedAmount)
-
     })
 
     it('executeAsync should return consoleLog and environment', async () => {
-
       axios.mockImplementation(() => Promise.reject(true))
       const amountBefore = 100
       const expectedAmount = 200
-      const contextObj = await Context.generateContextObj({amountBefore})
+      contextObj = await Context.generateContextObj({ amountBefore })
 
       const args = {
         script: [
@@ -138,17 +141,11 @@ describe('Test Outbound Context', () => {
           "console.log('amountAfter: ', pm.environment.get('amountAfter'))",
           "pm.sendRequest({ url: 'http://localhost:3999/test?state=OPEN', header: {'Accept': 'application/json'}}, function (err, response) {})"
         ],
-        data: { context: {...contextObj}, id: uuid.v4()},
+        data: { context: { ...contextObj }, id: uuid.v4() },
         contextObj: contextObj
       }
 
-      let scriptResult
-      try {
-        scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
-      } finally {
-        contextObj.ctx.dispose()
-        contextObj.ctx = null
-      }
+      const scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
 
       expect(scriptResult.consoleLog[0][1]).toEqual('log')
       expect(scriptResult.consoleLog[0][2]).toEqual('amountAfter: ')
@@ -158,17 +155,13 @@ describe('Test Outbound Context', () => {
       expect(scriptResult.environment).toHaveProperty('amountAfter')
       expect(scriptResult.environment.amountBefore).toEqual(amountBefore)
       expect(scriptResult.environment.amountAfter).toEqual(expectedAmount)
-
     })
 
     it('executeAsync should return consoleLog and environment', async () => {
-
-      axios.mockImplementation(() => Promise.reject({
-        response: {}
-      }))
+      axios.mockImplementation(() => Promise.reject({ response: {} }))
       const amountBefore = 100
       const expectedAmount = 200
-      const contextObj = await Context.generateContextObj({amountBefore})
+      contextObj = await Context.generateContextObj({ amountBefore })
 
       const args = {
         script: [
@@ -177,17 +170,11 @@ describe('Test Outbound Context', () => {
           "console.log('amountAfter: ', pm.environment.get('amountAfter'))",
           "pm.sendRequest({ url: 'http://localhost:3999/test?state=OPEN', header: {'Accept': 'application/json'}}, function (err, response) {})"
         ],
-        data: { context: {...contextObj}, id: uuid.v4()},
+        data: { context: { ...contextObj }, id: uuid.v4() },
         contextObj: contextObj
       }
 
-      let scriptResult
-      try {
-        scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
-      } finally {
-        contextObj.ctx.dispose()
-        contextObj.ctx = null
-      }
+      const scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
 
       expect(scriptResult.consoleLog[0][1]).toEqual('log')
       expect(scriptResult.consoleLog[0][2]).toEqual('amountAfter: ')
@@ -197,28 +184,18 @@ describe('Test Outbound Context', () => {
       expect(scriptResult.environment).toHaveProperty('amountAfter')
       expect(scriptResult.environment.amountBefore).toEqual(amountBefore)
       expect(scriptResult.environment.amountAfter).toEqual(expectedAmount)
-
     })
-    // Error scenarios
-    it('executeAsync should return consoleLog with error messages', async () => {
 
-      const contextObj = await Context.generateContextObj({})
+    it('executeAsync should return consoleLog with error messages', async () => {
+      contextObj = await Context.generateContextObj({})
       const args = {
-        script: [
-          "asdf()"
-        ],
-        data: { context: {...contextObj}, id: uuid.v4()},
+        script: ["asdf()"],
+        data: { context: { ...contextObj }, id: uuid.v4() },
         contextObj: contextObj
       }
 
-      let scriptResult
-      try {
-        scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
-      } finally {
-        contextObj.ctx.dispose()
-        contextObj.ctx = null
-      }
-      console.log(scriptResult.consoleLog)
+      const scriptResult = await Context.executeAsync(args.script, args.data, args.contextObj)
+
       expect(scriptResult.consoleLog[0][1]).toEqual('executionError')
       expect(scriptResult.consoleLog[0][2]).toHaveProperty('type')
       expect(scriptResult.consoleLog[0][2]).toHaveProperty('name')

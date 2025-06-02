@@ -93,9 +93,13 @@ const webSocketNegativeMock2 = () => {
 describe('WebSocketClientManager', () => {
   describe('websocket connect', () => {
     let websocket = null
-    beforeAll(async () => {
+    beforeEach(async () => {
       websocket = new WebSocketClientManager()
       await websocket.init()
+    })
+    afterEach(() => {
+      websocket.clearAllTimers() // Clear all timers after each test
+      websocket = null
     })
     it('websocket connect should return true', async () => {
       WebSocket.mockImplementationOnce(webSocketPositiveMock)
@@ -147,7 +151,7 @@ describe('WebSocketClientManager', () => {
     it('websocket getMessage should fail after connect timeout', async () => {
       WebSocket.mockImplementationOnce(webSocketPositiveMock)
       await expect(websocket.connect('wss://www.host.com', 'test1', 100)).resolves.toBe(true)
-      await new Promise((r) => setTimeout(r, 150));
+      await new Promise((r) => setTimeout(r, 150))
       await expect(websocket.getMessage('test1')).resolves.toBe(null)
       expect(websocket.disconnect('test1')).toBe(true)
     })
