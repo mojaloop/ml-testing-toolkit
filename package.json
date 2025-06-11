@@ -109,7 +109,7 @@
     "lodash": "4.17.21",
     "mongo-uri-builder": "4.0.0",
     "mongoose": "8.15.1",
-    "multer": "2.0.0",
+    "multer": "2.0.1",
     "mustache": "4.2.0",
     "mv": "2.1.1",
     "node-dir": "0.1.17",
