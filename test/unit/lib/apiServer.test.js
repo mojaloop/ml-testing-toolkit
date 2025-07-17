@@ -58,8 +58,8 @@ describe('api-server', () => {
   })
   describe('when getApp is called', () => {
     it('the server should be initialized if not already', async () => {
-      expect(() => apiServer.getApp()).not.toThrowError()
-      expect(() => apiServer.getApp()).not.toThrowError()
+      expect(() => apiServer.getApp()).not.toThrow()
+      expect(() => apiServer.getApp()).not.toThrow()
     })
   })
   describe('when verifyUser is called', () => {
@@ -69,7 +69,7 @@ describe('api-server', () => {
           AUTH_ENABLED: true
         }
       })
-      expect(() => apiServer.verifyUser()).not.toThrowError()
+      expect(() => apiServer.verifyUser()).not.toThrow()
     })
     it('should return a function which can be executed with 401 status code', async () => {
       Config.getSystemConfig.mockReturnValue({
@@ -82,7 +82,7 @@ describe('api-server', () => {
         statusCode: 401
       }
       const retFn = apiServer.verifyUser()
-      expect(() => retFn(req, res, () => {})).not.toThrowError()
+      expect(() => retFn(req, res, () => {})).not.toThrow()
     })
     it('should return a function which can be executed with 200 status code', async () => {
       Config.getSystemConfig.mockReturnValue({
@@ -95,7 +95,7 @@ describe('api-server', () => {
         statusCode: 200
       }
       const retFn = apiServer.verifyUser()
-      expect(() => retFn(req, res, () => {})).not.toThrowError()
+      expect(() => retFn(req, res, () => {})).not.toThrow()
     })
   })
   describe('when startServer is called', () => {

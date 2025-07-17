@@ -305,7 +305,7 @@ describe('mb-connection-manager', () => {
   describe('waitForTlsHubCerts', () => {
     it('should throw an error', async () => {
       jest.useRealTimers()
-      await expect(MBConnectionManagerProvider.waitForTlsHubCerts(0)).rejects.toThrowError()
+      await expect(MBConnectionManagerProvider.waitForTlsHubCerts(0)).rejects.toThrow()
     })
   })
   describe('initialize', () => {
