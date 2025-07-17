@@ -76,7 +76,7 @@ describe('Server Logs', () => {
             ServerLogs.setAdapter(undefined)
             expect(() => {
                 ServerLogs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
-            }).toThrowError()
+            }).toThrow()
         })
         it('should return falsy value if SERVER LOGS ADAPTER config is missing', async () => {
             spyGetSystemConfig.mockReturnValueOnce({})
@@ -98,7 +98,7 @@ describe('Server Logs', () => {
             ServerLogs.setAdapter(undefined)
             expect(() => {
                 ServerLogs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
-            }).toThrowError()
+            }).toThrow()
         })
     })
 })

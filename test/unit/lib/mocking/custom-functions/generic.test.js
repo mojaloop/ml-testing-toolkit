@@ -77,7 +77,7 @@ describe('Generic Custom Functions', () => {
     })
     it('It should return some uuid value when options.generateIDType === ulid', async () => {
       Generic.generateID({ generateIDType: 'ulid' })
-      expect(ulidx.monotonicFactory).toBeCalled()
+      expect(ulidx.monotonicFactory).toHaveBeenCalled()
     })
   })
 })

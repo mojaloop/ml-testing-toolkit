@@ -392,7 +392,7 @@ describe('importExport', () => {
     it('should resolve importing file', async () => {
       spyUpsert.mockResolvedValueOnce({})
       await expect(importExport.importSpecFile(JSON.stringify(''),['rules_response'], user)).resolves.toBe(undefined)
-      expect(spyUpsert).toBeCalled()
+      expect(spyUpsert).toHaveBeenCalled()
     })
   })
 })
