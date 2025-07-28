@@ -2,6 +2,8 @@
 reject: [
   "chai", # version 5 uses only ESM
   "postman-collection",
-  "postman-sandbox"
+  "postman-sandbox",
+  "jest",
+  "@types/jest"
 ]
 
