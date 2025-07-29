@@ -30,7 +30,8 @@
 'use strict'
 
 const mongoDBWrapper = require('../models/mongoDBWrapper')
-const MongoUriBuilder = require('mongo-uri-builder')
+const { ConnectionString } = require('connection-string')
+const Logger = require('@mojaloop/central-services-logger')
 
 let conn
 const getConnection = async () => {
@@ -45,14 +46,18 @@ const getConnection = async () => {
         params = {}
       }
     }
-    const connectionString = systemConfig.DB.CONNECTION_STRING || MongoUriBuilder({
-      username: encodeURIComponent(systemConfig.DB.USER),
-      password: encodeURIComponent(systemConfig.DB.PASSWORD),
-      host: systemConfig.DB.HOST,
-      port: systemConfig.DB.PORT,
-      database: systemConfig.DB.DATABASE,
+    const csMongoDBObj = new ConnectionString()
+    csMongoDBObj.setDefaults({
+      protocol: 'mongodb',
+      hosts: [{ name: systemConfig.DB.HOST, port: systemConfig.DB.PORT }],
+      user: systemConfig.DB.USER,
+      password: systemConfig.DB.PASSWORD,
+      path: [systemConfig.DB.DATABASE],
       params
     })
+    const connectionString = systemConfig.DB.CONNECTION_STRING || csMongoDBObj.toString()
+    const safeConnectionString = connectionString.replace(/(\/\/)(.*):(.*)@/, '$1****:****@')
+    Logger.info(`Connecting to MongoDB with connection string: ${safeConnectionString}`)
 
     conn = await mongoDBWrapper.connect(connectionString, {
       useNewUrlParser: true,
