@@ -19,7 +19,8 @@
     "USER": "ttk",
     "PASSWORD": "ttk@123",
     "DATABASE": "admin",
-    "CONNECTION_STRING": null
+    "CONNECTION_STRING": null,
+    "PARAMS": {}
   },
   "METRICS": {
     "timeout": 5000,

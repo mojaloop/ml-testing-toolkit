@@ -37,13 +37,16 @@ const getConnection = async () => {
   if (!conn) {
     const Config = require('../../config')
     const systemConfig = Config.getSystemConfig()
+    const params = systemConfig.DB.PARAMS || {}
     const connectionString = systemConfig.DB.CONNECTION_STRING || MongoUriBuilder({
       username: encodeURIComponent(systemConfig.DB.USER),
       password: encodeURIComponent(systemConfig.DB.PASSWORD),
       host: systemConfig.DB.HOST,
       port: systemConfig.DB.PORT,
-      database: systemConfig.DB.DATABASE
+      database: systemConfig.DB.DATABASE,
+      params
     })
+
     conn = await mongoDBWrapper.connect(connectionString, {
       useNewUrlParser: true,
       useUnifiedTopology: true
