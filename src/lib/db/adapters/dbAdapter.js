@@ -37,7 +37,14 @@ const getConnection = async () => {
   if (!conn) {
     const Config = require('../../config')
     const systemConfig = Config.getSystemConfig()
-    const params = systemConfig.DB.PARAMS || {}
+    let params = systemConfig.DB.PARAMS || {}
+    if (typeof params === 'string') {
+      try {
+        params = JSON.parse(params)
+      } catch (e) {
+        params = {}
+      }
+    }
     const connectionString = systemConfig.DB.CONNECTION_STRING || MongoUriBuilder({
       username: encodeURIComponent(systemConfig.DB.USER),
       password: encodeURIComponent(systemConfig.DB.PASSWORD),
