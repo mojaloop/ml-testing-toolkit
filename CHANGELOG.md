@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.13.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.13.0...v18.13.1) (2025-07-30)
+
+
+### Chore
+
+* add ability to pass mongodb params ([#330](https://github.com/mojaloop/ml-testing-toolkit/issues/330)) ([d071616](https://github.com/mojaloop/ml-testing-toolkit/commit/d071616e02f06f9d110e7c3c3673f440e71e4043))
+
 ## [18.13.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.12.4...v18.13.0) (2025-07-30)
 
 
