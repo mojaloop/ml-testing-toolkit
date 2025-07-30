@@ -371,7 +371,7 @@ describe('mb-connection-manager', () => {
       })
     })
     it('should not throw error', async () => {
-      const original = mapping.post['/api/login'] 
+      const original = mapping.post['/api/login']
       mapping.post['/api/login'] = {
         status: 200,
         headers: {}
@@ -380,7 +380,7 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/login'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.post['/api/login'] 
+      const original = mapping.post['/api/login']
       mapping.post['/api/login'] = {
         status: 400
       }
@@ -388,7 +388,7 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/login'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments'] 
+      const original = mapping.get['/api/environments']
       mapping.get['/api/environments'] = {
         status: 200,
         data: []
@@ -397,7 +397,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments'] 
+      const original = mapping.get['/api/environments']
       mapping.get['/api/environments'] = {
         status: 400
       }
@@ -405,7 +405,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.post['/api/environments'] 
+      const original = mapping.post['/api/environments']
       mapping.post['/api/environments'] = {
         status: 400,
         data: []
@@ -414,7 +414,7 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/environments'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps'] 
+      const original = mapping.get['/api/environments/1/dfsps']
       mapping.get['/api/environments/1/dfsps'] = {
         status: 200,
         data: [{
@@ -425,7 +425,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps'] 
+      const original = mapping.get['/api/environments/1/dfsps']
       mapping.get['/api/environments/1/dfsps'] = {
         status: 400
       }
@@ -433,7 +433,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.post['/api/environments/1/dfsps'] 
+      const original = mapping.post['/api/environments/1/dfsps']
       mapping.post['/api/environments/1/dfsps'] = {
         status: 400
       }
@@ -442,7 +442,7 @@ describe('mb-connection-manager', () => {
     })
     it('should not throw error', async () => {
       reject.post['/api/environments/1/dfsps'] = {}
-      const original = mapping.post['/api/environments/1/dfsps'] 
+      const original = mapping.post['/api/environments/1/dfsps']
       mapping.post['/api/environments/1/dfsps'] = {
         status: 400
       }
@@ -452,7 +452,7 @@ describe('mb-connection-manager', () => {
     })
     it('should not throw error', async () => {
       reject.post['/api/environments/1/dfsps'] = {response: {data: {}}}
-      const original = mapping.post['/api/environments/1/dfsps'] 
+      const original = mapping.post['/api/environments/1/dfsps']
       mapping.post['/api/environments/1/dfsps'] = {
         status: 400
       }
@@ -460,9 +460,9 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/environments/1/dfsps'] = original
       reject.post['/api/environments/1/dfsps'] = false
     })
-    
+
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] 
+      const original = mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts']
       mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = {
         status: 200,
         data: {
@@ -476,7 +476,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] 
+      const original = mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts']
       mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = {
         status: 400
       }
@@ -484,7 +484,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps/userdfsp/endpoints'] 
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/endpoints']
       mapping.get['/api/environments/1/dfsps/userdfsp/endpoints'] = {
         status: 400
       }
@@ -492,7 +492,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/userdfsp/endpoints'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] 
+      const original = mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts']
       const mockData = {
         status: 200,
         data: {
@@ -506,9 +506,9 @@ describe('mb-connection-manager', () => {
       await expect(MBConnectionManagerProvider.checkConnectionManager()).resolves.toBeUndefined()
       mapping.get['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = original
     })
-    
+
     it('should not throw error', async () => {
-      const original = mapping.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] 
+      const original = mapping.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts']
       mapping.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts'] = {
         status: 400
       }
@@ -527,7 +527,7 @@ describe('mb-connection-manager', () => {
       reject.post['/api/environments/1/dfsps/testingtoolkitdfsp/jwscerts']  = false
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps/userdfsp/jwscerts'] 
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/jwscerts']
       mapping.get['/api/environments/1/dfsps/userdfsp/jwscerts'] = {
         status: 400
       }
@@ -535,7 +535,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/userdfsp/jwscerts'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps/userdfsp/ca'] 
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/ca']
       mapping.get['/api/environments/1/dfsps/userdfsp/ca'] = {
         status: 400
       }
@@ -543,7 +543,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/userdfsp/ca'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/ca/rootCert'] 
+      const original = mapping.get['/api/environments/1/ca/rootCert']
       mapping.get['/api/environments/1/ca/rootCert'] = {
         status: 200,
         data: {
@@ -554,7 +554,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/ca/rootCert'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/ca/rootCert'] 
+      const original = mapping.get['/api/environments/1/ca/rootCert']
       mapping.get['/api/environments/1/ca/rootCert'] = {
         status: 400
       }
@@ -562,7 +562,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/ca/rootCert'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.post['/api/environments/1/cas'] 
+      const original = mapping.post['/api/environments/1/cas']
       mapping.post['/api/environments/1/cas'] = {
         status: 400
       }
@@ -580,7 +580,7 @@ describe('mb-connection-manager', () => {
       reject.post['/api/environments/1/cas'] = false
     })
     it('should not throw error', async () => {
-      const original = mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] 
+      const original = mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign']
       mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = {
         status: 200,
         data: {
@@ -592,7 +592,7 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] 
+      const original = mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign']
       mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = {
         status: 400
       }
@@ -600,7 +600,7 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/inbound'] 
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/inbound']
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/inbound'] = {
         status: 400
       }
@@ -608,7 +608,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/inbound'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound']
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {
         status: 200,
         data: [
@@ -624,7 +624,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound']
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {
         status: 400
       }
@@ -632,7 +632,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/hub/servercerts'] 
+      const original = mapping.get['/api/environments/1/hub/servercerts']
       mapping.get['/api/environments/1/hub/servercerts'] = {
         status: 400
       }
@@ -640,7 +640,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/hub/servercerts'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/hub/servercerts'] 
+      const original = mapping.get['/api/environments/1/hub/servercerts']
       mapping.get['/api/environments/1/hub/servercerts'] = {
         status: 400
       }
@@ -648,7 +648,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/hub/servercerts'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps/userdfsp/servercerts'] 
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/servercerts']
       mapping.get['/api/environments/1/dfsps/userdfsp/servercerts'] = {
         status: 400
       }
@@ -670,7 +670,7 @@ describe('mb-connection-manager', () => {
       reject.post['/api/environments/1/dfsps/userdfsp/enrollments/inbound/1/sign'] = false
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound']
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {
         status: 400
       }
@@ -680,7 +680,7 @@ describe('mb-connection-manager', () => {
       reject.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = false
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
+      const original = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound']
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {
         status: 400
       }
@@ -690,11 +690,11 @@ describe('mb-connection-manager', () => {
       reject.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = false
     })
     it('should not throw error', async () => {
-      const originalGet = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
+      const originalGet = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound']
       mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {
         status: 400
       }
-      const originalPost = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] 
+      const originalPost = mapping.get['/api/environments/1/dfsps/userdfsp/enrollments/outbound']
       mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = {
         status: 400
       }
@@ -703,7 +703,7 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/environments/1/dfsps/userdfsp/enrollments/outbound'] = originalPost
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/hub/servercerts'] 
+      const original = mapping.get['/api/environments/1/hub/servercerts']
       mapping.get['/api/environments/1/hub/servercerts'] = {
         status: 400
       }
@@ -721,11 +721,11 @@ describe('mb-connection-manager', () => {
       reject.put['/api/environments/1/hub/servercerts'] = false
     })
     it('should not throw error', async () => {
-      const originalGet = mapping.get['/api/environments/1/hub/servercerts'] 
+      const originalGet = mapping.get['/api/environments/1/hub/servercerts']
       mapping.get['/api/environments/1/hub/servercerts'] = {
         status: 400
       }
-      const originalPost = mapping.post['/api/environments/1/hub/servercerts'] 
+      const originalPost = mapping.post['/api/environments/1/hub/servercerts']
       mapping.post['/api/environments/1/hub/servercerts'] = {
         status: 400
       }
@@ -734,7 +734,7 @@ describe('mb-connection-manager', () => {
       mapping.post['/api/environments/1/hub/servercerts'] = originalPost
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/hub/servercerts'] 
+      const original = mapping.get['/api/environments/1/hub/servercerts']
       mapping.get['/api/environments/1/hub/servercerts'] = {
         status: 400
       }
@@ -744,7 +744,7 @@ describe('mb-connection-manager', () => {
       mapping.get['/api/environments/1/hub/servercerts'] = original
     })
     it('should not throw error', async () => {
-      const original = mapping.get['/api/environments/1/hub/servercerts'] 
+      const original = mapping.get['/api/environments/1/hub/servercerts']
       mapping.get['/api/environments/1/hub/servercerts'] = {
         status: 400
       }
