@@ -1,4 +1,17 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+## [18.13.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.12.4...v18.13.0) (2025-07-30)
+
+
+### Features
+
+* bump up the node version to v22.15.1 ([#321](https://github.com/mojaloop/ml-testing-toolkit/issues/321)) ([0b9a0ba](https://github.com/mojaloop/ml-testing-toolkit/commit/0b9a0bac706799c610668faa5c1759f96eca25f0))
+
+
+### Chore
+
+* add initial sbom ([#331](https://github.com/mojaloop/ml-testing-toolkit/issues/331)) ([2ce2a51](https://github.com/mojaloop/ml-testing-toolkit/commit/2ce2a510705554c7a018bbcbd9b84837010eb16b))
+* fix vuls and update deps ([#329](https://github.com/mojaloop/ml-testing-toolkit/issues/329)) ([bc1cd2a](https://github.com/mojaloop/ml-testing-toolkit/commit/bc1cd2aa16e7807832d591c0611a388020f659e9))
+
 ### [18.12.4](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.12.3...v18.12.4) (2025-05-01)
 
 
