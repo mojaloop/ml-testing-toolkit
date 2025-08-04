@@ -31,6 +31,7 @@
 
 const dbAdapter = require('./db/adapters/dbAdapter')
 const fileAdapter = require('./fileAdapter')
+const axios = require('axios').default
 
 const read = async (id, user) => {
   let document
@@ -54,7 +55,8 @@ const read = async (id, user) => {
     if (id.endsWith('/')) {
       document = { data: await find(id) }
     } else {
-      document = { data: await fileAdapter.read(id) }
+      const data = await fileAdapter.read(id)
+      document = { data: data?.toString().startsWith('https://') ? (await axios.get(data.toString())).data : data }
     }
   }
   return document
