@@ -56,6 +56,7 @@ const getConnection = async () => {
     if (systemConfig.DB.SSL_ENABLED) {
       mongoOptions.tls = true
       if (typeof systemConfig.DB.SSL_VERIFY !== 'undefined') {
+        console.log(`SSL_VERIFY is set to ${systemConfig.DB.SSL_VERIFY} (type: ${typeof systemConfig.DB.SSL_VERIFY})`)
         mongoOptions.tlsAllowInvalidCertificates = !systemConfig.DB.SSL_VERIFY
       }
       if (systemConfig.DB.SSL_CA) {
@@ -217,6 +218,13 @@ const getReport = async (reportId) => {
   return await MyModel.findById(reportId)
 }
 
+const _deleteConn = async () => {
+  if (conn) {
+    await conn.disconnect()
+    conn = undefined
+  }
+}
+
 module.exports = {
   read,
   find,
@@ -224,5 +232,6 @@ module.exports = {
   remove,
   upsertReport,
   listReports,
-  getReport
+  getReport,
+  _deleteConn
 }
