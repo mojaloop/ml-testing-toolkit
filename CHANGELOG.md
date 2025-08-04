@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.13.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.13.1...v18.13.2) (2025-08-04)
+
+
+### Bug Fixes
+
+* support read only root filesystem ([#332](https://github.com/mojaloop/ml-testing-toolkit/issues/332)) ([9ba2be7](https://github.com/mojaloop/ml-testing-toolkit/commit/9ba2be7a21e7a7f387ad9289987404932b8f77c6))
+
 ### [18.13.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.13.0...v18.13.1) (2025-07-30)
 
 
