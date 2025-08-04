@@ -83,8 +83,8 @@ jest.mock('../../../src/lib/fileAdapter', () => {
         case 'read_1/': return {}
         case 'read_3': return {}
         case 'read_5': return {}
-        case 'read_8': return "http://localhost/read_8"
-        case 'read_9': return "https://localhost/read_9"
+        case 'read_8': return 'http://localhost/read_8'
+        case 'read_9': return 'https://localhost/read_9'
       }
     },
     readDir: (id) => {
