@@ -33,6 +33,13 @@ const dbAdapter = require('./db/adapters/dbAdapter')
 const fileAdapter = require('./fileAdapter')
 const axios = require('axios').default
 
+const cache = {} // make sure we return the same data after the first fetch
+const fetch = async objectOrUrl => {
+  if (!/^https?:\/\//.test(objectOrUrl)) return objectOrUrl
+  if (!cache[objectOrUrl]) cache[objectOrUrl] = (await axios.get(objectOrUrl)).data
+  return cache[objectOrUrl]
+}
+
 const read = async (id, user) => {
   let document
   const Config = require('./config')
@@ -55,8 +62,7 @@ const read = async (id, user) => {
     if (id.endsWith('/')) {
       document = { data: await find(id) }
     } else {
-      const data = await fileAdapter.read(id)
-      document = { data: data?.toString().startsWith('https://') ? (await axios.get(data.toString())).data : data }
+      document = { data: await fetch(await fileAdapter.read(id)) }
     }
   }
   return document

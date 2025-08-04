@@ -28,6 +28,12 @@
  --------------
  ******/
 
+const axios = require('axios').default
+axios.create = jest.fn(() => axios)
+jest.mock('axios')
+
+axios.get.mockImplementation(url => Promise.resolve({data: {url}}))
+
 const storageAdapter = require('../../../src/lib/storageAdapter')
 const Config = require('../../../src/lib/config')
 jest.mock('../../../src/lib/config')
@@ -77,6 +83,8 @@ jest.mock('../../../src/lib/fileAdapter', () => {
         case 'read_1/': return {}
         case 'read_3': return {}
         case 'read_5': return {}
+        case 'read_8': return "http://localhost/read_8"
+        case 'read_9': return "https://localhost/read_9"
       }
     },
     readDir: (id) => {
@@ -148,6 +156,16 @@ describe('dbAdapter', () => {
       it('should read only 1 file', async () => {
         const result = await storageAdapter.read('read_7/')
         expect(result).toBeDefined()
+      })
+      it('should fetch http', async () => {
+        const result = await storageAdapter.read('read_8')
+        expect(result).toBeDefined()
+        expect(result.data).toEqual({url: 'http://localhost/read_8'})
+      })
+      it('should fetch https', async () => {
+        const result = await storageAdapter.read('read_9')
+        expect(result).toBeDefined()
+        expect(result.data).toEqual({url: 'https://localhost/read_9'})
       })
     })
     describe('upsert', () => {
