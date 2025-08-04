@@ -1,7 +1,7 @@
 {
   "name": "ml-testing-toolkit",
   "description": "Testing Toolkit for Mojaloop implementations",
-  "version": "18.13.1",
+  "version": "18.13.2-rorfs.2",
   "license": "Apache-2.0",
   "author": "Vijaya Kumar Guthi, ModusBox Inc. ",
   "contributors": [
@@ -71,7 +71,7 @@
     "genexec": "pkg -t node8-win ."
   },
   "dependencies": {
-    "@elastic/elasticsearch": "9.0.3",
+    "@elastic/elasticsearch": "9.1.0",
     "@hapi/basic": "7.0.2",
     "@hapi/boom": "10.0.1",
     "@hapi/good": "9.0.1",
@@ -108,7 +108,7 @@
     "json-rules-engine": "7.3.1",
     "jsonwebtoken": "9.0.2",
     "lodash": "4.17.21",
-    "mongoose": "8.16.5",
+    "mongoose": "8.17.0",
     "multer": "2.0.2",
     "mustache": "4.2.0",
     "mv": "2.1.1",
