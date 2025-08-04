@@ -46,6 +46,38 @@ const getConnection = async () => {
         params = {}
       }
     }
+
+    // TLS/SSL support
+    const mongoOptions = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    }
+
+    if (systemConfig.DB.SSL_ENABLED) {
+      mongoOptions.tls = true
+      if (typeof systemConfig.DB.SSL_VERIFY !== 'undefined') {
+        mongoOptions.tlsAllowInvalidCertificates = !systemConfig.DB.SSL_VERIFY
+      }
+      if (systemConfig.DB.SSL_CA) {
+      // SSL_CA is a string (from kube secret), may be PEM or comma-separated PEMs
+        let ca = systemConfig.DB.SSL_CA
+        if (typeof ca === 'string') {
+        // If comma-separated, split into array
+          if (ca.includes(',')) {
+            ca = ca.split(',').map(s => s.trim())
+          }
+        }
+        // Convert to Buffer(s) if needed
+        if (Array.isArray(ca)) {
+          ca = ca.map(item => Buffer.isBuffer(item) ? item : Buffer.from(item))
+        } else if (!Buffer.isBuffer(ca)) {
+          ca = Buffer.from(ca)
+        }
+        // Mongoose expects tlsCAFile as a Buffer or array of Buffers
+        mongoOptions.tlsCAFile = ca
+      }
+    }
+
     const csMongoDBObj = new ConnectionString()
     csMongoDBObj.setDefaults({
       protocol: 'mongodb',
@@ -59,10 +91,7 @@ const getConnection = async () => {
     const safeConnectionString = connectionString.replace(/(\/\/)(.*):(.*)@/, '$1****:****@')
     Logger.info(`Connecting to MongoDB with connection string: ${safeConnectionString}`)
 
-    conn = await mongoDBWrapper.connect(connectionString, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    })
+    conn = await mongoDBWrapper.connect(connectionString, mongoOptions)
   }
   return conn
 }

@@ -100,20 +100,46 @@ const loadSystemConfig = async (filename = SYSTEM_CONFIG_FILE) => {
 
 const _getSecretsFromEnvironment = () => {
   const secretsFromEnvironment = {}
-  if (process.env.REPORTING_DB_CONNECTION_PASSWORD || process.env.REPORTING_DB_CONNECTION_STRING) {
+  if (
+    process.env.REPORTING_DB_CONNECTION_PASSWORD ||
+    process.env.REPORTING_DB_CONNECTION_STRING ||
+    process.env.REPORTING_DB_SSL_ENABLED ||
+    process.env.REPORTING_DB_SSL_VERIFY ||
+    process.env.REPORTING_DB_SSL_CA
+  ) {
     try {
       const reportingDbConnectionPassword = process.env.REPORTING_DB_CONNECTION_PASSWORD
       const reportingDbConnectionString = process.env.REPORTING_DB_CONNECTION_STRING
-      console.log(`Retrieved reporting database password in environment '${process.env.REPORTING_DB_CONNECTION_PASSWORD}'`)
-      console.log(`Retrieved reporting database connection string in environment '${process.env.REPORTING_DB_CONNECTION_STRING}'`)
+      const reportingDbSslEnabled = process.env.REPORTING_DB_SSL_ENABLED === 'true'
+      const reportingDbSslVerify = process.env.REPORTING_DB_SSL_VERIFY !== 'false'
+      const reportingDbSslCa = process.env.REPORTING_DB_SSL_CA
+
       secretsFromEnvironment.DB = {
         PASSWORD: reportingDbConnectionPassword,
         CONNECTION_STRING: reportingDbConnectionString
       }
-      console.log(`Secrets retrieved from environment to be merged into system config ${secretsFromEnvironment}`)
+
+      if (
+        process.env.REPORTING_DB_SSL_ENABLED ||
+        process.env.REPORTING_DB_SSL_VERIFY ||
+        process.env.REPORTING_DB_SSL_CA
+      ) {
+        secretsFromEnvironment.DB.SSL_ENABLED = reportingDbSslEnabled
+        secretsFromEnvironment.DB.SSL_VERIFY = reportingDbSslVerify
+        if (reportingDbSslCa) {
+          secretsFromEnvironment.DB.SSL_CA = reportingDbSslCa
+        }
+      }
+
+      // Hide CA from being logged
+      const logSecrets = _.cloneDeep(secretsFromEnvironment)
+      if (logSecrets.DB && logSecrets.DB.SSL_CA) {
+        logSecrets.DB.SSL_CA = '[HIDDEN]'
+      }
+      console.log('Secrets retrieved from environment to be merged into system config', logSecrets)
     } catch (err) {
       console.log(err)
-      console.log('Failed to retrieve reporting database password or connection string in environment')
+      console.log('Failed to retrieve reporting database secrets or SSL/TLS settings from environment')
     }
   }
   return secretsFromEnvironment
