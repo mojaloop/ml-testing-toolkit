@@ -90,13 +90,14 @@ const loadSystemConfig = async (filename = SYSTEM_CONFIG_FILE) => {
     const systemConfigFromEnvironment = _getSystemConfigFromEnvironment()
     _.merge(SYSTEM_CONFIG, systemConfigFromEnvironment)
     const secretsFromEnvironment = _getSecretsFromEnvironment()
-    console.log(secretsFromEnvironment)
     _.merge(SYSTEM_CONFIG, secretsFromEnvironment)
   } catch (err) {
     console.log(`Can not read the file ${filename}`, err)
   }
   return true
 }
+
+const mask = value => (value && value.length > 4) ? `${value.slice(0, 2)}***${value.slice(-2)}` : value
 
 const _getSecretsFromEnvironment = () => {
   const secretsFromEnvironment = {}
@@ -133,9 +134,9 @@ const _getSecretsFromEnvironment = () => {
 
       // Hide CA from being logged
       const logSecrets = _.cloneDeep(secretsFromEnvironment)
-      if (logSecrets.DB && logSecrets.DB.SSL_CA) {
-        logSecrets.DB.SSL_CA = '[HIDDEN]'
-      }
+      if (logSecrets.DB && logSecrets.DB.SSL_CA) logSecrets.DB.SSL_CA = mask(logSecrets.DB.SSL_CA)
+      if (logSecrets.DB && logSecrets.DB.PASSWORD) logSecrets.DB.PASSWORD = mask(logSecrets.DB.PASSWORD)
+      if (logSecrets.DB && logSecrets.DB.CONNECTION_STRING) logSecrets.DB.CONNECTION_STRING = mask(logSecrets.DB.CONNECTION_STRING)
       console.log('Secrets retrieved from environment to be merged into system config', logSecrets)
     } catch (err) {
       console.log(err)
