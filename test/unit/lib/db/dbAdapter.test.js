@@ -227,4 +227,186 @@ describe('dbAdapter', () => {
       expect(spyMongooseConnect).toHaveBeenCalledWith("mongodb://ttk:ttk@localhost:27017/ttk", {"useNewUrlParser": true, "useUnifiedTopology": true})
     })
   })
+
+  describe('getConnection - params and SSL/TLS support', () => {
+    let originalEnv
+    let dbAdapterModule
+    let mockConnect
+    let mockLoggerInfo
+
+    beforeEach(() => {
+      jest.resetModules()
+      originalEnv = { ...process.env }
+      mockConnect = jest.fn().mockResolvedValue({
+        model: () => ({
+          findById: jest.fn(),
+          create: jest.fn(),
+          find: jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue([]), sort: jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue([]) }) }),
+          findOneAndRemove: jest.fn(),
+          findOneAndUpdate: jest.fn(),
+          countDocuments: jest.fn().mockResolvedValue(0)
+        }),
+        disconnect: jest.fn()
+      })
+      mockLoggerInfo = jest.fn()
+      jest.doMock('../../../../src/lib/db/models/mongoDBWrapper', () => ({
+        connect: mockConnect,
+        models: {
+          logs: {},
+          reports: {},
+          common: {},
+          commonModel: {},
+        },
+        Types: {
+          ObjectId: jest.fn(() => 'mockObjectId')
+        }
+      }))
+      jest.doMock('@mojaloop/central-services-logger', () => ({
+        info: mockLoggerInfo
+      }))
+    })
+
+    afterEach(async () => {
+      process.env = originalEnv
+      jest.resetModules()
+      if (dbAdapterModule && dbAdapterModule._deleteConn) {
+        await dbAdapterModule._deleteConn()
+      }
+    })
+
+    it('should parse DB.PARAMS if string and pass to connection-string', async () => {
+      jest.doMock('../../../../src/lib/config', () => ({
+        getSystemConfig: () => ({
+          DB: {
+            HOST: "localhost",
+            PORT: 27017,
+            USER: "ttk",
+            PASSWORD: "ttk",
+            DATABASE: "ttk",
+            PARAMS: '{"replicaSet":"rs0"}'
+          }
+        })
+      }))
+      dbAdapterModule = require('../../../../src/lib/db/adapters/dbAdapter')
+      await dbAdapterModule.read('id1', { dfspId: 'test' })
+      expect(mockConnect).toHaveBeenCalledWith(
+        expect.stringContaining('replicaSet=rs0'),
+        expect.objectContaining({ useNewUrlParser: true, useUnifiedTopology: true })
+      )
+      await dbAdapterModule._deleteConn()
+    })
+
+    it('should handle invalid DB.PARAMS string gracefully', async () => {
+      jest.doMock('../../../../src/lib/config', () => ({
+        getSystemConfig: () => ({
+          DB: {
+            HOST: "localhost",
+            PORT: 27017,
+            USER: "ttk",
+            PASSWORD: "ttk",
+            DATABASE: "ttk",
+            PARAMS: '{invalidJson:}'
+          }
+        })
+      }))
+      dbAdapterModule = require('../../../../src/lib/db/adapters/dbAdapter')
+      await dbAdapterModule.read('id1', { dfspId: 'test' })
+      expect(mockConnect).toHaveBeenCalled()
+      await dbAdapterModule._deleteConn()
+    })
+
+    it('should enable TLS/SSL if SSL_ENABLED is true', async () => {
+      jest.doMock('../../../../src/lib/config', () => ({
+        getSystemConfig: () => ({
+          DB: {
+            HOST: "localhost",
+            PORT: 27017,
+            USER: "ttk",
+            PASSWORD: "ttk",
+            DATABASE: "ttk",
+            SSL_ENABLED: true
+          }
+        })
+      }))
+      dbAdapterModule = require('../../../../src/lib/db/adapters/dbAdapter')
+      await dbAdapterModule.read('id1', { dfspId: 'test' })
+      expect(mockConnect).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ tls: true })
+      )
+      await dbAdapterModule._deleteConn()
+    })
+
+    it('should set tlsAllowInvalidCertificates if SSL_VERIFY is false', async () => {
+      jest.doMock('../../../../src/lib/config', () => ({
+        getSystemConfig: () => ({
+          DB: {
+            HOST: "localhost",
+            PORT: 27017,
+            USER: "ttk",
+            PASSWORD: "ttk",
+            DATABASE: "ttk",
+            SSL_ENABLED: true,
+            SSL_VERIFY: false
+          }
+        })
+      }))
+      dbAdapterModule = require('../../../../src/lib/db/adapters/dbAdapter')
+      await dbAdapterModule.read('id1', { dfspId: 'test' })
+      expect(mockConnect).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ tlsAllowInvalidCertificates: true })
+      )
+      await dbAdapterModule._deleteConn()
+    })
+
+    it('should set tlsCAFile as Buffer if SSL_CA is string', async () => {
+      const pem = '-----BEGIN CERTIFICATE-----\nabc\n-----END CERTIFICATE-----'
+      jest.doMock('../../../../src/lib/config', () => ({
+        getSystemConfig: () => ({
+          DB: {
+            HOST: "localhost",
+            PORT: 27017,
+            USER: "ttk",
+            PASSWORD: "ttk",
+            DATABASE: "ttk",
+            SSL_ENABLED: true,
+            SSL_CA: pem
+          }
+        })
+      }))
+      dbAdapterModule = require('../../../../src/lib/db/adapters/dbAdapter')
+      await dbAdapterModule.read('id1', { dfspId: 'test' })
+      expect(mockConnect).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ tlsCAFile: expect.any(Buffer) })
+      )
+      await dbAdapterModule._deleteConn()
+    })
+
+    it('should set tlsCAFile as array of Buffers if SSL_CA is comma-separated string', async () => {
+      const pem1 = '-----BEGIN CERTIFICATE-----\nabc\n-----END CERTIFICATE-----'
+      const pem2 = '-----BEGIN CERTIFICATE-----\ndef\n-----END CERTIFICATE-----'
+      jest.doMock('../../../../src/lib/config', () => ({
+        getSystemConfig: () => ({
+          DB: {
+            HOST: "localhost",
+            PORT: 27017,
+            USER: "ttk",
+            PASSWORD: "ttk",
+            DATABASE: "ttk",
+            SSL_ENABLED: true,
+            SSL_CA: `${pem1},${pem2}`
+          }
+        })
+      }))
+      dbAdapterModule = require('../../../../src/lib/db/adapters/dbAdapter')
+      await dbAdapterModule.read('id1', { dfspId: 'test' })
+      expect(mockConnect).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ tlsCAFile: expect.any(Array) })
+      )
+      await dbAdapterModule._deleteConn()
+    })
+  })
 })
