@@ -167,7 +167,7 @@ describe('Config', () => {
     })
   })
   describe('Config secrets', () => {
-    it('should load config from env if set ', async () => {
+    it('should load config from env if set', async () => {
       storageAdapter.read.mockResolvedValueOnce({
         data: {
           INIT_CONFIG: {
@@ -177,7 +177,7 @@ describe('Config', () => {
           }
         }
       })
-      process.env.REPORTING_DB_CONNECTION_PASSWORD = 'password123'
+      process.env.REPORTING_DB_CONNECTION_PASSWORD = '123'
       process.env.REPORTING_DB_CONNECTION_STRING = 'connection_string'
       process.env.REPORTING_DB_SSL_CA = 'ssl_ca'
       process.env.REPORTING_DB_SSL_ENABLED = 'true'
@@ -186,10 +186,34 @@ describe('Config', () => {
       await Config.loadSystemConfig()
       await expect(Config.getSystemConfig()).toEqual(expect.objectContaining({
         DB: {
-          PASSWORD: 'password123',
+          PASSWORD: '123',
           CONNECTION_STRING: 'connection_string',
           SSL_CA: 'ssl_ca',
           SSL_ENABLED: true,
+          SSL_VERIFY: true
+        }
+      }))
+    })
+    it('should load partial config from env', async () => {
+      storageAdapter.read.mockResolvedValueOnce({
+        data: {
+          INIT_CONFIG: {
+            objectStore: {
+              test1: 'value1'
+            }
+          }
+        }
+      })
+
+      delete process.env.REPORTING_DB_CONNECTION_PASSWORD
+      delete process.env.REPORTING_DB_CONNECTION_STRING
+      delete process.env.REPORTING_DB_SSL_CA
+      delete process.env.REPORTING_DB_SSL_ENABLED
+      process.env.REPORTING_DB_SSL_VERIFY = 'true'
+      await Config.loadSystemConfig()
+      await expect(Config.getSystemConfig()).toEqual(expect.objectContaining({
+        DB: {
+          SSL_ENABLED: false,
           SSL_VERIFY: true
         }
       }))
