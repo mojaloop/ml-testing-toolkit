@@ -167,7 +167,7 @@ describe('Config', () => {
     })
   })
   describe('Config secrets', () => {
-    it('should load reporting database password from env if set ', async () => {
+    it('should load config from env if set ', async () => {
       storageAdapter.read.mockResolvedValueOnce({
         data: {
           INIT_CONFIG: {
@@ -178,10 +178,19 @@ describe('Config', () => {
         }
       })
       process.env.REPORTING_DB_CONNECTION_PASSWORD = 'password123'
+      process.env.REPORTING_DB_CONNECTION_STRING = 'connection_string'
+      process.env.REPORTING_DB_SSL_CA = 'ssl_ca'
+      process.env.REPORTING_DB_SSL_ENABLED = 'true'
+      process.env.REPORTING_DB_SSL_VERIFY = 'true'
+
       await Config.loadSystemConfig()
       await expect(Config.getSystemConfig()).toEqual(expect.objectContaining({
         DB: {
-          PASSWORD: 'password123'
+          PASSWORD: 'password123',
+          CONNECTION_STRING: 'connection_string',
+          SSL_CA: 'ssl_ca',
+          SSL_ENABLED: true,
+          SSL_VERIFY: true
         }
       }))
     })
