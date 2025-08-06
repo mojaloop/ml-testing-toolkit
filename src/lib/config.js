@@ -106,14 +106,14 @@ const _getSecretsFromEnvironment = () => {
     process.env.REPORTING_DB_CONNECTION_STRING ||
     process.env.REPORTING_DB_SSL_ENABLED ||
     process.env.REPORTING_DB_SSL_VERIFY ||
-    process.env.REPORTING_DB_SSL_CA
+    process.env.REPORTING_DB_SSL_CA_FILE_PATH
   ) {
     try {
       const reportingDbConnectionPassword = process.env.REPORTING_DB_CONNECTION_PASSWORD
       const reportingDbConnectionString = process.env.REPORTING_DB_CONNECTION_STRING
       const reportingDbSslEnabled = process.env.REPORTING_DB_SSL_ENABLED === 'true'
       const reportingDbSslVerify = process.env.REPORTING_DB_SSL_VERIFY !== 'false'
-      const reportingDbSslCa = process.env.REPORTING_DB_SSL_CA
+      const reportingDbSslCa = process.env.REPORTING_DB_SSL_CA_FILE_PATH
 
       secretsFromEnvironment.DB = {
         PASSWORD: reportingDbConnectionPassword,
@@ -123,18 +123,18 @@ const _getSecretsFromEnvironment = () => {
       if (
         process.env.REPORTING_DB_SSL_ENABLED ||
         process.env.REPORTING_DB_SSL_VERIFY ||
-        process.env.REPORTING_DB_SSL_CA
+        process.env.REPORTING_DB_SSL_CA_FILE_PATH
       ) {
         secretsFromEnvironment.DB.SSL_ENABLED = reportingDbSslEnabled
         secretsFromEnvironment.DB.SSL_VERIFY = reportingDbSslVerify
         if (reportingDbSslCa) {
-          secretsFromEnvironment.DB.SSL_CA = reportingDbSslCa
+          secretsFromEnvironment.DB.SSL_CA_FILE_PATH = reportingDbSslCa
         }
       }
 
       // Hide CA from being logged
       const logSecrets = _.cloneDeep(secretsFromEnvironment)
-      if (logSecrets.DB && logSecrets.DB.SSL_CA) logSecrets.DB.SSL_CA = mask(logSecrets.DB.SSL_CA)
+      if (logSecrets.DB && logSecrets.DB.SSL_CA_FILE_PATH) logSecrets.DB.SSL_CA_FILE_PATH = mask(logSecrets.DB.SSL_CA_FILE_PATH)
       if (logSecrets.DB && logSecrets.DB.PASSWORD) logSecrets.DB.PASSWORD = mask(logSecrets.DB.PASSWORD)
       if (logSecrets.DB && logSecrets.DB.CONNECTION_STRING) logSecrets.DB.CONNECTION_STRING = mask(logSecrets.DB.CONNECTION_STRING)
       console.log('Secrets retrieved from environment to be merged into system config', logSecrets)
