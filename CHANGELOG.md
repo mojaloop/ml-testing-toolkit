@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.14.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.14.0...v18.14.1) (2025-08-06)
+
+
+### Bug Fixes
+
+* fix mongo tls argument ([#334](https://github.com/mojaloop/ml-testing-toolkit/issues/334)) ([69b16bc](https://github.com/mojaloop/ml-testing-toolkit/commit/69b16bcacea2ae31de0e49f40fa4fa4853ddfac0))
+
 ## [18.14.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.13.2...v18.14.0) (2025-08-05)
 
 
