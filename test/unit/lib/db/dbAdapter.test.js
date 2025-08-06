@@ -359,54 +359,5 @@ describe('dbAdapter', () => {
       )
       await dbAdapterModule._deleteConn()
     })
-
-    it('should set tlsCAFile as Buffer if SSL_CA is string', async () => {
-      const pem = '-----BEGIN CERTIFICATE-----\nabc\n-----END CERTIFICATE-----'
-      jest.doMock('../../../../src/lib/config', () => ({
-        getSystemConfig: () => ({
-          DB: {
-            HOST: "localhost",
-            PORT: 27017,
-            USER: "ttk",
-            PASSWORD: "ttk",
-            DATABASE: "ttk",
-            SSL_ENABLED: true,
-            SSL_CA: pem
-          }
-        })
-      }))
-      dbAdapterModule = require('../../../../src/lib/db/adapters/dbAdapter')
-      await dbAdapterModule.read('id1', { dfspId: 'test' })
-      expect(mockConnect).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({ tlsCAFile: expect.any(Buffer) })
-      )
-      await dbAdapterModule._deleteConn()
-    })
-
-    it('should set tlsCAFile as array of Buffers if SSL_CA is comma-separated string', async () => {
-      const pem1 = '-----BEGIN CERTIFICATE-----\nabc\n-----END CERTIFICATE-----'
-      const pem2 = '-----BEGIN CERTIFICATE-----\ndef\n-----END CERTIFICATE-----'
-      jest.doMock('../../../../src/lib/config', () => ({
-        getSystemConfig: () => ({
-          DB: {
-            HOST: "localhost",
-            PORT: 27017,
-            USER: "ttk",
-            PASSWORD: "ttk",
-            DATABASE: "ttk",
-            SSL_ENABLED: true,
-            SSL_CA: `${pem1},${pem2}`
-          }
-        })
-      }))
-      dbAdapterModule = require('../../../../src/lib/db/adapters/dbAdapter')
-      await dbAdapterModule.read('id1', { dfspId: 'test' })
-      expect(mockConnect).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({ tlsCAFile: expect.any(Array) })
-      )
-      await dbAdapterModule._deleteConn()
-    })
   })
 })

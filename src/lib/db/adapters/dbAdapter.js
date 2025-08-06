@@ -59,23 +59,8 @@ const getConnection = async () => {
         console.log(`SSL_VERIFY is set to ${systemConfig.DB.SSL_VERIFY} (type: ${typeof systemConfig.DB.SSL_VERIFY})`)
         mongoOptions.tlsAllowInvalidCertificates = !systemConfig.DB.SSL_VERIFY
       }
-      if (systemConfig.DB.SSL_CA) {
-      // SSL_CA is a string (from kube secret), may be PEM or comma-separated PEMs
-        let ca = systemConfig.DB.SSL_CA
-        if (typeof ca === 'string') {
-        // If comma-separated, split into array
-          if (ca.includes(',')) {
-            ca = ca.split(',').map(s => s.trim())
-          }
-        }
-        // Convert to Buffer(s) if needed
-        if (Array.isArray(ca)) {
-          ca = ca.map(item => Buffer.isBuffer(item) ? item : Buffer.from(item))
-        } else if (!Buffer.isBuffer(ca)) {
-          ca = Buffer.from(ca)
-        }
-        // Mongoose expects tlsCAFile as a Buffer or array of Buffers
-        mongoOptions.tlsCAFile = ca
+      if (systemConfig.DB.SSL_CA_FILE_PATH) {
+        mongoOptions.tlsCAFile = systemConfig.DB.SSL_CA_FILE_PATH
       }
     }
 

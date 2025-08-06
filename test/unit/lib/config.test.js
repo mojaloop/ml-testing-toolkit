@@ -179,7 +179,7 @@ describe('Config', () => {
       })
       process.env.REPORTING_DB_CONNECTION_PASSWORD = '123'
       process.env.REPORTING_DB_CONNECTION_STRING = 'connection_string'
-      process.env.REPORTING_DB_SSL_CA = 'ssl_ca'
+      process.env.REPORTING_DB_SSL_CA_FILE_PATH = 'ssl_ca'
       process.env.REPORTING_DB_SSL_ENABLED = 'true'
       process.env.REPORTING_DB_SSL_VERIFY = 'true'
 
@@ -188,7 +188,7 @@ describe('Config', () => {
         DB: {
           PASSWORD: '123',
           CONNECTION_STRING: 'connection_string',
-          SSL_CA: 'ssl_ca',
+          SSL_CA_FILE_PATH: 'ssl_ca',
           SSL_ENABLED: true,
           SSL_VERIFY: true
         }
@@ -207,7 +207,7 @@ describe('Config', () => {
 
       delete process.env.REPORTING_DB_CONNECTION_PASSWORD
       delete process.env.REPORTING_DB_CONNECTION_STRING
-      delete process.env.REPORTING_DB_SSL_CA
+      delete process.env.REPORTING_DB_SSL_CA_FILE_PATH
       delete process.env.REPORTING_DB_SSL_ENABLED
       process.env.REPORTING_DB_SSL_VERIFY = 'true'
       await Config.loadSystemConfig()
