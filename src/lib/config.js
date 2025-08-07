@@ -106,7 +106,8 @@ const _getSecretsFromEnvironment = () => {
     process.env.REPORTING_DB_CONNECTION_STRING ||
     process.env.REPORTING_DB_SSL_ENABLED ||
     process.env.REPORTING_DB_SSL_VERIFY ||
-    process.env.REPORTING_DB_SSL_CA_FILE_PATH
+    process.env.REPORTING_DB_SSL_CA_FILE_PATH ||
+    process.env.REPORTING_DB_PARAMS
   ) {
     try {
       const reportingDbConnectionPassword = process.env.REPORTING_DB_CONNECTION_PASSWORD
@@ -114,10 +115,17 @@ const _getSecretsFromEnvironment = () => {
       const reportingDbSslEnabled = process.env.REPORTING_DB_SSL_ENABLED === 'true'
       const reportingDbSslVerify = process.env.REPORTING_DB_SSL_VERIFY !== 'false'
       const reportingDbSslCa = process.env.REPORTING_DB_SSL_CA_FILE_PATH
+      const reportingDbConnectionParams = process.env.REPORTING_DB_PARAMS
+        ? JSON.parse(process.env.REPORTING_DB_PARAMS)
+        : undefined
 
       secretsFromEnvironment.DB = {
         PASSWORD: reportingDbConnectionPassword,
         CONNECTION_STRING: reportingDbConnectionString
+      }
+
+      if (process.env.REPORTING_DB_PARAMS && reportingDbConnectionParams) {
+        secretsFromEnvironment.DB.PARAMS = reportingDbConnectionParams
       }
 
       if (
@@ -138,6 +146,7 @@ const _getSecretsFromEnvironment = () => {
       if (logSecrets.DB && logSecrets.DB.PASSWORD) logSecrets.DB.PASSWORD = mask(logSecrets.DB.PASSWORD)
       if (logSecrets.DB && logSecrets.DB.CONNECTION_STRING) logSecrets.DB.CONNECTION_STRING = mask(logSecrets.DB.CONNECTION_STRING)
       console.log('Secrets retrieved from environment to be merged into system config', logSecrets)
+      if (logSecrets.DB && logSecrets.DB.PARAMS) logSecrets.DB.PARAMS = JSON.stringify(logSecrets.DB.PARAMS)
     } catch (err) {
       console.log(err)
       console.log('Failed to retrieve reporting database secrets or SSL/TLS settings from environment')
