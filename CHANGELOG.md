@@ -1,4 +1,12 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.14.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.14.1...v18.14.2) (2025-08-07)
+
+
+### Chore
+
+* pass in params as env variable instead ([#335](https://github.com/mojaloop/ml-testing-toolkit/issues/335)) ([6f51950](https://github.com/mojaloop/ml-testing-toolkit/commit/6f519508f3076940a77658bc65f5f29525695d45))
+* **sbom:** update sbom [skip ci] ([af4bfd8](https://github.com/mojaloop/ml-testing-toolkit/commit/af4bfd8193c15721f63759234f31fce246f63311))
+
 ### [18.14.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.14.0...v18.14.1) (2025-08-06)
 
 
