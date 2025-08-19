@@ -29,6 +29,7 @@
 
 const addFormats = require('ajv-formats')
 const OpenApiBackend = require('openapi-backend').default
+const fs = require('node:fs')
 const Utils = require('./utils')
 const path = require('path')
 const Config = require('./config')
@@ -37,9 +38,24 @@ const OpenApiMockHandler = require('./mocking/openApiMockHandler')
 
 const apiDefinitionsPath = 'spec_files/api_definitions/'
 
+// check if the file contains URL and return it instead of the file name
+const checkUrl = async fileName => {
+  const buffer = Buffer.alloc(10)
+  const fileHandle = await fs.promises.open(fileName, 'r')
+  try {
+    await fileHandle.read(buffer, 0, 10, 0)
+  } finally {
+    await fileHandle.close()
+  }
+  const prefix = buffer.toString('utf8').replace('\uFEFF', '') // Remove BOM
+  return (prefix.startsWith('"http'))
+    ? JSON.parse(fs.readFileSync(fileName).toString('utf8'))
+    : fileName
+}
+
 const validateDefinition = async (apiFilePath) => {
   const newApi = new OpenApiBackend({
-    definition: path.join(apiFilePath),
+    definition: await checkUrl(path.join(apiFilePath)),
     customizeAjv: ajv => addFormats(ajv),
     strict: true,
     quick: true
