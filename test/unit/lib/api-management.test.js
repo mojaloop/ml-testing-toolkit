@@ -63,6 +63,9 @@ describe('API Management', () => {
     it('should not throw an error', async () => {
       await expect(APIManagement.addDefinition(specFilePrefix + 'api_spec_sync.yaml', 'name', '1.0', 'false')).resolves.toBeUndefined()
     })
+    it('should load definition from URL', async () => {
+      await expect(APIManagement.addDefinition(specFilePrefix + 'api_spec_url.json', 'name', '1.0', 'false')).resolves.toBeUndefined()
+    })
   })
   describe('deleteDefinition', () => {
     it('Happy path', async () => {
