@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.14.4](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.14.3...v18.14.4) (2025-08-19)
+
+
+### Bug Fixes
+
+* added sdk specs here as a workaround to the problem of downloading spec files ([#337](https://github.com/mojaloop/ml-testing-toolkit/issues/337)) ([4455178](https://github.com/mojaloop/ml-testing-toolkit/commit/445517876d6f6bf75a707e2b55612e1ef994a694))
+
 ### [18.14.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.14.2...v18.14.3) (2025-08-19)
 
 
