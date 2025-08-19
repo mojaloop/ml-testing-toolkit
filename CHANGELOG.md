@@ -1,4 +1,16 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.14.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.14.2...v18.14.3) (2025-08-19)
+
+
+### Bug Fixes
+
+* add URL handling for API definitions ([#336](https://github.com/mojaloop/ml-testing-toolkit/issues/336)) ([730557c](https://github.com/mojaloop/ml-testing-toolkit/commit/730557cc103dcd1b9cc36716b3792e73cf7efd5c))
+
+
+### Chore
+
+* **sbom:** update sbom [skip ci] ([a9e0800](https://github.com/mojaloop/ml-testing-toolkit/commit/a9e0800f36c91372025760cba64539631ad62154))
+
 ### [18.14.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.14.1...v18.14.2) (2025-08-07)
 
 
