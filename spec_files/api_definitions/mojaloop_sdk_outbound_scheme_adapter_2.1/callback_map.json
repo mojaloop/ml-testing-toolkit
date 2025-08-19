@@ -1,0 +1,46 @@
+{
+    "/bulkTransactions": {
+      "post": {
+        "fspid": "{$request.headers.fspiop-source}",
+        "successCallback": {
+          "method": "put",
+          "path": "/bulkTransactions/{bulkTransactionId}",
+          "pathPattern": "/bulkTransactions/{$request.body.bulkTransactionId}",
+          "headerOverride": {
+            "Date": "{$request.headers.date}"
+          },
+          "bodyOverride": {}
+        },
+        "errorCallback": {
+          "method": "put",
+          "path": "/bulkTransactions/{bulkTransactionId}/error",
+          "pathPattern": "/bulkTransactions/{$request.body.bulkTransactionId}/error",
+          "headerOverride": {
+            "Date": "{$request.headers.date}"
+          }
+        }
+      }
+    },
+    "/bulkTransactions/{bulkTransactionId}": {
+      "put": {
+        "fspid": "{$request.headers.fspiop-source}",
+        "successCallback": {
+          "method": "put",
+          "path": "/bulkTransactions/{bulkTransactionId}",
+          "pathPattern": "/bulkTransactions/{$request.params.bulkTransactionId}",
+          "headerOverride": {
+            "Date": "{$request.headers.date}"
+          },
+          "bodyOverride": {}
+        },
+        "errorCallback": {
+          "method": "put",
+          "path": "/bulkTransactions/{bulkTransactionId}/error",
+          "pathPattern": "/bulkTransactions/{$request.params.bulkTransactionId}/error",
+          "headerOverride": {
+            "Date": "{$request.headers.date}"
+          }
+        }
+      }
+    }
+  }

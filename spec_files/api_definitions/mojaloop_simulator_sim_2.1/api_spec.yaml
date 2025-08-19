@@ -1,0 +1,2837 @@
+openapi: 3.0.1
+info:
+  title: Mojaloop SDK Backend API
+  description: >
+    API specification for the SDK Backend API.
+
+
+    To be implemented by the Digital Financial Service Provider (DFSP) to work
+    in tandem with the Mojaloop SDK (`mojaloop/sdk-scheme-adapter`).
+
+
+    This API is not to be confused with the Mojaloop SDK's Inbound or Outbound
+    API.
+
+
+    TODO: More explanation and links about the SDK adapter's Inbound and
+    Outbound API.
+
+
+    **Note on terminology:** The term "Switch" is equal to the term "Hub", and
+    the term "FSP" is equal to the term "DFSP".
+  license:
+    name: Apache License Version 2.0, January 2004
+    url: http://www.apache.org/licenses/
+  version: 2.1.0
+paths:
+  /:
+    get:
+      operationId: BackendHealthCheck
+      responses:
+        '200':
+          description: Returns empty body if the service is running.
+      summary: Health check endpoint.
+  /bulkQuotes:
+    post:
+      operationId: BackendBulkQuotesPost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/bulkQuoteRequest'
+        description: Incoming request for a bulk quotation.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulkQuoteResponse'
+          description: A response to the bulk quote request.
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Requests a bulk quote.
+      tags:
+        - BulkQuotes
+  /bulkQuotes/{idValue}:
+    get:
+      operationId: BackendBulkQuotesGet
+      parameters:
+        - $ref: '#/components/parameters/idValue'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulkQuoteResponse'
+          description: Response containing details of the requested bulk quote.
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: >-
+        Requests information relating to a bulk quote identified by the
+        specified identifier value.
+      tags:
+        - BulkQuotes
+  /bulkTransactions/{bulkTransactionId}:
+    put:
+      description: >-
+        The HTTP request `PUT /bulkTransactions/{bulkTransactionId}` is used to
+        amend information regarding a bulk transaction, i.e. when
+        autoAcceptParty or autoAcceptQuote  is false then the payer need to
+        provide confirmation to proceed with further processing of the request.
+        The `{bulkTransactionId}` in the URI should contain the
+        `bulkTransactionId` that was used for the creation of the bulk transfer.
+      operationId: BackendBulkTransactionsPut
+      parameters:
+        - $ref: '#/components/parameters/bulkTransactionId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/bulkTransactionResponse'
+      responses:
+        '202':
+          description: Bulk transaction information successfully amended.
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Callbacks for the bulk transaction request.
+      tags:
+        - BulkTransactionsPut
+  /requestToPay/{transactionRequestId}:
+    put:
+      description: >-
+        It is used to notify the DFSP backend about the status of the
+        requestToPayTransfer.
+      operationId: RequestToPayPut
+      parameters:
+        - $ref: '#/components/parameters/transactionRequestId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requestToPayCallback'
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Callback for the requestToPay request.
+      tags:
+        - RequestToPayPut
+  /bulkTransfers:
+    post:
+      operationId: BackendBulkTransfersPost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/bulkTransferRequest'
+        description: An incoming bulk transfer request.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulkTransferResponse'
+          description: The bulk transfer was accepted.
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: >-
+        Execute bulk transfer of funds from an external account to internal
+        accounts.
+      tags:
+        - BulkTransfers
+  /bulkTransfers/{idValue}:
+    get:
+      operationId: BackendBulkTransfersGet
+      parameters:
+        - $ref: '#/components/parameters/idValue'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulkTransferResponse'
+          description: Response containing details of the requested bulk transfer.
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: >-
+        Requests information relating to a bulk transfer identified by the
+        specified identifier value.
+      tags:
+        - BulkTransfers
+  /otp/{transactionRequestId}:
+    get:
+      operationId: BackendOtpGet
+      parameters:
+        - $ref: '#/components/parameters/transactionRequestId'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/otpDetails'
+          description: Response containing details of the OTP.
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Requests OTP.
+      tags:
+        - OTP
+  /participants/{idType}/{idValue}:
+    get:
+      description: >-
+        The HTTP request `GET /participants/{idType}/{idValue}` is used to find
+        out in which FSP the requested party, defined by `{idType}` and
+        `{idValue}`, is located.
+      operationId: BackendParticipantsGetByTypeAndID
+      parameters:
+        - $ref: '#/components/parameters/idType'
+        - $ref: '#/components/parameters/idValue'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/participantsResponse'
+          description: Response containing details of the requested party.
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: >-
+        Asks for the identifier (fspId) of the scheme participant (FSP) that can
+        handle transfers for the specified identifier type and value.
+      tags:
+        - Participants
+  /participants/{idType}/{idValue}/{idSubValue}:
+    get:
+      description: >-
+        The HTTP request `GET /participants/{idType}/{idValue}/{idSubValue}` is
+        used to find out in which FSP the requested party, defined by
+        `{idType}`, `{idValue}` and `{idSubValue}` is located.
+      operationId: BackendParticipantsGetByTypeIDAndSubId
+      parameters:
+        - $ref: '#/components/parameters/idType'
+        - $ref: '#/components/parameters/idValue'
+        - $ref: '#/components/parameters/idSubValue'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/participantsResponse'
+          description: Response containing details of the requested party.
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: >-
+        Asks for the identifier (fspId) of the scheme participant (FSP) that can
+        handle transfers for the specified identifier type and value.
+      tags:
+        - Participants
+  /parties/{idType}/{idValue}:
+    get:
+      description: >-
+        The HTTP request `GET /parties/{idType}/{idValue}` is used to look up
+        information regarding the requested transfer party, identified by
+        `{idType}` and `{idValue}`.
+      operationId: BackendPartiesGetByTypeAndID
+      parameters:
+        - $ref: '#/components/parameters/idType'
+        - $ref: '#/components/parameters/idValue'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transferParty'
+          description: Response containing details of the requested party.
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: >-
+        Requests information relating to a transfer party identified by the
+        specified identifier type and value.
+      tags:
+        - Parties
+  /parties/{idType}/{idValue}/{idSubValue}:
+    get:
+      description: >-
+        The HTTP request `GET /parties/{idType}/{idValue}/{idSubValue}` is used
+        to look up information regarding the requested transfer party,
+        identified by `{idType}`, `{idValue}` and `{idSubValue}`.
+      operationId: BackendPartiesGetByTypeIdAndSubId
+      parameters:
+        - $ref: '#/components/parameters/idType'
+        - $ref: '#/components/parameters/idValue'
+        - $ref: '#/components/parameters/idSubValue'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transferParty'
+          description: Response containing details of the requested party.
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: >-
+        Requests information relating to a transfer party identified by the
+        specified identifier type, value and subId value.
+      tags:
+        - Parties
+  /quoterequests:
+    post:
+      description: >-
+        The HTTP request `POST /quoterequests` is used to request the creation
+        of a quote for the provided financial transaction.
+      operationId: BackendQuoteRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/quoteRequest'
+        description: Request for a transfer quotation.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/quoteResponse'
+          description: A response to the transfer quotation request.
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Requests a quote for the specified transfer.
+      tags:
+        - Quotes
+  /transactionrequests:
+    post:
+      operationId: BackendTransactionRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transactionRequest'
+        description: Request for Transaction Request.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transactionRequestResponse'
+          description: A response to the transfer transaction request.
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Transaction request that supports pull based transfers.
+      tags:
+        - TransactionRequest
+  /transfers:
+    post:
+      description: >-
+        The HTTP request `POST /transfers` is used to request the creation of a
+        transfer for the transfer party.
+      operationId: BackendTransfersPost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transferRequest'
+        description: An incoming transfer request.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transferResponse'
+          description: The transfer was accepted.
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Transfers funds from an external account to an internal account.
+      tags:
+        - Transfers
+  /transfers/{transferId}:
+    get:
+      description: >-
+        The HTTP request `GET /transfers/{transferId}` is used to get
+        information regarding a transfer created or requested earlier. The
+        `{transferId}` in the URI should contain the `transferId` that was used
+        for the creation of the transfer.
+      operationId: BackendTransfersGet
+      parameters:
+        - $ref: '#/components/parameters/transferId'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transferDetailsResponse'
+          description: The transfer was accepted.
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Retrieves information for a specific transfer.
+      tags:
+        - Transfers
+    put:
+      description: >-
+        The HTTP request `PUT /transfers/{transferId}` is used to receive
+        notification for transfer being fulfiled when the FSP is a Payee.
+      operationId: BackendTransfersPut
+      parameters:
+        - $ref: '#/components/parameters/transferId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/fulfilNotification'
+        description: An incoming notification for fulfiled transfer.
+      responses:
+        '200':
+          description: The notification was accepted.
+        '500':
+          $ref: '#/components/responses/500'
+      summary: Receive notification for a specific transfer.
+      tags:
+        - Transfers
+  /fxQuotes:
+    post:
+      description: >-
+        The HTTP request `POST /fxQuotes` is used to ask an FXP backend to
+        provide a quotation for a currency conversion.
+      summary: Calculate FX quote
+      tags:
+        - Fx
+      operationId: FxQuotesPost
+      requestBody:
+        description: Details of the FX quote request.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FxQuotesPostBackendRequest'
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FxQuotesPostBackendResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+  /fxTransfers:
+    post:
+      description: >-
+        The HTTP request `POST /fxTransfers` is used to ask an FXP backend to
+        confirm the execution of an agreed currency conversion.
+      summary: Perform FX transfer
+      tags:
+        - Fx
+      operationId: FxTransfersPost
+      requestBody:
+        description: Details of the FX transfer request.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FxTransfersPostBackendRequest'
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FxTransfersPostBackendResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+  /fxTransfers/{commitRequestId}:
+    put:
+      description: >-
+        The HTTP request `PUT /fxTransfers/{commitRequestId}` is used to notify
+        an FXP backend about the status of currency conversion.
+      summary: FX Commit Notification
+      tags:
+        - Fx
+      operationId: FxTransfersById
+      requestBody:
+        description: Status of the FX transfer.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FxTransfersPutBackendRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  parameters:
+    idSubValue:
+      description: >-
+        A sub-identifier of the party identifier, or a sub-type of the party
+        identifier's type. For example, `PASSPORT`, `DRIVING_LICENSE`.
+      in: path
+      name: idSubValue
+      required: true
+      schema:
+        type: string
+    idType:
+      description: The type of the party identifier. For example, `MSISDN`, `PERSONAL_ID`.
+      in: path
+      name: idType
+      required: true
+      schema:
+        type: string
+    idValue:
+      description: The identifier value.
+      in: path
+      name: idValue
+      required: true
+      schema:
+        type: string
+    transactionRequestId:
+      in: path
+      name: transactionRequestId
+      required: true
+      schema:
+        $ref: '#/components/schemas/transactionRequestId'
+    transferId:
+      in: path
+      name: transferId
+      required: true
+      schema:
+        type: string
+    bulkTransactionId:
+      name: bulkTransactionId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/CorrelationId'
+      description: >-
+        Identifier of the bulk transaction to continue as returned in the
+        response to a `POST /bulkTransaction` request.
+  schemas:
+    DateOfBirth:
+      title: DateofBirth (type Date)
+      type: string
+      pattern: >-
+        ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)$
+      description: Date of Birth of the Party.
+      example: '1966-06-16'
+    FirstName:
+      title: FirstName
+      type: string
+      minLength: 1
+      maxLength: 128
+      pattern: >-
+        ^(?!\s*$)[\p{L}\p{gc=Mark}\p{digit}\p{gc=Connector_Punctuation}\p{Join_Control}
+        .,''-]{1,128}$
+      description: First name of the Party (Name Type).
+      example: Henrik
+    FspId:
+      title: FspId
+      type: string
+      minLength: 1
+      maxLength: 32
+      description: FSP identifier.
+    IndividualQuote:
+      description: Data model for individual quote in a bulk quote request.
+      properties:
+        amount:
+          $ref: '#/components/schemas/money'
+        amountType:
+          $ref: '#/components/schemas/amountType'
+        currency:
+          $ref: '#/components/schemas/currency'
+        feesAmount:
+          $ref: '#/components/schemas/money'
+        feesCurrency:
+          $ref: '#/components/schemas/currency'
+        initiator:
+          $ref: '#/components/schemas/initiator'
+        initiatorType:
+          $ref: '#/components/schemas/initiatorType'
+        note:
+          description: An optional note associated with the quote.
+          maxLength: 128
+          minLength: 1
+          type: string
+        quoteId:
+          $ref: '#/components/schemas/quoteId'
+        subScenario:
+          $ref: '#/components/schemas/TransactionSubScenario'
+        to:
+          $ref: '#/components/schemas/transferParty'
+        transactionId:
+          $ref: '#/components/schemas/transactionId'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+      required:
+        - quoteId
+        - transactionId
+        - to
+        - amountType
+        - amount
+        - currency
+        - transactionType
+        - initiator
+        - initiatorType
+      type: object
+    IndividualQuoteResultFailed:
+      description: Data model for failed individual quote in a bulk quote response.
+      properties:
+        errorResponse:
+          $ref: '#/components/schemas/errorResponse'
+        quoteId:
+          $ref: '#/components/schemas/quoteId'
+      required:
+        - quoteId
+        - errorResponse
+      type: object
+    IndividualQuoteResultSuccess:
+      description: Data model for successful individual quote in a bulk quote response.
+      properties:
+        payeeFspCommissionAmount:
+          $ref: '#/components/schemas/money'
+        payeeFspCommissionAmountCurrency:
+          $ref: '#/components/schemas/currency'
+        payeeFspFeeAmount:
+          $ref: '#/components/schemas/money'
+        payeeFspFeeAmountCurrency:
+          $ref: '#/components/schemas/currency'
+        payeeReceiveAmount:
+          $ref: '#/components/schemas/money'
+        payeeReceiveAmountCurrency:
+          $ref: '#/components/schemas/currency'
+        quoteId:
+          $ref: '#/components/schemas/quoteId'
+        transferAmount:
+          $ref: '#/components/schemas/money'
+        transferAmountCurrency:
+          $ref: '#/components/schemas/currency'
+      required:
+        - quoteId
+      type: object
+    IndividualTransfer:
+      description: Data model for individual transfer in a bulk transfer request.
+      properties:
+        amount:
+          $ref: '#/components/schemas/money'
+        amountType:
+          $ref: '#/components/schemas/amountType'
+        currency:
+          $ref: '#/components/schemas/currency'
+        feesAmount:
+          $ref: '#/components/schemas/money'
+        feesCurrency:
+          $ref: '#/components/schemas/currency'
+        initiator:
+          $ref: '#/components/schemas/initiator'
+        initiatorType:
+          $ref: '#/components/schemas/initiatorType'
+        note:
+          description: An optional note associated with the quote.
+          maxLength: 128
+          minLength: 1
+          type: string
+        subScenario:
+          $ref: '#/components/schemas/TransactionSubScenario'
+        to:
+          $ref: '#/components/schemas/transferParty'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+        transferId:
+          $ref: '#/components/schemas/transferId'
+      required:
+        - transferId
+        - amount
+        - currency
+      type: object
+    IndividualTransferResult:
+      description: Data model for individual transfer in a bulk transfer response.
+      properties:
+        errorResponse:
+          $ref: '#/components/schemas/errorResponse'
+        extensionList:
+          $ref: '#/components/schemas/extensionList'
+        transferId:
+          $ref: '#/components/schemas/transferId'
+      required:
+        - transferId
+      type: object
+    LastName:
+      title: LastName
+      type: string
+      minLength: 1
+      maxLength: 128
+      pattern: >-
+        ^(?!\s*$)[\p{L}\p{gc=Mark}\p{digit}\p{gc=Connector_Punctuation}\p{Join_Control}
+        .,''-]{1,128}$
+      description: Last name of the Party (Name Type).
+      example: Karlsson
+    MerchantClassificationCode:
+      title: MerchantClassificationCode
+      type: string
+      pattern: ^[\d]{1,4}$
+      description: >-
+        A limited set of pre-defined numbers. This list would be a limited set
+        of numbers identifying a set of popular merchant types like School Fees,
+        Pubs and Restaurants, Groceries, etc.
+    MiddleName:
+      title: MiddleName
+      type: string
+      minLength: 1
+      maxLength: 128
+      pattern: >-
+        ^(?!\s*$)[\p{L}\p{gc=Mark}\p{digit}\p{gc=Connector_Punctuation}\p{Join_Control}
+        .,''-]{1,128}$
+      description: Middle name of the Party (Name Type).
+      example: Johannes
+    amountCurrency:
+      description: Object containing Amount and Currency of the transfer.
+      properties:
+        amount:
+          $ref: '#/components/schemas/money'
+        currency:
+          $ref: '#/components/schemas/currency'
+      required:
+        - amount
+        - currency
+      type: object
+    amountType:
+      enum:
+        - SEND
+        - RECEIVE
+      type: string
+    bulkQuoteId:
+      description: A Mojaloop API bulk quote identifier (UUID).
+      pattern: >-
+        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$|^[0-9A-HJKMNP-TV-Z]{26}$
+      type: string
+    bulkQuoteRequest:
+      description: A request for a bulk quote.
+      properties:
+        bulkQuoteId:
+          $ref: '#/components/schemas/bulkQuoteId'
+        expiration:
+          $ref: '#/components/schemas/timestamp'
+        from:
+          $ref: '#/components/schemas/transferParty'
+        geoCode:
+          $ref: '#/components/schemas/geoCode'
+        individualQuotes:
+          items:
+            $ref: '#/components/schemas/IndividualQuote'
+          maxItems: 1000
+          minItems: 1
+          type: array
+      required:
+        - bulkQuoteId
+        - from
+        - individualQuotes
+      type: object
+    bulkQuoteResponse:
+      description: A response to a request for a bulk quote.
+      properties:
+        bulkQuoteId:
+          $ref: '#/components/schemas/bulkQuoteId'
+        expiration:
+          $ref: '#/components/schemas/timestamp'
+        individualQuoteResults:
+          description: >-
+            Fees for each individual transaction, if any of them are charged per
+            transaction.
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/IndividualQuoteResultSuccess'
+              - $ref: '#/components/schemas/IndividualQuoteResultFailed'
+          maxItems: 1000
+          minItems: 1
+          type: array
+      required:
+        - bulkQuoteId
+        - individualQuoteResults
+      type: object
+    bulkTransferId:
+      description: A Mojaloop API transfer identifier (UUID).
+      pattern: >-
+        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$|^[0-9A-HJKMNP-TV-Z]{26}$
+      type: string
+    bulkTransferRequest:
+      properties:
+        bulkQuote:
+          $ref: '#/components/schemas/bulkQuoteResponse'
+        bulkTransferId:
+          $ref: '#/components/schemas/bulkTransferId'
+        from:
+          $ref: '#/components/schemas/transferParty'
+        individualTransfers:
+          items:
+            $ref: '#/components/schemas/IndividualTransfer'
+          maxItems: 1000
+          minItems: 1
+          type: array
+      required:
+        - bulkTransferId
+        - individualTransfers
+      type: object
+    bulkTransferResponse:
+      properties:
+        bulkTransferId:
+          $ref: '#/components/schemas/bulkTransferId'
+        homeTransactionId:
+          description: >-
+            Transaction ID from the DFSP backend, used to reconcile transactions
+            between the switch and DFSP backend systems.
+          type: string
+        individualTransferResults:
+          items:
+            $ref: '#/components/schemas/IndividualTransferResult'
+          maxItems: 1000
+          minItems: 1
+          type: array
+      required:
+        - homeTransactionId
+      type: object
+    currency:
+      enum:
+        - AED
+        - AFN
+        - ALL
+        - AMD
+        - ANG
+        - AOA
+        - ARS
+        - AUD
+        - AWG
+        - AZN
+        - BAM
+        - BBD
+        - BDT
+        - BGN
+        - BHD
+        - BIF
+        - BMD
+        - BND
+        - BOB
+        - BRL
+        - BSD
+        - BTN
+        - BWP
+        - BYN
+        - BZD
+        - CAD
+        - CDF
+        - CHF
+        - CLP
+        - CNY
+        - COP
+        - CRC
+        - CUC
+        - CUP
+        - CVE
+        - CZK
+        - DJF
+        - DKK
+        - DOP
+        - DZD
+        - EGP
+        - ERN
+        - ETB
+        - EUR
+        - FJD
+        - FKP
+        - GBP
+        - GEL
+        - GGP
+        - GHS
+        - GIP
+        - GMD
+        - GNF
+        - GTQ
+        - GYD
+        - HKD
+        - HNL
+        - HRK
+        - HTG
+        - HUF
+        - IDR
+        - ILS
+        - IMP
+        - INR
+        - IQD
+        - IRR
+        - ISK
+        - JEP
+        - JMD
+        - JOD
+        - JPY
+        - KES
+        - KGS
+        - KHR
+        - KMF
+        - KPW
+        - KRW
+        - KWD
+        - KYD
+        - KZT
+        - LAK
+        - LBP
+        - LKR
+        - LRD
+        - LSL
+        - LYD
+        - MAD
+        - MDL
+        - MGA
+        - MKD
+        - MMK
+        - MNT
+        - MOP
+        - MRO
+        - MUR
+        - MVR
+        - MWK
+        - MXN
+        - MYR
+        - MZN
+        - NAD
+        - NGN
+        - NIO
+        - NOK
+        - NPR
+        - NZD
+        - OMR
+        - PAB
+        - PEN
+        - PGK
+        - PHP
+        - PKR
+        - PLN
+        - PYG
+        - QAR
+        - RON
+        - RSD
+        - RUB
+        - RWF
+        - SAR
+        - SBD
+        - SCR
+        - SDG
+        - SEK
+        - SGD
+        - SHP
+        - SLL
+        - SOS
+        - SPL
+        - SRD
+        - STD
+        - SVC
+        - SYP
+        - SZL
+        - THB
+        - TJS
+        - TMT
+        - TND
+        - TOP
+        - TRY
+        - TTD
+        - TVD
+        - TWD
+        - TZS
+        - UAH
+        - UGX
+        - USD
+        - UYU
+        - UZS
+        - VEF
+        - VND
+        - VUV
+        - WST
+        - XAF
+        - XCD
+        - XDR
+        - XOF
+        - XPF
+        - XTS
+        - XXX
+        - YER
+        - ZAR
+        - ZMW
+        - ZWD
+      maxLength: 3
+      minLength: 3
+      type: string
+    dateOfBirth:
+      description: Date of birth in the form YYYY-MM-DD.
+      pattern: >-
+        ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)$
+      type: string
+    errorCode:
+      description: >
+        The API data type errorCode is a JSON String of four characters,
+        consisting of digits only. Negative numbers are not allowed. A leading
+        zero is not allowed. Each error code in the API is a four-digit number,
+        for example, 1234, where the first number (1 in the example) represents
+        the high-level error category, the second number (2 in the example)
+        represents the low-level error category, and the last two numbers (34 in
+        the example) represents the specific error.
+      pattern: ^[1-9]\d{3}$
+      title: ErrorCode
+      type: string
+    errorDescription:
+      description: Error description string.
+      maxLength: 128
+      minLength: 1
+      title: ErrorDescription
+      type: string
+    errorInformation:
+      description: A Mojaloop API error information construct.
+      properties:
+        errorCode:
+          $ref: '#/components/schemas/errorCode'
+        errorDescription:
+          $ref: '#/components/schemas/errorDescription'
+        extensionList:
+          $ref: '#/components/schemas/extensionListComplex'
+      required:
+        - errorCode
+        - errorDescription
+      title: ErrorInformation
+      type: object
+    extensionItem:
+      properties:
+        key:
+          maxLength: 32
+          minLength: 1
+          type: string
+        value:
+          maxLength: 128
+          minLength: 1
+          type: string
+      type: object
+    extensionList:
+      items:
+        $ref: '#/components/schemas/extensionItem'
+      maxItems: 16
+      minItems: 0
+      type: array
+    extensionListComplex:
+      description: Data model for the complex type ExtensionList.
+      properties:
+        extension:
+          description: Number of Extension elements.
+          items:
+            $ref: '#/components/schemas/extensionItem'
+          maxItems: 16
+          minItems: 1
+          type: array
+      required:
+        - extension
+      type: object
+    fspId:
+      description: FSP identifier.
+      maxLength: 32
+      minLength: 1
+      type: string
+    fulfilNotification:
+      description: PUT /transfers/{transferId} object.
+      properties:
+        currentState:
+          $ref: '#/components/schemas/transferStatus'
+        direction:
+          enum:
+            - INBOUND
+          type: string
+        finalNotification:
+          properties:
+            completedTimestamp:
+              $ref: '#/components/schemas/timestamp'
+            extensionList:
+              $ref: '#/components/schemas/extensionList'
+            transferState:
+              $ref: '#/components/schemas/transferState'
+          required:
+            - completedTimestamp
+            - transferState
+          type: object
+        fulfil:
+          properties:
+            body:
+              type: object
+            headers:
+              type: object
+          type: object
+        initiatedTimestamp:
+          $ref: '#/components/schemas/timestamp'
+        lastError:
+          $ref: '#/components/schemas/transferError'
+        prepare:
+          properties:
+            body:
+              type: object
+            headers:
+              type: object
+          type: object
+        quote:
+          properties:
+            fulfilment:
+              type: string
+            internalRequest:
+              type: object
+            mojaloopResponse:
+              type: object
+            request:
+              type: object
+            response:
+              type: object
+          type: object
+        quoteRequest:
+          properties:
+            body:
+              type: object
+            headers:
+              type: object
+          type: object
+        quoteResponse:
+          properties:
+            body:
+              type: object
+            headers:
+              type: object
+          type: object
+        transferId:
+          $ref: '#/components/schemas/transferId'
+      title: TransfersIDPatchResponse
+      type: object
+    generalError:
+      description: >-
+        This object may represent a number of different error object types and
+        so its properties may vary significantly.
+      type: object
+    geoCode:
+      description: >-
+        Indicates the geographic location from where the transaction was
+        initiated.
+      properties:
+        latitude:
+          $ref: '#/components/schemas/latitude'
+        longitude:
+          $ref: '#/components/schemas/longitude'
+      required:
+        - latitude
+        - longitude
+      type: object
+    idSubValue:
+      maxLength: 128
+      minLength: 1
+      type: string
+    idType:
+      enum:
+        - MSISDN
+        - ACCOUNT_NO
+        - EMAIL
+        - PERSONAL_ID
+        - BUSINESS
+        - DEVICE
+        - ACCOUNT_ID
+        - IBAN
+        - ALIAS
+      type: string
+    idValue:
+      description: Identifier of the party.
+      maxLength: 128
+      minLength: 1
+      type: string
+    ilpPacketData:
+      description: Object containing transfer object.
+      properties:
+        amount:
+          $ref: '#/components/schemas/amountCurrency'
+        payee:
+          $ref: '#/components/schemas/Party'
+        payer:
+          $ref: '#/components/schemas/Party'
+        quoteId:
+          $ref: '#/components/schemas/quoteId'
+        transactionId:
+          $ref: '#/components/schemas/transactionId'
+        transactionType:
+          $ref: '#/components/schemas/transactionTypeObject'
+      required:
+        - quoteId
+        - transactionId
+        - payer
+        - payee
+        - amount
+        - transactionType
+      type: object
+    initiator:
+      enum:
+        - PAYER
+        - PAYEE
+      type: string
+    initiatorType:
+      enum:
+        - CONSUMER
+        - AGENT
+        - BUSINESS
+        - DEVICE
+      type: string
+    latitude:
+      description: >-
+        The API data type Latitude is a JSON String in a lexical format that is
+        restricted by a regular expression for interoperability reasons.
+      pattern: >-
+        ^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$
+      type: string
+    longitude:
+      description: >-
+        The API data type Longitude is a JSON String in a lexical format that is
+        restricted by a regular expression for interoperability reasons.
+      pattern: >-
+        ^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$
+      type: string
+    money:
+      pattern: ^([0]|([1-9][0-9]{0,17}))([.][0-9]{0,3}[1-9])?$
+      type: string
+    otpDetails:
+      properties:
+        otpValue:
+          description: OTP value.
+          type: string
+      required:
+        - otpValue
+      type: object
+    participantsResponse:
+      properties:
+        fspId:
+          $ref: '#/components/schemas/fspId'
+      type: object
+    payerType:
+      enum:
+        - CONSUMER
+        - AGENT
+        - BUSINESS
+        - DEVICE
+      type: string
+    quoteId:
+      description: A Mojaloop API quote identifier (UUID).
+      pattern: >-
+        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$|^[0-9A-HJKMNP-TV-Z]{26}$
+      type: string
+    quoteRequest:
+      description: A request for a quote for transfer from the DFSP backend.
+      properties:
+        homeR2PTransactionId:
+          type: string
+          description: >-
+            Linked homeR2PTransactionId which was generated as part of POST
+            /requestToPay to SDK incase of requestToPay transfer.
+        amount:
+          $ref: '#/components/schemas/money'
+        amountType:
+          $ref: '#/components/schemas/amountType'
+        currency:
+          $ref: '#/components/schemas/currency'
+        expiration:
+          $ref: '#/components/schemas/timestamp'
+        extensionList:
+          $ref: '#/components/schemas/extensionList'
+        feesAmount:
+          $ref: '#/components/schemas/money'
+        feesCurrency:
+          $ref: '#/components/schemas/currency'
+        from:
+          $ref: '#/components/schemas/transferParty'
+        geoCode:
+          $ref: '#/components/schemas/geoCode'
+        initiator:
+          $ref: '#/components/schemas/initiator'
+        initiatorType:
+          $ref: '#/components/schemas/initiatorType'
+        note:
+          description: An optional note associated with the requested transfer.
+          maxLength: 128
+          minLength: 1
+          type: string
+        quoteId:
+          $ref: '#/components/schemas/quoteId'
+        subScenario:
+          $ref: '#/components/schemas/TransactionSubScenario'
+        to:
+          $ref: '#/components/schemas/transferParty'
+        transactionId:
+          $ref: '#/components/schemas/transactionId'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+        transactionRequestId:
+          $ref: '#/components/schemas/transactionRequestId'
+        converter:
+          allOf:
+            - $ref: '#/components/schemas/CurrencyConverter'
+            - description: >-
+                An optional field which will allow the payer DFSP to specify
+                which DFSP it wants to undertake currency conversion. This is
+                useful incase of if the sender wants the recipient to receive a
+                specified amount of the target currency, but the payer DFSP does
+                not want to undertake the currency conversion. In this case, the
+                amount of the transfer would be expressed in the target currency
+                and the amountType would be set to RECEIVE.
+        currencyConversion:
+          allOf:
+            - $ref: '#/components/schemas/FxRate'
+            - description: >-
+                Used by the debtor party if it wants to share information about
+                the currency conversion it proposes to make; or if it is
+                required by scheme rules to share this information. This object
+                contains the amount of the transfer in the source and target
+                currencies, but does not identify the FXP being used.
+      required:
+        - quoteId
+        - transactionId
+        - to
+        - from
+        - amountType
+        - amount
+        - currency
+        - transactionType
+        - initiator
+        - initiatorType
+      type: object
+    quoteResponse:
+      description: A response to a request for a quote.
+      properties:
+        expiration:
+          $ref: '#/components/schemas/timestamp'
+        extensionList:
+          $ref: '#/components/schemas/extensionList'
+        geoCode:
+          $ref: '#/components/schemas/geoCode'
+        payeeFspCommissionAmount:
+          $ref: '#/components/schemas/money'
+        payeeFspCommissionAmountCurrency:
+          $ref: '#/components/schemas/currency'
+        payeeFspFeeAmount:
+          $ref: '#/components/schemas/money'
+        payeeFspFeeAmountCurrency:
+          $ref: '#/components/schemas/currency'
+        payeeReceiveAmount:
+          $ref: '#/components/schemas/money'
+        payeeReceiveAmountCurrency:
+          $ref: '#/components/schemas/currency'
+        quoteId:
+          $ref: '#/components/schemas/quoteId'
+        transactionId:
+          $ref: '#/components/schemas/transactionId'
+        transferAmount:
+          $ref: '#/components/schemas/money'
+        transferAmountCurrency:
+          $ref: '#/components/schemas/currency'
+      required:
+        - quoteId
+        - transactionId
+        - transferAmount
+        - transferAmountCurrency
+      type: object
+    scenario:
+      enum:
+        - TRANSFER
+      type: string
+    timestamp:
+      description: An ISO-8601 formatted timestamp.
+      pattern: >-
+        ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:(\.\d{3}))(?:Z|[+-][01]\d:[0-5]\d)$
+      type: string
+    transactionId:
+      description: >-
+        ID of the transaction, the ID is decided by the Payer FSP during the
+        creation of the quote.
+      pattern: >-
+        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$|^[0-9A-HJKMNP-TV-Z]{26}$
+      type: string
+    transactionRequest:
+      description: A request for a pull based transfer.
+      properties:
+        amount:
+          $ref: '#/components/schemas/money'
+        currency:
+          $ref: '#/components/schemas/currency'
+        expiration:
+          $ref: '#/components/schemas/timestamp'
+        from:
+          $ref: '#/components/schemas/transferParty'
+        geoCode:
+          $ref: '#/components/schemas/geoCode'
+        initiator:
+          $ref: '#/components/schemas/initiator'
+        initiatorType:
+          $ref: '#/components/schemas/initiatorType'
+        note:
+          description: An optional note associated with the requested transfer.
+          maxLength: 128
+          minLength: 1
+          type: string
+        to:
+          $ref: '#/components/schemas/transferParty'
+        transactionRequestId:
+          $ref: '#/components/schemas/transactionRequestId'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+        subScenario:
+          $ref: '#/components/schemas/TransactionSubScenario'
+        authenticationType:
+          $ref: '#/components/schemas/AuthenticationType'
+      required:
+        - transactionRequestId
+        - to
+        - from
+        - amount
+        - currency
+        - transactionType
+        - initiator
+        - initiatorType
+      type: object
+    transactionRequestId:
+      description: A Mojaloop API transaction request identifier (UUID).
+      pattern: >-
+        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$|^[0-9A-HJKMNP-TV-Z]{26}$
+      type: string
+    transactionRequestResponse:
+      description: A response to a request for a quote.
+      properties:
+        homeR2PTransactionId:
+          type: string
+          description: >-
+            Transaction ID from the DFSP backend, used to reconcile transactions
+            between the Switch and DFSP backend systems.
+        transactionId:
+          $ref: '#/components/schemas/transactionId'
+        transactionRequestState:
+          $ref: '#/components/schemas/transactionRequestState'
+      required:
+        - transactionId
+        - transactionRequestState
+      type: object
+    transactionRequestState:
+      enum:
+        - RECEIVED
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+      type: string
+    transactionSubScenario:
+      description: >-
+        Possible sub-scenario, defined locally within the scheme (UndefinedEnum
+        Type). Based on FSPIOP TransactionSubScenario.
+      example: LOCALLY_DEFINED_SUBSCENARIO
+      pattern: ^[A-Z_]{1,32}$
+      title: transactionSubScenario
+      type: string
+    transactionType:
+      enum:
+        - TRANSFER
+        - DEPOSIT
+        - PAYMENT
+      type: string
+    transactionTypeObject:
+      description: Object containing transfer object.
+      properties:
+        initiator:
+          $ref: '#/components/schemas/initiator'
+        initiatorType:
+          $ref: '#/components/schemas/initiatorType'
+        scenario:
+          $ref: '#/components/schemas/scenario'
+        subScenario:
+          $ref: '#/components/schemas/TransactionSubScenario'
+      required:
+        - scenario
+        - initiator
+        - initiatorType
+      type: object
+    transferDetailsResponse:
+      properties:
+        amount:
+          $ref: '#/components/schemas/money'
+        amountType:
+          $ref: '#/components/schemas/amountType'
+        currency:
+          $ref: '#/components/schemas/currency'
+        extensions:
+          $ref: '#/components/schemas/extensionList'
+        from:
+          $ref: '#/components/schemas/transferParty'
+        homeTransactionId:
+          description: >-
+            Transaction ID from the DFSP backend, used to reconcile transactions
+            between the Switch and DFSP backend systems.
+          type: string
+        note:
+          maxLength: 128
+          type: string
+        subScenario:
+          $ref: '#/components/schemas/TransactionSubScenario'
+        timestamp:
+          $ref: '#/components/schemas/timestamp'
+        to:
+          $ref: '#/components/schemas/transferParty'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+        transferState:
+          $ref: '#/components/schemas/transferState'
+      required:
+        - homeTransactionId
+        - from
+        - to
+        - amountType
+        - currency
+        - amount
+        - transferState
+        - transactionType
+        - timestamp
+      type: object
+    transferId:
+      description: A Mojaloop API transfer identifier (UUID).
+      pattern: >-
+        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$|^[0-9A-HJKMNP-TV-Z]{26}$
+      type: string
+    transferParty:
+      properties:
+        dateOfBirth:
+          $ref: '#/components/schemas/dateOfBirth'
+        displayName:
+          description: Display name of the sender, if known.
+          type: string
+        extensionList:
+          $ref: '#/components/schemas/extensionList'
+        firstName:
+          description: Party first name.
+          type: string
+        fspId:
+          description: Mojaloop scheme FSPID of the DFSP which owns the party account.
+          type: string
+        idSubValue:
+          $ref: '#/components/schemas/idSubValue'
+        idType:
+          $ref: '#/components/schemas/idType'
+        idValue:
+          description: The identifier string used to identify the sender.
+          type: string
+        lastName:
+          description: Party last name.
+          type: string
+        merchantClassificationCode:
+          description: >-
+            Up to 4 digits specifying the sender's merchant classification, if
+            known and applicable.
+          type: string
+        middleName:
+          description: Party middle name.
+          type: string
+        type:
+          $ref: '#/components/schemas/payerType'
+        supportedCurrencies:
+          type: array
+          description: Currencies in which the party can receive funds.
+          items:
+            $ref: '#/components/schemas/currency'
+          minItems: 0
+          maxItems: 16
+        kycInformation:
+          $ref: '#/components/schemas/KYCInformation'
+      required:
+        - idType
+        - idValue
+      type: object
+    transferRequest:
+      properties:
+        homeR2PTransactionId:
+          type: string
+          description: >-
+            Linked homeR2PTransactionId which was generated as part of POST
+            /requestToPay to SDK incase of requestToPay transfer.
+        amount:
+          $ref: '#/components/schemas/money'
+        amountType:
+          $ref: '#/components/schemas/amountType'
+        currency:
+          $ref: '#/components/schemas/currency'
+        from:
+          $ref: '#/components/schemas/transferParty'
+        ilpPacket:
+          properties:
+            data:
+              $ref: '#/components/schemas/ilpPacketData'
+          required:
+            - data
+          type: object
+        note:
+          maxLength: 128
+          type: string
+        quote:
+          $ref: '#/components/schemas/quoteResponse'
+        quoteRequestExtensions:
+          $ref: '#/components/schemas/extensionList'
+        subScenario:
+          $ref: '#/components/schemas/TransactionSubScenario'
+        to:
+          $ref: '#/components/schemas/transferParty'
+        transactionType:
+          $ref: '#/components/schemas/transactionType'
+        transferId:
+          $ref: '#/components/schemas/transferId'
+        transactionRequestId:
+          $ref: '#/components/schemas/transactionRequestId'
+      required:
+        - transferId
+        - quote
+        - from
+        - to
+        - amountType
+        - currency
+        - amount
+        - transactionType
+        - ilpPacket
+      type: object
+    transferResponse:
+      properties:
+        completedTimestamp:
+          $ref: '#/components/schemas/timestamp'
+        fulfilment:
+          $ref: '#/components/schemas/IlpFulfilment'
+        homeTransactionId:
+          description: >-
+            Transaction ID from the DFSP backend, used to reconcile transactions
+            between the Switch and DFSP backend systems.
+          type: string
+        transferState:
+          $ref: '#/components/schemas/transferState'
+      required:
+        - homeTransactionId
+      type: object
+    transferState:
+      description: >
+        Below are the allowed values for the enumeration - RECEIVED DFSP has
+        received the transfer. - RESERVED DFSP has reserved the transfer. -
+        COMMITTED DFSP has successfully performed the transfer. - ABORTED DFSP
+        has aborted the transfer due a rejection or failure to perform the
+        transfer.
+      enum:
+        - RECEIVED
+        - RESERVED
+        - COMMITTED
+        - ABORTED
+      type: string
+    transferStatus:
+      enum:
+        - ERROR_OCCURRED
+        - WAITING_FOR_PARTY_ACCEPTANCE
+        - WAITING_FOR_QUOTE_ACCEPTANCE
+        - COMPLETED
+      type: string
+    requestToPayCallback:
+      description: Callback for requestToPay.
+      properties:
+        homeR2PTransactionId:
+          type: string
+          description: >-
+            Transaction ID from the DFSP backend, used to reconcile transactions
+            between the Switch and DFSP backend systems.
+        transactionRequestState:
+          $ref: '#/components/schemas/transactionRequestState'
+      required:
+        - transactionRequestState
+    KYCInformation:
+      title: KYCInformation
+      type: string
+      minLength: 1
+      maxLength: 2048
+      description: >-
+        KYC information for the party in a form mandated by an individual
+        scheme.
+      example: |-
+        {
+            "metadata": {
+                "format": "JSON",
+                "version": "1.0",
+                "description": "Data containing KYC Information"
+            },
+            "data": {
+                "name": "John Doe",
+                "dob": "1980-05-15",
+                "gender": "Male",
+                "address": "123 Main Street, Anytown, USA",
+                "email": "johndoe@example.com",
+                "phone": "+1 555-123-4567",
+                "nationality": "US",
+                "passport_number": "AB1234567",
+                "issue_date": "2010-02-20",
+                "expiry_date": "2025-02-20",
+                "bank_account_number": "1234567890",
+                "bank_name": "Example Bank",
+                "employer": "ABC Company",
+                "occupation": "Software Engineer",
+                "income": "$80,000 per year",
+                "marital_status": "Single",
+                "dependents": 0,
+                "risk_level": "Low"
+            }
+        }
+    TransactionSubScenario:
+      title: TransactionSubScenario
+      type: string
+      pattern: ^[A-Z_]{1,32}$
+      description: >-
+        Possible sub-scenario, defined locally within the scheme (UndefinedEnum
+        Type).
+      example: LOCALLY_DEFINED_SUBSCENARIO
+    errorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: string
+          description: >
+            Backend error code from FSP. Ideally, statusCode is FSPIOP
+            conforming. SDK will use status code to retrieve an FSPIOP error
+            with the same code.
+
+            Otherwise, a suitable generic FSPIOP will be used with the
+            errorResponse in the FSPIOP error message.
+        message:
+          type: string
+          description: Error message text.
+    CorrelationId:
+      title: CorrelationId
+      type: string
+      pattern: >-
+        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$|^[0-9A-HJKMNP-TV-Z]{26}$
+      description: >-
+        Identifier that correlates all messages of the same sequence. The API
+        data type UUID (Universally Unique Identifier) is a JSON String in
+        canonical format, conforming to [RFC
+        4122](https://tools.ietf.org/html/rfc4122), that is restricted by a
+        regular expression for interoperability reasons. A UUID is always 36
+        characters long, 32 hexadecimal symbols and 4 dashes (‘-‘).
+      example: b51ec534-ee48-4575-b6a9-ead2955b8069
+    bulkTransactionStatus:
+      type: string
+      enum:
+        - ERROR_OCCURRED
+        - WAITING_FOR_PARTY_ACCEPTANCE
+        - WAITING_FOR_QUOTE_ACCEPTANCE
+        - COMPLETED
+    autoAcceptPartyOption:
+      type: object
+      required:
+        - enabled
+      properties:
+        enabled:
+          type: boolean
+          enum:
+            - false
+            - true
+    Currency:
+      title: Currency
+      description: >-
+        The currency codes defined in [ISO
+        4217](https://www.iso.org/iso-4217-currency-codes.html) as three-letter
+        alphabetic codes are used as the standard naming representation for
+        currencies.
+      type: string
+      minLength: 3
+      maxLength: 3
+      enum:
+        - AED
+        - AFN
+        - ALL
+        - AMD
+        - ANG
+        - AOA
+        - ARS
+        - AUD
+        - AWG
+        - AZN
+        - BAM
+        - BBD
+        - BDT
+        - BGN
+        - BHD
+        - BIF
+        - BMD
+        - BND
+        - BOB
+        - BRL
+        - BSD
+        - BTN
+        - BWP
+        - BYN
+        - BZD
+        - CAD
+        - CDF
+        - CHF
+        - CLP
+        - CNY
+        - COP
+        - CRC
+        - CUC
+        - CUP
+        - CVE
+        - CZK
+        - DJF
+        - DKK
+        - DOP
+        - DZD
+        - EGP
+        - ERN
+        - ETB
+        - EUR
+        - FJD
+        - FKP
+        - GBP
+        - GEL
+        - GGP
+        - GHS
+        - GIP
+        - GMD
+        - GNF
+        - GTQ
+        - GYD
+        - HKD
+        - HNL
+        - HRK
+        - HTG
+        - HUF
+        - IDR
+        - ILS
+        - IMP
+        - INR
+        - IQD
+        - IRR
+        - ISK
+        - JEP
+        - JMD
+        - JOD
+        - JPY
+        - KES
+        - KGS
+        - KHR
+        - KMF
+        - KPW
+        - KRW
+        - KWD
+        - KYD
+        - KZT
+        - LAK
+        - LBP
+        - LKR
+        - LRD
+        - LSL
+        - LYD
+        - MAD
+        - MDL
+        - MGA
+        - MKD
+        - MMK
+        - MNT
+        - MOP
+        - MRO
+        - MUR
+        - MVR
+        - MWK
+        - MXN
+        - MYR
+        - MZN
+        - NAD
+        - NGN
+        - NIO
+        - NOK
+        - NPR
+        - NZD
+        - OMR
+        - PAB
+        - PEN
+        - PGK
+        - PHP
+        - PKR
+        - PLN
+        - PYG
+        - QAR
+        - RON
+        - RSD
+        - RUB
+        - RWF
+        - SAR
+        - SBD
+        - SCR
+        - SDG
+        - SEK
+        - SGD
+        - SHP
+        - SLL
+        - SOS
+        - SPL
+        - SRD
+        - STD
+        - SVC
+        - SYP
+        - SZL
+        - THB
+        - TJS
+        - TMT
+        - TND
+        - TOP
+        - TRY
+        - TTD
+        - TVD
+        - TWD
+        - TZS
+        - UAH
+        - UGX
+        - USD
+        - UYU
+        - UZS
+        - VEF
+        - VND
+        - VUV
+        - WST
+        - XAF
+        - XCD
+        - XDR
+        - XOF
+        - XPF
+        - XTS
+        - XXX
+        - YER
+        - ZAR
+        - ZMW
+        - ZWD
+    Amount:
+      title: Amount
+      type: string
+      pattern: ^([0]|([1-9][0-9]{0,17}))([.][0-9]{0,3}[1-9])?$
+      description: >-
+        The API data type Amount is a JSON String in a canonical format that is
+        restricted by a regular expression for interoperability reasons. This
+        pattern does not allow any trailing zeroes at all, but allows an amount
+        without a minor currency unit. It also only allows four digits in the
+        minor currency unit; a negative value is not allowed. Using more than 18
+        digits in the major currency unit is not allowed.
+      example: '123.45'
+    bulkPerTransferFeeLimit:
+      type: object
+      required:
+        - currency
+        - amount
+      properties:
+        currency:
+          $ref: '#/components/schemas/Currency'
+        amount:
+          $ref: '#/components/schemas/Amount'
+    autoAcceptQuote:
+      type: object
+      required:
+        - enabled
+      properties:
+        enabled:
+          type: boolean
+          enum:
+            - true
+            - false
+        perTransferFeeLimits:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/bulkPerTransferFeeLimit'
+    DateTime:
+      title: DateTime
+      type: string
+      pattern: >-
+        ^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:(\.\d{3}))(?:Z|[+-][01]\d:[0-5]\d)$
+      description: >-
+        The API data type DateTime is a JSON String in a lexical format that is
+        restricted by a regular expression for interoperability reasons. The
+        format is according to [ISO
+        8601](https://www.iso.org/iso-8601-date-and-time-format.html), expressed
+        in a combined date, time and time zone format. A more readable version
+        of the format is yyyy-MM-ddTHH:mm:ss.SSS[-HH:MM]. Examples are
+        "2016-05-24T08:38:08.699-04:00", "2016-05-24T08:38:08.699Z" (where Z
+        indicates Zulu time zone, same as UTC).
+      example: '2016-05-24T08:38:08.699-04:00'
+    bulkTransactionOptions:
+      type: object
+      required:
+        - autoAcceptParty
+        - autoAcceptQuote
+        - bulkExpiration
+      properties:
+        onlyValidateParty:
+          description: >-
+            Set to true if only party validation is required.  This means the
+            quotes and transfers will not run. This is useful for only party
+            resolution.
+          type: boolean
+        autoAcceptParty:
+          $ref: '#/components/schemas/autoAcceptPartyOption'
+        autoAcceptQuote:
+          description: >-
+            Set to true if the quote response is accepted without confirmation
+            from the payer. The fees applied by the payee will be acceptable to
+            the payer abiding by the limits set by optional
+            'perTransferFeeLimits' array.
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/autoAcceptQuote'
+        skipPartyLookup:
+          description: >-
+            Set to true if supplying an FSPID for the payee party and no party
+            resolution is needed. This may be useful if a previous party
+            resolution has been performed.
+          type: boolean
+        synchronous:
+          description: >-
+            Set to true if the bulkTransfer requests need be handled
+            synchronous. Otherwise the requests will be handled asynchronously,
+            meaning there will  be callbacks whenever the processing is done
+          type: boolean
+        bulkExpiration:
+          $ref: '#/components/schemas/DateTime'
+    PartyIdType:
+      title: PartyIdType
+      type: string
+      enum:
+        - MSISDN
+        - EMAIL
+        - PERSONAL_ID
+        - BUSINESS
+        - DEVICE
+        - ACCOUNT_ID
+        - IBAN
+        - ALIAS
+      description: >-
+        Below are the allowed values for the enumeration.
+
+        - MSISDN - An MSISDN (Mobile Station International Subscriber Directory
+        Number, that is, the phone number) is used as reference to a
+        participant. The MSISDN identifier should be in international format
+        according to the [ITU-T E.164
+        standard](https://www.itu.int/rec/T-REC-E.164/en). Optionally, the
+        MSISDN may be prefixed by a single plus sign, indicating the
+        international prefix.
+
+        - EMAIL - An email is used as reference to a participant. The format of
+        the email should be according to the informational [RFC
+        3696](https://tools.ietf.org/html/rfc3696).
+
+        - PERSONAL_ID - A personal identifier is used as reference to a
+        participant. Examples of personal identification are passport number,
+        birth certificate number, and national registration number. The
+        identifier number is added in the PartyIdentifier element. The personal
+        identifier type is added in the PartySubIdOrType element.
+
+        - BUSINESS - A specific Business (for example, an organization or a
+        company) is used as reference to a participant. The BUSINESS identifier
+        can be in any format. To make a transaction connected to a specific
+        username or bill number in a Business, the PartySubIdOrType element
+        should be used.
+
+        - DEVICE - A specific device (for example, a POS or ATM) ID connected to
+        a specific business or organization is used as reference to a Party. For
+        referencing a specific device under a specific business or organization,
+        use the PartySubIdOrType element.
+
+        - ACCOUNT_ID - A bank account number or FSP account ID should be used as
+        reference to a participant. The ACCOUNT_ID identifier can be in any
+        format, as formats can greatly differ depending on country and FSP.
+
+        - IBAN - A bank account number or FSP account ID is used as reference to
+        a participant. The IBAN identifier can consist of up to 34 alphanumeric
+        characters and should be entered without whitespace.
+
+        - ALIAS An alias is used as reference to a participant. The alias should
+        be created in the FSP as an alternative reference to an account owner.
+        Another example of an alias is a username in the FSP system. The ALIAS
+        identifier can be in any format. It is also possible to use the
+        PartySubIdOrType element for identifying an account under an Alias
+        defined by the PartyIdentifier.
+    PartyIdentifier:
+      title: PartyIdentifier
+      type: string
+      minLength: 1
+      maxLength: 128
+      description: Identifier of the Party.
+      example: '16135551212'
+    PartySubIdOrType:
+      title: PartySubIdOrType
+      type: string
+      minLength: 1
+      maxLength: 128
+      description: >-
+        Either a sub-identifier of a PartyIdentifier, or a sub-type of the
+        PartyIdType, normally a PersonalIdentifierType.
+    ExtensionKey:
+      title: ExtensionKey
+      type: string
+      minLength: 1
+      maxLength: 32
+      description: Extension key.
+    ExtensionValue:
+      title: ExtensionValue
+      type: string
+      minLength: 1
+      maxLength: 128
+      description: Extension value.
+    Extension:
+      title: Extension
+      type: object
+      description: Data model for the complex type Extension.
+      properties:
+        key:
+          $ref: '#/components/schemas/ExtensionKey'
+        value:
+          $ref: '#/components/schemas/ExtensionValue'
+      required:
+        - key
+        - value
+    ExtensionList:
+      title: ExtensionList
+      type: object
+      description: >-
+        Data model for the complex type ExtensionList. An optional list of
+        extensions, specific to deployment.
+      properties:
+        extension:
+          type: array
+          items:
+            $ref: '#/components/schemas/Extension'
+          minItems: 1
+          maxItems: 16
+          description: Number of Extension elements.
+      required:
+        - extension
+    PartyIdInfo:
+      title: PartyIdInfo
+      type: object
+      description: >-
+        Data model for the complex type PartyIdInfo. An ExtensionList element
+        has been added to this reqeust in version v1.1
+      properties:
+        partyIdType:
+          $ref: '#/components/schemas/PartyIdType'
+        partyIdentifier:
+          $ref: '#/components/schemas/PartyIdentifier'
+        partySubIdOrType:
+          $ref: '#/components/schemas/PartySubIdOrType'
+        fspId:
+          $ref: '#/components/schemas/FspId'
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
+      required:
+        - partyIdType
+        - partyIdentifier
+    PartyName:
+      title: PartyName
+      type: string
+      minLength: 1
+      maxLength: 128
+      description: Name of the Party. Could be a real name or a nickname.
+    PartyComplexName:
+      title: PartyComplexName
+      type: object
+      description: Data model for the complex type PartyComplexName.
+      properties:
+        firstName:
+          $ref: '#/components/schemas/FirstName'
+        middleName:
+          $ref: '#/components/schemas/MiddleName'
+        lastName:
+          $ref: '#/components/schemas/LastName'
+    PartyPersonalInfo:
+      title: PartyPersonalInfo
+      type: object
+      description: Data model for the complex type PartyPersonalInfo.
+      properties:
+        complexName:
+          $ref: '#/components/schemas/PartyComplexName'
+        dateOfBirth:
+          $ref: '#/components/schemas/DateOfBirth'
+        kycInformation:
+          $ref: '#/components/schemas/KYCInformation'
+    Party:
+      title: Party
+      type: object
+      description: Data model for the complex type Party.
+      properties:
+        partyIdInfo:
+          $ref: '#/components/schemas/PartyIdInfo'
+        merchantClassificationCode:
+          $ref: '#/components/schemas/MerchantClassificationCode'
+        name:
+          $ref: '#/components/schemas/PartyName'
+        personalInfo:
+          $ref: '#/components/schemas/PartyPersonalInfo'
+        supportedCurrencies:
+          type: array
+          description: Currencies in which the party can receive funds.
+          items:
+            $ref: '#/components/schemas/Currency'
+          minItems: 0
+          maxItems: 16
+      required:
+        - partyIdInfo
+    AmountType:
+      title: AmountType
+      type: string
+      enum:
+        - SEND
+        - RECEIVE
+      description: >-
+        Below are the allowed values for the enumeration AmountType.
+
+        - SEND - Amount the Payer would like to send, that is, the amount that
+        should be withdrawn from the Payer account including any fees.
+
+        - RECEIVE - Amount the Payer would like the Payee to receive, that is,
+        the amount that should be sent to the receiver exclusive of any fees.
+      example: RECEIVE
+    Note:
+      title: Note
+      type: string
+      minLength: 1
+      maxLength: 128
+      description: Memo assigned to transaction.
+      example: Note sent to Payee.
+    Money:
+      title: Money
+      type: object
+      description: Data model for the complex type Money.
+      properties:
+        currency:
+          $ref: '#/components/schemas/Currency'
+        amount:
+          $ref: '#/components/schemas/Amount'
+      required:
+        - currency
+        - amount
+    Latitude:
+      title: Latitude
+      type: string
+      pattern: >-
+        ^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$
+      description: >-
+        The API data type Latitude is a JSON String in a lexical format that is
+        restricted by a regular expression for interoperability reasons.
+      example: '+45.4215'
+    Longitude:
+      title: Longitude
+      type: string
+      pattern: >-
+        ^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$
+      description: >-
+        The API data type Longitude is a JSON String in a lexical format that is
+        restricted by a regular expression for interoperability reasons.
+      example: '+75.6972'
+    GeoCode:
+      title: GeoCode
+      type: object
+      description: >-
+        Data model for the complex type GeoCode. Indicates the geographic
+        location from where the transaction was initiated.
+      properties:
+        latitude:
+          $ref: '#/components/schemas/Latitude'
+        longitude:
+          $ref: '#/components/schemas/Longitude'
+      required:
+        - latitude
+        - longitude
+    IlpPacket:
+      title: IlpPacket
+      type: string
+      pattern: ^[A-Za-z0-9-_]+[=]{0,2}$
+      minLength: 1
+      maxLength: 32768
+      description: Information for recipient (transport layer information).
+      example: >-
+        AYIBgQAAAAAAAASwNGxldmVsb25lLmRmc3AxLm1lci45T2RTOF81MDdqUUZERmZlakgyOVc4bXFmNEpLMHlGTFGCAUBQU0svMS4wCk5vbmNlOiB1SXlweUYzY3pYSXBFdzVVc05TYWh3CkVuY3J5cHRpb246IG5vbmUKUGF5bWVudC1JZDogMTMyMzZhM2ItOGZhOC00MTYzLTg0NDctNGMzZWQzZGE5OGE3CgpDb250ZW50LUxlbmd0aDogMTM1CkNvbnRlbnQtVHlwZTogYXBwbGljYXRpb24vanNvbgpTZW5kZXItSWRlbnRpZmllcjogOTI4MDYzOTEKCiJ7XCJmZWVcIjowLFwidHJhbnNmZXJDb2RlXCI6XCJpbnZvaWNlXCIsXCJkZWJpdE5hbWVcIjpcImFsaWNlIGNvb3BlclwiLFwiY3JlZGl0TmFtZVwiOlwibWVyIGNoYW50XCIsXCJkZWJpdElkZW50aWZpZXJcIjpcIjkyODA2MzkxXCJ9IgA
+    IlpCondition:
+      title: IlpCondition
+      type: string
+      pattern: ^[A-Za-z0-9-_]{43}$
+      maxLength: 48
+      description: Condition that must be attached to the transfer by the Payer.
+    ErrorCode:
+      title: ErrorCode
+      type: string
+      pattern: ^[1-9]\d{3}$
+      description: >-
+        The API data type ErrorCode is a JSON String of four characters,
+        consisting of digits only. Negative numbers are not allowed. A leading
+        zero is not allowed. Each error code in the API is a four-digit number,
+        for example, 1234, where the first number (1 in the example) represents
+        the high-level error category, the second number (2 in the example)
+        represents the low-level error category, and the last two numbers (34 in
+        the example) represent the specific error.
+      example: '5100'
+    ErrorDescription:
+      title: ErrorDescription
+      type: string
+      minLength: 1
+      maxLength: 128
+      description: Error description string.
+    ErrorInformation:
+      title: ErrorInformation
+      type: object
+      description: Data model for the complex type ErrorInformation.
+      properties:
+        errorCode:
+          $ref: '#/components/schemas/ErrorCode'
+        errorDescription:
+          $ref: '#/components/schemas/ErrorDescription'
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
+      required:
+        - errorCode
+        - errorDescription
+    mojaloopError:
+      type: object
+      properties:
+        errorInformation:
+          $ref: '#/components/schemas/ErrorInformation'
+    quoteError:
+      type: object
+      description: >-
+        This object represents a Mojaloop API error received at any time during
+        the quote process
+      properties:
+        httpStatusCode:
+          type: integer
+          description: >-
+            The HTTP status code returned to the caller. This is the same as the
+            actual HTTP status code returned with the response.
+        mojaloopError:
+          $ref: '#/components/schemas/mojaloopError'
+    individualQuoteResult:
+      type: object
+      properties:
+        quoteId:
+          $ref: '#/components/schemas/CorrelationId'
+        transferAmount:
+          $ref: '#/components/schemas/Money'
+        payeeReceiveAmount:
+          $ref: '#/components/schemas/Money'
+        payeeFspFee:
+          $ref: '#/components/schemas/Money'
+        payeeFspCommission:
+          $ref: '#/components/schemas/Money'
+        geoCode:
+          $ref: '#/components/schemas/GeoCode'
+        ilpPacket:
+          $ref: '#/components/schemas/IlpPacket'
+        condition:
+          $ref: '#/components/schemas/IlpCondition'
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
+        lastError:
+          $ref: '#/components/schemas/quoteError'
+      required:
+        - quoteId
+    IlpFulfilment:
+      title: IlpFulfilment
+      type: string
+      pattern: ^[A-Za-z0-9-_]{43}$
+      maxLength: 48
+      description: Fulfilment that must be attached to the transfer by the Payee.
+      example: WLctttbu2HvTsa1XWvUoGRcQozHsqeu9Ahl2JW9Bsu8
+    TransferState:
+      title: TransferState
+      type: string
+      enum:
+        - RECEIVED
+        - RESERVED
+        - COMMITTED
+        - ABORTED
+      description: >-
+        Below are the allowed values for the enumeration.
+
+        - RECEIVED - Next ledger has received the transfer.
+
+        - RESERVED - Next ledger has reserved the transfer.
+
+        - COMMITTED - Next ledger has successfully performed the transfer.
+
+        - ABORTED - Next ledger has aborted the transfer due to a rejection or
+        failure to perform the transfer.
+      example: RESERVED
+    transferError:
+      type: object
+      description: >-
+        This object represents a Mojaloop API error received at any time during
+        the transfer process
+      properties:
+        httpStatusCode:
+          type: integer
+          description: >-
+            The HTTP status code returned to the caller. This is the same as the
+            actual HTTP status code returned with the response.
+        mojaloopError:
+          $ref: '#/components/schemas/mojaloopError'
+    individualTransferResult:
+      type: object
+      required:
+        - transferId
+      properties:
+        transferId:
+          $ref: '#/components/schemas/CorrelationId'
+        fulfilment:
+          $ref: '#/components/schemas/IlpFulfilment'
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
+        transferState:
+          $ref: '#/components/schemas/TransferState'
+        lastError:
+          $ref: '#/components/schemas/transferError'
+    bulkTransactionIndividualTransferResult:
+      type: object
+      required:
+        - homeTransactionId
+      properties:
+        transferId:
+          $ref: '#/components/schemas/CorrelationId'
+        homeTransactionId:
+          type: string
+          description: >-
+            Transaction ID from the DFSP backend, used to reconcile transactions
+            between the Switch and DFSP backend systems.
+        transactionId:
+          $ref: '#/components/schemas/CorrelationId'
+        to:
+          $ref: '#/components/schemas/Party'
+        reference:
+          description: Payer Loan reference
+          type: string
+        amountType:
+          $ref: '#/components/schemas/AmountType'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        amount:
+          $ref: '#/components/schemas/Amount'
+        note:
+          $ref: '#/components/schemas/Note'
+        quoteId:
+          $ref: '#/components/schemas/CorrelationId'
+        quoteResponse:
+          $ref: '#/components/schemas/individualQuoteResult'
+        fulfil:
+          $ref: '#/components/schemas/individualTransferResult'
+        quoteExtensions:
+          $ref: '#/components/schemas/ExtensionList'
+        transferExtensions:
+          $ref: '#/components/schemas/ExtensionList'
+        lastError:
+          $ref: '#/components/schemas/transferError'
+    bulkTransactionResponse:
+      title: BulkTransactionResponse
+      type: object
+      required:
+        - bulkHomeTransactionID
+        - bulkTransactionId
+        - currentState
+        - individualTransferResults
+      properties:
+        bulkHomeTransactionID:
+          type: string
+          description: >-
+            Transaction ID from the DFSP backend, used to reconcile transactions
+            between the Switch and DFSP backend systems.
+        bulkTransactionId:
+          $ref: '#/components/schemas/CorrelationId'
+        currentState:
+          $ref: '#/components/schemas/bulkTransactionStatus'
+        options:
+          $ref: '#/components/schemas/bulkTransactionOptions'
+        individualTransferResults:
+          description: List of individual transfer result in a bulk transfer response.
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/bulkTransactionIndividualTransferResult'
+        extensions:
+          $ref: '#/components/schemas/ExtensionList'
+    CurrencyConverter:
+      title: CurrencyConverter
+      type: string
+      enum:
+        - PAYER
+        - PAYEE
+      description: >-
+        Below are the allowed values for the enumeration CurrencyConverter. -
+        PAYER - Currency conversion should be performed by the payer. - PAYEE -
+        Currency conversion should be performed by the payee.
+    FxRate:
+      title: FxRate
+      type: object
+      description: >-
+        The FxRate object contains information about a currency conversion in
+        the transfer. It can be used by parties to the transfer to exchange
+        information with each other about the exchange rate for the transfer, to
+        ensure that the best rate can be agreed on.
+      properties:
+        sourceAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+            - description: The amount of the transfer in the source currency.
+        targetAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+            - description: The amount of the transfer in the target currency.
+      required:
+        - sourceAmount
+        - targetAmount
+    AuthenticationType:
+      title: AuthenticationType
+      type: string
+      enum:
+        - OTP
+        - QRCODE
+        - U2F
+      description: |-
+        Below are the allowed values for the enumeration AuthenticationType.
+        - OTP - One-time password generated by the Payer FSP.
+        - QRCODE - QR code used as One Time Password.
+        - U2F - U2F is a new addition isolated to Thirdparty stream.
+      example: OTP
+    FxMoney:
+      title: FxMoney
+      type: object
+      description: >-
+        Data model for the complex type FxMoney; This is based on the type Money
+        but allows the amount to be optional to support FX quotations.
+      properties:
+        currency:
+          $ref: '#/components/schemas/Currency'
+        amount:
+          $ref: '#/components/schemas/Amount'
+      required:
+        - currency
+    FxCharge:
+      title: FxCharge
+      type: object
+      description: >-
+        An FXP will be able to specify a charge which it proposes to levy on the
+        currency conversion operation using a FxCharge object.
+      properties:
+        chargeType:
+          type: string
+          minLength: 1
+          maxLength: 32
+          description: A description of the charge which is being levied.
+        sourceAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+            - description: >-
+                The amount of the charge which is being levied, expressed in the
+                source currency.
+        targetAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+            - description: >-
+                The amount of the charge which is being levied, expressed in the
+                target currency.
+      required:
+        - chargeType
+    FxConversion:
+      title: FxConversion
+      type: object
+      description: >-
+        A DFSP will be able to request a currency conversion, and an FX provider
+        will be able to describe its involvement in a proposed transfer, using a
+        FxConversion object.
+      properties:
+        conversionId:
+          allOf:
+            - $ref: '#/components/schemas/CorrelationId'
+            - description: An end-to-end identifier for the conversion request.
+        determiningTransferId:
+          allOf:
+            - $ref: '#/components/schemas/CorrelationId'
+            - description: >-
+                The transaction ID of the transfer on whose success this
+                currency conversion depends.
+        initiatingFsp:
+          allOf:
+            - $ref: '#/components/schemas/FspId'
+            - description: >-
+                The id of the participant who is requesting a currency
+                conversion.
+        counterPartyFsp:
+          allOf:
+            - $ref: '#/components/schemas/FspId'
+            - description: The ID of the FXP performing the conversion.
+        amountType:
+          allOf:
+            - $ref: '#/components/schemas/AmountType'
+            - description: >-
+                This is the AmountType for the base transaction - If SEND - then
+                any charges levied by the FXP as part of the transaction will be
+                deducted by the FXP from the amount shown for the target party
+                in the conversion. If RECEIVE - then any charges levied by the
+                FXP as part of the transaction will be added by the FXP to the
+                amount shown for the source party in the conversion.
+        sourceAmount:
+          allOf:
+            - $ref: '#/components/schemas/FxMoney'
+            - description: The amount to be converted, expressed in the source currency.
+        targetAmount:
+          allOf:
+            - $ref: '#/components/schemas/FxMoney'
+            - description: The converted amount, expressed in the target currency.
+        expiration:
+          allOf:
+            - $ref: '#/components/schemas/DateTime'
+            - description: >-
+                The end of the period for which the currency conversion is
+                required to remain valid.
+        charges:
+          type: array
+          description: >-
+            One or more charges which the FXP intends to levy as part of the
+            currency conversion, or which the payee DFSP intends to add to the
+            amount transferred.
+          items:
+            $ref: '#/components/schemas/FxCharge'
+          minItems: 0
+          maxItems: 16
+        extensionList:
+          allOf:
+            - $ref: '#/components/schemas/ExtensionList'
+            - description: The extension list for the currency conversion request.
+      required:
+        - conversionId
+        - initiatingFsp
+        - counterPartyFsp
+        - amountType
+        - sourceAmount
+        - targetAmount
+        - expiration
+    FxQuotesPostBackendRequest:
+      title: FxQuotesPostBackendRequest
+      type: object
+      description: The object sent in the POST /fxQuotes request.
+      properties:
+        conversionRequestId:
+          allOf:
+            - $ref: '#/components/schemas/CorrelationId'
+            - description: An end-to-end identifier for the conversion quotation request.
+        conversionTerms:
+          allOf:
+            - $ref: '#/components/schemas/FxConversion'
+            - description: >-
+                The terms of the currency conversion for which a quotation is
+                sought.
+      required:
+        - conversionRequestId
+        - conversionTerms
+    FxQuotesPostBackendResponse:
+      title: FxQuotesPostBackendResponse
+      type: object
+      description: >-
+        The object sent as a response for the POST /fxQuotes request. The terms
+        under which the FXP will undertake the currency conversion proposed by
+        the requester.
+      properties:
+        homeTransactionId:
+          description: >-
+            Transaction ID for the FXP backend, used to reconcile transactions
+            between the Switch and FXP backend systems.
+          type: string
+        conversionTerms:
+          allOf:
+            - $ref: '#/components/schemas/FxConversion'
+            - description: >-
+                The terms under which the FXP will undertake the currency
+                conversion proposed by the requester.
+      required:
+        - conversionTerms
+    commitRequestId:
+      allOf:
+        - $ref: '#/components/schemas/CorrelationId'
+        - description: An end-to-end identifier for the confirmation request.
+    determiningTransferId:
+      allOf:
+        - $ref: '#/components/schemas/CorrelationId'
+        - description: >-
+            The transaction ID of the transfer to which this currency conversion
+            relates, if the conversion is part of a transfer. If the conversion
+            is a bulk currency purchase, this field should be omitted.
+    initiatingFsp:
+      allOf:
+        - $ref: '#/components/schemas/FspId'
+        - description: Identifier for the FSP who is requesting a currency conversion.
+    counterPartyFsp:
+      allOf:
+        - $ref: '#/components/schemas/FspId'
+        - description: Identifier for the FXP who is performing the currency conversion.
+    sourceAmount:
+      allOf:
+        - $ref: '#/components/schemas/Money'
+        - description: The amount being offered for conversion by the requesting FSP.
+    targetAmount:
+      allOf:
+        - $ref: '#/components/schemas/Money'
+        - description: >-
+            The amount which the FXP is to credit to the requesting FSP in the
+            target currency.
+    condition:
+      allOf:
+        - $ref: '#/components/schemas/IlpCondition'
+        - description: >-
+            ILP condition received by the requesting FSP when the quote was
+            approved.
+    FxTransfersPostBackendRequest:
+      title: FxTransfersPostBackendRequest
+      type: object
+      description: The object sent in the POST /fxTransfers request.
+      properties:
+        homeTransactionId:
+          description: >-
+            Transaction ID for the FXP backend, used to reconcile transactions
+            between the Switch and FXP backend systems.
+          type: string
+        commitRequestId:
+          $ref: '#/components/schemas/commitRequestId'
+        determiningTransferId:
+          $ref: '#/components/schemas/determiningTransferId'
+        initiatingFsp:
+          $ref: '#/components/schemas/initiatingFsp'
+        counterPartyFsp:
+          $ref: '#/components/schemas/counterPartyFsp'
+        sourceAmount:
+          $ref: '#/components/schemas/sourceAmount'
+        targetAmount:
+          $ref: '#/components/schemas/targetAmount'
+        condition:
+          $ref: '#/components/schemas/condition'
+      required:
+        - commitRequestId
+        - initiatingFsp
+        - counterPartyFsp
+        - sourceAmount
+        - targetAmount
+    fulfilment:
+      allOf:
+        - $ref: '#/components/schemas/IlpFulfilment'
+        - description: >-
+            The fulfilment of the condition specified for the currency
+            conversion. Mandatory if the conversion has been executed
+            successfully.
+    completedTimestamp:
+      allOf:
+        - $ref: '#/components/schemas/DateTime'
+        - description: Time and date when the conversion was executed.
+    conversionState:
+      allOf:
+        - $ref: '#/components/schemas/TransferState'
+        - description: The current status of the conversion request.
+    FxTransfersPostBackendResponse:
+      title: FxTransfersPostBackendResponse
+      type: object
+      description: The object sent as a response for the POST /fxTransfers request.
+      properties:
+        homeTransactionId:
+          description: >-
+            Transaction ID for the FXP backend, used to reconcile transactions
+            between the Switch and FXP backend systems.
+          type: string
+        fulfilment:
+          $ref: '#/components/schemas/fulfilment'
+        completedTimestamp:
+          $ref: '#/components/schemas/completedTimestamp'
+        conversionState:
+          $ref: '#/components/schemas/conversionState'
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
+      required:
+        - conversionState
+    FxTransfersPutBackendRequest:
+      title: FxTransfersPutBackendRequest
+      type: object
+      description: PUT /fxTransfers/{commitRequestId} object
+      properties:
+        homeTransactionId:
+          description: >-
+            Transaction ID for the FXP backend, used to reconcile transactions
+            between the Switch and FXP backend systems.
+          type: string
+        fulfilment:
+          $ref: '#/components/schemas/fulfilment'
+        completedTimestamp:
+          $ref: '#/components/schemas/completedTimestamp'
+        conversionState:
+          $ref: '#/components/schemas/conversionState'
+        extensionList:
+          $ref: '#/components/schemas/ExtensionList'
+      required:
+        - conversionState
+  responses:
+    '200':
+      description: OK
+    '400':
+      description: Malformed or missing required headers or parameters.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+    '404':
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+    '500':
+      description: An error occurred processing the request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
