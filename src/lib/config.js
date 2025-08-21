@@ -107,6 +107,7 @@ const _getSecretsFromEnvironment = () => {
     process.env.REPORTING_DB_SSL_ENABLED ||
     process.env.REPORTING_DB_SSL_VERIFY ||
     process.env.REPORTING_DB_SSL_CA_FILE_PATH ||
+    process.env.REPORTING_DB_SSL_CLIENT_CERT_FILE_PATH ||
     process.env.REPORTING_DB_PARAMS
   ) {
     try {
@@ -115,6 +116,7 @@ const _getSecretsFromEnvironment = () => {
       const reportingDbSslEnabled = process.env.REPORTING_DB_SSL_ENABLED === 'true'
       const reportingDbSslVerify = process.env.REPORTING_DB_SSL_VERIFY !== 'false'
       const reportingDbSslCa = process.env.REPORTING_DB_SSL_CA_FILE_PATH
+      const reportingDbClientCert = process.env.REPORTING_DB_SSL_CLIENT_CERT_FILE_PATH
       const reportingDbConnectionParams = process.env.REPORTING_DB_PARAMS
         ? JSON.parse(process.env.REPORTING_DB_PARAMS)
         : undefined
@@ -131,12 +133,16 @@ const _getSecretsFromEnvironment = () => {
       if (
         process.env.REPORTING_DB_SSL_ENABLED ||
         process.env.REPORTING_DB_SSL_VERIFY ||
-        process.env.REPORTING_DB_SSL_CA_FILE_PATH
+        process.env.REPORTING_DB_SSL_CA_FILE_PATH ||
+        process.env.REPORTING_DB_SSL_CLIENT_CERT_FILE_PATH
       ) {
         secretsFromEnvironment.DB.SSL_ENABLED = reportingDbSslEnabled
         secretsFromEnvironment.DB.SSL_VERIFY = reportingDbSslVerify
         if (reportingDbSslCa) {
           secretsFromEnvironment.DB.SSL_CA_FILE_PATH = reportingDbSslCa
+        }
+        if (reportingDbClientCert) {
+          secretsFromEnvironment.DB.SSL_CLIENT_CERT_FILE_PATH = reportingDbClientCert
         }
       }
 
@@ -145,6 +151,7 @@ const _getSecretsFromEnvironment = () => {
       if (logSecrets.DB && logSecrets.DB.SSL_CA_FILE_PATH) logSecrets.DB.SSL_CA_FILE_PATH = mask(logSecrets.DB.SSL_CA_FILE_PATH)
       if (logSecrets.DB && logSecrets.DB.PASSWORD) logSecrets.DB.PASSWORD = mask(logSecrets.DB.PASSWORD)
       if (logSecrets.DB && logSecrets.DB.CONNECTION_STRING) logSecrets.DB.CONNECTION_STRING = mask(logSecrets.DB.CONNECTION_STRING)
+      if (logSecrets.DB && logSecrets.DB.SSL_CLIENT_CERT_FILE_PATH) logSecrets.DB.SSL_CLIENT_CERT_FILE_PATH = mask(logSecrets.DB.SSL_CLIENT_CERT_FILE_PATH)
       console.log('Secrets retrieved from environment to be merged into system config', logSecrets)
       if (logSecrets.DB && logSecrets.DB.PARAMS) logSecrets.DB.PARAMS = JSON.stringify(logSecrets.DB.PARAMS)
     } catch (err) {

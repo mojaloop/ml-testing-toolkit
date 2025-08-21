@@ -167,6 +167,15 @@ describe('Config', () => {
     })
   })
   describe('Config secrets', () => {
+    afterEach(() => {
+      delete process.env.REPORTING_DB_CONNECTION_PASSWORD
+      delete process.env.REPORTING_DB_CONNECTION_STRING
+      delete process.env.REPORTING_DB_SSL_CA_FILE_PATH
+      delete process.env.REPORTING_DB_SSL_ENABLED
+      delete process.env.REPORTING_DB_SSL_VERIFY
+      delete process.env.REPORTING_DB_SSL_CLIENT_CERT_FILE_PATH
+    })
+
     it('should load config from env if set', async () => {
       storageAdapter.read.mockResolvedValueOnce({
         data: {
@@ -182,6 +191,7 @@ describe('Config', () => {
       process.env.REPORTING_DB_SSL_CA_FILE_PATH = 'ssl_ca'
       process.env.REPORTING_DB_SSL_ENABLED = 'true'
       process.env.REPORTING_DB_SSL_VERIFY = 'true'
+      process.env.REPORTING_DB_SSL_CLIENT_CERT_FILE_PATH = 'ssl_client_cert'
 
       await Config.loadSystemConfig()
       await expect(Config.getSystemConfig()).toEqual(expect.objectContaining({
@@ -190,10 +200,12 @@ describe('Config', () => {
           CONNECTION_STRING: 'connection_string',
           SSL_CA_FILE_PATH: 'ssl_ca',
           SSL_ENABLED: true,
-          SSL_VERIFY: true
+          SSL_VERIFY: true,
+          SSL_CLIENT_CERT_FILE_PATH: 'ssl_client_cert'
         }
       }))
     })
+
     it('should load partial config from env', async () => {
       storageAdapter.read.mockResolvedValueOnce({
         data: {
@@ -209,6 +221,7 @@ describe('Config', () => {
       delete process.env.REPORTING_DB_CONNECTION_STRING
       delete process.env.REPORTING_DB_SSL_CA_FILE_PATH
       delete process.env.REPORTING_DB_SSL_ENABLED
+      delete process.env.REPORTING_DB_SSL_CLIENT_CERT_FILE_PATH
       process.env.REPORTING_DB_SSL_VERIFY = 'true'
       await Config.loadSystemConfig()
       await expect(Config.getSystemConfig()).toEqual(expect.objectContaining({
@@ -217,6 +230,15 @@ describe('Config', () => {
           SSL_VERIFY: true
         }
       }))
+    })
+
+    it('should load SSL_CLIENT_CERT_FILE_PATH if set', async () => {
+      storageAdapter.read.mockResolvedValueOnce({
+        data: {}
+      })
+      process.env.REPORTING_DB_SSL_CLIENT_CERT_FILE_PATH = 'ssl_client_cert_path'
+      await Config.loadSystemConfig()
+      expect(Config.getSystemConfig().DB.SSL_CLIENT_CERT_FILE_PATH).toBe('ssl_client_cert_path')
     })
   })
 })

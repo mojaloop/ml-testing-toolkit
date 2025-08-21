@@ -62,6 +62,9 @@ const getConnection = async () => {
       if (systemConfig.DB.SSL_CA_FILE_PATH) {
         mongoOptions.tlsCAFile = systemConfig.DB.SSL_CA_FILE_PATH
       }
+      if (systemConfig.DB.SSL_CLIENT_CERT_FILE_PATH) {
+        mongoOptions.tlsCertificateKeyFile = systemConfig.DB.SSL_CLIENT_CERT_FILE_PATH
+      }
     }
 
     const csMongoDBObj = new ConnectionString()
