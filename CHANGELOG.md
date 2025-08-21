@@ -1,4 +1,16 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+## [18.15.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.14.4...v18.15.0) (2025-08-21)
+
+
+### Features
+
+* update ttk to accept tls client cert ([#338](https://github.com/mojaloop/ml-testing-toolkit/issues/338)) ([7e826c4](https://github.com/mojaloop/ml-testing-toolkit/commit/7e826c464180ba933f05c63b2b7c7c0874d18853))
+
+
+### Chore
+
+* **sbom:** update sbom [skip ci] ([519f16b](https://github.com/mojaloop/ml-testing-toolkit/commit/519f16b0f65603301c49d8201e7682abb8aa4c84))
+
 ### [18.14.4](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.14.3...v18.14.4) (2025-08-19)
 
 
