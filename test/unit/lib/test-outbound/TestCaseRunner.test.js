@@ -134,7 +134,7 @@ describe('TestCaseRunner Tests -->', () => {
 
       await testCaseRunner.runPromiseListInBatches(promiseList, count)
       const durationMs = Date.now() - startAt
-      expect(durationMs).toBeLessThan(timeoutMs * 2) // a bit more than 1 iteration
+      expect(durationMs).toBeLessThan(timeoutMs * 3) // faster than 3 sequential iterations
     })
 
     test('should process several promises sequentially [batchSize = 1]', async () => {

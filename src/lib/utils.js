@@ -70,6 +70,21 @@ const resolveRoot = path => resolve(process.env.TTK_ROOT || '.', path)
 const resolve1 = fn => (arg1, ...rest) => fn(resolveRoot(arg1), ...rest)
 const resolve2 = fn => (arg1, arg2, ...rest) => fn(resolveRoot(arg1), resolveRoot(arg2), ...rest)
 
+// check if the file contains URL and return it instead of the file name
+const checkUrl = async fileName => {
+  const buffer = Buffer.alloc(10)
+  const fileHandle = await fs.promises.open(fileName, 'r')
+  try {
+    await fileHandle.read(buffer, 0, 10, 0)
+  } finally {
+    await fileHandle.close()
+  }
+  const prefix = buffer.toString('utf8').replace('\uFEFF', '') // Remove BOM
+  return (prefix.startsWith('"http'))
+    ? JSON.parse(fs.readFileSync(fileName).toString('utf8'))
+    : fileName
+}
+
 module.exports = {
   readFileAsync: resolve1(readFileAsync),
   writeFileAsync: resolve1(writeFileAsync),
@@ -85,5 +100,6 @@ module.exports = {
   getHeader,
   headersToLowerCase,
   urlToPath,
+  checkUrl,
   resolve: resolveRoot
 }
