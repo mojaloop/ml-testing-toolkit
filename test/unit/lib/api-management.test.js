@@ -138,6 +138,60 @@ describe('API Management', () => {
         ]
       })
     })
+    it('should throw an error when patching non-existent API', async () => {
+      SpyGetSystemConfig.mockReturnValue({
+      API_DEFINITIONS: []
+      })
+      await expect(APIManagement.patchDefinitionParams('nonexistent', '1.0', { hostnames: ['host'] })).rejects.toThrowError('Requested API is not found')
+    })
+
+    it('should patch both hostnames and prefix', async () => {
+      const apiDef = {
+      type: 'name',
+      version: '1.0',
+      folderPath: "name_1.0",
+      additionalApi: true
+      }
+      SpyGetSystemConfig.mockReturnValue({
+      API_DEFINITIONS: [apiDef]
+      })
+      const patchParams = { hostnames: ['host1'], prefix: '/api' }
+      await expect(APIManagement.patchDefinitionParams('name', '1.0', patchParams)).resolves.toBe(true)
+      expect(apiDef.hostnames).toEqual(['host1'])
+      expect(apiDef.prefix).toEqual('/api')
+    })
+
+    it('should patch only hostnames if prefix is undefined', async () => {
+      const apiDef = {
+      type: 'name',
+      version: '1.0',
+      folderPath: "name_1.0",
+      additionalApi: true
+      }
+      SpyGetSystemConfig.mockReturnValue({
+      API_DEFINITIONS: [apiDef]
+      })
+      const patchParams = { hostnames: ['host2'] }
+      await expect(APIManagement.patchDefinitionParams('name', '1.0', patchParams)).resolves.toBe(true)
+      expect(apiDef.hostnames).toEqual(['host2'])
+      expect(apiDef.prefix).toBeUndefined()
+    })
+
+    it('should patch only prefix if hostnames is undefined', async () => {
+      const apiDef = {
+      type: 'name',
+      version: '1.0',
+      folderPath: "name_1.0",
+      additionalApi: true
+      }
+      SpyGetSystemConfig.mockReturnValue({
+      API_DEFINITIONS: [apiDef]
+      })
+      const patchParams = { prefix: '/newprefix' }
+      await expect(APIManagement.patchDefinitionParams('name', '1.0', patchParams)).resolves.toBe(true)
+      expect(apiDef.prefix).toEqual('/newprefix')
+      expect(apiDef.hostnames).toBeUndefined()
+    })
   })
 
   describe('validateDefinition with remote URL', () => {
