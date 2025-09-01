@@ -162,5 +162,65 @@ describe('API Management', () => {
       await expect(APIManagement.validateDefinition(tmpFile.name)).resolves.not.toThrowError()
       tmpFile.removeCallback()
     })
+    it('should load and validate definition from remote JSON URL', async () => {
+      const mockJsonContent = JSON.stringify({
+      openapi: "3.0.0",
+      info: { title: "Mojaloop API", version: "2.0.0" },
+      paths: {}
+      })
+      axios.get.mockResolvedValueOnce({
+      data: mockJsonContent,
+      headers: { 'content-type': 'application/json' }
+      })
+      const remoteJsonUrl = 'https://example.com/openapi.json'
+      const tmpFile = tmp.fileSync()
+      fs.writeFileSync(tmpFile.name, `"${remoteJsonUrl}"`)
+      await expect(APIManagement.validateDefinition(tmpFile.name)).resolves.not.toThrowError()
+      tmpFile.removeCallback()
+    })
+
+    it('should fallback to YAML parsing if JSON parsing fails for remote URL', async () => {
+      const invalidJsonContent = "openapi: 3.0.0\ninfo:\n  title: Mojaloop API\n  version: 2.0.0\npaths: {}"
+      axios.get.mockResolvedValueOnce({
+      data: invalidJsonContent,
+      headers: { 'content-type': 'application/json' }
+      })
+      const remoteYamlUrl = 'https://example.com/openapi-fallback.yaml'
+      const tmpFile = tmp.fileSync()
+      fs.writeFileSync(tmpFile.name, `"${remoteYamlUrl}"`)
+      await expect(APIManagement.validateDefinition(tmpFile.name)).resolves.not.toThrowError()
+      tmpFile.removeCallback()
+    })
+
+    it('should handle remote URL with single quotes', async () => {
+      axios.get.mockResolvedValueOnce({
+      data: mockYamlContent,
+      headers: { 'content-type': 'application/x-yaml' }
+      })
+      const tmpFile = tmp.fileSync()
+      fs.writeFileSync(tmpFile.name, `'${remoteYamlUrl}'`)
+      await expect(APIManagement.validateDefinition(tmpFile.name)).resolves.not.toThrowError()
+      tmpFile.removeCallback()
+    })
+
+    it('should handle remote URL with BOM', async () => {
+      axios.get.mockResolvedValueOnce({
+      data: mockYamlContent,
+      headers: { 'content-type': 'application/x-yaml' }
+      })
+      const tmpFile = tmp.fileSync()
+      // Write BOM + quoted URL
+      fs.writeFileSync(tmpFile.name, '\uFEFF"' + remoteYamlUrl + '"')
+      await expect(APIManagement.validateDefinition(tmpFile.name)).resolves.not.toThrowError()
+      tmpFile.removeCallback()
+    })
+
+    it('should throw error if remote URL cannot be fetched', async () => {
+      axios.get.mockRejectedValueOnce(new Error('Network error'))
+      const tmpFile = tmp.fileSync()
+      fs.writeFileSync(tmpFile.name, `"https://invalid-url.example.com/openapi.yaml"`)
+      await expect(APIManagement.validateDefinition(tmpFile.name)).rejects.toThrowError()
+      tmpFile.removeCallback()
+    })
   })
 })
