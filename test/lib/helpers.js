@@ -30,6 +30,10 @@
 'use strict'
 const Logger = require('@mojaloop/central-services-logger')
 
+async function sleepPromise (seconds) {
+  return new Promise(resolve => setTimeout(resolve, seconds * 1000))
+}
+
 async function wrapWithRetries (func, remainingRetries = 10, timeout = 2) {
   Logger.warn(`wrapWithRetries remainingRetries:${remainingRetries}, timeout:${timeout}`)
 
