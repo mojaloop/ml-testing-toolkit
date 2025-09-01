@@ -43,6 +43,7 @@ const readRecursiveAsync = promisify(files)
 const rmdirAsync = promisify(fs.rmdir)
 const mvAsync = promisify(mv)
 const { resolve } = require('path')
+const yaml = require('js-yaml')
 
 const getHeader = (headers, name) => {
   return Object.entries(headers).find(
@@ -80,9 +81,20 @@ const checkUrl = async fileName => {
     await fileHandle.close()
   }
   const prefix = buffer.toString('utf8').replace('\uFEFF', '') // Remove BOM
-  return (prefix.startsWith('"http'))
-    ? JSON.parse(fs.readFileSync(fileName).toString('utf8'))
-    : fileName
+  if (prefix.startsWith('"http') || prefix.startsWith("'http")) {
+    const content = fs.readFileSync(fileName, 'utf8')
+    try {
+      return JSON.parse(content)
+    } catch (jsonErr) {
+      try {
+        return yaml.load(content)
+      } catch (yamlErr) {
+        throw new Error(`Failed to parse file as JSON or YAML: ${jsonErr.message}; ${yamlErr.message}`)
+      }
+    }
+  } else {
+    return fileName
+  }
 }
 
 module.exports = {
