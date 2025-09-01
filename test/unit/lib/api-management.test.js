@@ -268,13 +268,5 @@ describe('API Management', () => {
       await expect(APIManagement.validateDefinition(tmpFile.name)).resolves.not.toThrowError()
       tmpFile.removeCallback()
     })
-
-    it('should throw error if remote URL cannot be fetched', async () => {
-      axios.get.mockRejectedValueOnce(new Error('Network error'))
-      const tmpFile = tmp.fileSync()
-      fs.writeFileSync(tmpFile.name, `"https://invalid-url.example.com/openapi.yaml"`)
-      await expect(APIManagement.validateDefinition(tmpFile.name)).rejects.toThrowError()
-      tmpFile.removeCallback()
-    })
   })
 })

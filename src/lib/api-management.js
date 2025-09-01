@@ -29,49 +29,17 @@
 
 const addFormats = require('ajv-formats')
 const OpenApiBackend = require('openapi-backend').default
-const fs = require('node:fs')
 const Utils = require('./utils')
 const path = require('path')
 const Config = require('./config')
 const OpenApiDefinitionsModel = require('./mocking/openApiDefinitionsModel')
 const OpenApiMockHandler = require('./mocking/openApiMockHandler')
-const axios = require('axios')
-const yaml = require('js-yaml')
 const apiDefinitionsPath = 'spec_files/api_definitions/'
 
-// check if the file contains URL and return it instead of the file name
-const fetchAndParseRemoteSpec = async url => {
-  const response = await axios.get(url)
-  try {
-    // Try parsing as JSON first
-    return JSON.parse(response.data)
-  } catch (e) {
-    // If JSON parsing fails, assume YAML
-    return yaml.load(response.data)
-  }
-}
-
-const checkUrl = async fileName => {
-  const buffer = Buffer.alloc(10)
-  const fileHandle = await fs.promises.open(fileName, 'r')
-  try {
-    await fileHandle.read(buffer, 0, 10, 0)
-  } finally {
-    await fileHandle.close()
-  }
-  const prefix = buffer.toString('utf8').replace('\uFEFF', '') // Remove BOM
-  if (prefix.startsWith('"http') || prefix.startsWith("'http")) {
-    let url = fs.readFileSync(fileName).toString('utf8').trim()
-    url = url.replace(/^['"]|['"]$/g, '')
-    return await fetchAndParseRemoteSpec(url)
-  } else {
-    return fileName
-  }
-}
 
 const validateDefinition = async (apiFilePath) => {
   const newApi = new OpenApiBackend({
-    definition: await checkUrl(path.join(apiFilePath)),
+    definition: await Utils.checkUrl(path.join(apiFilePath)),
     customizeAjv: ajv => addFormats(ajv),
     strict: true,
     quick: true
