@@ -137,7 +137,7 @@ describe('transactionRequestsService', () => {
       await TransactionRequestsService.handleRequest(sampleContext, request, callback, null)
       expect(outbound.OutboundSend).not.toHaveBeenCalled()
     })
-    it('It should call outboundsend method if there is no sessionId', async () => {
+    it('It should call outboundsend method if there is no sessionId with customInfo', async () => {
       const requestWithoutSessionId = {
         method: 'post',
         path: '/transactionRequests',
@@ -191,7 +191,6 @@ describe('transactionRequestsService', () => {
       }
       outbound.OutboundSend.mockClear()
       await TransactionRequestsService.handleRequest(sampleContext, requestWithoutSessionId, callback, 'spec_files/api_definitions/fspiop_1.0/trigger_templates')
-      await new Promise(resolve => setTimeout(resolve, 2000))
       // Retry logic for assertion using wrapWithRetries
       await wrapWithRetries(() => {
         if (outbound.OutboundSend.mock.calls.length > 0) {
@@ -201,7 +200,7 @@ describe('transactionRequestsService', () => {
       }, 10, 200)
       expect(outbound.OutboundSend).toHaveBeenCalled()
     })
-    it('It should call outboundsend method if there is no sessionId', async () => {
+    it('It should call outboundsend method if there is no sessionId no customInfo', async () => {
       const requestWithoutCustomInfo = {
         method: 'post',
         path: '/transactionRequests',
