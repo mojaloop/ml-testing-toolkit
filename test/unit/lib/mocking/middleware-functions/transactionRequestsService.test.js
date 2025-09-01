@@ -31,6 +31,7 @@
 
 const TransactionRequestsService = require('../../../../../src/lib/mocking/middleware-functions/transactionRequestsService')
 const outbound = require('../../../../../src/lib/test-outbound/outbound-initiator')
+const wrapWithRetries = require('../../../../lib/helpers')
 
 jest.mock('../../../../../src/lib/test-outbound/outbound-initiator')
 
@@ -112,7 +113,13 @@ describe('transactionRequestsService', () => {
       }
       outbound.OutboundSend.mockClear()
       await TransactionRequestsService.handleRequest(sampleContext, request, callback, 'spec_files/api_definitions/fspiop_1.0/trigger_templates')
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Retry logic for assertion using wrapWithRetries
+      await wrapWithRetries(() => {
+        if (outbound.OutboundSend.mock.calls.length > 0) {
+          return true
+        }
+        return false
+      }, 10, 200)
       expect(outbound.OutboundSend).toHaveBeenCalled()
     })
     it('It should not call outboundsend method if the callback request state is not RECEIVED', async () => {
@@ -185,6 +192,13 @@ describe('transactionRequestsService', () => {
       outbound.OutboundSend.mockClear()
       await TransactionRequestsService.handleRequest(sampleContext, requestWithoutSessionId, callback, 'spec_files/api_definitions/fspiop_1.0/trigger_templates')
       await new Promise(resolve => setTimeout(resolve, 2000))
+      // Retry logic for assertion using wrapWithRetries
+      await wrapWithRetries(() => {
+        if (outbound.OutboundSend.mock.calls.length > 0) {
+          return true
+        }
+        return false
+      }, 10, 200)
       expect(outbound.OutboundSend).toHaveBeenCalled()
     })
     it('It should call outboundsend method if there is no sessionId', async () => {
