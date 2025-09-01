@@ -64,9 +64,9 @@ module.exports.initilizeMockHandler = async () => {
   // Get API Definitions from configuration
   const apiDefinitions = await OpenApiDefinitionsModel.getApiDefinitions()
   // Create create openApiBackend objects for all the api definitions
-  apis = apiDefinitions.map(item => {
+  apis = await Promise.all(apiDefinitions.map(async item => {
     const tempObj = new OpenApiBackend({
-      definition: path.join(item.specFile),
+      definition: await utils.checkUrl(path.join(item.specFile)),
       customizeAjv: ajv => addFormats(ajv),
       strict: true,
       quick: true,
@@ -100,7 +100,7 @@ module.exports.initilizeMockHandler = async () => {
       ...item,
       openApiBackendObject: tempObj
     }
-  })
+  }))
 
   for (const api of apis) {
     customLogger.logMessage('info', 'Initializing the api spec file: ' + api.specFile, { notification: false })

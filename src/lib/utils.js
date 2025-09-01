@@ -43,6 +43,7 @@ const readRecursiveAsync = promisify(files)
 const rmdirAsync = promisify(fs.rmdir)
 const mvAsync = promisify(mv)
 const { resolve } = require('path')
+const yaml = require('js-yaml')
 
 const getHeader = (headers, name) => {
   return Object.entries(headers).find(
@@ -70,6 +71,32 @@ const resolveRoot = path => resolve(process.env.TTK_ROOT || '.', path)
 const resolve1 = fn => (arg1, ...rest) => fn(resolveRoot(arg1), ...rest)
 const resolve2 = fn => (arg1, arg2, ...rest) => fn(resolveRoot(arg1), resolveRoot(arg2), ...rest)
 
+// check if the file contains URL and return it instead of the file name
+const checkUrl = async fileName => {
+  const buffer = Buffer.alloc(10)
+  const fileHandle = await fs.promises.open(fileName, 'r')
+  try {
+    await fileHandle.read(buffer, 0, 10, 0)
+  } finally {
+    await fileHandle.close()
+  }
+  const prefix = buffer.toString('utf8').replace('\uFEFF', '') // Remove BOM
+  if (prefix.startsWith('"http') || prefix.startsWith("'http")) {
+    const content = fs.readFileSync(fileName, 'utf8')
+    try {
+      return JSON.parse(content)
+    } catch (jsonErr) {
+      try {
+        return yaml.load(content)
+      } catch (yamlErr) {
+        throw new Error(`Failed to parse file as JSON or YAML: ${jsonErr.message}; ${yamlErr.message}`)
+      }
+    }
+  } else {
+    return fileName
+  }
+}
+
 module.exports = {
   readFileAsync: resolve1(readFileAsync),
   writeFileAsync: resolve1(writeFileAsync),
@@ -85,5 +112,6 @@ module.exports = {
   getHeader,
   headersToLowerCase,
   urlToPath,
+  checkUrl,
   resolve: resolveRoot
 }
