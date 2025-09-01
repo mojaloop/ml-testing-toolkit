@@ -42,16 +42,12 @@ const apiDefinitionsPath = 'spec_files/api_definitions/'
 // check if the file contains URL and return it instead of the file name
 const fetchAndParseRemoteSpec = async url => {
   const response = await axios.get(url)
-  const contentType = response.headers['content-type']
-  if (contentType && contentType.includes('yaml')) {
+  try {
+    // Try parsing as JSON first
+    return JSON.parse(response.data)
+  } catch (e) {
+    // If JSON parsing fails, assume YAML
     return yaml.load(response.data)
-  } else {
-    try {
-      return JSON.parse(response.data)
-    } catch (e) {
-      // fallback: try yaml if JSON parsing fails
-      return yaml.load(response.data)
-    }
   }
 }
 
