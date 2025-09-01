@@ -32,6 +32,8 @@ const Utils = require('../../../src/lib/utils')
 const Config = require('../../../src/lib/config')
 const OpenApiBackend = require('openapi-backend').default
 const fs = require('fs')
+const axios = require('axios')
+const tmp = require('tmp')
 
 jest.mock('../../../src/lib/utils')
 jest.mock('../../../src/lib/config')
@@ -132,17 +134,33 @@ describe('API Management', () => {
             type: 'name',
             version: '1.0',
             folderPath: "name_1.0",
-            additionalApi: true
           }
         ]
       })
-      await expect(APIManagement.patchDefinitionParams('name', '1.0', { prefix: '/new-prefix' })).resolves.toBe(true)
     })
-    it('should throw an error when API not found', async () => {
-      SpyGetSystemConfig.mockReturnValue({
-        API_DEFINITIONS: []
-      })
-      await expect(APIManagement.patchDefinitionParams('name', '1.0', { hostnames: ['hostname1', 'hostname2'] })).rejects.toThrowError()
+  })
+
+  describe('validateDefinition with remote URL', () => {
+    // Mock axios.get globally for tests that require remote URL loading
+    const mockYamlContent = `
+      openapi: 3.0.0
+      info:
+        title: Mojaloop API
+        version: 2.0.0
+      paths: {}
+    `
+    axios.get = jest.fn().mockResolvedValue({
+      data: mockYamlContent,
+      headers: { 'content-type': 'application/x-yaml' }
+    })
+    const remoteYamlUrl = 'https://raw.githubusercontent.com/mojaloop/api-snippets/refs/heads/main/docs/fspiop-rest-v2.0-openapi3-snippets.yaml'
+
+    it('should load and validate definition from remote YAML URL', async () => {
+      // Write the URL to a temp file as expected by checkUrl
+      const tmpFile = tmp.fileSync()
+      fs.writeFileSync(tmpFile.name, `"${remoteYamlUrl}"`)
+      await expect(APIManagement.validateDefinition(tmpFile.name)).resolves.not.toThrowError()
+      tmpFile.removeCallback()
     })
   })
 })

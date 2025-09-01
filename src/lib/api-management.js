@@ -35,10 +35,26 @@ const path = require('path')
 const Config = require('./config')
 const OpenApiDefinitionsModel = require('./mocking/openApiDefinitionsModel')
 const OpenApiMockHandler = require('./mocking/openApiMockHandler')
-
+const axios = require('axios')
+const yaml = require('js-yaml')
 const apiDefinitionsPath = 'spec_files/api_definitions/'
 
 // check if the file contains URL and return it instead of the file name
+const fetchAndParseRemoteSpec = async url => {
+  const response = await axios.get(url)
+  const contentType = response.headers['content-type']
+  if (contentType && contentType.includes('yaml')) {
+    return yaml.load(response.data)
+  } else {
+    try {
+      return JSON.parse(response.data)
+    } catch (e) {
+      // fallback: try yaml if JSON parsing fails
+      return yaml.load(response.data)
+    }
+  }
+}
+
 const checkUrl = async fileName => {
   const buffer = Buffer.alloc(10)
   const fileHandle = await fs.promises.open(fileName, 'r')
@@ -48,9 +64,13 @@ const checkUrl = async fileName => {
     await fileHandle.close()
   }
   const prefix = buffer.toString('utf8').replace('\uFEFF', '') // Remove BOM
-  return (prefix.startsWith('"http'))
-    ? JSON.parse(fs.readFileSync(fileName).toString('utf8'))
-    : fileName
+  if (prefix.startsWith('"http') || prefix.startsWith("'http")) {
+    let url = fs.readFileSync(fileName).toString('utf8').trim()
+    url = url.replace(/^['"]|['"]$/g, '')
+    return await fetchAndParseRemoteSpec(url)
+  } else {
+    return fileName
+  }
 }
 
 const validateDefinition = async (apiFilePath) => {
