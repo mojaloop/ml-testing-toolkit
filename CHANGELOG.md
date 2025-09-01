@@ -1,4 +1,16 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.15.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.15.0...v18.15.1) (2025-09-01)
+
+
+### Bug Fixes
+
+* load mock definition from URL ([#340](https://github.com/mojaloop/ml-testing-toolkit/issues/340)) ([a3b96c8](https://github.com/mojaloop/ml-testing-toolkit/commit/a3b96c8907bdda174f10e308a964c9c6c0c667ce))
+
+
+### Chore
+
+* **sbom:** update sbom [skip ci] ([1674a29](https://github.com/mojaloop/ml-testing-toolkit/commit/1674a297464bad8740c963835f73c7dc0cb31f42))
+
 ## [18.15.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.14.4...v18.15.0) (2025-08-21)
 
 
