@@ -112,7 +112,7 @@ describe('transactionRequestsService', () => {
       }
       outbound.OutboundSend.mockClear()
       await TransactionRequestsService.handleRequest(sampleContext, request, callback, 'spec_files/api_definitions/fspiop_1.0/trigger_templates')
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, 2000))
       expect(outbound.OutboundSend).toHaveBeenCalled()
     })
     it('It should not call outboundsend method if the callback request state is not RECEIVED', async () => {
@@ -184,7 +184,7 @@ describe('transactionRequestsService', () => {
       }
       outbound.OutboundSend.mockClear()
       await TransactionRequestsService.handleRequest(sampleContext, requestWithoutSessionId, callback, 'spec_files/api_definitions/fspiop_1.0/trigger_templates')
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, 2000))
       expect(outbound.OutboundSend).toHaveBeenCalled()
     })
     it('It should call outboundsend method if there is no sessionId', async () => {
