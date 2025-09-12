@@ -265,6 +265,9 @@ const executeAsync = async (script, data, contextObj) => {
     }
     consoleLog.push([{ execution: 0 }, 'executionError', err.toString()])
   }
+  // finally {
+  //   contextObj.inboundEvent.cleanup()
+  // }
   const result = {
     consoleLog,
     environment: { ...contextObj.environment }

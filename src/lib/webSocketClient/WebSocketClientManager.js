@@ -107,41 +107,48 @@ class WebSocketClientManager {
 
   getMessage (clientName, timeout = 5000) {
     return new Promise((resolve, reject) => {
-      if (!this.ws[clientName]) {
-        resolve(null)
-      } else {
-        // Check for the message received already
-        if (this.ws[clientName].message !== null) {
-          // Store the message somewhere
-          const retMessage = this.parseMessage(this.ws[clientName].message)
-          // Disconnect the websocket connection
-          this.disconnect(clientName)
-          // Return the stored message
-          // this.customLog('Returning stored message...')
-          resolve(retMessage)
-        } else {
-          // Listen for the new message for some time
-          let timer = null
-          // Set the timer
-          timer = setTimeout(() => {
-            try {
-              this.ws[clientName].eventEmitter.removeAllListeners('newMessage')
-              // Disconnect the websocket connection
-              this.disconnect(clientName)
-              resolve(null)
-            } catch (err) {
-              reject(err)
-            }
-          }, timeout)
-          // Listen for message
-          this.ws[clientName].eventEmitter.once('newMessage', (message) => {
-            clearTimeout(timer)
-            this.ws[clientName].eventEmitter.removeAllListeners('newMessage')
-            this.disconnect(clientName)
-            resolve(this.parseMessage(message))
-          })
+      let timer = null
+
+      const cleanup = () => {
+        if (timer) {
+          clearTimeout(timer)
+          timer = null
+        }
+        if (this.ws[clientName] && this.ws[clientName].eventEmitter) {
+          this.ws[clientName].eventEmitter.removeAllListeners('newMessage')
         }
       }
+
+      if (!this.ws[clientName]) {
+        resolve(null)
+        return
+      }
+
+      // Check for already received message
+      if (this.ws[clientName].message !== null) {
+        const retMessage = this.parseMessage(this.ws[clientName].message)
+        this.disconnect(clientName)
+        resolve(retMessage)
+        return
+      }
+
+      // Set timeout
+      timer = setTimeout(() => {
+        try {
+          cleanup()
+          this.disconnect(clientName)
+          resolve(null)
+        } catch (err) {
+          reject(err)
+        }
+      }, timeout)
+
+      // Listen for message
+      this.ws[clientName].eventEmitter.once('newMessage', (message) => {
+        cleanup()
+        this.disconnect(clientName)
+        resolve(this.parseMessage(message))
+      })
     })
   }
 
