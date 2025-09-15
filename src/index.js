@@ -51,6 +51,20 @@ And you can send mojaloop requests to http://localhost:4040
 
 const init = async () => {
   RequestLogger.logMessage('info', 'Toolkit Initialization started...', { notification: false })
+
+  // Set higher max listeners to prevent memory leak warnings
+  process.setMaxListeners(20)
+
+  // Set max listeners for HTTP modules to prevent socket listener warnings
+  const http = require('http')
+  const https = require('https')
+  if (http.Server && http.Server.prototype.setMaxListeners) {
+    http.Server.prototype.setMaxListeners(20)
+  }
+  if (https.Server && https.Server.prototype.setMaxListeners) {
+    https.Server.prototype.setMaxListeners(20)
+  }
+
   await Config.loadSystemConfig()
   await Config.loadUserConfig()
   apiServer.startServer(5050)

@@ -6,6 +6,5 @@ reject: [
   "jest",
   "@types/jest",
   "uuid",
-  "axios"
 ]
 

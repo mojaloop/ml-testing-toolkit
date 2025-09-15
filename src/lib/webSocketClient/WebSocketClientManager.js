@@ -56,6 +56,8 @@ class WebSocketClientManager {
   }
 
   connect (url, clientName, timeout = 15000) {
+    this.customLog(`Connecting to WebSocket URL: ${url} with client name: ${clientName} and timeout: ${timeout}ms`)
+
     const tlsOptions = { rejectUnauthorized: false }
     const urlObject = new URL(url)
     if (this.userConfig.CLIENT_MUTUAL_TLS_ENABLED) {
@@ -80,9 +82,13 @@ class WebSocketClientManager {
           eventEmitter: null
         }
         this.ws[clientName].client = new WebSocket(url, tlsOptions)
+        // Set a higher limit for event listeners to prevent memory leak warnings
+        this.ws[clientName].client.setMaxListeners(20)
         this.ws[clientName].client.on('open', () => {
           this.customLog('WebSocket Client Connected')
           this.ws[clientName].eventEmitter = new MyEmitter()
+          // Also set max listeners for the event emitter
+          this.ws[clientName].eventEmitter.setMaxListeners(20)
           this.timers[clientName] = setTimeout(() => {
             // Auto destroy the connection after timeout
             this.disconnect(clientName)
