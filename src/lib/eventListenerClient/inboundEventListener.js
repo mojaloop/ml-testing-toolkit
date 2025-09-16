@@ -52,8 +52,10 @@ class InboundEventListener {
   async init () {
     this.userConfig = await Config.getStoredUserConfig()
 
-    if (this.newInboundHandler) {
-      this.emitter.removeListener('newInbound', this.newInboundHandler)
+    // Fixes the MyEmitter listener leak issue
+    if (this.newInboundHandler || this.emitter.listenerCount('newInbound') > 0) {
+      this.emitter.removeAllListeners('newInbound')
+      this.newInboundHandler = null
     }
 
     this.newInboundHandler = (data) => {
