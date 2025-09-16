@@ -82,13 +82,9 @@ class WebSocketClientManager {
           eventEmitter: null
         }
         this.ws[clientName].client = new WebSocket(url, tlsOptions)
-        // Set a higher limit for event listeners to prevent memory leak warnings
-        this.ws[clientName].client.setMaxListeners(20)
         this.ws[clientName].client.on('open', () => {
           this.customLog('WebSocket Client Connected')
           this.ws[clientName].eventEmitter = new MyEmitter()
-          // Also set max listeners for the event emitter
-          this.ws[clientName].eventEmitter.setMaxListeners(20)
           this.timers[clientName] = setTimeout(() => {
             // Auto destroy the connection after timeout
             this.disconnect(clientName)

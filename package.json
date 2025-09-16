@@ -40,7 +40,7 @@
   ],
   "main": "src/index.js",
   "scripts": {
-    "start": "node --trace-warnings src/index.js",
+    "start": "node src/index.js",
     "standard": "standard",
     "standard:fix": "standard --fix",
     "dev": "nodemon src/index.js",
@@ -194,12 +194,6 @@
     "yargs-parser": "21.1.1",
     "oas-validator": {
       "ajv": "6.12.3"
-    },
-    "@mojaloop/central-services-shared": {
-      "axios": "1.12.0"
-    },
-    "@mojaloop/sdk-standard-components": {
-      "axios": "1.12.0"
     }
   }
 }

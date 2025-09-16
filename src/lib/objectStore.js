@@ -29,7 +29,6 @@
  ******/
 
 const _ = require('lodash')
-const customLogger = require('./requestLogger')
 
 const storedObject = {
   data: {
@@ -98,7 +97,6 @@ const popObject = (key, item, user) => {
 }
 
 const clearOldObjects = () => {
-  customLogger.logMessage('info', 'Clearing old objects in objectStore', { notification: false })
   const interval = 10 * 60 * 1000
   clear('transactions', interval)
   clear('requests', interval)

@@ -46,19 +46,17 @@ class InboundEventListener {
       this.consoleFn = console
     }
     this.emitter = MyEventEmitter.getEmitter('inboundRequest')
-    this.newInboundHandler = null
   }
 
   async init () {
     this.userConfig = await Config.getStoredUserConfig()
 
     // Fixes the MyEmitter listener leak issue
-    if (this.newInboundHandler || this.emitter.listenerCount('newInbound') > 0) {
+    if (this.emitter.listenerCount('newInbound') > 0) {
       this.emitter.removeAllListeners('newInbound')
-      this.newInboundHandler = null
     }
 
-    this.newInboundHandler = (data) => {
+    this.emitter.on('newInbound', (data) => {
       for (const [, eventListener] of Object.entries(this.eventListeners)) {
         // Match method, path and condition for each inbound request
         if (eventListener.method === data.method && eventListener.path === data.path) {
@@ -72,9 +70,7 @@ class InboundEventListener {
           }
         }
       }
-    }
-
-    this.emitter.on('newInbound', this.newInboundHandler)
+    })
   }
 
   customLog (logMessage) {
@@ -201,9 +197,8 @@ class InboundEventListener {
   // Add a new cleanup method
   cleanup () {
     // Remove the newInbound listener
-    if (this.newInboundHandler) {
-      this.emitter.removeListener('newInbound', this.newInboundHandler)
-      this.newInboundHandler = null
+    if (this.emitter.listenerCount('newInbound') > 0) {
+      this.emitter.removeAllListeners('newInbound')
     }
 
     // Clean up all event listeners

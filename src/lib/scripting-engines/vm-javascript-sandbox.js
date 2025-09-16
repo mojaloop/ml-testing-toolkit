@@ -42,12 +42,10 @@ const { getHeader, urlToPath } = require('../utils')
 
 const registerAxiosRequestInterceptor = (userConfig, axios, transformerObj) => {
   // Clear any existing interceptors first to prevent accumulation
-  axios.interceptors.request.clear()
-  axios.interceptors.response.clear()
-
-  // Set higher max listeners to prevent memory leak warnings
-  axios.defaults.maxRedirects = 5
-  axios.defaults.timeout = 30000
+  if (axios.interceptors?.request?.clear && axios.interceptors?.response?.clear) {
+    axios.interceptors.request.clear()
+    axios.interceptors.response.clear()
+  }
 
   // istanbul ignore next
   axios.interceptors.request.use(async config => {
@@ -220,7 +218,7 @@ const generateContextObj = async (environmentObj = {}) => {
     ctx: {
       dispose: () => {
         // Clear axios interceptors to prevent memory leaks
-        if (axios && axios.interceptors) {
+        if (axios.interceptors?.request?.clear && axios.interceptors?.response?.clear) {
           axios.interceptors.request.clear()
           axios.interceptors.response.clear()
         }
@@ -279,9 +277,6 @@ const executeAsync = async (script, data, contextObj) => {
     }
     consoleLog.push([{ execution: 0 }, 'executionError', err.toString()])
   }
-  // finally {
-  //   contextObj.inboundEvent.cleanup()
-  // }
   const result = {
     consoleLog,
     environment: { ...contextObj.environment }

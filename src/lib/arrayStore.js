@@ -27,8 +27,6 @@
  --------------
  ******/
 
-const customLogger = require('./requestLogger')
-
 const storedObject = {
   data: {
     requestsHistory: [],
@@ -85,7 +83,6 @@ const clear = (arrName, interval) => {
 }
 
 const clearOldObjects = () => {
-  customLogger.logMessage('info', 'Clearing old objects in arrayStore', { notification: false })
   const interval = 10 * 60 * 1000
   clear('requestsHistory', interval)
   clear('callbacksHistory', interval)

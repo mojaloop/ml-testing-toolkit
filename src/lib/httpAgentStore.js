@@ -118,7 +118,6 @@ const _clear = (agentStoreObj, interval) => {
 }
 
 const _clearAgents = (unUsedAgentsExpiryMs) => {
-  customLogger.logMessage('info', 'Clearing http/https agents', { notification: false })
   _clear(httpsAgentStore, unUsedAgentsExpiryMs)
   _clear(httpAgentStore, unUsedAgentsExpiryMs)
 }
