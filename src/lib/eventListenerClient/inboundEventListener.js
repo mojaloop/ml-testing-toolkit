@@ -27,9 +27,6 @@
  --------------
  ******/
 
-// Ignore temporarily to get the snapshot release done
-/* istanbul ignore file */
-
 const MyEventEmitter = require('../MyEventEmitter')
 const EventEmitter = require('events')
 class MyEmitter extends EventEmitter {}
