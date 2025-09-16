@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+## [18.16.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.15.1...v18.16.0) (2025-09-16)
+
+
+### Bug Fixes
+
+* **csi-1782:** fix MyEmitter memory leak ([#342](https://github.com/mojaloop/ml-testing-toolkit/issues/342)) ([c141048](https://github.com/mojaloop/ml-testing-toolkit/commit/c1410487a3c17824b0869b6920c2132d491a6007))
+
 ### [18.15.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.15.0...v18.15.1) (2025-09-01)
 
 
