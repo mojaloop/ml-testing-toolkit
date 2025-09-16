@@ -47,6 +47,12 @@ class InboundEventListener {
 
   async init () {
     this.userConfig = await Config.getStoredUserConfig()
+
+    // Fixes the MyEmitter listener leak issue
+    if (this.emitter.listenerCount('newInbound') > 0) {
+      this.emitter.removeAllListeners('newInbound')
+    }
+
     this.emitter.on('newInbound', (data) => {
       for (const [, eventListener] of Object.entries(this.eventListeners)) {
         // Match method, path and condition for each inbound request
@@ -98,59 +104,74 @@ class InboundEventListener {
 
   getMessage (clientName, timeout = 5000) {
     return new Promise((resolve, reject) => {
-      if (!this.eventListeners[clientName]) {
-        resolve(null)
-      } else {
-        // Check for the message received already
-        if (this.eventListeners[clientName].message !== null) {
-          // Store the message somewhere
-          const retMessage = this.parseMessage(this.eventListeners[clientName].message)
-          // Destroy the event listener
-          this.destroy(clientName)
-          // Return the stored message
-          // this.customLog('Returning stored message...')
-          if (this.transformer.reverseTransform) {
-            this.transformer.reverseTransform(retMessage).then((result) => {
-              resolve(result)
-            }).catch((err) => {
-              this.customLog('Error transforming message: ' + err)
-              resolve(retMessage)
-            })
-          } else {
-            resolve(retMessage)
-          }
-        } else {
-          // Listen for the new message for some time
-          let timer = null
-          // Set the timer
-          timer = setTimeout(() => {
-            try {
-              this.customLog('Error: Timeout')
-              // Destroy the event listener
-              this.destroy(clientName)
-              resolve(null)
-            } catch (err) {
-              reject(err)
-            }
-          }, timeout)
-          // Listen for message
-          this.eventListeners[clientName].eventEmitter.once('newMessage', (message) => {
-            clearTimeout(timer)
-            this.destroy(clientName)
-            const retMessage = this.parseMessage(message)
-            if (this.transformer.reverseTransform) {
-              this.transformer.reverseTransform(retMessage).then((result) => {
-                resolve(result)
-              }).catch((err) => {
-                this.customLog('Error transforming message: ' + err)
-                resolve(retMessage)
-              })
-            } else {
-              resolve(retMessage)
-            }
-          })
+      let timer = null
+
+      const cleanup = () => {
+        if (timer) {
+          clearTimeout(timer)
+          timer = null
+        }
+        if (this.eventListeners[clientName] && this.eventListeners[clientName].eventEmitter) {
+          this.eventListeners[clientName].eventEmitter.removeAllListeners('newMessage')
         }
       }
+
+      if (!this.eventListeners[clientName]) {
+        resolve(null)
+        return
+      }
+
+      // Check for the message received already
+      if (this.eventListeners[clientName].message !== null) {
+        // Store the message somewhere
+        const retMessage = this.parseMessage(this.eventListeners[clientName].message)
+        // Destroy the event listener
+        this.destroy(clientName)
+        // Return the stored message
+        // this.customLog('Returning stored message...')
+        if (this.transformer.reverseTransform) {
+          this.transformer.reverseTransform(retMessage).then((result) => {
+            resolve(result)
+          }).catch((err) => {
+            this.customLog('Error transforming message: ' + err)
+            resolve(retMessage)
+          })
+        } else {
+          resolve(retMessage)
+        }
+        return
+      }
+
+      // Listen for the new message for some time
+      // Set the timer
+      timer = setTimeout(() => {
+        try {
+          this.customLog('Error: Timeout')
+          // Destroy the event listener
+          this.destroy(clientName)
+          resolve(null)
+        } catch (err) {
+          reject(err)
+        }
+      }, timeout)
+
+      // Listen for message
+      this.eventListeners[clientName].eventEmitter.once('newMessage', (message) => {
+        cleanup()
+        this.destroy(clientName)
+        const retMessage = this.parseMessage(message)
+
+        if (this.transformer.reverseTransform) {
+          this.transformer.reverseTransform(retMessage).then((result) => {
+            resolve(result)
+          }).catch((err) => {
+            this.customLog('Error transforming message: ' + err)
+            resolve(retMessage)
+          })
+        } else {
+          resolve(retMessage)
+        }
+      })
     })
   }
 
