@@ -167,7 +167,10 @@ class WebSocketClientManager {
 
   disconnect (clientName) {
     if (this.ws[clientName]) {
-      this.ws[clientName].client.close()
+      if (this.ws[clientName].client) {
+        this.ws[clientName].client.removeAllListeners()
+        this.ws[clientName].client.close()
+      }
       if (this.ws[clientName].eventEmitter) {
         this.ws[clientName].eventEmitter.removeAllListeners()
       }
@@ -182,7 +185,10 @@ class WebSocketClientManager {
 
   disconnectAll () {
     for (const clientName in this.ws) {
-      this.ws[clientName].client.close()
+      if (this.ws[clientName].client) {
+        this.ws[clientName].client.removeAllListeners()
+        this.ws[clientName].client.close()
+      }
       if (this.ws[clientName].eventEmitter) {
         this.ws[clientName].eventEmitter.removeAllListeners()
       }

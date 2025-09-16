@@ -44,7 +44,8 @@ const webSocketPositiveMock = () => {
         callbackFn({ data: 'some data' })
       }
     },
-    close: () => {}
+    close: () => {},
+    removeAllListeners: () => jest.fn()
   }
 }
 const webSocketPositiveMockDelayedMessage = () => {
@@ -56,7 +57,8 @@ const webSocketPositiveMockDelayedMessage = () => {
         setTimeout(callbackFn, 100, { data: 'some data' })
       }
     },
-    close: () => {}
+    close: () => {},
+    removeAllListeners: () => jest.fn()
   }
 }
 const webSocketPositiveMockNoMessage = () => {
@@ -66,7 +68,8 @@ const webSocketPositiveMockNoMessage = () => {
         callbackFn()
       }
     },
-    close: () => {}
+    close: () => {},
+    removeAllListeners: () => jest.fn()
   }
 }
 const webSocketNegativeMock1 = () => {
@@ -76,7 +79,8 @@ const webSocketNegativeMock1 = () => {
         callbackFn()
       }
     },
-    close: () => {}
+    close: () => {},
+    removeAllListeners: () => jest.fn()
   }
 }
 const webSocketNegativeMock2 = () => {
@@ -86,7 +90,8 @@ const webSocketNegativeMock2 = () => {
         callbackFn()
       }
     },
-    close: () => {}
+    close: () => {},
+    removeAllListeners: () => jest.fn()
   }
 }
 
