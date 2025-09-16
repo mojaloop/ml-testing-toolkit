@@ -193,19 +193,6 @@ class InboundEventListener {
     }
     return true
   }
-
-  // Add a new cleanup method
-  cleanup () {
-    // Remove the newInbound listener
-    if (this.emitter.listenerCount('newInbound') > 0) {
-      this.emitter.removeAllListeners('newInbound')
-    }
-
-    // Clean up all event listeners
-    Object.keys(this.eventListeners).forEach(clientName => {
-      this.destroy(clientName)
-    })
-  }
 }
 
 module.exports = {
