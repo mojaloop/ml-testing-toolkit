@@ -41,12 +41,6 @@ const customLogger = require('../requestLogger')
 const { getHeader, urlToPath } = require('../utils')
 
 const registerAxiosRequestInterceptor = (userConfig, axios, transformerObj) => {
-  // Clear any existing interceptors first to prevent accumulation
-  if (axios.interceptors?.request?.clear && axios.interceptors?.response?.clear) {
-    axios.interceptors.request.clear()
-    axios.interceptors.response.clear()
-  }
-
   // istanbul ignore next
   axios.interceptors.request.use(async config => {
     const options = { rejectUnauthorized: false }
@@ -216,13 +210,7 @@ const generateContextObj = async (environmentObj = {}) => {
 
   const contextObj = {
     ctx: {
-      dispose: () => {
-        // Clear axios interceptors to prevent memory leaks
-        if (axios.interceptors?.request?.clear && axios.interceptors?.response?.clear) {
-          axios.interceptors.request.clear()
-          axios.interceptors.response.clear()
-        }
-      }
+      dispose: () => {}
     },
     environment: { ...environmentObj },
     requestVariables,

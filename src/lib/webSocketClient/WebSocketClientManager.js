@@ -28,9 +28,6 @@
  --------------
  ******/
 
-// Ignore temporarily to get the snapshot release done
-/* istanbul ignore file */
-
 const WebSocket = require('ws')
 const EventEmitter = require('events')
 class MyEmitter extends EventEmitter {}
@@ -200,13 +197,6 @@ class WebSocketClientManager {
       this.customLog(`${clientName}: Deleted`)
     }
     return true
-  }
-
-  clearAllTimers () {
-    Object.keys(this.timers).forEach((clientName) => {
-      clearTimeout(this.timers[clientName])
-      delete this.timers[clientName]
-    })
   }
 }
 
