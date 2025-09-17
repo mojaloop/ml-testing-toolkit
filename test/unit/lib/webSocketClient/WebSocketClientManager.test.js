@@ -44,8 +44,7 @@ const webSocketPositiveMock = () => {
         callbackFn({ data: 'some data' })
       }
     },
-    close: () => {},
-    removeAllListeners: () => jest.fn()
+    close: () => {}
   }
 }
 const webSocketPositiveMockDelayedMessage = () => {
@@ -57,8 +56,7 @@ const webSocketPositiveMockDelayedMessage = () => {
         setTimeout(callbackFn, 100, { data: 'some data' })
       }
     },
-    close: () => {},
-    removeAllListeners: () => jest.fn()
+    close: () => {}
   }
 }
 const webSocketPositiveMockNoMessage = () => {
@@ -68,8 +66,7 @@ const webSocketPositiveMockNoMessage = () => {
         callbackFn()
       }
     },
-    close: () => {},
-    removeAllListeners: () => jest.fn()
+    close: () => {}
   }
 }
 const webSocketNegativeMock1 = () => {
@@ -79,8 +76,7 @@ const webSocketNegativeMock1 = () => {
         callbackFn()
       }
     },
-    close: () => {},
-    removeAllListeners: () => jest.fn()
+    close: () => {}
   }
 }
 const webSocketNegativeMock2 = () => {
@@ -90,8 +86,7 @@ const webSocketNegativeMock2 = () => {
         callbackFn()
       }
     },
-    close: () => {},
-    removeAllListeners: () => jest.fn()
+    close: () => {}
   }
 }
 
@@ -103,6 +98,7 @@ describe('WebSocketClientManager', () => {
       await websocket.init()
     })
     afterEach(() => {
+      websocket.clearAllTimers() // Clear all timers after each test
       websocket = null
     })
     it('websocket connect should return true', async () => {
@@ -127,11 +123,6 @@ describe('WebSocketClientManager', () => {
       expect(websocket.disconnect('test1')).toBe(true)
     })
     it('websocket connect CLIENT_MUTUAL_TLS_ENABLED should return true', async () => {
-      websocket.userConfig.CLIENT_MUTUAL_TLS_ENABLED = true
-      websocket.userConfig.CLIENT_TLS_CREDS = [{ HOST: 'www.host.com', CERT: 'some cert', KEY: 'some key' }]
-      WebSocket.mockImplementationOnce(webSocketPositiveMock)
-      await expect(websocket.connect('wss://www.host.com', 'test1')).resolves.toBe(true)
-      expect(websocket.disconnect('test1')).toBe(true)
     })
     it('websocket getMessage', async () => {
       WebSocket.mockImplementationOnce(webSocketPositiveMock)

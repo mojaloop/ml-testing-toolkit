@@ -4,7 +4,6 @@ reject: [
   "postman-collection",
   "postman-sandbox",
   "jest",
-  "@types/jest",
-  "uuid",
+  "@types/jest"
 ]
 
