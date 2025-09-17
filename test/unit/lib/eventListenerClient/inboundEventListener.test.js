@@ -45,8 +45,7 @@
          on: jest.fn((event, callback) => {
            if (event === 'newInbound') newInboundCallback = callback
          }),
-         removeAllListeners: jest.fn(),
-         listenerCount: jest.fn(() => 0)
+         removeAllListeners: jest.fn()
        }
        jest.spyOn(MyEventEmitter, 'getEmitter').mockReturnValue(emitterMock)
        eventListener = new InboundEventListener()
@@ -247,8 +246,7 @@
          on: jest.fn((event, callback) => {
            if (event === 'newInbound') newInboundCallback = callback
          }),
-         removeAllListeners: jest.fn(),
-         listenerCount: jest.fn(() => 0)
+         removeAllListeners: jest.fn()
        }
        jest.spyOn(MyEventEmitter, 'getEmitter').mockReturnValue(emitterMock)
        eventListener = new InboundEventListener(customConsole)
