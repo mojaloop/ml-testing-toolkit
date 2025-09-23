@@ -50,7 +50,8 @@ class InboundEventListener {
 
     // Fixes the MyEmitter listener leak issue
     if (this.emitter.listenerCount('newInbound') > 0) {
-      this.emitter.removeAllListeners('newInbound')
+      // this.emitter.removeAllListeners('newInbound')
+      return
     }
 
     this.emitter.on('newInbound', (data) => {
