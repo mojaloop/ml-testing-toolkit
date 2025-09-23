@@ -31,6 +31,7 @@
  'use strict'
 
  const InboundEventListener = require('../../../../src/lib/eventListenerClient/inboundEventListener').InboundEventListener
+const { listenerCount } = require('ws')
  const MyEventEmitter = require('../../../../src/lib/MyEventEmitter')
  
  describe('InboundEventListener', () => {
@@ -45,7 +46,8 @@
          on: jest.fn((event, callback) => {
            if (event === 'newInbound') newInboundCallback = callback
          }),
-         removeAllListeners: jest.fn()
+         removeAllListeners: jest.fn(),
+         listenerCount: jest.fn().mockReturnValue(0)
        }
        jest.spyOn(MyEventEmitter, 'getEmitter').mockReturnValue(emitterMock)
        eventListener = new InboundEventListener()
@@ -246,7 +248,8 @@
          on: jest.fn((event, callback) => {
            if (event === 'newInbound') newInboundCallback = callback
          }),
-         removeAllListeners: jest.fn()
+         removeAllListeners: jest.fn(),
+         listenerCount: jest.fn().mockReturnValue(0)
        }
        jest.spyOn(MyEventEmitter, 'getEmitter').mockReturnValue(emitterMock)
        eventListener = new InboundEventListener(customConsole)

@@ -47,6 +47,12 @@ class InboundEventListener {
 
   async init () {
     this.userConfig = await Config.getStoredUserConfig()
+
+    // Fixes the MyEmitter listener leak issue
+    if (this.emitter.listenerCount('newInbound') > 0) {
+      this.emitter.removeAllListeners('newInbound')
+    }
+
     this.emitter.on('newInbound', (data) => {
       for (const [, eventListener] of Object.entries(this.eventListeners)) {
         // Match method, path and condition for each inbound request
