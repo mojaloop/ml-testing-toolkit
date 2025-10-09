@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.16.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.16.1...v18.16.2) (2025-10-09)
+
+
+### Chore
+
+* bump deps ([#346](https://github.com/mojaloop/ml-testing-toolkit/issues/346)) ([52e690d](https://github.com/mojaloop/ml-testing-toolkit/commit/52e690dd9d342106dce5b6ca53bf061c40391fc3))
+
 ### [18.16.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.16.0...v18.16.1) (2025-09-17)
 
 
