@@ -16,6 +16,6 @@ module.exports = {
   testTimeout: 30000,
   // Mock ESM modules that Jest can't handle
   moduleNameMapper: {
-    '^@faker-js/faker$': '<rootDir>/__mocks__/@faker-js/faker.js'
+    '^@faker-js/faker$': '<rootDir>/node_modules/@mojaloop/ml-testing-toolkit-shared-lib/__mocks__/@faker-js/faker.js'
   }
 }
