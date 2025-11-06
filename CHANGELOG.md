@@ -1,4 +1,16 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.16.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.16.2...v18.16.3) (2025-11-06)
+
+
+### Bug Fixes
+
+* **csi-1926:** added logs to output error ([#349](https://github.com/mojaloop/ml-testing-toolkit/issues/349)) ([dd1c660](https://github.com/mojaloop/ml-testing-toolkit/commit/dd1c660381d2277e60c45943dd8b19a7a13828d9))
+
+
+### Chore
+
+* **sbom:** update sbom [skip ci] ([7d0c57f](https://github.com/mojaloop/ml-testing-toolkit/commit/7d0c57f9d58f3c58c43a52e76d55f1d77415ac9c))
+
 ### [18.16.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.16.1...v18.16.2) (2025-10-09)
 
 
