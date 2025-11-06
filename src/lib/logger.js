@@ -1,10 +1,9 @@
 const { loggerFactory, LOG_LEVELS } = require('@mojaloop/sdk-standard-components').Logger
-const { hostname } = require('node:os')
 
 const createLogger = (conf = {}) => {
   const {
     context = {
-      hostname: hostname()
+      context: 'ML_TTK'
     },
     isJsonOutput = false
   } = conf

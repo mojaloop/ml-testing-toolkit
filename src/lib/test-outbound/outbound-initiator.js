@@ -1053,6 +1053,7 @@ const getTotalCounts = (inputTemplate) => {
 // Generate consolidated final report
 const generateFinalReport = (inputTemplate, runtimeInformation, metrics) => {
   const { test_cases, ...remaingPropsInTemplate } = inputTemplate
+
   const resultTestCases = test_cases.map(testCase => {
     const { requests, ...remainingPropsInTestCase } = testCase
     const resultRequests = requests.map(requestItem => {

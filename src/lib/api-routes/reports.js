@@ -31,6 +31,9 @@ const express = require('express')
 const router = new express.Router()
 // const { check, validationResult } = require('express-validator')
 const reportGenerator = require('../report-generator/generator')
+const { logger } = require('../logger')
+
+const log = logger.child({ component: 'api-routes::reports' })
 
 // Generate report
 router.post('/testcase/:format', async (req, res, next) => {
@@ -48,6 +51,7 @@ router.post('/testcase/:format', async (req, res, next) => {
     res.setHeader('TTK-FileName', 'TTK-Assertion-Report' + downloadFileSuffix)
     res.status(200).send(result)
   } catch (err) {
+    log.child({ format }).error('error in POST /testcase/:format - ', err)
     res.status(500).json({ error: err && err.message })
   }
 })
@@ -65,6 +69,7 @@ router.post('/testcase_definition/:format', async (req, res, next) => {
     res.setHeader('TTK-FileName', 'TTK-Testcase-Definition' + downloadFileSuffix)
     res.status(200).send(result)
   } catch (err) {
+    log.child({ format }).error('error in POST /testcase_definition/:format - ', err)
     res.status(500).json({ error: err && err.message })
   }
 })
