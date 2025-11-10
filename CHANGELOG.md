@@ -1,4 +1,16 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.16.4](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.16.3...v18.16.4) (2025-11-10)
+
+
+### Bug Fixes
+
+* **csi-1915:** included ISO20022 messages in TTK report callbacks ([#350](https://github.com/mojaloop/ml-testing-toolkit/issues/350)) ([c68adb3](https://github.com/mojaloop/ml-testing-toolkit/commit/c68adb390105be9c057902cdcdebf03ecb10ecba))
+
+
+### Chore
+
+* **sbom:** update sbom [skip ci] ([5a53aae](https://github.com/mojaloop/ml-testing-toolkit/commit/5a53aae1c92497bb4ec50c8ed148c28695329bdf))
+
 ### [18.16.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.16.2...v18.16.3) (2025-11-06)
 
 
