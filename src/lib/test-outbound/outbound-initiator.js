@@ -505,6 +505,7 @@ const setResponse = async (
   if (globalConfig.testsExecution) {
     assertionResults = await handleTests(convertedRequest, resp.requestSent, resp.syncResponse, resp.callback, variableData.environment, backgroundData, contextObj.requestVariables)
   }
+  traceId = resp.syncResponse?.body?.traceId || traceId
   request.appended = {
     status,
     assertionResults,
