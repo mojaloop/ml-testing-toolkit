@@ -4,7 +4,7 @@
 ## @global-owner1 and @global-owner2 will be requested for
 ## review when someone opens a pull request.
 #*       @global-owner1 @global-owner2
-*   @vijayg10 @elnyry-sam-k @bushjames @shashi165 @gibaros @kleyow
+*   @vijayg10 @elnyry-sam-k @bushjames @shashi165 @gibaros @kleyow @geka-evk
 ## Order is important; the last matching pattern takes the most
 ## precedence. When someone opens a pull request that only
 ## modifies JS files, only @js-owner and not the global
