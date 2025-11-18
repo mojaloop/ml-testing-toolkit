@@ -5,6 +5,7 @@ ignore:
   - vulnerability: CVE-2025-9230
   - vulnerability: CVE-2025-9232
   - vulnerability: CVE-2025-9231
+  - vulnerability: GHSA-3xgq-45jj-v275
 
 # Set output format defaults
 output:
