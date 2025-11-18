@@ -1,4 +1,17 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.16.5](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.16.4...v18.16.5) (2025-11-18)
+
+
+### Bug Fixes
+
+* consider optional traceId in response body ([#351](https://github.com/mojaloop/ml-testing-toolkit/issues/351)) ([a9d3e6c](https://github.com/mojaloop/ml-testing-toolkit/commit/a9d3e6c77f2ec91367ae8dfaf3cfc008c2cb4a24))
+* dependencies ([#353](https://github.com/mojaloop/ml-testing-toolkit/issues/353)) ([a821e99](https://github.com/mojaloop/ml-testing-toolkit/commit/a821e99c9c3273986c6e6a8df8348a90a1c190f9))
+
+
+### Chore
+
+* **sbom:** update sbom [skip ci] ([64d799f](https://github.com/mojaloop/ml-testing-toolkit/commit/64d799f7d0905309d1f7651bb6a9e56b863556ad))
+
 ### [18.16.4](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.16.3...v18.16.4) (2025-11-10)
 
 
