@@ -48,10 +48,7 @@ const getConnection = async () => {
     }
 
     // TLS/SSL support
-    const mongoOptions = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    }
+    const mongoOptions = {}
 
     if (systemConfig.DB.SSL_ENABLED) {
       mongoOptions.tls = true
