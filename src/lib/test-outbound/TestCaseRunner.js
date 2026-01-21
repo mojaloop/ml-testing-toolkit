@@ -40,12 +40,17 @@ const SKIP_EMPTY_EXECUTION_ORDER = false // skip testCases without executionOrde
 class TestCaseRunner {
   constructor (config, logger) {
     this.config = config
-    this.logger = logger || loggerFactory('TestCaseRunner')
+    this.logger = logger || loggerFactory({ context: 'TTK', system: 'TestCaseRunner' })
   }
+
+  static lib = inputTemplate => inputTemplate.test_cases.reduce((acc, testCase) =>
+    testCase.options?.lib ? testCase.requests.reduce((acc, request) => ({ ...acc, [`${testCase.id}.${request.id}`]: request }), acc) : acc
+  , {})
 
   async runAll ({
     processTestCase, inputTemplate, traceID, variableData, dfspId, globalConfig, metrics
   }) {
+    const lib = TestCaseRunner.lib(inputTemplate)
     const runOneTestCase = (testCase, index) => () => {
       globalConfig.totalProgress.testCasesProcessed++
       return processTestCase(
@@ -59,7 +64,8 @@ class TestCaseRunner {
         metrics,
         inputTemplate.name,
         inputTemplate.saveReport,
-        index
+        index,
+        lib
       )
     }
 
