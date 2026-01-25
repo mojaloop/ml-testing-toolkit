@@ -327,9 +327,10 @@ const generateAsyncCallback = async (item, context, req) => {
       }
       const isFxTransfer = fxTransferPathMatch.test(req.path)
       const transferId = req.path.match(isFxTransfer ? fxTransferPathMatch : transferPathMatch)[1]
+      customLogger.logMessage('debug', 'Storing transfer for validation', { additionalData: { transferId }, request: req })
+
       context.storedTransfers[transferId] = {
         request: req.payload,
-        timestamp: Date.now(),
         type: isFxTransfer ? 'fxTransfer' : 'transfer'
       }
     }

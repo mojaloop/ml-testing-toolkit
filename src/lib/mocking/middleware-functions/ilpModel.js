@@ -139,22 +139,24 @@ const handleTransferIlp = (context, response) => {
       const generatedFulfilment = ilpV4Obj.calculateFulfil(context.request.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
       response.body.TxInfAndSts.ExctnConf = generatedFulfilment
     }
+  }
 
-    // Retrieve stored transfer if available
+  if (context.request.method === 'get' && response.method === 'put' && pathMatch.test(response.path)) {
     const transferId = response.path.match(pathMatch)[1]
-    const storedTransfer = context.request.customInfo?.storedTransfer || context.storedTransfers?.[transferId]
+    const storedTransfer = context.storedTransfers?.[transferId]
 
+    // Check if stored request exists and is within 30 seconds
     if (storedTransfer) {
-      // Transfer was stored from POST request, use it for GET responses
-      if (context.request.method === 'get') {
-        if (storedTransfer.ilpPacket) {
-          const generatedFulfilment = ilpObj.calculateFulfil(storedTransfer.ilpPacket).replace('"', '')
-          response.body.fulfilment = generatedFulfilment
-        } else if (storedTransfer.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket) {
-          const generatedFulfilment = ilpV4Obj.calculateFulfil(storedTransfer.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
-          response.body.TxInfAndSts.ExctnConf = generatedFulfilment
-        }
+      if (storedTransfer.request.ilpPacket) {
+        const generatedFulfilment = ilpObj.calculateFulfil(storedTransfer.request.ilpPacket).replace('"', '')
+        response.body.fulfilment = generatedFulfilment
+      } else if (storedTransfer.request.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket) {
+        const generatedFulfilment = ilpV4Obj.calculateFulfil(storedTransfer.request.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
+        response.body.TxInfAndSts.ExctnConf = generatedFulfilment
       }
+      delete context.storedTransfers[transferId]
+    } else {
+      delete response.body.fulfilment
     }
   }
 }

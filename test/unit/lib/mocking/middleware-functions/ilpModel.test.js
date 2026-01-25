@@ -343,6 +343,7 @@ const transferISOResponseBody = {
   }
 }
 
+const exampleIlpPacket = 'DIICbwAAAAAAD0JAMjAyNjAxMjUyMDA0MTk5MjHo4kKnlo7nomKuv4En2_IKeFeWY585cXvynk6qipXvqgpnLm1vamFsb29wggIoZXlKMGNtRnVjMkZqZEdsdmJrbGtJam9pTURGTFJsSlRVVEUwTTBvNE5FcExSVlJXTVVneFRWZzNTRFVpTENKeGRXOTBaVWxrSWpvaU1ERkxSbEpUVVRFME0wbzRORXBMUlZSV01VZ3hUVmczU0RRaUxDSndZWGxsWlNJNmV5SndZWEowZVVsa1NXNW1ieUk2ZXlKd1lYSjBlVWxrVkhsd1pTSTZJakV5TXpRMU5pSXNJbkJoY25SNVNXUmxiblJwWm1sbGNpSTZJazFUU1ZORVRpSXNJbVp6Y0Vsa0lqb2libTl1WlhocGMzUmxiblJ3WVhsbFpXWnpjQ0o5ZlN3aWNHRjVaWElpT25zaWNHRnlkSGxKWkVsdVptOGlPbnNpY0dGeWRIbEpaRlI1Y0dVaU9pSXhNak0wTlRZaUxDSndZWEowZVVsa1pXNTBhV1pwWlhJaU9pSk5VMGxUUkU0aUxDSm1jM0JKWkNJNkluUmxjM1JwYm1kMGIyOXNhMmwwWkdaemNDSjlmU3dpWVcxdmRXNTBJanA3SW1OMWNuSmxibU41SWpvaVdGaFlJaXdpWVcxdmRXNTBJam9pTVRBd0luMHNJblJ5WVc1ellXTjBhVzl1Vkhsd1pTSTZiblZzYkN3aVpYaHdhWEpoZEdsdmJpSTZJakl3TWpZdE1ERXRNalZVTWpBNk1EUTZNVGt1T1RJeFdpSXNJbTV2ZEdVaU9tNTFiR3g5'
 const wrongIlpPacket = 'AYIDNQAAAAAAAE4gImcudGVzdGluZ3Rvb2xraXRkZnNwLm1zaXNkbi4wMDAxMTGCAwZleUowY21GdWMyRmpkR2x2Ymtsa0lqb2lOVGcyTjJJM09EVXRZMk14TnkwMFpUVTVMVGs1WWpVdE0yWTFNVFptTkRNNE9USmtJaXdpY1hWdmRHVkpaQ0k2SWpjMk1UWmhNbU14TFRBek1qQXROREpqT0MxaE9USXpMVFJrWTJFNU9XTTJOREF5TkNJc0luQmhlV1ZsSWpwN0luQmhjblI1U1dSSmJtWnZJanA3SW5CaGNuUjVTV1JVZVhCbElqb2lUVk5KVTBST0lpd2ljR0Z5ZEhsSlpHVnVkR2xtYVdWeUlqb2lNREF3TVRFeElpd2labk53U1dRaU9pSjBaWE4wYVc1bmRHOXZiR3RwZEdSbWMzQWlmU3dpY0dWeWMyOXVZV3hKYm1adklqcDdJbU52YlhCc1pYaE9ZVzFsSWpwN0ltWnBjbk4wVG1GdFpTSTZJa1JoYm1sbGJDSXNJbTFwWkdSc1pVNWhiV1VpT2lKVElpd2liR0Z6ZEU1aGJXVWlPaUpTYjJSeWFXZDFaWG9pZlN3aVpHRjBaVTltUW1seWRHZ2lPaUl4T1RneExURXdMVEU0SW4xOUxDSndZWGxsY2lJNmV5SndZWEowZVVsa1NXNW1ieUk2ZXlKd1lYSjBlVWxrVkhsd1pTSTZJazFUU1ZORVRpSXNJbkJoY25SNVNXUmxiblJwWm1sbGNpSTZJakV5TXpRMU5pSXNJbVp6Y0Vsa0lqb2lkWE5sY21SbWMzQWlmU3dpYm1GdFpTSTZJa3B2YUc0Z1NtOW9ibk52YmlKOUxDSmhiVzkxYm5RaU9uc2lZM1Z5Y21WdVkza2lPaUpWVTBRaUxDSmhiVzkxYm5RaU9pSXlNREFpZlN3aWRISmhibk5oWTNScGIyNVVlWEJsSWpwN0luTmpaVzVoY21sdklqb2lWRkpCVGxOR1JWSWlMQ0pwYm1sMGFXRjBiM0lpT2lKUVFWbEZVaUlzSW1sdWFYUnBZWFJ2Y2xSNWNHVWlPaUpEVDA1VFZVMUZVaUo5ZlEA'
 
 describe('ILP Model', () => {
@@ -533,6 +534,92 @@ describe('ILP Model', () => {
             }
           }
         }
+      }
+      IlpModel.handleTransferIlp(sampleContext, response)
+      expect(response.body).not.toHaveProperty('fulfilment')
+    })
+    it('handleTransferIlp should use stored transfer from context.storedTransfers', () => {
+      const transferId = 'test-transfer-id'
+      const storedTransfer = {
+        request: {
+          ilpPacket: exampleIlpPacket
+        }
+      }
+      const sampleContext = {
+        request: {
+          method: 'get'
+        },
+        storedTransfers: {
+          [transferId]: storedTransfer
+        }
+      }
+      const response = {
+        method: 'put',
+        path: `/transfers/${transferId}`,
+        body: {...transferPartResponseBody}
+      }
+      IlpModel.handleTransferIlp(sampleContext, response)
+      expect(response.body.fulfilment).not.toBeNull()
+    })
+
+    it('handleTransferIlp should use stored transfer for GET request with ISO20022', () => {
+      const storedTransfer = {
+        CdtTrfTxInf: {
+          VrfctnOfTerms: {
+            IlpV4PrepPacket: exampleIlpPacket
+          }
+        }
+      }
+      const sampleContext = {
+        request: {
+          method: 'get',
+        },
+        storedTransfers: {
+          request: storedTransfer
+        }
+      }
+      const response = {
+        method: 'put',
+        path: '/transfers/asdfasdf',
+        body: {...transferISOResponseBody}
+      }
+      IlpModel.handleTransferIlp(sampleContext, response)
+      expect(response.body.TxInfAndSts.ExctnConf).not.toBeNull()
+    })
+
+    it('handleTransferIlp should not use stored transfer when method is not GET', () => {
+      const storedTransfer = {
+        ilpPacket: ilpPacket
+      }
+      const sampleContext = {
+        request: {
+          method: 'post',
+          body: {},
+          customInfo: {
+          storedTransfer: storedTransfer
+          }
+        }
+      }
+      const response = {
+        method: 'put',
+        path: '/transfers/asdfasdf',
+        body: {...transferPartResponseBody}
+      }
+      IlpModel.handleTransferIlp(sampleContext, response)
+      expect(response.body).not.toHaveProperty('fulfilment')
+    })
+
+    it('handleTransferIlp should handle missing stored transfer gracefully', () => {
+      const sampleContext = {
+        request: {
+          method: 'get',
+          body: {}
+        }
+      }
+      const response = {
+        method: 'put',
+        path: '/transfers/asdfasdf',
+        body: {...transferPartResponseBody}
       }
       IlpModel.handleTransferIlp(sampleContext, response)
       expect(response.body).not.toHaveProperty('fulfilment')
