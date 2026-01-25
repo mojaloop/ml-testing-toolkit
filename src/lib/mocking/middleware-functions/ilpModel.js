@@ -166,11 +166,7 @@ const handleTransferIlp = (context, response) => {
         customLogger.logMessage('warn', 'No ILP packet or IlpV4PrepPacket found in stored transfer request', { additionalData: { transferId, storedTransfer } })
       }
       // Remove the stored transfer from objectStore
-      objectStore.get('storedTransfers', undefined) // Ensure init
-      objectStore.set('storedTransfers', {
-        ...objectStore.get('storedTransfers', undefined),
-        [transferId]: undefined
-      })
+      objectStore.deleteObject('storedTransfers', transferId)
     } else {
       delete response.body.fulfilment
     }

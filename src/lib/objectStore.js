@@ -29,6 +29,7 @@
  ******/
 
 const _ = require('lodash')
+const { logger } = require('./logger')
 
 const storedObject = {
   data: {
@@ -77,13 +78,17 @@ const push = (key, item, value, user) => {
 }
 
 const clear = (object, interval) => {
-  for (const context in storedObject) {
-    for (const item in storedObject[context][object]) {
-      const timeDiff = Date.now() - storedObject[context][object][item].insertedDate
-      if (timeDiff > interval) {
-        delete storedObject[context][object][item]
+  try {
+    for (const context in storedObject) {
+      for (const item in storedObject[context][object]) {
+        const timeDiff = Date.now() - storedObject[context][object][item].insertedDate
+        if (timeDiff > interval) {
+          delete storedObject[context][object][item]
+        }
       }
     }
+  } catch (err) {
+    logger.error('Error clearing old objects', err)
   }
 }
 
@@ -95,6 +100,15 @@ const popObject = (key, item, user) => {
     return foundData
   }
   return null
+}
+
+const deleteObject = (key, item, user) => {
+  const context = init(key, user)
+  if (Object.prototype.hasOwnProperty.call(storedObject[context][key], item)) {
+    delete storedObject[context][key][item]
+    return true
+  }
+  return false
 }
 
 const clearOldObjects = () => {
@@ -120,5 +134,6 @@ module.exports = {
   initObjectStore,
   push,
   clear,
-  popObject
+  popObject,
+  deleteObject
 }

@@ -100,7 +100,7 @@ describe('ObjectStore', () => {
       })
       jest.useFakeTimers()
       const result = ObjectStore.initObjectStore()
-      setTimeout(() => {done()}, 2000);      
+      setTimeout(() => {done()}, 2000);
       jest.advanceTimersByTime(2000)
       jest.useRealTimers()
       expect(result).toBeUndefined()
@@ -125,6 +125,33 @@ describe('ObjectStore', () => {
       setTimeout(() => {done()}, 2000)
       jest.advanceTimersByTime(2000)
       jest.useRealTimers()
+    })
+  })
+  describe('deleteObject', () => {
+    it('should delete an existing object and return true', () => {
+      ObjectStore.push('transactions', 'deleteItem', { foo: 'bar' })
+      const result = ObjectStore.deleteObject('transactions', 'deleteItem')
+      expect(result).toBe(true)
+      const getResult = ObjectStore.get('transactions', 'deleteItem')
+      expect(getResult).toBeNull()
+    })
+
+    it('should delete an existing dfsp-wise object and return true', () => {
+      ObjectStore.push('transactions', 'deleteItemDfsp', { foo: 'baz' }, user)
+      const result = ObjectStore.deleteObject('transactions', 'deleteItemDfsp', user)
+      expect(result).toBe(true)
+      const getResult = ObjectStore.get('transactions', 'deleteItemDfsp', user)
+      expect(getResult).toBeNull()
+    })
+
+    it('should return false when trying to delete a non-existing object', () => {
+      const result = ObjectStore.deleteObject('transactions', 'nonExistingItem')
+      expect(result).toBe(false)
+    })
+
+    it('should return false when trying to delete a non-existing dfsp-wise object', () => {
+      const result = ObjectStore.deleteObject('transactions', 'nonExistingItemDfsp', user)
+      expect(result).toBe(false)
     })
   })
 })
