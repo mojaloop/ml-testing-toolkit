@@ -327,7 +327,10 @@ const generateAsyncCallback = async (item, context, req) => {
         context.storedTransfers = {}
       }
       const isFxTransfer = fxTransferPathMatch.test(req.path)
-      const transferId = (req.payload && req.payload.transferId) || (req.payload && req.payload.commitRequestId)
+      let transferId = (req.payload && req.payload.transferId) || (req.payload && req.payload.commitRequestId)
+      if (!transferId && req.payload && req.payload.CdtTrfTxInf && req.payload.CdtTrfTxInf.PmtId && req.payload.CdtTrfTxInf.PmtId.TxId) {
+        transferId = req.payload.CdtTrfTxInf.PmtId.TxId
+      }
       customLogger.logMessage('debug', 'Storing transfer for validation', { additionalData: { transferId }, request: req })
 
       context.storedTransfers[transferId] = {
