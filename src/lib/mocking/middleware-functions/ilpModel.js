@@ -144,24 +144,20 @@ const handleTransferIlp = (context, response) => {
 
   customLogger.logMessage('debug', 'Generated callback body', { additionalData: { context, response } })
   if (context.request.method === 'get' && response.method === 'put' && pathMatch.test(response.path)) {
-    customLogger.logMessage('debug', 'Returning stored fulfilment if exists for transfer GET')
     const transferId = response.path.match(pathMatch)[1]
-    customLogger.logMessage('debug', 'Fetching stored transfer for fulfilment', { additionalData: { transferId } })
     // Use objectStore to get the stored transfer
     const storedTransfer = objectStore.get('storedTransfers', transferId)
-    customLogger.logMessage('debug', 'Stored transfer fetched for fulfilment', { additionalData: { storedTransfer, context } })
+    customLogger.logMessage('debug', 'Stored transfer fetched for fulfilment', { additionalData: { storedTransfer, context, transferId } })
     // Check if stored request exists and is within 30 seconds
     if (storedTransfer) {
       if (storedTransfer.data?.request?.ilpPacket) {
         customLogger.logMessage('debug', 'Stored transfer has ilpPacket. Generating fulfilment.', { additionalData: { transferId, ilpPacket: storedTransfer.data.request.ilpPacket } })
         const generatedFulfilment = ilpObj.calculateFulfil(storedTransfer.data.request.ilpPacket).replace('"', '')
         response.body.fulfilment = generatedFulfilment
-        customLogger.logMessage('debug', 'Fulfilment set in response body', { additionalData: { transferId, fulfilment: generatedFulfilment } })
       } else if (storedTransfer.data?.request?.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket) {
         customLogger.logMessage('debug', 'Stored transfer has IlpV4PrepPacket. Generating fulfilment.', { additionalData: { transferId, IlpV4PrepPacket: storedTransfer.data.request.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket } })
         const generatedFulfilment = ilpV4Obj.calculateFulfil(storedTransfer.data.request.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
         response.body.TxInfAndSts.ExctnConf = generatedFulfilment
-        customLogger.logMessage('debug', 'ExctnConf set in response body', { additionalData: { transferId, ExctnConf: generatedFulfilment } })
       } else {
         customLogger.logMessage('warn', 'No ILP packet or IlpV4PrepPacket found in stored transfer request', { additionalData: { transferId, storedTransfer } })
       }
