@@ -35,7 +35,8 @@ const storedObject = {
     transactions: {},
     inboundEnvironment: {},
     requests: {},
-    callbacks: {}
+    callbacks: {},
+    storedTransfers: {}
   }
 }
 
@@ -103,6 +104,7 @@ const clearOldObjects = () => {
   clear('callbacks', interval)
   clear('requestsHistory', interval)
   clear('callbacksHistory', interval)
+  clear('storedTransfers', interval)
 }
 
 const initObjectStore = (initConfig = null) => {

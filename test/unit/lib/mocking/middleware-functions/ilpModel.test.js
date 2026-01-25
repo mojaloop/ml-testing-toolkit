@@ -31,6 +31,7 @@
 
 const path = require('path')
 const IlpModel = require('../../../../../src/lib/mocking/middleware-functions/ilpModel')
+const ObjectStore = require('../../../../../src/lib/objectStore')
 
 const quoteRequestBody = {
   quoteId: 'f27456e9-fffb-47c0-9f28-5c727434873d',
@@ -538,7 +539,8 @@ describe('ILP Model', () => {
       IlpModel.handleTransferIlp(sampleContext, response)
       expect(response.body).not.toHaveProperty('fulfilment')
     })
-    it('handleTransferIlp should use stored transfer from context.storedTransfers', () => {
+    it('handleTransferIlp should use stored transfer from objectStore for GET request', () => {
+      // Mock ObjectStore.get to return a stored transfer with ilpPacket
       const transferId = 'test-transfer-id'
       const storedTransfer = {
         request: {
@@ -547,10 +549,8 @@ describe('ILP Model', () => {
       }
       const sampleContext = {
         request: {
-          method: 'get'
-        },
-        storedTransfers: {
-          [transferId]: storedTransfer
+          method: 'get',
+          customInfo: {}
         }
       }
       const response = {
@@ -558,33 +558,53 @@ describe('ILP Model', () => {
         path: `/transfers/${transferId}`,
         body: {...transferPartResponseBody}
       }
+      // Save original get and set
+      const origGet = ObjectStore.get
+      const origSet = ObjectStore.set
+      // Patch ObjectStore.get to return our storedTransfer
+      ObjectStore.get = jest.fn(() => storedTransfer)
+      ObjectStore.set = jest.fn()
       IlpModel.handleTransferIlp(sampleContext, response)
       expect(response.body.fulfilment).not.toBeNull()
+      // Restore
+      ObjectStore.get = origGet
+      ObjectStore.set = origSet
     })
 
     it('handleTransferIlp should use stored transfer for GET request with ISO20022', () => {
+      // Mock ObjectStore.get to return a stored transfer with IlpV4PrepPacket
+      const transferId = 'test-transfer-id'
       const storedTransfer = {
-        CdtTrfTxInf: {
+        request: {
+          CdtTrfTxInf: {
           VrfctnOfTerms: {
             IlpV4PrepPacket: exampleIlpPacket
+          }
           }
         }
       }
       const sampleContext = {
         request: {
           method: 'get',
-        },
-        storedTransfers: {
-          request: storedTransfer
+          customInfo: {}
         }
       }
       const response = {
         method: 'put',
-        path: '/transfers/asdfasdf',
+        path: `/transfers/${transferId}`,
         body: {...transferISOResponseBody}
       }
+      // Save original get and set
+      const origGet = ObjectStore.get
+      const origSet = ObjectStore.set
+      // Patch ObjectStore.get to return our storedTransfer
+      ObjectStore.get = jest.fn(() => storedTransfer)
+      ObjectStore.set = jest.fn()
       IlpModel.handleTransferIlp(sampleContext, response)
       expect(response.body.TxInfAndSts.ExctnConf).not.toBeNull()
+      // Restore
+      ObjectStore.get = origGet
+      ObjectStore.set = origSet
     })
 
     it('handleTransferIlp should not use stored transfer when method is not GET', () => {

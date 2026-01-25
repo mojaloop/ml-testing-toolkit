@@ -30,6 +30,7 @@
 const { ilpFactory, ILP_VERSIONS } = require('@mojaloop/sdk-standard-components').Ilp
 const customLogger = require('../../requestLogger')
 const { logger } = require('../../logger')
+const objectStore = require('../../objectStore')
 
 let ilpObj = null
 let ilpV4Obj = null
@@ -146,16 +147,17 @@ const handleTransferIlp = (context, response) => {
     customLogger.logMessage('debug', 'Returning stored fulfilment if exists for transfer GET')
     const transferId = response.path.match(pathMatch)[1]
     customLogger.logMessage('debug', 'Fetching stored transfer for fulfilment', { additionalData: { transferId } })
-    const storedTransfer = context.storedTransfers?.[transferId]
+    // Use objectStore to get the stored transfer
+    const storedTransfer = objectStore.get('storedTransfers', transferId, context.request.customInfo?.user)
     customLogger.logMessage('debug', 'Stored transfer fetched for fulfilment', { additionalData: { storedTransfer, context } })
     // Check if stored request exists and is within 30 seconds
     if (storedTransfer) {
-      if (storedTransfer.request.ilpPacket) {
+      if (storedTransfer.request?.ilpPacket) {
         customLogger.logMessage('debug', 'Stored transfer has ilpPacket. Generating fulfilment.', { additionalData: { transferId, ilpPacket: storedTransfer.request.ilpPacket } })
         const generatedFulfilment = ilpObj.calculateFulfil(storedTransfer.request.ilpPacket).replace('"', '')
         response.body.fulfilment = generatedFulfilment
         customLogger.logMessage('debug', 'Fulfilment set in response body', { additionalData: { transferId, fulfilment: generatedFulfilment } })
-      } else if (storedTransfer.request.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket) {
+      } else if (storedTransfer.request?.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket) {
         customLogger.logMessage('debug', 'Stored transfer has IlpV4PrepPacket. Generating fulfilment.', { additionalData: { transferId, IlpV4PrepPacket: storedTransfer.request.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket } })
         const generatedFulfilment = ilpV4Obj.calculateFulfil(storedTransfer.request.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
         response.body.TxInfAndSts.ExctnConf = generatedFulfilment
@@ -163,7 +165,12 @@ const handleTransferIlp = (context, response) => {
       } else {
         customLogger.logMessage('warn', 'No ILP packet or IlpV4PrepPacket found in stored transfer request', { additionalData: { transferId, storedTransfer } })
       }
-      delete context.storedTransfers[transferId]
+      // Remove the stored transfer from objectStore
+      objectStore.get('storedTransfers', undefined, context.request.customInfo?.user) // Ensure init
+      objectStore.set('storedTransfers', {
+        ...objectStore.get('storedTransfers', undefined, context.request.customInfo?.user),
+        [transferId]: undefined
+      }, context.request.customInfo?.user)
     } else {
       delete response.body.fulfilment
     }

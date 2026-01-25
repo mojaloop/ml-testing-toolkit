@@ -1138,7 +1138,11 @@ describe('OpenApiMockHandler', () => {
       })
 
       describe('Transfer storing logic', () => {
-        it('Should store transfer when POST /transfers is called', async () => {
+        beforeEach(() => {
+          ObjectStore.push.mockClear()
+        })
+
+        it('Should call objectStore.push with correct params for POST /transfers', async () => {
           const item = {}
           const sampleContext = {
             operation: {
@@ -1165,19 +1169,24 @@ describe('OpenApiMockHandler', () => {
           SpyRequestLogger.mockReturnValue()
           SpyOpenApiRulesEngine.mockResolvedValueOnce({})
           SpyGetUserConfig.mockReturnValueOnce({
-            HUB_ONLY_MODE: false
+        HUB_ONLY_MODE: false
           })
           SpyCallbackRules.mockResolvedValueOnce({})
 
           await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
 
-          expect(sampleContext.storedTransfers).toBeDefined()
-          expect(sampleContext.storedTransfers['123']).toBeDefined()
-          expect(sampleContext.storedTransfers['123'].type).toBe('transfer')
-          expect(sampleContext.storedTransfers['123'].request).toEqual(sampleRequest.payload)
+          expect(ObjectStore.push).toHaveBeenCalledWith(
+            'storedTransfers',
+            '123',
+            {
+              request: sampleRequest.payload,
+              type: 'transfer'
+            },
+            undefined
+          )
         })
 
-        it('Should store fxTransfer when POST /fxTransfers is called', async () => {
+        it('Should call objectStore.push with correct params for POST /fxTransfers', async () => {
           const item = {}
           const sampleContext = {
             operation: {
@@ -1210,13 +1219,18 @@ describe('OpenApiMockHandler', () => {
 
           await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
 
-          expect(sampleContext.storedTransfers).toBeDefined()
-          expect(sampleContext.storedTransfers['456']).toBeDefined()
-          expect(sampleContext.storedTransfers['456'].type).toBe('fxTransfer')
-          expect(sampleContext.storedTransfers['456'].request).toEqual(sampleRequest.payload)
+          expect(ObjectStore.push).toHaveBeenCalledWith(
+            'storedTransfers',
+            '456',
+            {
+              request: sampleRequest.payload,
+              type: 'fxTransfer'
+            },
+            undefined
+          )
         })
 
-        it('Should not store transfer when method is PUT', async () => {
+        it('Should not call objectStore.push when method is PUT', async () => {
           const item = {}
           const sampleContext = {
             operation: {
@@ -1240,10 +1254,10 @@ describe('OpenApiMockHandler', () => {
 
           await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
 
-          expect(sampleContext.storedTransfers).toBeUndefined()
+          expect(ObjectStore.push).not.toHaveBeenCalled()
         })
 
-        it('Should not store transfer when path does not match transfer pattern', async () => {
+        it('Should not call objectStore.push when path does not match transfer pattern', async () => {
           const item = {}
           const sampleContext = {
             operation: {
@@ -1273,10 +1287,10 @@ describe('OpenApiMockHandler', () => {
 
           await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
 
-          expect(sampleContext.storedTransfers).toBeUndefined()
+          expect(ObjectStore.push).not.toHaveBeenCalled()
         })
 
-        it('Should store multiple transfers in the same context', async () => {
+        it('Should call objectStore.push for multiple transfers', async () => {
           const item = {}
           const sampleContext = {
             operation: {
@@ -1284,15 +1298,18 @@ describe('OpenApiMockHandler', () => {
             },
             request: {
               method: 'post'
-            },
-            storedTransfers: {
-              '111': {
-                request: { transferId: '111' },
-                type: 'transfer'
-              }
             }
           }
-          const sampleRequest = {
+          const sampleRequest1 = {
+            customInfo: {},
+            method: 'post',
+            path: '/transfers',
+            payload: {
+              transferId: '111',
+              amount: { currency: 'USD', amount: '100' }
+            }
+          }
+          const sampleRequest2 = {
             customInfo: {},
             method: 'post',
             path: '/transfers',
@@ -1301,25 +1318,42 @@ describe('OpenApiMockHandler', () => {
               amount: { currency: 'USD', amount: '200' }
             }
           }
-          SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+          SpyReadFileAsync.mockReturnValue(JSON.stringify({
             '/transfers': {
               'post': {}
             }
           }))
           SpyRequestLogger.mockReturnValue()
-          SpyOpenApiRulesEngine.mockResolvedValueOnce({})
-          SpyGetUserConfig.mockReturnValueOnce({
+          SpyOpenApiRulesEngine.mockResolvedValue({})
+          SpyGetUserConfig.mockReturnValue({
             HUB_ONLY_MODE: false
           })
-          SpyCallbackRules.mockResolvedValueOnce({})
+          SpyCallbackRules.mockResolvedValue({})
 
-          await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+          await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest1)
+          await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest2)
 
-          expect(sampleContext.storedTransfers['111']).toBeDefined()
-          expect(sampleContext.storedTransfers['222']).toBeDefined()
-          expect(Object.keys(sampleContext.storedTransfers).length).toBe(2)
+          expect(ObjectStore.push).toHaveBeenCalledWith(
+            'storedTransfers',
+            '111',
+            {
+              request: sampleRequest1.payload,
+              type: 'transfer'
+            },
+            undefined
+          )
+          expect(ObjectStore.push).toHaveBeenCalledWith(
+            'storedTransfers',
+            '222',
+            {
+              request: sampleRequest2.payload,
+              type: 'transfer'
+            },
+            undefined
+          )
         })
-        it('Should extract transferId from CdtTrfTxInf.PmtId.TxId if transferId and commitRequestId are missing', async () => {
+
+        it('Should call objectStore.push with transferId from CdtTrfTxInf.PmtId.TxId if transferId and commitRequestId are missing', async () => {
           const item = {}
           const sampleContext = {
             operation: {
@@ -1335,9 +1369,9 @@ describe('OpenApiMockHandler', () => {
             path: '/transfers',
             payload: {
               CdtTrfTxInf: {
-          PmtId: {
-            TxId: 'cdt-txid-999'
-          }
+                PmtId: {
+              TxId: 'cdt-txid-999'
+                }
               }
             }
           }
@@ -1355,10 +1389,15 @@ describe('OpenApiMockHandler', () => {
 
           await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
 
-          expect(sampleContext.storedTransfers).toBeDefined()
-          expect(sampleContext.storedTransfers['cdt-txid-999']).toBeDefined()
-          expect(sampleContext.storedTransfers['cdt-txid-999'].type).toBe('transfer')
-          expect(sampleContext.storedTransfers['cdt-txid-999'].request).toEqual(sampleRequest.payload)
+          expect(ObjectStore.push).toHaveBeenCalledWith(
+            'storedTransfers',
+            'cdt-txid-999',
+            {
+              request: sampleRequest.payload,
+              type: 'transfer'
+            },
+            undefined
+          )
         })
       })
     })

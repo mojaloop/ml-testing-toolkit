@@ -323,9 +323,6 @@ const generateAsyncCallback = async (item, context, req) => {
     const fxTransferPathMatch = /\/fxTransfers(?:\/([^/]+))?$/
     customLogger.logMessage('debug', 'Processing transfer request', { additionalData: { method: req.method, path: req.path }, request: req })
     if (req.method === 'post' && (transferPathMatch.test(req.path) || fxTransferPathMatch.test(req.path))) {
-      if (!context.storedTransfers) {
-        context.storedTransfers = {}
-      }
       const isFxTransfer = fxTransferPathMatch.test(req.path)
       let transferId = (req.payload && req.payload.transferId) || (req.payload && req.payload.commitRequestId)
       if (!transferId && req.payload && req.payload.CdtTrfTxInf && req.payload.CdtTrfTxInf.PmtId && req.payload.CdtTrfTxInf.PmtId.TxId) {
@@ -333,10 +330,11 @@ const generateAsyncCallback = async (item, context, req) => {
       }
       customLogger.logMessage('debug', 'Storing transfer for validation', { additionalData: { transferId }, request: req })
 
-      context.storedTransfers[transferId] = {
+      // Use objectStore to store the transfer
+      objectStore.push('storedTransfers', transferId, {
         request: req.payload,
         type: isFxTransfer ? 'fxTransfer' : 'transfer'
-      }
+      }, req.customInfo.user)
     }
 
     // Getting callback info from callback map file
