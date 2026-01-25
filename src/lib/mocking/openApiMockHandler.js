@@ -321,6 +321,7 @@ const generateAsyncCallback = async (item, context, req) => {
     // Store transfers early - right after validation
     const transferPathMatch = /\/transfers\/([^/]+)$/
     const fxTransferPathMatch = /\/fxTransfers\/([^/]+)$/
+    customLogger.logMessage('debug', 'Processing transfer request', { additionalData: { method: req.method, path: req.path }, request: req })
     if (req.method === 'post' && (transferPathMatch.test(req.path) || fxTransferPathMatch.test(req.path))) {
       if (!context.storedTransfers) {
         context.storedTransfers = {}
@@ -443,7 +444,7 @@ const generateAsyncCallback = async (item, context, req) => {
       return
     }
   }
-
+  customLogger.logMessage('debug', 'Generated callback body', { additionalData: { body: generatedCallback.body }, request: req })
   if (generatedCallback.body) {
     // Append ILP properties to callback
     const fulfilment = IlpModel.handleQuoteIlp(context, generatedCallback)
