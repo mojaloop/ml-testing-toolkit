@@ -1319,6 +1319,47 @@ describe('OpenApiMockHandler', () => {
           expect(sampleContext.storedTransfers['222']).toBeDefined()
           expect(Object.keys(sampleContext.storedTransfers).length).toBe(2)
         })
+        it('Should extract transferId from CdtTrfTxInf.PmtId.TxId if transferId and commitRequestId are missing', async () => {
+          const item = {}
+          const sampleContext = {
+            operation: {
+              path: '/transfers'
+            },
+            request: {
+              method: 'post'
+            }
+          }
+          const sampleRequest = {
+            customInfo: {},
+            method: 'post',
+            path: '/transfers',
+            payload: {
+              CdtTrfTxInf: {
+          PmtId: {
+            TxId: 'cdt-txid-999'
+          }
+              }
+            }
+          }
+          SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+            '/transfers': {
+              'post': {}
+            }
+          }))
+          SpyRequestLogger.mockReturnValue()
+          SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+          SpyGetUserConfig.mockReturnValueOnce({
+            HUB_ONLY_MODE: false
+          })
+          SpyCallbackRules.mockResolvedValueOnce({})
+
+          await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+
+          expect(sampleContext.storedTransfers).toBeDefined()
+          expect(sampleContext.storedTransfers['cdt-txid-999']).toBeDefined()
+          expect(sampleContext.storedTransfers['cdt-txid-999'].type).toBe('transfer')
+          expect(sampleContext.storedTransfers['cdt-txid-999'].request).toEqual(sampleRequest.payload)
+        })
       })
     })
   })
