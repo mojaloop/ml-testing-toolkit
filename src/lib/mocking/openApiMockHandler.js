@@ -334,7 +334,7 @@ const generateAsyncCallback = async (item, context, req) => {
       objectStore.push('storedTransfers', transferId, {
         request: req.payload,
         type: isFxTransfer ? 'fxTransfer' : 'transfer'
-      }, req.customInfo.user)
+      })
     }
 
     // Getting callback info from callback map file
