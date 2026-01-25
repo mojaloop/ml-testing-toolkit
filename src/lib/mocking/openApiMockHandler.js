@@ -318,6 +318,22 @@ const generateAsyncCallback = async (item, context, req) => {
       return
     }
   } else {
+    // Store transfers early - right after validation
+    const transferPathMatch = /\/transfers\/([^/]+)$/
+    const fxTransferPathMatch = /\/fxTransfers\/([^/]+)$/
+    if (req.method === 'post' && (transferPathMatch.test(req.path) || fxTransferPathMatch.test(req.path))) {
+      if (!context.storedTransfers) {
+        context.storedTransfers = {}
+      }
+      const isFxTransfer = fxTransferPathMatch.test(req.path)
+      const transferId = req.path.match(isFxTransfer ? fxTransferPathMatch : transferPathMatch)[1]
+      context.storedTransfers[transferId] = {
+        request: req.payload,
+        timestamp: Date.now(),
+        type: isFxTransfer ? 'fxTransfer' : 'transfer'
+      }
+    }
+
     // Getting callback info from callback map file
     try {
       const cbMapRawdata = await utils.readFileAsync(item.callbackMapFile)

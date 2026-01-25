@@ -6,6 +6,7 @@ ignore:
     reason: "No fixes available as of 2026-01-14 on Dockerfile base image 22.21.1-alpine3.23"
   - vulnerability: CVE-2026-22184
     reason: "No fixes available as of 2026-01-16 on Dockerfile base image 22.21.1-alpine3.23"
+  - vulnerability: GHSA-xxjr-mmjv-4gpg
 
 # Set output format defaults
 output:

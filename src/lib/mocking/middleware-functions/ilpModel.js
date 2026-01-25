@@ -139,9 +139,23 @@ const handleTransferIlp = (context, response) => {
       const generatedFulfilment = ilpV4Obj.calculateFulfil(context.request.body.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
       response.body.TxInfAndSts.ExctnConf = generatedFulfilment
     }
-  }
-  if (context.request.method === 'get' && response.method === 'put' && pathMatch.test(response.path)) {
-    delete response.body.fulfilment
+
+    // Retrieve stored transfer if available
+    const transferId = response.path.match(pathMatch)[1]
+    const storedTransfer = context.request.customInfo?.storedTransfer || context.storedTransfers?.[transferId]
+
+    if (storedTransfer) {
+      // Transfer was stored from POST request, use it for GET responses
+      if (context.request.method === 'get') {
+        if (storedTransfer.ilpPacket) {
+          const generatedFulfilment = ilpObj.calculateFulfil(storedTransfer.ilpPacket).replace('"', '')
+          response.body.fulfilment = generatedFulfilment
+        } else if (storedTransfer.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket) {
+          const generatedFulfilment = ilpV4Obj.calculateFulfil(storedTransfer.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
+          response.body.TxInfAndSts.ExctnConf = generatedFulfilment
+        }
+      }
+    }
   }
 }
 
