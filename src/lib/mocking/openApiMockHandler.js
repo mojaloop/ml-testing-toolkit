@@ -319,15 +319,16 @@ const generateAsyncCallback = async (item, context, req) => {
     }
   } else {
     // Store transfers early - right after validation
-    const transferPathMatch = /\/transfers\/([^/]+)$/
-    const fxTransferPathMatch = /\/fxTransfers\/([^/]+)$/
+    const transferPathMatch = /\/transfers(?:\/([^/]+))?$/
+    const fxTransferPathMatch = /\/fxTransfers(?:\/([^/]+))?$/
     customLogger.logMessage('debug', 'Processing transfer request', { additionalData: { method: req.method, path: req.path }, request: req })
     if (req.method === 'post' && (transferPathMatch.test(req.path) || fxTransferPathMatch.test(req.path))) {
       if (!context.storedTransfers) {
         context.storedTransfers = {}
       }
       const isFxTransfer = fxTransferPathMatch.test(req.path)
-      const transferId = req.path.match(isFxTransfer ? fxTransferPathMatch : transferPathMatch)[1]
+      const match = req.path.match(isFxTransfer ? fxTransferPathMatch : transferPathMatch)
+      const transferId = match[1] || (req.payload && req.payload.transferId) || (req.payload && req.payload.commitmentId)
       customLogger.logMessage('debug', 'Storing transfer for validation', { additionalData: { transferId }, request: req })
 
       context.storedTransfers[transferId] = {
