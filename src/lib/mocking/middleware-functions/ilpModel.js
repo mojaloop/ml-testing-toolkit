@@ -147,7 +147,7 @@ const handleTransferIlp = (context, response) => {
     const transferId = response.path.match(pathMatch)[1]
     customLogger.logMessage('debug', 'Fetching stored transfer for fulfilment', { additionalData: { transferId } })
     const storedTransfer = context.storedTransfers?.[transferId]
-    customLogger.logMessage('debug', 'Stored transfer fetched for fulfilment', { additionalData: { storedTransfer } })
+    customLogger.logMessage('debug', 'Stored transfer fetched for fulfilment', { additionalData: { storedTransfer, context } })
     // Check if stored request exists and is within 30 seconds
     if (storedTransfer) {
       if (storedTransfer.request.ilpPacket) {
