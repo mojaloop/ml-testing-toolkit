@@ -1142,7 +1142,7 @@ describe('OpenApiMockHandler', () => {
           const item = {}
           const sampleContext = {
             operation: {
-              path: '/transfers/{ID}'
+              path: '/transfers'
             },
             request: {
               method: 'post'
@@ -1151,14 +1151,14 @@ describe('OpenApiMockHandler', () => {
           const sampleRequest = {
             customInfo: {},
             method: 'post',
-            path: '/transfers/123',
+            path: '/transfers',
             payload: {
               transferId: '123',
               amount: { currency: 'USD', amount: '100' }
             }
           }
           SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
-            '/transfers/{ID}': {
+            '/transfers': {
               'post': {}
             }
           }))
@@ -1181,7 +1181,7 @@ describe('OpenApiMockHandler', () => {
           const item = {}
           const sampleContext = {
             operation: {
-              path: '/fxTransfers/{ID}'
+              path: '/fxTransfers'
             },
             request: {
               method: 'post'
@@ -1190,14 +1190,14 @@ describe('OpenApiMockHandler', () => {
           const sampleRequest = {
             customInfo: {},
             method: 'post',
-            path: '/fxTransfers/456',
+            path: '/fxTransfers',
             payload: {
               commitRequestId: '456',
               sourceAmount: { currency: 'USD', amount: '100' }
             }
           }
           SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
-            '/fxTransfers/{ID}': {
+            '/fxTransfers': {
               'post': {}
             }
           }))
@@ -1216,7 +1216,7 @@ describe('OpenApiMockHandler', () => {
           expect(sampleContext.storedTransfers['456'].request).toEqual(sampleRequest.payload)
         })
 
-        it('Should not store transfer when method is not POST', async () => {
+        it('Should not store transfer when method is PUT', async () => {
           const item = {}
           const sampleContext = {
             operation: {
@@ -1280,15 +1280,14 @@ describe('OpenApiMockHandler', () => {
           const item = {}
           const sampleContext = {
             operation: {
-              path: '/transfers/{ID}'
+              path: '/transfers'
             },
             request: {
               method: 'post'
             },
             storedTransfers: {
               '111': {
-                request: {},
-                timestamp: Date.now(),
+                request: { transferId: '111' },
                 type: 'transfer'
               }
             }
@@ -1296,14 +1295,14 @@ describe('OpenApiMockHandler', () => {
           const sampleRequest = {
             customInfo: {},
             method: 'post',
-            path: '/transfers/222',
+            path: '/transfers',
             payload: {
               transferId: '222',
               amount: { currency: 'USD', amount: '200' }
             }
           }
           SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
-            '/transfers/{ID}': {
+            '/transfers': {
               'post': {}
             }
           }))

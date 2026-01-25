@@ -143,6 +143,7 @@ const handleTransferIlp = (context, response) => {
 
   customLogger.logMessage('debug', 'Generated callback body', { additionalData: { context, response }, request: context.request })
   if (context.request.method === 'get' && response.method === 'put' && pathMatch.test(response.path)) {
+    customLogger.logMessage('debug', 'success', { additionalData: { context, response }, request: context.request })
     const transferId = response.path.match(pathMatch)[1]
     const storedTransfer = context.storedTransfers?.[transferId]
 
