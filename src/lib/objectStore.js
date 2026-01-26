@@ -29,13 +29,15 @@
  ******/
 
 const _ = require('lodash')
+const { logger } = require('./logger')
 
 const storedObject = {
   data: {
     transactions: {},
     inboundEnvironment: {},
     requests: {},
-    callbacks: {}
+    callbacks: {},
+    storedTransfers: {}
   }
 }
 
@@ -76,13 +78,17 @@ const push = (key, item, value, user) => {
 }
 
 const clear = (object, interval) => {
-  for (const context in storedObject) {
-    for (const item in storedObject[context][object]) {
-      const timeDiff = Date.now() - storedObject[context][object][item].insertedDate
-      if (timeDiff > interval) {
-        delete storedObject[context][object][item]
+  try {
+    for (const context in storedObject) {
+      for (const item in storedObject[context][object]) {
+        const timeDiff = Date.now() - storedObject[context][object][item].insertedDate
+        if (timeDiff > interval) {
+          delete storedObject[context][object][item]
+        }
       }
     }
+  } catch (err) {
+    logger.error('Error clearing old objects', err)
   }
 }
 
@@ -96,6 +102,15 @@ const popObject = (key, item, user) => {
   return null
 }
 
+const deleteObject = (key, item, user) => {
+  const context = init(key, user)
+  if (Object.prototype.hasOwnProperty.call(storedObject[context][key], item)) {
+    delete storedObject[context][key][item]
+    return true
+  }
+  return false
+}
+
 const clearOldObjects = () => {
   const interval = 10 * 60 * 1000
   clear('transactions', interval)
@@ -103,6 +118,7 @@ const clearOldObjects = () => {
   clear('callbacks', interval)
   clear('requestsHistory', interval)
   clear('callbacksHistory', interval)
+  clear('storedTransfers', interval)
 }
 
 const initObjectStore = (initConfig = null) => {
@@ -116,7 +132,9 @@ module.exports = {
   set,
   get,
   initObjectStore,
+  init,
   push,
   clear,
-  popObject
+  popObject,
+  deleteObject
 }

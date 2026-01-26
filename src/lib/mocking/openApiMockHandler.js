@@ -318,6 +318,32 @@ const generateAsyncCallback = async (item, context, req) => {
       return
     }
   } else {
+    // Store transfers early - right after validation
+    const transferPathMatch = /\/transfers(?:\/([^/]+))?$/
+    const fxTransferPathMatch = /\/fxTransfers(?:\/([^/]+))?$/
+    customLogger.logMessage('debug', 'Processing transfer request', { additionalData: { method: req.method, path: req.path }, request: req })
+    if (req.method === 'post' && (transferPathMatch.test(req.path) || fxTransferPathMatch.test(req.path))) {
+      const isFxTransfer = fxTransferPathMatch.test(req.path)
+      let transferId = (req.payload && req.payload.transferId) || (req.payload && req.payload.commitRequestId)
+      if (!transferId && req.payload && req.payload.CdtTrfTxInf && req.payload.CdtTrfTxInf.PmtId && req.payload.CdtTrfTxInf.PmtId.TxId) {
+        transferId = req.payload.CdtTrfTxInf.PmtId.TxId
+      }
+      customLogger.logMessage('debug', 'Storing transfer for validation', { additionalData: { transferId }, request: req })
+
+      // Use objectStore to store the transfer only when a valid transferId is resolved
+      if (transferId) {
+        objectStore.push('storedTransfers', transferId, {
+          request: req.payload,
+          type: isFxTransfer ? 'fxTransfer' : 'transfer'
+        })
+      } else {
+        customLogger.logMessage('warn', 'Skipping storing transfer: transferId could not be resolved from payload', {
+          additionalData: { method: req.method, path: req.path },
+          request: req
+        })
+      }
+    }
+
     // Getting callback info from callback map file
     try {
       const cbMapRawdata = await utils.readFileAsync(item.callbackMapFile)
@@ -426,7 +452,7 @@ const generateAsyncCallback = async (item, context, req) => {
       return
     }
   }
-
+  customLogger.logMessage('debug', 'Generated callback body', { additionalData: { body: generatedCallback.body }, request: req })
   if (generatedCallback.body) {
     // Append ILP properties to callback
     const fulfilment = IlpModel.handleQuoteIlp(context, generatedCallback)

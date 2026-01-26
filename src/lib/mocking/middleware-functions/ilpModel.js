@@ -30,6 +30,7 @@
 const { ilpFactory, ILP_VERSIONS } = require('@mojaloop/sdk-standard-components').Ilp
 const customLogger = require('../../requestLogger')
 const { logger } = require('../../logger')
+const objectStore = require('../../objectStore')
 
 let ilpObj = null
 let ilpV4Obj = null
@@ -140,8 +141,30 @@ const handleTransferIlp = (context, response) => {
       response.body.TxInfAndSts.ExctnConf = generatedFulfilment
     }
   }
+
+  customLogger.logMessage('debug', 'Generated callback body', { additionalData: { context, response } })
   if (context.request.method === 'get' && response.method === 'put' && pathMatch.test(response.path)) {
-    delete response.body.fulfilment
+    const transferId = response.path.match(pathMatch)[1]
+    // Use objectStore to get the stored transfer
+    const storedTransfer = objectStore.get('storedTransfers', transferId)
+    customLogger.logMessage('debug', 'Stored transfer fetched for fulfilment', { additionalData: { transferId } })
+    if (storedTransfer) {
+      if (storedTransfer.data?.request?.ilpPacket) {
+        customLogger.logMessage('debug', 'Stored transfer has ilpPacket. Generating fulfilment.', { additionalData: { transferId, ilpPacket: storedTransfer.data.request.ilpPacket } })
+        const generatedFulfilment = ilpObj.calculateFulfil(storedTransfer.data.request.ilpPacket).replace('"', '')
+        response.body.fulfilment = generatedFulfilment
+      } else if (storedTransfer.data?.request?.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket) {
+        customLogger.logMessage('debug', 'Stored transfer has IlpV4PrepPacket. Generating fulfilment.', { additionalData: { transferId } })
+        const generatedFulfilment = ilpV4Obj.calculateFulfil(storedTransfer.data.request.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
+        response.body.TxInfAndSts.ExctnConf = generatedFulfilment
+      } else {
+        customLogger.logMessage('warn', 'No ILP packet or IlpV4PrepPacket found in stored transfer request', { additionalData: { transferId } })
+      }
+      // Remove the stored transfer from objectStore regardless of success or failure
+      objectStore.deleteObject('storedTransfers', transferId)
+    } else {
+      delete response.body.fulfilment
+    }
   }
 }
 

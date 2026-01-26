@@ -1136,6 +1136,265 @@ describe('OpenApiMockHandler', () => {
         SpyHandleRequest.mockReturnValueOnce()
         const result = await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
       })
+
+      describe('Transfer storing logic', () => {
+        beforeEach(() => {
+          ObjectStore.push.mockClear()
+        })
+
+        it('Should call objectStore.push with correct params for POST /transfers', async () => {
+          const item = {}
+          const sampleContext = {
+        operation: {
+          path: '/transfers'
+        },
+        request: {
+          method: 'post'
+        }
+          }
+          const sampleRequest = {
+        customInfo: {},
+        method: 'post',
+        path: '/transfers',
+        payload: {
+          transferId: '123',
+          amount: { currency: 'USD', amount: '100' }
+        }
+          }
+          SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+        '/transfers': {
+          'post': {}
+        }
+          }))
+          SpyRequestLogger.mockReturnValue()
+          SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+          SpyGetUserConfig.mockReturnValueOnce({
+        HUB_ONLY_MODE: false
+          })
+          SpyCallbackRules.mockResolvedValueOnce({})
+
+          await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+
+          expect(ObjectStore.push).toHaveBeenCalledWith(
+        'storedTransfers',
+        '123',
+        {
+          request: sampleRequest.payload,
+          type: 'transfer'
+        }
+          )
+        })
+
+        it('Should call objectStore.push with correct params for POST /fxTransfers', async () => {
+          const item = {}
+          const sampleContext = {
+        operation: {
+          path: '/fxTransfers'
+        },
+        request: {
+          method: 'post'
+        }
+          }
+          const sampleRequest = {
+        customInfo: {},
+        method: 'post',
+        path: '/fxTransfers',
+        payload: {
+          commitRequestId: '456',
+          sourceAmount: { currency: 'USD', amount: '100' }
+        }
+          }
+          SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+        '/fxTransfers': {
+          'post': {}
+        }
+          }))
+          SpyRequestLogger.mockReturnValue()
+          SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+          SpyGetUserConfig.mockReturnValueOnce({
+        HUB_ONLY_MODE: false
+          })
+          SpyCallbackRules.mockResolvedValueOnce({})
+
+          await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+
+          expect(ObjectStore.push).toHaveBeenCalledWith(
+        'storedTransfers',
+        '456',
+        {
+          request: sampleRequest.payload,
+          type: 'fxTransfer'
+        }
+          )
+        })
+
+        it('Should not call objectStore.push when method is PUT', async () => {
+          const item = {}
+          const sampleContext = {
+        operation: {
+          path: '/transfers/{ID}'
+        },
+        request: {
+          method: 'put'
+        }
+          }
+          const sampleRequest = {
+        customInfo: {},
+        method: 'put',
+        path: '/transfers/789',
+        payload: {}
+          }
+          SpyGetUserConfig.mockReturnValueOnce({
+        HUB_ONLY_MODE: true
+          })
+          SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+          SpyForwardRules.mockResolvedValueOnce()
+
+          await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+
+          expect(ObjectStore.push).not.toHaveBeenCalled()
+        })
+
+        it('Should not call objectStore.push when path does not match transfer pattern', async () => {
+          const item = {}
+          const sampleContext = {
+        operation: {
+          path: '/quotes'
+        },
+        request: {
+          method: 'post'
+        }
+          }
+          const sampleRequest = {
+        customInfo: {},
+        method: 'post',
+        path: '/quotes',
+        payload: {}
+          }
+          SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+        '/quotes': {
+          'post': {}
+        }
+          }))
+          SpyRequestLogger.mockReturnValue()
+          SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+          SpyGetUserConfig.mockReturnValueOnce({
+        HUB_ONLY_MODE: false
+          })
+          SpyCallbackRules.mockResolvedValueOnce({})
+
+          await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+
+          expect(ObjectStore.push).not.toHaveBeenCalled()
+        })
+
+        it('Should call objectStore.push for multiple transfers', async () => {
+          const item = {}
+          const sampleContext = {
+        operation: {
+          path: '/transfers'
+        },
+        request: {
+          method: 'post'
+        }
+          }
+          const sampleRequest1 = {
+        customInfo: {},
+        method: 'post',
+        path: '/transfers',
+        payload: {
+          transferId: '111',
+          amount: { currency: 'USD', amount: '100' }
+        }
+          }
+          const sampleRequest2 = {
+        customInfo: {},
+        method: 'post',
+        path: '/transfers',
+        payload: {
+          transferId: '222',
+          amount: { currency: 'USD', amount: '200' }
+        }
+          }
+          SpyReadFileAsync.mockReturnValue(JSON.stringify({
+        '/transfers': {
+          'post': {}
+        }
+          }))
+          SpyRequestLogger.mockReturnValue()
+          SpyOpenApiRulesEngine.mockResolvedValue({})
+          SpyGetUserConfig.mockReturnValue({
+        HUB_ONLY_MODE: false
+          })
+          SpyCallbackRules.mockResolvedValue({})
+
+          await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest1)
+          await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest2)
+
+          expect(ObjectStore.push).toHaveBeenCalledWith(
+        'storedTransfers',
+        '111',
+        {
+          request: sampleRequest1.payload,
+          type: 'transfer'
+        }
+          )
+          expect(ObjectStore.push).toHaveBeenCalledWith(
+        'storedTransfers',
+        '222',
+        {
+          request: sampleRequest2.payload,
+          type: 'transfer'
+        }
+          )
+        })
+
+        it('Should call objectStore.push with transferId from CdtTrfTxInf.PmtId.TxId if transferId and commitRequestId are missing', async () => {
+          const item = {}
+          const sampleContext = {
+        operation: {
+          path: '/transfers'
+        },
+        request: {
+          method: 'post'
+        }
+          }
+          const sampleRequest = {
+        customInfo: {},
+        method: 'post',
+        path: '/transfers',
+        payload: {
+          CdtTrfTxInf: {
+            PmtId: {
+          TxId: 'cdt-txid-999'
+            }
+          }
+        }
+          }
+          SpyReadFileAsync.mockReturnValueOnce(JSON.stringify({
+        '/transfers': {
+          'post': {}
+        }
+          }))
+          SpyRequestLogger.mockReturnValue()
+          SpyOpenApiRulesEngine.mockResolvedValueOnce({})
+          SpyGetUserConfig.mockReturnValueOnce({
+        HUB_ONLY_MODE: false
+          })
+          SpyCallbackRules.mockResolvedValueOnce({})
+
+          await OpenApiMockHandler.generateAsyncCallback(item, sampleContext, sampleRequest)
+
+          expect(ObjectStore.push).toHaveBeenCalledWith(
+        'storedTransfers',
+        'cdt-txid-999',
+        {
+          request: sampleRequest.payload,
+          type: 'transfer'
+        }
+          )
+        })
+      })
     })
   })
 })
