@@ -539,111 +539,7 @@ describe('ILP Model', () => {
       IlpModel.handleTransferIlp(sampleContext, response)
       expect(response.body).not.toHaveProperty('fulfilment')
     })
-    it('handleTransferIlp should use stored transfer from objectStore for GET request', () => {
-      // Mock ObjectStore.get to return a stored transfer with ilpPacket
-      const transferId = 'test-transfer-id'
-      const storedTransfer = {
-        request: {
-          ilpPacket: exampleIlpPacket
-        }
-      }
-      const sampleContext = {
-        request: {
-          method: 'get',
-          customInfo: {}
-        }
-      }
-      const response = {
-        method: 'put',
-        path: `/transfers/${transferId}`,
-        body: {...transferPartResponseBody}
-      }
-      // Save original get and set
-      const origGet = ObjectStore.get
-      const origSet = ObjectStore.set
-      // Patch ObjectStore.get to return our storedTransfer
-      ObjectStore.get = jest.fn(() => storedTransfer)
-      ObjectStore.set = jest.fn()
-      IlpModel.handleTransferIlp(sampleContext, response)
-      expect(response.body.fulfilment).not.toBeNull()
-      // Restore
-      ObjectStore.get = origGet
-      ObjectStore.set = origSet
-    })
 
-    it('handleTransferIlp should use stored transfer for GET request with ISO20022', () => {
-      // Mock ObjectStore.get to return a stored transfer with IlpV4PrepPacket
-      const transferId = 'test-transfer-id'
-      const storedTransfer = {
-        request: {
-          CdtTrfTxInf: {
-          VrfctnOfTerms: {
-            IlpV4PrepPacket: exampleIlpPacket
-          }
-          }
-        }
-      }
-      const sampleContext = {
-        request: {
-          method: 'get',
-          customInfo: {}
-        }
-      }
-      const response = {
-        method: 'put',
-        path: `/transfers/${transferId}`,
-        body: {...transferISOResponseBody}
-      }
-      // Save original get and set
-      const origGet = ObjectStore.get
-      const origSet = ObjectStore.set
-      // Patch ObjectStore.get to return our storedTransfer
-      ObjectStore.get = jest.fn(() => storedTransfer)
-      ObjectStore.set = jest.fn()
-      IlpModel.handleTransferIlp(sampleContext, response)
-      expect(response.body.TxInfAndSts.ExctnConf).not.toBeNull()
-      // Restore
-      ObjectStore.get = origGet
-      ObjectStore.set = origSet
-    })
-
-    it('handleTransferIlp should not use stored transfer when method is not GET', () => {
-      const storedTransfer = {
-        ilpPacket: ilpPacket
-      }
-      const sampleContext = {
-        request: {
-          method: 'post',
-          body: {},
-          customInfo: {
-          storedTransfer: storedTransfer
-          }
-        }
-      }
-      const response = {
-        method: 'put',
-        path: '/transfers/asdfasdf',
-        body: {...transferPartResponseBody}
-      }
-      IlpModel.handleTransferIlp(sampleContext, response)
-      expect(response.body).not.toHaveProperty('fulfilment')
-    })
-
-    it('handleTransferIlp should handle missing stored transfer gracefully', () => {
-      const sampleContext = {
-        request: {
-          method: 'get',
-          body: {}
-        }
-      }
-      const response = {
-        method: 'put',
-        path: '/transfers/asdfasdf',
-        body: {...transferPartResponseBody}
-      }
-      IlpModel.handleTransferIlp(sampleContext, response)
-      expect(response.body).not.toHaveProperty('fulfilment')
-    })
     it('validateTransferIlpPacket should validate the ilpPacket', () => {
       const sampleRequest = {
         payload: {
@@ -870,6 +766,118 @@ describe('ILP Model', () => {
       expect(transactionObject).toHaveProperty('payer')
       expect(transactionObject).toHaveProperty('amount')
       expect(transactionObject).toHaveProperty('quoteId')
+    })
+
+    describe('handleTransferIlp GET stored transfer', () => {
+      beforeEach(() => {
+        // Clear any stored transfers before each test
+        ObjectStore.init()
+      })
+
+      it('should generate and store fulfilment for GET /transfers with stored ilpPacket', () => {
+        const transferId = 'test-transfer-id'
+
+        ObjectStore.push('storedTransfers', transferId, {
+          request: {
+            ilpPacket: exampleIlpPacket
+          },
+          type: 'transfer'
+        })
+
+        const sampleContext = {
+          request: {
+          method: 'get'
+          }
+        }
+        const response = {
+          method: 'put',
+          path: `/transfers/${transferId}`,
+          body: {...transferPartResponseBody}
+        }
+
+        IlpModel.handleTransferIlp(sampleContext, response)
+
+        expect(response.body).toHaveProperty('fulfilment')
+        expect(ObjectStore.get('storedTransfers', transferId)).toBeNull()
+      })
+
+      it('should generate and store fulfilment for GET /transfers with stored IlpV4PrepPacket', () => {
+        const transferId = 'test-transfer-id-iso'
+
+        ObjectStore.push('storedTransfers', transferId, {
+          request: {
+            CdtTrfTxInf: {
+              VrfctnOfTerms: {
+                IlpV4PrepPacket: exampleIlpPacket
+              }
+            }
+          },
+          type: 'transfer'
+        })
+
+        const sampleContext = {
+          request: {
+          method: 'get'
+          }
+        }
+        const response = {
+          method: 'put',
+          path: `/transfers/${transferId}`,
+          body: {
+          ...transferISOResponseBody
+          }
+        }
+
+        IlpModel.handleTransferIlp(sampleContext, response)
+        expect(response.body.TxInfAndSts).toHaveProperty('ExctnConf')
+        expect(ObjectStore.get('storedTransfers', transferId)).toBeNull()
+      })
+
+      it('should delete fulfilment for GET /transfers when no stored transfer exists', () => {
+        const transferId = 'non-existent-transfer-id'
+
+        const sampleContext = {
+          request: {
+          method: 'get'
+          }
+        }
+        const response = {
+          method: 'put',
+          path: `/transfers/${transferId}`,
+          body: {
+            ...transferPartResponseBody,
+            fulfilment: 'some-fulfilment'
+          }
+        }
+
+        IlpModel.handleTransferIlp(sampleContext, response)
+
+        expect(response.body).not.toHaveProperty('fulfilment')
+      })
+
+      it('should warn when stored transfer has no ILP packet', () => {
+        const transferId = 'no-packet-transfer-id'
+
+        ObjectStore.push('storedTransfers', transferId, {
+          request: {},
+          type: 'transfer'
+        })
+
+        const sampleContext = {
+          request: {
+          method: 'get'
+          }
+        }
+        const response = {
+          method: 'put',
+          path: `/transfers/${transferId}`,
+          body: {...transferPartResponseBody}
+        }
+
+        IlpModel.handleTransferIlp(sampleContext, response)
+
+        expect(ObjectStore.get('storedTransfers', transferId)).toBeNull()
+      })
     })
   })
 })

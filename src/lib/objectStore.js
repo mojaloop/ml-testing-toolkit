@@ -132,6 +132,7 @@ module.exports = {
   set,
   get,
   initObjectStore,
+  init,
   push,
   clear,
   popObject,
