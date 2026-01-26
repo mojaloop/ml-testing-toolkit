@@ -330,11 +330,18 @@ const generateAsyncCallback = async (item, context, req) => {
       }
       customLogger.logMessage('debug', 'Storing transfer for validation', { additionalData: { transferId }, request: req })
 
-      // Use objectStore to store the transfer
-      objectStore.push('storedTransfers', transferId, {
-        request: req.payload,
-        type: isFxTransfer ? 'fxTransfer' : 'transfer'
-      })
+      // Use objectStore to store the transfer only when a valid transferId is resolved
+      if (transferId) {
+        objectStore.push('storedTransfers', transferId, {
+          request: req.payload,
+          type: isFxTransfer ? 'fxTransfer' : 'transfer'
+        })
+      } else {
+        customLogger.logMessage('warn', 'Skipping storing transfer: transferId could not be resolved from payload', {
+          additionalData: { method: req.method, path: req.path },
+          request: req
+        })
+      }
     }
 
     // Getting callback info from callback map file
