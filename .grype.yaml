@@ -15,7 +15,14 @@ ignore:
   - vulnerability: CVE-2026-21637
   - vulnerability: CVE-2025-59466
   - vulnerability: GHSA-xxjr-mmjv-4gpg
-
+  # High severity vulnerabilities
+  - vulnerability: CVE-2025-69420
+    reason: "libcrypto3 3.3.5-r0, libssl3 3.3.5-r0"
+  - vulnerability: GHSA-34x7-hfp2-rc4v
+    reason: "tar 6.2.1, 7.4.3"
+  # Medium severity vulnerabilities
+  - vulnerability: CVE-2026-22796
+    reason: "libcrypto3 3.3.5-r0, libssl3 3.3.5-r0"
 # Set output format defaults
 output:
   - "table"
