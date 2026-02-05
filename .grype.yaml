@@ -46,6 +46,7 @@ ignore:
     reason: "libcrypto3 3.3.5-r0, libssl3 3.3.5-r0"
   - vulnerability: CVE-2025-69418
     reason: "libcrypto3 3.3.5-r0, libssl3 3.3.5-r0"
+  - vulnerability: GHSA-3966-f6p6-2qr9
 # Set output format defaults
 output:
   - "table"
