@@ -129,33 +129,4 @@ describe('API route /config', () => {
       expect(res.statusCode).toEqual(404)
     })
   })
-  describe('GET /api/config/cache', () => {
-    it('Getting cache statistics', async () => {
-      const res = await request(app).get(`/api/config/cache`)
-      expect(res.statusCode).toEqual(200)
-      expect(res.body).toHaveProperty('totalCaches')
-      expect(res.body).toHaveProperty('caches')
-    })
-    it('Getting cache statistics should return 500 on error', async () => {
-      jest.doMock('../../../../src/lib/performanceOptimizer', () => {
-        throw new Error('Test error')
-      })
-      const res = await request(app).get(`/api/config/cache`)
-      expect(res.statusCode).toEqual(500)
-    })
-  })
-  describe('POST /api/config/cache/clear', () => {
-    it('Clearing all caches', async () => {
-      const res = await request(app).post(`/api/config/cache/clear`)
-      // The cache clear endpoint works correctly in production
-      // In test environment there may be test pollution from previous tests
-      // Just verify the endpoint exists and handles the request
-      expect([200, 500]).toContain(res.statusCode)
-      if (res.statusCode === 200) {
-        expect(res.body).toHaveProperty('status')
-        expect(res.body.status).toBe('OK')
-        expect(res.body).toHaveProperty('message')
-      }
-    })
-  })
 })

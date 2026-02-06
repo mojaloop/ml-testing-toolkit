@@ -2665,12 +2665,12 @@
             "counterPartyFsp": "fxp_123",
             "amountType": "RECEIVE",
             "sourceAmount": {
-              "currency": "{$request.body.conversionTerms.sourceAmount.currency}",
-              "amount": "{$request.body.conversionTerms.sourceAmount.amount}"
+              "currency": "USD",
+              "amount": "105.23"
             },
             "targetAmount": {
-              "currency": "{$request.body.conversionTerms.sourceAmount.currency}",
-              "amount": "{$request.body.conversionTerms.sourceAmount.amount}"
+              "currency": "EUR",
+              "amount": "100"
             },
             "expiration": "2016-05-24T08:38:08.699-04:00",
             "charges": [
@@ -2690,7 +2690,7 @@
           }
         }
       },
-      "type": "FIXED_CALLBACK"
+      "type": "MOCK_CALLBACK"
     },
     "type": "callback",
     "version": 1

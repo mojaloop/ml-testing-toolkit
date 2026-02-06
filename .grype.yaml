@@ -1,28 +1,24 @@
 ignore:
+  # fast-xml-parser vulnerability
   - vulnerability: GHSA-37qj-frw5-hhjh
-    reason: "fast-xml-parser 4.5.3→5.3.4"
+  # lodash vulnerabilities
   - vulnerability: GHSA-xxjr-mmjv-4gpg
-    reason: "lodash/lodash-es 4.17.21→4.17.23"
+  # @isaacs/brace-expansion vulnerability
   - vulnerability: GHSA-7h2j-956f-4vf2
-    reason: "@isaacs/brace-expansion 5.0.0→5.0.1"
+  # busybox vulnerabilities
   - vulnerability: CVE-2025-60876
-    reason: "busybox 1.37.0-r30 (busybox-binsh, ssl_client)"
+  # glob vulnerabilities
   - vulnerability: GHSA-5j98-mcp5-4vw2
-    include-aliases: true
-    reason: "glob 10.4.5→10.5.0 and 11.0.3→11.1.0"
+  # tar vulnerabilities
   - vulnerability: GHSA-34x7-hfp2-rc4v
-    reason: "tar 7.5.1→7.5.7"
-  - vulnerability: GHSA-73rr-hh4g-fpgx
-    reason: "diff 8.0.2→8.0.3"
   - vulnerability: GHSA-r6q2-hw4h-h46w
-    reason: "tar 7.5.1→7.5.4"
-  - vulnerability: GHSA-3966-f6p6-2qr9
-    reason: "npm 11.6.2"
   - vulnerability: GHSA-8qq5-rm4j-mr97
-    reason: "tar 7.5.1→7.5.3"
   - vulnerability: GHSA-29xp-372q-xqph
-    reason: "tar 7.5.1→7.5.2"
-
+  # diff vulnerability
+  - vulnerability: GHSA-73rr-hh4g-fpgx
+  # npm vulnerability
+  - vulnerability: GHSA-3966-f6p6-2qr9
+# Set output format defaults
 output:
   - "table"
   - "json"

@@ -43,17 +43,16 @@ describe('Test Outbound Context', () => {
 
   // Global cleanup to ensure no contexts are left open
   afterEach(async () => {
-    if (contextObj && contextObj._release) {
-      // Always use the release method if available
-      contextObj._release()
+    if (contextObj && contextObj.ctx) {
+      // Remove all event listeners to prevent leaks
+      contextObj.ctx.removeAllListeners()
+      try {
+        await contextObj.ctx.dispose() // Ensure dispose is awaited
+      } catch (err) {
+        console.warn('Error disposing context:', err)
+      }
+      contextObj.ctx = null
       contextObj = null
-    }
-  })
-
-  // Cleanup context pool after all tests
-  afterAll(() => {
-    if (Context.cleanupContextPool) {
-      Context.cleanupContextPool()
     }
   })
 
@@ -204,64 +203,6 @@ describe('Test Outbound Context', () => {
       expect(scriptResult.consoleLog[0][2].type).toEqual('Error')
       expect(scriptResult.consoleLog[0][2].name).toEqual('ReferenceError')
       expect(scriptResult.consoleLog[0][2].message).toEqual('asdf is not defined')
-    })
-  })
-
-  describe('releaseContext', () => {
-    it('should release context back to pool', async () => {
-      contextObj = await Context.generateContextObj({ test: 'value' })
-      expect(() => Context.releaseContext(contextObj)).not.toThrowError()
-      contextObj = null // Prevent double cleanup
-    })
-
-    it('should handle releasing context multiple times', async () => {
-      contextObj = await Context.generateContextObj({})
-      Context.releaseContext(contextObj)
-      expect(() => Context.releaseContext(contextObj)).not.toThrowError()
-      contextObj = null // Prevent double cleanup
-    })
-
-    it('should handle null context gracefully', () => {
-      expect(() => Context.releaseContext(null)).not.toThrowError()
-    })
-  })
-
-  describe('context pooling', () => {
-    it('should reuse contexts from pool when available', async () => {
-      const ctx1 = await Context.generateContextObj({ env1: 'value1' })
-      const isPooled1 = ctx1._isPooled
-
-      // Release context back to pool
-      if (ctx1._release) ctx1._release()
-
-      // Get another context - should potentially reuse from pool
-      const ctx2 = await Context.generateContextObj({ env2: 'value2' })
-      expect(ctx2).toBeDefined()
-      expect(ctx2.environment.env2).toEqual('value2')
-
-      // Cleanup
-      if (ctx2._release) ctx2._release()
-      contextObj = null
-    })
-
-    it('should create temporary context when pool is exhausted', async () => {
-      const contexts = []
-      // Acquire more contexts than pool size
-      for (let i = 0; i < 7; i++) {
-        contexts.push(await Context.generateContextObj({ index: i }))
-      }
-
-      // All contexts should be valid
-      contexts.forEach(ctx => {
-        expect(ctx).toBeDefined()
-        expect(ctx.ctx).toBeDefined()
-      })
-
-      // Cleanup all contexts
-      contexts.forEach(ctx => {
-        if (ctx._release) ctx._release()
-      })
-      contextObj = null
     })
   })
 })
