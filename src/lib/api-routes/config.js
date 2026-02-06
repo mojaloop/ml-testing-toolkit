@@ -80,26 +80,4 @@ router.put('/user', [
   }
 })
 
-// Get cache statistics
-router.get('/cache', async (req, res, next) => {
-  try {
-    const perfOptimizer = require('../performanceOptimizer')
-    const stats = perfOptimizer.getCacheStats()
-    res.status(200).json(stats)
-  } catch (err) {
-    res.status(500).json({ error: err && err.message })
-  }
-})
-
-// Clear all caches
-router.post('/cache/clear', async (req, res, next) => {
-  try {
-    const perfOptimizer = require('../performanceOptimizer')
-    perfOptimizer.clearAllCaches()
-    res.status(200).json({ status: 'OK', message: 'All caches cleared' })
-  } catch (err) {
-    res.status(500).json({ error: err && err.message })
-  }
-})
-
 module.exports = router

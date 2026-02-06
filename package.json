@@ -71,7 +71,7 @@
     "genexec": "pkg -t node8-win ."
   },
   "dependencies": {
-    "@elastic/elasticsearch": "9.3.0",
+    "@elastic/elasticsearch": "9.2.1",
     "@hapi/basic": "7.0.2",
     "@hapi/boom": "10.0.1",
     "@hapi/good": "9.0.1",
@@ -94,7 +94,7 @@
     "cookie-parser": "1.4.7",
     "cookies": "0.9.1",
     "cors": "2.8.6",
-    "dotenv": "17.2.4",
+    "dotenv": "17.2.3",
     "express": "5.2.1",
     "express-validator": "7.3.1",
     "fs": "0.0.1-security",

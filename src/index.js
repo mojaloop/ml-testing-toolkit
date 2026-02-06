@@ -64,20 +64,4 @@ const init = async () => {
   RequestLogger.logMessage('info', 'Toolkit Initialization completed.', { notification: false, additionalData: welcomeMessage })
 }
 
-// Graceful shutdown handler
-const shutdown = async (signal) => {
-  RequestLogger.logMessage('info', `${signal} received. Starting graceful shutdown...`, { notification: false })
-
-  // Stop servers
-  await apiServer.stopServer()
-  await server.stop()
-
-  RequestLogger.logMessage('info', 'Graceful shutdown completed', { notification: false })
-  process.exit(0)
-}
-
-// Register shutdown handlers
-process.on('SIGTERM', () => shutdown('SIGTERM'))
-process.on('SIGINT', () => shutdown('SIGINT'))
-
 init()

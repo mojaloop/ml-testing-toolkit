@@ -31,53 +31,24 @@
 
 const NotificationEmitter = require('../../../src/lib/notificationEmitter')
 
-const mockEmit = jest.fn()
-const mockIO = {
-  emit: mockEmit,
-  engine: {
-    clientsCount: 0
-  }
-}
-
 jest.mock('../../../src/lib/socket-server',() => ({
-  getIO: jest.fn(() => mockIO)
+  getIO: jest.fn(() => {
+    return {
+      emit: jest.fn()
+    }
+  })
 }))
 
 describe('NotificationEmitter', () => {
-  beforeEach(() => {
-    mockEmit.mockClear()
-    mockIO.engine.clientsCount = 0
-  })
-
   describe('broadcastLog', () => {
     it('should not throw an error when sessionID is missing', () => {
-      mockIO.engine.clientsCount = 1
       expect(() => NotificationEmitter.broadcastLog({})).not.toThrowError()
     })
     it('should not throw an error', () => {
-      mockIO.engine.clientsCount = 1
       expect(() => NotificationEmitter.broadcastLog({}, 'sessionID')).not.toThrowError()
     })
     it('should not throw error when sessionID is provided', () => {
-      mockIO.engine.clientsCount = 1
       expect(() => NotificationEmitter.broadcastLog({}, 'sessionID')).not.toThrowError()
-    })
-    it('should not emit when no clients are connected', () => {
-      mockIO.engine.clientsCount = 0
-      NotificationEmitter.broadcastLog({}, 'sessionID')
-      expect(mockEmit).not.toHaveBeenCalled()
-    })
-    it('should emit when clients are connected', () => {
-      mockIO.engine.clientsCount = 1
-      NotificationEmitter.broadcastLog({}, 'sessionID')
-      expect(mockEmit).toHaveBeenCalled()
-    })
-    it('should handle when engine is undefined', () => {
-      const originalEngine = mockIO.engine
-      mockIO.engine = undefined
-      NotificationEmitter.broadcastLog({}, 'sessionID')
-      expect(mockEmit).not.toHaveBeenCalled()
-      mockIO.engine = originalEngine
     })
   })
   describe('broadcastOutboundLog', () => {

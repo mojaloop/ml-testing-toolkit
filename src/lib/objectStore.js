@@ -121,30 +121,17 @@ const clearOldObjects = () => {
   clear('storedTransfers', interval)
 }
 
-let cleanupIntervalId = null
-
 const initObjectStore = (initConfig = null) => {
   if (initConfig) {
     _.merge(storedObject.data, initConfig)
   }
-  if (cleanupIntervalId) {
-    clearInterval(cleanupIntervalId)
-  }
-  cleanupIntervalId = setInterval(clearOldObjects, 1000)
-}
-
-const stopObjectStore = () => {
-  if (cleanupIntervalId) {
-    clearInterval(cleanupIntervalId)
-    cleanupIntervalId = null
-  }
+  setInterval(clearOldObjects, 1000)
 }
 
 module.exports = {
   set,
   get,
   initObjectStore,
-  stopObjectStore,
   init,
   push,
   clear,

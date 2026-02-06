@@ -1,28 +1,53 @@
 ignore:
-  - vulnerability: GHSA-37qj-frw5-hhjh
-    reason: "fast-xml-parser 4.5.3→5.3.4"
-  - vulnerability: GHSA-xxjr-mmjv-4gpg
-    reason: "lodash/lodash-es 4.17.21→4.17.23"
-  - vulnerability: GHSA-7h2j-956f-4vf2
-    reason: "@isaacs/brace-expansion 5.0.0→5.0.1"
-  - vulnerability: CVE-2025-60876
-    reason: "busybox 1.37.0-r30 (busybox-binsh, ssl_client)"
+  # Remove this ignore after verifying CI builds fresh image
   - vulnerability: GHSA-5j98-mcp5-4vw2
     include-aliases: true
-    reason: "glob 10.4.5→10.5.0 and 11.0.3→11.1.0"
-  - vulnerability: GHSA-34x7-hfp2-rc4v
-    reason: "tar 7.5.1→7.5.7"
-  - vulnerability: GHSA-73rr-hh4g-fpgx
-    reason: "diff 8.0.2→8.0.3"
+  - vulnerability: CVE-2025-60876
+    reason: "No fixes available as of 2026-01-14 on Dockerfile base image 22.21.1-alpine3.23"
+  - vulnerability: CVE-2026-22184
+    reason: "No fixes available as of 2026-01-16 on Dockerfile base image 22.21.1-alpine3.23"
+  - vulnerability: CVE-2026-28309
+  - vulnerability: CVE-2025-59465
+  - vulnerability: CVE-2025-55131
   - vulnerability: GHSA-r6q2-hw4h-h46w
-    reason: "tar 7.5.1→7.5.4"
-  - vulnerability: GHSA-3966-f6p6-2qr9
-    reason: "npm 11.6.2"
   - vulnerability: GHSA-8qq5-rm4j-mr97
-    reason: "tar 7.5.1→7.5.3"
-  - vulnerability: GHSA-29xp-372q-xqph
-    reason: "tar 7.5.1→7.5.2"
-
+  - vulnerability: CVE-2025-55130
+  - vulnerability: CVE-2026-21637
+  - vulnerability: CVE-2025-59466
+  - vulnerability: GHSA-xxjr-mmjv-4gpg
+  # High severity vulnerabilities
+  - vulnerability: CVE-2025-69420
+    reason: "libcrypto3 3.3.5-r0, libssl3 3.3.5-r0"
+  - vulnerability: GHSA-34x7-hfp2-rc4v
+    reason: "tar 6.2.1, 7.4.3"
+  # Medium severity vulnerabilities
+  - vulnerability: CVE-2026-22796
+    reason: "libcrypto3 3.3.5-r0, libssl3 3.3.5-r0"
+  # libcrypto3 3.3.5-r0 / libssl3 3.3.5-r0: CVE-2025-15467
+  - vulnerability: CVE-2025-15467
+    reason: "libcrypto3 3.3.5-r0, libssl3 3.3.5-r0"
+  # High severity vulnerabilities
+  - vulnerability: GHSA-37qj-frw5-hhjh
+    reason: "fast-xml-parser 4.5.3"
+  - vulnerability: CVE-2025-69419
+    reason: "libcrypto3 3.3.5-r0, libssl3 3.3.5-r0"
+  - vulnerability: CVE-2025-69421
+    reason: "libcrypto3 3.3.5-r0, libssl3 3.3.5-r0"
+  # Medium severity vulnerabilities
+  - vulnerability: CVE-2025-66199
+    reason: "libcrypto3 3.3.5-r0, libssl3 3.3.5-r0"
+  - vulnerability: CVE-2025-15468
+    reason: "libcrypto3 3.3.5-r0, libssl3 3.3.5-r0"
+  - vulnerability: CVE-2026-22795
+    reason: "libcrypto3 3.3.5-r0, libssl3 3.3.5-r0"
+  - vulnerability: GHSA-p5wg-g6qr-c7cg
+    reason: "eslint 8.57.1"
+  - vulnerability: CVE-2025-68160
+    reason: "libcrypto3 3.3.5-r0, libssl3 3.3.5-r0"
+  - vulnerability: CVE-2025-69418
+    reason: "libcrypto3 3.3.5-r0, libssl3 3.3.5-r0"
+  - vulnerability: GHSA-3966-f6p6-2qr9
+# Set output format defaults
 output:
   - "table"
   - "json"

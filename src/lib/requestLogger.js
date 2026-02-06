@@ -121,8 +121,7 @@ const logResponse = async (request, user) => {
 const logMessage = (verbosity, message, externalData = {}) => {
   const data = {
     additionalData: externalData.additionalData,
-    // Performance optimization: Don't broadcast debug logs by default (high volume, low priority)
-    notification: typeof externalData.notification !== 'undefined' ? externalData.notification : (verbosity !== 'debug'),
+    notification: typeof externalData.notification !== 'undefined' ? externalData.notification : true,
     messageType: externalData.messageType || 'generic',
     request: externalData.request || null,
     user: externalData.user
