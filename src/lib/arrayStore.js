@@ -88,14 +88,27 @@ const clearOldObjects = () => {
   clear('callbacksHistory', interval)
 }
 
+let cleanupIntervalId = null
+
 const initArrayStore = () => {
-  setInterval(clearOldObjects, 1000)
+  if (cleanupIntervalId) {
+    clearInterval(cleanupIntervalId)
+  }
+  cleanupIntervalId = setInterval(clearOldObjects, 1000)
+}
+
+const stopArrayStore = () => {
+  if (cleanupIntervalId) {
+    clearInterval(cleanupIntervalId)
+    cleanupIntervalId = null
+  }
 }
 
 module.exports = {
   get,
   reset,
   initArrayStore,
+  stopArrayStore,
   push,
   clear
 }

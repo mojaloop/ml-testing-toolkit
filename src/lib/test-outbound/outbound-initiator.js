@@ -330,7 +330,15 @@ const processTestCase = async (
         if (convertedRequest.scriptingEngine && convertedRequest.scriptingEngine === 'javascript') {
           context = javascriptContext
         }
-        contextObj = await context.generateContextObj(variableData.environment)
+        // Use context pooling for both engines
+        if (context.acquireContext) {
+          contextObj = await context.acquireContext(variableData.environment)
+          // Add release method
+          contextObj._release = () => context.releaseContext(contextObj)
+        } else {
+          // Fallback for engines without pooling support
+          contextObj = await context.generateContextObj(variableData.environment)
+        }
       }
 
       // Get transformer if specified
@@ -428,9 +436,9 @@ const processTestCase = async (
           convertedRequest.retry === retries
         )
       } finally {
-        if (contextObj) {
-          contextObj.ctx.dispose()
-          contextObj.ctx = null
+        if (contextObj && contextObj._release) {
+          // Release context back to pool instead of disposing
+          contextObj._release()
         }
         if (request.appended?.assertionResults?.isFailed) {
           if (convertedRequest.retry < retries) {

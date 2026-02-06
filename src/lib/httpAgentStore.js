@@ -122,14 +122,34 @@ const _clearAgents = (unUsedAgentsExpiryMs) => {
   _clear(httpAgentStore, unUsedAgentsExpiryMs)
 }
 
+let cleanupIntervalId = null
+
 const init = () => {
   const timerInterval = (Config.getSystemConfig().HTTP_CLIENT && Config.getSystemConfig().HTTP_CLIENT.UNUSED_AGENTS_CHECK_TIMER_MS !== undefined) ? Config.getSystemConfig().HTTP_CLIENT.UNUSED_AGENTS_CHECK_TIMER_MS : (5 * 60 * 1000) // Check for the cleanup every 5min
   const unUsedAgentsExpiryMs = (Config.getSystemConfig().HTTP_CLIENT && Config.getSystemConfig().HTTP_CLIENT.UNUSED_AGENTS_EXPIRY_MS !== undefined) ? Config.getSystemConfig().HTTP_CLIENT.UNUSED_AGENTS_EXPIRY_MS : (30 * 60 * 1000) // Clear http agents not being used for more this time
-  setInterval(_clearAgents, timerInterval, unUsedAgentsExpiryMs)
+  if (cleanupIntervalId) {
+    clearInterval(cleanupIntervalId)
+  }
+  cleanupIntervalId = setInterval(_clearAgents, timerInterval, unUsedAgentsExpiryMs)
+}
+
+const stop = () => {
+  if (cleanupIntervalId) {
+    clearInterval(cleanupIntervalId)
+    cleanupIntervalId = null
+  }
+  // Destroy all agents
+  Object.values(httpsAgentStore).forEach(agentInfo => {
+    if (agentInfo.agent) agentInfo.agent.destroy()
+  })
+  Object.values(httpAgentStore).forEach(agentInfo => {
+    if (agentInfo.agent) agentInfo.agent.destroy()
+  })
 }
 
 module.exports = {
   getHttpAgent,
   getHttpsAgent,
-  init
+  init,
+  stop
 }

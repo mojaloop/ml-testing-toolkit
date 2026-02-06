@@ -102,4 +102,21 @@ describe('ArrayStore', () => {
       expect(result).toBeUndefined()
     })
   })
+  describe('stopArrayStore', () => {
+    it('Stop Array Store should not throw an error', async () => {
+      const result = ArrayStore.stopArrayStore()
+      expect(result).toBeUndefined()
+    })
+    it('Calling stopArrayStore multiple times should not throw an error', async () => {
+      ArrayStore.stopArrayStore()
+      const result = ArrayStore.stopArrayStore()
+      expect(result).toBeUndefined()
+    })
+    it('Can reinitialize after stopping', async () => {
+      ArrayStore.stopArrayStore()
+      const result = ArrayStore.initArrayStore()
+      expect(result).toBeUndefined()
+      ArrayStore.stopArrayStore()
+    })
+  })
 })

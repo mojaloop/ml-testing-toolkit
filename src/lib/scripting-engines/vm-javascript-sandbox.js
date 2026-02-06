@@ -40,6 +40,109 @@ const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 const customLogger = require('../requestLogger')
 const { getHeader, urlToPath } = require('../utils')
 
+const CONTEXT_POOL_SIZE = 5
+const contextPool = []
+
+// Initialize the context pool at startup
+const initializeContextPool = async () => {
+  if (contextPool.length === 0) {
+    for (let i = 0; i < CONTEXT_POOL_SIZE; i++) {
+      const ctx = await generateContextObj()
+      ctx._inUse = false
+      contextPool.push(ctx)
+    }
+  }
+}
+
+// Acquire a context from the pool
+const acquireContext = async (environmentObj = {}) => {
+  // Initialize pool on first use
+  if (contextPool.length === 0) {
+    await initializeContextPool()
+  }
+
+  // Find available context
+  const availableContext = contextPool.find(ctx => !ctx._inUse)
+
+  if (availableContext) {
+    availableContext._inUse = true
+    // Update environment for this execution
+    availableContext.environment = { ...environmentObj }
+    return availableContext
+  }
+
+  // If no available context, create temporary one
+  const tempContext = await generateContextObj(environmentObj)
+  tempContext._temporary = true
+  tempContext._inUse = true
+  return tempContext
+}
+
+// Release a context back to the pool
+const releaseContext = (contextObj) => {
+  if (!contextObj) return
+
+  if (contextObj._temporary) {
+    // Dispose temporary context
+    try {
+      if (contextObj.websocket && contextObj.websocket.destroy) {
+        contextObj.websocket.destroy()
+      }
+      if (contextObj.inboundEvent && contextObj.inboundEvent.destroy) {
+        // Destroy all event listeners
+        Object.keys(contextObj.inboundEvent.eventListeners || {}).forEach(clientName => {
+          contextObj.inboundEvent.destroy(clientName)
+        })
+        // Remove all listeners from emitter
+        if (contextObj.inboundEvent.emitter) {
+          contextObj.inboundEvent.emitter.removeAllListeners('newInbound')
+        }
+      }
+    } catch (err) {
+      customLogger.logMessage('warn', 'Failed to cleanup temporary context', { additionalData: err.message })
+    }
+    return
+  }
+
+  // Clean up and reset context state
+  clearConsole(contextObj.consoleOutObj)
+  contextObj.requestVariables = {}
+  contextObj.environment = {}
+
+  // Note: WebSocketClientManager and InboundEventListener manage their own
+  // event listeners internally, no need to clean them up here
+
+  // Reset transformer
+  contextObj.transformerObj.transformer = null
+  contextObj.transformerObj.transformerName = null
+  contextObj.transformerObj.options = {}
+
+  // Mark as available
+  contextObj._inUse = false
+}
+
+// Clean up all contexts in the pool
+const cleanupContextPool = () => {
+  contextPool.forEach(ctx => {
+    try {
+      if (ctx.websocket && ctx.websocket.destroy) ctx.websocket.destroy()
+      if (ctx.inboundEvent && ctx.inboundEvent.destroy) {
+        // Destroy all event listeners
+        Object.keys(ctx.inboundEvent.eventListeners || {}).forEach(clientName => {
+          ctx.inboundEvent.destroy(clientName)
+        })
+        // Remove all listeners from emitter
+        if (ctx.inboundEvent.emitter) {
+          ctx.inboundEvent.emitter.removeAllListeners('newInbound')
+        }
+      }
+    } catch (err) {
+      customLogger.logMessage('warn', 'Failed to cleanup context', { additionalData: err.message })
+    }
+  })
+  contextPool.length = 0
+}
+
 const registerAxiosRequestInterceptor = (userConfig, axios, transformerObj) => {
   // istanbul ignore next
   axios.interceptors.request.use(async config => {
@@ -143,6 +246,7 @@ const customWrapperFn = (requestVariables, consoleFn) => {
       consoleFn.log(`Setting transformer '${transformerName}' if exists...`)
       if (!transformerName) {
         requestVariables.TRANSFORM = undefined
+        return
       }
       requestVariables.TRANSFORM = {
         transformerName,
@@ -264,7 +368,14 @@ const executeAsync = async (script, data, contextObj) => {
       consoleLog.push([{ execution: 0 }, 'log', ...contextObj.consoleOutObj.stdOut[i]])
     }
     consoleLog.push([{ execution: 0 }, 'executionError', err.toString()])
+  } finally {
+    // Clean up context-specific properties after execution
+    delete contextObj.request
+    delete contextObj.response
+    delete contextObj.callback
+    delete contextObj.collectionVariables
   }
+
   const result = {
     consoleLog,
     environment: { ...contextObj.environment }
@@ -290,5 +401,8 @@ async function _runScript (code, context = {}, options = {}) {
 module.exports = {
   registerAxiosRequestInterceptor,
   generateContextObj,
-  executeAsync
+  acquireContext,
+  releaseContext,
+  executeAsync,
+  cleanupContextPool
 }

@@ -33,10 +33,15 @@ const axios = require('axios').default
 const customLogger = require('../requestLogger')
 const UniqueIdGenerator = require('../../lib/uniqueIdGenerator')
 
+// Context pool for reusing sandbox contexts
+const CONTEXT_POOL_SIZE = 5
+const contextPool = []
+let contextPoolInitialized = false
+
 // const createContextAsync = util.promisify(Sandbox.createContext)
-const createContextAsync = () => {
+const createContextAsync = (options) => {
   return new Promise((resolve, reject) => {
-    Sandbox.createContext(function (err, ctx) {
+    Sandbox.createContext(options || {}, function (err, ctx) {
       if (err) {
         reject(err)
         return console.error(err)
@@ -46,13 +51,72 @@ const createContextAsync = () => {
   })
 }
 
-const generateContextObj = async (environment = {}) => {
-  const ctx = await createContextAsync({ timeout: 30000 })
+// Initialize context pool on first use
+const initializeContextPool = async () => {
+  if (contextPoolInitialized) return
+  contextPoolInitialized = true
+
+  customLogger.logMessage('info', `Initializing sandbox context pool with ${CONTEXT_POOL_SIZE} contexts`, { notification: false })
+  const promises = []
+  for (let i = 0; i < CONTEXT_POOL_SIZE; i++) {
+    promises.push(createContextAsync())
+  }
+  const contexts = await Promise.all(promises)
+
+  contexts.forEach(ctx => {
+    ctx.executeAsync = util.promisify(ctx.execute)
+    ctx.on('error', function (cursor, err) {
+      // log the error in postman sandbox
+      console.log(cursor, err)
+    })
+    contextPool.push({ ctx, inUse: false })
+  })
+  customLogger.logMessage('info', 'Sandbox context pool initialized', { notification: false })
+}
+
+// Get context from pool or create new one
+const acquireContext = async () => {
+  await initializeContextPool()
+
+  // Try to find an available context in the pool
+  const available = contextPool.find(item => !item.inUse)
+  if (available) {
+    available.inUse = true
+    return available.ctx
+  }
+
+  // If pool is exhausted, create a new context (temporary)
+  customLogger.logMessage('debug', 'Context pool exhausted, creating temporary context', { notification: false })
+  const ctx = await createContextAsync()
   ctx.executeAsync = util.promisify(ctx.execute)
   ctx.on('error', function (cursor, err) {
-    // log the error in postman sandbox
     console.log(cursor, err)
   })
+  return ctx
+}
+
+// Release context back to pool
+const releaseContext = (ctx) => {
+  const poolItem = contextPool.find(item => item.ctx === ctx)
+  if (poolItem) {
+    // Context is being returned to pool
+    // executeAsync already cleans up execution-specific listeners in its finally block
+    // so we don't need to do additional cleanup here
+    poolItem.inUse = false
+  } else {
+    // This was a temporary context (not in pool), dispose it
+    try {
+      if (ctx && typeof ctx.dispose === 'function') {
+        ctx.dispose()
+      }
+    } catch (err) {
+      customLogger.logMessage('warn', 'Failed to dispose temporary context', { additionalData: err.message })
+    }
+  }
+}
+
+const generateContextObj = async (environment = {}) => {
+  const ctx = await acquireContext()
   const transformerObj = {
     transformer: null,
     transformerName: null,
@@ -61,9 +125,35 @@ const generateContextObj = async (environment = {}) => {
   const contextObj = {
     ctx,
     environment,
-    transformerObj
+    transformerObj,
+    _release: () => releaseContext(ctx),
+    _isPooled: contextPool.some(item => item.ctx === ctx)
   }
   return contextObj
+}
+
+// Cleanup function for graceful shutdown
+const cleanupContextPool = () => {
+  customLogger.logMessage('info', 'Cleaning up sandbox context pool', { notification: false })
+  contextPool.forEach(({ ctx }) => {
+    try {
+      ctx.removeAllListeners()
+      ctx.dispose()
+    } catch (err) {
+      customLogger.logMessage('warn', 'Failed to dispose context', { additionalData: err.message })
+    }
+  })
+  contextPool.length = 0
+  contextPoolInitialized = false
+  customLogger.logMessage('info', 'Context pool cleanup complete', { notification: false })
+}
+
+// Register cleanup with performance optimizer
+try {
+  const perfOptimizer = require('../performanceOptimizer')
+  perfOptimizer.registerCache(cleanupContextPool, 'Sandbox Context Pool')
+} catch (err) {
+  // Performance optimizer not available
 }
 
 const executeAsync = async (script, data, contextObj) => {
@@ -76,9 +166,12 @@ const executeAsync = async (script, data, contextObj) => {
   data.context.ctx = contextObj.ctx
   data.context.environment = Object.entries(contextObj.environment || {}).map((item) => { return { type: 'any', key: item[0], value: item[1] } })
 
-  contextObj.ctx.on('console', function () {
+  // Define event handlers that we'll remove later
+  const consoleHandler = function () {
     consoleLog.push(Array.from(arguments))
-  })
+  }
+
+  contextObj.ctx.on('console', consoleHandler)
 
   contextObj.ctx.on(`execution.request.${data.id}`, async (cursor, id, requestId, req) => {
     const host = `${req.url.protocol}://${req.url.host.join('.')}${req.url.port ? ':' + req.url.port : ''}/`
@@ -127,6 +220,16 @@ const executeAsync = async (script, data, contextObj) => {
     contextObj.environment = resp.environment.values.reduce((envObj, item) => { envObj[item.key] = item.value; return envObj }, {})
   } catch (err) {
     // consoleLog.push([{execution: 0}, 'executionError', err.message])
+  } finally {
+    // Clean up event listeners to prevent memory leaks
+    try {
+      contextObj.ctx.removeListener('console', consoleHandler)
+      contextObj.ctx.removeAllListeners(`execution.request.${data.id}`)
+      contextObj.ctx.removeAllListeners(`execution.response.${data.id}`)
+      contextObj.ctx.removeAllListeners(`execution.error.${data.id}`)
+    } catch (cleanupErr) {
+      // Ignore cleanup errors
+    }
   }
   const result = {
     consoleLog,
@@ -138,5 +241,7 @@ const executeAsync = async (script, data, contextObj) => {
 
 module.exports = {
   generateContextObj,
-  executeAsync
+  executeAsync,
+  releaseContext,
+  cleanupContextPool
 }

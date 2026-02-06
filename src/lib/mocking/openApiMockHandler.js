@@ -67,7 +67,13 @@ module.exports.initilizeMockHandler = async () => {
   apis = await Promise.all(apiDefinitions.map(async item => {
     const tempObj = new OpenApiBackend({
       definition: await utils.checkUrl(path.join(item.specFile)),
-      customizeAjv: ajv => addFormats(ajv),
+      customizeAjv: ajv => {
+        addFormats(ajv)
+        // Enable caching and optimization to avoid repeated schema compilation
+        ajv.opts.cache = new Map()
+        ajv.opts.serialize = false
+        return ajv
+      },
       strict: true,
       quick: true,
       handlers: {
