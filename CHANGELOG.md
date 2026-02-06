@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+## [18.19.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.18.0...v18.19.0) (2026-02-06)
+
+
+### Features
+
+* revert performance-optimization ([#367](https://github.com/mojaloop/ml-testing-toolkit/issues/367)) ([5b7c6c5](https://github.com/mojaloop/ml-testing-toolkit/commit/5b7c6c52d8ffe949ca16fa8374bea3fbc08c1a0c)), closes [#366](https://github.com/mojaloop/ml-testing-toolkit/issues/366)
+
 ## [18.18.0](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.17.3...v18.18.0) (2026-02-06)
 
 
