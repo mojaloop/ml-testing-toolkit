@@ -1,4 +1,12 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.17.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.17.2...v18.17.3) (2026-02-05)
+
+
+### Chore
+
+* dep update ([#365](https://github.com/mojaloop/ml-testing-toolkit/issues/365)) ([953855d](https://github.com/mojaloop/ml-testing-toolkit/commit/953855dc31b867ab0622f1501465e5c27e3a29af))
+* **sbom:** update sbom [skip ci] ([a588fc3](https://github.com/mojaloop/ml-testing-toolkit/commit/a588fc325d92e5adf6d8e29fc1105d311405813d))
+
 ### [18.17.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.17.1...v18.17.2) (2026-02-03)
 
 
