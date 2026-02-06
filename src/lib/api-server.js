@@ -97,6 +97,41 @@ const startServer = port => {
 }
 
 const stopServer = port => {
+  // Clean up performance caches and context pools
+  try {
+    const perfOptimizer = require('./performanceOptimizer')
+    perfOptimizer.clearAllCaches()
+
+    // Clean up context pools
+    const postmanContext = require('./scripting-engines/postman-sandbox')
+    if (postmanContext.cleanupContextPool) {
+      postmanContext.cleanupContextPool()
+    }
+
+    const javascriptContext = require('./scripting-engines/vm-javascript-sandbox')
+    if (javascriptContext.cleanupContextPool) {
+      javascriptContext.cleanupContextPool()
+    }
+
+    // Stop interval timers
+    const arrayStore = require('./arrayStore')
+    if (arrayStore.stopArrayStore) {
+      arrayStore.stopArrayStore()
+    }
+
+    const objectStore = require('./objectStore')
+    if (objectStore.stopObjectStore) {
+      objectStore.stopObjectStore()
+    }
+
+    const httpAgentStore = require('./httpAgentStore')
+    if (httpAgentStore.stop) {
+      httpAgentStore.stop()
+    }
+  } catch (err) {
+    customLogger.logMessage('warn', 'Error during cleanup', { additionalData: err.message })
+  }
+
   http.close()
   customLogger.logMessage('info', 'API Server stopped', { notification: false })
 }

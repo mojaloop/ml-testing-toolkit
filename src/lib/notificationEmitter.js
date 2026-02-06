@@ -32,6 +32,13 @@ const SocketServer = require('./socket-server')
 const broadcast = (log, sessionID = null, type) => {
   const io = SocketServer.getIO()
   if (io) {
+    // Performance optimization: Only broadcast if clients are connected
+    // This prevents expensive encoding operations when no one is listening
+    const hasClients = io.engine?.clientsCount > 0
+    if (!hasClients) {
+      return
+    }
+
     io.emit(type, log)
     if (sessionID) {
       io.emit(`${type}/` + sessionID, log)

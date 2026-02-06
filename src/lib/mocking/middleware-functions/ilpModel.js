@@ -142,23 +142,23 @@ const handleTransferIlp = (context, response) => {
     }
   }
 
-  customLogger.logMessage('debug', 'Generated callback body', { additionalData: { context, response } })
+  customLogger.logMessage('debug', 'Generated callback body', { additionalData: { context, response }, notification: false })
   if (context.request.method === 'get' && response.method === 'put' && pathMatch.test(response.path)) {
     const transferId = response.path.match(pathMatch)[1]
     // Use objectStore to get the stored transfer
     const storedTransfer = objectStore.get('storedTransfers', transferId)
-    customLogger.logMessage('debug', 'Stored transfer fetched for fulfilment', { additionalData: { transferId } })
+    customLogger.logMessage('debug', 'Stored transfer fetched for fulfilment', { additionalData: { transferId }, notification: false })
     if (storedTransfer) {
       if (storedTransfer.data?.request?.ilpPacket) {
-        customLogger.logMessage('debug', 'Stored transfer has ilpPacket. Generating fulfilment.', { additionalData: { transferId, ilpPacket: storedTransfer.data.request.ilpPacket } })
+        customLogger.logMessage('debug', 'Stored transfer has ilpPacket. Generating fulfilment.', { additionalData: { transferId, ilpPacket: storedTransfer.data.request.ilpPacket }, notification: false })
         const generatedFulfilment = ilpObj.calculateFulfil(storedTransfer.data.request.ilpPacket).replace('"', '')
         response.body.fulfilment = generatedFulfilment
       } else if (storedTransfer.data?.request?.CdtTrfTxInf?.VrfctnOfTerms?.IlpV4PrepPacket) {
-        customLogger.logMessage('debug', 'Stored transfer has IlpV4PrepPacket. Generating fulfilment.', { additionalData: { transferId } })
+        customLogger.logMessage('debug', 'Stored transfer has IlpV4PrepPacket. Generating fulfilment.', { additionalData: { transferId }, notification: false })
         const generatedFulfilment = ilpV4Obj.calculateFulfil(storedTransfer.data.request.CdtTrfTxInf.VrfctnOfTerms.IlpV4PrepPacket).replace('"', '')
         response.body.TxInfAndSts.ExctnConf = generatedFulfilment
       } else {
-        customLogger.logMessage('warn', 'No ILP packet or IlpV4PrepPacket found in stored transfer request', { additionalData: { transferId } })
+        customLogger.logMessage('warn', 'No ILP packet or IlpV4PrepPacket found in stored transfer request', { additionalData: { transferId }, notification: false })
       }
       // Remove the stored transfer from objectStore regardless of success or failure
       objectStore.deleteObject('storedTransfers', transferId)
