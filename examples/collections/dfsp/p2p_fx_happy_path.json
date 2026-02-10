@@ -160,13 +160,6 @@
                 ]
               },
               {
-                "id": 4,
-                "description": "Callback FSP Destination equal to request FSP Source",
-                "exec": [
-                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers['FSPIOP-Source']}')"
-                ]
-              },
-              {
                 "id": 5,
                 "description": "Callback body should contain conversionTerms",
                 "exec": [
@@ -211,8 +204,8 @@
           "operationPath": "/quotes",
           "method": "post",
           "headers": {
-            "Accept": "application/vnd.interoperability.quotes+json;version=1.0",
-            "Content-Type": "application/vnd.interoperability.quotes+json;version=1.0",
+            "Accept": "{$inputs.acceptQuotes}",
+            "Content-Type": "{$inputs.contentTypeQuotes}",
             "Date": "{$function.generic.curDate}",
             "FSPIOP-Source": "{$inputs.fromFspId}",
             "FSPIOP-Destination": "{$prev.1.callback.body.party.partyIdInfo.fspId}"
@@ -274,13 +267,6 @@
                 "description": "Callback Content Length not 0",
                 "exec": [
                   "expect(callback.headers['Content-Length']).to.not.equal('0')"
-                ]
-              },
-              {
-                "id": 4,
-                "description": "Callback FSP Destination equal to request FSP Source",
-                "exec": [
-                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers['FSPIOP-Source']}')"
                 ]
               },
               {
@@ -348,8 +334,8 @@
           "path": "/fxTransfers",
           "method": "post",
           "headers": {
-            "Accept": "application/vnd.interoperability.fxTransfers+json;version=1.0",
-            "Content-Type": "application/vnd.interoperability.fxTransfers+json;version=1.0",
+            "Accept": "application/vnd.interoperability.fxTransfers+json;version=2.0",
+            "Content-Type": "application/vnd.interoperability.fxTransfers+json;version=2.0",
             "Date": "{$function.generic.curDate}",
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
@@ -392,13 +378,6 @@
                 "exec": [
                   "expect(callback.headers['Content-Length']).to.not.equal('0')"
                 ]
-              },
-              {
-                "id": 4,
-                "description": "Callback FSP Destination equal to request FSP Source",
-                "exec": [
-                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers['FSPIOP-Source']}')"
-                ]
               }
             ]
           },
@@ -416,8 +395,8 @@
           "operationPath": "/transfers",
           "method": "post",
           "headers": {
-            "Accept": "application/vnd.interoperability.transfers+json;version=1.0",
-            "Content-Type": "application/vnd.interoperability.transfers+json;version=1.0",
+            "Accept": "{$inputs.acceptTransfers}",
+            "Content-Type": "{$inputs.contentTransfers}",
             "Date": "{$function.generic.curDate}",
             "FSPIOP-Source": "{$inputs.fromFspId}"
           },
@@ -454,13 +433,6 @@
                 "description": "Callback Content Length not 0",
                 "exec": [
                   "expect(callback.headers['Content-Length']).to.not.equal('0')"
-                ]
-              },
-              {
-                "id": 4,
-                "description": "Callback FSP Destination equal to request FSP Source",
-                "exec": [
-                  "expect(callback.headers['fspiop-destination']).to.equal('{$request.headers['FSPIOP-Source']}')"
                 ]
               },
               {
