@@ -154,4 +154,21 @@ describe('ObjectStore', () => {
       expect(result).toBe(false)
     })
   })
+  describe('stopObjectStore', () => {
+    it('Stop Object Store should not throw an error', async () => {
+      const result = ObjectStore.stopObjectStore()
+      expect(result).toBeUndefined()
+    })
+    it('Calling stopObjectStore multiple times should not throw an error', async () => {
+      ObjectStore.stopObjectStore()
+      const result = ObjectStore.stopObjectStore()
+      expect(result).toBeUndefined()
+    })
+    it('Can reinitialize after stopping', async () => {
+      ObjectStore.stopObjectStore()
+      const result = ObjectStore.initObjectStore()
+      expect(result).toBeUndefined()
+      ObjectStore.stopObjectStore()
+    })
+  })
 })

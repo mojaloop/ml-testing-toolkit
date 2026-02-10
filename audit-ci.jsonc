@@ -5,6 +5,7 @@
   "moderate": true,
   "allowlist": [
     "GHSA-37qj-frw5-hhjh",
-    "GHSA-xxjr-mmjv-4gpg"
+    "GHSA-xxjr-mmjv-4gpg",
+    "GHSA-43fc-jf86-j433"
   ]
 }

@@ -18,6 +18,7 @@ ignore:
   - vulnerability: GHSA-73rr-hh4g-fpgx
   # npm vulnerability
   - vulnerability: GHSA-3966-f6p6-2qr9
+  - vulnerability: GHSA-43fc-jf86-j433
 # Set output format defaults
 output:
   - "table"

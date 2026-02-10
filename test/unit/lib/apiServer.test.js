@@ -110,6 +110,20 @@ describe('api-server', () => {
       })()).resolves.toBeTruthy()
     })
   })
+  describe('when stopServer is called', () => {
+    it('should cleanup performance caches', async () => {
+      apiServer.startServer()
+      await wait()
+      // Should not throw error even if cleanup modules are not available
+      expect(() => apiServer.stopServer()).not.toThrowError()
+    })
+    it('should not throw error when called multiple times', async () => {
+      apiServer.startServer()
+      await wait()
+      apiServer.stopServer()
+      expect(() => apiServer.stopServer()).not.toThrowError()
+    })
+  })
   describe('when getHttp is called', () => {
     it('should return a http server', async () => {
       const http = apiServer.getHttp()

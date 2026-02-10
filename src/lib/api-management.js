@@ -40,7 +40,13 @@ const apiDefinitionsPath = 'spec_files/api_definitions/'
 const validateDefinition = async (apiFilePath) => {
   const newApi = new OpenApiBackend({
     definition: await Utils.checkUrl(path.join(apiFilePath)),
-    customizeAjv: ajv => addFormats(ajv),
+    customizeAjv: ajv => {
+      addFormats(ajv)
+      // Enable caching and optimization
+      ajv.opts.cache = new Map()
+      ajv.opts.serialize = false
+      return ajv
+    },
     strict: true,
     quick: true
   })
