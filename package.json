@@ -88,7 +88,7 @@
     "adm-zip": "0.5.16",
     "ajv-formats": "3.0.1",
     "atob": "2.1.2",
-    "axios": "1.13.4",
+    "axios": "1.13.5",
     "chai": "4.4.1",
     "connection-string": "^5.0.0",
     "cookie-parser": "1.4.7",
