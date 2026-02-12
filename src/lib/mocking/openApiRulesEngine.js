@@ -41,6 +41,7 @@ const uuid = require('uuid')
 const postmanContext = require('../scripting-engines/postman-sandbox')
 const javascriptContext = require('../scripting-engines/vm-javascript-sandbox')
 const { OpenApiMockGenerator } = require('@mojaloop/ml-testing-toolkit-shared-lib')
+const utils = require('../utils')
 
 // const jsfRefFilePathPrefix = 'spec_files/jsf_ref_files/'
 
@@ -342,7 +343,8 @@ const responseRules = async (context, req) => {
     } else if (curEvent.type === 'MOCK_RESPONSE') {
       if (req.customInfo.specFile) {
         const responseGenerator = new OpenApiMockGenerator()
-        await responseGenerator.load(path.join(req.customInfo.specFile))
+        const filePath = await utils.checkUrl(path.join(req.customInfo.specFile))
+        await responseGenerator.load(filePath)
         let jsfRefs1 = []
         if (req.customInfo.jsfRefFile) {
           try {

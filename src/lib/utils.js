@@ -21,12 +21,14 @@
 
  * Mojaloop Foundation
  - Name Surname <name.surname@mojaloop.io>
+ - Shashikant Hirugade <shashi.mojaloop@gmail.com>
 
  * ModusBox
  * Georgi Logodazhki <georgi.logodazhki@modusbox.com> (Original Author)
  --------------
  ******/
 
+'use strict'
 const fs = require('fs')
 const mv = require('mv')
 const { files } = require('node-dir')
@@ -44,6 +46,8 @@ const rmdirAsync = promisify(fs.rmdir)
 const mvAsync = promisify(mv)
 const { resolve } = require('path')
 const yaml = require('js-yaml')
+const http = require('http')
+const https = require('https')
 
 const getHeader = (headers, name) => {
   return Object.entries(headers).find(
@@ -97,6 +101,83 @@ const checkUrl = async fileName => {
   }
 }
 
+const isHttpUrl = (s) => typeof s === 'string' && /^https?:\/\//i.test(s)
+
+const fetchText = (url) => new Promise((resolve, reject) => {
+  const lib = url.startsWith('https://') ? https : http
+  const req = lib.get(
+    url,
+    { headers: { 'User-Agent': 'mojaloop-ttk' } },
+    (res) => {
+      // follow redirects
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        res.resume()
+        return resolve(fetchText(res.headers.location))
+      }
+
+      if (res.statusCode < 200 || res.statusCode >= 300) {
+        const chunks = []
+        res.on('data', (c) => chunks.push(c))
+        res.on('end', () => {
+          const body = Buffer.concat(chunks).toString('utf8')
+          reject(new Error(`Failed to fetch ${url}: HTTP ${res.statusCode}\n${body.slice(0, 500)}`))
+        })
+        return
+      }
+
+      const chunks = []
+      res.on('data', (c) => chunks.push(c))
+      res.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')))
+    }
+  )
+  req.on('error', reject)
+})
+
+const parseJsonOrYaml = (content, label = 'content') => {
+  try {
+    return JSON.parse(content)
+  } catch (jsonErr) {
+    try {
+      return yaml.load(content)
+    } catch (yamlErr) {
+      throw new Error(`Failed to parse ${label} as JSON or YAML: ${jsonErr.message}; ${yamlErr.message}`)
+    }
+  }
+}
+
+/**
+ * resolveAndLoad:
+ * - accepts a local file path OR a direct URL
+ * - if local file content is JSON/YAML -> returns parsed value
+ * - if local file content is a URL string -> fetches it and returns parsed value
+ * - if argument itself is a URL -> fetches it and returns parsed value
+ *
+ * NOTE: This function resolves relative file paths using TTK_ROOT.
+ */
+const resolveAndLoad = async (filePathOrUrl) => {
+  // If caller passes URL directly
+  if (isHttpUrl(filePathOrUrl)) {
+    const remoteText = await fetchText(filePathOrUrl)
+    return parseJsonOrYaml(remoteText, filePathOrUrl)
+  }
+
+  // Treat as local file; resolve relative path via TTK_ROOT
+  const localPath = resolveRoot(filePathOrUrl)
+  const localText = await fs.promises.readFile(localPath, 'utf8')
+
+  // Parse local JSON/YAML
+  const parsedLocal = parseJsonOrYaml(localText, localPath)
+
+  // If local content is a URL string, follow it
+  if (isHttpUrl(parsedLocal)) {
+    const remoteText = await fetchText(parsedLocal)
+    return parseJsonOrYaml(remoteText, parsedLocal)
+  }
+
+  // Otherwise local file contained actual JSON/YAML content
+  return parsedLocal
+}
+
 module.exports = {
   readFileAsync: resolve1(readFileAsync),
   writeFileAsync: resolve1(writeFileAsync),
@@ -113,5 +194,6 @@ module.exports = {
   headersToLowerCase,
   urlToPath,
   checkUrl,
+  resolveAndLoad,
   resolve: resolveRoot
 }

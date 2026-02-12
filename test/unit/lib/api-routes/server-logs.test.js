@@ -48,20 +48,43 @@ jest.mock('../../../../src/lib/server-logs')
 describe('API route /serverlogs', () => {
   beforeEach(() => {
     requestLogger.logMessage.mockReturnValue()
-    ServerLogs.search.mockReturnValue({})
+    ServerLogs.search.mockReset()
   })
+
   describe('GET /api/serverlogs/search', () => {
     it('Search logs by traceId', async () => {
-      ServerLogs.search.mockReturnValueOnce({ hits: { total: 1 }})
-      const res = await request(app).get(`/api/serverlogs/search`).query({ traceId: 'mockTraceId' }).send() 
+      ServerLogs.search.mockResolvedValueOnce({ hits: { total: 1 } })
+      const res = await request(app)
+        .get('/api/serverlogs/search')
+        .query({ traceId: 'mockTraceId' })
+        .send()
+
       expect(res.statusCode).toEqual(200)
       expect(res.body).toHaveProperty('hits')
+      expect(ServerLogs.search).toHaveBeenCalledWith({ query: { traceId: 'mockTraceId' } })
     })
-    it('Search logs by traceId, empty queryString', async () => {
-        ServerLogs.search.mockReturnValueOnce({ hits: { total: 1 }})
-        const res = await request(app).get(`/api/serverlogs/search`).send() 
-        expect(res.statusCode).toEqual(200)
-        expect(res.body).not.toHaveProperty('hits')
-      })
+
+    it('Does not call search when queryString is empty', async () => {
+      const res = await request(app)
+        .get('/api/serverlogs/search')
+        .send()
+
+      expect(res.statusCode).toEqual(200)
+      expect(res.body).toEqual([])              // results default
+      expect(ServerLogs.search).not.toHaveBeenCalled()
+    })
+
+    it('Returns 500 when ServerLogs.search throws', async () => {
+      ServerLogs.search.mockRejectedValueOnce(new Error('boom'))
+
+      const res = await request(app)
+        .get('/api/serverlogs/search')
+        .query({ traceId: 'mockTraceId' })
+        .send()
+
+      expect(res.statusCode).toEqual(500)
+      expect(res.body).toEqual({ error: 'boom' })
+      expect(ServerLogs.search).toHaveBeenCalled()
+    })
   })
 })
