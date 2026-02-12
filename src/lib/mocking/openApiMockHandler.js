@@ -275,8 +275,11 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
   let responseBody, responseStatus
   // Check for response map file
   try {
-    const respMapRawdata = await utils.readFileAsync(item.responseMapFile)
-    const responseMap = JSON.parse(respMapRawdata)
+    const respMapRawdata = await utils.loadJsonOrYamlMaybeUrl(item.responseMapFile)
+    const responseMap =
+    (typeof respMapRawdata === 'string')
+      ? JSON.parse(respMapRawdata)
+      : respMapRawdata
     if (responseMap && responseMap[context.operation.path] && responseMap[context.operation.path][context.request.method]) {
       const responseInfo = responseMap[context.operation.path][context.request.method]
       req.customInfo.responseInfo = responseInfo
@@ -346,8 +349,11 @@ const generateAsyncCallback = async (item, context, req) => {
 
     // Getting callback info from callback map file
     try {
-      const cbMapRawdata = await utils.readFileAsync(item.callbackMapFile)
-      const callbackMap = JSON.parse(cbMapRawdata)
+      const cbMapRawdata = await utils.loadJsonOrYamlMaybeUrl(item.callbackMapFile)
+      const callbackMap =
+      (typeof cbMapRawdata === 'string')
+        ? JSON.parse(cbMapRawdata)
+        : cbMapRawdata
       if (!callbackMap[context.operation.path]) {
         customLogger.logMessage('error', 'Callback not found for path in callback map file for ' + context.operation.path, req.customInfo.user, { request: req })
         return

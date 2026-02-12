@@ -42,7 +42,7 @@ const Config = require('../config')
 const customLogger = require('../requestLogger')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
-const { readFileAsync, headersToLowerCase } = require('../utils')
+const { loadJsonOrYamlMaybeUrl, headersToLowerCase } = require('../utils')
 const expectOriginal = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
@@ -362,8 +362,11 @@ const processTestCase = async (
         let successCallbackUrl = null
         let errorCallbackUrl = null
         if (reqApiDefinition?.asynchronous === true) {
-          const cbMapRawdata = await readFileAsync(reqApiDefinition.callbackMapFile)
-          const reqCallbackMap = JSON.parse(cbMapRawdata)
+          const cbMapRawdata = await loadJsonOrYamlMaybeUrl(reqApiDefinition.callbackMapFile)
+          const reqCallbackMap =
+            (typeof cbMapRawdata === 'string')
+              ? JSON.parse(cbMapRawdata)
+              : cbMapRawdata          
           if (reqCallbackMap[request.operationPath] && reqCallbackMap[request.operationPath][request.method]) {
             const successCallback = reqCallbackMap[request.operationPath][request.method].successCallback
             const errorCallback = reqCallbackMap[request.operationPath][request.method].errorCallback
