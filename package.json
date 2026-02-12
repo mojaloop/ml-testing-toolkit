@@ -8,7 +8,8 @@
     "Georgi Logodazhki <georgi.logodazhki@modusbox.com>",
     "Sam Kummary <sam@modusbox.com>",
     "Steven Oderayi <steven.oderayi@modusbox.com>",
-    "Vijay Kumar <vijaya.guthi@modusbox.com>"
+    "Vijay Kumar <vijaya.guthi@modusbox.com>",
+    "Shashikant Hirugade <shashi.mojaloop@gmail.com>"
   ],
   "engines": {
     "node": ">=22.x"
@@ -71,7 +72,7 @@
     "genexec": "pkg -t node8-win ."
   },
   "dependencies": {
-    "@elastic/elasticsearch": "9.3.0",
+    "@elastic/elasticsearch": "9.3.1",
     "@hapi/basic": "7.0.2",
     "@hapi/boom": "10.0.1",
     "@hapi/good": "9.0.1",
@@ -88,7 +89,7 @@
     "adm-zip": "0.5.16",
     "ajv-formats": "3.0.1",
     "atob": "2.1.2",
-    "axios": "1.13.4",
+    "axios": "1.13.5",
     "chai": "4.4.1",
     "connection-string": "^5.0.0",
     "cookie-parser": "1.4.7",
@@ -97,7 +98,6 @@
     "dotenv": "17.2.4",
     "express": "5.2.1",
     "express-validator": "7.3.1",
-    "fs": "0.0.1-security",
     "handlebars": "4.7.8",
     "hapi-auth-bearer-token": "8.0.0",
     "hapi-openapi": "3.0.0",
@@ -108,7 +108,7 @@
     "json-rules-engine": "7.3.1",
     "jsonwebtoken": "9.0.3",
     "lodash": "4.17.23",
-    "mongoose": "9.1.6",
+    "mongoose": "9.2.1",
     "multer": "2.0.2",
     "mustache": "4.2.0",
     "mv": "2.1.1",
@@ -169,6 +169,7 @@
     }
   },
   "overrides": {
+    "axios": "1.13.5",
     "form-data": "4.0.4",
     "brace-expansion": "2.0.2",
     "npm-check-updates": {
@@ -178,6 +179,8 @@
       "read-package-json": "6.0.0",
       "cacache": "17.0.4"
     },
+    "lodash": "4.17.23",
+    "lodash-es": "4.17.23",
     "make-fetch-happen": {
       "cacache": "17.0.4"
     },

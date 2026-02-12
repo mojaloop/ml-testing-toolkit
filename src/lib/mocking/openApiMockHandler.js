@@ -21,6 +21,7 @@
 
  * Mojaloop Foundation
  - Name Surname <name.surname@mojaloop.io>
+ - Shashikant Hirugade <shashi.mojaloop@gmail.com>
 
  * ModusBox
  * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
@@ -275,7 +276,7 @@ const openApiBackendNotImplementedHandler = async (context, req, h, item) => {
   let responseBody, responseStatus
   // Check for response map file
   try {
-    const respMapRawdata = await utils.loadJsonOrYamlMaybeUrl(item.responseMapFile)
+    const respMapRawdata = await utils.resolveAndLoad(item.responseMapFile)
     const responseMap =
     (typeof respMapRawdata === 'string')
       ? JSON.parse(respMapRawdata)
@@ -349,7 +350,7 @@ const generateAsyncCallback = async (item, context, req) => {
 
     // Getting callback info from callback map file
     try {
-      const cbMapRawdata = await utils.loadJsonOrYamlMaybeUrl(item.callbackMapFile)
+      const cbMapRawdata = await utils.resolveAndLoad(item.callbackMapFile)
       const callbackMap =
       (typeof cbMapRawdata === 'string')
         ? JSON.parse(cbMapRawdata)

@@ -101,14 +101,13 @@ const checkUrl = async fileName => {
   }
 }
 
-
 const isHttpUrl = (s) => typeof s === 'string' && /^https?:\/\//i.test(s)
 
 const fetchText = (url) => new Promise((resolve, reject) => {
   const lib = url.startsWith('https://') ? https : http
   const req = lib.get(
     url,
-    { headers: { 'User-Agent': 'ttk-utils/1.0' } },
+    { headers: { 'User-Agent': 'mojaloop-ttk' } },
     (res) => {
       // follow redirects
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
@@ -147,7 +146,7 @@ const parseJsonOrYaml = (content, label = 'content') => {
 }
 
 /**
- * loadJsonOrYamlMaybeUrl:
+ * resolveAndLoad:
  * - accepts a local file path OR a direct URL
  * - if local file content is JSON/YAML -> returns parsed value
  * - if local file content is a URL string -> fetches it and returns parsed value
@@ -155,7 +154,7 @@ const parseJsonOrYaml = (content, label = 'content') => {
  *
  * NOTE: This function resolves relative file paths using TTK_ROOT.
  */
-const loadJsonOrYamlMaybeUrl = async (filePathOrUrl) => {
+const resolveAndLoad = async (filePathOrUrl) => {
   // If caller passes URL directly
   if (isHttpUrl(filePathOrUrl)) {
     const remoteText = await fetchText(filePathOrUrl)
@@ -195,6 +194,6 @@ module.exports = {
   headersToLowerCase,
   urlToPath,
   checkUrl,
-  loadJsonOrYamlMaybeUrl,
+  resolveAndLoad,
   resolve: resolveRoot
 }
