@@ -1,3 +1,5 @@
+scan-type: source
+
 ignore:
   - vulnerability: GHSA-37qj-frw5-hhjh
   - vulnerability: GHSA-xxjr-mmjv-4gpg
