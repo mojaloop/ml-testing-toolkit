@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.19.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.19.1...v18.19.2) (2026-02-26)
+
+
+### Chore
+
+* **ci:** update CircleCI orb to 1.1.16 ([#373](https://github.com/mojaloop/ml-testing-toolkit/issues/373)) ([6927427](https://github.com/mojaloop/ml-testing-toolkit/commit/6927427e44fce0e1947fb837553babb30c6aaad1))
+
 ### [18.19.1](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.19.0...v18.19.1) (2026-02-12)
 
 
