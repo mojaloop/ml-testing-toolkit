@@ -21,6 +21,7 @@
 
  * Mojaloop Foundation
  - Name Surname <name.surname@mojaloop.io>
+ - Shashikant Hirugade <shashi.mojaloop@gmail.com>
 
  * ModusBox
  * Georgi Logodazhki <georgi.logodazhki@modusbox.com>
@@ -42,7 +43,7 @@ const Config = require('../config')
 const customLogger = require('../requestLogger')
 const MyEventEmitter = require('../MyEventEmitter')
 const notificationEmitter = require('../notificationEmitter.js')
-const { readFileAsync, headersToLowerCase } = require('../utils')
+const { resolveAndLoad, headersToLowerCase } = require('../utils')
 const expectOriginal = require('chai').expect // eslint-disable-line
 const JwsSigning = require('../jws/JwsSigning')
 const ConnectionProvider = require('../configuration-providers/mb-connection-manager')
@@ -319,7 +320,7 @@ const processTestCase = async (
 
       // Insert traceparent header if sessionID passed
       if (tracing.sessionID || saveReport) {
-        convertedRequest.headers.traceparent = '00-' + requestTraceId + '-' + String(testCaseIndex).padStart(8, '0') + String(requestIndex).padStart(8, '0') + '-01'
+        convertedRequest.headers.traceparent = '00-' + requestTraceId + '-' + crypto.randomBytes(8).toString('hex') + '-01'
         // todo: think about proper traceparent header
       }
 
@@ -362,8 +363,11 @@ const processTestCase = async (
         let successCallbackUrl = null
         let errorCallbackUrl = null
         if (reqApiDefinition?.asynchronous === true) {
-          const cbMapRawdata = await readFileAsync(reqApiDefinition.callbackMapFile)
-          const reqCallbackMap = JSON.parse(cbMapRawdata)
+          const cbMapRawdata = await resolveAndLoad(reqApiDefinition.callbackMapFile)
+          const reqCallbackMap =
+            (typeof cbMapRawdata === 'string')
+              ? JSON.parse(cbMapRawdata)
+              : cbMapRawdata
           if (reqCallbackMap[request.operationPath] && reqCallbackMap[request.operationPath][request.method]) {
             const successCallback = reqCallbackMap[request.operationPath][request.method].successCallback
             const errorCallback = reqCallbackMap[request.operationPath][request.method].errorCallback

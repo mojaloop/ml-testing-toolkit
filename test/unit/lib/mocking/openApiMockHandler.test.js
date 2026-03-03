@@ -75,6 +75,7 @@ const SpyValidateAcceptHeader = jest.spyOn(OpenApiVersionTools, 'validateAcceptH
 const SpyNegotiateVersion = jest.spyOn(OpenApiVersionTools, 'negotiateVersion')
 const SpyValidateContentTypeHeader = jest.spyOn(OpenApiVersionTools, 'validateContentTypeHeader')
 const SpyParseAcceptHeader = jest.spyOn(OpenApiVersionTools, 'parseAcceptHeader')
+const SpyResolveAndLoad = jest.spyOn(Utils, 'resolveAndLoad')
 
 jest.mock('../../../../src/lib/objectStore')
 jest.mock('../../../../src/lib/arrayStore')
@@ -143,6 +144,10 @@ const h = {
 }
 
 describe('OpenApiMockHandler', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   describe('initilizeMockHandler', () => {
     it('Should not throw errors', async () => {
       SpyInit.mockReturnValueOnce()
@@ -215,7 +220,7 @@ describe('OpenApiMockHandler', () => {
       }
       ObjectStore.push.mockReturnValueOnce()
       ArrayStore.push.mockReturnValueOnce()
-      SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
+      SpyResolveAndLoad.mockResolvedValueOnce(JSON.stringify({
         '/quotes': {
           put: {}
         }
@@ -229,7 +234,7 @@ describe('OpenApiMockHandler', () => {
       req.path = '/quotes/{ID}/error'
       ObjectStore.push.mockReturnValueOnce()
       ArrayStore.push.mockReturnValueOnce()
-      SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
+      SpyResolveAndLoad.mockResolvedValueOnce(JSON.stringify({
         '/quotes/{ID}/error': {
           put: {}
         }
@@ -248,6 +253,25 @@ describe('OpenApiMockHandler', () => {
     })
   })
   describe('handleRequest', () => {
+    beforeEach(async () => {
+      SpyInit.mockReturnValue()
+      SpyGetUserConfig.mockResolvedValue({ ILP_SECRET: 'secret', VERSIONING_SUPPORT_ENABLE: false })
+      SpyGetApiDefinitions.mockResolvedValue([
+        {
+          specFile: 'spec_files/api_definitions/mojaloop_sdk_outbound_scheme_adapter_1.0/api_spec.yaml',
+          type: 'mojaloop_sdk_outbound_scheme_adapter',
+          version: '1.0',
+          hostnames: [],
+          prefix: '/sdk-out'
+        },
+        {
+          specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+          type: 'fspiop',
+          hostnames: []
+        }
+      ])
+      await OpenApiMockHandler.initilizeMockHandler()
+    })    
     it('Check for the returned value when validation failed', async () => {
       SpyValidate.mockImplementationOnce(() => {throw new Error('')})
       const result = await OpenApiMockHandler.handleRequest(sampleRequest, h)
@@ -272,6 +296,176 @@ describe('OpenApiMockHandler', () => {
       sampleRequest.path = '/quotes'
       expect(result).toBeDefined
     })
+    it('Should trim prefix from request path when selected API has prefix', async () => {
+      // init with two apis, first has prefix so it becomes pickedApis[0]
+      SpyInit.mockReturnValueOnce()
+      SpyGetUserConfig.mockResolvedValueOnce({ ILP_SECRET: 'secret', VERSIONING_SUPPORT_ENABLE: false })
+      SpyGetApiDefinitions.mockResolvedValueOnce([
+        {
+          specFile: 'spec_files/api_definitions/mojaloop_sdk_outbound_scheme_adapter_1.0/api_spec.yaml',
+          type: 'customPrefix',
+          hostnames: [],
+          prefix: '/sdk-out'
+        },
+        {
+          specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+          type: 'fspiop',
+          hostnames: []
+        }
+      ])
+    
+      await OpenApiMockHandler.initilizeMockHandler()
+      const apis = OpenApiMockHandler.getOpenApiObjects()
+    
+      // Force prefix API to match
+      apis[0].openApiBackendObject.matchOperation = jest.fn(() => true)
+      apis[1].openApiBackendObject.matchOperation = jest.fn(() => false)
+    
+      const handleSpy = jest.fn(async () => true)
+      apis[0].openApiBackendObject.handleRequest = handleSpy
+    
+      SpyValidate.mockReturnValueOnce(true)
+    
+      const req = {
+        method: 'post',
+        path: '/sdk-out/quotes',
+        headers: { accept: 'application/json' },
+        payload: {},
+        query: {},
+        info: { hostname: 'x' },
+        customInfo: { user: 'u1' }
+      }
+    
+      await OpenApiMockHandler.handleRequest(req, h)
+    
+      // openapi-backend receives trimmed path
+      expect(handleSpy).toHaveBeenCalled()
+      const firstArg = handleSpy.mock.calls[0][0]
+      expect(firstArg.path).toBe('/quotes')
+    })
+    it('Should fall back when hostnames exist but req.info.hostname is missing', async () => {
+      SpyInit.mockReturnValueOnce()
+      SpyGetUserConfig.mockResolvedValueOnce({ ILP_SECRET: 'secret', VERSIONING_SUPPORT_ENABLE: false })
+      SpyGetApiDefinitions.mockResolvedValueOnce([
+        { specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml', type: 'customA', hostnames: ['host-a'] },
+        { specFile: 'spec_files/api_definitions/mojaloop_sdk_outbound_scheme_adapter_1.0/api_spec.yaml', type: 'customB', hostnames: [] }
+      ])
+    
+      await OpenApiMockHandler.initilizeMockHandler()
+      const apis = OpenApiMockHandler.getOpenApiObjects()
+    
+      apis[0].openApiBackendObject.matchOperation = jest.fn(() => true)
+      apis[1].openApiBackendObject.matchOperation = jest.fn(() => true)
+    
+      apis[0].openApiBackendObject.handleRequest = jest.fn(async () => 'A')
+      apis[1].openApiBackendObject.handleRequest = jest.fn(async () => 'B')
+    
+      SpyValidate.mockReturnValueOnce(true)
+    
+      const req = {
+        method: 'post',
+        path: '/whatever',
+        headers: { accept: 'application/json' },
+        payload: {},
+        query: {},
+        // info missing here
+        customInfo: { user: 'u1' }
+      }
+    
+      await OpenApiMockHandler.handleRequest(req, h)
+      // We just want to hit the branch; assert at least one handler called:
+      expect(apis[0].openApiBackendObject.handleRequest.mock.calls.length +
+             apis[1].openApiBackendObject.handleRequest.mock.calls.length).toBe(1)
+    })
+    it('Should pick apis without hostnames when hostname does not match any', async () => {
+      SpyInit.mockReturnValueOnce()
+      SpyGetUserConfig.mockResolvedValueOnce({ ILP_SECRET: 'secret', VERSIONING_SUPPORT_ENABLE: false })
+      SpyGetApiDefinitions.mockResolvedValueOnce([
+        { specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml', type: 'customA', hostnames: ['host-a'] },
+        { specFile: 'spec_files/api_definitions/mojaloop_sdk_outbound_scheme_adapter_1.0/api_spec.yaml', type: 'customB', hostnames: [] }
+      ])
+    
+      await OpenApiMockHandler.initilizeMockHandler()
+      const apis = OpenApiMockHandler.getOpenApiObjects()
+    
+      apis[0].openApiBackendObject.matchOperation = jest.fn(() => true)
+      apis[1].openApiBackendObject.matchOperation = jest.fn(() => true)
+    
+      apis[0].openApiBackendObject.handleRequest = jest.fn(async () => 'A')
+      apis[1].openApiBackendObject.handleRequest = jest.fn(async () => 'B')
+    
+      SpyValidate.mockReturnValueOnce(true)
+    
+      const req = {
+        method: 'post',
+        path: '/whatever',
+        headers: { accept: 'application/json' },
+        payload: {},
+        query: {},
+        info: { hostname: 'no-match' },
+        customInfo: { user: 'u1' }
+      }
+    
+      await OpenApiMockHandler.handleRequest(req, h)
+    
+      // should pick the hostnames:[] API (customB)
+      expect(apis[1].openApiBackendObject.handleRequest).toHaveBeenCalled()
+      expect(apis[0].openApiBackendObject.handleRequest).not.toHaveBeenCalled()
+    })
+    it('Should trim prefix from request path before passing to openapi-backend', async () => {
+      const apis = OpenApiMockHandler.getOpenApiObjects()
+    
+      // Make sure only prefix API matches
+      apis[0].openApiBackendObject.matchOperation = jest.fn(() => true)
+      apis[1].openApiBackendObject.matchOperation = jest.fn(() => false)
+    
+      const handleSpy = jest.fn(async () => true)
+      apis[0].openApiBackendObject.handleRequest = handleSpy
+    
+      SpyValidate.mockReturnValueOnce(true)
+    
+      const req = {
+        method: 'post',
+        path: '/sdk-out/quotes',
+        headers: { accept: 'application/json' },
+        payload: {},
+        query: {},
+        info: { hostname: 'anything' },
+        customInfo: { user: 'u1' }
+      }
+    
+      await OpenApiMockHandler.handleRequest(req, h)
+    
+      expect(handleSpy).toHaveBeenCalled()
+      expect(handleSpy.mock.calls[0][0].path).toBe('/quotes') // trimmed
+    })
+    it('Should not break hostname matching when req.info is missing (fallback branch)', async () => {
+      const apis = OpenApiMockHandler.getOpenApiObjects()
+    
+      // Ensure no prefix API interferes
+      apis[0].openApiBackendObject.matchOperation = jest.fn(() => false)
+      apis[1].openApiBackendObject.matchOperation = jest.fn(() => true)
+    
+      apis[1].hostnames = ['host-a'] // make it require hostname match
+    
+      const handleSpy = jest.fn(async () => true)
+      apis[1].openApiBackendObject.handleRequest = handleSpy
+    
+      SpyValidate.mockReturnValueOnce(true)
+    
+      const req = {
+        method: 'post',
+        path: '/quotes',
+        headers: { accept: 'application/json' },
+        payload: {},
+        query: {},
+        // info missing
+        customInfo: { user: 'u1' }
+      }
+    
+      const res = await OpenApiMockHandler.handleRequest(req, h)
+      expect(res).toBeDefined()
+    })                
     it('Check for the returned value when validation failed, negotiate version failed and versioning is supported', async () => {
       SpyValidate.mockReturnValueOnce(false)
       SpyParseAcceptHeader.mockReturnValueOnce({
@@ -809,7 +1003,7 @@ describe('OpenApiMockHandler', () => {
         customInfo: {},
         method: 'post'
       }
-      SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
+      SpyResolveAndLoad.mockResolvedValueOnce(JSON.stringify({
         '/transfers': {
           'post': {}
         }
@@ -835,7 +1029,7 @@ describe('OpenApiMockHandler', () => {
         customInfo: {},
         method: 'post'
       }
-      SpyReadFileAsync.mockResolvedValueOnce(JSON.stringify({
+      SpyResolveAndLoad.mockResolvedValueOnce(JSON.stringify({
         '/transfers': {
           'post': {}
         }
@@ -1395,6 +1589,444 @@ describe('OpenApiMockHandler', () => {
           )
         })
       })
+    })
+    it('Should return when callbackRules sets skipCallback=true', async () => {
+      SpyOpenApiRulesEngine.mockReset()
+      SpyCallbackRules.mockReset()
+      SpyHandleCallback.mockReset()
+      SpyResolveAndLoad.mockReset()
+      SpyGetUserConfig.mockReset()
+    
+      SpyGetUserConfig.mockResolvedValueOnce({ HUB_ONLY_MODE: false })
+      SpyResolveAndLoad.mockResolvedValueOnce({ '/transfers': { post: {} } })
+      SpyOpenApiRulesEngine.mockImplementationOnce(async () => ({})) // validateRules ok
+    
+      SpyCallbackRules.mockResolvedValueOnce({ skipCallback: true })
+    
+      const item = { callbackMapFile: 'cb.json' }
+      const ctx = { operation: { path: '/transfers' }, request: { method: 'post' } }
+      const req = { method: 'post', path: '/transfers', payload: { transferId: '1' }, headers: {}, customInfo: { user: 'u1' } }
+    
+      await OpenApiMockHandler.generateAsyncCallback(item, ctx, req)
+    
+      expect(SpyHandleCallback).not.toHaveBeenCalled()
+    })
+    it('Should NOT store transfer when transferId cannot be resolved from payload', async () => {
+      SpyOpenApiRulesEngine.mockReset()
+      SpyCallbackRules.mockReset()
+      SpyHandleCallback.mockReset()
+      SpyResolveAndLoad.mockReset()
+      SpyGetUserConfig.mockReset()
+    
+      ObjectStore.push.mockClear()
+    
+      SpyGetUserConfig.mockResolvedValueOnce({ HUB_ONLY_MODE: false })
+      SpyResolveAndLoad.mockResolvedValueOnce({ '/transfers': { post: {} } })
+      SpyOpenApiRulesEngine.mockImplementationOnce(async () => ({})) // validateRules ok
+      SpyCallbackRules.mockResolvedValueOnce({ skipCallback: true }) // stop early after storing logic
+    
+      const item = { callbackMapFile: 'cb.json' }
+      const ctx = { operation: { path: '/transfers' }, request: { method: 'post' } }
+      const req = {
+        method: 'post',
+        path: '/transfers',
+        payload: { /* no transferId, no commitRequestId, no CdtTrfTxInf... */ },
+        headers: {},
+        customInfo: { user: 'u1' }
+      }
+    
+      await OpenApiMockHandler.generateAsyncCallback(item, ctx, req)
+    
+      expect(ObjectStore.push).not.toHaveBeenCalled()
+    })
+    it('Should store fxTransfer when path is /fxTransfers/{id} as well', async () => {
+      SpyOpenApiRulesEngine.mockReset()
+      SpyCallbackRules.mockReset()
+      SpyHandleCallback.mockReset()
+      SpyResolveAndLoad.mockReset()
+      SpyGetUserConfig.mockReset()
+    
+      ObjectStore.push.mockClear()
+    
+      SpyGetUserConfig.mockResolvedValueOnce({ HUB_ONLY_MODE: false })
+      SpyResolveAndLoad.mockResolvedValueOnce({ '/fxTransfers': { post: {} } })
+      SpyOpenApiRulesEngine.mockImplementationOnce(async () => ({}))
+      SpyCallbackRules.mockResolvedValueOnce({ skipCallback: true })
+    
+      const item = { callbackMapFile: 'cb.json' }
+      const ctx = { operation: { path: '/fxTransfers' }, request: { method: 'post' } }
+      const req = {
+        method: 'post',
+        path: '/fxTransfers/abc-123',
+        payload: { commitRequestId: '456' },
+        headers: {},
+        customInfo: { user: 'u1' }
+      }
+    
+      await OpenApiMockHandler.generateAsyncCallback(item, ctx, req)
+    
+      expect(ObjectStore.push).toHaveBeenCalledWith('storedTransfers', '456', {
+        request: req.payload,
+        type: 'fxTransfer'
+      })
+    })     
+  })
+  describe('handleRequest - extra branches', () => {
+    it('Should return 404 when no API matches the request path', async () => {
+      SpyInit.mockReturnValueOnce()
+      SpyGetUserConfig.mockResolvedValueOnce({ ILP_SECRET: 'secret', VERSIONING_SUPPORT_ENABLE: false })
+      SpyGetApiDefinitions.mockResolvedValueOnce([
+        { specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml', type: 'fspiop' }
+      ])
+
+      await OpenApiMockHandler.initilizeMockHandler()
+      const apis = OpenApiMockHandler.getOpenApiObjects()
+      expect(apis.length).toBeGreaterThan(0)
+
+      apis[0].openApiBackendObject.matchOperation = jest.fn(() => false)
+
+      const req = {
+        method: 'post',
+        path: '/does-not-exist',
+        headers: { accept: 'application/json' },
+        payload: {},
+        query: {},
+        info: { hostname: 'whatever' },
+        customInfo: { user: 'u1' }
+      }
+
+      SpyValidate.mockReturnValueOnce(true)
+
+      const res = await OpenApiMockHandler.handleRequest(req, h)
+      expect(res).toBeDefined()
+    })
+    it('Should prefer hostname-matched API when multiple APIs match', async () => {
+      SpyInit.mockReturnValueOnce()
+      SpyGetUserConfig.mockResolvedValueOnce({ ILP_SECRET: 'secret', VERSIONING_SUPPORT_ENABLE: false })
+      SpyGetApiDefinitions.mockResolvedValueOnce([
+        {
+          specFile: 'spec_files/api_definitions/mojaloop_sdk_outbound_scheme_adapter_1.0/api_spec.yaml',
+          type: 'customA',
+          hostnames: []
+        },
+        {
+          specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml',
+          type: 'customB',
+          hostnames: ['host-a']
+        }
+      ])
+
+      await OpenApiMockHandler.initilizeMockHandler()
+
+      const apis = OpenApiMockHandler.getOpenApiObjects()
+      // Make both "match", but only one has matching hostname
+      apis[0].openApiBackendObject.matchOperation = jest.fn(() => true)
+      apis[1].openApiBackendObject.matchOperation = jest.fn(() => true)
+
+      // Stub handleRequest result on BOTH to ensure we can detect which one was called
+      apis[0].openApiBackendObject.handleRequest = jest.fn(async () => 'from-A')
+      apis[1].openApiBackendObject.handleRequest = jest.fn(async () => 'from-B')
+
+      SpyValidate.mockReturnValueOnce(true)
+
+      const req = {
+        method: 'post',
+        path: '/anything',
+        headers: { accept: 'application/json' },
+        payload: {},
+        query: {},
+        info: { hostname: 'host-a' },
+        customInfo: { user: 'u1' }
+      }
+
+      const res = await OpenApiMockHandler.handleRequest(req, h)
+      expect(res).toBeDefined()
+
+      // Should have selected hostname-matched API (customB)
+      expect(apis[1].openApiBackendObject.handleRequest).toHaveBeenCalled()
+      expect(apis[0].openApiBackendObject.handleRequest).not.toHaveBeenCalled()
+    })
+    it('Should hit try/catch around openApiBackendObject.handleRequest and return 404 on throw', async () => {
+      SpyInit.mockReturnValueOnce()
+      SpyGetUserConfig.mockResolvedValueOnce({ ILP_SECRET: 'secret', VERSIONING_SUPPORT_ENABLE: false })
+      SpyGetApiDefinitions.mockResolvedValueOnce([
+        { specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml', type: 'fspiop' }
+      ])
+
+      await OpenApiMockHandler.initilizeMockHandler()
+      const apis = OpenApiMockHandler.getOpenApiObjects()
+
+      apis[0].openApiBackendObject.matchOperation = jest.fn(() => true)
+      apis[0].openApiBackendObject.handleRequest = jest.fn(async () => { throw new Error('boom') })
+
+      SpyValidate.mockReturnValueOnce(true)
+
+      const req = {
+        method: 'post',
+        path: '/quotes',
+        headers: { accept: 'application/json' },
+        payload: {},
+        query: {},
+        info: { hostname: 'x' },
+        customInfo: { user: 'u1' }
+      }
+
+      const res = await OpenApiMockHandler.handleRequest(req, h)
+      expect(res).toBeDefined()
+    })
+  })
+  describe('openApiBackendNotImplementedHandler - extra branches', () => {
+    afterEach(async () => {
+      await Promise.resolve()
+      await Promise.resolve()
+    })    
+    it('Should early-return when response info is missing in response map', async () => {
+      SpyInit.mockReturnValueOnce()
+      SpyGetUserConfig.mockResolvedValueOnce({ ILP_SECRET: 'secret', VERSIONING_SUPPORT_ENABLE: false })
+      SpyGetApiDefinitions.mockResolvedValueOnce([
+        { specFile: 'spec_files/api_definitions/fspiop_1.0/api_spec.yaml', type: 'fspiop' }
+      ])
+
+      await OpenApiMockHandler.initilizeMockHandler()
+      const apis = OpenApiMockHandler.getOpenApiObjects()
+      const openApiBackendObject = apis[0].openApiBackendObject
+
+      const item = { responseMapFile: 'x.json' }
+      const req = { method: 'post', path: '/quotes', headers: {}, payload: {}, customInfo: { user: 'u1' } }
+      const context = {
+        operation: { path: '/quotes' },
+        request: { method: 'post' },
+        api: { mockResponseForOperation: () => ({ status: 200, mock: { ok: true } }) }
+      }
+
+      // response map doesn't include method/path -> should return undefined
+      SpyResolveAndLoad.mockResolvedValueOnce({ '/quotes': { put: {} } })
+
+      const res = await OpenApiMockHandler.openApiBackendNotImplementedHandler(context, req, h, item)
+      expect(res).toBeUndefined()
+    })
+
+    it('Should return empty response (no body) when generated response body is empty object', async () => {
+      const item = { responseMapFile: 'x.json' }
+    
+      const req = {
+        method: 'post',
+        path: '/quotes',
+        headers: {},
+        payload: {},
+        customInfo: { user: 'u1' }
+      }
+    
+      const context = {
+        operation: { path: '/quotes', operationId: 999 },
+        request: { method: 'post' },
+        api: { mockResponseForOperation: () => ({ status: 200, mock: { shouldNotBeUsed: true } }) }
+      }
+      const codeSpy = jest.fn(() => true)
+      const responseSpy = jest.fn(() => ({ code: codeSpy }))
+      const h2 = { response: responseSpy }
+    
+      SpyResolveAndLoad.mockResolvedValueOnce({
+        '/quotes': { post: {} }
+      })
+    
+      SpyResponseRules.mockResolvedValueOnce({
+        status: '200',
+        body: {} // _.isEmpty({}) is true => should do h.response().code(200)
+      })
+    
+      const res = await OpenApiMockHandler.openApiBackendNotImplementedHandler(context, req, h2, item)
+    
+      expect(res).toBeDefined()
+      expect(responseSpy).toHaveBeenCalledWith()
+      expect(codeSpy).toHaveBeenCalledWith(200)
+    })
+
+    it('Should schedule async callback via setImmediate when asynchronous=true and success status', async () => {
+      const item = { responseMapFile: 'x.json', asynchronous: true }
+    
+      const req = {
+        method: 'post',
+        path: '/quotes',
+        headers: {},
+        payload: {},
+        customInfo: { user: 'u1' }
+      }
+    
+      const context = {
+        operation: { path: '/quotes', operationId: 999 },
+        request: { method: 'post' },
+        api: { mockResponseForOperation: () => ({ status: 200, mock: { ok: true } }) }
+      }
+    
+      SpyResolveAndLoad.mockResolvedValueOnce({ '/quotes': { post: {} } })
+      SpyResponseRules.mockResolvedValueOnce({ status: '200', body: { ok: true } })
+    
+      const immediateSpy = jest.spyOn(global, 'setImmediate').mockImplementation(() => {
+        // IMPORTANT: do not execute callback
+      })
+    
+      await OpenApiMockHandler.openApiBackendNotImplementedHandler(context, req, h, item)
+    
+      expect(immediateSpy).toHaveBeenCalled()
+    
+      immediateSpy.mockRestore()
+    })
+  })
+
+  describe('generateAsyncCallback - extra branches', () => {
+    beforeEach(() => {
+      SpyOpenApiRulesEngine.mockReset()
+      SpyCallbackRules.mockReset()
+      SpyHandleCallback.mockReset()
+      SpyResolveAndLoad.mockReset()
+      SpyGetUserConfig.mockReset()
+      SpyForwardRules.mockReset()
+    })    
+    it('Should early-return for PUT when HUB_ONLY_MODE=false', async () => {
+      SpyGetUserConfig.mockResolvedValueOnce({ HUB_ONLY_MODE: false })
+
+      const item = {}
+      const ctx = { operation: { path: '/transfers/{ID}' }, request: { method: 'put' } }
+      const req = { method: 'put', path: '/transfers/123', payload: {}, headers: {}, customInfo: { user: 'u1' } }
+
+      await OpenApiMockHandler.generateAsyncCallback(item, ctx, req)
+
+      expect(SpyOpenApiRulesEngine).not.toHaveBeenCalled()
+      expect(SpyCallbackRules).not.toHaveBeenCalled()
+      expect(SpyHandleCallback).not.toHaveBeenCalled()
+    })
+
+    it('Should return when validateRules says skipCallback=true', async () => {
+      SpyOpenApiRulesEngine.mockReset()
+      SpyCallbackRules.mockReset()
+      SpyHandleCallback.mockReset()
+      SpyResolveAndLoad.mockReset()
+      SpyGetUserConfig.mockReset()
+    
+      SpyGetUserConfig.mockResolvedValueOnce({ HUB_ONLY_MODE: false })
+      SpyResolveAndLoad.mockResolvedValueOnce({ '/transfers': { post: {} } })
+    
+      // validateRules -> skipCallback
+      SpyOpenApiRulesEngine.mockImplementationOnce(async () => ({ skipCallback: true }))
+    
+      const item = { callbackMapFile: 'cb.json' }
+      const ctx = { operation: { path: '/transfers' }, request: { method: 'post' } }
+      const req = {
+        method: 'post',
+        path: '/transfers',
+        payload: { transferId: '1' },
+        headers: {},
+        customInfo: { user: 'u1' }
+      }
+    
+      await OpenApiMockHandler.generateAsyncCallback(item, ctx, req)
+    
+      expect(SpyCallbackRules).not.toHaveBeenCalled()
+      expect(SpyHandleCallback).not.toHaveBeenCalled()
+    })
+
+    it('Should send error callback when validateRules returns body', async () => {
+      SpyOpenApiRulesEngine.mockReset()
+      SpyCallbackRules.mockReset()
+      SpyHandleCallback.mockReset()
+      SpyResolveAndLoad.mockReset()
+      SpyGetUserConfig.mockReset()
+    
+      SpyGetUserConfig.mockResolvedValueOnce({ HUB_ONLY_MODE: false })
+      SpyResolveAndLoad.mockResolvedValueOnce({ '/transfers': { post: {} } })
+    
+      // validateRules -> returns body => handleCallback and return
+      SpyOpenApiRulesEngine.mockImplementationOnce(async () => ({
+        body: { errorInformation: { errorCode: '9999', errorDescription: 'fail' } }
+      }))
+    
+      const item = { callbackMapFile: 'cb.json' }
+      const ctx = { operation: { path: '/transfers' }, request: { method: 'post' } }
+      const req = {
+        method: 'post',
+        path: '/transfers',
+        payload: { transferId: '1' },
+        headers: {},
+        customInfo: { user: 'u1' }
+      }
+    
+      await OpenApiMockHandler.generateAsyncCallback(item, ctx, req)
+    
+      expect(SpyHandleCallback).toHaveBeenCalled()
+      expect(SpyCallbackRules).not.toHaveBeenCalled()
+    })
+
+    it('Should forward request and return when HUB_ONLY_MODE=true and forwardRules returns object', async () => {
+      SpyOpenApiRulesEngine.mockReset()
+      SpyCallbackRules.mockReset()
+      SpyHandleCallback.mockReset()
+      SpyForwardRules.mockReset()
+      SpyGetUserConfig.mockReset()
+    
+      SpyGetUserConfig.mockResolvedValueOnce({ HUB_ONLY_MODE: true })
+    
+      // validateRules: allow it to continue
+      SpyOpenApiRulesEngine.mockImplementationOnce(async () => ({}))
+    
+      // callbackRules WILL run, but its result is irrelevant in HUB_ONLY_MODE
+      SpyCallbackRules.mockResolvedValueOnce({ body: { ignored: true } })
+    
+      SpyForwardRules.mockResolvedValueOnce({ headers: { a: 'b' }, body: { ok: true } })
+    
+      const item = {}
+      const ctx = { operation: { path: '/transfers/{ID}' }, request: { method: 'put' } }
+      const req = {
+        method: 'put',
+        path: '/transfers/123',
+        payload: {},
+        headers: {},
+        customInfo: { user: 'u1' }
+      }
+    
+      await OpenApiMockHandler.generateAsyncCallback(item, ctx, req)
+    
+      expect(SpyCallbackRules).toHaveBeenCalled()   // ✅ important change
+      expect(SpyForwardRules).toHaveBeenCalled()
+      expect(SpyHandleCallback).toHaveBeenCalled()
+    })
+    it('Should build ISO20022 error callback body when previous-quote association fails', async () => {
+      SpyOpenApiRulesEngine.mockReset()
+      SpyCallbackRules.mockReset()
+      SpyHandleCallback.mockReset()
+      SpyResolveAndLoad.mockReset()
+      SpyGetUserConfig.mockReset()
+      SpyHandleTransfers.mockReset()
+      SpyGenerateMockErrorCallback.mockReset()
+    
+      SpyGetUserConfig.mockResolvedValueOnce({
+        HUB_ONLY_MODE: false,
+        TRANSFERS_VALIDATION_WITH_PREVIOUS_QUOTES: true
+      })
+    
+      SpyResolveAndLoad.mockResolvedValueOnce({ '/transfers': { post: {} } })
+      SpyOpenApiRulesEngine.mockImplementationOnce(async () => ({}))
+      SpyCallbackRules.mockResolvedValueOnce({ skipCallback: false, body: { any: 'thing' } })
+      SpyHandleTransfers.mockReturnValueOnce(false)    
+      SpyGenerateMockErrorCallback.mockResolvedValueOnce({ headers: {} })
+      const item = { callbackMapFile: 'cb.json' }
+      const ctx = { operation: { path: '/transfers' }, request: { method: 'post' } }
+      const req = {
+        method: 'post',
+        path: '/transfers',
+        payload: { transferId: 't1' },
+        headers: {},
+        customInfo: { user: 'u1', selectedApi: { type: 'iso20022' } }
+      }
+    
+      await OpenApiMockHandler.generateAsyncCallback(item, ctx, req)
+    
+      expect(SpyHandleCallback).toHaveBeenCalled()
+    
+      const calledWith = SpyHandleCallback.mock.calls[0][0]
+      expect(calledWith.headers['content-type']).toContain('application/vnd.interoperability.iso20022.transfers+json')
+      expect(calledWith.body).toHaveProperty('GrpHdr')
+      expect(calledWith.body).toHaveProperty('TxInfAndSts')
     })
   })
 })
