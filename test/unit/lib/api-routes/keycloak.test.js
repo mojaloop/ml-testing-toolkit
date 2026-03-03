@@ -21,105 +21,139 @@
 
  * Mojaloop Foundation
  - Name Surname <name.surname@mojaloop.io>
+ - Shashikant Hirugade <shashi.mojaloop@gmail.com>
 
- * ModusBox
- * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
 
 'use strict'
 
-const request = require('supertest')
 const express = require('express')
-const keycloakRoutes = require('../../../../src/lib/api-routes/keycloak')
+const request = require('supertest')
+
+jest.mock('../../../../src/lib/oauth/KeycloakHelper', () => ({
+  getClientAuthInfo: jest.fn(),
+  getTokenInfo: jest.fn()
+}))
+
 const KeycloakHelper = require('../../../../src/lib/oauth/KeycloakHelper')
+const router = require('../../../../src/lib/api-routes/keycloak.js')
 
-jest.mock('../../../../src/lib/oauth/KeycloakHelper')
+const makeApp = () => {
+  const app = express()
+  app.use(express.json())
 
-describe('Keycloak API Routes', () => {
-  let app
+  // Add a tiny middleware to populate req.user for /clientinfo
+  app.use((req, res, next) => {
+    req.user = { sub: 'user-123', name: 'Test User' }
+    next()
+  })
 
+  app.use(router)
+  return app
+}
+
+describe('Auth router', () => {
   beforeEach(() => {
-    app = express()
-    app.use(express.json())
-    app.use((req, res, next) => {
-      req.user = { dfspId: 'test-dfsp', groups: ['test-group'] }
-      next()
-    })
-    app.use('/keycloak', keycloakRoutes)
     jest.clearAllMocks()
   })
 
   describe('GET /clientinfo', () => {
-    it('should return client info successfully', async () => {
-      const mockResponse = { clientId: 'test-client', clientSecret: 'secret' }
-      KeycloakHelper.getClientAuthInfo.mockResolvedValue(mockResponse)
+    it('should return 200 with client info', async () => {
+      const app = makeApp()
 
-      const response = await request(app)
-        .get('/keycloak/clientinfo')
-        .expect(200)
+      KeycloakHelper.getClientAuthInfo.mockResolvedValue({
+        clientId: 'abc',
+        roles: ['role1']
+      })
 
-      expect(response.body).toEqual(mockResponse)
-      expect(KeycloakHelper.getClientAuthInfo).toHaveBeenCalledWith({ dfspId: 'test-dfsp', groups: ['test-group'] })
+      const res = await request(app).get('/clientinfo').expect(200)
+
+      expect(res.body).toEqual({ clientId: 'abc', roles: ['role1'] })
+
+      // verify req.user was passed through
+      expect(KeycloakHelper.getClientAuthInfo).toHaveBeenCalledTimes(1)
+      expect(KeycloakHelper.getClientAuthInfo).toHaveBeenCalledWith({
+        sub: 'user-123',
+        name: 'Test User'
+      })
     })
 
-    it('should handle errors and return 500', async () => {
-      const mockError = new Error('Failed to get client info')
-      KeycloakHelper.getClientAuthInfo.mockRejectedValue(mockError)
+    it('should return 500 when KeycloakHelper throws and include message', async () => {
+      const app = makeApp()
 
-      const response = await request(app)
-        .get('/keycloak/clientinfo')
-        .expect(500)
+      KeycloakHelper.getClientAuthInfo.mockRejectedValue(new Error('boom'))
 
-      expect(response.body).toEqual({ error: 'Failed to get client info' })
+      const res = await request(app).get('/clientinfo').expect(500)
+
+      expect(res.body).toEqual({ error: 'boom' })
+      expect(KeycloakHelper.getClientAuthInfo).toHaveBeenCalledTimes(1)
     })
 
-    it('should handle errors without message', async () => {
-      KeycloakHelper.getClientAuthInfo.mockRejectedValue(null)
+    it('should return 500 with empty error if thrown value has no message', async () => {
+      const app = makeApp()
 
-      const response = await request(app)
-        .get('/keycloak/clientinfo')
-        .expect(500)
+      // e.g. someone throws a string or plain object
+      KeycloakHelper.getClientAuthInfo.mockRejectedValue({})
 
-      expect(response.body).toEqual({ error: null })
+      const res = await request(app).get('/clientinfo').expect(500)
+
+      expect(res.body).toEqual({ error: undefined })
+      expect(KeycloakHelper.getClientAuthInfo).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('POST /tokeninfo', () => {
-    it('should return token info successfully', async () => {
-      const mockResponse = { access_token: 'token123', expires_in: 3600 }
-      KeycloakHelper.getTokenInfo.mockResolvedValue(mockResponse)
+    it('should return 200 with token info', async () => {
+      const app = makeApp()
 
-      const response = await request(app)
-        .post('/keycloak/tokeninfo')
-        .send({ token: 'some-token' })
+      KeycloakHelper.getTokenInfo.mockResolvedValue({
+        active: true,
+        scope: 'read write'
+      })
+
+      const payload = { access_token: 'abc.def.ghi' }
+
+      const res = await request(app)
+        .post('/tokeninfo')
+        .send(payload)
         .expect(200)
 
-      expect(response.body).toEqual(mockResponse)
-      expect(KeycloakHelper.getTokenInfo).toHaveBeenCalledWith({ token: 'some-token' })
+      expect(res.body).toEqual({ active: true, scope: 'read write' })
+
+      // verify req.body passed through
+      expect(KeycloakHelper.getTokenInfo).toHaveBeenCalledTimes(1)
+      expect(KeycloakHelper.getTokenInfo).toHaveBeenCalledWith(payload)
     })
 
-    it('should handle errors and return 500', async () => {
-      const mockError = new Error('Failed to get token info')
-      KeycloakHelper.getTokenInfo.mockRejectedValue(mockError)
+    it('should return 500 when KeycloakHelper throws and include message', async () => {
+      const app = makeApp()
 
-      const response = await request(app)
-        .post('/keycloak/tokeninfo')
-        .send({ token: 'some-token' })
+      KeycloakHelper.getTokenInfo.mockRejectedValue(new Error('invalid token'))
+
+      const res = await request(app)
+        .post('/tokeninfo')
+        .send({ access_token: 'bad' })
         .expect(500)
 
-      expect(response.body).toEqual({ error: 'Failed to get token info' })
+      expect(res.body).toEqual({ error: 'invalid token' })
+      expect(KeycloakHelper.getTokenInfo).toHaveBeenCalledTimes(1)
     })
 
-    it('should handle errors without message', async () => {
+    it('should return 500 with empty error if thrown value has no message', async () => {
+      const app = makeApp()
+
       KeycloakHelper.getTokenInfo.mockRejectedValue(null)
 
-      const response = await request(app)
-        .post('/keycloak/tokeninfo')
-        .send({ token: 'some-token' })
+      const res = await request(app)
+        .post('/tokeninfo')
+        .send({ access_token: 'x' })
         .expect(500)
 
-      expect(response.body).toEqual({ error: null })
+      expect(res.body).toEqual({ error: null && null.message }) // -> { error: null }
+      // simpler assertion:
+      expect(res.body).toEqual({ error: null })
+      expect(KeycloakHelper.getTokenInfo).toHaveBeenCalledTimes(1)
     })
   })
 })
