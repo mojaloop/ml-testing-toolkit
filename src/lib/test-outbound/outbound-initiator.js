@@ -319,7 +319,7 @@ const processTestCase = async (
 
       // Insert traceparent header if sessionID passed
       if (tracing.sessionID || saveReport) {
-        convertedRequest.headers.traceparent = '00-' + requestTraceId + '-' + String(testCaseIndex).padStart(8, '0') + String(requestIndex).padStart(8, '0') + '-01'
+        convertedRequest.headers.traceparent = '00-' + requestTraceId + '-' + crypto.randomBytes(8).toString('hex') + '-01'
         // todo: think about proper traceparent header
       }
 
