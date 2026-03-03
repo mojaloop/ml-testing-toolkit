@@ -92,6 +92,17 @@ describe('Server Logs', () => {
             ServerLogs.setAdapter(undefined)
             expect(ServerLogs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })).toBeUndefined()
         })
+        it('should throw error if SERVER LOGS ADAPTER config is missing while enabled', async () => {
+            spyGetSystemConfig.mockReturnValueOnce({
+                SERVER_LOGS: {
+                    ENABLED: true
+                }
+            })
+            ServerLogs.setAdapter(undefined)
+            expect(() => {
+                ServerLogs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
+            }).toThrowError('[SERVER LOGS] Adapter configuration is missing.')
+        })
         it('should use cached adapter if already set', async () => {
             const adapter = {
                 search: jest.fn().mockReturnValue([{ data: { cached: true } }])

@@ -101,6 +101,21 @@ describe('ArrayStore', () => {
       const result = ArrayStore.clear('transactions', 1)
       expect(result).toBeUndefined()
     })
+    it('should delete only expired items from array', async () => {
+      const nowSpy = jest.spyOn(Date, 'now')
+      nowSpy.mockReturnValueOnce(1000)
+      ArrayStore.push('expiringTransactions', { id: 'old-item' })
+      nowSpy.mockReturnValueOnce(2000)
+      ArrayStore.push('expiringTransactions', { id: 'new-item' })
+
+      nowSpy.mockReturnValue(2500)
+      ArrayStore.clear('expiringTransactions', 1000)
+
+      const remaining = ArrayStore.get('expiringTransactions')
+      expect(remaining).toHaveLength(1)
+      expect(remaining[0].data.id).toEqual('new-item')
+      nowSpy.mockRestore()
+    })
   })
   describe('stopArrayStore', () => {
     it('Stop Array Store should not throw an error', async () => {

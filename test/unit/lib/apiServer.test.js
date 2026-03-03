@@ -145,6 +145,23 @@ describe('api-server', () => {
       objectStore.stopObjectStore = originalObjectStop
       httpAgentStore.stop = originalHttpStop
     })
+    it('should log warning when cleanup throws an error', async () => {
+      const perfOptimizer = require('../../../src/lib/performanceOptimizer')
+      const clearAllCachesSpy = jest.spyOn(perfOptimizer, 'clearAllCaches').mockImplementation(() => {
+        throw new Error('mock cleanup failure')
+      })
+
+      apiServer.startServer(0)
+      await wait()
+      expect(() => apiServer.stopServer()).not.toThrowError()
+      expect(requestLogger.logMessage).toHaveBeenCalledWith(
+        'warn',
+        'Error during cleanup',
+        { additionalData: 'mock cleanup failure' }
+      )
+
+      clearAllCachesSpy.mockRestore()
+    })
   })
   describe('when getHttp is called', () => {
     it('should return a http server', async () => {
