@@ -6,7 +6,7 @@ ARG NODE_VERSION=lts-alpine
 #  export NODE_VERSION="$(cat .nvmrc)-alpine" \
 #  docker build \
 #    --build-arg NODE_VERSION=$NODE_VERSION \
-#    -t mojaloop/sdk-scheme-adapter:local \
+#    -t mojaloop/ml-testing-toolkit:local \
 #    . \
 #
 
