@@ -123,6 +123,28 @@ describe('api-server', () => {
       apiServer.stopServer()
       expect(() => apiServer.stopServer()).not.toThrowError()
     })
+    it('should not call optional stop handlers when they are unavailable', async () => {
+      const arrayStore = require('../../../src/lib/arrayStore')
+      const objectStore = require('../../../src/lib/objectStore')
+      const httpAgentStore = require('../../../src/lib/httpAgentStore')
+
+      const originalArrayStop = arrayStore.stopArrayStore
+      const originalObjectStop = objectStore.stopObjectStore
+      const originalHttpStop = httpAgentStore.stop
+
+      apiServer.startServer(0)
+      await wait()
+
+      arrayStore.stopArrayStore = undefined
+      objectStore.stopObjectStore = undefined
+      httpAgentStore.stop = undefined
+
+      expect(() => apiServer.stopServer()).not.toThrowError()
+
+      arrayStore.stopArrayStore = originalArrayStop
+      objectStore.stopObjectStore = originalObjectStop
+      httpAgentStore.stop = originalHttpStop
+    })
   })
   describe('when getHttp is called', () => {
     it('should return a http server', async () => {

@@ -83,6 +83,33 @@ describe('Server Logs', () => {
             ServerLogs.setAdapter(undefined)
             expect(ServerLogs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })).toBeFalsy()
         })
+        it('should return undefined if SERVER LOGS is disabled', async () => {
+            spyGetSystemConfig.mockReturnValueOnce({
+                SERVER_LOGS: {
+                    ENABLED: false
+                }
+            })
+            ServerLogs.setAdapter(undefined)
+            expect(ServerLogs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })).toBeUndefined()
+        })
+        it('should use cached adapter if already set', async () => {
+            const adapter = {
+                search: jest.fn().mockReturnValue([{ data: { cached: true } }])
+            }
+            spyGetSystemConfig.mockReturnValueOnce({
+                SERVER_LOGS: {
+                    ENABLED: true,
+                    ADAPTER: {
+                        TYPE: 'ELASTICSEARCH'
+                    }
+                }
+            })
+            ServerLogs.setAdapter(adapter)
+            const result = ServerLogs.search({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
+            expect(adapter.search).toHaveBeenCalledWith({ query: { 'metadata.trace.traceId': 'mockTraceId' } })
+            expect(result).toHaveLength(1)
+            ServerLogs.setAdapter(undefined)
+        })
         it('should throw error if SERVER LOGS ADAPTER TYPE config is unsupported', async () => {
             spyGetSystemConfig.mockReturnValueOnce({
                 SERVER_LOGS: {
