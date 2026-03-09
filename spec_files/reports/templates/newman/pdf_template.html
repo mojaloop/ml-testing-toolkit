@@ -419,7 +419,7 @@ input:checked + .slider:before {
    <h5 class="text-center">{{runtimeInformation.completedTime}}</h5>
     <br /> <br /> <br />
    <div class="row">
-    <div class="col-lg-4 col-md-4">
+    <div class="col-lg-3 col-md-3">
      <div class="card text-white card-danger">
       <div class="card-body bg-success">
        <div class="rotate">
@@ -430,7 +430,7 @@ input:checked + .slider:before {
       </div>
      </div>
     </div>
-    <div class="col-lg-4 col-md-4">
+    <div class="col-lg-3 col-md-3">
      <div class="card text-white card-warning">
       <div class="card-body bg-success">
        <div class="rotate">
@@ -441,7 +441,18 @@ input:checked + .slider:before {
       </div>
      </div>
     </div>
-    <div class="col-lg-4 col-md-4">
+    <div class="col-lg-3 col-md-3">
+     <div class="card text-white card-warning">
+      <div class="card-body bg-warning">
+       <div class="rotate">
+        <i class="fa fa-minus-circle fa-5x"></i>
+       </div>
+       <h6 class="text-uppercase">Total Skipped Tests</h6>
+       <h1 class="display-2">{{totalSkippedAssertions test_cases}}</h1>
+      </div>
+     </div>
+    </div>
+    <div class="col-lg-3 col-md-3">
      <div class="card text-white card-info">
       <div class="card-body bg-danger">
        <div class="rotate">
@@ -496,7 +507,7 @@ input:checked + .slider:before {
                     <tr class="">
                         <td>Assertions</td>
                         <td class="text-center">{{totalAssertions test_cases}}</td>
-                        <td class="text-center">{{totalFailedAssertions test_cases}}</td>
+                        <td class="text-center">{{totalFailedAssertions test_cases}} (Skipped: {{totalSkippedAssertions test_cases}})</td>
                     </tr>
                 </tbody>
             </table>
@@ -737,7 +748,7 @@ input:checked + .slider:before {
                                             <tfoot>
                                                 <tr class="bg-light">
                                                     <td><strong>Total</strong></td>
-                                                    <td class="text-center"><strong>{{request.tests.passedAssertionsCount}} / {{request.tests.assertions.length}}</strong></td>
+                                                    <td class="text-center"><strong>{{request.tests.passedAssertionsCount}} Passed / {{requestSkippedAssertions request}} Skipped / {{request.tests.assertions.length}} Total</strong></td>
                                                 </tr>
                                             </tfoot>
                                         </table>

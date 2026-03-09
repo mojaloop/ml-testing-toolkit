@@ -49,8 +49,59 @@ const totalPassedAssertions = (testCases) => {
   }, 0)
 }
 
+const skippedAssertionsInTests = (tests) => {
+  if (!tests || !Array.isArray(tests.assertions)) {
+    return 0
+  }
+
+  return tests.assertions.reduce((count, assertion) => {
+    return count + ((assertion.resultStatus && assertion.resultStatus.status === 'SKIPPED') ? 1 : 0)
+  }, 0)
+}
+
+const totalSkippedAssertions = (testCases) => {
+  return testCases.reduce((total, curTestCase) => {
+    const skippedAssertionsInRequest = curTestCase.requests.reduce((skippedAssertionCountRequest, curRequest) => {
+      return skippedAssertionCountRequest + skippedAssertionsInTests(curRequest.request.tests)
+    }, 0)
+
+    return total + skippedAssertionsInRequest
+  }, 0)
+}
+
 const totalFailedAssertions = (testCases) => {
-  return totalAssertions(testCases) - totalPassedAssertions(testCases)
+  return testCases.reduce((total, curTestCase) => {
+    const failedAssertionsInRequest = curTestCase.requests.reduce((failedAssertionCountRequest, curRequest) => {
+      const tests = curRequest.request.tests
+
+      if (!tests || !Array.isArray(tests.assertions)) {
+        return failedAssertionCountRequest
+      }
+
+      const failedCountByStatus = tests.assertions.reduce((count, assertion) => {
+        const status = assertion.resultStatus && assertion.resultStatus.status
+
+        if (status === 'SUCCESS' || status === 'SKIPPED') {
+          return count
+        }
+
+        return count + 1
+      }, 0)
+
+      // Fallback for legacy payloads where status is missing.
+      if (failedCountByStatus === 0 && Number.isInteger(tests.passedAssertionsCount)) {
+        return failedAssertionCountRequest + Math.max(tests.assertions.length - tests.passedAssertionsCount, 0)
+      }
+
+      return failedAssertionCountRequest + failedCountByStatus
+    }, 0)
+
+    return total + failedAssertionsInRequest
+  }, 0)
+}
+
+const requestSkippedAssertions = (request) => {
+  return skippedAssertionsInTests(request && request.tests)
 }
 
 const totalTestCases = (testCases) => {
@@ -139,6 +190,7 @@ module.exports = {
   now,
   totalAssertions,
   totalPassedAssertions,
+  totalSkippedAssertions,
   totalFailedAssertions,
   totalTestCases,
   failedTestCases,
@@ -150,5 +202,6 @@ module.exports = {
   jsonStringify,
   isAssertionPassed,
   isAssertionSkipped,
+  requestSkippedAssertions,
   ifSkippedRequest
 }
