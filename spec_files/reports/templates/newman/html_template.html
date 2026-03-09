@@ -102,6 +102,59 @@
     .card-deck {
       background-color: var(--bg-card-deck)!important;
     }
+
+    /* Keep request list entries full-width in the right pane. */
+    .card-deck.iteration-0 {
+      display: block;
+      width: 100%;
+      margin: 0;
+    }
+
+    .card-deck.iteration-0 > .row {
+      width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .card-deck.iteration-0 > .row > .col-sm-12 {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .card-deck.iteration-0 .card-header > a {
+      display: block;
+      width: 100%;
+    }
+
+    .sidebar-nav-item {
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      border-color: #6c757d;
+    }
+
+    .sidebar-nav-item.active {
+      background-color: var(--info);
+      color: #ffffff;
+      border-color: var(--info);
+    }
+
+    .sidebar-sticky {
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    @media (max-width: 767.98px) {
+      .sidebar-sticky {
+        position: static;
+        top: auto;
+        max-height: none;
+        overflow-y: visible;
+        padding-right: 0;
+      }
+    }
     .form-control {
       background: var(--form-input);
     }
@@ -410,8 +463,8 @@
   </style>
 </head>
 <body class="">
-  <div class="container">
-    <div class="container">
+  <div class="container-fluid px-3">
+     <div class="container-fluid px-0">
       <label for="slider">Light</label>
       <label id="switch" class="switch">
         <input type="checkbox" onchange="toggleTheme()" id="slider">
@@ -421,16 +474,8 @@
     </div>
     <div class="card">
       <div class="card-header">
-        <ul class="nav nav-pills mb-3 nav-justified" id="pills-tab" role="tablist">
-          <li class="nav-item bg-info active" data-toggle="tooltip" title="Click to view the Summary">
-            <a class="nav-link text-white" id="pills-summary-tab" data-toggle="pill" href="#" data-target="#pills-summary" role="tab" aria-controls="pills-summary" aria-selected="true">Summary</a>
-          </li>
-          <li class="nav-item bg-success" data-toggle="tooltip" title="Click to view the Requests">
-            <a class="nav-link text-white" id="pills-requests-tab" data-toggle="pill" href="#" data-target="#pills-requests" role="tab" aria-controls="pills-requests" aria-selected="false">Details</a>
-          </li>
-        </ul>
         <div class="tab-content" id="pills-tabContent">
-          <div class="tab-pane fade show active" id="pills-summary" role="tabcard" aria-labelledby="pills-summary-tab">
+          <div class="d-none" id="pills-summary" role="tabcard" aria-labelledby="pills-summary-tab">
             <div class="row">
               <div class="col-md-9 col-lg-12 main">
                 <h1 class="display-4 text-center">Testing Toolkit Report</h1>
@@ -541,44 +586,163 @@
               </div>
             </div>
           </div>
-          <div class="tab-pane fade" id="pills-logs" role="tabcard" aria-labelledby="pills-logs-tab">
+          <div class="d-none" id="pills-logs" role="tabcard" aria-labelledby="pills-logs-tab">
             <button id="topOfLogsScreen" class="btn btn-outline-success btn-sm backToTop" onclick="topFunction()">Go To Top</button>
           </div>
-          <div class="tab-pane fade" id="pills-requests" role="tabcard" aria-labelledby="pills-requests-tab">
+          <div class="tab-pane show active" id="pills-requests" role="tabcard" aria-labelledby="pills-requests-tab">
 
             <button id="topOfRequestsScreen" class="btn btn-outline-success btn-sm backToTop" onclick="topFunction()">Go To Top</button>
 
-            <div class="btn-group float-right" role="group" aria-label="Button Group">
-              <button id="openAll" class="btn btn-outline-success btn-sm float-right">Expand Folders</button>
-              <button id="openAllRequests" class="btn btn-outline-success btn-sm float-right">Expand Requests</button>
-              <button id="closeAll" class="btn btn-outline-success btn-sm float-right">Collapse Folders</button>
-              <button id="closeAllRequests" class="btn btn-outline-success btn-sm float-right">Collapse Requests</button>
-              <button id="showAll" class="btn btn-outline-success btn-sm float-right">Show All</button>
-              <button id="showOnlyFailed" class="btn btn-outline-success btn-sm float-right">Show Only Failed</button>
-            </div>
-
-            <div class="text-uppercase" id="execution-menu">
-              <nav class="table-responsive">
-                <ul class="nav single-line-tabs d-none" id="iterationList">
-                </ul>
-              </nav>
-            </div>
-            <h6 class="text-uppercase text-muted" id="iterationSelected" style="padding-top: 10px;"></h6>
-            {{#each test_cases}}
-            <div class="tab-content" id="execution-data">
-
-              <div class="alert alert-dark text-uppercase text-center iteration-0">
-                <a data-toggle="collapse" href="#" data-target="#folder-collapse-{{id}}" aria-expanded="false" aria-controls="collapse" id="folder-{{id}}" class="collapsed text-dark z-block">
-                  {{#if (ifFailedTestCase this)}}
-                  <i class="fas fa-info-circle float-left resultsInfoFail" ></i>
-                  {{/if}}
-                  {{name}} <i class="float-lg-right fa fa-chevron-down" style="padding-top: 4px;"></i>
-                </a>
+            <div class="row mt-3">
+              <div class="col-lg-3 col-md-4 mb-3">
+                <div class="sidebar-sticky">
+                  <div class="card border-info mb-3">
+                    <div class="card-body">
+                      <div class="list-group" role="tablist">
+                        <a class="list-group-item list-group-item-action sidebar-nav-item active" id="testcase-tab-summary" href="#testcase-panel-summary" role="tab" aria-controls="testcase-panel-summary">Summary</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card border-info">
+                    <div class="card-body">
+                      <h6 class="card-title text-uppercase text-white text-center bg-info">Test Cases</h6>
+                      <div class="list-group" id="testcase-list" role="tablist">
+                        {{#each test_cases}}
+                        <a class="list-group-item list-group-item-action sidebar-nav-item" id="testcase-tab-{{id}}" href="#testcase-panel-{{id}}" role="tab" aria-controls="testcase-panel-{{id}}">{{name}}</a>
+                        {{/each}}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div id="folder-collapse-{{id}}" class="collapse" aria-labelledby="folder-{{id}}">
+              <div class="col-lg-9 col-md-8">
+                <div class="tab-content" id="testcase-detail-panels">
+            <div class="tab-pane fade show active" id="testcase-panel-summary" role="tabpanel" aria-labelledby="testcase-tab-summary">
+              <div class="row">
+                <div class="col-md-9 col-lg-12 main">
+                  <h1 class="display-4 text-center">Testing Toolkit Report</h1>
+                  <h5 class="text-center">{{runtimeInformation.completedTime}}</h5>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-6">
+                      <div class="card text-white card-danger">
+                        <div class="card-body bg-success">
+                          <div class="rotate">
+                            <i class="fa fa-list fa-4x"></i>
+                          </div>
+                          <h6 class="text-uppercase">Total Assertions</h6>
+                          <h1 class="display-2">{{totalAssertions test_cases}}</h1>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                      <div class="card text-white card-warning">
+                        <div class="card-body bg-success">
+                          <div class="rotate">
+                            <i class="fa fa-share fa-5x"></i>
+                          </div>
+                          <h6 class="text-uppercase">Total Passed Tests</h6>
+                          <h1 class="display-2">{{totalPassedAssertions test_cases}}</h1>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                      <div class="card text-white card-warning">
+                        <div class="card-body bg-warning">
+                          <div class="rotate">
+                            <i class="fa fa-minus-circle fa-5x"></i>
+                          </div>
+                          <h6 class="text-uppercase">Total Skipped Tests</h6>
+                          <h1 class="display-2">{{totalSkippedAssertions test_cases}}</h1>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                      <div class="card text-white card-info">
+                        <div class="card-body bg-danger">
+                          <div class="rotate">
+                            <i class="fa fa-plus-circle fa-5x"></i>
+                          </div>
+                          <h6 class="text-uppercase">Total Failed Tests</h6>
+                          <h1 class="display-2">{{totalFailedAssertions test_cases}}</h1>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col">
+                      <div class="row">
+                        <div class="col-sm-12 mb-3">
+                          <div class="card border-info">
+                            <div class="card-body">
+                              <h5 class="card-title text-uppercase text-white text-center bg-info">Runtime Information</h5>
+                              <span><i class="fas fa-file-code"></i></span><strong> Template Name:</strong> {{name}}<br>
+                              {{#if runtimeInformation}}
+                              <span><i class="fas fa-stopwatch"></i></span><strong> Total run duration:</strong> {{runtimeInformation.runDurationMs}} ms<br>
+                              {{/if}}
+                              {{#if extraRuntimeInformation}}
+                              {{#each extraRuntimeInformation}}
+                              <span><i class="fas fa-arrow-right"></i></span><strong> {{key}}:</strong> {{value}}<br>
+                              {{/each}}
+                              {{/if}}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-sm-12 mb-3">
+                          <div class="table-responsive">
+                            <table class="table table-striped table-bordered">
+                              <thead class="thead-inverse">
+                                <tr class="text-center">
+                                  <th class="text-uppercase">Summary Item</th>
+                                  <th class="text-uppercase">Total</th>
+                                  <th class="text-uppercase">Failed</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td>Test Cases</td>
+                                  <td class="text-center">{{totalTestCases test_cases}}</td>
+                                  <td class="text-center">{{failedTestCases test_cases}}</td>
+                                </tr>
+                                <tr>
+                                  <td>Requests</td>
+                                  <td class="text-center">{{totalRequests test_cases}}</td>
+                                  <td class="text-center">{{failedRequests test_cases}}</td>
+                                </tr>
+                                <tr class="">
+                                  <td>Assertions</td>
+                                  <td class="text-center">{{totalAssertions test_cases}}</td>
+                                  <td class="text-center">{{totalFailedAssertions test_cases}} (Skipped: {{totalSkippedAssertions test_cases}})</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                      <hr>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {{#each test_cases}}
+            <div class="tab-pane fade" id="testcase-panel-{{id}}" role="tabpanel" aria-labelledby="testcase-tab-{{id}}">
+
+              <div class="alert alert-dark text-uppercase text-center">
+                {{#if (ifFailedTestCase this)}}
+                <i class="fas fa-info-circle float-left resultsInfoFail" ></i>
+                {{/if}}
+                {{name}}
+              </div>
+              <div id="folder-collapse-{{id}}" class="show" aria-labelledby="folder-{{id}}">
                 <div class="card border-info" style="width: 100%;">
                   <div class="card-body">
                     <span><i class="fas fa-stopwatch"></i></span><strong> Testcase Duration:</strong> <span class="badge-outline badge badge-success"> {{testResult.runDurationMs}} ms</span><br>
+                    {{#each (testCaseMetaFields this)}}
+                    <span><i class="fas fa-info-circle"></i></span><strong> {{key}}:</strong> {{value}}<br>
+                    {{/each}}
                   </div>
                 </div>
                 <br>
@@ -605,7 +769,8 @@
                                 <div class="row">
                                   <div class="col-sm-12 mb-3">
                                     <div class="card-deck">
-                                      <div class="card border-info" style="width: 50rem;">
+                                      <div class="card border-info w-100">
+
                                         <div class="card-body">
                                           <h5 class="card-title text-uppercase text-white text-center bg-info">Request Information</h5>
                                           {{#if (ifSkippedRequest status)}}
@@ -622,7 +787,8 @@
                                           <br>
                                         </div>
                                       </div>
-                                      <div class="card border-info" style="width: 50rem;">
+                                      <div class="card border-info w-100">
+
                                         <div class="card-body">
                                           <h5 class="card-title text-uppercase text-white text-center bg-info">Response Information</h5>
                                           <span><i class="fas fa-info-circle"></i></span><strong> Response Code:</strong> <span class="float-right badge-outline badge badge-success"> {{response.status}} - {{response.statusText}} </span><br>
@@ -653,7 +819,8 @@
                                     <div class="row">
                                       <div class="col-sm-12 mb-3">
                                         <div class="card-deck">
-                                          <div class="card border-info" style="width: 50rem;">
+                                          <div class="card border-info w-100">
+
                                             <div class="card-body">
                                               <h5 class="card-title text-uppercase text-white text-center bg-info">Request Headers</h5>
                                               <div class="table-responsive">
@@ -679,7 +846,8 @@
                                     <div class="row">
                                       <div class="col-sm-12 mb-3">
                                         <div class="card-deck">
-                                          <div class="card border-info" style="width: 50rem;">
+                                          <div class="card border-info w-100">
+
                                             <div class="card-body">
                                               <h5 class="card-title text-uppercase text-white text-center bg-info">Request Body</h5>
                                               <div class="dyn-height">
@@ -698,7 +866,8 @@
                                     <div class="row">
                                       <div class="col-sm-12 mb-3">
                                         <div class="card-deck">
-                                          <div class="card border-info" style="width: 50rem;">
+                                          <div class="card border-info w-100">
+
                                             <div class="card-body">
                                               <h5 class="card-title text-uppercase text-white text-center bg-info">Transformed Request Headers</h5>
                                               <div class="table-responsive">
@@ -724,7 +893,8 @@
                                     <div class="row">
                                       <div class="col-sm-12 mb-3">
                                         <div class="card-deck">
-                                          <div class="card border-info" style="width: 50rem;">
+                                          <div class="card border-info w-100">
+
                                             <div class="card-body">
                                               <h5 class="card-title text-uppercase text-white text-center bg-info">Transformed Request Body</h5>
                                               <div class="dyn-height">
@@ -743,7 +913,8 @@
                                     <div class="row">
                                       <div class="col-sm-12 mb-3">
                                         <div class="card-deck">
-                                          <div class="card border-info" style="width: 50rem;">
+                                          <div class="card border-info w-100">
+
                                             <div class="card-body">
                                               <h5 class="card-title text-uppercase text-white text-center bg-info">CURL command</h5>
                                               <div class="dyn-height">
@@ -762,7 +933,8 @@
                                     <div class="row">
                                       <div class="col-sm-12 mb-3">
                                         <div class="card-deck">
-                                          <div class="card border-info" style="width: 50rem;">
+                                          <div class="card border-info w-100">
+
                                             <div class="card-body">
                                               <h5 class="card-title text-uppercase text-white text-center bg-info">Response Headers</h5>
                                               <div class="dyn-height">
@@ -781,7 +953,8 @@
                                     <div class="row">
                                       <div class="col-sm-12 mb-3">
                                         <div class="card-deck">
-                                          <div class="card border-info" style="width: 50rem;">
+                                          <div class="card border-info w-100">
+
                                             <div class="card-body">
                                               <h5 class="card-title text-uppercase text-white text-center bg-info">Response Body</h5>
                                               <div class="dyn-height">
@@ -800,7 +973,8 @@
                                     <div class="row">
                                       <div class="col-sm-12 mb-3">
                                         <div class="card-deck">
-                                          <div class="card border-info" style="width: 50rem;">
+                                          <div class="card border-info w-100">
+
                                             <div class="card-body">
                                               <h5 class="card-title text-uppercase text-white text-center bg-info">Callback Headers</h5>
                                               <div class="table-responsive">
@@ -826,7 +1000,8 @@
                                     <div class="row">
                                       <div class="col-sm-12 mb-3">
                                         <div class="card-deck">
-                                          <div class="card border-info" style="width: 50rem;">
+                                          <div class="card border-info w-100">
+
                                             <div class="card-body">
                                               <h5 class="card-title text-uppercase text-white text-center bg-info">Callback Body</h5>
                                               <div class="dyn-height">
@@ -845,7 +1020,8 @@
                                     <div class="row">
                                       <div class="col-sm-12 mb-3">
                                         <div class="card-deck">
-                                          <div class="card border-info" style="width: 50rem;">
+                                          <div class="card border-info w-100">
+
                                             <div class="card-body">
                                               <h5 class="card-title text-uppercase text-white text-center bg-info">Transformed Callback Headers</h5>
                                               <div class="table-responsive">
@@ -871,7 +1047,8 @@
                                     <div class="row">
                                       <div class="col-sm-12 mb-3">
                                         <div class="card-deck">
-                                          <div class="card border-info" style="width: 50rem;">
+                                          <div class="card border-info w-100">
+
                                             <div class="card-body">
                                               <h5 class="card-title text-uppercase text-white text-center bg-info">Transformed Callback Body</h5>
                                               <div class="dyn-height">
@@ -926,7 +1103,8 @@
                                           <div class="row d-none">
                                             <div class="col-sm-12 mb-3">
                                               <div class="card-deck">
-                                                <div class="card border-danger" style="width: 50rem;">
+                                                <div class="card border-danger w-100">
+
                                                   <div class="card-body">
                                                     <h5 class="card-title text-uppercase text-white text-center bg-danger">Test Failure</h5>
                                                     <div class="table-responsive">
@@ -977,75 +1155,19 @@
             $('[data-toggle="tooltip"]').tooltip({
               trigger : 'hover'
             })
+
+            $('.sidebar-nav-item').on('click', function (e) {
+              e.preventDefault()
+              const target = $(this).attr('href')
+
+              $('.sidebar-nav-item').removeClass('active')
+              $(this).addClass('active')
+
+              $('#testcase-detail-panels .tab-pane').removeClass('show active')
+              $(target).addClass('show active')
+            })
           })
         </script>
-
-        <script>
-          $('#openAll').on('click', function(e) {
-            {{#each test_cases}}
-            $('#folder-{{id}}').removeClass('collapsed')
-            $('#folder-collapse-{{id}}').addClass('show')
-            {{/each}}
-          })
-        </script>
-
-        <script>
-          $('#closeAll').on('click', function(e) {
-            {{#each test_cases}}
-            $('#folder-{{id}}').addClass('collapsed')
-            $('#folder-collapse-{{id}}').removeClass('show')
-            {{/each}}
-          })
-        </script>
-
-        <script>
-          $('#openAllRequests').on('click', function(e) {
-            {{#each test_cases}}
-            {{#each requests}}
-            $('#requests-{{../id}}-{{request.id}}').removeClass('collapsed')
-            $('#collapse-{{../id}}-{{request.id}}').removeClass('collapsed')
-            $('#requests-{{../id}}-{{request.id}}').addClass('show')
-            $('#collapse-{{../id}}-{{request.id}}').addClass('show')
-            {{/each}}
-            {{/each}}
-          })
-        </script>
-
-        <script>
-          $('#closeAllRequests').on('click', function(e) {
-            {{#each test_cases}}
-            {{#each requests}}
-            $('#requests-{{../id}}-{{request.id}}').removeClass('show')
-            $('#collapse-{{../id}}-{{request.id}}').removeClass('show')
-            $('#requests-{{../id}}-{{request.id}}').addClass('collapsed')
-            $('#collapse-{{../id}}-{{request.id}}').addClass('collapsed')
-            {{/each}}
-            {{/each}}
-          })
-        </script>
-
-        <script>
-          $('#showAll').on('click', function(e) {
-            {{#each test_cases}}
-            $('#folder-{{id}}').parent('.tab-content').removeClass('hidden')
-            $('#folder-collapse-{{id}}').parent('.tab-content').removeClass('hidden')
-            {{/each}}
-          })
-        </script>
-
-        <script>
-          $('#showOnlyFailed').on('click', function(e) {
-            {{#each test_cases}}
-            $('[aria-labelledby="folder-{{id}}"]').each(function() {
-              if ($(this).find('.resultsInfoFail').length === 0) {
-                $(this).closest('.tab-content').addClass('hidden');
-              }
-            });
-            {{/each}}
-          })
-        </script>
-
-
 
         <script>
           function isJSON(data)
@@ -1184,51 +1306,6 @@
           function topFunction() {
             document.body.scrollTop = 0;
             document.documentElement.scrollTop = 0;
-          }
-        </script>
-
-        <script type="text/javascript">
-          "use strict";
-
-          window.onload = function () {
-
-            let totalIterations = 1;
-
-            let menu = document.querySelector('#execution-menu .nav');
-
-            for(var i = 0; i < totalIterations; i++)
-            {
-              let li = document.createElement('li');
-              li.appendChild(document.createTextNode((i + 1)));
-              li.setAttribute('id', 'iteration-' + i);
-              li.classList.add("custom-tab");
-              li.classList.add("itPassed");
-
-              li.addEventListener('click', function() {
-                let allItems = document.querySelectorAll('[class*=iteration-]');
-                allItems.forEach(function(elem) {
-                  elem.style.display = 'none';
-                })
-
-                let allMenus = document.querySelectorAll('[id*=iteration-]');
-                allMenus.forEach(function(elem){
-                  elem.style.borderBottom = 'none';
-                })
-
-                this.style.borderBottom = 'solid 3px #032a33';
-
-                let items = document.querySelectorAll("." + this.id);
-                items.forEach(function(elem) {
-                  elem.style.display = elem.style.display == 'block' ? 'none' : 'block';
-                })
-              });
-              menu.appendChild(li);
-            }
-
-            //shows first tab data
-            document.getElementById('iteration-0').click();
-            //   document.getElementById('iterationSelected').innerHTML = `Iteration ${document.getElementById('iteration-0').innerHTML} selected`
-
           }
         </script>
 
