@@ -43,9 +43,19 @@ const totalAssertions = (testCases) => {
 const totalPassedAssertions = (testCases) => {
   return testCases.reduce((total, curTestCase) => {
     const passedAssertionsInRequest = curTestCase.requests.reduce((passedAssertionCountRequest, curRequest) => {
-      return passedAssertionCountRequest + ((curRequest.request.tests && curRequest.request.tests.passedAssertionsCount) ? curRequest.request.tests.passedAssertionsCount : 0)
+      return passedAssertionCountRequest + passedAssertionsInTests(curRequest.request.tests)
     }, 0)
     return total + passedAssertionsInRequest
+  }, 0)
+}
+
+const passedAssertionsInTests = (tests) => {
+  if (!tests || !Array.isArray(tests.assertions)) {
+    return 0
+  }
+
+  return tests.assertions.reduce((count, assertion) => {
+    return count + ((assertion.resultStatus && assertion.resultStatus.status === 'SUCCESS') ? 1 : 0)
   }, 0)
 }
 
@@ -56,6 +66,16 @@ const skippedAssertionsInTests = (tests) => {
 
   return tests.assertions.reduce((count, assertion) => {
     return count + ((assertion.resultStatus && assertion.resultStatus.status === 'SKIPPED') ? 1 : 0)
+  }, 0)
+}
+
+const failedAssertionsInTests = (tests) => {
+  if (!tests || !Array.isArray(tests.assertions)) {
+    return 0
+  }
+
+  return tests.assertions.reduce((count, assertion) => {
+    return count + ((assertion.resultStatus && assertion.resultStatus.status === 'FAILED') ? 1 : 0)
   }, 0)
 }
 
@@ -72,28 +92,7 @@ const totalSkippedAssertions = (testCases) => {
 const totalFailedAssertions = (testCases) => {
   return testCases.reduce((total, curTestCase) => {
     const failedAssertionsInRequest = curTestCase.requests.reduce((failedAssertionCountRequest, curRequest) => {
-      const tests = curRequest.request.tests
-
-      if (!tests || !Array.isArray(tests.assertions)) {
-        return failedAssertionCountRequest
-      }
-
-      const failedCountByStatus = tests.assertions.reduce((count, assertion) => {
-        const status = assertion.resultStatus && assertion.resultStatus.status
-
-        if (status === 'SUCCESS' || status === 'SKIPPED') {
-          return count
-        }
-
-        return count + 1
-      }, 0)
-
-      // Fallback for legacy payloads where status is missing.
-      if (failedCountByStatus === 0 && Number.isInteger(tests.passedAssertionsCount)) {
-        return failedAssertionCountRequest + Math.max(tests.assertions.length - tests.passedAssertionsCount, 0)
-      }
-
-      return failedAssertionCountRequest + failedCountByStatus
+      return failedAssertionCountRequest + failedAssertionsInTests(curRequest.request.tests)
     }, 0)
 
     return total + failedAssertionsInRequest
@@ -216,6 +215,10 @@ const isAssertionSkipped = (status) => {
   return status === 'SKIPPED'
 }
 
+const sequenceNumber = (index) => {
+  return Number(index) + 1
+}
+
 module.exports = {
   now,
   totalAssertions,
@@ -232,6 +235,7 @@ module.exports = {
   jsonStringify,
   isAssertionPassed,
   isAssertionSkipped,
+  sequenceNumber,
   requestSkippedAssertions,
   testCaseMetaFields,
   ifSkippedRequest

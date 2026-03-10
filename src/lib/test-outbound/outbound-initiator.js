@@ -113,6 +113,8 @@ const OutboundSend = async (
       runDurationMs,
       totalAssertions: 0,
       totalPassedAssertions: 0,
+      totalFailedAssertions: 0,
+      totalSkippedAssertions: 0,
       isPassed: false
     }
     if (sync) {
@@ -208,6 +210,8 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metr
         runDurationMs,
         totalAssertions: 0,
         totalPassedAssertions: 0,
+        totalFailedAssertions: 0,
+        totalSkippedAssertions: 0,
         isPassed: false
       }
       // TODO: This can be optimized by storing only results into the iterations array
@@ -1071,8 +1075,18 @@ const generateFinalReport = (inputTemplate, runtimeInformation, metrics) => {
           }
         })
         request.tests.passedAssertionsCount = assertionResults.passedCount
+        const skippedAssertionsCount = request.tests.assertions.reduce((count, assertion) => {
+          return count + ((assertion.resultStatus && assertion.resultStatus.status === 'SKIPPED') ? 1 : 0)
+        }, 0)
+        const failedAssertionsCount = request.tests.assertions.reduce((count, assertion) => {
+          return count + ((assertion.resultStatus && assertion.resultStatus.status === 'FAILED') ? 1 : 0)
+        }, 0)
+        const passedAssertionsCount = request.tests.assertions.length - skippedAssertionsCount - failedAssertionsCount
+
         runtimeInformation.totalAssertions += request.tests.assertions.length
-        runtimeInformation.totalPassedAssertions += request.tests.passedAssertionsCount
+        runtimeInformation.totalPassedAssertions += passedAssertionsCount
+        runtimeInformation.totalFailedAssertions += failedAssertionsCount
+        runtimeInformation.totalSkippedAssertions += skippedAssertionsCount
       }
       return {
         request,
