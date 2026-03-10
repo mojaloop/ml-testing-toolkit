@@ -37,11 +37,11 @@ const sampleTestCases  = [
           tests: {
             passedAssertionsCount: 4,
             assertions: [
-              { exec: 'assertion1' },
-              { exec: 'assertion2' },
-              { exec: 'assertion3' },
-              { exec: 'assertion4' },
-              { exec: 'assertion5' }
+              { exec: 'assertion1', resultStatus: { status: 'SUCCESS' } },
+              { exec: 'assertion2', resultStatus: { status: 'SUCCESS' } },
+              { exec: 'assertion3', resultStatus: { status: 'SUCCESS' } },
+              { exec: 'assertion4', resultStatus: { status: 'SUCCESS' } },
+              { exec: 'assertion5', resultStatus: { status: 'FAILED' } }
             ]
           }
         }
@@ -51,9 +51,9 @@ const sampleTestCases  = [
           tests: {
             passedAssertionsCount: 3,
             assertions: [
-              { exec: 'assertion1' },
-              { exec: 'assertion2' },
-              { exec: 'assertion3' }
+              { exec: 'assertion1', resultStatus: { status: 'SUCCESS' } },
+              { exec: 'assertion2', resultStatus: { status: 'SUCCESS' } },
+              { exec: 'assertion3', resultStatus: { status: 'SUCCESS' } }
             ]
           }
         }
@@ -63,8 +63,8 @@ const sampleTestCases  = [
           tests: {
             passedAssertionsCount: 0,
             assertions: [
-              { exec: 'assertion1' },
-              { exec: 'assertion2' }
+              { exec: 'assertion1', resultStatus: { status: 'FAILED' } },
+              { exec: 'assertion2', resultStatus: { status: 'FAILED' } }
             ]
           }
         }
@@ -78,7 +78,7 @@ const sampleTestCases  = [
           tests: {
             passedAssertionsCount: 1,
             assertions: [
-              { exec: 'assertion1' }
+              { exec: 'assertion1', resultStatus: { status: 'SUCCESS' } }
             ]
           }
         }
@@ -111,6 +111,53 @@ describe('Handlebar Helper Functions', () => {
   describe('totalPassedAssertions', () => {
     it('should return total passed assertions', async () => {
       expect(HandlebarHelpers.totalPassedAssertions(sampleTestCases)).toEqual(8)
+    })
+
+    it('should count only SUCCESS statuses', async () => {
+      const input = [{
+        requests: [{
+          request: {
+            tests: {
+              assertions: [
+                { resultStatus: { status: 'SUCCESS' } },
+                { resultStatus: { status: 'FAILED' } },
+                { resultStatus: { status: 'SKIPPED' } },
+                { resultStatus: { status: 'UNKNOWN' } }
+              ]
+            }
+          }
+        }]
+      }]
+      expect(HandlebarHelpers.totalPassedAssertions(input)).toEqual(1)
+    })
+
+    it('should return 0 when tests/assertions are missing', async () => {
+      const input = [{ requests: [{ request: { tests: {} } }, { request: {} }] }]
+      expect(HandlebarHelpers.totalPassedAssertions(input)).toEqual(0)
+    })
+  })
+
+  describe('totalSkippedAssertions', () => {
+    it('should return total skipped assertions', async () => {
+      const input = [{
+        requests: [{
+          request: {
+            tests: {
+              assertions: [
+                { resultStatus: { status: 'SKIPPED' } },
+                { resultStatus: { status: 'SUCCESS' } },
+                { resultStatus: { status: 'SKIPPED' } }
+              ]
+            }
+          }
+        }]
+      }]
+      expect(HandlebarHelpers.totalSkippedAssertions(input)).toEqual(2)
+    })
+
+    it('should return 0 when tests/assertions are missing', async () => {
+      const input = [{ requests: [{ request: { tests: {} } }, { request: {} }] }]
+      expect(HandlebarHelpers.totalSkippedAssertions(input)).toEqual(0)
     })
   })
 
@@ -198,6 +245,73 @@ describe('Handlebar Helper Functions', () => {
     })
   })
 
+  describe('requestSkippedAssertions', () => {
+    it('should return skipped assertion count for request', async () => {
+      const request = {
+        tests: {
+          assertions: [
+            { resultStatus: { status: 'SKIPPED' } },
+            { resultStatus: { status: 'SUCCESS' } },
+            { resultStatus: { status: 'SKIPPED' } }
+          ]
+        }
+      }
+
+      expect(HandlebarHelpers.requestSkippedAssertions(request)).toEqual(2)
+    })
+
+    it('should return 0 for missing request/tests', async () => {
+      expect(HandlebarHelpers.requestSkippedAssertions(null)).toEqual(0)
+      expect(HandlebarHelpers.requestSkippedAssertions({})).toEqual(0)
+    })
+  })
+
+  describe('testCaseMetaFields', () => {
+    it('should flatten only fileInfo and meta fields', async () => {
+      const testCase = {
+        id: 1,
+        name: 'Test Case',
+        fileInfo: {
+          path: 'collections/dfsp/p2p_failed_tests.json'
+        },
+        meta: {
+          info: 'Party info with missing header',
+          tags: ['negative', 'p2p']
+        },
+        options: {
+          breakOnError: false
+        }
+      }
+
+      expect(HandlebarHelpers.testCaseMetaFields(testCase)).toEqual([
+        { key: 'fileInfo.path', value: 'collections/dfsp/p2p_failed_tests.json' },
+        { key: 'meta.info', value: 'Party info with missing header' },
+        { key: 'meta.tags', value: '["negative","p2p"]' }
+      ])
+    })
+
+    it('should return empty for invalid input', async () => {
+      expect(HandlebarHelpers.testCaseMetaFields(null)).toEqual([])
+    })
+
+    it('should ignore undefined nested metadata values', async () => {
+      const testCase = {
+        fileInfo: {
+          path: 'collections/dfsp/p2p_failed_tests.json',
+          optional: undefined
+        },
+        meta: {
+          info: 'some info'
+        }
+      }
+
+      expect(HandlebarHelpers.testCaseMetaFields(testCase)).toEqual([
+        { key: 'fileInfo.path', value: 'collections/dfsp/p2p_failed_tests.json' },
+        { key: 'meta.info', value: 'some info' }
+      ])
+    })
+  })
+
   describe('jsonStringify', () => {
     it('should return strigified value of json', async () => {
       expect(HandlebarHelpers.jsonStringify({})).toEqual('{}')
@@ -213,6 +327,13 @@ describe('Handlebar Helper Functions', () => {
   describe('isAssertionSkipped', () => {
     it('should return strigified value of json', async () => {
       expect(HandlebarHelpers.isAssertionSkipped('SKIPPED')).toEqual(true)
+    })
+  })
+
+  describe('sequenceNumber', () => {
+    it('should return 1-based sequence number', async () => {
+      expect(HandlebarHelpers.sequenceNumber(0)).toEqual(1)
+      expect(HandlebarHelpers.sequenceNumber(4)).toEqual(5)
     })
   })
 

@@ -43,14 +43,94 @@ const totalAssertions = (testCases) => {
 const totalPassedAssertions = (testCases) => {
   return testCases.reduce((total, curTestCase) => {
     const passedAssertionsInRequest = curTestCase.requests.reduce((passedAssertionCountRequest, curRequest) => {
-      return passedAssertionCountRequest + ((curRequest.request.tests && curRequest.request.tests.passedAssertionsCount) ? curRequest.request.tests.passedAssertionsCount : 0)
+      return passedAssertionCountRequest + passedAssertionsInTests(curRequest.request.tests)
     }, 0)
     return total + passedAssertionsInRequest
   }, 0)
 }
 
+const passedAssertionsInTests = (tests) => {
+  if (!tests || !Array.isArray(tests.assertions)) {
+    return 0
+  }
+
+  return tests.assertions.reduce((count, assertion) => {
+    return count + ((assertion.resultStatus && assertion.resultStatus.status === 'SUCCESS') ? 1 : 0)
+  }, 0)
+}
+
+const skippedAssertionsInTests = (tests) => {
+  if (!tests || !Array.isArray(tests.assertions)) {
+    return 0
+  }
+
+  return tests.assertions.reduce((count, assertion) => {
+    return count + ((assertion.resultStatus && assertion.resultStatus.status === 'SKIPPED') ? 1 : 0)
+  }, 0)
+}
+
+const failedAssertionsInTests = (tests) => {
+  if (!tests || !Array.isArray(tests.assertions)) {
+    return 0
+  }
+
+  return tests.assertions.reduce((count, assertion) => {
+    return count + ((assertion.resultStatus && assertion.resultStatus.status === 'FAILED') ? 1 : 0)
+  }, 0)
+}
+
+const totalSkippedAssertions = (testCases) => {
+  return testCases.reduce((total, curTestCase) => {
+    const skippedAssertionsInRequest = curTestCase.requests.reduce((skippedAssertionCountRequest, curRequest) => {
+      return skippedAssertionCountRequest + skippedAssertionsInTests(curRequest.request.tests)
+    }, 0)
+
+    return total + skippedAssertionsInRequest
+  }, 0)
+}
+
 const totalFailedAssertions = (testCases) => {
-  return totalAssertions(testCases) - totalPassedAssertions(testCases)
+  return testCases.reduce((total, curTestCase) => {
+    const failedAssertionsInRequest = curTestCase.requests.reduce((failedAssertionCountRequest, curRequest) => {
+      return failedAssertionCountRequest + failedAssertionsInTests(curRequest.request.tests)
+    }, 0)
+
+    return total + failedAssertionsInRequest
+  }, 0)
+}
+
+const requestSkippedAssertions = (request) => {
+  return skippedAssertionsInTests(request && request.tests)
+}
+
+const testCaseMetaFields = (testCase) => {
+  if (!testCase || typeof testCase !== 'object') {
+    return []
+  }
+
+  const includedKeys = ['fileInfo', 'meta']
+
+  const flattenMetaFields = (value, path) => {
+    if (value === null || typeof value === 'undefined') {
+      return []
+    }
+
+    if (Array.isArray(value)) {
+      return [{ key: path, value: JSON.stringify(value) }]
+    }
+
+    if (typeof value === 'object') {
+      return Object.keys(value)
+        .sort()
+        .flatMap((childKey) => flattenMetaFields(value[childKey], path ? `${path}.${childKey}` : childKey))
+    }
+
+    return [{ key: path, value: String(value) }]
+  }
+
+  return includedKeys
+    .filter((key) => typeof testCase[key] !== 'undefined' && testCase[key] !== null)
+    .flatMap((key) => flattenMetaFields(testCase[key], key))
 }
 
 const totalTestCases = (testCases) => {
@@ -135,10 +215,15 @@ const isAssertionSkipped = (status) => {
   return status === 'SKIPPED'
 }
 
+const sequenceNumber = (index) => {
+  return Number(index) + 1
+}
+
 module.exports = {
   now,
   totalAssertions,
   totalPassedAssertions,
+  totalSkippedAssertions,
   totalFailedAssertions,
   totalTestCases,
   failedTestCases,
@@ -150,5 +235,8 @@ module.exports = {
   jsonStringify,
   isAssertionPassed,
   isAssertionSkipped,
+  sequenceNumber,
+  requestSkippedAssertions,
+  testCaseMetaFields,
   ifSkippedRequest
 }
