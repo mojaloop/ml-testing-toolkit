@@ -138,6 +138,13 @@
       border-color: var(--info);
     }
 
+    .failed-testcase-badge {
+      float: right;
+      font-size: 0.68rem;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
     .sidebar-sticky {
       position: sticky;
       top: 20px;
@@ -491,10 +498,17 @@
                   </div>
                   <div class="card border-info">
                     <div class="card-body">
+                      <div class="d-flex justify-content-end align-items-center mb-3">
+                        <span class="mr-2"><strong>Show failed only</strong></span>
+                        <label class="switch mb-0">
+                          <input type="checkbox" id="failed-only-toggle">
+                          <span class="slider round"></span>
+                        </label>
+                      </div>
                       <h6 class="card-title text-uppercase text-white text-center bg-info">Test Cases</h6>
                       <div class="list-group" id="testcase-list" role="tablist">
                         {{#each test_cases}}
-                        <a class="list-group-item list-group-item-action sidebar-nav-item" id="testcase-tab-{{id}}" href="#testcase-panel-{{id}}" role="tab" aria-controls="testcase-panel-{{id}}">{{sequenceNumber @index}}. {{name}}</a>
+                        <a class="list-group-item list-group-item-action sidebar-nav-item testcase-nav-item" data-failed="{{ifFailedTestCase this}}" id="testcase-tab-{{id}}" href="#testcase-panel-{{id}}" role="tab" aria-controls="testcase-panel-{{id}}">{{sequenceNumber @index}}. {{name}}{{#if (ifFailedTestCase this)}} <span class="badge badge-danger failed-testcase-badge">FAILED</span>{{/if}}</a>
                         {{/each}}
                       </div>
                     </div>
@@ -1042,16 +1056,45 @@
               trigger : 'hover'
             })
 
+            function showPanel(panelSelector, navSelector) {
+              $('.sidebar-nav-item').removeClass('active')
+              $(navSelector).addClass('active')
+              $('#testcase-detail-panels .tab-pane').removeClass('show active')
+              $(panelSelector).addClass('show active')
+            }
+
+            function applyFailedOnlyFilter() {
+              const showFailedOnly = $('#failed-only-toggle').is(':checked')
+              const $testcaseItems = $('.testcase-nav-item')
+
+              if (showFailedOnly) {
+                $testcaseItems.each(function () {
+                  const isFailed = String($(this).data('failed')) === 'true'
+                  $(this).toggle(isFailed)
+                })
+
+                const $activeNav = $('.sidebar-nav-item.active')
+                const activeIsVisible = $activeNav.is(':visible')
+                if (!activeIsVisible) {
+                  const $firstVisibleFailed = $('.testcase-nav-item:visible').first()
+                  if ($firstVisibleFailed.length > 0) {
+                    showPanel($firstVisibleFailed.attr('href'), '#' + $firstVisibleFailed.attr('id'))
+                  } else {
+                    showPanel('#testcase-panel-summary', '#testcase-tab-summary')
+                  }
+                }
+              } else {
+                $testcaseItems.show()
+              }
+            }
+
             $('.sidebar-nav-item').on('click', function (e) {
               e.preventDefault()
-              const target = $(this).attr('href')
-
-              $('.sidebar-nav-item').removeClass('active')
-              $(this).addClass('active')
-
-              $('#testcase-detail-panels .tab-pane').removeClass('show active')
-              $(target).addClass('show active')
+              showPanel($(this).attr('href'), '#' + $(this).attr('id'))
             })
+
+            $('#failed-only-toggle').on('change', applyFailedOnlyFilter)
+            applyFailedOnlyFilter()
           })
         </script>
 
