@@ -1098,7 +1098,7 @@ const generateFinalReport = (inputTemplate, runtimeInformation, metrics) => {
       requests: resultRequests
     }
   })
-  if (runtimeInformation.totalPassedAssertions === runtimeInformation.totalAssertions) {
+  if (runtimeInformation.totalPassedAssertions + runtimeInformation.totalSkippedAssertions === runtimeInformation.totalAssertions) {
     runtimeInformation.isPassed = true
     metrics?.testSuccess.add(1, { template: inputTemplate.name })
   } else {
