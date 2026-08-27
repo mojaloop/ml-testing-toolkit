@@ -79,6 +79,7 @@
     "@hapi/hapi": "21.4.6",
     "@hapi/inert": "7.1.0",
     "@hapi/vision": "7.0.3",
+    "@mojaloop/central-services-error-handling": "13.2.0",
     "@mojaloop/central-services-logger": "11.10.4",
     "@mojaloop/central-services-metrics": "12.8.5",
     "@mojaloop/ml-schema-transformer-lib": "2.9.0",
