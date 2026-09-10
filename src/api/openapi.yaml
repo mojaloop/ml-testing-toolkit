@@ -1,0 +1,61 @@
+openapi: 3.1.0
+info:
+  title: Testing Toolkit backend
+  version: '1.0'
+  description: >-
+    The API the testing toolkit UI calls from the browser, websockets
+    included. One permission per verb over the whole mount; the test cases
+    and their runs are the application's business.
+servers:
+  - url: /
+x-authz:
+  service: ttkBackend
+paths:
+  /:
+    get:
+      operationId: view
+      summary: Reads test collections, runs and reports
+      x-authz:
+        scopedBy: []
+      security:
+        - session: []
+      responses:
+        '200':
+          description: What was asked for
+    post:
+      operationId: create
+      summary: Starts runs and creates collections
+      x-authz:
+        scopedBy: []
+      security:
+        - session: []
+      responses:
+        '200':
+          description: What was created
+    put:
+      operationId: update
+      summary: Updates collections and settings
+      x-authz:
+        scopedBy: []
+      security:
+        - session: []
+      responses:
+        '200':
+          description: What was updated
+    delete:
+      operationId: remove
+      summary: Removes collections and runs
+      x-authz:
+        scopedBy: []
+      security:
+        - session: []
+      responses:
+        '200':
+          description: What was removed
+components:
+  securitySchemes:
+    session:
+      type: apiKey
+      in: cookie
+      name: ory_kratos_session
+      description: A human's browser session
