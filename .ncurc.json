@@ -1,0 +1,20 @@
+{
+  "reject": [
+    "chai",
+    "why-chai: v5 is ESM-only and this suite is CommonJS (carried over from the yaml config)",
+    "postman-collection",
+    "postman-sandbox",
+    "why-postman: held at the versions the committed lock pins (carried over from the yaml config)",
+    "jest",
+    "@types/jest",
+    "why-jest: held at 29.x (carried over from the yaml config); this also keeps sanitize-html on a line whose htmlparser2 is still CommonJS",
+    "uuid",
+    "why-uuid: newer majors are ESM-only and break the suites (carried over from the yaml config)",
+    "@types/node",
+    "why-types-node: its major must match the Node runtime major in .nvmrc (24); a higher major only weakens type checking; bump together with the runtime",
+    "@mojaloop/ml-testing-toolkit-shared-lib",
+    "why-shared-lib: 14.3.4+ floats @apidevtools/json-schema-ref-parser to the ESM-only 15.x line, which jest 29 (pinned here) cannot require - 210 suites fail with 'Cannot use import statement outside a module'; hold at 14.3.3 until the jest 30 upgrade (reproduced 2026-09-24)",
+    "openapi-backend",
+    "why-openapi-backend: 5.21.x pulls the same ESM-only ref-parser through its own node_modules and fails 12 suites the same way; hold at 5.16.1 until the jest 30 upgrade (reproduced 2026-09-24)"
+  ]
+}
