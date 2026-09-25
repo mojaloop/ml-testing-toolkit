@@ -44,8 +44,6 @@ const OAuthHelper = require('./oauth/OAuthHelper')
 const DOCUMENT = path.join(__dirname, '..', 'api', 'openapi.yaml')
 
 const initServer = (authz) => {
-  // The platform reads this service's document here, ahead of every route
-  // that would answer the path itself
   if (authz) app.use(authz.expose())
 
   // For CORS policy
