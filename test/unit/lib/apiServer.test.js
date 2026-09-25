@@ -27,6 +27,7 @@
  --------------
  ******/
 
+const request = require('supertest')
 const Config = require('../../../src/lib/config')
 const requestLogger = require('../../../src/lib/requestLogger')
 
@@ -99,15 +100,13 @@ describe('api-server', () => {
     })
   })
   describe('when startServer is called', () => {
-    it('the server should be initialized', async () => {
-      // apiServer.startServer()
-      await expect((async () => {
-        await wait();
-        apiServer.startServer()
-        await wait();
-        apiServer.stopServer()
-        return 'OK'
-      })()).resolves.toBeTruthy()
+    it('the server should be initialized, serving its API document', async () => {
+      await apiServer.startServer(0)
+      const res = await request(apiServer.getHttp()).get('/.authz/openapi')
+      expect(res.statusCode).toEqual(200)
+      expect(res.headers['content-type']).toEqual('application/json')
+      expect(JSON.parse(res.text).openapi).toMatch(/^3\.1/)
+      apiServer.stopServer()
     })
   })
   describe('when getHttp is called', () => {
@@ -116,5 +115,4 @@ describe('api-server', () => {
       expect(http).toBeTruthy()
     })
   })
-  const wait = async (ms = 0) => new Promise(resolve => setTimeout(resolve, ms))
 })

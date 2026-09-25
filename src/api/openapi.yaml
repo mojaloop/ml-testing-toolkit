@@ -8,8 +8,6 @@ info:
     and their runs are the application's business.
 servers:
   - url: /
-x-authz:
-  service: ttkBackend
 paths:
   /:
     get:

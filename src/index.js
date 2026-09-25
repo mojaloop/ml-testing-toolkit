@@ -53,7 +53,7 @@ const init = async () => {
   RequestLogger.logMessage('info', 'Toolkit Initialization started...', { notification: false })
   await Config.loadSystemConfig()
   await Config.loadUserConfig()
-  apiServer.startServer(5050)
+  await apiServer.startServer(5050)
   socketServer.initServer(apiServer.getHttp())
   const systemConfig = Config.getSystemConfig()
   if (systemConfig.CONNECTION_MANAGER.ENABLED) {

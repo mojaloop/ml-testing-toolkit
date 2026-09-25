@@ -38,9 +38,16 @@ const util = require('util')
 const path = require('path')
 const fs = require('fs')
 const cors = require('cors')
+const { createGuard } = require('@mojaloop/authz')
 const OAuthHelper = require('./oauth/OAuthHelper')
 
-const initServer = () => {
+const DOCUMENT = path.join(__dirname, '..', 'api', 'openapi.yaml')
+
+const initServer = (authz) => {
+  // The platform reads this service's document here, ahead of every route
+  // that would answer the path itself
+  if (authz) app.use(authz.expose())
+
   // For CORS policy
   app.use(cors({
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
@@ -90,8 +97,8 @@ const initServer = () => {
   }
 }
 
-const startServer = port => {
-  initServer()
+const startServer = async port => {
+  initServer(await createGuard(DOCUMENT))
   http.listen(port)
   customLogger.logMessage('info', 'API Server started on port ' + port, { notification: false })
 }
