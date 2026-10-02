@@ -180,7 +180,7 @@
       "cacache": "17.0.4"
     },
     "lodash": "4.18.1",
-    "lodash-es": "4.17.23",
+    "lodash-es": "4.18.1",
     "make-fetch-happen": {
       "cacache": "17.0.4"
     },
@@ -196,10 +196,10 @@
     "jsonwebtoken": "9.0.3",
     "yargs-parser": "20.2.9",
     "oas-validator": {
-      "ajv": "6.12.3"
+      "ajv": "6.15.0"
     },
     "minimatch": "3.1.4",
-    "qs": "6.15.3",
+    "qs": "6.16.0",
     "flatted": "3.4.2",
     "immutable": "5.1.8",
     "protobufjs": "7.6.5",
@@ -207,7 +207,6 @@
     "fast-xml-parser": "5.7.0",
     "postcss": "8.5.23",
     "convict": "6.2.5",
-    "@faker-js/faker": "10.5.0",
     "@grpc/grpc-js": "1.14.4",
     "@hapi/content": "6.0.2",
     "browserslist": "4.28.7",
@@ -218,16 +217,23 @@
     "picomatch": "2.3.2",
     "socket.io-parser": "4.2.7",
     "nanoid": "3.3.18",
-    "mysql2": "3.23.1",
+    "mysql2": "3.24.4",
     "@hapi/wreck": "18.1.2",
-    "sanitize-html": "2.17.6",
     "body-parser": "1.20.6",
     "@opentelemetry/core": "2.8.0",
-    "joi": "17.13.6",
+    "joi": "17.13.8",
     "yaml": "2.8.3",
-    "ajv": "6.14.0",
     "baseline-browser-mapping": "2.11.0",
     "follow-redirects": "1.16.0",
-    "@babel/core": "7.29.6"
+    "@babel/core": "7.29.6",
+    "serialize-error": "8.1.0",
+    "js-yaml@4": "4.3.2",
+    "js-yaml@3": "3.15.2",
+    "ws@8": "8.21.3",
+    "ajv@6": "6.15.0",
+    "ajv@8": "8.20.0",
+    "uuid@8": "11.1.1",
+    "uuid@11": "11.1.1",
+    "joi@18": "18.2.9"
   }
 }
