@@ -1,192 +1,206 @@
 scan-type: source
 ignore:
+  - vulnerability: CVE-2026-54873
+    include-aliases: true
+    reason: >-
+      Alpine base image package (apk): libcrypto3 3.5.8-r0 / libssl3 3.5.8-r0 - base image node:24.21.0-alpine3.24, no
+      fix in image as of 2026-10-16 (high severity)
+  - vulnerability: CVE-2026-72897
+    include-aliases: true
+    reason: >-
+      Alpine base image package (apk): libcrypto3 3.5.8-r0 / libssl3 3.5.8-r0 - base image node:24.21.0-alpine3.24, no
+      fix in image as of 2026-10-16 (high severity)
+  - vulnerability: CVE-2026-84782
+    include-aliases: true
+    reason: >-
+      Alpine base image package (apk): libcrypto3 3.5.8-r0 / libssl3 3.5.8-r0 - base image node:24.21.0-alpine3.24, no
+      fix in image as of 2026-10-16 (high severity)
+  - vulnerability: CVE-2026-84784
+    include-aliases: true
+    reason: >-
+      Alpine base image package (apk): libcrypto3 3.5.8-r0 / libssl3 3.5.8-r0 - base image node:24.21.0-alpine3.24, no
+      fix in image as of 2026-10-16 (high severity)
   - vulnerability: CVE-2026-85091
     include-aliases: true
     reason: >-
       Alpine base image package (apk): zlib 1.3.2-r0 - base image node:24.21.0-alpine3.24, no fix in image as of
-      2026-09-18 (high severity)
+      2026-10-16 (high severity)
+  - vulnerability: GHSA-6j4f-fj2g-mc7p
+    include-aliases: true
+    reason: >-
+      Base image npm package: brace-expansion 5.0.7 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in
+      image as of 2026-10-16 (high severity)
+  - vulnerability: GHSA-ch52-4w7c-c8xp
+    include-aliases: true
+    reason: >-
+      Base image npm package: http-cache-semantics 4.2.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix
+      in image as of 2026-10-16 (high severity)
   - vulnerability: GHSA-mh99-v99m-4gvg
     include-aliases: true
     reason: >-
       Base image npm package: brace-expansion 5.0.7 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in
-      image as of 2026-09-18 (high severity)
-  - vulnerability: GHSA-rgw5-rvv9-x895
-    include-aliases: true
-    reason: >-
-      Base image npm package: brace-expansion 5.0.7 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in
-      image as of 2026-09-18 (high severity)
+      image as of 2026-10-16 (high severity)
   - vulnerability: GHSA-mwp4-54f8-5fhr
     include-aliases: true
     reason: >-
       Base image npm package: ip-address 10.2.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image
-      as of 2026-09-18 (high severity)
+      as of 2026-10-16 (high severity)
+  - vulnerability: GHSA-qhr7-859c-m2p7
+    include-aliases: true
+    reason: >-
+      Base image npm package: brace-expansion 5.0.7 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in
+      image as of 2026-10-16 (high severity)
   - vulnerability: GHSA-r292-9mhp-454m
     include-aliases: true
     reason: >-
       Base image npm package: tar 7.5.19 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image as of
-      2026-09-18 (high severity)
+      2026-10-16 (high severity)
+  - vulnerability: GHSA-rfgv-xxqx-mfg5
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici 6.27.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image as of
+      2026-10-16 (high severity)
+  - vulnerability: GHSA-rgw5-rvv9-x895
+    include-aliases: true
+    reason: >-
+      Base image npm package: brace-expansion 5.0.7 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in
+      image as of 2026-10-16 (high severity)
   - vulnerability: CVE-2025-60876
     include-aliases: true
     reason: >-
-      Alpine base image package (apk): busybox / busybox-binsh / ssl_client 1.37.0-r31 - base image
-      node:24.21.0-alpine3.24, no fix in image as of 2026-09-18 (medium severity)
+      Alpine base image package (apk): busybox 1.37.0-r31 / busybox-binsh 1.37.0-r31 / ssl_client 1.37.0-r31 - base
+      image node:24.21.0-alpine3.24, no fix in image as of 2026-10-16 (medium severity)
+  - vulnerability: CVE-2026-35189
+    include-aliases: true
+    reason: >-
+      Alpine base image package (apk): libcrypto3 3.5.8-r0 / libssl3 3.5.8-r0 - base image node:24.21.0-alpine3.24, no
+      fix in image as of 2026-10-16 (medium severity)
+  - vulnerability: CVE-2026-42772
+    include-aliases: true
+    reason: >-
+      Alpine base image package (apk): libcrypto3 3.5.8-r0 / libssl3 3.5.8-r0 - base image node:24.21.0-alpine3.24, no
+      fix in image as of 2026-10-16 (medium severity)
+  - vulnerability: CVE-2026-75804
+    include-aliases: true
+    reason: >-
+      Alpine base image package (apk): libcrypto3 3.5.8-r0 / libssl3 3.5.8-r0 - base image node:24.21.0-alpine3.24, no
+      fix in image as of 2026-10-16 (medium severity)
+  - vulnerability: CVE-2026-75805
+    include-aliases: true
+    reason: >-
+      Alpine base image package (apk): libcrypto3 3.5.8-r0 / libssl3 3.5.8-r0 - base image node:24.21.0-alpine3.24, no
+      fix in image as of 2026-10-16 (medium severity)
+  - vulnerability: CVE-2026-75806
+    include-aliases: true
+    reason: >-
+      Alpine base image package (apk): libcrypto3 3.5.8-r0 / libssl3 3.5.8-r0 - base image node:24.21.0-alpine3.24, no
+      fix in image as of 2026-10-16 (medium severity)
   - vulnerability: GHSA-22jq-vg5j-6vgg
     include-aliases: true
     reason: >-
       Base image npm package: ip-address 10.2.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image
-      as of 2026-09-18 (medium severity)
+      as of 2026-10-16 (medium severity)
+  - vulnerability: GHSA-2vr4-cq9g-pvrc
+    include-aliases: true
+    reason: >-
+      Base image npm package: ip-address 10.2.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image
+      as of 2026-10-16 (medium severity)
+  - vulnerability: GHSA-3wwx-pv8p-q78v
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici 6.27.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image as of
+      2026-10-16 (medium severity)
   - vulnerability: GHSA-4xrf-jv44-h6hh
     include-aliases: true
     reason: >-
       Base image npm package: ip-address 10.2.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image
-      as of 2026-09-18 (medium severity)
+      as of 2026-10-16 (medium severity)
   - vulnerability: GHSA-8xcm-r25x-g524
     include-aliases: true
     reason: >-
       Base image npm package: undici 6.27.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image as of
-      2026-09-18 (medium severity)
+      2026-10-16 (medium severity)
+  - vulnerability: GHSA-h3mg-xc3c-68pw
+    include-aliases: true
+    reason: >-
+      Base image npm package: ip-address 10.2.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image
+      as of 2026-10-16 (medium severity)
+  - vulnerability: GHSA-j6r3-76f7-8jcv
+    include-aliases: true
+    reason: >-
+      Base image npm package: ip-address 10.2.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image
+      as of 2026-10-16 (medium severity)
   - vulnerability: GHSA-m8rv-5g2x-5cg5
     include-aliases: true
     reason: >-
       Base image npm package: undici 6.27.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image as of
-      2026-09-18 (medium severity)
+      2026-10-16 (medium severity)
+  - vulnerability: GHSA-q2hr-2g5m-vwhr
+    include-aliases: true
+    reason: >-
+      Base image npm package: brace-expansion 5.0.7 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in
+      image as of 2026-10-16 (medium severity)
+  - vulnerability: GHSA-rj75-hqrm-r3gf
+    include-aliases: true
+    reason: >-
+      Base image npm package: postcss-selector-parser 7.1.4 (bundled in npm) - base image node:24.21.0-alpine3.24, no
+      fix in image as of 2026-10-16 (medium severity)
+  - vulnerability: GHSA-rpw4-54j3-4h4q
+    include-aliases: true
+    reason: >-
+      Base image npm package: ip-address 10.2.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image
+      as of 2026-10-16 (medium severity)
   - vulnerability: GHSA-v3r7-h72x-cjcm
     include-aliases: true
     reason: >-
       Base image npm package: undici 6.27.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image as of
-      2026-09-18 (medium severity)
-  - vulnerability: GHSA-37qj-frw5-hhjh
-  - vulnerability: GHSA-xxjr-mmjv-4gpg
-  - vulnerability: GHSA-7h2j-956f-4vf2
-  - vulnerability: GHSA-5j98-mcp5-4vw2
-  - vulnerability: GHSA-34x7-hfp2-rc4v
-  - vulnerability: GHSA-r6q2-hw4h-h46w
-  - vulnerability: GHSA-8qq5-rm4j-mr97
-  - vulnerability: GHSA-29xp-372q-xqph
-  - vulnerability: GHSA-73rr-hh4g-fpgx
-  - vulnerability: GHSA-3966-f6p6-2qr9
-  - vulnerability: GHSA-g8qq-57p8-ggw5
+      2026-10-16 (medium severity)
+  - vulnerability: CVE-2026-35191
     include-aliases: true
     reason: >-
-      sanitize-html held at 2.17.6: 2.17.7 pulls ESM-only htmlparser2 12, which jest 29 (pinned via .ncurc) cannot load;
-      revisit with the jest 30 upgrade (as of 2026-09-24, moderate severity)
-  - vulnerability: GHSA-jxwj-j7wr-gfrw
+      Alpine base image package (apk): libcrypto3 3.5.8-r0 / libssl3 3.5.8-r0 - base image node:24.21.0-alpine3.24, no
+      fix in image as of 2026-10-16 (low severity)
+  - vulnerability: CVE-2026-54872
     include-aliases: true
     reason: >-
-      sanitize-html held at 2.17.6: 2.17.7 pulls ESM-only htmlparser2 12, which jest 29 (pinned via .ncurc) cannot load;
-      revisit with the jest 30 upgrade (as of 2026-09-24, moderate severity)
-  - vulnerability: GHSA-vccv-cmxp-4j9h
+      Alpine base image package (apk): libcrypto3 3.5.8-r0 / libssl3 3.5.8-r0 - base image node:24.21.0-alpine3.24, no
+      fix in image as of 2026-10-16 (low severity)
+  - vulnerability: CVE-2026-54875
     include-aliases: true
     reason: >-
-      sanitize-html held at 2.17.6: 2.17.7 pulls ESM-only htmlparser2 12, which jest 29 (pinned via .ncurc) cannot load;
-      revisit with the jest 30 upgrade (as of 2026-09-24, moderate severity)
-  - vulnerability: GHSA-qxc2-j82w-r537
+      Alpine base image package (apk): libcrypto3 3.5.8-r0 / libssl3 3.5.8-r0 - base image node:24.21.0-alpine3.24, no
+      fix in image as of 2026-10-16 (low severity)
+  - vulnerability: CVE-2026-77696
     include-aliases: true
     reason: >-
-      @faker-js/faker held at 10.3.0: the fixed 10.5.0 is ESM-only and jest 29 (pinned via .ncurc) cannot load its
-      locale files (21 suites fail). Dev-only test-data generator; revisit with the jest 30 upgrade (as of 2026-09-24,
-      high severity)
-  - vulnerability: GHSA-rfgv-xxqx-mfg5
-    include-aliases: true
-    reason: >-
-      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
-      2026-10-02 (high severity)
-  - vulnerability: GHSA-6j4f-fj2g-mc7p
-    include-aliases: true
-    reason: >-
-      Base image npm package: brace-expansion - bundled in Node.js base image, not fixable via application dependencies
-      as of 2026-10-02 (high severity)
-  - vulnerability: GHSA-qhr7-859c-m2p7
-    include-aliases: true
-    reason: >-
-      Base image npm package: brace-expansion - bundled in Node.js base image, not fixable via application dependencies
-      as of 2026-10-02 (high severity)
-  - vulnerability: GHSA-2vr4-cq9g-pvrc
-    include-aliases: true
-    reason: >-
-      Base image npm package: ip-address - bundled in Node.js base image, not fixable via application dependencies as of
-      2026-10-02 (moderate severity)
-  - vulnerability: GHSA-3wwx-pv8p-q78v
-    include-aliases: true
-    reason: >-
-      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
-      2026-10-02 (moderate severity)
-  - vulnerability: GHSA-rpw4-54j3-4h4q
-    include-aliases: true
-    reason: >-
-      Base image npm package: ip-address - bundled in Node.js base image, not fixable via application dependencies as of
-      2026-10-02 (moderate severity)
-  - vulnerability: GHSA-j6r3-76f7-8jcv
-    include-aliases: true
-    reason: >-
-      Base image npm package: ip-address - bundled in Node.js base image, not fixable via application dependencies as of
-      2026-10-02 (moderate severity)
-  - vulnerability: GHSA-h3mg-xc3c-68pw
-    include-aliases: true
-    reason: >-
-      Base image npm package: ip-address - bundled in Node.js base image, not fixable via application dependencies as of
-      2026-10-02 (moderate severity)
-  - vulnerability: GHSA-q2hr-2g5m-vwhr
-    include-aliases: true
-    reason: >-
-      Base image npm package: brace-expansion - bundled in Node.js base image, not fixable via application dependencies
-      as of 2026-10-02 (moderate severity)
+      Alpine base image package (apk): libcrypto3 3.5.8-r0 / libssl3 3.5.8-r0 - base image node:24.21.0-alpine3.24, no
+      fix in image as of 2026-10-16 (low severity)
   - vulnerability: GHSA-r53p-7pc4-xj5r
     include-aliases: true
     reason: >-
-      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
-      2026-10-02 (low severity)
-  - vulnerability: GHSA-m9gg-hp2v-232j
+      Base image npm package: undici 6.27.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image as of
+      2026-10-16 (low severity)
+  - vulnerability: GHSA-vfj7-8cjw-p6xm
     include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-f596-whhp-79r4
+    reason: >-
+      braces 3.0.3 stack-exhaustion ReDoS - dev-only transitive via @mojaloop/api-snippets > ts-auto-mock > micromatch;
+      no patched release of braces 3.x exists as of 2026-10-16; also allowlisted in audit-ci.jsonc
+  - vulnerability: GHSA-qxc2-j82w-r537
     include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-2gc4-cqfq-p2gv
+    reason: >-
+      @faker-js/faker <=10.4.0 pinned by ml-testing-toolkit-shared-lib 10.3.0 and postman-collection 5.5.3; the fixed
+      10.5 line is ESM-only and cannot load under jest 29; also allowlisted in audit-ci.jsonc
+  - vulnerability: GHSA-g8qq-57p8-ggw5
     include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-qw65-cvwx-89v3
+    reason: >-
+      sanitize-html held at 2.17.6 - 2.17.7 pulls ESM-only htmlparser2 12 which jest 29 (pinned via .ncurc) cannot load;
+      also allowlisted in audit-ci.jsonc
+  - vulnerability: GHSA-jxwj-j7wr-gfrw
     include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-58mr-gqgx-xq4g
+    reason: sanitize-html - same hold as GHSA-g8qq-57p8-ggw5; also allowlisted in audit-ci.jsonc
+  - vulnerability: GHSA-vccv-cmxp-4j9h
     include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-hrr3-gc8f-f4qj
-    include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-253c-mchw-3w2r
-    include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-pmjh-fq2x-6v4x
-    include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-3xpg-4rpp-hhhm
-    include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-2jfj-6hjv-fm6j
-    include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-2gqq-gqf2-x968
-    include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-w293-vg96-wgc3
-    include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-8436-99hf-9mmv
-    include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-rx4f-c7p8-82vq
-    include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-2g4f-4pwh-qvx6
-    include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-jmr7-xgp7-cmfj
-    include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
-  - vulnerability: GHSA-m7jm-9gc2-mpf2
-    include-aliases: true
-    reason: 'Unfixable npm transitive vulnerability: unknown (unknown severity) as of 2026-10-02'
+    reason: sanitize-html - same hold as GHSA-g8qq-57p8-ggw5; also allowlisted in audit-ci.jsonc
 output:
   - table
   - json
