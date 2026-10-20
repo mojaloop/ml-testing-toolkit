@@ -68,7 +68,7 @@ describe('Index', () => {
       })
       ConnectionProvider.initialize.mockResolvedValue()
       Server.initialize.mockResolvedValue()
-      expect(() => {require('../../src/index').default}).not.toThrowError();
+      expect(() => {require('../../src/index').default}).not.toThrow();
     })
 
     it('Init should initialize mbConnectionManager when enabled', async () => {
@@ -86,7 +86,7 @@ describe('Index', () => {
       })
       ConnectionProvider.initialize.mockResolvedValue()
       Server.initialize.mockResolvedValue()
-      expect(() => {require('../../src/index').default}).not.toThrowError();
+      expect(() => {require('../../src/index').default}).not.toThrow();
     })
   })
 })

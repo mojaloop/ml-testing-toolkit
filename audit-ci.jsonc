@@ -5,9 +5,6 @@
   "moderate": true,
   "allowlist": [ // NOTE: Please add as much information as possible to any items added to the allowList
     "GHSA-vfj7-8cjw-p6xm", // braces stack-exhaustion ReDoS - dev-only transitive via @mojaloop/api-snippets > ts-auto-mock > micromatch; no patched release of braces 3.x exists (2026-10-16)
-    "GHSA-qxc2-j82w-r537", // @faker-js/faker <=10.4.0 - pinned by @mojaloop/ml-testing-toolkit-shared-lib (10.3.0) and postman-collection (5.5.3); the fixed 10.5 line is ESM-only and cannot load under jest 29 (held via .ncurc). Revisit with the jest 30 upgrade.
-    "GHSA-g8qq-57p8-ggw5", // sanitize-html held at 2.17.6: 2.17.7 pulls ESM-only htmlparser2 12, which jest 29 (pinned via .ncurc) cannot load
-    "GHSA-jxwj-j7wr-gfrw", // sanitize-html, same hold as above
-    "GHSA-vccv-cmxp-4j9h" // sanitize-html, same hold as above
+    "GHSA-qxc2-j82w-r537", // @faker-js/faker 5.5.3 under postman-collection: postman-sandbox 6.8 still consumes the faker 5 API (faker.address.city), so the copy cannot move to the fixed 10.5 line; the shared-lib copy is on 10.5.0 via a scoped override (2026-10-20)
   ]
 }

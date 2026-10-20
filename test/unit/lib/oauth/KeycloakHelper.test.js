@@ -99,7 +99,7 @@ describe('KeycloakHelper tests', () => {
           toCurl: () => ''
         }
       }))
-      await expect(KeycloakHelper.getKeyCloakUsers(keyCloakToken)).rejects.toThrowError()
+      await expect(KeycloakHelper.getKeyCloakUsers(keyCloakToken)).rejects.toThrow()
     });
   });
   describe('getTokenInfo', () => {
@@ -153,7 +153,7 @@ describe('KeycloakHelper tests', () => {
           toCurl: () => ''
         }
       }))
-      await expect(KeycloakHelper.getTokenInfo(authInfo)).rejects.toThrowError()
+      await expect(KeycloakHelper.getTokenInfo(authInfo)).rejects.toThrow()
     });
     it('should throw an error if there is an error sending http request', async () => {
       SpyGetSystemConfig.mockReturnValue({
@@ -169,7 +169,7 @@ describe('KeycloakHelper tests', () => {
         tokenEndpoint: 'http://localhost/token'
       }
       axios.post.mockImplementation(() => Promise.reject(new Error('Some Error')))
-      await expect(KeycloakHelper.getTokenInfo(authInfo)).rejects.toThrowError()
+      await expect(KeycloakHelper.getTokenInfo(authInfo)).rejects.toThrow()
     });
   });
 
@@ -279,7 +279,7 @@ describe('KeycloakHelper tests', () => {
           toCurl: () => ''
         }
       }))
-      await expect(KeycloakHelper.keycloakAuth()).rejects.toThrowError()
+      await expect(KeycloakHelper.keycloakAuth()).rejects.toThrow()
     });
 
 
@@ -396,7 +396,7 @@ describe('KeycloakHelper tests', () => {
           toCurl: () => ''
         }
       }))
-      await expect(KeycloakHelper.getClientAuthInfo(user)).rejects.toThrowError()
+      await expect(KeycloakHelper.getClientAuthInfo(user)).rejects.toThrow()
     });
     it('should throw error if client not found', async () => {
       SpyGetSystemConfig.mockReturnValue({
@@ -441,7 +441,7 @@ describe('KeycloakHelper tests', () => {
           toCurl: () => ''
         }
       }))
-      await expect(KeycloakHelper.getClientAuthInfo(user)).rejects.toThrowError()
+      await expect(KeycloakHelper.getClientAuthInfo(user)).rejects.toThrow()
     });
     it('should throw error if some error during client creation', async () => {
       SpyGetSystemConfig.mockReturnValue({
@@ -489,7 +489,7 @@ describe('KeycloakHelper tests', () => {
 
       axios.post.mockImplementation(() => Promise.reject(new Error('Some Error')))
 
-      await expect(KeycloakHelper.getClientAuthInfo(user)).rejects.toThrowError()
+      await expect(KeycloakHelper.getClientAuthInfo(user)).rejects.toThrow()
     });
     it('should throw error if authentication failed during client creation', async () => {
       SpyGetSystemConfig.mockReturnValue({
@@ -537,7 +537,7 @@ describe('KeycloakHelper tests', () => {
 
       axios.post.mockImplementation(() => Promise.reject(new Error('Authentication failed', { statusCode: 400 })))
 
-      await expect(KeycloakHelper.getClientAuthInfo(user)).rejects.toThrowError()
+      await expect(KeycloakHelper.getClientAuthInfo(user)).rejects.toThrow()
     });
     it('should throw error if authentication failed to get secret', async () => {
       SpyGetSystemConfig.mockReturnValue({
@@ -591,7 +591,7 @@ describe('KeycloakHelper tests', () => {
         }
       }))
 
-      await expect(KeycloakHelper.getClientAuthInfo(user)).rejects.toThrowError()
+      await expect(KeycloakHelper.getClientAuthInfo(user)).rejects.toThrow()
     });
 
   });

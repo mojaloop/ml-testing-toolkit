@@ -46,14 +46,14 @@
     "standard:fix": "standard --fix",
     "dev": "nodemon src/index.js",
     "test": "npm run test:unit",
-    "test:unit": "jest --testMatch '**/test/unit/**/*.test.js'",
-    "test:int": "jest --reporters=default --reporters=jest-junit --testMatch '**/test/integration/**/*.test.js'",
+    "test:unit": "NODE_OPTIONS=--experimental-vm-modules jest --testMatch '**/test/unit/**/*.test.js'",
+    "test:int": "NODE_OPTIONS=--experimental-vm-modules jest --reporters=default --reporters=jest-junit --testMatch '**/test/integration/**/*.test.js'",
     "test:integration": "echo 'No integration tests defined'",
     "test:func": "cd test/func && docker-compose up --exit-code-from=test-service",
     "test:functional": "npm run docker:build && npm run test:func && npm run docker:down",
-    "test:coverage": "jest --coverage --coverageThreshold='{}' --testMatch '**/test/unit/**/*.test.js'",
-    "test:coverage-check": "jest --coverage --testMatch '**/test/unit/**/*.test.js'",
-    "test:junit": "jest --reporters=default --reporters=jest-junit --testMatch '**/test/unit/**/*.test.js'",
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --coverageThreshold='{}' --testMatch '**/test/unit/**/*.test.js'",
+    "test:coverage-check": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --testMatch '**/test/unit/**/*.test.js'",
+    "test:junit": "NODE_OPTIONS=--experimental-vm-modules jest --reporters=default --reporters=jest-junit --testMatch '**/test/unit/**/*.test.js'",
     "test:xunit": "npm run test:unit > ./test/results/xunit.xml",
     "lint": "npm run standard",
     "lint:fix": "npm run standard:fix",
@@ -81,8 +81,8 @@
     "@hapi/vision": "7.0.3",
     "@mojaloop/central-services-logger": "11.10.7",
     "@mojaloop/central-services-metrics": "12.8.9",
-    "@mojaloop/ml-schema-transformer-lib": "2.10.1",
-    "@mojaloop/ml-testing-toolkit-shared-lib": "14.3.3",
+    "@mojaloop/ml-schema-transformer-lib": "2.10.2",
+    "@mojaloop/ml-testing-toolkit-shared-lib": "14.3.5",
     "@mojaloop/sdk-standard-components": "19.19.3",
     "@now-ims/hapi-now-auth": "2.1.0",
     "@types/socket.io": "3.0.2",
@@ -90,7 +90,7 @@
     "ajv-formats": "3.0.1",
     "atob": "2.1.2",
     "axios": "1.20.0",
-    "chai": "4.4.1",
+    "chai": "6.3.0",
     "connection-string": "^5.0.0",
     "cookie-parser": "1.4.7",
     "cookies": "0.9.2",
@@ -114,28 +114,28 @@
     "mv": "2.1.1",
     "node-dir": "0.1.17",
     "node-strings": "1.0.2",
-    "openapi-backend": "5.16.1",
+    "openapi-backend": "5.22.0",
     "parse-strings-in-object": "1.6.0",
     "passport": "0.7.0",
     "passport-jwt": "4.0.1",
     "path": "0.12.7",
-    "postman-collection": "5.0.0",
-    "postman-sandbox": "6.0.0",
+    "postman-collection": "5.3.1",
+    "postman-sandbox": "6.8.0",
     "rc": "1.2.8",
     "request-to-curl": "0.1.6",
     "selectn": "1.3.0",
     "socket.io": "4.8.4",
     "socket.io-client": "4.8.4",
     "ulidx": "2.4.1",
-    "uuid": "11.1.1",
+    "uuid": "14.0.3",
     "ws": "8.22.0"
   },
   "devDependencies": {
-    "@types/jest": "29.5.14",
+    "@types/jest": "30.0.0",
     "audit-ci": "7.1.0",
     "axios-mock-adapter": "2.1.0",
     "get-port": "7.2.0",
-    "jest": "29.7.0",
+    "jest": "30.5.2",
     "jest-junit": "17.0.0",
     "nodemon": "3.1.14",
     "npm-check-updates": "23.1.1",
@@ -178,7 +178,7 @@
     "lodash-es": "4.18.1",
     "shins": {
       "ejs": "3.1.10",
-      "sanitize-html": "2.12.1"
+      "sanitize-html": "2.17.7"
     },
     "better-ajv-errors": {
       "jsonpointer": "5.0.1"
@@ -190,7 +190,7 @@
       "ajv": "6.15.0"
     },
     "qs": "6.16.0",
-    "flatted": "3.4.2",
+    "flatted": "3.4.4",
     "immutable": "5.1.9",
     "fast-xml-parser": "5.7.0",
     "postcss": "8.5.23",
@@ -233,6 +233,10 @@
     "body-parser@1": "1.20.6",
     "joi@17": "17.13.8",
     "minimatch@3": "3.1.5",
-    "yargs-parser@11": "21.1.1"
+    "yargs-parser@11": "21.1.1",
+    "sanitize-html": "2.17.7",
+    "@mojaloop/ml-testing-toolkit-shared-lib": {
+      "@faker-js/faker": "10.6.0"
+    }
   }
 }

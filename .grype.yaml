@@ -188,19 +188,8 @@ ignore:
   - vulnerability: GHSA-qxc2-j82w-r537
     include-aliases: true
     reason: >-
-      @faker-js/faker <=10.4.0 pinned by ml-testing-toolkit-shared-lib 10.3.0 and postman-collection 5.5.3; the fixed
-      10.5 line is ESM-only and cannot load under jest 29; also allowlisted in audit-ci.jsonc
-  - vulnerability: GHSA-g8qq-57p8-ggw5
-    include-aliases: true
-    reason: >-
-      sanitize-html held at 2.17.6 - 2.17.7 pulls ESM-only htmlparser2 12 which jest 29 (pinned via .ncurc) cannot load;
-      also allowlisted in audit-ci.jsonc
-  - vulnerability: GHSA-jxwj-j7wr-gfrw
-    include-aliases: true
-    reason: sanitize-html - same hold as GHSA-g8qq-57p8-ggw5; also allowlisted in audit-ci.jsonc
-  - vulnerability: GHSA-vccv-cmxp-4j9h
-    include-aliases: true
-    reason: sanitize-html - same hold as GHSA-g8qq-57p8-ggw5; also allowlisted in audit-ci.jsonc
+      @faker-js/faker 5.5.3 under postman-collection: postman-sandbox 6.8 still consumes the faker 5 API, so that copy
+      cannot move to 10.5; the shared-lib copy is on 10.5.0 via a scoped override; also allowlisted in audit-ci.jsonc
 output:
   - table
   - json

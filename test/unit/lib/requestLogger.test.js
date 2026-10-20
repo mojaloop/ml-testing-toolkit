@@ -67,7 +67,7 @@ describe('requestLogger', () => {
       Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
       })
-      expect(() => requestLogger.logRequest(req)).not.toThrowError()
+      expect(() => requestLogger.logRequest(req)).not.toThrow()
     })
     it('should take session id from fspiop-source header if HOSTING_ENABLED is true', async () => {
       const req = {
@@ -90,7 +90,7 @@ describe('requestLogger', () => {
       Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
       })
-      expect(() => requestLogger.logRequest(req)).not.toThrowError()
+      expect(() => requestLogger.logRequest(req)).not.toThrow()
     })
     it('should not throw an error if body is missing', async () => {
       const req = {
@@ -107,7 +107,7 @@ describe('requestLogger', () => {
       Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: false
       })
-      expect(() => requestLogger.logRequest(req)).not.toThrowError()
+      expect(() => requestLogger.logRequest(req)).not.toThrow()
     })
     it('should not throw an error if customInfo is missing', async () => {
       const req = {
@@ -120,7 +120,7 @@ describe('requestLogger', () => {
       Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: false
       })
-      expect(() => requestLogger.logRequest(req)).not.toThrowError()
+      expect(() => requestLogger.logRequest(req)).not.toThrow()
     })
   })
   describe('when logResponse is called', () => {
@@ -140,11 +140,11 @@ describe('requestLogger', () => {
       Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: false
       })
-      expect(() => requestLogger.logResponse(req)).not.toThrowError()
+      expect(() => requestLogger.logResponse(req)).not.toThrow()
     })
     it('should not throw an error if response is missing', async () => {
       const req = {}
-      expect(() => requestLogger.logResponse(req)).not.toThrowError()
+      expect(() => requestLogger.logResponse(req)).not.toThrow()
     })
     it('should not throw an error if customInfo is missing', async () => {
       const req = {
@@ -159,7 +159,7 @@ describe('requestLogger', () => {
       Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: false
       })
-      expect(() => requestLogger.logResponse(req)).not.toThrowError()
+      expect(() => requestLogger.logResponse(req)).not.toThrow()
     })
   })
   describe('when logMessage is called', () => {
@@ -170,7 +170,7 @@ describe('requestLogger', () => {
         additionalData: {},
         notification: false
       }
-      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()
+      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrow()
     })
     it('with verbosity warn then should not throw an error', async () => {
       const verbosity = 'warn'
@@ -178,7 +178,7 @@ describe('requestLogger', () => {
       const externalData = {
         notification: false
       }
-      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()
+      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrow()
     })
     it('with verbosity error then should not throw an error', async () => {
       const verbosity = 'error'
@@ -186,7 +186,7 @@ describe('requestLogger', () => {
       const externalData = {
         notification: false
       }
-      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()
+      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrow()
     })
     it('with verbosity default then should not throw an error', async () => {
       const verbosity = 'default'
@@ -194,7 +194,7 @@ describe('requestLogger', () => {
       const externalData = {
         notification: false
       }
-      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()
+      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrow()
     })
     it('when request is empty should not throw an error', async () => {
       const verbosity = 'info'
@@ -202,7 +202,7 @@ describe('requestLogger', () => {
       Config.getSystemConfig.mockReturnValue({
         HOSTING_ENABLED: false
       })
-      expect(() => requestLogger.logMessage(verbosity,message)).not.toThrowError()
+      expect(() => requestLogger.logMessage(verbosity,message)).not.toThrow()
     })
     it('when request is not empty should not throw an error', async () => {
       const verbosity = 'info'
@@ -226,7 +226,7 @@ describe('requestLogger', () => {
       Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
       })
-      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()
+      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrow()
     })
     it('when request is not empty should not throw an error', async () => {
       const verbosity = 'info'
@@ -244,7 +244,7 @@ describe('requestLogger', () => {
       Config.getSystemConfig.mockReturnValueOnce({
         HOSTING_ENABLED: true
       })
-      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrowError()
+      expect(() => requestLogger.logMessage(verbosity,message,externalData)).not.toThrow()
     })
   })
 })
