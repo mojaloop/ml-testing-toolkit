@@ -76,8 +76,8 @@
     "@hapi/basic": "7.0.2",
     "@hapi/boom": "10.0.1",
     "@hapi/good": "9.0.1",
-    "@hapi/hapi": "21.4.10",
-    "@hapi/inert": "7.1.2",
+    "@hapi/hapi": "21.4.11",
+    "@hapi/inert": "7.1.3",
     "@hapi/vision": "7.0.3",
     "@mojaloop/central-services-logger": "11.10.7",
     "@mojaloop/central-services-metrics": "12.8.9",
@@ -108,8 +108,8 @@
     "json-rules-engine": "7.3.1",
     "jsonwebtoken": "9.0.3",
     "lodash": "4.18.1",
-    "mongoose": "9.11.2",
-    "multer": "2.4.0",
+    "mongoose": "9.11.3",
+    "multer": "2.5.0",
     "mustache": "4.2.0",
     "mv": "2.1.1",
     "node-dir": "0.1.17",
@@ -120,7 +120,7 @@
     "passport-jwt": "4.0.1",
     "path": "0.12.7",
     "postman-collection": "5.3.1",
-    "postman-sandbox": "6.8.0",
+    "postman-sandbox": "6.9.0",
     "rc": "1.2.8",
     "request-to-curl": "0.1.6",
     "selectn": "1.3.0",
@@ -178,13 +178,13 @@
     "lodash-es": "4.18.1",
     "shins": {
       "ejs": "3.1.10",
-      "sanitize-html": "2.17.7"
+      "sanitize-html": "2.18.1"
     },
     "better-ajv-errors": {
       "jsonpointer": "5.0.1"
     },
     "cross-spawn": "7.0.6",
-    "markdown-it": "14.3.1",
+    "markdown-it": "14.3.3",
     "jsonwebtoken": "9.0.3",
     "oas-validator": {
       "ajv": "6.15.0"
@@ -209,7 +209,7 @@
     "@opentelemetry/core": "2.8.0",
     "yaml": "2.9.1",
     "baseline-browser-mapping": "2.11.0",
-    "follow-redirects": "1.16.0",
+    "follow-redirects": "1.16.1",
     "@babel/core": "7.29.6",
     "serialize-error": "8.1.0",
     "js-yaml@4": "4.3.2",
@@ -234,7 +234,7 @@
     "joi@17": "17.13.8",
     "minimatch@3": "3.1.5",
     "yargs-parser@11": "21.1.1",
-    "sanitize-html": "2.17.7",
+    "sanitize-html": "2.18.1",
     "@mojaloop/ml-testing-toolkit-shared-lib": {
       "@faker-js/faker": "10.6.0"
     }
