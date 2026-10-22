@@ -98,7 +98,7 @@ describe('dfspMockUsers', () => {
       axios.get.mockReturnValueOnce({
         status: 500
       })
-      await expect(dfspMockUsers.getDFSPList()).rejects.toThrowError()
+      await expect(dfspMockUsers.getDFSPList()).rejects.toThrow()
     })
     it('should throw an error if hosting and keycloak enabled and oauth requests fail', async () => {
       Config.getSystemConfig.mockReturnValue({
@@ -121,7 +121,7 @@ describe('dfspMockUsers', () => {
       axios.get.mockReturnValueOnce({
         status: 500
       })
-      await expect(dfspMockUsers.getDFSPList()).rejects.toThrowError()
+      await expect(dfspMockUsers.getDFSPList()).rejects.toThrow()
     })
     it('should return dfsp wise list if hosting disabled and hub only mode enabled', async () => {
       Config.getSystemConfig.mockReturnValue({

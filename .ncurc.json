@@ -1,0 +1,6 @@
+{
+  "reject": [
+    "@types/node",
+    "why-types-node: its major must match the Node runtime major in .nvmrc (24); a higher major only weakens type checking; bump together with the runtime"
+  ]
+}

@@ -4,8 +4,7 @@
   // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
   "moderate": true,
   "allowlist": [ // NOTE: Please add as much information as possible to any items added to the allowList
-    "GHSA-m7jm-9gc2-mpf2",
-    "GHSA-2g4f-4pwh-qvx6",
-    "GHSA-jmr7-xgp7-cmfj"
+    "GHSA-vfj7-8cjw-p6xm", // braces stack-exhaustion ReDoS - dev-only transitive via @mojaloop/api-snippets > ts-auto-mock > micromatch; no patched release of braces 3.x exists (2026-10-16)
+    "GHSA-qxc2-j82w-r537", // @faker-js/faker 5.5.3 under postman-collection: postman-sandbox 6.8 still consumes the faker 5 API (faker.address.city), so the copy cannot move to the fixed 10.5 line; the shared-lib copy is on 10.5.0 via a scoped override (2026-10-20)
   ]
 }

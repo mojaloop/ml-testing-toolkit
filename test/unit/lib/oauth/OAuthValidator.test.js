@@ -115,7 +115,7 @@ describe('OAuthValidator tests', () => {
           EMBEDDED_CERTIFICATE: 'asdf'
         }
       });
-      await expect(OAuthValidator.verifyToken(token)).rejects.toThrowError()
+      await expect(OAuthValidator.verifyToken(token)).rejects.toThrow()
     });
     it('should throw an error when jwtPayload has no iss', async () => {
       SpyVerify.mockImplementation((token, secret, options, callback) => {
@@ -126,7 +126,7 @@ describe('OAuthValidator tests', () => {
           EMBEDDED_CERTIFICATE: 'asdf'
         }
       });
-      await expect(OAuthValidator.verifyToken(token)).rejects.toThrowError()
+      await expect(OAuthValidator.verifyToken(token)).rejects.toThrow()
     });
     it('should throw an error when jwtPayload has no clientId', async () => {
       SpyVerify.mockImplementation((token, secret, options, callback) => {
@@ -137,7 +137,7 @@ describe('OAuthValidator tests', () => {
           EMBEDDED_CERTIFICATE: 'asdf'
         }
       });
-      await expect(OAuthValidator.verifyToken(token)).rejects.toThrowError()
+      await expect(OAuthValidator.verifyToken(token)).rejects.toThrow()
     });
     it('should throw an error when jwtPayload is empty', async () => {
       SpyVerify.mockImplementation((token, secret, options, callback) => {
@@ -148,7 +148,7 @@ describe('OAuthValidator tests', () => {
           EMBEDDED_CERTIFICATE: 'asdf'
         }
       });
-      await expect(OAuthValidator.verifyToken(token)).rejects.toThrowError()
+      await expect(OAuthValidator.verifyToken(token)).rejects.toThrow()
     });
 
   });

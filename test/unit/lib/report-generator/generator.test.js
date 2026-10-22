@@ -142,7 +142,7 @@ describe('Report Generator', () => {
     })
     it('generateReport should throw error', async () => {
       HandlebarsCompile.mockReturnValue(null)
-      await expect(ReportGenerator.generateReport(sampleJsonReport, 'html')).rejects.toThrowError()
+      await expect(ReportGenerator.generateReport(sampleJsonReport, 'html')).rejects.toThrow()
     })
   })
 
@@ -157,7 +157,7 @@ describe('Report Generator', () => {
     })
 
     it('generateReport should not throw error for format html', async () => {
-      await expect(ReportGenerator.generateReport(sampleJsonReport, 'html')).rejects.toThrowError()
+      await expect(ReportGenerator.generateReport(sampleJsonReport, 'html')).rejects.toThrow()
     })
   })
 

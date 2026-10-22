@@ -306,7 +306,7 @@ describe('Test Outbound Context', () => {
         contextObj.ctx.dispose()
         contextObj.ctx = null
       }
-      expect(spyNotificationEmitterSendMessage).toBeCalled()
+      expect(spyNotificationEmitterSendMessage).toHaveBeenCalled()
     })
 
     it('executeAsync should call custom.setRequestTimeout function', async () => {

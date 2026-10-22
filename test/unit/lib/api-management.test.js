@@ -49,7 +49,7 @@ const SpyGetUserConfig = jest.spyOn(Config, 'getUserConfig')
 describe('API Management', () => {
   describe('validateDefinition', () => {
     it('should not throw an error', async () => {
-      await expect(APIManagement.validateDefinition(specFilePrefix + 'api_spec_sync.yaml')).resolves.not.toThrowError()
+      await expect(APIManagement.validateDefinition(specFilePrefix + 'api_spec_sync.yaml')).resolves.not.toThrow()
       expect(OpenApiBackend).toHaveBeenCalledTimes(1);
     })
   })
@@ -99,7 +99,7 @@ describe('API Management', () => {
       SpyGetUserConfig.mockReturnValue({
         ILP_SECRET: 'sample'
       })
-      await expect(APIManagement.deleteDefinition('name', '1.0')).rejects.toThrowError()
+      await expect(APIManagement.deleteDefinition('name', '1.0')).rejects.toThrow()
     })
     it('should throw an error when API not found', async () => {
       SpyGetSystemConfig.mockReturnValue({
@@ -108,7 +108,7 @@ describe('API Management', () => {
       SpyGetUserConfig.mockReturnValue({
         ILP_SECRET: 'sample'
       })
-      await expect(APIManagement.deleteDefinition('name', '1.0')).rejects.toThrowError()
+      await expect(APIManagement.deleteDefinition('name', '1.0')).rejects.toThrow()
     })
   })
   describe('patchDefinitionParams', () => {
@@ -142,7 +142,7 @@ describe('API Management', () => {
       SpyGetSystemConfig.mockReturnValue({
         API_DEFINITIONS: []
       })
-      await expect(APIManagement.patchDefinitionParams('name', '1.0', { hostnames: ['hostname1', 'hostname2'] })).rejects.toThrowError()
+      await expect(APIManagement.patchDefinitionParams('name', '1.0', { hostnames: ['hostname1', 'hostname2'] })).rejects.toThrow()
     })
   })
 })

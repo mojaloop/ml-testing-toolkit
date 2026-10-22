@@ -1,0 +1,12 @@
+{
+  "exceptions": {
+    "oer-utils@5.1.2": {
+      "reason": "Apache-2.0 licensed (LICENSE file in package: 'Licensed under the Apache License, Version 2.0', Copyright 2016 JS Foundation / Ripple, Inc.) but the upstream package.json omits the license field, so syft reads it as empty. Transitive via @mojaloop/sdk-standard-components (ilp-packet). Verified 2026-07-07.",
+      "expires": "2026-12-31"
+    },
+    "pause@0.0.1": {
+      "reason": "MIT per the package's own README and the connect/express lineage it comes from (tj/pause); the published package.json omits the license field, so the scanner reads it as empty. Transitive via the express stack. Added 2026-09-24.",
+      "expires": "2026-12-31"
+    }
+  }
+}
