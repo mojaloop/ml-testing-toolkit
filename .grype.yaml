@@ -190,6 +190,9 @@ ignore:
     reason: >-
       @faker-js/faker 5.5.3 under postman-collection: postman-sandbox 6.8 still consumes the faker 5 API, so that copy
       cannot move to 10.5; the shared-lib copy is on 10.5.0 via a scoped override; also allowlisted in audit-ci.jsonc
+  - vulnerability: CVE-2026-107891
+    include-aliases: true
+    reason: 'Alpine base image package (apk): musl - no npm fix available as of 2026-10-22 (info severity)'
 output:
   - table
   - json
