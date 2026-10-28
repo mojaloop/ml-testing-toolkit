@@ -188,6 +188,36 @@ ignore:
   - vulnerability: CVE-2026-107891
     include-aliases: true
     reason: 'Alpine base image package (apk): musl - no npm fix available as of 2026-10-22 (info severity)'
+  - vulnerability: GHSA-xjj6-f33q-929c
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (high severity)
+  - vulnerability: GHSA-rxp7-6hxx-x8q5
+    include-aliases: true
+    reason: >-
+      Base image npm package: ip-address - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (moderate severity)
+  - vulnerability: GHSA-4qv8-2p9j-2685
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (moderate severity)
+  - vulnerability: GHSA-9fm3-97px-rjf6
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (moderate severity)
+  - vulnerability: GHSA-qrxm-fqhp-jwvm
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (high severity)
+  - vulnerability: GHSA-2m5v-pch6-74hx
+    include-aliases: true
+    reason: >-
+      Base image npm package: undici - bundled in Node.js base image, not fixable via application dependencies as of
+      2026-10-28 (high severity)
 output:
   - table
   - json
