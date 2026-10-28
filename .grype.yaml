@@ -180,11 +180,6 @@ ignore:
     reason: >-
       Base image npm package: undici 6.27.0 (bundled in npm) - base image node:24.21.0-alpine3.24, no fix in image as of
       2026-10-16 (low severity)
-  - vulnerability: GHSA-vfj7-8cjw-p6xm
-    include-aliases: true
-    reason: >-
-      braces 3.0.3 stack-exhaustion ReDoS - dev-only transitive via @mojaloop/api-snippets > ts-auto-mock > micromatch;
-      no patched release of braces 3.x exists as of 2026-10-16; also allowlisted in audit-ci.jsonc
   - vulnerability: GHSA-qxc2-j82w-r537
     include-aliases: true
     reason: >-
