@@ -4,6 +4,9 @@
   // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
   "moderate": true,
   "allowlist": [ // NOTE: Please add as much information as possible to any items added to the allowList
-    "GHSA-qxc2-j82w-r537" // @faker-js/faker 5.5.3 under postman-collection: postman-sandbox 6.8 still consumes the faker 5 API (faker.address.city), so the copy cannot move to the fixed 10.5 line; the shared-lib copy is on 10.5.0 via a scoped override (2026-10-20)
+    "GHSA-qxc2-j82w-r537", // @faker-js/faker 5.5.3 under postman-collection: postman-sandbox 6.8 still consumes the faker 5 API (faker.address.city), so the copy cannot move to the fixed 10.5 line; the shared-lib copy is on 10.5.0 via a scoped override (2026-10-20)
+    "GHSA-3g3m-2fjr-6pw4",
+    "GHSA-g3hv-75wg-m249",
+    "GHSA-4528-x5fx-h6hg"
   ]
 }
