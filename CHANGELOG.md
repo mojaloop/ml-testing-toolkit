@@ -1,4 +1,16 @@
 # Changelog: [mojaloop/thirdparty-api-svc](https://github.com/mojaloop/thirdparty-api-svc)
+### [18.19.3](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.19.2...v18.19.3) (2026-11-24)
+
+
+### Bug Fixes
+
+* **security:** patch 92 vulnerabilities + update deps, orb, docker ([#378](https://github.com/mojaloop/ml-testing-toolkit/issues/378)) ([f85a3a8](https://github.com/mojaloop/ml-testing-toolkit/commit/f85a3a8a02dae24084c324dadd3ac2ee4b3eb496))
+
+
+### Chore
+
+* **sbom:** update sbom [skip ci] ([bd1bc7e](https://github.com/mojaloop/ml-testing-toolkit/commit/bd1bc7e90e4c9cc84b606b868a04dfd744f6338b))
+
 ### [18.19.2](https://github.com/mojaloop/ml-testing-toolkit/compare/v18.19.1...v18.19.2) (2026-02-26)
 
 
