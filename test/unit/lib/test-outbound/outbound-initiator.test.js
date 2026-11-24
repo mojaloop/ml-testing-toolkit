@@ -927,7 +927,7 @@ describe('Outbound Initiator Functions', () => {
         body: sampleRequest.body,
         ignoreCallbacks: null
       }
-      await expect(OutboundInitiator.sendRequest(testRequestObj, null, null, 'notExistingDfsp')).rejects.toThrowError()
+      await expect(OutboundInitiator.sendRequest(testRequestObj, null, null, 'notExistingDfsp')).rejects.toThrow()
     })
     it('sendRequest should call axios with appropriate params 9 and with CLIENT_MUTUAL_TLS_ENABLED', async () => {
       axios.mockImplementation(() => Promise.resolve({
@@ -1939,7 +1939,7 @@ describe('Outbound Initiator Functions', () => {
       const sampleTemplateModified4 = JSON.parse(JSON.stringify(sampleTemplate))
       sampleTemplateModified4.saveReport = true
       await OutboundInitiator.OutboundSend(sampleTemplateModified4, '123')
-      expect(spyDbAdapterUpsertReport).toBeCalled()
+      expect(spyDbAdapterUpsertReport).toHaveBeenCalled()
     })
     it('OutboundSend with saveReport enabled - error case', async () => {
       SpyGetApiDefinitions.mockResolvedValueOnce([{
@@ -1960,7 +1960,7 @@ describe('Outbound Initiator Functions', () => {
       const sampleTemplateModified4 = JSON.parse(JSON.stringify(sampleTemplate))
       sampleTemplateModified4.saveReport = true
       await OutboundInitiator.OutboundSend(sampleTemplateModified4, '123')
-      expect(spyDbAdapterUpsertReport).toBeCalled()
+      expect(spyDbAdapterUpsertReport).toHaveBeenCalled()
     })
 
     it('OutboundSend with sync option enabled', async () => {

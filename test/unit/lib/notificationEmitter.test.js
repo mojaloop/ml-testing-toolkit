@@ -42,37 +42,37 @@ jest.mock('../../../src/lib/socket-server',() => ({
 describe('NotificationEmitter', () => {
   describe('broadcastLog', () => {
     it('should not throw an error when sessionID is missing', () => {
-      expect(() => NotificationEmitter.broadcastLog({})).not.toThrowError()
+      expect(() => NotificationEmitter.broadcastLog({})).not.toThrow()
     })
     it('should not throw an error', () => {
-      expect(() => NotificationEmitter.broadcastLog({}, 'sessionID')).not.toThrowError()
+      expect(() => NotificationEmitter.broadcastLog({}, 'sessionID')).not.toThrow()
     })
     it('should not throw error when sessionID is provided', () => {
-      expect(() => NotificationEmitter.broadcastLog({}, 'sessionID')).not.toThrowError()
+      expect(() => NotificationEmitter.broadcastLog({}, 'sessionID')).not.toThrow()
     })
   })
   describe('broadcastOutboundLog', () => {
     it('should not throw an error when sessionID is missing', () => {
-      expect(() => NotificationEmitter.broadcastOutboundLog({})).not.toThrowError()
+      expect(() => NotificationEmitter.broadcastOutboundLog({})).not.toThrow()
     })
     it('should not throw an error', () => {
-      expect(() => NotificationEmitter.broadcastOutboundLog({}, 'sessionID')).not.toThrowError()
+      expect(() => NotificationEmitter.broadcastOutboundLog({}, 'sessionID')).not.toThrow()
     })
   })
   describe('broadcastOutboundProgress', () => {
     it('should not throw an error when sessionID is missing', () => {
-      expect(() => NotificationEmitter.broadcastOutboundProgress({})).not.toThrowError()
+      expect(() => NotificationEmitter.broadcastOutboundProgress({})).not.toThrow()
     })
     it('should not throw an error', () => {
-      expect(() => NotificationEmitter.broadcastOutboundProgress({}, 'sessionID')).not.toThrowError()
+      expect(() => NotificationEmitter.broadcastOutboundProgress({}, 'sessionID')).not.toThrow()
     })
   })
   describe('sendMessage', () => {
     it('should not throw an error when sessionID is missing', () => {
-      expect(() => NotificationEmitter.sendMessage({})).not.toThrowError()
+      expect(() => NotificationEmitter.sendMessage({})).not.toThrow()
     })
     it('should not throw an error', () => {
-      expect(() => NotificationEmitter.sendMessage({}, 'sessionID')).not.toThrowError()
+      expect(() => NotificationEmitter.sendMessage({}, 'sessionID')).not.toThrow()
     })
   })
 })

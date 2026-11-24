@@ -1,0 +1,8 @@
+{
+  "reject": [
+    "@types/node",
+    "why-types-node: its major must match the Node runtime major in .nvmrc (24); a higher major only weakens type checking; bump together with the runtime",
+    "@mojaloop/central-services-logger",
+    "why-central-services-logger: 12.x no longer handles uncaught exceptions or unhandled rejections, so Node's default (exit 1) applies; TTK runs user scripts that can leave a promise rejected, and with logger 11 that was logged and the server kept running, while with 12 one bad script restarts the TTK for everyone. Held at 11.x until TTK installs its own handlers (review on #378, 2026-11-23)"
+  ]
+}

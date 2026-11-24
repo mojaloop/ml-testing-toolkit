@@ -216,11 +216,11 @@ describe('JwsSigning', () => {
 
       it('Without data property', async () => {
         const { data, ...tmpReqOpts } = reqOpts
-        await expect(JwsSigning.sign(tmpReqOpts)).rejects.toThrowError()
+        await expect(JwsSigning.sign(tmpReqOpts)).rejects.toThrow()
       })
       it('Without header property', async () => {
         const { headers, ...tmpReqOpts } = reqOpts
-        await expect(JwsSigning.sign(tmpReqOpts)).rejects.toThrowError()
+        await expect(JwsSigning.sign(tmpReqOpts)).rejects.toThrow()
       })
     })
     describe('Passing invalid key', () => {
@@ -230,11 +230,11 @@ describe('JwsSigning', () => {
       reqOpts.data = reqOpts.body
       it('Without private key', async () => {
         mockDefinePrivateKey(null)
-        await expect(JwsSigning.sign(reqOpts)).rejects.toThrowError()
+        await expect(JwsSigning.sign(reqOpts)).rejects.toThrow()
       })
       it('With invalid key', async () => {
         mockDefinePrivateKey('asdf')
-        await expect(JwsSigning.sign(reqOpts)).rejects.toThrowError()
+        await expect(JwsSigning.sign(reqOpts)).rejects.toThrow()
       })
     })
   })
@@ -263,21 +263,21 @@ describe('JwsSigning', () => {
       })
       it('Without payload property', async () => {
         const { payload, ...tmpReqOpts } = reqOpts
-        await expect(JwsSigning.validate(tmpReqOpts)).rejects.toThrowError();
+        await expect(JwsSigning.validate(tmpReqOpts)).rejects.toThrow();
       })
       it('Without header property', async () => {
         const { headers, ...tmpReqOpts } = reqOpts
-        await expect(JwsSigning.validate(tmpReqOpts)).rejects.toThrowError();
+        await expect(JwsSigning.validate(tmpReqOpts)).rejects.toThrow();
       })
     })
     describe('Passing invalid keys', () => {
       it('Without public certificate', async () => {
         mockDefinePublicCert(null)
-        await expect(JwsSigning.validate(reqOpts)).rejects.toThrowError();
+        await expect(JwsSigning.validate(reqOpts)).rejects.toThrow();
       })
       it('With invalid certificate4', async () => {
         mockDefinePublicCert('asdf')
-        await expect(JwsSigning.validate(reqOpts)).rejects.toThrowError();
+        await expect(JwsSigning.validate(reqOpts)).rejects.toThrow();
       })
     })
   })

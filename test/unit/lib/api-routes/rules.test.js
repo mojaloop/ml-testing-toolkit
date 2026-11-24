@@ -133,7 +133,7 @@ describe('API route /api/rules', () => {
         ImportExport.exportSpecFile.mockResolvedValueOnce()
         const res = await request(app).get(`/api/rules/files/validation/test.json/export`)
         expect(res.statusCode).toEqual(200)
-        expect(ImportExport.exportSpecFile).toBeCalledWith(
+        expect(ImportExport.exportSpecFile).toHaveBeenCalledWith(
           'rules_validation/test.json', undefined
         )
       })
@@ -147,7 +147,7 @@ describe('API route /api/rules', () => {
           .query({rulesFilename})
           .send({buffer: Buffer.from([])})
         expect(res.statusCode).toEqual(200)
-        expect(ImportExport.importSpecFile).toBeCalledWith(
+        expect(ImportExport.importSpecFile).toHaveBeenCalledWith(
           expect.any(Object),
           'rules_validation/test.json',
           undefined
@@ -311,7 +311,7 @@ describe('API route /api/rules', () => {
         ImportExport.exportSpecFile.mockResolvedValueOnce()
         const res = await request(app).get(`/api/rules/files/callback/test.json/export`)
         expect(res.statusCode).toEqual(200)
-        expect(ImportExport.exportSpecFile).toBeCalledWith(
+        expect(ImportExport.exportSpecFile).toHaveBeenCalledWith(
           'rules_callback/test.json', undefined
         )
       })
@@ -325,7 +325,7 @@ describe('API route /api/rules', () => {
           .query({rulesFilename})
           .send({buffer: Buffer.from([])})
         expect(res.statusCode).toEqual(200)
-        expect(ImportExport.importSpecFile).toBeCalledWith(
+        expect(ImportExport.importSpecFile).toHaveBeenCalledWith(
           expect.any(Object),
           'rules_callback/test.json',
           undefined
@@ -413,7 +413,7 @@ describe('API route /api/rules', () => {
         ImportExport.exportSpecFile.mockResolvedValueOnce()
         const res = await request(app).get(`/api/rules/files/response/test.json/export`)
         expect(res.statusCode).toEqual(200)
-        expect(ImportExport.exportSpecFile).toBeCalledWith(
+        expect(ImportExport.exportSpecFile).toHaveBeenCalledWith(
           'rules_response/test.json', undefined
         )
       })
@@ -427,7 +427,7 @@ describe('API route /api/rules', () => {
           .query({rulesFilename})
           .send({buffer: Buffer.from([])})
         expect(res.statusCode).toEqual(200)
-        expect(ImportExport.importSpecFile).toBeCalledWith(
+        expect(ImportExport.importSpecFile).toHaveBeenCalledWith(
           expect.any(Object),
           'rules_response/test.json',
           undefined

@@ -52,7 +52,7 @@ describe('Socket Server', () => {
       await Config.getObjectStoreInitConfig()
       const httpMock = jest.mock()
       SocketServer.initServer(httpMock)
-      expect(socketIO).toBeCalledWith(
+      expect(socketIO).toHaveBeenCalledWith(
         httpMock, {
           cors: expect.any(Object),
           pingInterval: 1,
