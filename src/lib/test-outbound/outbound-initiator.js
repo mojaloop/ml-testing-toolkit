@@ -182,6 +182,7 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metr
       const startedTimeStamp = new Date()
       // Deep copy the template
       const tmpTemplate = JSON.parse(JSON.stringify(inputTemplate))
+      const lib = TestCaseRunner.lib(tmpTemplate)
       // Execute all the test cases in the template
       for (const i in tmpTemplate.test_cases) {
         await processTestCase(
@@ -195,7 +196,8 @@ const OutboundSendLoop = async (inputTemplate, traceID, dfspId, iterations, metr
           metrics,
           tmpTemplate.name,
           tmpTemplate.saveReport,
-          i
+          i,
+          lib
         )
       }
       const completedTimeStamp = new Date()
@@ -255,7 +257,8 @@ const processTestCase = async (
   metrics,
   templateName,
   saveReport,
-  testCaseIndex
+  testCaseIndex,
+  lib
 ) => {
   const tracing = getTracing(traceID)
   const testCaseStartedTime = new Date()
@@ -265,6 +268,12 @@ const processTestCase = async (
   // Store the request ids into a new array
   const templateIDArr = []
   for (const i in testCase.requests) {
+    if (testCase.requests[i].call) {
+      testCase.requests[i] = _.merge(
+        structuredClone(requestsObj[testCase.requests[i].call] ?? lib[testCase.requests[i].call]),
+        testCase.requests[i]
+      )
+    }
     requestsObj[testCase.requests[i].id] = testCase.requests[i]
     templateIDArr.push(testCase.requests[i].id)
   }
